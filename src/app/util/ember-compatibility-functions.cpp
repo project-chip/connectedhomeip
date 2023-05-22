@@ -27,6 +27,7 @@
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
+#include <app/att-storage.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
@@ -45,7 +46,6 @@
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/Constants.h>
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-type.h>
 
 #include <zap-generated/endpoint_config.h>

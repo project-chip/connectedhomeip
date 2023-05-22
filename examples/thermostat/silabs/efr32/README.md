@@ -162,7 +162,7 @@ arguments
 -   On the command line:
 
           $ cd ~/connectedhomeip/examples/thermostat/silabs/efr32
-          $ python3 out/debug/chip-efr32-thermostat-switch-example.flash.py
+          $ python3 out/debug/matter-silabs-thermostat-switch-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 

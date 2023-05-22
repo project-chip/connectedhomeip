@@ -61,6 +61,28 @@
 #define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION SL_HARDWARE_VERSION
 #endif
 
+/**
+ *  Allow for some test/fall-back values to be used
+ * Production builds shall set to 0 or remove this option
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+#define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+/**
+ *  @brief Fallback value for the basic information cluster's Vendor name attribute
+ *   if the actual vendor name is not provisioned in the device memory.
+ */
+#define CHIP_DEVICE_CONFIG_TEST_VENDOR_NAME "Silabs"
+
+/**
+ *  @brief Fallback value for the basic information cluster's product name attribute
+ *   if the actual vendor name is not provisioned in the device memory.
+ */
+#define CHIP_DEVICE_CONFIG_TEST_PRODUCT_NAME "SL_Sample"
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
+
 #if defined(SL_WIFI)
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 1
 #else

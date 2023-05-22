@@ -74,6 +74,7 @@
             "pump-configuration-and-control-client"
         ],
         "PWM_CLUSTER": [],
+        "REFRIGERATOR_ALARM": [],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
         "SCENES_CLUSTER": [],
         "SMOKE_CO_ALARM_CLUSTER": [],
@@ -97,6 +98,7 @@
         "WATER_TANK_MONITORING_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "WINDOW_COVERING_CLUSTER": [],
+        "TEMPERATURE_CONTROL_CLUSTER": [],
         "ZEOLITE_FILTER_MONITORING_CLUSTER": [],
         "ZLL_COMMISSIONING_CLUSTER": []
     },
@@ -176,6 +178,7 @@
             "pump-configuration-and-control-server"
         ],
         "PWM_CLUSTER": [],
+        "REFRIGERATOR_ALARM_CLUSTER": ["refrigerator-alarm-server"],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
         "SCENES_CLUSTER": ["scenes"],
         "SMOKE_CO_ALARM_CLUSTER": [],
@@ -199,6 +202,7 @@
         "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
+        "TEMPERATURE_CONTROL_CLUSTER": ["temperature-control-server"],
         "ZLL_COMMISSIONING_CLUSTER": []
     }
 }

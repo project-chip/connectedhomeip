@@ -107,7 +107,7 @@ OnOffServer & OnOffServer::Instance()
     return instance;
 }
 
-bool OnOffServer::HasFeature(chip::EndpointId endpoint, OnOffFeature feature)
+bool OnOffServer::HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     bool success;
     uint32_t featureMap;
@@ -138,7 +138,7 @@ static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
         return false;
     }
 
-    return LevelControlHasFeature(endpoint, LevelControl::LevelControlFeature::kOnOff);
+    return LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff);
 }
 #endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
