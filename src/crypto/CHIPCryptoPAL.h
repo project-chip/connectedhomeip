@@ -43,14 +43,15 @@ namespace Crypto {
 
 constexpr size_t kMax_x509_Certificate_Length = 600;
 
-constexpr size_t kP256_FE_Length                   = 32;
-constexpr size_t kP256_ECDSA_Signature_Length_Raw  = (2 * kP256_FE_Length);
-constexpr size_t kP256_Point_Length                = (2 * kP256_FE_Length + 1);
-constexpr size_t kSHA256_Hash_Length               = 32;
-constexpr size_t kSHA1_Hash_Length                 = 20;
-constexpr size_t kSubjectKeyIdentifierLength       = kSHA1_Hash_Length;
-constexpr size_t kAuthorityKeyIdentifierLength     = kSHA1_Hash_Length;
-constexpr size_t kMaxCertificateSerialNumberLength = 20;
+constexpr size_t kP256_FE_Length                        = 32;
+constexpr size_t kP256_ECDSA_Signature_Length_Raw       = (2 * kP256_FE_Length);
+constexpr size_t kP256_Point_Length                     = (2 * kP256_FE_Length + 1);
+constexpr size_t kSHA256_Hash_Length                    = 32;
+constexpr size_t kSHA1_Hash_Length                      = 20;
+constexpr size_t kSubjectKeyIdentifierLength            = kSHA1_Hash_Length;
+constexpr size_t kAuthorityKeyIdentifierLength          = kSHA1_Hash_Length;
+constexpr size_t kMaxCertificateSerialNumberLength      = 20;
+constexpr size_t kMaxCertificateDistinguishedNameLength = 200;
 
 constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
@@ -1571,6 +1572,16 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
  * @brief Extracts Serial Number from X509 Certificate.
  **/
 CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, MutableByteSpan & serialNumber);
+
+/**
+ * @brief Extracts Subject Distinguished Name from X509 Certificate. The value is copied into buffer in a raw ASN.1 X.509 format.
+ **/
+CHIP_ERROR ExtractSubjectFromX509Cert(const ByteSpan & certificate, MutableByteSpan & subject);
+
+/**
+ * @brief Extracts Issuer Distinguished Name from X509 Certificate. The value is copied into buffer in a raw ASN.1 X.509 format.
+ **/
+CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & issuer);
 
 /**
  * @brief Checks for resigned version of the certificate in the list and returns it.

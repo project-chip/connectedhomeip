@@ -83,6 +83,9 @@ using ByteSpan = Span<const uint8_t>;
 
 namespace Logging {
 
+// Get the module name associated with a LogModule, or "-" on invalid value.
+const char * GetModuleName(LogModule module);
+
 // Log redirection
 using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, const char * msg, va_list args);
 DLL_EXPORT void SetLogRedirectCallback(LogRedirectCallback_t callback);

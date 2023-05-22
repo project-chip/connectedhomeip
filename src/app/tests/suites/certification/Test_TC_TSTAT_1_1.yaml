@@ -110,7 +110,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 27, 28, 65528, 65529, 65531, 65532, 65533]
+              contains: [0, 27, 28, 65528, 65529, 65530, 65531, 65532, 65533]
 
     - label:
           "Read the Feature dependent(TSTAT.S.F00(HEAT)) attribute in
@@ -230,22 +230,54 @@ tests:
               contains: [0, 1, 2, 3]
 
     - label: "Read the global attribute: GeneratedCommandList"
+      PICS: " !TSTAT.S.C04.Rsp && !TSTAT.S.C02.Rsp "
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Read Feature dependent(TSTAT.S.F03(SCH)) commands in
+          GeneratedCommandList"
+      PICS: TSTAT.S.F03
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           constraints:
               type: list
-    #Commenting out the step EventList attribute which is out of scope for matter V1.0
-    # - label: "Read the global attribute: EventList"
-    #   disabled: true
-    #   verification: |
-    #       Not implemented in chip-tool
-    #   cluster: "LogCommands"
-    #   command: "UserPrompt"
-    #   PICS: PICS_USER_PROMPT
-    #   arguments:
-    #       values:
-    #           - name: "message"
-    #             value: "Please enter 'y' for success"
-    #           - name: "expectedValue"
-    #             value: "y"
+              contains: [0]
+
+    - label:
+          "Read optional command (GetRelayStatusLogResponse) in
+          GeneratedCommandList"
+      PICS: TSTAT.S.C04.Rsp
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    #Manufacturer specific event IDs check not possible
+    - label:
+          "Read EventList attribute from the DUT.For this cluster the list is
+          usually empty but it can contain manufacturer specific event IDs."
+      verification: |
+          ./chip-tool thermostat read event-list 1 1
+           On TH(chip-tool), Verify that the DUT response provides a list of supported events. For this cluster the list is usually empty but it can contain manufacturer specific event IDs.
+           [1676466998.893033][29061:29063] CHIP:DMG: }
+           [1676466998.893114][29061:29063] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_FFFA DataVersion: 2603128677
+           [1676466998.893155][29061:29063] CHIP:TOO:   EventList: 0 entries
+           [1676466998.893209][29061:29063] CHIP:EM: <<< [E:35662i S:59401 M:190799889 (Ack:191492950)] (S) Msg TX to 1:0000000000000001 [3F11] --- Type 0000:10 (SecureChannel:StandaloneAck)
+           [1676466998.893221][29061:29063] CHIP:IN: (S) Sending msg 190799889 on secure session with LSID: 59401
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

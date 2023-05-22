@@ -157,29 +157,29 @@ tests:
 
           ReportDataMessage =
           [1671450651.817816][8426:8426] CHIP:DMG: {
-          [1671450651.817819][8426:8426] CHIP:DMG: 	AttributeReportIBs =
-          [1671450651.817825][8426:8426] CHIP:DMG: 	[
-          [1671450651.817828][8426:8426] CHIP:DMG: 		AttributeReportIB =
-          [1671450651.817849][8426:8426] CHIP:DMG: 		{
-          [1671450651.817853][8426:8426] CHIP:DMG: 			AttributeDataIB =
-          [1671450651.817858][8426:8426] CHIP:DMG: 			{
-          [1671450651.817862][8426:8426] CHIP:DMG: 				DataVersion = 0xcfe432fa,
-          [1671450651.817864][8426:8426] CHIP:DMG: 				AttributePathIB =
-          [1671450651.817868][8426:8426] CHIP:DMG: 				{
-          [1671450651.817872][8426:8426] CHIP:DMG: 					Endpoint = 0x1,
-          [1671450651.817876][8426:8426] CHIP:DMG: 					Cluster = 0x3b,
-          [1671450651.817879][8426:8426] CHIP:DMG: 					Attribute = 0x0000_0000,
-          [1671450651.817882][8426:8426] CHIP:DMG: 				}
+          [1671450651.817819][8426:8426] CHIP:DMG:         AttributeReportIBs =
+          [1671450651.817825][8426:8426] CHIP:DMG:         [
+          [1671450651.817828][8426:8426] CHIP:DMG:                 AttributeReportIB =
+          [1671450651.817849][8426:8426] CHIP:DMG:                 {
+          [1671450651.817853][8426:8426] CHIP:DMG:                         AttributeDataIB =
+          [1671450651.817858][8426:8426] CHIP:DMG:                         {
+          [1671450651.817862][8426:8426] CHIP:DMG:                                 DataVersion = 0xcfe432fa,
+          [1671450651.817864][8426:8426] CHIP:DMG:                                 AttributePathIB =
+          [1671450651.817868][8426:8426] CHIP:DMG:                                 {
+          [1671450651.817872][8426:8426] CHIP:DMG:                                         Endpoint = 0x1,
+          [1671450651.817876][8426:8426] CHIP:DMG:                                         Cluster = 0x3b,
+          [1671450651.817879][8426:8426] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1671450651.817882][8426:8426] CHIP:DMG:                                 }
           [1671450651.817888][8426:8426] CHIP:DMG:
-          [1671450651.817892][8426:8426] CHIP:DMG: 				Data = 2,
-          [1671450651.817895][8426:8426] CHIP:DMG: 			},
+          [1671450651.817892][8426:8426] CHIP:DMG:                                 Data = 2,
+          [1671450651.817895][8426:8426] CHIP:DMG:                         },
           [1671450651.817901][8426:8426] CHIP:DMG:
-          [1671450651.817905][8426:8426] CHIP:DMG: 		},
+          [1671450651.817905][8426:8426] CHIP:DMG:                 },
           [1671450651.817910][8426:8426] CHIP:DMG:
-          [1671450651.817913][8426:8426] CHIP:DMG: 	],
+          [1671450651.817913][8426:8426] CHIP:DMG:         ],
           [1671450651.817918][8426:8426] CHIP:DMG:
-          [1671450651.817921][8426:8426] CHIP:DMG: 	SuppressResponse = true,
-          [1671450651.817925][8426:8426] CHIP:DMG: 	InteractionModelRevision = 1
+          [1671450651.817921][8426:8426] CHIP:DMG:         SuppressResponse = true,
+          [1671450651.817925][8426:8426] CHIP:DMG:         InteractionModelRevision = 1
           [1671450651.817928][8426:8426] CHIP:DMG: }
       disabled: true
 
@@ -199,10 +199,12 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
+
           1. ./chip-tool interactive start
           2. switch subscribe-event switch-latched 1 100 1 1
 
           Verify switch latched event has newposition set to 0 on DUT (chip-tool) logs:
+
           [1659679766.774013][2535:2540] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000
           [1659679766.774035][2535:2540] CHIP:TOO:          Event number: 3
           [1659679766.774055][2535:2540] CHIP:TOO:          Priority: Info
@@ -256,7 +258,7 @@ tests:
       verification: |
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
 
-          echo "{"Name":"SwitchLatched","NewPosition":1}" > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
+          echo '{"Name":"SwitchLatched","NewPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           [1659621148.831745][8590:8596] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":1}"
           [1659621148.832236][8590:8590] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4be58f54
@@ -270,6 +272,7 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
+
           1. ./chip-tool interactive start
            2. switch subscribe-event switch-latched 1 100 1 1
 
@@ -374,7 +377,7 @@ tests:
           [1671450600.458286][8426:8426] CHIP:DMG: }
       disabled: true
 
-    - label: "DUT reads attribute NumberOfPositions."
+    - label: "DUT reads attribute NumberOfPositions"
       PICS: SWTCH.C.F01
       verification: |
           1. ./chip-tool interactive start
@@ -384,36 +387,36 @@ tests:
           Verify  number of positions value is 2 in TH all-clusters-app log
           DMG: ReportDataMessage =
           [1671450651.817816][8426:8426] CHIP:DMG: {
-          [1671450651.817819][8426:8426] CHIP:DMG: 	AttributeReportIBs =
-          [1671450651.817825][8426:8426] CHIP:DMG: 	[
-          [1671450651.817828][8426:8426] CHIP:DMG: 		AttributeReportIB =
-          [1671450651.817849][8426:8426] CHIP:DMG: 		{
-          [1671450651.817853][8426:8426] CHIP:DMG: 			AttributeDataIB =
-          [1671450651.817858][8426:8426] CHIP:DMG: 			{
-          [1671450651.817862][8426:8426] CHIP:DMG: 				DataVersion = 0xcfe432fa,
-          [1671450651.817864][8426:8426] CHIP:DMG: 				AttributePathIB =
-          [1671450651.817868][8426:8426] CHIP:DMG: 				{
-          [1671450651.817872][8426:8426] CHIP:DMG: 					Endpoint = 0x1,
-          [1671450651.817876][8426:8426] CHIP:DMG: 					Cluster = 0x3b,
-          [1671450651.817879][8426:8426] CHIP:DMG: 					Attribute = 0x0000_0000,
-          [1671450651.817882][8426:8426] CHIP:DMG: 				}
+          [1671450651.817819][8426:8426] CHIP:DMG:         AttributeReportIBs =
+          [1671450651.817825][8426:8426] CHIP:DMG:         [
+          [1671450651.817828][8426:8426] CHIP:DMG:                 AttributeReportIB =
+          [1671450651.817849][8426:8426] CHIP:DMG:                 {
+          [1671450651.817853][8426:8426] CHIP:DMG:                         AttributeDataIB =
+          [1671450651.817858][8426:8426] CHIP:DMG:                         {
+          [1671450651.817862][8426:8426] CHIP:DMG:                                 DataVersion = 0xcfe432fa,
+          [1671450651.817864][8426:8426] CHIP:DMG:                                 AttributePathIB =
+          [1671450651.817868][8426:8426] CHIP:DMG:                                 {
+          [1671450651.817872][8426:8426] CHIP:DMG:                                         Endpoint = 0x1,
+          [1671450651.817876][8426:8426] CHIP:DMG:                                         Cluster = 0x3b,
+          [1671450651.817879][8426:8426] CHIP:DMG:                                         Attribute = 0x0000_0000,
+          [1671450651.817882][8426:8426] CHIP:DMG:                                 }
           [1671450651.817888][8426:8426] CHIP:DMG:
-          [1671450651.817892][8426:8426] CHIP:DMG: 				Data = 2,
-          [1671450651.817895][8426:8426] CHIP:DMG: 			},
+          [1671450651.817892][8426:8426] CHIP:DMG:                                 Data = 2,
+          [1671450651.817895][8426:8426] CHIP:DMG:                         },
           [1671450651.817901][8426:8426] CHIP:DMG:
-          [1671450651.817905][8426:8426] CHIP:DMG: 		},
+          [1671450651.817905][8426:8426] CHIP:DMG:                 },
           [1671450651.817910][8426:8426] CHIP:DMG:
-          [1671450651.817913][8426:8426] CHIP:DMG: 	],
+          [1671450651.817913][8426:8426] CHIP:DMG:         ],
           [1671450651.817918][8426:8426] CHIP:DMG:
-          [1671450651.817921][8426:8426] CHIP:DMG: 	SuppressResponse = true,
-          [1671450651.817925][8426:8426] CHIP:DMG: 	InteractionModelRevision = 1
+          [1671450651.817921][8426:8426] CHIP:DMG:         SuppressResponse = true,
+          [1671450651.817925][8426:8426] CHIP:DMG:         InteractionModelRevision = 1
           [1671450651.817928][8426:8426] CHIP:DMG: }
       disabled: true
 
     - label:
-          "DUT sets up eventing (InitialPress and ShortRelease; if SWTCH.C.F03
-          also LongPress and LongRelease) so it will receive events when the
-          switch is operated."
+          "DUT sets up eventing (InitialPress and ShortRelease; if
+          SWTCH.C.F03(MSL) also LongPress and LongRelease) so it will receive
+          events when the switch is operated"
       PICS: SWTCH.C.F01 && SWTCH.C.M.EV
       verification: |
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
@@ -429,6 +432,7 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
+
           1. ./chip-tool interactive start
            2. switch subscribe-event initial-press 1 100 1 1
 
@@ -441,7 +445,6 @@ tests:
           [1659683181.743506][2829:2835] CHIP:TOO:    }
 
           echo '{"Name":"ShortRelease","PreviousPosition":0}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
-
           Verify for ShortRelease event  in DUT(chip-tool) Log:
 
           [1659683678.805455][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":0}"
@@ -451,6 +454,7 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
+
           1. ./chip-tool interactive start
            2. switch subscribe-event short-release 1 100 1 1
 
@@ -468,6 +472,7 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
+
           1. ./chip-tool interactive start
            2. switch subscribe-event long-press 1 100 1 1
 
@@ -484,6 +489,7 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
+
           1. ./chip-tool interactive start
            2. switch subscribe-event long-release 1 100 1 1
 
@@ -499,9 +505,9 @@ tests:
 
     - label:
           "TH simulates operation of the switch by repeating these steps (over a
-          1 minute period) - change state (attribute CurrentPosition) from 0 to
-          1 - wait 0.2 seconds - change state (attribute CurrentPosition) from 1
-          to 0 - wait 10 seconds DUT reads attribute CurrentPosition regularly"
+          1 minute period) change state (attribute CurrentPosition) from 0 to 1
+          wait 0.2 seconds change state (attribute CurrentPosition) from 1 to 0
+          wait 10 seconds DUT reads attribute CurrentPosition regularly"
       PICS: SWTCH.C.F01 && SWTCH.C.M.RA
       verification: |
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
@@ -563,6 +569,7 @@ tests:
           [1659624126.647480][8590:8590] CHIP:ZCL: SwitchServer: OnInitialPress
 
           After 0.2 seconds, send this command
+
           echo '{"Name":"ShortRelease","PreviousPosition":1}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
 
           [1659684051.064329][2530:2538] CHIP:-: Received payload: "{"Name":"ShortRelease","PreviousPosition":1}"
@@ -576,8 +583,10 @@ tests:
 
           all-clusters app will emit events to the subscriber (DUT-client), e.g.
           Verify in TH Log:
+
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
+
           1. ./chip-tool interactive start
           2. switch subscribe-event initial-press 1 100 1 1
 
@@ -591,6 +600,7 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
+
           1. ./chip-tool interactive start
           2. switch subscribe-event short-release 1 100 1 1
 
@@ -635,6 +645,7 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
+
           1. ./chip-tool interactive start
           2. switch subscribe-event initial-press 1 100 1 1
 
@@ -648,6 +659,7 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
+
           1. ./chip-tool interactive start
           2. switch subscribe-event long-press 1 100 1 1
 
@@ -661,6 +673,7 @@ tests:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
+
           1. ./chip-tool interactive start
           2. switch subscribe-event long-release 1 100 1 1
 

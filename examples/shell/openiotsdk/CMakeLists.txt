@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2022 Project CHIP Authors
+#   Copyright (c) 2022-2023 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -35,22 +35,6 @@ project(${APP_TARGET} LANGUAGES C CXX ASM)
 
 include(sdk)
 
-# LwIP configuration
-if(TARGET lwip-cmsis-port)
-    # lwip requires user_lwipopts.h, we use the custom settings
-    target_include_directories(lwipopts
-        INTERFACE
-            ${OPEN_IOT_SDK_CONFIG}/lwip
-    )
-
-    if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-        target_compile_definitions(lwipopts
-            INTERFACE
-                LWIP_DEBUG
-        )
-    endif()
-endif()
-
 add_executable(${APP_TARGET})
 
 # Application CHIP build configuration 
@@ -58,6 +42,16 @@ set(CONFIG_CHIP_LIB_SHELL YES)
 include(chip)
 
 add_subdirectory(${OPEN_IOT_SDK_EXAMPLE_COMMON}/app ./app_build)
+
+target_compile_definitions(openiotsdk-startup
+    PRIVATE
+        IOT_SDK_APP_SERIAL_BAUDRATE=9600
+)
+
+target_compile_definitions(openiotsdk-startup
+    PRIVATE
+        IOT_SDK_APP_MAIN_STACK_SIZE=8192
+)
 
 target_include_directories(${APP_TARGET} 
     PRIVATE
@@ -73,6 +67,7 @@ target_sources(${APP_TARGET}
 )
 
 target_link_libraries(${APP_TARGET}
+    openiotsdk-startup
     openiotsdk-app
 )
 

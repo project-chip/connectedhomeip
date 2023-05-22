@@ -114,6 +114,11 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc.mm"
         },
         {
+            "path": "MTRCommandPayloads_Internal.zapt",
+            "name": "Internal methods for objc reflections of MTR command payloads header",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloads_Internal.h"
+        },
+        {
             "path": "MTRAttributeTLVValueDecoder-src.zapt",
             "name": "Decode TLV attribute values into Objc objects",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeTLVValueDecoder.mm"

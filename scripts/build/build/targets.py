@@ -14,6 +14,7 @@
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
+from builders.asr import ASRApp, ASRBoard, ASRBuilder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
@@ -371,6 +372,28 @@ def BuildAmebaTarget():
     return target
 
 
+def BuildASRTarget():
+    target = BuildTarget('asr', ASRBuilder)
+
+    # board
+    target.AppendFixedTargets([
+        TargetPart('asr582x', board=ASRBoard.ASR582X),
+        TargetPart('asr595x', board=ASRBoard.ASR595X),
+    ])
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('lighting', app=ASRApp.LIGHT),
+    ])
+
+    # modifiers
+    target.AppendModifier('ota', enable_ota_requestor=True)
+    target.AppendModifier('shell', chip_build_libshell=True)
+    target.AppendModifier('no_logging', chip_logging=False)
+
+    return target
+
+
 def BuildK32WTarget():
     target = BuildTarget('k32w', K32WBuilder)
 
@@ -585,6 +608,7 @@ def BuildOpenIotSdkTargets():
 
 BUILD_TARGETS = [
     BuildAmebaTarget(),
+    BuildASRTarget(),
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
     Buildcc32xxTarget(),

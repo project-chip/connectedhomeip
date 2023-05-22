@@ -654,7 +654,8 @@ JNI_METHOD(void, pairDeviceWithAddress)
 }
 
 JNI_METHOD(void, pairDeviceWithCode)
-(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring setUpCode, jbyteArray csrNonce, jobject networkCredentials)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring setUpCode, jboolean discoverOnce,
+ jboolean useOnlyOnNetworkDiscovery, jbyteArray csrNonce, jobject networkCredentials)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -665,6 +666,18 @@ JNI_METHOD(void, pairDeviceWithCode)
     JniUtfString setUpCodeJniString(env, setUpCode);
 
     CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+
+    auto discoveryType = DiscoveryType::kAll;
+    if (useOnlyOnNetworkDiscovery)
+    {
+        discoveryType = DiscoveryType::kDiscoveryNetworkOnly;
+    }
+
+    if (discoverOnce)
+    {
+        discoveryType = DiscoveryType::kDiscoveryNetworkOnlyWithoutPASEAutoRetry;
+    }
+
     if (csrNonce != nullptr)
     {
         JniByteArray jniCsrNonce(env, csrNonce);
@@ -680,7 +693,7 @@ JNI_METHOD(void, pairDeviceWithCode)
     {
         commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
     }
-    err = wrapper->Controller()->PairDevice(deviceId, setUpCodeJniString.c_str(), commissioningParams, DiscoveryType::kAll);
+    err = wrapper->Controller()->PairDevice(deviceId, setUpCodeJniString.c_str(), commissioningParams, discoveryType);
 
     if (err != CHIP_NO_ERROR)
     {

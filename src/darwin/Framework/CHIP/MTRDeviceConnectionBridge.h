@@ -22,7 +22,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/ExchangeMgr.h>
-#include <transport/SessionHandle.h>
+#include <transport/Session.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

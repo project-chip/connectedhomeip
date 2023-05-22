@@ -2,7 +2,7 @@
 #include <jni/CHIPReadCallbacks.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <zap-generated/CHIPClusters.h>
+#include <controller/CHIPCluster.h>
 
 #include <controller/java/AndroidClusterExceptions.h>
 #include <controller/java/CHIPDefaultCallbacks.h>
