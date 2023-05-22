@@ -1,6 +1,6 @@
 package chip.onboardingpayload
 
-/** Class to hold the data from the scanned QR code or manual entry code.  */
+/** Class to hold the data from the scanned QR code or Manual Pairing Code.  */
 class OnboardingPayload(
   /** Version info of the OnboardingPayload: version SHALL be 0 */
   var version: Int = 0,

@@ -225,7 +225,6 @@ kotlin_library("json_to_tlv_to_json_test") {
 
   deps = [
     ":jsontlv",
-    ":tlv",
     "${chip_root}/third_party/java_deps:gson",
     "${chip_root}/third_party/java_deps:junit-4",
     "${chip_root}/third_party/java_deps:kotlin-test",
