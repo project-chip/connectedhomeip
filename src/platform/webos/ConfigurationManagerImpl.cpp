@@ -106,14 +106,14 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))
     {
-        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
         err               = WriteConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, location);
         SuccessOrExit(err);
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_LocationCapability))
     {
-        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
         err               = WriteConfigValue(PosixConfig::kConfigKey_LocationCapability, location);
         SuccessOrExit(err);
     }
