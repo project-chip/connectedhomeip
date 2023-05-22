@@ -32,5 +32,7 @@ class Nullable():
     def __lt__(self, other):
         return True
 
+    def __hash__(self):
+        return 0
 
 NullValue = Nullable()
