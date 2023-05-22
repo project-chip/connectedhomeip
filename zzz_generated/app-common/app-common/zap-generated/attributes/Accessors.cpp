@@ -21400,7 +21400,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -21489,7 +21489,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::CarbonMonoxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -21953,7 +21953,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -22042,7 +22042,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::CarbonDioxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -22497,7 +22497,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -22583,7 +22584,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::EthyleneConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -23039,7 +23041,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::EthyleneOxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -23128,7 +23130,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::EthyleneOxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -23583,7 +23585,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -23669,7 +23672,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::HydrogenConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -24125,7 +24129,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::HydrogenSulfideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -24214,7 +24218,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::HydrogenSulfideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -24679,7 +24683,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::NitricOxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -24768,7 +24772,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::NitricOxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -25230,7 +25234,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -25319,7 +25323,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::NitrogenDioxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -25770,7 +25774,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -25854,7 +25859,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::OxygenConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -26289,7 +26295,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -26373,7 +26379,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::OzoneConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -26822,7 +26828,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::SulfurDioxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -26911,7 +26917,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::SulfurDioxideConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -27375,7 +27381,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::DissolvedOxygenConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -27464,7 +27470,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::DissolvedOxygenConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -27920,7 +27926,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -28006,7 +28013,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BromateConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -28462,7 +28470,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::ChloraminesConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -28551,7 +28559,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::ChloraminesConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -29004,7 +29012,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -29090,7 +29099,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ChlorineConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -29546,7 +29556,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::FecalColiformEColiConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -29635,7 +29645,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::FecalColiformEColiConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -30092,7 +30102,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -30178,7 +30189,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::FluorideConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -30634,7 +30646,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::HaloaceticAcidsConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -30723,7 +30735,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::HaloaceticAcidsConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -31188,7 +31200,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::TotalTrihalomethanesConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -31277,7 +31289,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::TotalTrihalomethanesConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -31744,7 +31756,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::TotalColiformBacteriaConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -31833,7 +31845,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::TotalColiformBacteriaConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -32302,7 +32314,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::TurbidityConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -32391,7 +32403,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::TurbidityConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -32835,7 +32847,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -32919,7 +32932,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::CopperConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -33354,7 +33368,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -33438,7 +33452,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::LeadConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -33887,7 +33901,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::ManganeseConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -33976,7 +33990,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::ManganeseConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -34425,7 +34439,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -34511,7 +34526,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::SulfateConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -34967,7 +34983,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::BromodichloromethaneConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -35056,7 +35072,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::BromodichloromethaneConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -35523,7 +35539,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::BromoformConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -35612,7 +35628,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::BromoformConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -36070,7 +36086,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::ChlorodibromomethaneConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -36159,7 +36175,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::ChlorodibromomethaneConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -36626,7 +36642,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::ChloroformConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -36715,7 +36731,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::ChloroformConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -37162,7 +37178,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -37246,7 +37263,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::SodiumConcentrationMeasurement::Id, Id, writable,
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -37681,7 +37699,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -37765,7 +37783,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::Pm25ConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -38214,7 +38232,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -38303,7 +38321,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::FormaldehydeConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -38751,7 +38769,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -38835,7 +38853,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::Pm1ConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -39270,7 +39288,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -39354,7 +39372,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::Pm10ConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -39803,7 +39821,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -39892,7 +39910,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, Id, writable,
-                                 ZCL_INT32U_ATTRIBUTE_TYPE);
+                                 ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow
@@ -40351,7 +40369,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace PeakMeasuredValueWindow
@@ -40435,7 +40453,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::RadonConcentrationMeasurement::Id, Id, writable, ZCL_ELAPSED_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace AverageMeasuredValueWindow

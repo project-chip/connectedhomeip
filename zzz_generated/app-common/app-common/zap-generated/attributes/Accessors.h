@@ -3745,7 +3745,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -3757,7 +3757,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -3832,7 +3832,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -3844,7 +3844,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -3918,7 +3918,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -3930,7 +3930,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4002,7 +4002,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4014,7 +4014,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4088,7 +4088,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4100,7 +4100,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4172,7 +4172,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4184,7 +4184,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4259,7 +4259,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4271,7 +4271,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4343,7 +4343,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4355,7 +4355,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4430,7 +4430,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4442,7 +4442,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4514,7 +4514,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4526,7 +4526,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4598,7 +4598,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4610,7 +4610,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4684,7 +4684,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4696,7 +4696,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4771,7 +4771,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4783,7 +4783,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4855,7 +4855,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4867,7 +4867,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -4939,7 +4939,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -4951,7 +4951,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5023,7 +5023,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5035,7 +5035,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5111,7 +5111,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5123,7 +5123,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5195,7 +5195,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5207,7 +5207,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5282,7 +5282,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5294,7 +5294,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5371,7 +5371,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5383,7 +5383,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5460,7 +5460,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5472,7 +5472,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5544,7 +5544,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5556,7 +5556,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5628,7 +5628,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5640,7 +5640,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5712,7 +5712,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5724,7 +5724,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5796,7 +5796,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5808,7 +5808,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5880,7 +5880,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5892,7 +5892,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -5969,7 +5969,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -5981,7 +5981,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -6053,7 +6053,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -6065,7 +6065,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -6142,7 +6142,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -6154,7 +6154,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -6226,7 +6226,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -6238,7 +6238,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -6310,7 +6310,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -6322,7 +6322,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -6394,7 +6394,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -6406,7 +6406,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -6480,7 +6480,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -6492,7 +6492,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -6564,7 +6564,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -6576,7 +6576,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -6648,7 +6648,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -6660,7 +6660,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
@@ -6738,7 +6738,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace PeakMeasuredValue
 
 namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace PeakMeasuredValueWindow
 
@@ -6750,7 +6750,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace AverageMeasuredValue
 
 namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace AverageMeasuredValueWindow
 
