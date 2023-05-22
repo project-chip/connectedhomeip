@@ -214,3 +214,8 @@ jobs:
               if: always()
               run: |
                   git grep -n 'SuccessOrExit(CHIP_ERROR' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            - name: Check that our hardcoded SHA for clang-format on ARM mac matches the pigweed SHA.
+              if: always()
+              run: |
+                  ./scripts/lints/clang-format-version-matches.py
