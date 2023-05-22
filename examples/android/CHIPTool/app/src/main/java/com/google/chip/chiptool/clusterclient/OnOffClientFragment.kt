@@ -98,7 +98,7 @@ class OnOffClientFragment : Fragment() {
     val clusterId = OnOff.ID
     val attributeId = OnOff.Attribute.OnOff.id
 
-    val attributePath = ChipAttributePath.newInstance(endpointId.toLong(), clusterId, attributeId)
+    val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
 
     ChipClient.getDeviceController(requireContext()).readPath(object: ReportCallback {
       override fun onError(attributePath: ChipAttributePath?, eventPath: ChipEventPath?, ex: java.lang.Exception) {
@@ -140,7 +140,7 @@ class OnOffClientFragment : Fragment() {
     val clusterId = OnOff.ID
     val attributeId = OnOff.Attribute.OnOff.id
 
-    val attributePath = ChipAttributePath.newInstance(endpointId.toLong(), clusterId, attributeId)
+    val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
 
     val subscriptionEstablishedCallback =
             SubscriptionEstablishedCallback {
@@ -209,13 +209,13 @@ class OnOffClientFragment : Fragment() {
     // TODO : Need to be implement poj-to-tlv
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
-    tlvWriter.put(ContextSpecificTag(0), binding.levelBar.progress.toUInt())
-    tlvWriter.put(ContextSpecificTag(1), 0u)
-    tlvWriter.put(ContextSpecificTag(2), 0u)
-    tlvWriter.put(ContextSpecificTag(3), 0u)
+    tlvWriter.put(ContextSpecificTag(LevelControl.MoveToLevelCommandField.Level.id), binding.levelBar.progress.toUInt())
+    tlvWriter.put(ContextSpecificTag(LevelControl.MoveToLevelCommandField.OptionsMask.id), 0u)
+    tlvWriter.put(ContextSpecificTag(LevelControl.MoveToLevelCommandField.OptionsOverride.id), 0u)
+    tlvWriter.put(ContextSpecificTag(LevelControl.MoveToLevelCommandField.TransitionTime.id), 0u)
     tlvWriter.endStructure()
 
-    val invokeElement = InvokeElement.newInstance(addressUpdateFragment.endpointId.toLong()
+    val invokeElement = InvokeElement.newInstance(addressUpdateFragment.endpointId
             , LevelControl.ID
             , LevelControl.Command.MoveToLevel.id
             , tlvWriter.getEncoded(), null)
@@ -239,7 +239,7 @@ class OnOffClientFragment : Fragment() {
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
     tlvWriter.endStructure()
-    val invokeElement = InvokeElement.newInstance(addressUpdateFragment.endpointId.toLong()
+    val invokeElement = InvokeElement.newInstance(addressUpdateFragment.endpointId
             , OnOff.ID
             , commandId.id
             , tlvWriter.getEncoded(), null)

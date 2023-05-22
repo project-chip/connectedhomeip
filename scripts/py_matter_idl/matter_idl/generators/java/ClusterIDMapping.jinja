@@ -115,6 +115,30 @@ public class ClusterIDMapping {
             }
         }
 
+        {%- for command in cluster.commands | sort(attribute='code') %}
+            {%- if command.input_param -%}
+                public enum {{command.name | upfirst}}CommandField {
+                    {%- for field in (cluster.structs | named(command.input_param)).fields -%} {{field.name | upfirst}}({{field.code}}), {%- endfor -%};
+                    private final int id;
+                    {{command.name | upfirst}}CommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static {{command.name | upfirst}}CommandField value(int id) throws NoSuchFieldError {
+                        for ({{command.name | upfirst}}CommandField field : {{command.name | upfirst}}CommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }
+            {%- endif -%}
+        {%- endfor -%}
+
         @Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();

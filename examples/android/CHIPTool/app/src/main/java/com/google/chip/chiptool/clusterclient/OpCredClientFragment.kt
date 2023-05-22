@@ -96,7 +96,7 @@ class OpCredClientFragment : Fragment() {
         showMessage("OpCred $attributeName value: $value")
       }
 
-    }, devicePtr, listOf(ChipAttributePath.newInstance(endpointId.toLong(), clusterId, attributeId)), null, false, 0 /* imTimeoutMs */)
+    }, devicePtr, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), null, false, 0 /* imTimeoutMs */)
   }
 
   private fun showMessage(msg: String) {
