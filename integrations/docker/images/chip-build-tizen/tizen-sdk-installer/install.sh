@@ -263,8 +263,8 @@ function install_tizen_sdk() {
     ln -sf "$TIZEN_SDK_DATA_PATH/.tizen-cli-config" "$TIZEN_SDK_ROOT/tools/.tizen-cli-config"
 
     # Use Tizen developer platform certificate as default
-    cp "${TIZEN_SDK_ROOT}"/tools/certificate-generator/certificates/distributor/sdk-platform/* \
-        "${TIZEN_SDK_ROOT}"/tools/certificate-generator/certificates/distributor/
+    cp "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/sdk-platform/* \
+        "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/
 
     # Make symbolic links relative
     find "$TIZEN_SDK_SYSROOT/usr/lib" -maxdepth 1 -type l | while IFS= read -r LNK; do
