@@ -83,6 +83,23 @@ static void InitServer(intptr_t context)
     NetWorkCommissioningInstInit();
 }
 
+extern "C" bool matter_server_is_commissioned()
+{
+    return (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0);
+}
+
+extern "C" void matter_get_fabric_indexes(uint16_t *pFabricIndexes)
+{
+    size_t i = 0;
+    for (auto it = chip::Server::GetInstance().GetFabricTable().begin();
+        it != chip::Server::GetInstance().GetFabricTable().end(); ++it)
+    {
+            ChipLogError(DeviceLayer, "Fabric Index = %d", it->GetFabricIndex());
+            pFabricIndexes[i] = it->GetFabricIndex();
+            i++;
+    }
+}
+
 extern "C" void ChipTest(void)
 {
     ChipLogProgress(SoftwareUpdate, "ota-requestor!");
