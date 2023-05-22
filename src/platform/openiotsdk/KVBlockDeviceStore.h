@@ -81,6 +81,7 @@ public:
 
     // Initialization
     static CHIP_ERROR Init(void);
+    static CHIP_ERROR Shutdown(void);
 
     // Config value accessors
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
