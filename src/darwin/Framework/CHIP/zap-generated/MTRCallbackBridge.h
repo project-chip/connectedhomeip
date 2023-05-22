@@ -268,14 +268,14 @@ typedef void (*NullablePowerSourceClusterWiredCurrentTypeEnumAttributeCallback)(
 typedef void (*PowerSourceClusterWiredFaultEnumAttributeCallback)(void *, chip::app::Clusters::PowerSource::WiredFaultEnum);
 typedef void (*NullablePowerSourceClusterWiredFaultEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultEnum> &);
-typedef void (*GeneralCommissioningClusterCommissioningErrorAttributeCallback)(
-    void *, chip::app::Clusters::GeneralCommissioning::CommissioningError);
-typedef void (*NullableGeneralCommissioningClusterCommissioningErrorAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningError> &);
-typedef void (*GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback)(
-    void *, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType);
-typedef void (*NullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType> &);
+typedef void (*GeneralCommissioningClusterCommissioningErrorEnumAttributeCallback)(
+    void *, chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum);
+typedef void (*NullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum> &);
+typedef void (*GeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallback)(
+    void *, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum);
+typedef void (*NullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> &);
 typedef void (*NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback)(
     void *, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus);
 typedef void (*NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback)(
@@ -19233,144 +19233,148 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralCommissioningClusterCommissioningErrorAttributeCallback>
+class MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<GeneralCommissioningClusterCommissioningErrorEnumAttributeCallback>
 {
 public:
-    MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GeneralCommissioningClusterCommissioningErrorAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<GeneralCommissioningClusterCommissioningErrorEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            MTRActionBlock action) :
-        MTRCallbackBridge<GeneralCommissioningClusterCommissioningErrorAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralCommissioning::CommissioningError value);
-};
-
-class MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge
-    : public MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
-{
-public:
-    MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralCommissioningClusterCommissioningErrorAttributeCallback>
-{
-public:
-    MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                    ResponseHandler handler) :
-        MTRCallbackBridge<NullableGeneralCommissioningClusterCommissioningErrorAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<NullableGeneralCommissioningClusterCommissioningErrorAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningError> & value);
-};
-
-class MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge
-    : public MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge
-{
-public:
-    MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>
-{
-public:
-    MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<GeneralCommissioningClusterCommissioningErrorEnumAttributeCallback>(queue, handler, action,
                                                                                               OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum value);
 };
 
-class MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge
-    : public MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge
+class MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackSubscriptionBridge
+    : public MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge
 {
 public:
-    MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge(
+    MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(queue, handler, action),
+        MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnDone;
+    using MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>
+class MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallback>
 {
 public:
-    MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(dispatch_queue_t queue,
+    MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                         ResponseHandler handler) :
-        MTRCallbackBridge<NullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>(queue, handler,
+        MTRCallbackBridge<NullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallback>(queue, handler,
                                                                                                       OnSuccessFn){};
 
-    MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(dispatch_queue_t queue,
+    MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                         ResponseHandler handler,
                                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<NullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<NullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallback>(queue, handler, action,
                                                                                                       OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType> & value);
+                const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum> & value);
 };
 
-class MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge
+class MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge(
+    MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge(queue, handler, action),
+        MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnDone;
+    using MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<GeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallback>
+{
+public:
+    MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<GeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<GeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum value);
+};
+
+class MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallback>
+{
+public:
+    MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler) :
+        MTRCallbackBridge<NullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallback>(queue, handler,
+                                                                                                          OnSuccessFn){};
+
+    MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler,
+                                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                                          OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> & value);
+};
+
+class MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
