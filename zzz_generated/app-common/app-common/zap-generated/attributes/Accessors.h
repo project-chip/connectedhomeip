@@ -42,8 +42,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace IdentifyTime
 
 namespace IdentifyType {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Identify::IdentifyTypeEnum * value); // IdentifyTypeEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Identify::IdentifyTypeEnum value);
 } // namespace IdentifyType
 
 namespace FeatureMap {

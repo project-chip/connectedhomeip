@@ -24,72 +24,44 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::IdentifyEffectIdentifier val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::EffectIdentifierEnum val)
 {
-    using EnumType = Identify::IdentifyEffectIdentifier;
+    using EnumType = Identify::EffectIdentifierEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kBlink:
     case EnumType::kBreathe:
     case EnumType::kOkay:
     case EnumType::kChannelChange:
     case EnumType::kFinishEffect:
     case EnumType::kStopEffect:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::IdentifyEffectVariant val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::EffectVariantEnum val)
 {
-    using EnumType = Identify::IdentifyEffectVariant;
+    using EnumType = Identify::EffectVariantEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kDefault:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(1);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::IdentifyIdentifyType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::IdentifyTypeEnum val)
 {
-    using EnumType = Identify::IdentifyIdentifyType;
+    using EnumType = Identify::IdentifyTypeEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kNone:
-    case EnumType::kVisibleLight:
-    case EnumType::kVisibleLED:
+    case EnumType::kLightOutput:
+    case EnumType::kVisibleIndicator:
     case EnumType::kAudibleBeep:
     case EnumType::kDisplay:
     case EnumType::kActuator:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE:
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LIGHT:
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED:
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_AUDIBLE_BEEP:
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_DISPLAY:
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_ACTUATOR:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(6);

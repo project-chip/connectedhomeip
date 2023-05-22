@@ -71,9 +71,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 namespace IdentifyType {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Identify::IdentifyTypeEnum * value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Identify::IdentifyTypeEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::Identify::Id, Id, readable, sizeof(temp));
@@ -85,9 +85,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Identify::IdentifyTypeEnum value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Identify::IdentifyTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;

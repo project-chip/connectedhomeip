@@ -29,6 +29,8 @@
 
 // Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
+    /* Cluster: Identify, Attribute: IdentifyTime, Privilege: view */ \
+    /* Cluster: Identify, Attribute: IdentifyType, Privilege: view */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
@@ -92,6 +94,8 @@
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
+    /* Cluster: Identify, Attribute: IdentifyTime, Privilege: view */ \
+    /* Cluster: Identify, Attribute: IdentifyType, Privilege: view */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
@@ -155,6 +159,8 @@
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
+    /* Cluster: Identify, Attribute: IdentifyTime, Privilege: view */ \
+    /* Cluster: Identify, Attribute: IdentifyType, Privilege: view */ \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
@@ -220,6 +226,7 @@
 
 // Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
+    /* Cluster: Identify, Attribute: IdentifyTime, Privilege: operate */ \
     0x00000006, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
     0x00000008, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
@@ -274,6 +281,7 @@
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
+    /* Cluster: Identify, Attribute: IdentifyTime, Privilege: operate */ \
     0x00004003, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
     0x00004000, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
@@ -328,6 +336,7 @@
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
+    /* Cluster: Identify, Attribute: IdentifyTime, Privilege: operate */ \
     kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \

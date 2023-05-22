@@ -52,7 +52,7 @@ static id _Nullable DecodeAttributeValueForIdentifyCluster(AttributeId aAttribut
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::GeneratedCommandList::Id: {
