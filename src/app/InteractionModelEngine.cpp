@@ -417,56 +417,56 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
     return err;
 }
 
-static void CheckConcreteEventPath(const ConcreteEventPath & aPath, const Access::SubjectDescriptor & aSubjectDescriptor,
-                                   bool & aHasValidEventPath)
+static bool IsValidEventPath(const ConcreteEventPath & aPath, const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     // If we get here, the path exists.  We just have to do an ACL check for it.
     Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
     CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, RequiredPrivilege::ForReadEvent(aPath));
-    if (err == CHIP_NO_ERROR)
-    {
-        aHasValidEventPath = true;
-    }
+    return (err == CHIP_NO_ERROR);
 }
 
 /**
  * Helper to handle wildcard events in the event path.
  */
-static void CheckEventPathForEndpointAndCluster(EndpointId aEndpoint, const EmberAfCluster * aCluster,
-                                                const EventPathParams & aEventPath,
-                                                const Access::SubjectDescriptor & aSubjectDescriptor, bool & aHasValidEventPath)
+static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const EmberAfCluster * aCluster,
+                                                   const EventPathParams & aEventPath,
+                                                   const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     if (aEventPath.HasWildcardEventId())
     {
 #if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        for (decltype(aCluster->eventCount) idx = 0; !aHasValidEventPath && idx > aCluster->eventCount; ++idx)
+        for (decltype(aCluster->eventCount) idx = 0; idx > aCluster->eventCount; ++idx)
         {
             ConcreteEventPath path(aEndpoint, aCluster->clusterId, aCluster->eventList[idx]);
-            CheckConcreteEventPath(path, aSubjectDescriptor, aHasValidEventPath);
+            bool isValid = IsValidEventPath(path, aSubjectDescriptor);
+            if (isValid)
+            {
+                return true;
+            }
         }
+
+        return false;
 #else
         // We have no way to expand wildcards.  Just give up and claim this is
         // valid.
-        aHasValidEventPath = true;
+        return true;
 #endif
     }
-    else
+
+    ConcreteEventPath path(aEndpoint, aCluster->clusterId, aEventPath.mEventId);
+    if (CheckEventSupportStatus(path) != Status::Success)
     {
-        ConcreteEventPath path(aEndpoint, aCluster->clusterId, aEventPath.mEventId);
-        if (CheckEventSupportStatus(path) != Status::Success)
-        {
-            // Not a valid path.
-            return;
-        }
-        CheckConcreteEventPath(path, aSubjectDescriptor, aHasValidEventPath);
+        // Not a valid path.
+        return false;
     }
+    return IsValidEventPath(path, aSubjectDescriptor);
 }
 
 /**
  * Helper to handle wildcard clusters in the event path.
  */
-static void CheckEventPathForEndpoint(EndpointId aEndpoint, const EventPathParams & aEventPath,
-                                      const Access::SubjectDescriptor & aSubjectDescriptor, bool & aHasValidEventPath)
+static bool HasValidEventPathForEndpoint(EndpointId aEndpoint, const EventPathParams & aEventPath,
+                                         const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     if (aEventPath.HasWildcardClusterId())
     {
@@ -474,25 +474,29 @@ static void CheckEventPathForEndpoint(EndpointId aEndpoint, const EventPathParam
         if (endpointType == nullptr)
         {
             // Not going to have any valid paths in here.
-            return;
+            return false;
         }
 
-        for (decltype(endpointType->clusterCount) idx = 0; !aHasValidEventPath && idx < endpointType->clusterCount; ++idx)
+        for (decltype(endpointType->clusterCount) idx = 0; idx < endpointType->clusterCount; ++idx)
         {
-            CheckEventPathForEndpointAndCluster(aEndpoint, &endpointType->cluster[idx], aEventPath, aSubjectDescriptor,
-                                                aHasValidEventPath);
+            bool hasValidPath =
+                HasValidEventPathForEndpointAndCluster(aEndpoint, &endpointType->cluster[idx], aEventPath, aSubjectDescriptor);
+            if (hasValidPath)
+            {
+                return true;
+            }
         }
+
+        return false;
     }
-    else
+
+    auto * cluster = emberAfFindServerCluster(aEndpoint, aEventPath.mClusterId);
+    if (cluster == nullptr)
     {
-        auto * cluster = emberAfFindServerCluster(aEndpoint, aEventPath.mClusterId);
-        if (cluster == nullptr)
-        {
-            // Nothing valid here.
-            return;
-        }
-        CheckEventPathForEndpointAndCluster(aEndpoint, cluster, aEventPath, aSubjectDescriptor, aHasValidEventPath);
+        // Nothing valid here.
+        return false;
     }
+    return HasValidEventPathForEndpointAndCluster(aEndpoint, cluster, aEventPath, aSubjectDescriptor);
 }
 
 CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
@@ -532,15 +536,15 @@ CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescript
                 {
                     continue;
                 }
-                CheckEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), eventPath, aSubjectDescriptor,
-                                          aHasValidEventPath);
+                aHasValidEventPath =
+                    HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), eventPath, aSubjectDescriptor);
             }
         }
         else
         {
             // No need to check whether the endpoint is enabled, because
             // emberAfFindEndpointType returns null for disabled endpoints.
-            CheckEventPathForEndpoint(eventPath.mEndpointId, eventPath, aSubjectDescriptor, aHasValidEventPath);
+            aHasValidEventPath = HasValidEventPathForEndpoint(eventPath.mEndpointId, eventPath, aSubjectDescriptor);
         }
     }
 
