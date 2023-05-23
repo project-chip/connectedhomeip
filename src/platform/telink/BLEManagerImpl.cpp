@@ -293,7 +293,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     {
         return StartAdvertisingProcess();
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
