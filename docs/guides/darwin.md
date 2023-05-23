@@ -306,8 +306,17 @@ Example:
 -   Please refer to the iOS/iPadOS 16.1
     [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-16_1-release-notes)
     for currently known issues.
--   Please refer to the iOS/iPadOS 16.2 beta 3
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16-release-notes)
+-   Please refer to the iOS/iPadOS 16.2
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_2-release-notes)
+    for currently known issues
+-   Please refer to the iOS & iPadOS 16.3
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_3-release-notes)
+    for currently known issues
+-   Please refer to the iOS & iPadOS 16.4
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_4-release-notes)
+    for currently known issues
+-   Please refer to the iOS & iPadOS 16.5
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_5-release-notes)
     for currently known issues
 -   An issues related to Apple Home integration should be reported
     [feedback](#providing-feedback-to-apple) as described in this section

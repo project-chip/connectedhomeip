@@ -39,8 +39,6 @@ static_library("transport") {
     "Session.cpp",
     "Session.h",
     "SessionDelegate.h",
-    "SessionHandle.cpp",
-    "SessionHandle.h",
     "SessionHolder.cpp",
     "SessionHolder.h",
     "SessionManager.cpp",

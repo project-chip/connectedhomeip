@@ -18,7 +18,7 @@
 MEMORY
 {
   FLASH (rx)  : ORIGIN = ((0x28000000) + (0x60000) + (0x400)), LENGTH = ((0x200000) - (0x400) - (0x800))
-  RAM (rwx)   : ORIGIN = 0x21000000, LENGTH = 0x100000
+  RAM (rwx)   : ORIGIN = 0x21000000, LENGTH = 0x200000
 }
 
 __stack_size__ = 0x1000;

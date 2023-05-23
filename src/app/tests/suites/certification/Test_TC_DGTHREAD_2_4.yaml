@@ -16,6 +16,7 @@ name: 50.2.4. [TC-DGTHREAD-2.4] ResetCounts Command[DUT- Server]
 
 PICS:
     - DGTHREAD.S
+    - DGTHREAD.S.F01(ERRCNT)
 
 config:
     nodeId: 0x12344321

@@ -32,7 +32,7 @@ env:
 jobs:
     openiotsdk:
         name: Open IoT SDK examples building
-        timeout-minutes: 140
+        timeout-minutes: 90
 
         env:
             TEST_NETWORK_NAME: OIStest
@@ -107,25 +107,22 @@ jobs:
               run: |
                   scripts/examples/openiotsdk_example.sh unit-tests
 
-            - name: Test shell example
-              # Temporarily disable test due to performance issue with FVP
-              if: false #steps.build_shell.outcome == 'success'
+            - name: "Test: shell example"
+              if: steps.build_shell.outcome == 'success'
               timeout-minutes: 5
               run: |
                   scripts/examples/openiotsdk_example.sh -C test shell
 
-            - name: Test lock-app example
-              # Temporarily disable test due to performance issue with FVP
-              if: false #steps.build_lock_app.outcome == 'success'
+            - name: "Test: lock-app example"
+              if: steps.build_lock_app.outcome == 'success'
               timeout-minutes: 5
               run: |
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
                   scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh -C test -n ${TEST_NETWORK_NAME}tap lock-app
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
 
-            - name: Run unit tests
-              # Temporarily disable test due to performance issue with FVP
-              if: false #steps.build_unit_tests.outcome == 'success' && github.event_name == 'pull_request'
-              timeout-minutes: 90
+            - name: "Test: unit-tests"
+              if: steps.build_unit_tests.outcome == 'success'
+              timeout-minutes: 40
               run: |
-                  scripts/examples/openiotsdk_example.sh -C run unit-tests
+                  scripts/examples/openiotsdk_example.sh -C test unit-tests

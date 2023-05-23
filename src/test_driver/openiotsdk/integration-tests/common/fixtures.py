@@ -75,34 +75,20 @@ def device(fvp, fvpConfig, binaryPath, telnetPort, networkInterface):
 
 
 @pytest.fixture(scope="session")
-def vendor_id():
-    return 0xFFF1
-
-
-@pytest.fixture(scope="session")
-def fabric_id():
-    return 1
-
-
-@pytest.fixture(scope="session")
-def node_id():
-    return 1
-
-
-@pytest.fixture(scope="function")
-def controller(vendor_id, fabric_id, node_id):
+def controller(controllerConfig):
     try:
         chip.native.Init()
         chipStack = chip.ChipStack.ChipStack(
-            persistentStoragePath='/tmp/openiotsdk-test-storage.json', enableServerInteractions=False)
+            persistentStoragePath=controllerConfig['persistentStoragePath'], enableServerInteractions=False)
         certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(
             chipStack, chipStack.GetStorageManager())
         certificateAuthorityManager.LoadAuthoritiesFromStorage()
         if (len(certificateAuthorityManager.activeCaList) == 0):
             ca = certificateAuthorityManager.NewCertificateAuthority()
-            ca.NewFabricAdmin(vendorId=vendor_id, fabricId=fabric_id)
+            ca.NewFabricAdmin(vendorId=controllerConfig['vendorId'], fabricId=controllerConfig['fabricId'])
         elif (len(certificateAuthorityManager.activeCaList[0].adminList) == 0):
-            certificateAuthorityManager.activeCaList[0].NewFabricAdmin(vendorId=vendor_id, fabricId=fabric_id)
+            certificateAuthorityManager.activeCaList[0].NewFabricAdmin(
+                vendorId=controllerConfig['vendorId'], fabricId=controllerConfig['fabricId'])
 
         caList = certificateAuthorityManager.activeCaList
 
@@ -116,3 +102,8 @@ def controller(vendor_id, fabric_id, node_id):
         return None
 
     yield devCtrl
+
+    devCtrl.Shutdown()
+    certificateAuthorityManager.Shutdown()
+    chipStack.Shutdown()
+    os.remove(controllerConfig['persistentStoragePath'])

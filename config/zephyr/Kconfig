@@ -201,6 +201,23 @@ config CHIP_DEVICE_ENABLE_KEY
 	  test action. This value is used during certification tests, and should not
 	  be present on devices in production environment.
 
+config CHIP_DEVICE_PRODUCT_FINISH
+	string "Description of the product's external case finish method"
+	default "other"
+	help
+	  provides a description of the product's external case finish method.
+	  Possible values:
+	  other; matte; satin; polished; rugged; fabric
+
+config CHIP_DEVICE_PRODUCT_COLOR
+	string "Description of the product's primary color"
+	help
+	  provides a description of the product's primary color.
+	  Possible values:
+	  black; navy; green; teal; maroon; purple; olive; gray; blue; lime; 
+	  aqua; red; fuchsia; yellow; white; nickel; chrome; brass; cooper; 
+	  silver; gold.
+
 # Matter optional features and parameters
 
 config CHIP_ENABLE_PAIRING_AUTOSTART

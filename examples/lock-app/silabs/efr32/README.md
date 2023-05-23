@@ -172,7 +172,7 @@ arguments
 
           ```
           $ cd ~/connectedhomeip/examples/lock-app/silabs/efr32
-          $ python3 out/debug/chip-efr32-lock-example.flash.py
+          $ python3 out/debug/matter-silabs-lock-example.flash.py
           ```
 
 -   Or with the Ozone debugger, just load the .out file.

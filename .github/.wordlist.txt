@@ -88,6 +88,7 @@ armv
 ASAN
 asdk
 AssertionError
+ASR
 AST
 ASYNC
 atomics
@@ -563,6 +564,7 @@ FW
 gbl
 gcloud
 GDB
+gdbgui
 gdbserver
 GeneralCommissioning
 GeneralDiagnostics
@@ -718,6 +720,7 @@ Jupyter
 jupyterlab
 KA
 kAdminister
+kbd
 kBusy
 kCase
 Kconfig

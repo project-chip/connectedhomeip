@@ -135,7 +135,7 @@ tests:
           Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           basicinformation subscribe-event-by-id 0x000 20 400 1 0
-          Verify DUT is responsds with  status response  for the data sent in the above command
+          Verify DUT is responds with  status response  for the data sent in the above command
           On TH (On the reference app)
           6 from Retrans Table on exchange 33690r
           [1657455691.695355][11525:11525] CHIP:EM: Removed CHIP MessageCounter:11056066 from RetransTable on exchange 33690r

@@ -100,6 +100,12 @@ static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inC
 
         err = PlatformMgr().StopEventLoopTask();
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        // Sleep for a short time to allow the event loop to stop.
+        // Note, in some platform implementations the event loop thread
+        // is self-terminating. We need time to process the stopping event
+        // inside event loop.
+        chip::test_utils::SleepMillis(10);
     }
 
     NL_TEST_ASSERT(inSuite, counterRun == (3 * 2));

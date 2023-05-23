@@ -1,1 +1,1 @@
-0.7.9 Version bump reason: Fix path for sysroot for crosscompile image
+0.7.14 Version bump reason: [Telink] Update Docker image (drivers update)

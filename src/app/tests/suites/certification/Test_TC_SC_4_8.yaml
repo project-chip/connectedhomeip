@@ -46,6 +46,10 @@ tests:
           Filter the node ID and identify the Compressed Fabric ID from the above command.
 
           eth0 IPv6 8840D142C33AB653-0000000000000001             _matter._tcp         local
+
+          on first controller open a commissioning window using below command (In TH2)
+
+          ./chip-tool pairing open-commissioning-window 2 1 400 2000 3840 (Save the manualcode for 2nd  Provision)
       disabled: true
 
     - label: "Commission TH2 to DUTs Fabric"
@@ -54,9 +58,7 @@ tests:
 
           Below is the example when using chip tool as controller
 
-          ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3841
-
-
+          ./chip-tool pairing code 2 mannualcode(take the manualcodefrom step 1)
 
 
           avahi-browse _matter._tcp -rt
