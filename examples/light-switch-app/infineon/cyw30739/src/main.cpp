@@ -46,6 +46,7 @@
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Shell;
+using namespace ::chip::app;
 
 constexpr chip::EndpointId kLightDimmerSwitchEndpointId = 1;
 

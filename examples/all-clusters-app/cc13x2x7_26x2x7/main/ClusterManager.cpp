@@ -29,6 +29,7 @@
 #endif
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;

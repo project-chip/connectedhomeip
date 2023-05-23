@@ -69,6 +69,7 @@ static uint32_t identify_trigger_effect = IDENTIFY_TRIGGER_EFFECT_FINISH_STOP;
 #define LIGHTING_APPLICATION_IDENTIFY_ENDPOINT 1
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 

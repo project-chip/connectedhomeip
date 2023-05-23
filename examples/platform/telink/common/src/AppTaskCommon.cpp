@@ -33,6 +33,8 @@
 #include "OTAUtil.h"
 #endif
 
+using chip::app;
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {

@@ -71,6 +71,7 @@
 #define APP_STATE_LED 0
 
 using namespace chip;
+using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 

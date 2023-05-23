@@ -46,6 +46,7 @@
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Shell;
+using namespace ::chip::app;
 
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 static FactoryDataProvider sFactoryDataProvider;

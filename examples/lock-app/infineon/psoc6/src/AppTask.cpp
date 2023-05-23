@@ -64,6 +64,7 @@ using chip::DeviceLayer::OTAImageProcessorImpl;
 using chip::System::Layer;
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;

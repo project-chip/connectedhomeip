@@ -46,6 +46,7 @@
 #endif
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
