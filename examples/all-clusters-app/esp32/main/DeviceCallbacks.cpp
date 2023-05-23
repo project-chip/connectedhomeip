@@ -44,7 +44,6 @@
 static const char * TAG = "app-devicecallbacks";
 
 using namespace ::chip;
-using namespace ::chip::app;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace chip::app;

@@ -51,6 +51,7 @@ using chip::app::Clusters::DoorLock::OperationErrorEnum;
 using chip::app::Clusters::DoorLock::OperationSourceEnum;
 
 using namespace chip;
+using namespace chip::app;
 using namespace ::chip::DeviceLayer::Internal;
 
 using namespace ::chip::Credentials;
