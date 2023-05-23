@@ -92,7 +92,6 @@ jobs:
                       --target ti-cc13x4_26x4-lock-mtd \
                       --target ti-cc13x4_26x4-pump-mtd \
                       --target ti-cc13x4_26x4-pump-ftd \
-                      --target ti-cc13x4_26x4-all-clusters \
                       --target ti-cc13x4_26x4-pump-controller-mtd \
                       --target ti-cc13x4_26x4-pump-controller-ftd \
                       build \
@@ -147,15 +146,6 @@ jobs:
                     cc13x4_26x4 LP_EM_CC1354P10_6 pump-controller-app \
                     out/artifacts/ti-cc13x4_26x4-pump-controller-mtd/chip-LP_EM_CC1354P10_6-pump-controller-example.out \
                     /tmp/bloat_reports/
-
-            - name: Get All-clusters App size stats
-              timeout-minutes: 5
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    cc13x4_26x4 LP_EM_CC1354P10_6 all-clusters-app \
-                    out/artifacts/ti-cc13x4_26x4-all-clusters/chip-LP_EM_CC1354P10_6-all-clusters-example.out \
-                    /tmp/bloat_reports/
-
             - name: Get Lighting App size stats
               timeout-minutes: 5
               run: |

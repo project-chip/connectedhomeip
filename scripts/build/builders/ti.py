@@ -16,7 +16,7 @@ import os
 from enum import Enum, auto
 
 from .gn import GnBuilder
-
+from typing import Optional
 
 class TIApp(Enum):
     LOCK = auto()
@@ -95,7 +95,7 @@ class TIBuilder(GnBuilder):
                  runner,
                  board=TIBoard.LP_CC2652R7,
                  app: TIApp = TIApp.LOCK,
-                 openthread_ftd: bool = None):
+                 openthread_ftd: Optional[bool] = None):
         super(TIBuilder, self).__init__(
             root=app.BuildRoot(root, board),
             runner=runner)
@@ -110,12 +110,10 @@ class TIBuilder(GnBuilder):
             'ti_simplelink_board="%s"' % self.board.BoardName(),
         ]
 
-        if self.openthread_ftd is None:
-            pass
-        elif self.openthread_ftd:
+        if self.openthread_ftd:
             args.append('chip_openthread_ftd=true')
             args.append('chip_progress_logging=false')
-        else:
+        elif self.openthread_ftd is not None:
             args.append('chip_openthread_ftd=false')
 
         return args
