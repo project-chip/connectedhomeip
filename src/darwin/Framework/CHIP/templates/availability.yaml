@@ -3445,6 +3445,7 @@
                   - 5G
                   - 6G
                   - 60G
+                  - 1G
           DiagnosticLogs:
               LogsIntent:
                   - EndUserSupport
@@ -6763,6 +6764,7 @@
                   - N
                   - Ac
                   - Ax
+                  - Ah
           PumpConfigurationAndControl:
               ControlModeEnum:
                   - ConstantSpeed
