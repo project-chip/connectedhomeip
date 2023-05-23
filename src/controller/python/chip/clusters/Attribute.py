@@ -383,7 +383,7 @@ class AttributeCache:
 
         clusterCache[path.AttributeId] = data
 
-    def UpdateCachedData(self):
+    def UpdateCachedData(self, changedPathSet: set[AttributePath]):
         ''' This converts the raw TLV data into a cluster object format.
 
             Two formats are available:
@@ -401,68 +401,73 @@ class AttributeCache:
         tlvCache = self.attributeTLVCache
         attributeCache = self.attributeCache
 
-        for endpoint in tlvCache:
+        for attributePath in changedPathSet:
+            endpoint = attributePath.EndpointId
+
             if (endpoint not in attributeCache):
                 attributeCache[endpoint] = {}
 
             endpointCache = attributeCache[endpoint]
 
-            for cluster in tlvCache[endpoint]:
-                if cluster not in _ClusterIndex:
+            cluster = attributePath.ClusterId
+
+            if cluster not in _ClusterIndex:
+                #
+                # #22599 tracks dealing with unknown clusters more
+                # gracefully so that clients can still access this data.
+                #
+                continue
+
+            clusterType = _ClusterIndex[cluster]
+
+            if (clusterType not in endpointCache):
+                endpointCache[clusterType] = {}
+
+            clusterCache = endpointCache[clusterType]
+            clusterDataVersion = self.versionList.get(
+                endpoint, {}).get(cluster, None)
+
+            if (self.returnClusterObject):
+                try:
+                    # Since the TLV data is already organized by attribute tags, we can trivially convert to a cluster object representation.
+                    endpointCache[clusterType] = clusterType.FromDict(
+                        data=clusterType.descriptor.TagDictToLabelDict([], tlvCache[endpoint][cluster]))
+                    endpointCache[clusterType].SetDataVersion(
+                        clusterDataVersion)
+                except Exception as ex:
+                    decodedValue = ValueDecodeFailure(
+                        tlvCache[endpoint][cluster], ex)
+                    endpointCache[clusterType] = decodedValue
+            else:
+                clusterCache[DataVersion] = clusterDataVersion
+
+                attribute = attributePath.AttributeId
+
+                value = tlvCache[endpoint][cluster][attribute]
+
+                if (cluster, attribute) not in _AttributeIndex:
                     #
                     # #22599 tracks dealing with unknown clusters more
                     # gracefully so that clients can still access this data.
                     #
                     continue
 
-                clusterType = _ClusterIndex[cluster]
+                attributeType = _AttributeIndex[(
+                    cluster, attribute)][0]
 
-                if (clusterType not in endpointCache):
-                    endpointCache[clusterType] = {}
+                if (attributeType not in clusterCache):
+                    clusterCache[attributeType] = {}
 
-                clusterCache = endpointCache[clusterType]
-                clusterDataVersion = self.versionList.get(
-                    endpoint, {}).get(cluster, None)
-
-                if (self.returnClusterObject):
-                    try:
-                        # Since the TLV data is already organized by attribute tags, we can trivially convert to a cluster object representation.
-                        endpointCache[clusterType] = clusterType.FromDict(
-                            data=clusterType.descriptor.TagDictToLabelDict([], tlvCache[endpoint][cluster]))
-                        endpointCache[clusterType].SetDataVersion(
-                            clusterDataVersion)
-                    except Exception as ex:
-                        decodedValue = ValueDecodeFailure(
-                            tlvCache[endpoint][cluster], ex)
-                        endpointCache[clusterType] = decodedValue
+                if isinstance(value, ValueDecodeFailure):
+                    clusterCache[attributeType] = value
                 else:
-                    clusterCache[DataVersion] = clusterDataVersion
-                    for attribute in tlvCache[endpoint][cluster]:
-                        value = tlvCache[endpoint][cluster][attribute]
+                    try:
+                        decodedValue = attributeType.FromTagDictOrRawValue(
+                            tlvCache[endpoint][cluster][attribute])
+                    except Exception as ex:
+                        decodedValue = ValueDecodeFailure(value, ex)
 
-                        if (cluster, attribute) not in _AttributeIndex:
-                            #
-                            # #22599 tracks dealing with unknown clusters more
-                            # gracefully so that clients can still access this data.
-                            #
-                            continue
-
-                        attributeType = _AttributeIndex[(
-                            cluster, attribute)][0]
-
-                        if (attributeType not in clusterCache):
-                            clusterCache[attributeType] = {}
-
-                        if (type(value) is ValueDecodeFailure):
-                            clusterCache[attributeType] = value
-                        else:
-                            try:
-                                decodedValue = attributeType.FromTagDictOrRawValue(
-                                    tlvCache[endpoint][cluster][attribute])
-                            except Exception as ex:
-                                decodedValue = ValueDecodeFailure(value, ex)
-
-                            clusterCache[attributeType] = decodedValue
+                    clusterCache[attributeType] = decodedValue
 
 
 class SubscriptionTransaction:
@@ -765,7 +770,7 @@ class AsyncReadTransaction:
         pass
 
     def _handleReportEnd(self):
-        self._cache.UpdateCachedData()
+        self._cache.UpdateCachedData(self._changedPathSet)
 
         if (self._subscription_handler is not None):
             for change in self._changedPathSet:
