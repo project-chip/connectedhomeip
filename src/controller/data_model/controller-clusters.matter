@@ -2869,24 +2869,21 @@ client cluster AirQuality = 91 {
 /** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
 client cluster SmokeCoAlarm = 92 {
   enum AlarmStateEnum : ENUM8 {
-    kUnknown = 0;
-    kNormal = 1;
+    kNormal = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum ContaminationStateEnum : ENUM8 {
+    kNormal = 0;
+    kLow = 1;
     kWarning = 2;
     kCritical = 3;
   }
 
-  enum ContaminationStateEnum : ENUM8 {
-    kUnknown = 0;
-    kNormal = 1;
-    kLow = 2;
-    kWarning = 3;
-    kCritical = 4;
-  }
-
   enum EndOfServiceEnum : ENUM8 {
-    kUnknown = 0;
-    kExpired = 1;
-    kNormal = 2;
+    kExpired = 0;
+    kNormal = 1;
   }
 
   enum ExpressedStateEnum : ENUM8 {
@@ -2902,9 +2899,8 @@ client cluster SmokeCoAlarm = 92 {
   }
 
   enum MuteStateEnum : ENUM8 {
-    kUnknown = 0;
-    kNotMuted = 1;
-    kMuted = 2;
+    kNotMuted = 0;
+    kMuted = 1;
   }
 
   enum SensitivityEnum : ENUM8 {
