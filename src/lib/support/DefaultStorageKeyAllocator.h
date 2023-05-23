@@ -215,6 +215,16 @@ public:
     {
         return StorageKeyName::Formatted("f/%x/e/%x/sc/%x", fabric, endpoint, idx);
     }
+    // Operational State
+    static StorageKeyName OperationalStateOpStateList(EndpointId endpoint, ClusterId clusterId)
+    {
+        return StorageKeyName::Formatted("g/ops/sl/%x/%" PRIx32, endpoint, clusterId);
+    }
+
+    static StorageKeyName OperationalStatePhaseList(EndpointId endpoint, ClusterId clusterId)
+    {
+        return StorageKeyName::Formatted("g/ops/pl/%x/%" PRIx32, endpoint, clusterId);
+    }
 };
 
 } // namespace chip
