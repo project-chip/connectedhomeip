@@ -79,16 +79,13 @@ source_set("ota-requestor-test-srcs") {
   ]
 }
 source_set("operational-state-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/operational-state-server/OperationalStateDataProvider.cpp",
-  ]
+  sources = [ "${chip_root}/src/app/clusters/operational-state-server/OperationalStateDataProvider.cpp" ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
   ]
 }
-
 
 source_set("scenes-table-test-srcs") {
   sources = [
@@ -136,6 +133,7 @@ chip_test_suite("tests") {
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
+    "TestOperationalStateDataProvider.cpp",
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
@@ -144,7 +142,6 @@ chip_test_suite("tests") {
     "TestStatusResponseMessage.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
-    "TestOperationalStateDataProvider.cpp",
   ]
 
   if (!chip_fake_platform) {
@@ -179,8 +176,8 @@ chip_test_suite("tests") {
     # Disable CM cluster table tests until update is done
     #https://github.com/project-chip/connectedhomeip/issues/24425
     # ":client-monitoring-test-srcs",
-    ":ota-requestor-test-srcs",
     ":operational-state-test-srcs",
+    ":ota-requestor-test-srcs",
     ":scenes-table-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
