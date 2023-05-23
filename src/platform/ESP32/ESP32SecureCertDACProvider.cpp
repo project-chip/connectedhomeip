@@ -130,7 +130,7 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
                         ESP_LOGE(TAG, "Failed to get the type of private key from secure cert partition, esp_err:%d", esp_err));
 
     VerifyOrReturnError(keyType != ESP_SECURE_CERT_INVALID_KEY, CHIP_ERROR_INCORRECT_STATE,
-                        ESP_LOGE(TAG, "Private key type in secure cert partition in invalid"));
+                        ESP_LOGE(TAG, "Private key type in secure cert partition is invalid"));
 
     // This flow is for devices supporting ECDSA peripheral
     if (keyType == ESP_SECURE_CERT_ECDSA_PERIPHERAL_KEY)
