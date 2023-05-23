@@ -73,9 +73,12 @@ For MacOS, `gdbgui` python package will not be installed using `bootstrap.sh`
 script as it is restricted only for x64 Linux platforms. It is restricted
 because, building wheels for `gevent` (dependency of `gdbgui`) fails on MacOS.
 
-Please run the below commands after every bootstrapping.
+For ARM-based Mac, no further installation steps are necessary if Python3
+version is greater than or equal to 3.11.
 
-Workaround is to install `gdbgui` wheels as binary:
+If Python3 version is less than 3.11 or you are using x86(Intel-based) Mac then
+please run the below commands after every bootstrapping to install gdbgui wheels
+as binary
 
 ```
 python3 -m pip install -c scripts/setup/constraints.txt --no-cache --prefer-binary gdbgui==0.13.2.0
