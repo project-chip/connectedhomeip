@@ -258,6 +258,11 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/PendingNotificationMap.cpp",
           "${_app_root}/clusters/${cluster}/PendingNotificationMap.h",
         ]
+      } else if (cluster == "operational-state-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/OperationalStateDataProvider.cpp",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
