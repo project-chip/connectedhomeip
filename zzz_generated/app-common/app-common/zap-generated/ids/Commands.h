@@ -671,6 +671,16 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace SmokeCoAlarm
 
+namespace DishwasherAlarm {
+namespace Commands {
+
+namespace Reset {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Reset
+
+} // namespace Commands
+} // namespace DishwasherAlarm
+
 namespace HepaFilterMonitoring {
 namespace Commands {
 

@@ -737,6 +737,14 @@ MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterAllClearEvent : NSObject <NSCopying>
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRDishwasherAlarmClusterNotifyEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull active MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull inactive MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull state MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull mask MTR_NEWLY_AVAILABLE;
+@end
+
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDoorLockClusterCredentialStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull credentialType API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));

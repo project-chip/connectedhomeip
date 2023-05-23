@@ -400,6 +400,15 @@ public:
     ~SmokeCoAlarmCluster() {}
 };
 
+class DLL_EXPORT DishwasherAlarmCluster : public ClusterBase
+{
+public:
+    DishwasherAlarmCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~DishwasherAlarmCluster() {}
+};
+
 class DLL_EXPORT HepaFilterMonitoringCluster : public ClusterBase
 {
 public:

@@ -1140,6 +1140,40 @@ public class ChipEventStructs {
     }
   }
 
+  public static class DishwasherAlarmClusterNotifyEvent {
+    public Long active;
+    public Long inactive;
+    public Long state;
+    public Long mask;
+
+    public DishwasherAlarmClusterNotifyEvent(Long active, Long inactive, Long state, Long mask) {
+      this.active = active;
+      this.inactive = inactive;
+      this.state = state;
+      this.mask = mask;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("DishwasherAlarmClusterNotifyEvent {\n");
+      output.append("\tactive: ");
+      output.append(active);
+      output.append("\n");
+      output.append("\tinactive: ");
+      output.append(inactive);
+      output.append("\n");
+      output.append("\tstate: ");
+      output.append(state);
+      output.append("\n");
+      output.append("\tmask: ");
+      output.append(mask);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class DoorLockClusterDoorLockAlarmEvent {
     public Integer alarmCode;
 
