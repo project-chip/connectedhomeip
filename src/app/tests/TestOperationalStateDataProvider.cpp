@@ -26,11 +26,11 @@ using namespace chip;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters::OperationalState;
 
-using OperationalStateStructType = app::Clusters::OperationalState::Structs::OperationalStateStruct::Type;
+using OperationalStateStructType     = app::Clusters::OperationalState::Structs::OperationalStateStruct::Type;
 using OperationalStateStructTypeList = app::DataModel::List<OperationalStateStructType>;
 
 using PhaseListType = chip::CharSpan;
-using PhaseList        = chip::app::DataModel::List<const chip::CharSpan>;
+using PhaseList     = chip::app::DataModel::List<const chip::CharSpan>;
 
 namespace {
 
@@ -47,27 +47,31 @@ void TestOperationalStateListStoreLoad(nlTestSuite * inSuite, void * inContext)
             state.operationalStateLabel = chip::CharSpan(stateLabel, len);
         return state;
     };
-    char opStopped[8]   = "Stopped";
-    char opRunning[32]  = "Running";
-    char opPaused[64]  = "Paused";
-    EndpointId endpoint = 1;
-    ClusterId clusterId = 0x60;
-    OperationalStateStructType opS[3] = { makeOperationalStateStructType(OperationalStateEnum::kStopped, opStopped, sizeof(opStopped)),
-                        makeOperationalStateStructType(OperationalStateEnum::kRunning, opRunning, sizeof(opRunning)),
-                        makeOperationalStateStructType(OperationalStateEnum::kPaused, opPaused, sizeof(opPaused)) };
+    char opStopped[8]                 = "Stopped";
+    char opRunning[32]                = "Running";
+    char opPaused[64]                 = "Paused";
+    EndpointId endpoint               = 1;
+    ClusterId clusterId               = 0x60;
+    OperationalStateStructType opS[3] = {
+        makeOperationalStateStructType(OperationalStateEnum::kStopped, opStopped, sizeof(opStopped)),
+        makeOperationalStateStructType(OperationalStateEnum::kRunning, opRunning, sizeof(opRunning)),
+        makeOperationalStateStructType(OperationalStateEnum::kPaused, opPaused, sizeof(opPaused))
+    };
     OperationalStateStructTypeList opL(opS);
     NL_TEST_ASSERT(inSuite, opL.size() == 3);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == OperationalStateDataProv.StoreOperationalStateList<OperationalStateStructType>(endpoint, clusterId, opL));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       OperationalStateDataProv.StoreOperationalStateList<OperationalStateStructType>(endpoint, clusterId, opL));
 
-
-    OperationalStateStructDynamicList *pOpList = nullptr;
+    OperationalStateStructDynamicList * pOpList = nullptr;
     size_t size;
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == OperationalStateDataProv.LoadOperationalStateList(endpoint, clusterId, &pOpList, size));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR == OperationalStateDataProv.LoadOperationalStateList(endpoint, clusterId, &pOpList, size));
     NL_TEST_ASSERT(inSuite, size == 3);
     NL_TEST_ASSERT(inSuite, pOpList != nullptr);
 
     int i = 1;
-    for (OperationalStateStructDynamicList *op = pOpList; op != nullptr; op = op->Next)
+    for (OperationalStateStructDynamicList * op = pOpList; op != nullptr; op = op->Next)
     {
         if (i == 1)
         {
@@ -104,15 +108,16 @@ void TestOperationalStateListEmpty(nlTestSuite * inSuite, void * inContext)
     OperationalStateDataProv.Init(persistentStorage);
 
     OperationalStateStructTypeList opList;
-    EndpointId endpoint = 1;
-    ClusterId clusterId = 0x60;
-    size_t size = 0;
-    OperationalStateStructDynamicList *pOpList = nullptr;
+    EndpointId endpoint                         = 1;
+    ClusterId clusterId                         = 0x60;
+    size_t size                                 = 0;
+    OperationalStateStructDynamicList * pOpList = nullptr;
 
-    NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == OperationalStateDataProv.LoadOperationalStateList(endpoint, clusterId, &pOpList, size));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ==
+                       OperationalStateDataProv.LoadOperationalStateList(endpoint, clusterId, &pOpList, size));
     NL_TEST_ASSERT(inSuite, size == 0);
 }
-
 
 void TestUseOpStateIDGetOpStateStruct(nlTestSuite * inSuite, void * inContext)
 {
@@ -127,17 +132,21 @@ void TestUseOpStateIDGetOpStateStruct(nlTestSuite * inSuite, void * inContext)
             state.operationalStateLabel = chip::CharSpan(stateLabel, len);
         return state;
     };
-    char opStopped[8]   = "Stopped";
-    char opRunning[32]  = "Running";
-    char opPaused[64]  = "Paused";
-    EndpointId endpoint = 1;
-    ClusterId clusterId = 0x60;
-    OperationalStateStructType opS[3] = { makeOperationalStateStructType(OperationalStateEnum::kStopped, opStopped, sizeof(opStopped)),
-                        makeOperationalStateStructType(OperationalStateEnum::kRunning, opRunning, sizeof(opRunning)),
-                        makeOperationalStateStructType(OperationalStateEnum::kPaused, opPaused, sizeof(opPaused)) };
+    char opStopped[8]                 = "Stopped";
+    char opRunning[32]                = "Running";
+    char opPaused[64]                 = "Paused";
+    EndpointId endpoint               = 1;
+    ClusterId clusterId               = 0x60;
+    OperationalStateStructType opS[3] = {
+        makeOperationalStateStructType(OperationalStateEnum::kStopped, opStopped, sizeof(opStopped)),
+        makeOperationalStateStructType(OperationalStateEnum::kRunning, opRunning, sizeof(opRunning)),
+        makeOperationalStateStructType(OperationalStateEnum::kPaused, opPaused, sizeof(opPaused))
+    };
     OperationalStateStructTypeList opL(opS);
     NL_TEST_ASSERT(inSuite, opL.size() == 3);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == OperationalStateDataProv.StoreOperationalStateList<OperationalStateStructType>(endpoint, clusterId, opL));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       OperationalStateDataProv.StoreOperationalStateList<OperationalStateStructType>(endpoint, clusterId, opL));
 
     OperationalStateStructDynamicList pOp;
     pOp.operationalStateID = OperationalStateEnum::kPaused;
@@ -146,7 +155,6 @@ void TestUseOpStateIDGetOpStateStruct(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, 0 == memcmp(opPaused, pOp.operationalStateLabel.data(), strlen(opPaused)));
 }
-
 
 void TestPhaseListStoreLoad(nlTestSuite * inSuite, void * inContext)
 {
@@ -157,17 +165,11 @@ void TestPhaseListStoreLoad(nlTestSuite * inSuite, void * inContext)
     EndpointId endpoint = 1;
     ClusterId clusterId = 0x60;
 
-    char opPauseList[][32] = {
-        "pre-soak",
-        "rinse",
-        "spin"
-    };
+    char opPauseList[][32] = { "pre-soak", "rinse", "spin" };
 
-    const auto makePhaseType = [](char * str, size_t len = 0) {
-        return CharSpan::fromCharString(str);
-    };
+    const auto makePhaseType = [](char * str, size_t len = 0) { return CharSpan::fromCharString(str); };
 
-    PhaseListType  phase[3] = {
+    PhaseListType phase[3] = {
         makePhaseType(opPauseList[0]),
         makePhaseType(opPauseList[1]),
         makePhaseType(opPauseList[2]),
@@ -176,14 +178,14 @@ void TestPhaseListStoreLoad(nlTestSuite * inSuite, void * inContext)
     PhaseList phaseList(phase);
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == OperationalStateDataProv.StorePhaseList(endpoint, clusterId, phaseList));
 
-    PhaseListCharSpan *readPhaseList = nullptr;
-    size_t  size;
+    PhaseListCharSpan * readPhaseList = nullptr;
+    size_t size;
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == OperationalStateDataProv.LoadPhaseList(endpoint, clusterId, &readPhaseList, size));
 
     NL_TEST_ASSERT(inSuite, readPhaseList != nullptr);
 
     int i = 0;
-    for (PhaseListCharSpan *op = readPhaseList; op != nullptr; op = op->Next)
+    for (PhaseListCharSpan * op = readPhaseList; op != nullptr; op = op->Next)
     {
         if (i == 0)
         {
@@ -213,19 +215,21 @@ void TestPhaseListEmpty(nlTestSuite * inSuite, void * inContext)
     OperationalStateDataProv.Init(persistentStorage);
 
     OperationalStateStructTypeList opList;
-    EndpointId endpoint = 1;
-    ClusterId clusterId = 0x60;
-    size_t size = 0;
-    PhaseListCharSpan *readPhaseList = nullptr;
+    EndpointId endpoint               = 1;
+    ClusterId clusterId               = 0x60;
+    size_t size                       = 0;
+    PhaseListCharSpan * readPhaseList = nullptr;
 
-    NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == OperationalStateDataProv.LoadPhaseList(endpoint, clusterId, &readPhaseList, size));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND ==
+                       OperationalStateDataProv.LoadPhaseList(endpoint, clusterId, &readPhaseList, size));
     NL_TEST_ASSERT(inSuite, size == 0);
 }
 
-const nlTest sTests[] = {
-                          NL_TEST_DEF("Test operational state list store load", TestOperationalStateListStoreLoad),
+const nlTest sTests[] = { NL_TEST_DEF("Test operational state list store load", TestOperationalStateListStoreLoad),
                           NL_TEST_DEF("Test operational state list (empty list)", TestOperationalStateListEmpty),
-                          NL_TEST_DEF("Test use operational state id to get oprational state struct", TestUseOpStateIDGetOpStateStruct),
+                          NL_TEST_DEF("Test use operational state id to get oprational state struct",
+                                      TestUseOpStateIDGetOpStateStruct),
                           NL_TEST_DEF("Test phase list load", TestPhaseListStoreLoad),
                           NL_TEST_DEF("Test phase list (empty list)", TestPhaseListEmpty),
                           NL_TEST_SENTINEL() };

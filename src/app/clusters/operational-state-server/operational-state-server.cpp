@@ -32,12 +32,11 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/util/error-mapping.h>
+#include <app/clusters/operational-state-server/operational-state-default-impl.h>
 #include <app/clusters/operational-state-server/operational-state-delegate.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/server/Server.h>
-#include <app/clusters/operational-state-server/operational-state-default-impl.h>
-#include <app/server/Server.h>
+#include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -51,7 +50,8 @@ using Status = Protocols::InteractionModel::Status;
 CHIP_ERROR OperationalStateServer::Init()
 {
     // Check if the cluster has been selected in zap
-    if (!emberAfContainsServer(endpointId, clusterId)) {
+    if (!emberAfContainsServer(endpointId, clusterId))
+    {
         ChipLogError(Zcl, "Operational State: The cluster with ID %lu was not enabled in zap.", long(clusterId));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -73,38 +73,38 @@ void OperationalStateServer::InvokeCommand(HandlerContext & handlerContext)
     ChipLogDetail(Zcl, "OperationalState: InvokeCommand");
     switch (handlerContext.mRequestPath.mCommandId)
     {
-        case Commands::Pause::Id:
-            ChipLogDetail(Zcl, "OperationalState: Entering handling Pause state");
+    case Commands::Pause::Id:
+        ChipLogDetail(Zcl, "OperationalState: Entering handling Pause state");
 
-            HandleCommand<Commands::Pause::DecodableType>(
-                handlerContext, [this](HandlerContext & ctx, const auto & req) { HandlePauseState(ctx, req);  });
+        HandleCommand<Commands::Pause::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandlePauseState(ctx, req); });
         break;
 
-        case Commands::Resume::Id:
-            ChipLogDetail(Zcl, "OperationalState: Entering handling Resume state");
+    case Commands::Resume::Id:
+        ChipLogDetail(Zcl, "OperationalState: Entering handling Resume state");
 
-            HandleCommand<Commands::Resume::DecodableType>(
-                handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleResumeState(ctx, req);  });
+        HandleCommand<Commands::Resume::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleResumeState(ctx, req); });
         break;
 
-        case Commands::Start::Id:
-            ChipLogDetail(Zcl, "OperationalState: Entering handling Start state");
+    case Commands::Start::Id:
+        ChipLogDetail(Zcl, "OperationalState: Entering handling Start state");
 
-            HandleCommand<Commands::Start::DecodableType>(
-                handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleStartState(ctx, req);  });
+        HandleCommand<Commands::Start::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleStartState(ctx, req); });
         break;
 
-        case Commands::Stop::Id:
-            ChipLogDetail(Zcl, "OperationalState: Entering handling Stop state");
+    case Commands::Stop::Id:
+        ChipLogDetail(Zcl, "OperationalState: Entering handling Stop state");
 
-            HandleCommand<Commands::Stop::DecodableType>(
-                handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleStopState(ctx, req);  });
+        HandleCommand<Commands::Stop::DecodableType>(handlerContext,
+                                                     [this](HandlerContext & ctx, const auto & req) { HandleStopState(ctx, req); });
         break;
-
     }
 }
 
-CHIP_ERROR OperationalStateServer::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR OperationalStateServer::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback,
+                                                             void * context)
 {
     callback(Commands::Pause::Id, context);
     callback(Commands::Resume::Id, context);
@@ -120,23 +120,23 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     OperationalErrorStateStruct currentErrState;
     OperationalStateStruct currentOperationalState;
 
-    //copy current operational state
+    // copy current operational state
     currentOperationalState = operationalState;
-    //copy current operational error
+    // copy current operational error
     currentErrState = operationalError;
 
-    //callback
+    // callback
     delegate->HandlePauseState(currentOperationalState, currentErrState);
 
-    //set operational error
+    // set operational error
     SetOperationalState(currentOperationalState);
 
-    //copy current operational error
+    // copy current operational error
     operationalError = currentErrState;
 
-    //return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel = CharSpan::fromCharString(operationalError.ErrorStateLabel);
+    // return operational error
+    response.commandResponseState.errorStateID      = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
+    response.commandResponseState.errorStateLabel   = CharSpan::fromCharString(operationalError.ErrorStateLabel);
     response.commandResponseState.errorStateDetails = CharSpan::fromCharString(operationalError.ErrorStateDetails);
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -149,23 +149,23 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     OperationalErrorStateStruct currentErrState;
     OperationalStateStruct currentOperationalState;
 
-    //copy current operational state
+    // copy current operational state
     currentOperationalState = operationalState;
-    //copy current operational error
+    // copy current operational error
     currentErrState = operationalError;
 
-    //callback
+    // callback
     delegate->HandleResumeState(currentOperationalState, currentErrState);
 
-    //set operational error
+    // set operational error
     SetOperationalState(currentOperationalState);
 
-    //copy current operational error
+    // copy current operational error
     operationalError = currentErrState;
 
-    //return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel = CharSpan::fromCharString(operationalError.ErrorStateLabel);
+    // return operational error
+    response.commandResponseState.errorStateID      = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
+    response.commandResponseState.errorStateLabel   = CharSpan::fromCharString(operationalError.ErrorStateLabel);
     response.commandResponseState.errorStateDetails = CharSpan::fromCharString(operationalError.ErrorStateDetails);
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -178,23 +178,23 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
     OperationalErrorStateStruct currentErrState;
     OperationalStateStruct currentOperationalState;
 
-    //copy current operational state
+    // copy current operational state
     currentOperationalState = operationalState;
-    //copy current operational error
+    // copy current operational error
     currentErrState = operationalError;
 
-    //callback
+    // callback
     delegate->HandleStartState(currentOperationalState, currentErrState);
 
-    //set operational error
+    // set operational error
     SetOperationalState(currentOperationalState);
 
-    //copy current operational error
+    // copy current operational error
     operationalError = currentErrState;
 
-    //return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel = CharSpan::fromCharString(operationalError.ErrorStateLabel);
+    // return operational error
+    response.commandResponseState.errorStateID      = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
+    response.commandResponseState.errorStateLabel   = CharSpan::fromCharString(operationalError.ErrorStateLabel);
     response.commandResponseState.errorStateDetails = CharSpan::fromCharString(operationalError.ErrorStateDetails);
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -207,23 +207,23 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
     OperationalErrorStateStruct currentErrState;
     OperationalStateStruct currentOperationalState;
 
-    //copy current operational state
+    // copy current operational state
     currentOperationalState = operationalState;
-    //copy current operational error
+    // copy current operational error
     currentErrState = operationalError;
 
-    //callback
+    // callback
     delegate->HandleStopState(currentOperationalState, currentErrState);
 
-    //set operational error
+    // set operational error
     SetOperationalState(currentOperationalState);
 
-    //copy current operational error
+    // copy current operational error
     operationalError = currentErrState;
 
-    //return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel = CharSpan::fromCharString(operationalError.ErrorStateLabel);
+    // return operational error
+    response.commandResponseState.errorStateID      = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
+    response.commandResponseState.errorStateLabel   = CharSpan::fromCharString(operationalError.ErrorStateLabel);
     response.commandResponseState.errorStateDetails = CharSpan::fromCharString(operationalError.ErrorStateDetails);
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -255,12 +255,12 @@ void OperationalStateServer::HandleCommand(HandlerContext & handlerContext, Func
     }
 }
 
-CHIP_ERROR OperationalStateServer::GetOperationalStateList(OperationalStateStructDynamicList **operationalStateList, size_t & size)
+CHIP_ERROR OperationalStateServer::GetOperationalStateList(OperationalStateStructDynamicList ** operationalStateList, size_t & size)
 {
     return mOperationalStateDataProvider.LoadOperationalStateList(endpointId, clusterId, operationalStateList, size);
 }
 
-void OperationalStateServer::ReleaseOperationalStateList(OperationalStateStructDynamicList* operationalStateList)
+void OperationalStateServer::ReleaseOperationalStateList(OperationalStateStructDynamicList * operationalStateList)
 {
     mOperationalStateDataProvider.ReleaseOperationalStateList(operationalStateList);
 }
@@ -275,12 +275,12 @@ CHIP_ERROR OperationalStateServer::SetPhaseList(const PhaseList & phaseList)
     return mOperationalStateDataProvider.StorePhaseList(endpointId, clusterId, phaseList);
 }
 
-CHIP_ERROR OperationalStateServer::GetPhaseList(PhaseListCharSpan **phaseList, size_t & size)
+CHIP_ERROR OperationalStateServer::GetPhaseList(PhaseListCharSpan ** phaseList, size_t & size)
 {
     return mOperationalStateDataProvider.LoadPhaseList(endpointId, clusterId, phaseList, size);
 }
 
-void OperationalStateServer::ReleasePhaseList(PhaseListCharSpan *phaseList)
+void OperationalStateServer::ReleasePhaseList(PhaseListCharSpan * phaseList)
 {
     mOperationalStateDataProvider.ReleasePhaseList(phaseList);
 }
@@ -333,76 +333,73 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
     switch (aPath.mAttributeId)
     {
-        case OperationalState::Attributes::OperationalStateList::Id: {
-            OperationalStateStructDynamicList *pOpList = nullptr;
-            size_t size = 0;
-            GetOperationalStateList(&pOpList, size);
-            if (size == 0)
-            {
-                err = aEncoder.EncodeNull();
-            }
-            else
-            {
-                return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-
-                    for (OperationalStateStructDynamicList *pHead = pOpList; pHead != nullptr; pHead = pHead->Next)
-                    {
-                        ReturnErrorOnFailure(encoder.Encode(*pHead));
-                    }
-                    ReleaseOperationalStateList(pOpList);
-                    pOpList = nullptr;
-                    return CHIP_NO_ERROR;
-                });
-            }
-
+    case OperationalState::Attributes::OperationalStateList::Id: {
+        OperationalStateStructDynamicList * pOpList = nullptr;
+        size_t size                                 = 0;
+        GetOperationalStateList(&pOpList, size);
+        if (size == 0)
+        {
+            err = aEncoder.EncodeNull();
         }
-        break;
-
-        case OperationalState::Attributes::OperationalState::Id: {
-            OperationalState::Structs::OperationalStateStruct::Type opState;
-
-            opState.operationalStateID = static_cast<OperationalState::OperationalStateEnum>(operationalState.OperationalStateID);
-            opState.operationalStateLabel = CharSpan::fromCharString(operationalState.OperationalStateLabel);
-
-            return aEncoder.Encode(opState);
+        else
+        {
+            return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+                for (OperationalStateStructDynamicList * pHead = pOpList; pHead != nullptr; pHead = pHead->Next)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(*pHead));
+                }
+                ReleaseOperationalStateList(pOpList);
+                pOpList = nullptr;
+                return CHIP_NO_ERROR;
+            });
         }
-        break;
+    }
+    break;
 
-        case OperationalState::Attributes::OperationalError::Id: {
+    case OperationalState::Attributes::OperationalState::Id: {
+        OperationalState::Structs::OperationalStateStruct::Type opState;
 
-            OperationalState::Structs::ErrorStateStruct::Type opError;
+        opState.operationalStateID    = static_cast<OperationalState::OperationalStateEnum>(operationalState.OperationalStateID);
+        opState.operationalStateLabel = CharSpan::fromCharString(operationalState.OperationalStateLabel);
 
-            opError.errorStateID = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-            opError.errorStateLabel = CharSpan::fromCharString(operationalError.ErrorStateLabel);
-            opError.errorStateDetails = CharSpan::fromCharString(operationalError.ErrorStateDetails);
+        return aEncoder.Encode(opState);
+    }
+    break;
 
-            return aEncoder.Encode(opError);
+    case OperationalState::Attributes::OperationalError::Id: {
+
+        OperationalState::Structs::ErrorStateStruct::Type opError;
+
+        opError.errorStateID      = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
+        opError.errorStateLabel   = CharSpan::fromCharString(operationalError.ErrorStateLabel);
+        opError.errorStateDetails = CharSpan::fromCharString(operationalError.ErrorStateDetails);
+
+        return aEncoder.Encode(opError);
+    }
+    break;
+
+    case OperationalState::Attributes::PhaseList::Id: {
+        PhaseListCharSpan * phaseList = nullptr;
+        size_t size                   = 0;
+        GetPhaseList(&phaseList, size);
+        if (size == 0)
+        {
+            err = aEncoder.EncodeNull();
         }
-        break;
-
-        case OperationalState::Attributes::PhaseList::Id: {
-            PhaseListCharSpan *phaseList = nullptr;
-            size_t size = 0;
-            GetPhaseList(&phaseList, size);
-            if (size == 0)
-            {
-                err = aEncoder.EncodeNull();
-            }
-            else
-            {
-                return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-
-                    for (PhaseListCharSpan *pHead = phaseList; pHead != nullptr; pHead = pHead->Next)
-                    {
-                        ReturnErrorOnFailure(encoder.Encode(pHead->phase));
-                    }
-                    ReleasePhaseList(phaseList);
-                    phaseList = nullptr;
-                    return CHIP_NO_ERROR;
-                });
-            }
+        else
+        {
+            return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+                for (PhaseListCharSpan * pHead = phaseList; pHead != nullptr; pHead = pHead->Next)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(pHead->phase));
+                }
+                ReleasePhaseList(phaseList);
+                phaseList = nullptr;
+                return CHIP_NO_ERROR;
+            });
         }
-        break;
+    }
+    break;
     }
     return CHIP_NO_ERROR;
 }

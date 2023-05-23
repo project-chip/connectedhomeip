@@ -21,11 +21,13 @@
 #include <lib/core/TLV.h>
 namespace chip {
 
-CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId endpoint, ClusterId clusterId, OperationalStateStructDynamicList **operationalStateList, size_t & size)
+CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId endpoint, ClusterId clusterId,
+                                                                  OperationalStateStructDynamicList ** operationalStateList,
+                                                                  size_t & size)
 {
     uint8_t buffer[kOperationalStateMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
-    size = 0;
+    size           = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::OperationalStateOpStateList(endpoint, clusterId).KeyName(), bufferSpan));
@@ -36,11 +38,11 @@ CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId end
     reader.Init(bufferSpan.data(), bufferSpan.size());
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
-    size_t i = 0;
+    size_t i                                 = 0;
     OperationalStateStructDynamicList * head = nullptr;
     while (reader.Next() != CHIP_ERROR_END_OF_TLV)
     {
-        OperationalStateStructDynamicList *state = chip::Platform::New<OperationalStateStructDynamicList>();
+        OperationalStateStructDynamicList * state = chip::Platform::New<OperationalStateStructDynamicList>();
         if (state == nullptr)
         {
             ChipLogProgress(Zcl, "Malloc error");
@@ -49,8 +51,8 @@ CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId end
         OperationalStateStructType operationalState;
         ReturnErrorOnFailure(operationalState.Decode(reader));
 
-        state->Next = nullptr;
-        state->operationalStateID  = operationalState.operationalStateID;
+        state->Next               = nullptr;
+        state->operationalStateID = operationalState.operationalStateID;
         if (operationalState.operationalStateLabel.size())
         {
             if (operationalState.operationalStateLabel.size() <= kOperationalStateLabelMaxSize)
@@ -67,7 +69,6 @@ CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId end
         }
         else
         {
-
         }
         i++;
         if (head == nullptr)
@@ -76,7 +77,7 @@ CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId end
         }
         else
         {
-            OperationalStateStructDynamicList *pList = head;
+            OperationalStateStructDynamicList * pList = head;
             while (pList->Next != nullptr)
             {
                 pList = pList->Next;
@@ -86,7 +87,7 @@ CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId end
     }
 
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
-    size = i;
+    size                  = i;
     *operationalStateList = head;
 
     return err;
@@ -97,17 +98,19 @@ void OperationalStateDataProvider::ReleaseOperationalStateList(OperationalStateS
     while (operationalStateList)
     {
         OperationalStateStructDynamicList * del = operationalStateList;
-        operationalStateList                 = operationalStateList->Next;
+        operationalStateList                    = operationalStateList->Next;
         chip::Platform::Delete(del);
     }
 }
 
 CHIP_ERROR OperationalStateDataProvider::ClearOperationalStateList(EndpointId endpoint, ClusterId clusterId)
 {
-    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::OperationalStateOpStateList(endpoint, clusterId).KeyName());
+    return mPersistentStorage->SyncDeleteKeyValue(
+        DefaultStorageKeyAllocator::OperationalStateOpStateList(endpoint, clusterId).KeyName());
 }
 
-CHIP_ERROR OperationalStateDataProvider::UseOpStateIDGetOpStateStruct(EndpointId endpoint, ClusterId clusterId, OperationalStateStructDynamicList& targetOp)
+CHIP_ERROR OperationalStateDataProvider::UseOpStateIDGetOpStateStruct(EndpointId endpoint, ClusterId clusterId,
+                                                                      OperationalStateStructDynamicList & targetOp)
 {
     uint8_t buffer[kOperationalStateMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
@@ -141,7 +144,6 @@ CHIP_ERROR OperationalStateDataProvider::UseOpStateIDGetOpStateStruct(EndpointId
     return err;
 }
 
-
 CHIP_ERROR OperationalStateDataProvider::StorePhaseList(EndpointId endpoint, ClusterId clusterId, const PhaseList & phaseList)
 {
     uint8_t buffer[kOperationalStateMaxSerializedSize];
@@ -157,15 +159,16 @@ CHIP_ERROR OperationalStateDataProvider::StorePhaseList(EndpointId endpoint, Clu
     }
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 
-    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::OperationalStatePhaseList(endpoint, clusterId).KeyName(), buffer,
-                                               static_cast<uint16_t>(writer.GetLengthWritten()));
+    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::OperationalStatePhaseList(endpoint, clusterId).KeyName(),
+                                               buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-CHIP_ERROR OperationalStateDataProvider::LoadPhaseList(EndpointId endpoint, ClusterId clusterId, PhaseListCharSpan **phaseList, size_t & size)
+CHIP_ERROR OperationalStateDataProvider::LoadPhaseList(EndpointId endpoint, ClusterId clusterId, PhaseListCharSpan ** phaseList,
+                                                       size_t & size)
 {
     uint8_t buffer[kOperationalStateMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
-    size = 0;
+    size           = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::OperationalStatePhaseList(endpoint, clusterId).KeyName(), bufferSpan));
@@ -176,11 +179,11 @@ CHIP_ERROR OperationalStateDataProvider::LoadPhaseList(EndpointId endpoint, Clus
     reader.Init(bufferSpan.data(), bufferSpan.size());
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
-    size_t i = 0;
+    size_t i                 = 0;
     PhaseListCharSpan * head = nullptr;
     while (reader.Next() != CHIP_ERROR_END_OF_TLV)
     {
-        PhaseListCharSpan *newPhase = chip::Platform::New<PhaseListCharSpan>();
+        PhaseListCharSpan * newPhase = chip::Platform::New<PhaseListCharSpan>();
         if (newPhase == nullptr)
         {
             ChipLogProgress(Zcl, "Malloc error");
@@ -217,7 +220,7 @@ CHIP_ERROR OperationalStateDataProvider::LoadPhaseList(EndpointId endpoint, Clus
         }
         else
         {
-            PhaseListCharSpan *pList = head;
+            PhaseListCharSpan * pList = head;
             while (pList->Next != nullptr)
             {
                 pList = pList->Next;
@@ -227,7 +230,7 @@ CHIP_ERROR OperationalStateDataProvider::LoadPhaseList(EndpointId endpoint, Clus
     }
 
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
-    size = i;
+    size       = i;
     *phaseList = head;
 
     return err;
@@ -238,14 +241,15 @@ void OperationalStateDataProvider::ReleasePhaseList(PhaseListCharSpan * phaseLis
     while (phaseList)
     {
         PhaseListCharSpan * del = phaseList;
-        phaseList                 = phaseList->Next;
+        phaseList               = phaseList->Next;
         chip::Platform::Delete(del);
     }
 }
 
 CHIP_ERROR OperationalStateDataProvider::ClearPhaseStateList(EndpointId endpoint, ClusterId clusterId)
 {
-    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::OperationalStatePhaseList(endpoint, clusterId).KeyName());
+    return mPersistentStorage->SyncDeleteKeyValue(
+        DefaultStorageKeyAllocator::OperationalStatePhaseList(endpoint, clusterId).KeyName());
 }
 
 CHIP_ERROR OperationalStateDataProvider::Load(const char * key, MutableByteSpan & buffer)
@@ -256,7 +260,5 @@ CHIP_ERROR OperationalStateDataProvider::Load(const char * key, MutableByteSpan 
     buffer = MutableByteSpan(buffer.data(), size);
     return CHIP_NO_ERROR;
 }
-
-
 
 } // namespace chip

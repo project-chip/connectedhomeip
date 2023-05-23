@@ -35,10 +35,10 @@ class OperationalStateServer : public CommandHandlerInterface, public AttributeA
 
 public:
     template <typename T>
-    using DataModelListTemplate = app::DataModel::List<T>;
-    using OperationalStateStructType = app::Clusters::OperationalState::Structs::OperationalStateStruct::Type;
+    using DataModelListTemplate          = app::DataModel::List<T>;
+    using OperationalStateStructType     = app::Clusters::OperationalState::Structs::OperationalStateStruct::Type;
     using OperationalStateStructTypeList = app::DataModel::List<OperationalStateStructType>;
-    using PhaseList        = chip::app::DataModel::List<const chip::CharSpan>;
+    using PhaseList                      = chip::app::DataModel::List<const chip::CharSpan>;
     /**
      * Init the operational state server.
      * @param void
@@ -71,14 +71,14 @@ public:
      * @param size The number of operational state list's item.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR GetOperationalStateList(OperationalStateStructDynamicList** operationalStateList, size_t & size);
+    CHIP_ERROR GetOperationalStateList(OperationalStateStructDynamicList ** operationalStateList, size_t & size);
 
     /**
      * Rlease OperationalStateStructDynamicList
      * @param operationalStateList The pointer for which to clear the OperationalStateStructDynamicList.
      * @return void
      */
-    void ReleaseOperationalStateList(OperationalStateStructDynamicList* operationalStateList);
+    void ReleaseOperationalStateList(OperationalStateStructDynamicList * operationalStateList);
 
     /**
      * Clear operational state list.
@@ -99,21 +99,20 @@ public:
      * @param size The number of phase list's item.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR GetPhaseList(PhaseListCharSpan **phaseList, size_t & size);
+    CHIP_ERROR GetPhaseList(PhaseListCharSpan ** phaseList, size_t & size);
 
     /**
      * Rlease PhaseListCharSpan
      * @param phaseList The pointer for which to clear the PhaseListCharSpan.
      * @return void
      */
-    void ReleasePhaseList(PhaseListCharSpan *phaseList);
+    void ReleasePhaseList(PhaseListCharSpan * phaseList);
 
     /**
      * Clear phase list.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     CHIP_ERROR ClearPhaseStateList();
-
 
     /**
      * Set operational state.
@@ -172,24 +171,21 @@ public:
      * @param aClusterId The ID of the ModeSelect aliased cluster to be instantiated.
      * @param aDelegate A pointer to a delegate that will handle application layer logic.
      */
-    OperationalStateServer(EndpointId aEndpointId, ClusterId aClusterId, Delegate *aDelegate) :
+    OperationalStateServer(EndpointId aEndpointId, ClusterId aClusterId, Delegate * aDelegate) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId)
     {
 
         endpointId = aEndpointId;
-        clusterId = aClusterId;
-        delegate = aDelegate;
+        clusterId  = aClusterId;
+        delegate   = aDelegate;
     }
 
     // Inherited from CommandHandlerInterface
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
-
-    ~OperationalStateServer() override
-    {
-    }
+    ~OperationalStateServer() override {}
 };
 
 template <typename T>
