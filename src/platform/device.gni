@@ -183,6 +183,7 @@ if (chip_device_platform != "external") {
   chip_platform_config_include = ""
   chip_inet_platform_config_include = ""
   chip_system_platform_config_include = ""
+  chip_system_platform_mutex_include = ""
   chip_system_layer_impl_config_file = ""
 } else {
   declare_args() {
@@ -191,6 +192,7 @@ if (chip_device_platform != "external") {
     chip_platform_config_include = ""
     chip_inet_platform_config_include = ""
     chip_system_platform_config_include = ""
+    chip_system_platform_mutex_include = ""
     chip_system_layer_impl_config_file = ""
   }
 }
@@ -218,6 +220,8 @@ if (_chip_device_layer != "none" && chip_device_platform != "external") {
       "<platform/" + _chip_device_layer + "/InetPlatformConfig.h>"
   chip_system_platform_config_include =
       "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
+  chip_system_platform_mutex_include =
+      "<platform/" + _chip_device_layer + "/SystemPlatformMutex.h>"
 }
 
 declare_args() {

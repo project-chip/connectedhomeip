@@ -74,11 +74,12 @@ if (chip_system_config_locking == "") {
 assert(
     chip_system_config_locking == "posix" ||
         chip_system_config_locking == "freertos" ||
+        chip_system_config_locking == "platform" ||
         chip_system_config_locking == "none" ||
         chip_system_config_locking == "mbed" ||
         chip_system_config_locking == "cmsis-rtos" ||
         chip_system_config_locking == "zephyr",
-    "Please select a valid mutex implementation: posix, freertos, mbed, cmsis-rtos, zephyr, none")
+    "Please select a valid mutex implementation: posix, freertos, platform, mbed, cmsis-rtos, zephyr, none")
 
 assert(
     chip_system_config_clock == "clock_gettime" ||

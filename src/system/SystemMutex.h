@@ -48,6 +48,10 @@
 #endif
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_PLATFORM_LOCKING
+#include SYSTEM_PLATFORM_MUTEX_INCLUDE
+#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+
 #if CHIP_SYSTEM_CONFIG_MBED_LOCKING
 #include <rtos/Mutex.h>
 #endif // CHIP_SYSTEM_CONFIG_MBED_LOCKING
@@ -112,7 +116,7 @@ public:
     Mutex() = default;
 
     static CHIP_ERROR Init(Mutex & aMutex);
-#if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+#if CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING || CHIP_SYSTEM_CONFIG_PLATFORM_LOCKING
     inline bool isInitialized() { return mInitialized; }
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
@@ -135,6 +139,11 @@ private:
     volatile SemaphoreHandle_t mFreeRTOSSemaphore = nullptr;
     volatile bool mInitialized                    = 0;
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+
+#if CHIP_SYSTEM_CONFIG_PLATFORM_LOCKING
+    volatile platform_mutex_t mSemaphore = nullptr;
+    volatile bool mInitialized           = 0;
+#endif // CHIP_SYSTEM_CONFIG_PLATFORM_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_MBED_LOCKING
     rtos::Mutex mMbedMutex;
@@ -177,6 +186,13 @@ inline void Mutex::Unlock()
 inline void Mutex::Unlock(void)
 {
     xSemaphoreGive(this->mFreeRTOSSemaphore);
+}
+#endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+
+#if CHIP_SYSTEM_CONFIG_PLATFORM_LOCKING
+inline void Mutex::Unlock(void)
+{
+    platform_unlock_mutex((platform_mutex_t *) &this->mSemaphore);
 }
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 

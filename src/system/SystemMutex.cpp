@@ -110,6 +110,42 @@ DLL_EXPORT void Mutex::Lock(void)
 }
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_PLATFORM_LOCKING
+DLL_EXPORT CHIP_ERROR Mutex::Init(Mutex & aThis)
+{
+restart:
+    if (__sync_bool_compare_and_swap(&aThis.mInitialized, 0, 1))
+    {
+        platform_init_mutex((platform_mutex_t *) &aThis.mSemaphore);
+        if (aThis.mSemaphore == nullptr)
+        {
+            aThis.mInitialized = 0;
+
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+    else
+    {
+        while (aThis.mSemaphore == nullptr)
+        {
+            platform_delay_milliseconds(1);
+
+            if (aThis.mInitialized == 0)
+            {
+                goto restart;
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+DLL_EXPORT void Mutex::Lock(void)
+{
+    platform_lock_mutex((platform_mutex_t *) &this->mSemaphore, PLATFORM_WAIT_FOREVER);
+}
+#endif // CHIP_SYSTEM_CONFIG_PLATFORM_LOCKING
+
 #if CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
 DLL_EXPORT CHIP_ERROR Mutex::Init(Mutex & aThis)
 {

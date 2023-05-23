@@ -71,6 +71,7 @@ buildconfig_header("system_buildconfig") {
   config_device_layer = chip_device_platform != "none"
   chip_system_config_posix_locking = chip_system_config_locking == "posix"
   chip_system_config_freertos_locking = chip_system_config_locking == "freertos"
+  chip_system_config_platform_locking = chip_system_config_locking == "platform"
   chip_system_config_mbed_locking = chip_system_config_locking == "mbed"
   chip_system_config_cmsis_rtos_locking =
       chip_system_config_locking == "cmsis-rtos"
@@ -92,6 +93,7 @@ buildconfig_header("system_buildconfig") {
     "CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=false",
     "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=${chip_system_config_posix_locking}",
     "CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING=${chip_system_config_freertos_locking}",
+    "CHIP_SYSTEM_CONFIG_PLATFORM_LOCKING=${chip_system_config_platform_locking}",
     "CHIP_SYSTEM_CONFIG_MBED_LOCKING=${chip_system_config_mbed_locking}",
     "CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING=${chip_system_config_cmsis_rtos_locking}",
     "CHIP_SYSTEM_CONFIG_ZEPHYR_LOCKING=${chip_system_config_zephyr_locking}",
@@ -123,6 +125,11 @@ buildconfig_header("system_buildconfig") {
   if (chip_system_platform_config_include != "") {
     defines += [
       "SYSTEM_PLATFORM_CONFIG_INCLUDE=${chip_system_platform_config_include}",
+    ]
+  }
+  if (chip_system_platform_mutex_include != "") {
+    defines += [
+      "SYSTEM_PLATFORM_MUTEX_INCLUDE=${chip_system_platform_mutex_include}",
     ]
   }
   if (chip_enable_thread_safety_checks) {
