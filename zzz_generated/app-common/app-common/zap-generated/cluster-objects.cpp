@@ -2825,7 +2825,7 @@ namespace Events {} // namespace Events
 } // namespace Binding
 namespace AccessControl {
 namespace Structs {
-namespace Target {
+namespace AccessControlTargetStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -2872,7 +2872,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace Target
+} // namespace AccessControlTargetStruct
 namespace AccessControlEntryStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
