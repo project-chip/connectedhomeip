@@ -8,18 +8,17 @@ operations.
 For more details see
 [Common shell commands](../README.md#matter-shell-command-details).
 
-## Build and run
+## Build-run-test-debug
 
-For information on how to build and run this example and further information
-about the platform it is run on see
-[Open IoT SDK examples](../../../docs/examples/openiotsdk_examples.md).
+For information on how to build, run, test and debug this example and further
+information about the platform it is run on see
+[Open IoT SDK examples](../../../docs/guides/openiotsdk_examples.md).
 
 The example name to use in the scripts is `shell`.
 
-## Using the example
+## Example output
 
-Communication with the application goes through the active telnet session. When
-the application runs these lines should be visible:
+When the example runs, these lines should be visible:
 
 ```
 [INF] [SH] Open IoT SDK shell example application start
@@ -27,7 +26,7 @@ the application runs these lines should be visible:
 >
 ```
 
-The shell application launched correctly.
+This means the shell application launched correctly.
 
 Pass commands to the terminal and wait for the response. The application
 supports common Matter shell commands. They are used to control the basic
