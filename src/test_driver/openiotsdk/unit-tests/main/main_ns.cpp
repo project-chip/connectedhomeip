@@ -19,36 +19,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "openiotsdk_platform.h"
+#include <NlTestLogger.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
-
-#include <NlTestLogger.h>
-
-#include "cmsis_os2.h"
-#include "openiotsdk_platform.h"
 
 constexpr nl_test_output_logger_t NlTestLogger::nl_test_logger;
 
 using namespace ::chip;
-
-static void test_thread(void * argument)
-{
-    int status;
-    CHIP_ERROR err;
-
-    if (openiotsdk_network_init(true))
-    {
-        ChipLogAutomation("ERROR: Network initialization failed");
-        goto exit;
-    }
-
-    ChipLogAutomation("Open IoT SDK unit-tests run...");
-    status = RunRegisteredUnitTests();
-    ChipLogAutomation("Test status: %d", status);
-    ChipLogAutomation("Open IoT SDK unit-tests completed");
-exit:
-    osThreadTerminate(osThreadGetId());
-}
 
 int main()
 {

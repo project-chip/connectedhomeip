@@ -1,4 +1,4 @@
-{{#chip_tests tests useSynthesizeWaitForReport=true}}
+{{#chip_tests tests useSynthesizeWaitForReport=true includeAllClusters=true}}
 class {{filename}}: public TestCommandBridge
 {
   public:
