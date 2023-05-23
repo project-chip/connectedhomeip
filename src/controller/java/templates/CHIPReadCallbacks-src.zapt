@@ -1,5 +1,4 @@
 {{> header}}
-{{#if_enabled_clusters side='client'}}
 #include <jni/CHIPReadCallbacks.h>
 
 #include <zap-generated/CHIPClientCallbacks.h>
@@ -85,7 +84,7 @@ void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{ch
 {{/unless}}
 {{/chip_server_global_responses}}
 
-{{#all_user_clusters side='client'}}
+{{#zcl_clusters}}
 {{#zcl_attributes_server removeKeys='isOptional'}}
 {{! TODO: Add support for struct-typed attributes }}
 {{#if_unsupported_attribute_callback type isArray ../id}}
@@ -173,6 +172,4 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
 {{/if}}
 {{/if_unsupported_attribute_callback}}
 {{/zcl_attributes_server}}
-{{/all_user_clusters}}
-
-{{/if_enabled_clusters}}
+{{/zcl_clusters}}

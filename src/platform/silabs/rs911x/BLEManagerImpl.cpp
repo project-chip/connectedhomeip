@@ -31,7 +31,7 @@
 #ifndef SIWX_917
 #include "rail.h"
 #endif
-
+#include <crypto/RandUtils.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -77,6 +77,8 @@ using namespace ::chip::DeviceLayer::Internal;
 
 void sl_ble_init()
 {
+    uint8_t randomAddrBLE[6] = { 0 };
+    uint64_t randomAddr      = chip::Crypto::GetRandU64();
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
@@ -88,10 +90,13 @@ void sl_ble_init()
                                     rsi_ble_on_event_indication_confirmation, NULL);
 
     //  Exchange of GATT info with BLE stack
+
     rsi_ble_add_matter_service();
 
     //  initializing the application events map
     rsi_ble_app_init_events();
+    memcpy(randomAddrBLE, &randomAddr, 6);
+    rsi_ble_set_random_address_with_value(randomAddrBLE);
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 }
 
@@ -118,7 +123,6 @@ void sl_ble_event_handling_task(void)
         case RSI_BLE_CONN_EVENT: {
             rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
             BLEMgrImpl().HandleConnectEvent();
-            SILABS_LOG("%s Module got connected", __func__);
             // Requests the connection parameters change with the remote device
             rsi_ble_conn_params_update(event_msg.resp_enh_conn.dev_addr, BLE_MIN_CONNECTION_INTERVAL_MS,
                                        BLE_MAX_CONNECTION_INTERVAL_MS, BLE_SLAVE_LATENCY_MS, BLE_TIMEOUT_MS);
@@ -126,7 +130,6 @@ void sl_ble_event_handling_task(void)
         break;
         case RSI_BLE_DISCONN_EVENT: {
             // event invokes when disconnection was completed
-            SILABS_LOG("%s Module got Disconnected", __func__);
             BLEMgrImpl().HandleConnectionCloseEvent(event_msg.reason);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
@@ -134,7 +137,6 @@ void sl_ble_event_handling_task(void)
         break;
         case RSI_BLE_MTU_EVENT: {
             // event invokes when write/notification events received
-            SILABS_LOG("%s RSI_BLE_MTU_EVENT", __func__);
             BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
@@ -142,14 +144,12 @@ void sl_ble_event_handling_task(void)
         break;
         case RSI_BLE_GATT_WRITE_EVENT: {
             // event invokes when write/notification events received
-            SILABS_LOG("%s RSI_BLE_GATT_WRITE_EVENT", __func__);
             BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
         }
         break;
         case RSI_BLE_GATT_INDICATION_CONFIRMATION: {
-            SILABS_LOG("%s indication confirmation", __func__);
             BLEMgrImpl().HandleTxConfirmationEvent(1);
             rsi_ble_app_clear_event(RSI_BLE_GATT_INDICATION_CONFIRMATION);
         }
@@ -626,8 +626,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     sl_wfx_mac_address_t macaddr;
     wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
 
-    //! Set local name
-    status = rsi_ble_start_advertising();
+    status = sInstance.SendBLEAdvertisementCommand();
+
     if (status == RSI_SUCCESS)
     {
         ChipLogProgress(DeviceLayer, "rsi_ble_start_advertising Success");
@@ -646,6 +646,24 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 exit:
     ChipLogError(DeviceLayer, "StartAdvertising() End error: %s", ErrorStr(err));
     return CHIP_NO_ERROR; // err;
+}
+
+int32_t BLEManagerImpl::SendBLEAdvertisementCommand(void)
+{
+
+    rsi_ble_req_adv_t ble_adv = { 0 };
+
+    ble_adv.status = RSI_BLE_START_ADV;
+
+    ble_adv.adv_type         = RSI_BLE_ADV_TYPE;
+    ble_adv.filter_type      = RSI_BLE_ADV_FILTER_TYPE;
+    ble_adv.direct_addr_type = RSI_BLE_ADV_DIR_ADDR_TYPE;
+    rsi_ascii_dev_address_to_6bytes_rev(ble_adv.direct_addr, (int8_t *) RSI_BLE_ADV_DIR_ADDR);
+    ble_adv.adv_int_min     = RSI_BLE_ADV_INT_MIN;
+    ble_adv.adv_int_max     = RSI_BLE_ADV_INT_MAX;
+    ble_adv.own_addr_type   = LE_RANDOM_ADDRESS;
+    ble_adv.adv_channel_map = RSI_BLE_ADV_CHANNEL_MAP;
+    return rsi_ble_start_advertising_with_values(&ble_adv);
 }
 
 // TODO:: Implementation need to be done.

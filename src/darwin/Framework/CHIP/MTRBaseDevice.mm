@@ -230,6 +230,11 @@ static void CauseReadClientFailure(
 }
 #endif
 
+static bool CheckMemberOfType(NSDictionary<NSString *, id> * responseValue, NSString * memberName, Class expectedClass,
+    NSString * errorMessage, NSError * __autoreleasing * error);
+static void LogStringAndReturnError(NSString * errorStr, CHIP_ERROR errorCode, NSError * __autoreleasing * error);
+static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode, NSError * __autoreleasing * error);
+
 @implementation MTRReadClientContainer
 - (void)onDone
 {
@@ -1806,6 +1811,62 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         MTREventTimeTypeKey : eventTimeType,
         timestampKey : timestampValue
     };
+}
+
++ (System::PacketBufferHandle)_responseDataForCommand:(NSDictionary<NSString *, id> *)responseValue
+                                            clusterID:(chip::ClusterId)clusterID
+                                            commandID:(chip::CommandId)commandID
+                                                error:(NSError * __autoreleasing *)error
+{
+    if (!CheckMemberOfType(responseValue, MTRCommandPathKey, [MTRCommandPath class],
+            @"response-value command path is not an MTRCommandPath.", error)) {
+        return System::PacketBufferHandle();
+    }
+
+    MTRCommandPath * path = responseValue[MTRCommandPathKey];
+
+    if (![path.cluster isEqualToNumber:@(clusterID)]) {
+        LogStringAndReturnError([NSString stringWithFormat:@"Expected cluster id %@ but got %@", path.cluster, @(clusterID)],
+            MTRErrorCodeSchemaMismatch, error);
+        return System::PacketBufferHandle();
+    }
+
+    if (![path.command isEqualToNumber:@(commandID)]) {
+        LogStringAndReturnError([NSString stringWithFormat:@"Expected command id %@ but got %@", path.command, @(commandID)],
+            MTRErrorCodeSchemaMismatch, error);
+        return System::PacketBufferHandle();
+    }
+
+    if (!CheckMemberOfType(
+            responseValue, MTRDataKey, [NSDictionary class], @"response-value data is not a data-value dictionary.", error)) {
+        return System::PacketBufferHandle();
+    }
+
+    NSDictionary * data = responseValue[MTRDataKey];
+
+    auto buffer = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        LogStringAndReturnError(@"Unable to allocate encoding buffer", CHIP_ERROR_NO_MEMORY, error);
+        return System::PacketBufferHandle();
+    }
+
+    System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    CHIP_ERROR errorCode = MTREncodeTLVFromDataValueDictionary(data, writer, TLV::AnonymousTag());
+    if (errorCode != CHIP_NO_ERROR) {
+        LogStringAndReturnError(@"Unable to encode data-value to TLV", errorCode, error);
+        return System::PacketBufferHandle();
+    }
+
+    errorCode = writer.Finalize(&buffer);
+    if (errorCode != CHIP_NO_ERROR) {
+        LogStringAndReturnError(@"Unable to encode data-value to TLV", errorCode, error);
+        return System::PacketBufferHandle();
+    }
+
+    return buffer;
 }
 @end
 

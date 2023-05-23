@@ -176,7 +176,7 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool generaldiagnostics read boot-reasons 1 0
+          ./chip-tool generaldiagnostics read boot-reason 1 0
 
           verify that  bootreason attribute data type must match the value listed in Table 105 BootReason ENUM table in spec on TH(all-clusters-app).
 

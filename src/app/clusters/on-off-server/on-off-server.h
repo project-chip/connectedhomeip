@@ -24,8 +24,6 @@
 #include <app/util/basic-types.h>
 #include <platform/CHIPDeviceConfig.h>
 
-using chip::app::Clusters::OnOff::OnOffFeature;
-
 /**********************************************************
  * Defines and Macros
  *********************************************************/
@@ -43,6 +41,8 @@ static constexpr uint8_t MIN_TIME_VALUE  = 1;
 class OnOffServer
 {
 public:
+    using Feature = chip::app::Clusters::OnOff::Feature;
+
     /**********************************************************
      * Functions Definitions
      *********************************************************/
@@ -63,11 +63,8 @@ public:
     EmberAfStatus setOnOffValue(chip::EndpointId endpoint, chip::CommandId command, bool initiatedByLevelChange);
     EmberAfStatus getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp);
 
-    bool HasFeature(chip::EndpointId endpoint, OnOffFeature feature);
-    inline bool SupportsLightingApplications(chip::EndpointId endpointId)
-    {
-        return HasFeature(endpointId, OnOffFeature::kLighting);
-    }
+    bool HasFeature(chip::EndpointId endpoint, Feature feature);
+    inline bool SupportsLightingApplications(chip::EndpointId endpointId) { return HasFeature(endpointId, Feature::kLighting); }
 
     void cancelEndpointTimerCallback(chip::EndpointId endpoint);
 

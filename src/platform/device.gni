@@ -66,6 +66,7 @@ declare_args() {
       chip_device_platform == "webos" || chip_device_platform == "cc32xx" ||
       chip_device_platform == "bl602" || chip_device_platform == "mw320" ||
       chip_device_platform == "beken" || chip_device_platform == "mt793x" ||
+      chip_device_platform == "asr" ||
       (chip_device_platform == "darwin" && current_os == "mac")
 
   # Enable ble support.
@@ -87,7 +88,7 @@ declare_args() {
       chip_device_platform == "ameba" || chip_device_platform == "webos" ||
       chip_device_platform == "cc32xx" || chip_device_platform == "bl602" ||
       chip_device_platform == "mw320" || chip_device_platform == "beken" ||
-      chip_device_platform == "mt793x" ||
+      chip_device_platform == "mt793x" || chip_device_platform == "asr" ||
       chip_device_platform == "openiotsdk") {
     chip_mdns = "minimal"
   } else if (chip_device_platform == "darwin" ||
@@ -168,6 +169,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "mt793x"
 } else if (chip_device_platform == "openiotsdk") {
   _chip_device_layer = "openiotsdk"
+} else if (chip_device_platform == "asr") {
+  _chip_device_layer = "ASR"
 }
 
 if (chip_device_platform != "external") {
@@ -236,5 +239,5 @@ assert(
         chip_device_platform == "mw320" || chip_device_platform == "zephyr" ||
         chip_device_platform == "beken" || chip_device_platform == "bl702" ||
         chip_device_platform == "mt793x" || chip_device_platform == "SiWx917" ||
-        chip_device_platform == "openiotsdk",
+        chip_device_platform == "openiotsdk" || chip_device_platform == "asr",
     "Please select a valid value for chip_device_platform")

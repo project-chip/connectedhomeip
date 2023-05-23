@@ -64,7 +64,7 @@ efr32_sdk("sdk") {
 }
 
 silabs_executable("efr32_device_tests") {
-  output_name = "chip-efr32-device_tests.out"
+  output_name = "matter-silabs-device_tests.out"
 
   defines = [ "PW_RPC_ENABLED" ]
   sources = [

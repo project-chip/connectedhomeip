@@ -1,6 +1,4 @@
 {{> header}}
-{{#if_enabled_clusters side='client'}}
-
 package chip.devicecontroller;
 
 import javax.annotation.Nullable;
@@ -199,7 +197,7 @@ public class ClusterInfoMapping {
       callback.onFailure(e);
     }
   }
-  {{#all_user_clusters side='client'}}
+  {{#zcl_clusters}}
     {{#all_user_cluster_generated_commands}}
       {{#if_compare clusterId ../id operator='=='}}
         {{#if (is_str_equal commandSource 'server')}}
@@ -279,7 +277,7 @@ public class ClusterInfoMapping {
       {{/if_unsupported_attribute_callback}}
       {{/zcl_attributes_server}}
 
-  {{/all_user_clusters}}
+  {{/zcl_clusters}}
 
  public Map<String, ClusterInfo> getClusterMap() {
     Map<String, ClusterInfo> clusterMap = initializeClusterMap();
@@ -294,24 +292,24 @@ public class ClusterInfoMapping {
 
  public Map<String, ClusterInfo> initializeClusterMap() {
     Map<String, ClusterInfo> clusterMap = new HashMap<>();
-    {{#all_user_clusters side='client'}}
+    {{#zcl_clusters}}
       ClusterInfo {{asLowerCamelCase name}}ClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.{{asUpperCamelCase name}}Cluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInfo);
-    {{/all_user_clusters}}
+    {{/zcl_clusters}}
     return clusterMap;
  }
 
  public void combineCommand(Map<String, ClusterInfo> destination, Map<String, Map<String, InteractionInfo>> source) {
-    {{#all_user_clusters side='client'}}
+    {{#zcl_clusters}}
       destination.get("{{asLowerCamelCase name}}").combineCommands(source.get("{{asLowerCamelCase name}}"));
-    {{/all_user_clusters}}
+    {{/zcl_clusters}}
  }
 
  @SuppressWarnings("unchecked")
  public Map<String, Map<String, InteractionInfo>> getCommandMap() {
      Map<String, Map<String, InteractionInfo>> commandMap = new HashMap<>();
-     {{#all_user_clusters side='client'}}
+     {{#zcl_clusters}}
      Map<String, InteractionInfo> {{asLowerCamelCase name}}ClusterInteractionInfoMap = new LinkedHashMap<>();
       {{#all_user_cluster_generated_commands}}
         {{#if_compare clusterId ../id operator='=='}}
@@ -367,10 +365,9 @@ public class ClusterInfoMapping {
         {{/if_compare}}
       {{/all_user_cluster_generated_commands}}
      commandMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInteractionInfoMap);
-     {{/all_user_clusters}}
+     {{/zcl_clusters}}
      return commandMap;
   }
 
 }
 
-{{/if_enabled_clusters}}

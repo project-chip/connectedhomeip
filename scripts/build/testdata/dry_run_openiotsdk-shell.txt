@@ -2,7 +2,7 @@
 cd "{root}"
 
 # Generating openiotsdk-shell
-cmake -GNinja -S {root}/examples/shell/openiotsdk -B {out}/openiotsdk-shell --toolchain=toolchains/toolchain-arm-none-eabi-gcc.cmake -DCMAKE_SYSTEM_PROCESSOR=cortex-m55
+cmake -GNinja -S {root}/examples/shell/openiotsdk -B {out}/openiotsdk-shell --toolchain=toolchains/toolchain-arm-none-eabi-gcc.cmake -DCMAKE_SYSTEM_PROCESSOR=cortex-m55 -DCMAKE_BUILD_TYPE=Release
 
 # Building openiotsdk-shell
 cmake --build {out}/openiotsdk-shell

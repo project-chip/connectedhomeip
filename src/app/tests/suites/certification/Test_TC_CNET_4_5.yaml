@@ -40,7 +40,7 @@ tests:
 
     - label: "The FeatureMap attribute value is 1"
       verification: |
-          "./chip-tool networkcommissioning read feature-map 1 0
+          ./chip-tool networkcommissioning read feature-map 1 0
 
           Verify the "feature-map" on the TH(Chip-tool) Log:
 
@@ -51,8 +51,9 @@ tests:
 
     - label:
           "TH sends the AddOrUpdateWiFiNetwork command to the DUT with the
-          following argument: SSID argument value as Userwifi_ssid Credentials
-          argument value as Userwifi_Credentials Breadcrumb argument value as 1"
+          following fields: 1. SSID field set to PIXIT.CNET.WIFI_1S
+          T_ACCESSPOINT_SSI D 2. Credentials field set to PIXIT.CNET.WIFI_1S
+          T_ACCESSPOINT_CRE DENTIALS 3. Breadcrumb field set to 1"
       PICS: CNET.S.C02.Rsp
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network  hex:<your network id in hex> 1 0

@@ -154,12 +154,12 @@ static const char ModuleNames[kLogModule_Max][kMaxModuleNameLen + 1] = {
     "CSM", // CASESessionManager
 };
 
-static char const * GetModuleName(LogModule module)
+} // namespace
+
+const char * GetModuleName(LogModule module)
 {
     return ModuleNames[(module < kLogModule_Max) ? module : kLogModule_NotSpecified];
 }
-
-} // namespace
 
 void SetLogRedirectCallback(LogRedirectCallback_t callback)
 {

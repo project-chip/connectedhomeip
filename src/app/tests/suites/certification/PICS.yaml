@@ -700,6 +700,26 @@ PICS:
     - label: "Does the device implement the Access Control Cluster as a client?"
       id: ACL.C
 
+    #ACL -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(ACL) attribute?"
+      id: ACL.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(ACL) attribute?"
+      id: ACL.S.Afffc
+
+    - label: "Does the device implement the AttributeList(ACL) attribute?"
+      id: ACL.S.Afffb
+
+    - label: "Does the device implement the EventList(ACL) attribute?"
+      id: ACL.S.Afffa
+
+    - label: "Does the device implement the AcceptedCommandList(ACL) attribute?"
+      id: ACL.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(ACL) attribute?"
+      id: ACL.S.Afff8
+
     #
     # server / attributes
     #
@@ -850,6 +870,27 @@ PICS:
     - label: "Does the device implement the Binding Cluster as a client?"
       id: BIND.C
 
+    #BIND -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(BIND) attribute?"
+      id: BIND.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(BIND) attribute?"
+      id: BIND.S.Afffc
+
+    - label: "Does the device implement the AttributeList(BIND) attribute?"
+      id: BIND.S.Afffb
+
+    - label: "Does the device implement the EventList(BIND) attribute?"
+      id: BIND.S.Afffa
+
+    - label:
+          "Does the device implement the AcceptedCommandList(BIND) attribute?"
+      id: BIND.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(BIND) attribute?"
+      id: BIND.S.Afff8
+
     #
     # server / attributes
     #
@@ -908,6 +949,27 @@ PICS:
           "Does the device implement the Bridged Device Basic Information
           Cluster as a client?"
       id: BRBINFO.C
+
+    #BINFO -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(BINFO) attribute?"
+      id: BINFO.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(BINFO) attribute?"
+      id: BINFO.S.Afffc
+
+    - label: "Does the device implement the AttributeList(BINFO) attribute?"
+      id: BINFO.S.Afffb
+
+    - label: "Does the device implement the EventList(BINFO) attribute?"
+      id: BINFO.S.Afffa
+
+    - label:
+          "Does the device implement the AcceptedCommandList(BINFO) attribute?"
+      id: BINFO.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(BINFO) attribute?"
+      id: BINFO.S.Afff8
 
     #
     # server / attributes
@@ -1720,6 +1782,27 @@ PICS:
     - label: "Does the device implement the Descriptor cluster as a client?"
       id: DESC.C
 
+    #DESC -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(DESC) attribute?"
+      id: DESC.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(DESC) attribute?"
+      id: DESC.S.Afffc
+
+    - label: "Does the device implement the AttributeList(DESC) attribute?"
+      id: DESC.S.Afffb
+
+    - label: "Does the device implement the EventList(DESC) attribute?"
+      id: DESC.S.Afffa
+
+    - label:
+          "Does the device implement the AcceptedCommandList(DESC) attribute?"
+      id: DESC.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(DESC) attribute?"
+      id: DESC.S.Afff8
+
     #
     # server / attributes
     #
@@ -1786,6 +1869,27 @@ PICS:
           "Does the device implement the NetworkCommissioning Cluster cluster as
           a client?"
       id: CNET.C
+
+    #CNET -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(CNET) attribute?"
+      id: CNET.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(CNET) attribute?"
+      id: CNET.S.Afffc
+
+    - label: "Does the device implement the AttributeList(CNET) attribute?"
+      id: CNET.S.Afffb
+
+    - label: "Does the device implement the EventList(CNET) attribute?"
+      id: CNET.S.Afffa
+
+    - label:
+          "Does the device implement the AcceptedCommandList(CNET) attribute?"
+      id: CNET.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(CNET) attribute?"
+      id: CNET.S.Afff8
 
     #
     # server / attributes
@@ -1892,6 +1996,28 @@ PICS:
 
     - label: "Does the DUT(Server) support LastConnectErrorValue attribute?"
       id: CNET.S.A0007
+
+    #OPCREDS -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(OPCREDS) attribute?"
+      id: OPCREDS.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(OPCREDS) attribute?"
+      id: OPCREDS.S.Afffc
+
+    - label: "Does the device implement the AttributeList(OPCREDS) attribute?"
+      id: OPCREDS.S.Afffb
+
+    - label: "Does the device implement the EventList(OPCREDS) attribute?"
+      id: OPCREDS.S.Afffa
+
+    - label:
+          "Does the device implement the AcceptedCommandList(OPCREDS) attribute?"
+      id: OPCREDS.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(OPCREDS)
+          attribute?"
+      id: OPCREDS.S.Afff8
 
     #
     # server / commandsReceived
@@ -2315,6 +2441,27 @@ PICS:
     - label:
           "Does the device implement the Diagnostic Logs cluster as a client?"
       id: DLOG.C
+
+    #DLOG -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(DLOG) attribute?"
+      id: DLOG.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(DLOG) attribute?"
+      id: DLOG.S.Afffc
+
+    - label: "Does the device implement the AttributeList(DLOG) attribute?"
+      id: DLOG.S.Afffb
+
+    - label: "Does the device implement the EventList(DLOG) attribute?"
+      id: DLOG.S.Afffa
+
+    - label:
+          "Does the device implement the AcceptedCommandList(DLOG) attribute?"
+      id: DLOG.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(DLOG) attribute?"
+      id: DLOG.S.Afff8
 
     #
     # server / commandsReceived
@@ -3003,6 +3150,27 @@ PICS:
           a client?"
       id: DGETH.C
 
+    #DGETH -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(DGETH) attribute?"
+      id: DGETH.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(DGETH) attribute?"
+      id: DGETH.S.Afffc
+
+    - label: "Does the device implement the AttributeList(DGETH) attribute?"
+      id: DGETH.S.Afffb
+
+    - label: "Does the device implement the EventList(DGETH) attribute?"
+      id: DGETH.S.Afffa
+
+    - label:
+          "Does the device implement the AcceptedCommandList(DGETH) attribute?"
+      id: DGETH.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(DGETH) attribute?"
+      id: DGETH.S.Afff8
+
     #
     # server / attributes
     #
@@ -3113,6 +3281,27 @@ PICS:
     - label: "Does the device implement the Fixed Label cluster as a client?"
       id: FLABEL.C
 
+    #FLABEL -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(FLABEL) attribute?"
+      id: FLABEL.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(FLABEL) attribute?"
+      id: FLABEL.S.Afffc
+
+    - label: "Does the device implement the AttributeList(FLABEL) attribute?"
+      id: FLABEL.S.Afffb
+
+    - label: "Does the device implement the EventList(FLABEL) attribute?"
+      id: FLABEL.S.Afffa
+
+    - label:
+          "Does the device implement the AcceptedCommandList(FLABEL) attribute?"
+      id: FLABEL.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(FLABEL) attribute?"
+      id: FLABEL.S.Afff8
+
     #
     # server / attributes
     #
@@ -3135,6 +3324,26 @@ PICS:
     - label:
           "Does the device implement the Flow Measurement cluster as a client?"
       id: FLW.C
+
+    #FLW -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(FLW) attribute?"
+      id: FLW.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(FLW) attribute?"
+      id: FLW.S.Afffc
+
+    - label: "Does the device implement the AttributeList(FLW) attribute?"
+      id: FLW.S.Afffb
+
+    - label: "Does the device implement the EventList(FLW) attribute?"
+      id: FLW.S.Afffa
+
+    - label: "Does the device implement the AcceptedCommandList(FLW) attribute?"
+      id: FLW.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(FLW) attribute?"
+      id: FLW.S.Afff8
 
     #
     # server / attributes
@@ -3250,6 +3459,27 @@ PICS:
           "Does the device implement the General Diagnostics cluster as a
           client?"
       id: DGGEN.C
+
+    #DGGEN -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(DGGEN) attribute?"
+      id: DGGEN.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(DGGEN) attribute?"
+      id: DGGEN.S.Afffc
+
+    - label: "Does the device implement the AttributeList(DGGEN) attribute?"
+      id: DGGEN.S.Afffb
+
+    - label: "Does the device implement the EventList(DGGEN) attribute?"
+      id: DGGEN.S.Afffa
+
+    - label:
+          "Does the device implement the AcceptedCommandList(DGGEN) attribute?"
+      id: DGGEN.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(DGGEN) attribute?"
+      id: DGGEN.S.Afff8
 
     #
     # server / attributes
@@ -4995,6 +5225,26 @@ PICS:
           client?"
       id: PRS.C
 
+    #PRS -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(PRS) attribute?"
+      id: PRS.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(PRS) attribute?"
+      id: PRS.S.Afffc
+
+    - label: "Does the device implement the AttributeList(PRS) attribute?"
+      id: PRS.S.Afffb
+
+    - label: "Does the device implement the EventList(PRS) attribute?"
+      id: PRS.S.Afffa
+
+    - label: "Does the device implement the AcceptedCommandList(PRS) attribute?"
+      id: PRS.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(PRS) attribute?"
+      id: PRS.S.Afff8
+
     #
     # server / attributes
     #
@@ -5064,6 +5314,26 @@ PICS:
           "Does the device implement the Pump Configuration and Control cluster
           as a client?"
       id: PCC.C
+
+    #PCC -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(PCC) attribute?"
+      id: PCC.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(PCC) attribute?"
+      id: PCC.S.Afffc
+
+    - label: "Does the device implement the AttributeList(PCC) attribute?"
+      id: PCC.S.Afffb
+
+    - label: "Does the device implement the EventList(PCC) attribute?"
+      id: PCC.S.Afffa
+
+    - label: "Does the device implement the AcceptedCommandList(PCC) attribute?"
+      id: PCC.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(PCC) attribute?"
+      id: PCC.S.Afff8
 
     #
     # server / attributes
@@ -5141,55 +5411,55 @@ PICS:
     # server / Events
     #
     - label: "Does the device implement the SupplyVoltageLow event?"
-      id: PCC.S.E0000
+      id: PCC.S.E00
 
     - label: "Does the device implement the SupplyVoltageHigh event?"
-      id: PCC.S.E0001
+      id: PCC.S.E01
 
     - label: "Does the device implement the PowerMissingPhase event?"
-      id: PCC.S.E0002
+      id: PCC.S.E02
 
     - label: "Does the device implement the SystemPressureLow event?"
-      id: PCC.S.E0003
+      id: PCC.S.E03
 
     - label: "Does the device implement the SystemPressureHigh event?"
-      id: PCC.S.E0004
+      id: PCC.S.E04
 
     - label: "Does the device implement the DryRunning event?"
-      id: PCC.S.E0005
+      id: PCC.S.E05
 
     - label: "Does the device implement the MotorTemperatureHigh event?"
-      id: PCC.S.E0006
+      id: PCC.S.E06
 
     - label: "Does the device implement the PumpMotorFatalFailure event?"
-      id: PCC.S.E0007
+      id: PCC.S.E07
 
     - label: "Does the device implement the ElectronicTemperatureHigh event?"
-      id: PCC.S.E0008
+      id: PCC.S.E08
 
     - label: "Does the device implement the PumpBlocked event?"
-      id: PCC.S.E0009
+      id: PCC.S.E09
 
     - label: "Does the device implement the SensorFailure event?"
-      id: PCC.S.E000a
+      id: PCC.S.E0a
 
     - label: "Does the device implement the ElectronicNonFatalFailure event?"
-      id: PCC.S.E000b
+      id: PCC.S.E0b
 
     - label: "Does the device implement the ElectronicFatalFailure event?"
-      id: PCC.S.E000c
+      id: PCC.S.E0c
 
     - label: "Does the device implement the GeneralFault event?"
-      id: PCC.S.E000d
+      id: PCC.S.E0d
 
     - label: "Does the device implement the Leakage event?"
-      id: PCC.S.E000e
+      id: PCC.S.E0e
 
     - label: "Does the device implement the AirDetection event?"
-      id: PCC.S.E000f
+      id: PCC.S.E0f
 
     - label: "Does the device implement the TurbineOperation event?"
-      id: PCC.S.E0010
+      id: PCC.S.E10
 
     #
     # server / features
@@ -5415,6 +5685,27 @@ PICS:
           "Does the device implement the Software Diagnostics cluster as a
           client?"
       id: DGSW.C
+
+    #DGSW -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(DGSW) attribute?"
+      id: DGSW.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(DGSW) attribute?"
+      id: DGSW.S.Afffc
+
+    - label: "Does the device implement the AttributeList(DGSW) attribute?"
+      id: DGSW.S.Afffb
+
+    - label: "Does the device implement the EventList(DGSW) attribute?"
+      id: DGSW.S.Afffa
+
+    - label:
+          "Does the device implement the AcceptedCommandList(DGSW) attribute?"
+      id: DGSW.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(DGSW) attribute?"
+      id: DGSW.S.Afff8
 
     #
     # server / attributes
@@ -6721,6 +7012,27 @@ PICS:
 
     - label: "Does the device implement the User Label cluster as a client?"
       id: ULABEL.C
+
+    #ULABEL -- Global Attributes
+    - label: "Does the device implement the ClusterRevision(ULABEL) attribute?"
+      id: ULABEL.S.Afffd
+
+    - label: "Does the device implement the FeatureMap(ULABEL) attribute?"
+      id: ULABEL.S.Afffc
+
+    - label: "Does the device implement the AttributeList(ULABEL) attribute?"
+      id: ULABEL.S.Afffb
+
+    - label: "Does the device implement the EventList(ULABEL) attribute?"
+      id: ULABEL.S.Afffa
+
+    - label:
+          "Does the device implement the AcceptedCommandList(ULABEL) attribute?"
+      id: ULABEL.S.Afff9
+
+    - label:
+          "Does the device implement the GeneratedCommandList(ULABEL) attribute?"
+      id: ULABEL.S.Afff8
 
     #
     # server / attributes
