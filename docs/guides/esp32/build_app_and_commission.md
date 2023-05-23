@@ -31,7 +31,7 @@ and the ESP32S3.
 
 All the applications support variants of ESP32, ESP32C3, ESP32S3 chips.
 
-ESP32H2 and ESP32C6 are only supported and tested with lighting-app and 
+ESP32H2 and ESP32C6 are only supported and tested with lighting-app and
 all-clusters-app.
 
 Note: M5Stack Core 2 display is not supported in the tft component, while other
@@ -98,7 +98,7 @@ functionality can still work fine.
 
     To build the default configuration (`sdkconfig.defaults`) skip this step.
 
-    To build a specific configuration (example `m5stack` or `esp32h2` or 
+    To build a specific configuration (example `m5stack` or `esp32h2` or
     `esp32c6`):
 
     ```
@@ -107,7 +107,7 @@ functionality can still work fine.
     $ idf.py -D 'SDKCONFIG_DEFAULTS=sdkconfig.defaults.esp32h2' build
     $ idf.py -D 'SDKCONFIG_DEFAULTS=sdkconfig.defaults.esp32c6' build
     ```
-    
+
     Note: If using a specific device configuration, it is highly recommended to
     start off with one of the defaults and customize on top of that. Certain
     configurations have different constraints that are customized within the
