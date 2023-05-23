@@ -86,7 +86,7 @@ server cluster AccessControl = 31 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
-  enum CommissioningError : ENUM8 {
+  enum CommissioningErrorEnum : ENUM8 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -94,7 +94,7 @@ server cluster GeneralCommissioning = 48 {
     kBusyWithOtherAdmin = 4;
   }
 
-  enum RegulatoryLocationType : ENUM8 {
+  enum RegulatoryLocationTypeEnum : ENUM8 {
     kIndoor = 0;
     kOutdoor = 1;
     kIndoorOutdoor = 2;
@@ -121,23 +121,23 @@ server cluster GeneralCommissioning = 48 {
   }
 
   request struct SetRegulatoryConfigRequest {
-    RegulatoryLocationType newRegulatoryConfig = 0;
+    RegulatoryLocationTypeEnum newRegulatoryConfig = 0;
     CHAR_STRING countryCode = 1;
     INT64U breadcrumb = 2;
   }
 
   response struct ArmFailSafeResponse = 1 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse = 3 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct CommissioningCompleteResponse = 5 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 

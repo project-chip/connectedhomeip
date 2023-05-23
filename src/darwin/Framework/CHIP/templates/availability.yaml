@@ -3098,8 +3098,16 @@
               - WiredCurrentTypeEnum
               - WiredFaultEnum
           GeneralCommissioning:
-              - CommissioningError
-              - RegulatoryLocationType
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              - CommissioningErrorEnum
+              # RegulatoryLocationTypeEnum was originally just named
+              # RegulatoryLocationType, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              - RegulatoryLocationTypeEnum
           NetworkCommissioning:
               - NetworkCommissioningStatus
               - WiFiBand
@@ -3414,13 +3422,21 @@
                   - OverVoltage
                   - UnderVoltage
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   - Ok
                   - ValueOutsideRange
                   - InvalidAuthentication
                   - NoFailSafe
                   - BusyWithOtherAdmin
-              RegulatoryLocationType:
+              # RegulatoryLocationTypeEnum was originally just named
+              # RegulatoryLocationType, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              RegulatoryLocationTypeEnum:
                   - Indoor
                   - Outdoor
                   - IndoorOutdoor
@@ -5646,7 +5662,11 @@
                   - ValueB
                   - ValueC
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   - OK
           AccessControl:
               AccessControlEntryPrivilegeEnum:
@@ -6211,7 +6231,11 @@
               - DoorLockProgrammingEventCode
       enum values:
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   - Ok
           PowerSource:
               BatChargeLevelEnum:
@@ -6569,7 +6593,11 @@
               UserTypeEnum: DlUserType
       enum values:
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   OK: Ok
           PowerSource:
               BatChargeLevelEnum:

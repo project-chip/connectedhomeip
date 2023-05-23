@@ -720,9 +720,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::WiredFault
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::CommissioningError val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::CommissioningErrorEnum val)
 {
-    using EnumType = GeneralCommissioning::CommissioningError;
+    using EnumType = GeneralCommissioning::CommissioningErrorEnum;
     switch (val)
     {
     case EnumType::kOk:
@@ -735,9 +735,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::C
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::RegulatoryLocationType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::RegulatoryLocationTypeEnum val)
 {
-    using EnumType = GeneralCommissioning::RegulatoryLocationType;
+    using EnumType = GeneralCommissioning::RegulatoryLocationTypeEnum;
     switch (val)
     {
     case EnumType::kIndoor:

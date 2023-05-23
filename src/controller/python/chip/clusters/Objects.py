@@ -6936,8 +6936,8 @@ class GeneralCommissioning(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="basicCommissioningInfo", Tag=0x00000001, Type=GeneralCommissioning.Structs.BasicCommissioningInfo),
-                ClusterObjectFieldDescriptor(Label="regulatoryConfig", Tag=0x00000002, Type=GeneralCommissioning.Enums.RegulatoryLocationType),
-                ClusterObjectFieldDescriptor(Label="locationCapability", Tag=0x00000003, Type=GeneralCommissioning.Enums.RegulatoryLocationType),
+                ClusterObjectFieldDescriptor(Label="regulatoryConfig", Tag=0x00000002, Type=GeneralCommissioning.Enums.RegulatoryLocationTypeEnum),
+                ClusterObjectFieldDescriptor(Label="locationCapability", Tag=0x00000003, Type=GeneralCommissioning.Enums.RegulatoryLocationTypeEnum),
                 ClusterObjectFieldDescriptor(Label="supportsConcurrentConnection", Tag=0x00000004, Type=bool),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -6949,8 +6949,8 @@ class GeneralCommissioning(Cluster):
 
     breadcrumb: 'uint' = None
     basicCommissioningInfo: 'GeneralCommissioning.Structs.BasicCommissioningInfo' = None
-    regulatoryConfig: 'GeneralCommissioning.Enums.RegulatoryLocationType' = None
-    locationCapability: 'GeneralCommissioning.Enums.RegulatoryLocationType' = None
+    regulatoryConfig: 'GeneralCommissioning.Enums.RegulatoryLocationTypeEnum' = None
+    locationCapability: 'GeneralCommissioning.Enums.RegulatoryLocationTypeEnum' = None
     supportsConcurrentConnection: 'bool' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -6960,7 +6960,7 @@ class GeneralCommissioning(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class CommissioningError(MatterIntEnum):
+        class CommissioningErrorEnum(MatterIntEnum):
             kOk = 0x00
             kValueOutsideRange = 0x01
             kInvalidAuthentication = 0x02
@@ -6972,7 +6972,7 @@ class GeneralCommissioning(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 5,
 
-        class RegulatoryLocationType(MatterIntEnum):
+        class RegulatoryLocationTypeEnum(MatterIntEnum):
             kIndoor = 0x00
             kOutdoor = 0x01
             kIndoorOutdoor = 0x02
@@ -7026,11 +7026,11 @@ class GeneralCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.CommissioningError),
+                        ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.CommissioningErrorEnum),
                         ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'GeneralCommissioning.Enums.CommissioningError' = 0
+            errorCode: 'GeneralCommissioning.Enums.CommissioningErrorEnum' = 0
             debugText: 'str' = ""
 
         @dataclass
@@ -7044,12 +7044,12 @@ class GeneralCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="newRegulatoryConfig", Tag=0, Type=GeneralCommissioning.Enums.RegulatoryLocationType),
+                        ClusterObjectFieldDescriptor(Label="newRegulatoryConfig", Tag=0, Type=GeneralCommissioning.Enums.RegulatoryLocationTypeEnum),
                         ClusterObjectFieldDescriptor(Label="countryCode", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=2, Type=uint),
                     ])
 
-            newRegulatoryConfig: 'GeneralCommissioning.Enums.RegulatoryLocationType' = 0
+            newRegulatoryConfig: 'GeneralCommissioning.Enums.RegulatoryLocationTypeEnum' = 0
             countryCode: 'str' = ""
             breadcrumb: 'uint' = 0
 
@@ -7064,11 +7064,11 @@ class GeneralCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.CommissioningError),
+                        ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.CommissioningErrorEnum),
                         ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'GeneralCommissioning.Enums.CommissioningError' = 0
+            errorCode: 'GeneralCommissioning.Enums.CommissioningErrorEnum' = 0
             debugText: 'str' = ""
 
         @dataclass
@@ -7095,11 +7095,11 @@ class GeneralCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.CommissioningError),
+                        ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=GeneralCommissioning.Enums.CommissioningErrorEnum),
                         ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'GeneralCommissioning.Enums.CommissioningError' = 0
+            errorCode: 'GeneralCommissioning.Enums.CommissioningErrorEnum' = 0
             debugText: 'str' = ""
 
     class Attributes:
@@ -7147,9 +7147,9 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=GeneralCommissioning.Enums.RegulatoryLocationType)
+                return ClusterObjectFieldDescriptor(Type=GeneralCommissioning.Enums.RegulatoryLocationTypeEnum)
 
-            value: 'GeneralCommissioning.Enums.RegulatoryLocationType' = 0
+            value: 'GeneralCommissioning.Enums.RegulatoryLocationTypeEnum' = 0
 
         @dataclass
         class LocationCapability(ClusterAttributeDescriptor):
@@ -7163,9 +7163,9 @@ class GeneralCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=GeneralCommissioning.Enums.RegulatoryLocationType)
+                return ClusterObjectFieldDescriptor(Type=GeneralCommissioning.Enums.RegulatoryLocationTypeEnum)
 
-            value: 'GeneralCommissioning.Enums.RegulatoryLocationType' = 0
+            value: 'GeneralCommissioning.Enums.RegulatoryLocationTypeEnum' = 0
 
         @dataclass
         class SupportsConcurrentConnection(ClusterAttributeDescriptor):

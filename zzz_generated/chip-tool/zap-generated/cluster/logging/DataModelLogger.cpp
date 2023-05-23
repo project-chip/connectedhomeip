@@ -6029,12 +6029,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BasicCommissioningInfo", 1, value);
         }
         case GeneralCommissioning::Attributes::RegulatoryConfig::Id: {
-            chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value;
+            chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RegulatoryConfig", 1, value);
         }
         case GeneralCommissioning::Attributes::LocationCapability::Id: {
-            chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value;
+            chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LocationCapability", 1, value);
         }

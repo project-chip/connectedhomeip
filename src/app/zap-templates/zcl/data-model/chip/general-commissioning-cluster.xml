@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <enum name="CommissioningError" type="ENUM8">
+  <enum name="CommissioningErrorEnum" type="ENUM8">
     <cluster code="0x0030"/>
     <item name="OK" value="0x0"/>
     <item name="ValueOutsideRange" value="0x1"/>
@@ -24,7 +24,7 @@ limitations under the License.
     <item name="NoFailSafe" value="0x3"/>
     <item name="BusyWithOtherAdmin" value="0x4"/>
   </enum>
-  <enum name="RegulatoryLocationType" type="ENUM8">
+  <enum name="RegulatoryLocationTypeEnum" type="ENUM8">
     <cluster code="0x0030"/>
     <item name="Indoor" value="0x0"/>
     <item name="Outdoor" value="0x1"/>
@@ -47,8 +47,8 @@ limitations under the License.
       <access op="write" privilege="administer"/>
     </attribute>
     <attribute side="server" code="0x01" define="BASIC_COMMISSIONING_INFO" type="BasicCommissioningInfo" writable="false" optional="false">BasicCommissioningInfo</attribute>
-    <attribute side="server" code="0x02" define="REGULATORY_CONFIG" type="RegulatoryLocationType" writable="false" optional="false">RegulatoryConfig</attribute>
-    <attribute side="server" code="0x03" define="LOCATION_CAPABILITY" type="RegulatoryLocationType" writable="false" optional="false">LocationCapability</attribute>
+    <attribute side="server" code="0x02" define="REGULATORY_CONFIG" type="RegulatoryLocationTypeEnum" writable="false" optional="false">RegulatoryConfig</attribute>
+    <attribute side="server" code="0x03" define="LOCATION_CAPABILITY" type="RegulatoryLocationTypeEnum" writable="false" optional="false">LocationCapability</attribute>
     <attribute side="server" code="0x04" define="SUPPORTS_CONCURRENT_CONNECTION" type="boolean" writable="false" default="1" optional="false">SupportsConcurrentConnection</attribute>
 
     <command source="client" code="0x00" name="ArmFailSafe" response="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsafe">
@@ -59,19 +59,19 @@ limitations under the License.
     </command>
     <command source="server" code="0x01" name="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsaferesponse">
       <description>Success/failure response for ArmFailSafe command</description>
-      <arg name="ErrorCode" type="CommissioningError"/>
+      <arg name="ErrorCode" type="CommissioningErrorEnum"/>
       <arg name="DebugText" type="CHAR_STRING"/>
     </command>
     <command source="client" code="0x02" name="SetRegulatoryConfig" response="SetRegulatoryConfigResponse" cli="chip fabric_commissioning setregulatoryconfig">
       <description>Set the regulatory configuration to be used during commissioning</description>
-      <arg name="NewRegulatoryConfig" type="RegulatoryLocationType"/>
+      <arg name="NewRegulatoryConfig" type="RegulatoryLocationTypeEnum"/>
       <arg name="CountryCode" type="CHAR_STRING"/>
       <arg name="Breadcrumb" type="INT64U"/>
       <access op="invoke" privilege="administer"/>
     </command>
     <command source="server" code="0x03" name="SetRegulatoryConfigResponse" cli="chip fabric_commissioning setregulatoryconfigresponse">
       <description>Success/failure response for SetRegulatoryConfig command</description>
-      <arg name="ErrorCode" type="CommissioningError"/>
+      <arg name="ErrorCode" type="CommissioningErrorEnum"/>
       <arg name="DebugText" type="CHAR_STRING"/>
     </command>
     <command source="client" code="0x04" name="CommissioningComplete" response="CommissioningCompleteResponse" isFabricScoped="true" optional="false" cli="chip fabric_commissioning commissioningcomplete">
@@ -80,7 +80,7 @@ limitations under the License.
     </command>
     <command source="server" code="0x05" name="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcompleteresponse">
       <description>Indicates to client whether CommissioningComplete command succeeded</description>
-      <arg name="ErrorCode" type="CommissioningError"/>
+      <arg name="ErrorCode" type="CommissioningErrorEnum"/>
       <arg name="DebugText" type="CHAR_STRING"/>
     </command>
   </cluster>
