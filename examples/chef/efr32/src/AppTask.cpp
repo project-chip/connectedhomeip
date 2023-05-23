@@ -81,7 +81,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
     {
         ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
                         (uint8_t) identify->mEffectVariant);
-        sIdentifyEffect = identify->mEffectVariant;
+        sIdentifyEffect = static_cast<Clusters::Identify::EffectIdentifierEnum>(identify->mEffectVariant);
     }
 
     switch (sIdentifyEffect)

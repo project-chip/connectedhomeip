@@ -809,7 +809,7 @@ void AppTask::OnTriggerEffect(Identify * identify)
 
     case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
         ChipLogProgress(Zcl, "Channel Change effect not supported, using effect %d",
-                        Clusters::Identify::EffectIdentifierEnum::kBlink);
+                        (uint8_t) Clusters::Identify::EffectIdentifierEnum::kBlink);
         timerDelay = 2;
         break;
 
