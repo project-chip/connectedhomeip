@@ -25,8 +25,8 @@
 
 namespace chip {
 
-constexpr size_t kOperationalStateLabelMaxSize = 64u;
-constexpr size_t kPhaseMaxSize = 32u;
+constexpr size_t kOperationalStateLabelMaxSize      = 64u;
+constexpr size_t kPhaseMaxSize                      = 32u;
 constexpr size_t kOperationalStateMaxSerializedSize = 512u;
 
 /**
@@ -35,7 +35,7 @@ constexpr size_t kOperationalStateMaxSerializedSize = 512u;
 struct OperationalStateStructDynamicList : public app::Clusters::OperationalState::Structs::OperationalStateStruct::Type
 {
     char OperationalStateLabel[kOperationalStateLabelMaxSize];
-    OperationalStateStructDynamicList *Next;
+    OperationalStateStructDynamicList * Next;
 };
 
 /**
@@ -45,7 +45,7 @@ struct PhaseListCharSpan
 {
     char Phase[kPhaseMaxSize];
     CharSpan phase;
-    PhaseListCharSpan *Next;
+    PhaseListCharSpan * Next;
 };
 
 /**
@@ -56,11 +56,11 @@ class OperationalStateDataProvider
 
 public:
     template <typename T>
-    using DataModelListTemplate = app::DataModel::List<T>;
-    using OperationalStateStructType = app::Clusters::OperationalState::Structs::OperationalStateStruct::Type;
+    using DataModelListTemplate          = app::DataModel::List<T>;
+    using OperationalStateStructType     = app::Clusters::OperationalState::Structs::OperationalStateStruct::Type;
     using OperationalStateStructTypeList = app::DataModel::List<OperationalStateStructType>;
-    using PhaseListType = chip::CharSpan;
-    using PhaseList        = chip::app::DataModel::List<const chip::CharSpan>;
+    using PhaseListType                  = chip::CharSpan;
+    using PhaseList                      = chip::app::DataModel::List<const chip::CharSpan>;
 
     ~OperationalStateDataProvider() {}
 
@@ -80,7 +80,8 @@ public:
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     template <typename T>
-    CHIP_ERROR StoreOperationalStateList(EndpointId endpoint, ClusterId clusterId, const DataModelListTemplate<T> & operationalStateList);
+    CHIP_ERROR StoreOperationalStateList(EndpointId endpoint, ClusterId clusterId,
+                                         const DataModelListTemplate<T> & operationalStateList);
 
     /**
      * Load operational state list from storage.
@@ -90,9 +91,10 @@ public:
      * @param size The number of operational state list's item.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR LoadOperationalStateList(EndpointId endpoint, ClusterId clusterId, OperationalStateStructDynamicList** operationalStateList, size_t & size);
+    CHIP_ERROR LoadOperationalStateList(EndpointId endpoint, ClusterId clusterId,
+                                        OperationalStateStructDynamicList ** operationalStateList, size_t & size);
 
-     /**
+    /**
      * Clear operational state list from storage.
      * @param endpointId The endpoint for which to clear the list[OperationalStateStruct].
      * @param clusterId The cluster for which to clear the list[OperationalStateStruct].
@@ -100,21 +102,21 @@ public:
      */
     CHIP_ERROR ClearOperationalStateList(EndpointId endpoint, ClusterId clusterId);
 
-     /**
+    /**
      * Rlease OperationalStateStructDynamicList
      * @param operationalStateList The pointer for which to clear the OperationalStateStructDynamicList.
      * @return void
      */
     void ReleaseOperationalStateList(OperationalStateStructDynamicList * operationalStateList);
 
-     /**
+    /**
      * use operational state id to get OperationalStateStruct.
      * @param endpointId The endpoint for which to get the OperationalStateStruct.
      * @param clusterId The cluster for which to get the OperationalStateStruct.
      * @param targetOp The target operational state struct.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR UseOpStateIDGetOpStateStruct(EndpointId endpoint, ClusterId clusterId, OperationalStateStructDynamicList& targetOp);
+    CHIP_ERROR UseOpStateIDGetOpStateStruct(EndpointId endpoint, ClusterId clusterId, OperationalStateStructDynamicList & targetOp);
 
     /**
      * Store phase list to storage.
@@ -133,16 +135,16 @@ public:
      * @param size The number of phase list's item.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR LoadPhaseList(EndpointId endpoint, ClusterId clusterId, PhaseListCharSpan **phaseList, size_t & size);
+    CHIP_ERROR LoadPhaseList(EndpointId endpoint, ClusterId clusterId, PhaseListCharSpan ** phaseList, size_t & size);
 
-     /**
+    /**
      * Rlease PhaseListCharSpan
      * @param phaseList The pointer for which to clear the PhaseListCharSpan.
      * @return void
      */
     void ReleasePhaseList(PhaseListCharSpan * phaseList);
 
-     /**
+    /**
      * Clear phase list from storage.
      * @param endpointId The endpoint for which to clear the list[string].
      * @param clusterId The cluster for which to clear the list[string].
@@ -151,7 +153,7 @@ public:
     CHIP_ERROR ClearPhaseStateList(EndpointId endpoint, ClusterId clusterId);
 
 private:
-     /**
+    /**
      * Load content by key from storage.
      * @param key  key to save the content.
      * @param buffer buffer to save the content.
@@ -162,7 +164,8 @@ private:
 };
 
 template <typename T>
-CHIP_ERROR OperationalStateDataProvider::StoreOperationalStateList(EndpointId endpoint, ClusterId clusterId, const DataModelListTemplate<T> & operationalStateList)
+CHIP_ERROR OperationalStateDataProvider::StoreOperationalStateList(EndpointId endpoint, ClusterId clusterId,
+                                                                   const DataModelListTemplate<T> & operationalStateList)
 {
     uint8_t buffer[kOperationalStateMaxSerializedSize];
     TLV::TLVWriter writer;
@@ -178,10 +181,9 @@ CHIP_ERROR OperationalStateDataProvider::StoreOperationalStateList(EndpointId en
 
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 
-    return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::OperationalStateOpStateList(endpoint, clusterId).KeyName(), buffer,
-                                               static_cast<uint16_t>(writer.GetLengthWritten()));
-
+    return mPersistentStorage->SyncSetKeyValue(
+        DefaultStorageKeyAllocator::OperationalStateOpStateList(endpoint, clusterId).KeyName(), buffer,
+        static_cast<uint16_t>(writer.GetLengthWritten()));
 }
-
 
 } // namespace chip

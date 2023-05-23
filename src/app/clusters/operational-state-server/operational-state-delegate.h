@@ -26,8 +26,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace OperationalState {
-constexpr size_t kErrorStateLabelMaxSize = 64u;
-constexpr size_t kErrorStateDetailsMaxSize = 64u;
+constexpr size_t kErrorStateLabelMaxSize       = 64u;
+constexpr size_t kErrorStateDetailsMaxSize     = 64u;
 constexpr size_t kOperationalStateLabelMaxSize = 64u;
 
 struct OperationalErrorStateStruct
@@ -81,15 +81,13 @@ public:
      */
     virtual void HandleStopState(OperationalStateStruct & state, OperationalErrorStateStruct & error) = 0;
 
-     /**
+    /**
      *  Init the delegate
      */
     virtual CHIP_ERROR Init() = 0;
 
     virtual ~Delegate() = default;
 };
-
-
 
 } // namespace OperationalState
 } // namespace Clusters

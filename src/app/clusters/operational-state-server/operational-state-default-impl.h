@@ -43,9 +43,8 @@ using Status = Protocols::InteractionModel::Status;
 /**
  * @brief Operational State Cluster Stop Command callback (from client)
  */
-bool emberAfOperationalStateClusterPauseCallback(
-    CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
-    const Clusters::OperationalState::Commands::Pause::DecodableType & commandData)
+bool emberAfOperationalStateClusterPauseCallback(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
+                                                 const Clusters::OperationalState::Commands::Pause::DecodableType & commandData)
 {
     commandHandler->AddStatus(commandPath, Status::Success);
     return true;
@@ -53,9 +52,8 @@ bool emberAfOperationalStateClusterPauseCallback(
 /**
  * @brief Operational State Cluster Stop Command callback (from client)
  */
-bool emberAfOperationalStateClusterStopCallback(
-    CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
-    const Clusters::OperationalState::Commands::Stop::DecodableType & commandData)
+bool emberAfOperationalStateClusterStopCallback(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
+                                                const Clusters::OperationalState::Commands::Stop::DecodableType & commandData)
 {
     commandHandler->AddStatus(commandPath, Status::Success);
     return true;
@@ -63,9 +61,8 @@ bool emberAfOperationalStateClusterStopCallback(
 /**
  * @brief Operational State Cluster Start Command callback (from client)
  */
-bool emberAfOperationalStateClusterStartCallback(
-    CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
-    const Clusters::OperationalState::Commands::Start::DecodableType & commandData)
+bool emberAfOperationalStateClusterStartCallback(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
+                                                 const Clusters::OperationalState::Commands::Start::DecodableType & commandData)
 {
     commandHandler->AddStatus(commandPath, Status::Success);
     return true;
@@ -73,9 +70,8 @@ bool emberAfOperationalStateClusterStartCallback(
 /**
  * @brief Operational State Cluster Resume Command callback (from client)
  */
-bool emberAfOperationalStateClusterResumeCallback(
-    CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
-    const Clusters::OperationalState::Commands::Resume::DecodableType & commandData)
+bool emberAfOperationalStateClusterResumeCallback(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
+                                                  const Clusters::OperationalState::Commands::Resume::DecodableType & commandData)
 {
     commandHandler->AddStatus(commandPath, Status::Success);
     return true;
