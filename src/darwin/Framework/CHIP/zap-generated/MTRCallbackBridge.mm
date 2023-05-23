@@ -19104,15 +19104,15 @@ void MTRNullablePowerSourceClusterWiredFaultEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralCommissioning::CommissioningError value)
+void MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -19127,8 +19127,8 @@ void MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningError> & value)
+void MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19139,7 +19139,7 @@ void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -19154,15 +19154,15 @@ void MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackSu
     }
 }
 
-void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value)
+void MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -19177,8 +19177,8 @@ void MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscr
     }
 }
 
-void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType> & value)
+void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19189,7 +19189,8 @@ void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

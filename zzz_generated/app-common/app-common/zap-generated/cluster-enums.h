@@ -839,8 +839,8 @@ enum class Feature : uint32_t
 
 namespace GeneralCommissioning {
 
-// Enum for CommissioningError
-enum class CommissioningError : uint8_t
+// Enum for CommissioningErrorEnum
+enum class CommissioningErrorEnum : uint8_t
 {
     kOk                    = 0x00,
     kValueOutsideRange     = 0x01,
@@ -854,8 +854,8 @@ enum class CommissioningError : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for RegulatoryLocationType
-enum class RegulatoryLocationType : uint8_t
+// Enum for RegulatoryLocationTypeEnum
+enum class RegulatoryLocationTypeEnum : uint8_t
 {
     kIndoor        = 0x00,
     kOutdoor       = 0x01,

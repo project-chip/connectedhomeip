@@ -47,13 +47,6 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     otInstance * const instance = openthread_get_default_instance();
 
     ReturnErrorOnFailure(GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(instance));
-#ifdef CONFIG_CHIP_OPENTHREAD_TX_POWER
-    /* On Zephyr platform otPlatRadioSetTransmitPower does not touch radio HW */
-    if (otPlatRadioSetTransmitPower(OTInstance(), CONFIG_CHIP_OPENTHREAD_TX_POWER) != OT_ERROR_NONE)
-    {
-        ChipLogError(DeviceLayer, "Can't set OpenThread TX power");
-    }
-#endif /* CONFIG_CHIP_OPENTHREAD_TX_POWER */
 
     UDPEndPointImplSockets::SetJoinMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
         const otIp6Address otAddress = ToOpenThreadIP6Address(address);
