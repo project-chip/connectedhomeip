@@ -31,7 +31,7 @@ namespace app {
 namespace Clusters {
 namespace Scenes {
 
-class ScenesServer : public CommandHandlerInterface, public AttributeAccessInterface
+class ScenesServer : public CommandHandlerInterface
 {
 public:
     static ScenesServer & Instance();
@@ -42,9 +42,6 @@ public:
     // CommandHanlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
 
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
     // Callbacks
     void GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId);
     void MakeSceneInvalid(EndpointId aEndpointId);
@@ -52,7 +49,7 @@ public:
     void RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId);
 
 private:
-    ScenesServer() : CommandHandlerInterface(Optional<EndpointId>(), Id), AttributeAccessInterface(Optional<EndpointId>(), Id) {}
+    ScenesServer() : CommandHandlerInterface(Optional<EndpointId>(), Id) {}
     ~ScenesServer() {}
 
     bool mIsInitialized = false;
@@ -70,19 +67,6 @@ private:
     void HandleCopyScene(HandlerContext & ctx, const Commands::CopyScene::DecodableType & req);
 
     ConcreteCommandPath mPath = ConcreteCommandPath(0, 0, 0);
-
-    // Feature Flag
-    BitFlags<ScenesFeature> mFeatureFlags;
-
-    // Attributes
-    SceneId mCurrentScene = 0;
-    GroupId mCurrentGroup = 0;
-    bool mSceneValid      = false;
-    uint8_t mNameSupport  = 0;
-    chip::app::DataModel::Nullable<chip::NodeId> mLastConfiguredBy;
-
-    // Scene Table
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * mSceneTable = nullptr;
 
     // Group Data Provider
     Credentials::GroupDataProvider * mGroupProvider = nullptr;

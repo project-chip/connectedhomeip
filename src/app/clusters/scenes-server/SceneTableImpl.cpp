@@ -207,12 +207,12 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     EndpointId endpoint_id;
     FabricIndex fabric_index;
     uint8_t scene_count = 0;
-    uint8_t max_scenes_per_fabric;
-    uint8_t max_scenes_per_endpoint;
+    uint16_t max_scenes_per_fabric;
+    uint16_t max_scenes_per_endpoint;
     SceneStorageId scene_map[kMaxScenesPerFabric];
 
     FabricSceneData(EndpointId endpoint = kInvalidEndpointId, FabricIndex fabric = kUndefinedFabricIndex,
-                    uint8_t maxScenesPerFabric = kMaxScenesPerFabric, uint8_t maxScenesPerEndpoint = kMaxScenesPerEndpoint) :
+                    uint16_t maxScenesPerFabric = kMaxScenesPerFabric, uint16_t maxScenesPerEndpoint = kMaxScenesPerEndpoint) :
         endpoint_id(endpoint),
         fabric_index(fabric), max_scenes_per_fabric(maxScenesPerFabric), max_scenes_per_endpoint(maxScenesPerEndpoint)
     {}
@@ -279,7 +279,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         ReturnErrorOnFailure(reader.EnterContainer(fabricSceneContainer));
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneCount)));
         ReturnErrorOnFailure(reader.Get(scene_count));
-        scene_count = min(scene_count, max_scenes_per_fabric);
+        scene_count = min(scene_count, static_cast<uint8_t>(max_scenes_per_fabric));
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagScene::kStorageIDArray)));
         TLV::TLVType sceneMapContainer;
         ReturnErrorOnFailure(reader.EnterContainer(sceneMapContainer));
@@ -519,11 +519,11 @@ void DefaultSceneTableImpl::Finish()
     UnregisterAllHandlers();
     mSceneEntryIterators.ReleaseAll();
 }
-CHIP_ERROR DefaultSceneTableImpl::GetFabricSceneCount(EndpointId endpoint, FabricIndex fabric_index, uint8_t & scene_count)
+CHIP_ERROR DefaultSceneTableImpl::GetFabricSceneCount(FabricIndex fabric_index, uint8_t & scene_count)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricSceneData fabric(endpoint, fabric_index);
+    FabricSceneData fabric(mEndpointId, fabric_index);
     CHIP_ERROR err = fabric.Load(mStorage);
     VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
 
@@ -532,11 +532,11 @@ CHIP_ERROR DefaultSceneTableImpl::GetFabricSceneCount(EndpointId endpoint, Fabri
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::GetEndpointSceneCount(EndpointId endpoint, uint8_t & scene_count)
+CHIP_ERROR DefaultSceneTableImpl::GetEndpointSceneCount(uint8_t & scene_count)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    EndpointSceneCount endpoint_scene_count(endpoint);
+    EndpointSceneCount endpoint_scene_count(mEndpointId);
 
     ReturnErrorOnFailure(endpoint_scene_count.Load(mStorage));
     scene_count = endpoint_scene_count.count_value;
@@ -544,20 +544,20 @@ CHIP_ERROR DefaultSceneTableImpl::GetEndpointSceneCount(EndpointId endpoint, uin
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::SetEndpointSceneCount(EndpointId endpoint, const uint8_t & scene_count)
+CHIP_ERROR DefaultSceneTableImpl::SetEndpointSceneCount(const uint8_t & scene_count)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    EndpointSceneCount endpoint_scene_count(endpoint, scene_count);
+    EndpointSceneCount endpoint_scene_count(mEndpointId, scene_count);
     return endpoint_scene_count.Save(mStorage);
 }
 
-CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(EndpointId endpoint, FabricIndex fabric_index, uint8_t & capacity)
+CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     uint8_t endpoint_scene_count = 0;
-    ReturnErrorOnFailure(GetEndpointSceneCount(endpoint, endpoint_scene_count));
+    ReturnErrorOnFailure(GetEndpointSceneCount(endpoint_scene_count));
 
     // If the global scene count is higher than the maximal Global scene capacity, this returns a capacity of 0 until enough scenes
     // have been deleted to bring the global number of scenes under the global maximum.
@@ -567,9 +567,9 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(EndpointId endpoint, Fabr
         return CHIP_NO_ERROR;
     }
     uint8_t remaining_capacity_global = static_cast<uint8_t>(mMaxScenesPerEndpoint - endpoint_scene_count);
-    uint8_t remaining_capacity_fabric = mMaxScenesPerFabric;
+    uint8_t remaining_capacity_fabric = static_cast<uint8_t>(mMaxScenesPerFabric);
 
-    FabricSceneData fabric(endpoint, fabric_index);
+    FabricSceneData fabric(mEndpointId, fabric_index);
 
     // Load fabric data (defaults to zero)
     CHIP_ERROR err = fabric.Load(mStorage);
@@ -585,11 +585,11 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(EndpointId endpoint, Fabr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, const SceneTableEntry & entry)
+CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
+    FabricSceneData fabric(mEndpointId, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
 
     // Load fabric data (defaults to zero)
     CHIP_ERROR err = fabric.Load(mStorage);
@@ -599,13 +599,12 @@ CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(EndpointId endpoint, Fabric
     return err;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, SceneStorageId scene_id,
-                                                     SceneTableEntry & entry)
+CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
 {
-    VerifyOrReturnLogError(IsInitialized(), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
-    SceneTableData scene(endpoint, fabric_index);
+    FabricSceneData fabric(mEndpointId, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
+    SceneTableData scene(mEndpointId, fabric_index);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
     VerifyOrReturnError(fabric.Find(scene_id, scene.index) == CHIP_NO_ERROR, CHIP_ERROR_NOT_FOUND);
@@ -616,7 +615,7 @@ CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(EndpointId endpoint, Fabric
     // kMaxClustersPerScene was reduced by OTA) and therefore must be deleted as is is no longer considered accessible.
     if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
     {
-        ReturnErrorOnFailure(this->RemoveSceneTableEntry(endpoint, fabric_index, scene_id));
+        ReturnErrorOnFailure(this->RemoveSceneTableEntry(fabric_index, scene_id));
     }
     ReturnErrorOnFailure(err);
 
@@ -626,10 +625,10 @@ CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(EndpointId endpoint, Fabric
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, SceneStorageId scene_id)
+CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
-    FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
+    FabricSceneData fabric(mEndpointId, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
 
@@ -658,13 +657,12 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(EndpointId end
     return fabric.RemoveScene(mStorage, scene.mStorageId);
 }
 
-CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(EndpointId endpoint, FabricIndex fabric_index, GroupId group_id,
-                                                        Span<SceneId> & scene_list)
+CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(FabricIndex fabric_index, GroupId group_id, Span<SceneId> & scene_list)
 {
-    FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
-    SceneTableData scene(endpoint, fabric_index);
+    FabricSceneData fabric(mEndpointId, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
+    SceneTableData scene(mEndpointId, fabric_index);
 
-    auto * iterator = this->IterateSceneEntries(endpoint, fabric_index);
+    auto * iterator = this->IterateSceneEntries(fabric_index);
     VerifyOrReturnError(nullptr != iterator, CHIP_ERROR_INTERNAL);
     SceneId * list      = scene_list.data();
     uint8_t scene_count = 0;
@@ -687,12 +685,12 @@ CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(EndpointId endpoint, Fab
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::DeleteAllScenesInGroup(EndpointId endpoint, FabricIndex fabric_index, GroupId group_id)
+CHIP_ERROR DefaultSceneTableImpl::DeleteAllScenesInGroup(FabricIndex fabric_index, GroupId group_id)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricSceneData fabric(endpoint, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
-    SceneTableData scene(endpoint, fabric_index);
+    FabricSceneData fabric(mEndpointId, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
+    SceneTableData scene(mEndpointId, fabric_index);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
 
@@ -736,14 +734,14 @@ void DefaultSceneTableImpl::UnregisterAllHandlers()
 /// Does so by going through the SceneHandler list and calling the first handler the list find for each specific clusters.
 /// @param endpoint endpoint for which the scene is saved
 /// @param scene Scene in which the EFS gets populated
-CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(EndpointId endpoint, SceneTableEntry & scene)
+CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
     if (!HandlerListEmpty())
     {
         uint8_t clusterCount = 0;
         clusterId cArray[kMaxClustersPerScene];
         Span<clusterId> cSpan(cArray);
-        clusterCount = GetClustersFromEndpoint(endpoint, cArray, kMaxClustersPerScene);
+        clusterCount = GetClustersFromEndpoint(cArray, kMaxClustersPerScene);
         cSpan.reduce_size(clusterCount);
         for (clusterId cluster : cSpan)
         {
@@ -753,9 +751,9 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(EndpointId endpoint, SceneTableEn
 
             for (auto & handler : mHandlerList)
             {
-                if (handler.SupportsCluster(endpoint, cluster))
+                if (handler.SupportsCluster(mEndpointId, cluster))
                 {
-                    ReturnErrorOnFailure(handler.SerializeSave(endpoint, EFS.mID, EFSSpan));
+                    ReturnErrorOnFailure(handler.SerializeSave(mEndpointId, EFS.mID, EFSSpan));
                     EFS.mUsedBytes = static_cast<uint8_t>(EFSSpan.size());
                     ReturnErrorOnFailure(scene.mStorageData.mExtensionFieldSets.InsertFieldSet(EFS));
                     break;
@@ -772,7 +770,7 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(EndpointId endpoint, SceneTableEn
 /// cluster. Does so by going through the SceneHandler list and calling the first handler the list find for each specific clusters.
 /// @param endpoint endpoint on which the scene is applied
 /// @param scene Scene providing the EFSs (extension field sets)
-CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(EndpointId endpoint, const SceneTableEntry & scene)
+CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
 {
     ExtensionFieldSet EFS;
     TransitionTimeMs time;
@@ -791,9 +789,9 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(EndpointId endpoint, const Scene
             {
                 for (auto & handler : mHandlerList)
                 {
-                    if (handler.SupportsCluster(endpoint, cluster))
+                    if (handler.SupportsCluster(mEndpointId, cluster))
                     {
-                        ReturnErrorOnFailure(handler.ApplyScene(endpoint, cluster, EFSSpan, time));
+                        ReturnErrorOnFailure(handler.ApplyScene(mEndpointId, cluster, EFSSpan, time));
                         break;
                     }
                 }
@@ -835,24 +833,36 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 
 /// @brief wrapper function around emberAfGetClustersFromEndpoint to allow testing, shimmed in test configuration because
 /// emberAfGetClusterFromEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated files
-uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterList, uint8_t listLen)
+uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen)
 {
-    return emberAfGetClustersFromEndpoint(endpoint, clusterList, listLen, true);
+    return emberAfGetClustersFromEndpoint(mEndpointId, clusterList, listLen, true);
 }
 
-DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(EndpointId endpoint, FabricIndex fabric)
+void DefaultSceneTableImpl::SetEndpoint(EndpointId endpoint)
+{
+    mEndpointId = endpoint;
+}
+
+void DefaultSceneTableImpl::SetTableSize(uint16_t endpointSceneTableSize)
+{
+    // Verify the endpoint passed size respects the limits of the device configuration
+    mMaxScenesPerEndpoint = (kMaxScenesPerEndpoint < endpointSceneTableSize) ? kMaxScenesPerEndpoint : endpointSceneTableSize;
+    mMaxScenesPerFabric   = static_cast<uint16_t>(endpointSceneTableSize / 2);
+}
+
+DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(FabricIndex fabric)
 {
     VerifyOrReturnError(IsInitialized(), nullptr);
-    return mSceneEntryIterators.CreateObject(*this, endpoint, fabric, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
+    return mSceneEntryIterators.CreateObject(*this, fabric, mEndpointId, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
 }
 
-DefaultSceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, EndpointId endpoint,
-                                                                      FabricIndex fabricIdx, uint8_t maxScenesPerFabric,
-                                                                      uint8_t maxScenesEndpoint) :
+DefaultSceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, FabricIndex fabricIdx,
+                                                                      EndpointId endpoint, uint16_t maxScenesPerFabric,
+                                                                      uint16_t maxScenesEndpoint) :
     mProvider(provider),
-    mFabric(fabricIdx), mEndpointId(endpoint), mMaxScenesPerFabric(maxScenesPerFabric), mMaxScenesPerEndpoint(maxScenesEndpoint)
+    mFabric(fabricIdx), mEndpoint(endpoint), mMaxScenesPerFabric(maxScenesPerFabric), mMaxScenesPerEndpoint(maxScenesEndpoint)
 {
-    FabricSceneData fabric(endpoint, fabricIdx, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
+    FabricSceneData fabric(mEndpoint, fabricIdx, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     ReturnOnFailure(fabric.Load(provider.mStorage));
     mTotalScenes = fabric.scene_count;
     mSceneIndex  = 0;
@@ -865,8 +875,8 @@ size_t DefaultSceneTableImpl::SceneEntryIteratorImpl::Count()
 
 bool DefaultSceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & output)
 {
-    FabricSceneData fabric(mEndpointId, mFabric);
-    SceneTableData scene(mEndpointId, mFabric);
+    FabricSceneData fabric(mEndpoint, mFabric);
+    SceneTableData scene(mEndpoint, mFabric);
 
     VerifyOrReturnError(fabric.Load(mProvider.mStorage) == CHIP_NO_ERROR, false);
 
@@ -904,8 +914,11 @@ static DefaultSceneTableImpl gSceneTableImpl;
 /// @brief Instance getter for the default global scene table implementation
 ///        Should only be used in the scene cluster
 /// @return Default global scene table implementation
-DefaultSceneTableImpl * GetSceneTableImpl()
+DefaultSceneTableImpl * GetSceneTableImpl(EndpointId endpoint, uint16_t endpointTableSize)
 {
+    gSceneTableImpl.SetEndpoint(endpoint);
+    gSceneTableImpl.SetTableSize(endpointTableSize);
+
     return &gSceneTableImpl;
 }
 

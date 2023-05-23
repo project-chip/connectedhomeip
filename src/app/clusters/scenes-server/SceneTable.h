@@ -261,21 +261,19 @@ public:
     virtual void Finish()                                        = 0;
 
     // Global scene count
-    virtual CHIP_ERROR GetEndpointSceneCount(EndpointId endpoint, uint8_t & scene_count)                         = 0;
-    virtual CHIP_ERROR GetFabricSceneCount(EndpointId endpoint, FabricIndex fabric_index, uint8_t & scene_count) = 0;
+    virtual CHIP_ERROR GetEndpointSceneCount(uint8_t & scene_count)                         = 0;
+    virtual CHIP_ERROR GetFabricSceneCount(FabricIndex fabric_index, uint8_t & scene_count) = 0;
 
     // Data
-    virtual CHIP_ERROR GetRemainingCapacity(EndpointId endpoint, FabricIndex fabric_index, uint8_t & capacity)              = 0;
-    virtual CHIP_ERROR SetSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, const SceneTableEntry & entry)     = 0;
-    virtual CHIP_ERROR GetSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, SceneStorageId scene_id,
-                                          SceneTableEntry & entry)                                                          = 0;
-    virtual CHIP_ERROR RemoveSceneTableEntry(EndpointId endpoint, FabricIndex fabric_index, SceneStorageId scene_id)        = 0;
+    virtual CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity)                                   = 0;
+    virtual CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)                          = 0;
+    virtual CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)       = 0;
+    virtual CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)                             = 0;
     virtual CHIP_ERROR RemoveSceneTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index, SceneIndex scene_idx) = 0;
 
     // Groups
-    virtual CHIP_ERROR GetAllSceneIdsInGroup(EndpointId endpoint, FabricIndex fabric_index, GroupId group_id,
-                                             Span<SceneId> & scene_list)                                       = 0;
-    virtual CHIP_ERROR DeleteAllScenesInGroup(EndpointId endpoint, FabricIndex fabric_index, GroupId group_id) = 0;
+    virtual CHIP_ERROR GetAllSceneIdsInGroup(FabricIndex fabric_index, GroupId group_id, Span<SceneId> & scene_list) = 0;
+    virtual CHIP_ERROR DeleteAllScenesInGroup(FabricIndex fabric_index, GroupId group_id)                            = 0;
 
     // SceneHandlers
     virtual void RegisterHandler(SceneHandler * handler)   = 0;
@@ -283,8 +281,8 @@ public:
     virtual void UnregisterAllHandlers()                   = 0;
 
     // Extension field sets operation
-    virtual CHIP_ERROR SceneSaveEFS(EndpointId endpoint, SceneTableEntry & scene)        = 0;
-    virtual CHIP_ERROR SceneApplyEFS(EndpointId endpoint, const SceneTableEntry & scene) = 0;
+    virtual CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene)        = 0;
+    virtual CHIP_ERROR SceneApplyEFS(const SceneTableEntry & scene) = 0;
 
     // Fabrics
     virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
@@ -292,7 +290,7 @@ public:
     // Iterators
     using SceneEntryIterator = CommonIterator<SceneTableEntry>;
 
-    virtual SceneEntryIterator * IterateSceneEntries(EndpointId endpoint, FabricIndex fabric_index) = 0;
+    virtual SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) = 0;
 
     // Handlers
     virtual bool HandlerListEmpty() { return mHandlerList.Empty(); }
