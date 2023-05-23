@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 78.1.1. [TC-MOD-1.1] Global attributes with server as DUT
+name: 78.1.1. [TC-RVCRUNMS-1.1] Global attributes with server as DUT
 
 PICS:
-    - MOD.S
+    - RVCRUNMS.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Mode Select"
+    cluster: "RVC Run Mode Select"
     endpoint: 1
 
 tests:
@@ -40,7 +40,7 @@ tests:
               type: int16u
 
     - label: "TH reads the FeatureMap attribute from the DUT"
-      PICS: " !MOD.S.F00 && !MOD.S.F01 && !MOD.S.F02 "
+      PICS: " !RVCRUNMS.S.F00 && !RVCRUNMS.S.F01 && !RVCRUNMS.S.F02 "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -49,8 +49,8 @@ tests:
               type: bitmap32
 
     - label:
-          "Given MOD.S.F00(DEPONOFF) ensure featuremap has the correct bit set"
-      PICS: MOD.S.F00
+          "Given RVCRUNMS.S.F00(DEPONOFF) ensure featuremap has the correct bit set"
+      PICS: RVCRUNMS.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -59,8 +59,8 @@ tests:
               hasMasksSet: [0x1]
 
     - label:
-          "Given MOD.S.F01(EXT) ensure featuremap has the correct bit set"
-      PICS: MOD.S.F01
+          "Given RVCRUNMS.S.F01(EXT) ensure featuremap has the correct bit set"
+      PICS: RVCRUNMS.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -69,8 +69,8 @@ tests:
               hasMasksSet: [0x2]
 
     - label:
-          "Given MOD.S.F02(DEPCTM) ensure featuremap has the correct bit set"
-      PICS: MOD.S.F02
+          "Given RVCRUNMS.S.F02(DEPCTM) ensure featuremap has the correct bit set"
+      PICS: RVCRUNMS.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -90,7 +90,7 @@ tests:
     - label:
           "TH reads the optional attribute(StartUpMode) in AttributeList from
           the DUT"
-      PICS: MOD.S.A0004
+      PICS: RVCRUNMS.S.A0004
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -99,8 +99,8 @@ tests:
               contains: [4]
 
     - label:
-          "Read the Feature dependent(MOD.S.F00 - DEPONOFF) and optional attribute(OnMode) in AttributeList from the DUT"
-      PICS: MOD.S.A0005 && MOD.S.F00
+          "Read the Feature dependent(RVCRUNMS.S.F00 - DEPONOFF) and optional attribute(OnMode) in AttributeList from the DUT"
+      PICS: RVCRUNMS.S.A0005 && RVCRUNMS.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -108,8 +108,8 @@ tests:
               type: list
               contains: [5]
 
-    - label: "Read the global attribute AcceptedCommandList. Check if it contains the Feature dependent (MOD.S.F02 - DEPCTM) command with id 0x0 (ChangeToMode)"
-      PICS: MOD.S.Afff9 && !MOD.S.F02
+    - label: "Read the global attribute AcceptedCommandList. Check if it contains the Feature dependent (RVCRUNMS.S.F02 - DEPCTM) command with id 0x0 (ChangeToMode)"
+      PICS: RVCRUNMS.S.Afff9 && !RVCRUNMS.S.F02
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -118,8 +118,8 @@ tests:
               contains: [0]
 
 
-    - label: "Read the global attribute AcceptedCommandList. Check if it contains the Feature dependent (MOD.S.F01 - EXT) command with id 0x1 (ChangeToModeWithStatus)"
-      PICS: MOD.S.Afff9 && MOD.S.F01
+    - label: "Read the global attribute AcceptedCommandList. Check if it contains the Feature dependent (RVCRUNMS.S.F01 - EXT) command with id 0x1 (ChangeToModeWithStatus)"
+      PICS: RVCRUNMS.S.Afff9 && RVCRUNMS.S.F01
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -127,8 +127,8 @@ tests:
               type: list
               contains: [1]
 
-    - label: "Read the global attribute AcceptedCommandList. Check if it excludes the Feature dependent (MOD.S.F02 - DEPCTM) command with id 0x0 (ChangeToMode)"
-      PICS: MOD.S.Afff9 && MOD.S.F02
+    - label: "Read the global attribute AcceptedCommandList. Check if it excludes the Feature dependent (RVCRUNMS.S.F02 - DEPCTM) command with id 0x0 (ChangeToMode)"
+      PICS: RVCRUNMS.S.Afff9 && RVCRUNMS.S.F02
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -137,7 +137,7 @@ tests:
               excludes: [0]
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: MOD.S.Afff8
+      PICS: RVCRUNMS.S.Afff8
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -145,8 +145,8 @@ tests:
           constraints:
               type: list
 
-    - label: "Read the global attribute: GeneratedCommandList. Check if it contains the Feature dependent (MOD.S.F01 - EXT) command with id 0x2 (ChangeToModeResponse)"
-      PICS: MOD.S.Afff8 && MOD.S.F01
+    - label: "Read the global attribute: GeneratedCommandList. Check if it contains the Feature dependent (RVCRUNMS.S.F01 - EXT) command with id 0x2 (ChangeToModeResponse)"
+      PICS: RVCRUNMS.S.Afff8 && RVCRUNMS.S.F01
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
