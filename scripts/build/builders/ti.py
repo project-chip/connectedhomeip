@@ -18,6 +18,7 @@ from enum import Enum, auto
 from .gn import GnBuilder
 from typing import Optional
 
+
 class TIApp(Enum):
     LOCK = auto()
     PUMP = auto()
