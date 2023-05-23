@@ -23,9 +23,9 @@
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32SecureCertDACProvider.h>
 
-#if CONFIG_SOC_ECDSA_SUPPORTED
+#if CONFIG_USE_ESP32_ECDSA_PERIPHERAL
 #include <platform/ESP32/ESP32CHIPCryptoPAL.h>
-#endif // CONFIG_SOC_ECDSA_SUPPORTED
+#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
 
 #define TAG "dac_provider"
 
