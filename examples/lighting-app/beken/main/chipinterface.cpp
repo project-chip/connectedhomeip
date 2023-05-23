@@ -91,7 +91,8 @@ void OnTriggerEffect(Identify * identify)
 }
 
 static Identify gIdentify1 = {
-    chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, OnTriggerEffect,
+    chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    OnTriggerEffect,
 };
 
 // Warkaround for ld error:undefined reference to '__sync_synchronize'

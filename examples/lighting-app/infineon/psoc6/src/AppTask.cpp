@@ -134,7 +134,7 @@ static Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     OnIdentifyStart,
     OnIdentifyStop,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE,
+    Clusters::Identify::IdentifyTypeEnum::kNone,
 };
 
 static void InitServer(intptr_t context)

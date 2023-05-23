@@ -97,7 +97,7 @@ static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, A
                               // Use invalid value for identifiers to enable TriggerEffect command
                               // to stop Identify command for each effect
                               (EmberAfIdentifyEffectIdentifier)(Clusters::Identify::EffectIdentifierEnum::kStopEffect - 0x10),
-                              EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT };
+                              Clusters::Identify::EffectVariantEnum::kDefault };
 
 /* OTA related variables */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -774,7 +774,7 @@ void AppTask::OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * 
             (EmberAfIdentifyEffectIdentifier)(Clusters::Identify::EffectIdentifierEnum::kStopEffect - 0x10);
         gIdentify.mTargetEffectIdentifier =
             (EmberAfIdentifyEffectIdentifier)(Clusters::Identify::EffectIdentifierEnum::kStopEffect - 0x10);
-        gIdentify.mEffectVariant = EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT;
+        gIdentify.mEffectVariant = Clusters::Identify::EffectVariantEnum::kDefault;
 
         RestoreLightingState();
     }
@@ -809,7 +809,8 @@ void AppTask::OnTriggerEffect(Identify * identify)
         break;
 
     case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
-        ChipLogProgress(Zcl, "Channel Change effect not supported, using effect %d", Clusters::Identify::EffectIdentifierEnum::kBlink);
+        ChipLogProgress(Zcl, "Channel Change effect not supported, using effect %d",
+                        Clusters::Identify::EffectIdentifierEnum::kBlink);
         timerDelay = 2;
         break;
 

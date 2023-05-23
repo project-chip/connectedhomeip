@@ -73,7 +73,7 @@ Identify sIdentify = {
     APP_LIGHT_ENDPOINT_ID,
     AppTask::IdentifyStartHandler,
     AppTask::IdentifyStopHandler,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LIGHT,
+    Clusters::Identify::IdentifyTypeEnum::kLightOutput,
 };
 
 } // namespace
