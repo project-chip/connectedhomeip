@@ -7607,3 +7607,96 @@ PICS:
     - label:
           "Does the device implement sending the GoToTiltPercentage command ?"
       id: WNCV.C.C08.Tx
+
+    # Time Synchronization Cluster Test Plan
+    - label:
+          "Does the device implement the Time Synchronization cluster as a
+          server?"
+      id: TIMESYNC.S
+
+    - label:
+          "Does the device implement the Time Synchronization cluster as a
+          client?"
+      id: TIMESYNC.C
+
+    #
+    # server / features
+    #
+    - label: "Does the DUT(server) support the TimeZone feature?"
+      id: TIMESYNC.S.F00
+
+    - label: "Does the DUT(server) support the NTPClient feature?"
+      id: TIMESYNC.S.F01
+
+    - label: "Does the DUT(server) support the NTPServer feature?"
+      id: TIMESYNC.S.F02
+
+    - label: "Does the DUT(server) support the TimeSyncClient feature?"
+      id: TIMESYNC.S.F03
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the UTCTime attribute ?"
+      id: TIMESYNC.S.A0000
+
+    - label: "Does the device implement the Granularity attribute ?"
+      id: TIMESYNC.S.A0001
+
+    - label: "Does the device implement the TimeSource attribute ?"
+      id: TIMESYNC.S.A0002
+
+    - label: "Does the device implement the TrustedTimeSource attribute ?"
+      id: TIMESYNC.S.A0003
+
+    - label: "Does the device implement the DefaultNTP attribute ?"
+      id: TIMESYNC.S.A0004
+
+    - label: "Does the device implement the TimeZone attribute ?"
+      id: TIMESYNC.S.A0005
+
+    - label: "Does the device implement the DSTOffset attribute ?"
+      id: TIMESYNC.S.A0006
+
+    - label: "Does the device implement the LocalTime attribute ?"
+      id: TIMESYNC.S.A0007
+
+    - label: "Does the device implement the TimeZoneDatabase attribute ?"
+      id: TIMESYNC.S.A0008
+
+    - label: "Does the device implement the NTPServerAvailable attribute ?"
+      id: TIMESYNC.S.A0009
+
+    - label: "Does the device implement the TimeZoneListMaxSize attribute ?"
+      id: TIMESYNC.S.A000a
+
+    - label: "Does the device implement the DSTOffsetListMaxSize attribute ?"
+      id: TIMESYNC.S.A000b
+
+    - label: "Does the device implement the SupportsDNSResolve attribute ?"
+      id: TIMESYNC.S.A000c
+
+    #
+    # server / commandsReceived
+    #
+    - label: "Does the device implement receiving the SetUTCTime command?"
+      id: TIMESYNC.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the SetTrustedTimeSource command?"
+      id: TIMESYNC.S.C01.Rsp
+
+    - label: "Does the device implement receiving the SetTimeZone command?"
+      id: TIMESYNC.S.C02.Rsp
+
+    - label: "Does the device implement receiving the SetDSTOffset command?"
+      id: TIMESYNC.S.C04.Rsp
+
+    - label: "Does the device implement receiving the SetDefaultNTP command?"
+      id: TIMESYNC.S.C05.Rsp
+
+    #
+    # server / commandsGenerated
+    #
+    - label: "Does the DUT(server) support the SetTimeZoneResponse command?"
+      id: TIMESYNC.S.C03.Tx
