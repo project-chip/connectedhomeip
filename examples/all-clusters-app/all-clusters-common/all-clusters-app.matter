@@ -2323,6 +2323,65 @@ server cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
+server cluster OperationalState = 96 {
+  enum ErrorStateEnum : ENUM8 {
+    kNoError = 0;
+    kUnableToStartOrResume = 1;
+    kUnableToCompleteOperation = 2;
+    kCommandInvalidInState = 3;
+  }
+
+  enum OperationalStateEnum : ENUM8 {
+    kStopped = 0;
+    kRunning = 1;
+    kPaused = 2;
+    kError = 3;
+  }
+
+  struct ErrorStateStruct {
+    ErrorStateEnum errorStateID = 0;
+    char_string<64> errorStateLabel = 1;
+    char_string<64> errorStateDetails = 2;
+  }
+
+  struct OperationalStateStruct {
+    OperationalStateEnum operationalStateID = 0;
+    char_string operationalStateLabel = 1;
+  }
+
+  critical event OperationalError = 0 {
+    ErrorStateStruct errorState = 0;
+  }
+
+  info event OperationCompletion = 1 {
+    ErrorStateEnum completionErrorCode = 0;
+    INT32U totalOperationalTime = 1;
+    INT32U pausedTime = 2;
+  }
+
+  readonly attribute nullable CHAR_STRING phaseList[] = 0;
+  readonly attribute nullable int8u currentPhase = 1;
+  readonly attribute OperationalStateStruct operationalStateList[] = 3;
+  readonly attribute OperationalStateStruct operationalState = 4;
+  readonly attribute ErrorStateStruct operationalError = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct OperationalCommandResponse = 4 {
+    ErrorStateStruct commandResponseState = 0;
+  }
+
+  command Pause(): OperationalCommandResponse = 0;
+  command Stop(): OperationalCommandResponse = 1;
+  command Start(): OperationalCommandResponse = 2;
+  command Resume(): OperationalCommandResponse = 3;
+}
+
 /** An interface to a generic way to secure a door */
 server cluster DoorLock = 257 {
   enum AlarmCodeEnum : ENUM8 {
@@ -5136,6 +5195,21 @@ endpoint 1 {
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
     ram      attribute manufacturerExtension default = 255;
+  }
+
+  server cluster OperationalState {
+    emits event OperationalError;
+    callback attribute phaseList;
+    ram      attribute currentPhase;
+    callback attribute operationalStateList;
+    callback attribute operationalState;
+    callback attribute operationalError;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster DoorLock {
