@@ -49,3 +49,6 @@ CONFIG_DEVICE_PRODUCT_ID=0x8006
 
 # Disable softap support by default
 CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n
+
+# Enable HKDF in mbedtls
+CONFIG_MBEDTLS_HKDF_C=y
