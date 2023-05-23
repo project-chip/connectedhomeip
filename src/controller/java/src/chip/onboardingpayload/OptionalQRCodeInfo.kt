@@ -1,6 +1,11 @@
 package chip.onboardingpayload
 
-class OptionalQRCodeInfo {
+data class OptionalQRCodeInfo(
+  var tag: Int = 0,
+  var type: OptionalQRCodeInfoType = OptionalQRCodeInfoType.TYPE_UNKNOWN,
+  var data: String? = null,
+  var int32: Int = 0
+) {
   enum class OptionalQRCodeInfoType {
     TYPE_UNKNOWN,
     TYPE_STRING,
@@ -9,9 +14,4 @@ class OptionalQRCodeInfo {
     TYPE_UINT32,
     TYPE_UINT64
   }
-
-  var tag = 0
-  var type: OptionalQRCodeInfoType? = null
-  var data: String? = null
-  var int32 = 0
 }

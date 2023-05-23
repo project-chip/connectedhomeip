@@ -24,9 +24,9 @@ import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import chip.tlv.*
 import chip.jsontlv.fromJsonString
 import chip.jsontlv.toJsonString
+import chip.tlv.*
 
 @RunWith(JUnit4::class)
 class JsonToTlvToJsonTest {

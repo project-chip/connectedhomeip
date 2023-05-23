@@ -55,11 +55,11 @@ class OnboardingPayloadParser {
 
   /** Get QR code string from [OnboardingPayload].  */
   @Throws(OnboardingPayloadException::class)
-  external fun getQrCodeFromPayload(payload: OnboardingPayload): String?
+  external fun getQrCodeFromPayload(payload: OnboardingPayload): String
 
   /** Get Manual Pairing Code string from [OnboardingPayload].  */
   @Throws(OnboardingPayloadException::class)
-  external fun getManualPairingCodeFromPayload(payload: OnboardingPayload): String?
+  external fun getManualPairingCodeFromPayload(payload: OnboardingPayload): String
 
   @Throws(UnrecognizedQrCodeException::class, OnboardingPayloadException::class)
   private external fun fetchPayloadFromQrCode(
