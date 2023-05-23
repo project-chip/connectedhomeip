@@ -27,6 +27,7 @@
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace chip::app;
 using namespace chip::app::Clusters::WindowCovering;
 
 inline void OnTriggerEffectCompleted(chip::System::Layer * systemLayer, void * appState)
@@ -36,7 +37,7 @@ inline void OnTriggerEffectCompleted(chip::System::Layer * systemLayer, void * a
 
 void OnTriggerEffect(Identify * identify)
 {
-    EmberAfIdentifyEffectIdentifier sIdentifyEffect = identify->mCurrentEffectIdentifier;
+    Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
     ChipLogProgress(Zcl, "IDENTFY  OnTriggerEffect");
 
@@ -44,7 +45,7 @@ void OnTriggerEffect(Identify * identify)
     {
         ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
                         identify->mEffectVariant);
-        sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
+        sIdentifyEffect = identify->mEffectVariant;
     }
 
     switch (sIdentifyEffect)

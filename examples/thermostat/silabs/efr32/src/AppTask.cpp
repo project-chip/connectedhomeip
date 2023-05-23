@@ -60,6 +60,7 @@
 #define MODE_TIMER 1000 // 1s timer period
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
 
@@ -67,8 +68,7 @@ using namespace ::chip::DeviceLayer;
  * Variable declarations
  *********************************************************/
 namespace {
-EmberAfIdentifyEffectIdentifier sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-
+Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 }
 /**********************************************************
  * Identify Callbacks
@@ -94,7 +94,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
     {
         ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
                         identify->mEffectVariant);
-        sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
+        sIdentifyEffect = identify->mEffectVariant;
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1

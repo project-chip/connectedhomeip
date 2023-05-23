@@ -90,7 +90,7 @@ StaticQueue_t sAppEventQueueStruct;
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
-EmberAfIdentifyEffectIdentifier sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 /**********************************************************
@@ -112,7 +112,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
     {
         ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect variant %d",
                         identify->mEffectVariant);
-        sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
+        sIdentifyEffect = identify->mEffectVariant;
     }
 
     switch (sIdentifyEffect)

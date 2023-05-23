@@ -88,7 +88,7 @@ namespace {
 constexpr int extDiscTimeoutSecs = 20;
 }
 
-EmberAfIdentifyEffectIdentifier sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 /**********************************************************
  * Identify Callbacks
@@ -109,7 +109,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
     {
         ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect variant %d",
                         identify->mEffectVariant);
-        sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
+        sIdentifyEffect = identify->mEffectVariant;
     }
 
     switch (sIdentifyEffect)

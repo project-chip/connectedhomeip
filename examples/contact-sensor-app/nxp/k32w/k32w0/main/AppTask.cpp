@@ -82,6 +82,7 @@ extern "C" void K32WUartProcess(void);
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip;
+using namespace chip::app;
 
 AppTask AppTask::sAppTask;
 

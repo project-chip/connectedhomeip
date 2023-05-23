@@ -63,6 +63,7 @@ using chip::app::Clusters::DoorLock::OperationErrorEnum;
 using chip::app::Clusters::DoorLock::OperationSourceEnum;
 
 using namespace chip;
+using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
@@ -71,7 +72,7 @@ using namespace EFR32DoorLock::LockInitParams;
 namespace {
 LEDWidget sLockLED;
 
-EmberAfIdentifyEffectIdentifier sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 } // namespace
 /**********************************************************
  * Identify Callbacks
@@ -96,7 +97,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
     {
         ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
                         identify->mEffectVariant);
-        sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
+        sIdentifyEffect = identify->mEffectVariant;
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1

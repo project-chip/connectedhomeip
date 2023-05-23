@@ -84,6 +84,7 @@ extern "C" void K32WUartProcess(void);
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip;
+using namespace chip::app;
 
 AppTask AppTask::sAppTask;
 
@@ -96,7 +97,7 @@ static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, A
                               Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, AppTask::OnTriggerEffect,
                               // Use invalid value for identifiers to enable TriggerEffect command
                               // to stop Identify command for each effect
-                              (EmberAfIdentifyEffectIdentifier)(Clusters::Identify::EffectIdentifierEnum::kStopEffect - 0x10),
+                              Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue,
                               Clusters::Identify::EffectVariantEnum::kDefault };
 
 /* OTA related variables */
@@ -770,10 +771,8 @@ void AppTask::OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * 
         // TriggerEffect finished - reset identifiers
         // Use invalid value for identifiers to enable TriggerEffect command
         // to stop Identify command for each effect
-        gIdentify.mCurrentEffectIdentifier =
-            (EmberAfIdentifyEffectIdentifier)(Clusters::Identify::EffectIdentifierEnum::kStopEffect - 0x10);
-        gIdentify.mTargetEffectIdentifier =
-            (EmberAfIdentifyEffectIdentifier)(Clusters::Identify::EffectIdentifierEnum::kStopEffect - 0x10);
+        gIdentify.mCurrentEffectIdentifier = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
+        gIdentify.mTargetEffectIdentifier  = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
         gIdentify.mEffectVariant = Clusters::Identify::EffectVariantEnum::kDefault;
 
         RestoreLightingState();

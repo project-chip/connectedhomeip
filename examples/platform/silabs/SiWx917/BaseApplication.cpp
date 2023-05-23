@@ -102,7 +102,7 @@ bool sHaveBLEConnections = false;
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
-EmberAfIdentifyEffectIdentifier sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 StaticQueue_t sAppEventQueueStruct;

@@ -335,7 +335,7 @@ void AppTaskCommon::UpdateIdentifyStateEventHandler(AppEvent * aEvent)
     GetAppTask().mPwmIdentifyLed.UpdateAction();
 }
 
-void AppTaskCommon::IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect)
+void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect)
 {
     AppEvent event;
     event.Type = AppEvent::kEventType_IdentifyStart;
