@@ -246,8 +246,13 @@ void sl_wfx_host_pre_bootloader_spi_transfer()
         SPIDRV_DeInit(SL_SPIDRV_HANDLE);
         spi_enabled = false;
     }
-    bootloader_init();
+    int32_t status = bootloader_init();
     // bootloader_init takes care of SPIDRV_Init()
+    if (status != BOOTLOADER_OK)
+    {
+        SILABS_LOG("%s: bootloader_init failed with error code: %d", __func__, status);
+        return;
+    }
     sl_wfx_host_spiflash_cs_assert();
     SILABS_LOG("%s completed.", __func__);
 }
@@ -255,8 +260,14 @@ void sl_wfx_host_pre_bootloader_spi_transfer()
 void sl_wfx_host_post_bootloader_spi_transfer()
 {
     SILABS_LOG("%s started.", __func__);
-    bootloader_deinit();
-    GPIO->USARTROUTE[0].ROUTEEN = 0;
+    int32_t status = bootloader_deinit();
+    // bootloader_deinit will do USART disable
+    if (status != BOOTLOADER_OK)
+    {
+        SILABS_LOG("%s: bootloader_deinit failed with error code: %d", __func__, status);
+        return;
+    }
+    GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = 0;
     sl_wfx_host_spiflash_cs_deassert();
     xSemaphoreGive(spi_sem_sync_hdl);
     SILABS_LOG("%s completed.", __func__);
