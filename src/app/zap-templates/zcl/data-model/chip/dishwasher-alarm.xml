@@ -24,7 +24,7 @@ limitations under the License.
      <field name="DoorError"       mask="0x04"/>
      <field name="TempTooLow"      mask="0x08"/>
      <field name="TempTooHigh"     mask="0x10"/>
-     <field name="WaterLevelError" mask="0x11"/>
+     <field name="WaterLevelError" mask="0x20"/>
   </bitmap>
 
   <cluster>
