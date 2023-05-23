@@ -201,12 +201,37 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
+@interface MTRClusterLaundryWasherModeSelect ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterRefrigeratorAndTemperatureControlledCabinetModeSelect ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterRVCRunModeSelect ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterRVCCleanModeSelect ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
 @interface MTRClusterTemperatureControl ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
 @interface MTRClusterRefrigeratorAlarm ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterDishwasherModeSelect ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end

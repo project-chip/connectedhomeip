@@ -1462,11 +1462,11 @@ public class ChipStructs {
     }
   }
 
-  public static class ModeSelectClusterSemanticTagStruct {
+  public static class ModeSelectClusterModeTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public ModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
+    public ModeSelectClusterModeTagStruct(Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
     }
@@ -1474,7 +1474,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ModeSelectClusterSemanticTagStruct {\n");
+      output.append("ModeSelectClusterModeTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1489,15 +1489,15 @@ public class ChipStructs {
   public static class ModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
-    public ArrayList<ChipStructs.ModeSelectClusterSemanticTagStruct> semanticTags;
+    public ArrayList<ChipStructs.ModeSelectClusterModeTagStruct> modeTags;
 
     public ModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.ModeSelectClusterSemanticTagStruct> semanticTags) {
+        ArrayList<ChipStructs.ModeSelectClusterModeTagStruct> modeTags) {
       this.label = label;
       this.mode = mode;
-      this.semanticTags = semanticTags;
+      this.modeTags = modeTags;
     }
 
     @Override
@@ -1510,19 +1510,19 @@ public class ChipStructs {
       output.append("\tmode: ");
       output.append(mode);
       output.append("\n");
-      output.append("\tsemanticTags: ");
-      output.append(semanticTags);
+      output.append("\tmodeTags: ");
+      output.append(modeTags);
       output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class LaundryWasherModeSelectClusterSemanticTagStruct {
+  public static class LaundryWasherModeSelectClusterModeTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public LaundryWasherModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
+    public LaundryWasherModeSelectClusterModeTagStruct(Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
     }
@@ -1530,7 +1530,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("LaundryWasherModeSelectClusterSemanticTagStruct {\n");
+      output.append("LaundryWasherModeSelectClusterModeTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1545,15 +1545,15 @@ public class ChipStructs {
   public static class LaundryWasherModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
-    public ArrayList<ChipStructs.LaundryWasherModeSelectClusterSemanticTagStruct> semanticTags;
+    public ArrayList<ChipStructs.LaundryWasherModeSelectClusterModeTagStruct> modeTags;
 
     public LaundryWasherModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.LaundryWasherModeSelectClusterSemanticTagStruct> semanticTags) {
+        ArrayList<ChipStructs.LaundryWasherModeSelectClusterModeTagStruct> modeTags) {
       this.label = label;
       this.mode = mode;
-      this.semanticTags = semanticTags;
+      this.modeTags = modeTags;
     }
 
     @Override
@@ -1566,20 +1566,19 @@ public class ChipStructs {
       output.append("\tmode: ");
       output.append(mode);
       output.append("\n");
-      output.append("\tsemanticTags: ");
-      output.append(semanticTags);
+      output.append("\tmodeTags: ");
+      output.append(modeTags);
       output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static
-  class RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct {
+  public static class RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct(
+    public RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct(
         Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
@@ -1589,7 +1588,7 @@ public class ChipStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append(
-          "RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct {\n");
+          "RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1605,20 +1604,19 @@ public class ChipStructs {
     public String label;
     public Integer mode;
     public ArrayList<
-            ChipStructs
-                .RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct>
-        semanticTags;
+            ChipStructs.RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct>
+        modeTags;
 
     public RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
         ArrayList<
                 ChipStructs
-                    .RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct>
-            semanticTags) {
+                    .RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct>
+            modeTags) {
       this.label = label;
       this.mode = mode;
-      this.semanticTags = semanticTags;
+      this.modeTags = modeTags;
     }
 
     @Override
@@ -1632,19 +1630,19 @@ public class ChipStructs {
       output.append("\tmode: ");
       output.append(mode);
       output.append("\n");
-      output.append("\tsemanticTags: ");
-      output.append(semanticTags);
+      output.append("\tmodeTags: ");
+      output.append(modeTags);
       output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class RvcRunModeSelectClusterSemanticTagStruct {
+  public static class RvcRunModeSelectClusterModeTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public RvcRunModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
+    public RvcRunModeSelectClusterModeTagStruct(Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
     }
@@ -1652,7 +1650,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("RvcRunModeSelectClusterSemanticTagStruct {\n");
+      output.append("RvcRunModeSelectClusterModeTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1667,15 +1665,15 @@ public class ChipStructs {
   public static class RvcRunModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
-    public ArrayList<ChipStructs.RvcRunModeSelectClusterSemanticTagStruct> semanticTags;
+    public ArrayList<ChipStructs.RvcRunModeSelectClusterModeTagStruct> modeTags;
 
     public RvcRunModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.RvcRunModeSelectClusterSemanticTagStruct> semanticTags) {
+        ArrayList<ChipStructs.RvcRunModeSelectClusterModeTagStruct> modeTags) {
       this.label = label;
       this.mode = mode;
-      this.semanticTags = semanticTags;
+      this.modeTags = modeTags;
     }
 
     @Override
@@ -1688,19 +1686,19 @@ public class ChipStructs {
       output.append("\tmode: ");
       output.append(mode);
       output.append("\n");
-      output.append("\tsemanticTags: ");
-      output.append(semanticTags);
+      output.append("\tmodeTags: ");
+      output.append(modeTags);
       output.append("\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class RvcCleanModeSelectClusterSemanticTagStruct {
+  public static class RvcCleanModeSelectClusterModeTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public RvcCleanModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
+    public RvcCleanModeSelectClusterModeTagStruct(Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
     }
@@ -1708,7 +1706,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("RvcCleanModeSelectClusterSemanticTagStruct {\n");
+      output.append("RvcCleanModeSelectClusterModeTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1723,15 +1721,15 @@ public class ChipStructs {
   public static class RvcCleanModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
-    public ArrayList<ChipStructs.RvcCleanModeSelectClusterSemanticTagStruct> semanticTags;
+    public ArrayList<ChipStructs.RvcCleanModeSelectClusterModeTagStruct> modeTags;
 
     public RvcCleanModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.RvcCleanModeSelectClusterSemanticTagStruct> semanticTags) {
+        ArrayList<ChipStructs.RvcCleanModeSelectClusterModeTagStruct> modeTags) {
       this.label = label;
       this.mode = mode;
-      this.semanticTags = semanticTags;
+      this.modeTags = modeTags;
     }
 
     @Override
@@ -1744,8 +1742,8 @@ public class ChipStructs {
       output.append("\tmode: ");
       output.append(mode);
       output.append("\n");
-      output.append("\tsemanticTags: ");
-      output.append(semanticTags);
+      output.append("\tmodeTags: ");
+      output.append(modeTags);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1776,11 +1774,11 @@ public class ChipStructs {
     }
   }
 
-  public static class DishwasherModeSelectClusterSemanticTagStruct {
+  public static class DishwasherModeSelectClusterModeTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public DishwasherModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
+    public DishwasherModeSelectClusterModeTagStruct(Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
     }
@@ -1788,7 +1786,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("DishwasherModeSelectClusterSemanticTagStruct {\n");
+      output.append("DishwasherModeSelectClusterModeTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1803,15 +1801,15 @@ public class ChipStructs {
   public static class DishwasherModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
-    public ArrayList<ChipStructs.DishwasherModeSelectClusterSemanticTagStruct> semanticTags;
+    public ArrayList<ChipStructs.DishwasherModeSelectClusterModeTagStruct> modeTags;
 
     public DishwasherModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.DishwasherModeSelectClusterSemanticTagStruct> semanticTags) {
+        ArrayList<ChipStructs.DishwasherModeSelectClusterModeTagStruct> modeTags) {
       this.label = label;
       this.mode = mode;
-      this.semanticTags = semanticTags;
+      this.modeTags = modeTags;
     }
 
     @Override
@@ -1824,8 +1822,8 @@ public class ChipStructs {
       output.append("\tmode: ");
       output.append(mode);
       output.append("\n");
-      output.append("\tsemanticTags: ");
-      output.append(semanticTags);
+      output.append("\tmodeTags: ");
+      output.append(modeTags);
       output.append("\n");
       output.append("}\n");
       return output.toString();

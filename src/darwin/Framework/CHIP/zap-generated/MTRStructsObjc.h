@@ -662,25 +662,21 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull stateValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-@interface MTRModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull mfgCode API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@property (nonatomic, copy) NSNumber * _Nonnull value API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+MTR_NEWLY_AVAILABLE
+@interface MTRModeSelectClusterModeTagStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_DEPRECATED(
-    "Please use MTRModeSelectClusterSemanticTagStruct", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-@interface MTRModeSelectClusterSemanticTag : MTRModeSelectClusterSemanticTagStruct
-@end
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRModeSelectClusterModeOptionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nonnull mode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSArray * _Nonnull semanticTags API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRLaundryWasherModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
+@interface MTRLaundryWasherModeSelectClusterModeTagStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
@@ -689,11 +685,11 @@ MTR_NEWLY_AVAILABLE
 @interface MTRLaundryWasherModeSelectClusterModeOptionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
+@interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
@@ -702,11 +698,11 @@ MTR_NEWLY_AVAILABLE
 @interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCRunModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
+@interface MTRRVCRunModeSelectClusterModeTagStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
@@ -715,11 +711,11 @@ MTR_NEWLY_AVAILABLE
 @interface MTRRVCRunModeSelectClusterModeOptionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRVCCleanModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
+@interface MTRRVCCleanModeSelectClusterModeTagStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
@@ -728,7 +724,7 @@ MTR_NEWLY_AVAILABLE
 @interface MTRRVCCleanModeSelectClusterModeOptionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
@@ -746,7 +742,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRDishwasherModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
+@interface MTRDishwasherModeSelectClusterModeTagStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 @end
@@ -755,7 +751,7 @@ MTR_NEWLY_AVAILABLE
 @interface MTRDishwasherModeSelectClusterModeOptionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull semanticTags MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE

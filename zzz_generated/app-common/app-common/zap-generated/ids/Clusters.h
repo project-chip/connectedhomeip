@@ -151,12 +151,27 @@ static constexpr ClusterId Id = 0x00000046;
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
+namespace LaundryWasherModeSelect {
+static constexpr ClusterId Id = 0x00000051;
+} // namespace LaundryWasherModeSelect
+namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
+static constexpr ClusterId Id = 0x00000052;
+} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
+namespace RvcRunModeSelect {
+static constexpr ClusterId Id = 0x00000054;
+} // namespace RvcRunModeSelect
+namespace RvcCleanModeSelect {
+static constexpr ClusterId Id = 0x00000055;
+} // namespace RvcCleanModeSelect
 namespace TemperatureControl {
 static constexpr ClusterId Id = 0x00000056;
 } // namespace TemperatureControl
 namespace RefrigeratorAlarm {
 static constexpr ClusterId Id = 0x00000057;
 } // namespace RefrigeratorAlarm
+namespace DishwasherModeSelect {
+static constexpr ClusterId Id = 0x00000059;
+} // namespace DishwasherModeSelect
 namespace AirQuality {
 static constexpr ClusterId Id = 0x0000005B;
 } // namespace AirQuality

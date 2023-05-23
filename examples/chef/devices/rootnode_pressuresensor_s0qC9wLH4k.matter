@@ -1,7 +1,7 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct SemanticTagStruct {
+struct ModeTagStruct {
     vendor_id mfgCode = 0;
     enum16 value = 1;
 }
@@ -9,7 +9,7 @@ struct SemanticTagStruct {
 struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
-    SemanticTagStruct semanticTags[] = 2;
+    ModeTagStruct modeTags[] = 2;
 }
 
 struct ApplicationStruct {

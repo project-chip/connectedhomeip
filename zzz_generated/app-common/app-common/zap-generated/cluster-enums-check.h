@@ -1284,22 +1284,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::ChangeToModeResponseStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::ModeTag val)
 {
-    using EnumType = ModeSelect::ChangeToModeResponseStatus;
-    switch (val)
-    {
-    case EnumType::kSuccess:
-    case EnumType::kUnsupportedMode:
-    case EnumType::kGenericFailure:
-        return val;
-    default:
-        return static_cast<EnumType>(3);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::SemanticTags val)
-{
-    using EnumType = ModeSelect::SemanticTags;
+    using EnumType = ModeSelect::ModeTag;
     switch (val)
     {
     case EnumType::kAuto:
@@ -1317,10 +1304,23 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::SemanticTag
         return static_cast<EnumType>(10);
     }
 }
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherModeSelect::SemanticTags val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ModeSelect::StatusCode val)
 {
-    using EnumType = LaundryWasherModeSelect::SemanticTags;
+    using EnumType = ModeSelect::StatusCode;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kUnsupportedMode:
+    case EnumType::kGenericFailure:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherModeSelect::ModeTag val)
+{
+    using EnumType = LaundryWasherModeSelect::ModeTag;
     switch (val)
     {
     case EnumType::kNormal:
@@ -1333,9 +1333,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherModeSelect
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(RefrigeratorAndTemperatureControlledCabinetModeSelect::SemanticTags val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(RefrigeratorAndTemperatureControlledCabinetModeSelect::ModeTag val)
 {
-    using EnumType = RefrigeratorAndTemperatureControlledCabinetModeSelect::SemanticTags;
+    using EnumType = RefrigeratorAndTemperatureControlledCabinetModeSelect::ModeTag;
     switch (val)
     {
     case EnumType::kRapidCool:
@@ -1346,9 +1346,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RefrigeratorAndTemperat
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunModeSelect::ChangeToModeResponseStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunModeSelect::ModeTag val)
 {
-    using EnumType = RvcRunModeSelect::ChangeToModeResponseStatus;
+    using EnumType = RvcRunModeSelect::ModeTag;
+    switch (val)
+    {
+    case EnumType::kIdle:
+    case EnumType::kCleaning:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunModeSelect::StatusCode val)
+{
+    using EnumType = RvcRunModeSelect::StatusCode;
     switch (val)
     {
     case EnumType::kStuck:
@@ -1364,33 +1376,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunModeSelect::Chang
         return static_cast<EnumType>(0);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunModeSelect::SemanticTags val)
-{
-    using EnumType = RvcRunModeSelect::SemanticTags;
-    switch (val)
-    {
-    case EnumType::kIdle:
-    case EnumType::kCleaning:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcCleanModeSelect::ChangeToModeResponseStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcCleanModeSelect::ModeTag val)
 {
-    using EnumType = RvcCleanModeSelect::ChangeToModeResponseStatus;
-    switch (val)
-    {
-    case EnumType::kCleaningInProgress:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcCleanModeSelect::SemanticTags val)
-{
-    using EnumType = RvcCleanModeSelect::SemanticTags;
+    using EnumType = RvcCleanModeSelect::ModeTag;
     switch (val)
     {
     case EnumType::kDeepClean:
@@ -1401,10 +1390,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RvcCleanModeSelect::Sem
         return static_cast<EnumType>(0);
     }
 }
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(DishwasherModeSelect::SemanticTags val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcCleanModeSelect::StatusCode val)
 {
-    using EnumType = DishwasherModeSelect::SemanticTags;
+    using EnumType = RvcCleanModeSelect::StatusCode;
+    switch (val)
+    {
+    case EnumType::kCleaningInProgress:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(DishwasherModeSelect::ModeTag val)
+{
+    using EnumType = DishwasherModeSelect::ModeTag;
     switch (val)
     {
     case EnumType::kNormal:

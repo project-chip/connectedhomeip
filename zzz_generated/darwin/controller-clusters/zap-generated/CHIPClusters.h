@@ -373,6 +373,44 @@ public:
     ~ModeSelectCluster() {}
 };
 
+class DLL_EXPORT LaundryWasherModeSelectCluster : public ClusterBase
+{
+public:
+    LaundryWasherModeSelectCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                   EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~LaundryWasherModeSelectCluster() {}
+};
+
+class DLL_EXPORT RefrigeratorAndTemperatureControlledCabinetModeSelectCluster : public ClusterBase
+{
+public:
+    RefrigeratorAndTemperatureControlledCabinetModeSelectCluster(Messaging::ExchangeManager & exchangeManager,
+                                                                 const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~RefrigeratorAndTemperatureControlledCabinetModeSelectCluster() {}
+};
+
+class DLL_EXPORT RvcRunModeSelectCluster : public ClusterBase
+{
+public:
+    RvcRunModeSelectCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~RvcRunModeSelectCluster() {}
+};
+
+class DLL_EXPORT RvcCleanModeSelectCluster : public ClusterBase
+{
+public:
+    RvcCleanModeSelectCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~RvcCleanModeSelectCluster() {}
+};
+
 class DLL_EXPORT RefrigeratorAlarmCluster : public ClusterBase
 {
 public:
@@ -380,6 +418,15 @@ public:
         ClusterBase(exchangeManager, session, endpoint)
     {}
     ~RefrigeratorAlarmCluster() {}
+};
+
+class DLL_EXPORT DishwasherModeSelectCluster : public ClusterBase
+{
+public:
+    DishwasherModeSelectCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, endpoint)
+    {}
+    ~DishwasherModeSelectCluster() {}
 };
 
 class DLL_EXPORT AirQualityCluster : public ClusterBase
