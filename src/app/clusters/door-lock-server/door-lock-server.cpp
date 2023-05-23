@@ -3559,7 +3559,7 @@ bool emberAfDoorLockClusterUnboltDoorCallback(
     emberAfDoorLockClusterPrintln("Received command: UnboltDoor");
 
     if (DoorLockServer::Instance().HandleRemoteLockOperation(commandObj, commandPath, LockOperationTypeEnum::kUnlock,
-                                                             emberAfPluginDoorLockOnDoorUnlockCommand, commandData.PINCode))
+                                                             emberAfPluginDoorLockOnDoorUnboltCommand, commandData.PINCode))
     {
         // appclusters.pdf 5.3.3.25:
         // The number of seconds to wait after unlocking a lock before it automatically locks again. 0=disabled. If set, unlock

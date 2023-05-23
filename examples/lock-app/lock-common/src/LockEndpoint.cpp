@@ -29,6 +29,16 @@ bool LockEndpoint::Lock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum
 
 bool LockEndpoint::Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
+    if (DoorLockServer::Instance().SupportsUnbolt(mEndpointId))
+    {
+        setLockState(DlLockState::kUnlatched, pin, err, opSource);
+    }
+
+    return setLockState(DlLockState::kUnlocked, pin, err, opSource);
+}
+
+bool LockEndpoint::Unbolt(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
+{
     return setLockState(DlLockState::kUnlocked, pin, err, opSource);
 }
 
