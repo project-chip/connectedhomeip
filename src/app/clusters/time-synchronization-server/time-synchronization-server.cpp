@@ -85,17 +85,37 @@ Delegate * GetDefaultDelegate()
 } // namespace app
 } // namespace chip
 
+static bool ChipEpochToUnixEpochTime(uint32_t chipEpochTime, uint32_t & unixEpochTime)
+{
+    // VerifyOrReturnError(chipEpochTime <= kChipEpochSecondsSinceUnixEpoch, false);
+
+    unixEpochTime = chipEpochTime + kChipEpochSecondsSinceUnixEpoch;
+
+    return true;
+}
+
+static bool UnixEpochToChipEpochMicro(uint64_t unixEpochTime, uint64_t & chipEpochTime)
+{
+    uint32_t chipEpochSec;
+    chip::UnixEpochToChipEpochTime((uint32_t)(unixEpochTime / chip::kMicrosecondsPerSecond), chipEpochSec);
+    chipEpochTime = (uint64_t) chipEpochSec * chip::kMicrosecondsPerSecond;
+
+    return true;
+}
+
 static CHIP_ERROR utcTimeChanged(uint64_t utcTime)
 {
     System::Clock::Seconds32 lastKnownGoodChipEpoch;
-    uint32_t utcTimeInChipEpoch;
+    uint32_t chipEpochInUtcTime;
 
     ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().GetLastKnownGoodChipEpochTime(lastKnownGoodChipEpoch));
-    chip::UnixEpochToChipEpochTime((uint32_t)(utcTime / chip::kMicrosecondsPerSecond), utcTimeInChipEpoch);
-    // if ( lastKnownGoodChipEpoch > utcTimeInChipEpoch) return CHIP_ERROR_INVALID_TIME;
+    ChipEpochToUnixEpochTime((uint32_t)(utcTime / chip::kMicrosecondsPerSecond), chipEpochInUtcTime);
+
+    // if ( (utcTime / chip::kMicrosecondsPerSecond) < lastKnownGoodChipEpoch) return CHIP_ERROR_INVALID_TIME;
     ReturnErrorOnFailure(
-        Server::GetInstance().GetFabricTable().SetLastKnownGoodChipEpochTime(System::Clock::Seconds32(utcTimeInChipEpoch)));
-    ReturnErrorOnFailure(System::SystemClock().SetClock_RealTime(System::Clock::Microseconds64(utcTime)));
+        Server::GetInstance().GetFabricTable().SetLastKnownGoodChipEpochTime(System::Clock::Seconds32(chipEpochInUtcTime)));
+    ReturnErrorOnFailure(System::SystemClock().SetClock_RealTime(
+        System::Clock::Microseconds64((uint64_t) chipEpochInUtcTime * chip::kMicrosecondsPerSecond)));
 
     return CHIP_NO_ERROR;
 }
@@ -344,7 +364,10 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(chip::EndpointId ep, uint64_t
 {
     uint64_t timeZoneOffset = 0, dstOffset = 0;
     System::Clock::Microseconds64 utcTime;
+    uint64_t chipEpochTime;
     ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
+    UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime);
+
     if (isTimeZoneAvailable())
     {
         auto tz        = TimeSynchronizationServer::Instance().GetTimeZone().begin();
@@ -355,7 +378,7 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(chip::EndpointId ep, uint64_t
         auto dst  = TimeSynchronizationServer::Instance().GetDSTOffset().begin();
         dstOffset = chip::kMicrosecondsPerSecond * static_cast<uint64_t>(dst->offset);
     }
-    localTime = utcTime.count() + timeZoneOffset + dstOffset;
+    localTime = chipEpochTime + timeZoneOffset + dstOffset;
     return CHIP_NO_ERROR;
 }
 
@@ -364,13 +387,15 @@ bool TimeSynchronizationServer::isTimeZoneAvailable()
     System::Clock::Microseconds64 utcTime;
     auto tzList           = TimeSynchronizationServer::Instance().GetTimeZone();
     uint8_t activeTzIndex = 0;
+    uint64_t chipEpochTime;
 
     VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, false);
     VerifyOrReturnValue(tzList.size() != 0, false);
+    UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime);
 
     for (uint8_t i = 0; i < tzList.size(); i++)
     {
-        if (tzList[i].validAt != 0 && tzList[i].validAt <= utcTime.count())
+        if (tzList[i].validAt != 0 && tzList[i].validAt <= chipEpochTime)
         {
             tzList[i].validAt = 0;
             activeTzIndex     = i;
@@ -393,13 +418,15 @@ bool TimeSynchronizationServer::isDSTOffsetAvailable()
     System::Clock::Microseconds64 utcTime;
     uint8_t activeDstIndex = 0;
     auto dstList           = TimeSynchronizationServer::Instance().GetDSTOffset();
+    uint64_t chipEpochTime;
 
     VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, false);
     VerifyOrReturnValue(dstList.size() != 0, false);
+    UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime);
 
     for (uint8_t i = 0; i < dstList.size(); i++)
     {
-        if (dstList[i].validStarting <= utcTime.count())
+        if (dstList[i].validStarting <= chipEpochTime)
         {
             activeDstIndex = i;
         }
@@ -521,9 +548,12 @@ CHIP_ERROR TimeSynchronizationAttrAccess::Read(const ConcreteReadAttributePath &
     switch (aPath.mAttributeId)
     {
     case UTCTime::Id: {
-        System::Clock::Microseconds64 utcTime;
-        VerifyOrReturnError(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, aEncoder.EncodeNull());
-        return aEncoder.Encode(utcTime.count());
+        System::Clock::Microseconds64 utcTimeUnix;
+        uint64_t chipEpochTime;
+
+        VerifyOrReturnError(System::SystemClock().GetClock_RealTime(utcTimeUnix) == CHIP_NO_ERROR, aEncoder.EncodeNull());
+        UnixEpochToChipEpochMicro(utcTimeUnix.count(), chipEpochTime);
+        return aEncoder.Encode(chipEpochTime);
     }
     case Granularity::Id: {
         return aEncoder.Encode(TimeSynchronizationServer::Instance().GetGranularity());
