@@ -47,6 +47,7 @@
 #include "event_groups.h"
 #include "task.h"
 
+#include "silabs_utils.h"
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
