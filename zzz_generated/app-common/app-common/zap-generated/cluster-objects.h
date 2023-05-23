@@ -13181,6 +13181,13 @@ using Fields = Clusters::detail::Structs::LabelStruct::Fields;
 
 struct Type : public Clusters::detail::Structs::LabelStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::LabelStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -13268,6 +13275,13 @@ using Fields = Clusters::detail::Structs::LabelStruct::Fields;
 
 struct Type : public Clusters::detail::Structs::LabelStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::LabelStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -27014,6 +27028,13 @@ using Fields = Clusters::detail::Structs::ApplicationStruct::Fields;
 
 struct Type : public Clusters::detail::Structs::ApplicationStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ApplicationStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -27300,6 +27321,13 @@ using Fields = Clusters::detail::Structs::ApplicationStruct::Fields;
 
 struct Type : public Clusters::detail::Structs::ApplicationStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ApplicationStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
