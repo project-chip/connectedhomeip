@@ -85,7 +85,7 @@ static inline void unreg(Identify * inst)
     }
 }
 
-void ClusterServerInitCallbackEnum(EndpointId endpoint)
+void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
 {
     Identify * identify = inst(endpoint);
     if (identify != nullptr)

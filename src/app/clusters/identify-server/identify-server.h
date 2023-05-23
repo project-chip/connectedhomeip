@@ -20,13 +20,6 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/util/basic-types.h>
 
-// namespace chip {
-// namespace app {
-// namespace Clusters {
-// namespace Identify {
-
-using namespace chip::app;
-
 struct Identify
 {
     /**
@@ -52,19 +45,21 @@ struct Identify
      * @param effectVariant if supported by the app, initial effect variant
      */
     Identify(chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
-             Clusters::Identify::IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier = nullptr,
-             Clusters::Identify::EffectIdentifierEnum effectIdentifier = Clusters::Identify::EffectIdentifierEnum::kBlink,
-             Clusters::Identify::EffectVariantEnum effectVariant       = Clusters::Identify::EffectVariantEnum::kDefault);
+             chip::app::Clusters::Identify::IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier = nullptr,
+             chip::app::Clusters::Identify::EffectIdentifierEnum effectIdentifier =
+                 chip::app::Clusters::Identify::EffectIdentifierEnum::kBlink,
+             chip::app::Clusters::Identify::EffectVariantEnum effectVariant =
+                 chip::app::Clusters::Identify::EffectVariantEnum::kDefault);
     ~Identify();
 
     chip::EndpointId mEndpoint;
     onIdentifyStartCb mOnIdentifyStart = nullptr;
     onIdentifyStopCb mOnIdentifyStop   = nullptr;
-    Clusters::Identify::IdentifyTypeEnum mIdentifyType;
+    chip::app::Clusters::Identify::IdentifyTypeEnum mIdentifyType;
     onEffectIdentifierCb mOnEffectIdentifier;
-    Clusters::Identify::EffectIdentifierEnum mCurrentEffectIdentifier;
-    Clusters::Identify::EffectIdentifierEnum mTargetEffectIdentifier;
-    Clusters::Identify::EffectVariantEnum mEffectVariant;
+    chip::app::Clusters::Identify::EffectIdentifierEnum mCurrentEffectIdentifier;
+    chip::app::Clusters::Identify::EffectIdentifierEnum mTargetEffectIdentifier;
+    chip::app::Clusters::Identify::EffectVariantEnum mEffectVariant;
     bool mActive            = false;
     Identify * nextIdentify = nullptr;
 
@@ -74,7 +69,3 @@ struct Identify
 
     void setNext(Identify * inst) { this->nextIdentify = inst; }
 };
-// } // namespace Identify
-// } // namespace Clusters
-// } // namespace app
-// } // namespace chip
