@@ -2459,206 +2459,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ModeSelect
 
-namespace LaundryWasherModeSelect {
-namespace Attributes {
-
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
-namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace SupportedModes
-
-namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace CurrentMode
-
-namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace StartUpMode
-
-namespace OnMode {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace OnMode
-
-namespace GeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-
-namespace AcceptedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-
-namespace EventList {
-static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace LaundryWasherModeSelect
-
-namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
-namespace Attributes {
-
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
-namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace SupportedModes
-
-namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace CurrentMode
-
-namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace StartUpMode
-
-namespace OnMode {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace OnMode
-
-namespace GeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-
-namespace AcceptedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-
-namespace EventList {
-static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
-
-namespace RvcRunModeSelect {
-namespace Attributes {
-
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
-namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace SupportedModes
-
-namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace CurrentMode
-
-namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace StartUpMode
-
-namespace OnMode {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace OnMode
-
-namespace GeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-
-namespace AcceptedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-
-namespace EventList {
-static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace RvcRunModeSelect
-
-namespace RvcCleanModeSelect {
-namespace Attributes {
-
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
-namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace SupportedModes
-
-namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace CurrentMode
-
-namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace StartUpMode
-
-namespace OnMode {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace OnMode
-
-namespace GeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-
-namespace AcceptedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-
-namespace EventList {
-static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace RvcCleanModeSelect
-
 namespace TemperatureControl {
 namespace Attributes {
 
@@ -2713,28 +2513,20 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace TemperatureControl
 
-namespace DishwasherModeSelect {
+namespace RefrigeratorAlarm {
 namespace Attributes {
 
-namespace Description {
+namespace Mask {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
+} // namespace Mask
 
-namespace SupportedModes {
+namespace Latch {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Latch
+
+namespace State {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace SupportedModes
-
-namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace CurrentMode
-
-namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace StartUpMode
-
-namespace OnMode {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace OnMode
+} // namespace State
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -2761,7 +2553,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace DishwasherModeSelect
+} // namespace RefrigeratorAlarm
 
 namespace AirQuality {
 namespace Attributes {

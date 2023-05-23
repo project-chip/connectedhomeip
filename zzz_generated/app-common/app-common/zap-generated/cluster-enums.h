@@ -98,8 +98,8 @@ static IdentifyIdentifyType __attribute__((unused)) kIdentifyIdentifyTypekUnknow
 
 namespace Groups {
 
-// Bitmap for GroupsFeature
-enum class GroupsFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kGroupNames = 0x1,
 };
@@ -107,16 +107,16 @@ enum class GroupsFeature : uint32_t
 
 namespace Scenes {
 
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kSceneNames = 0x1,
+};
+
 // Bitmap for ScenesCopyMode
 enum class ScenesCopyMode : uint8_t
 {
     kCopyAllScenes = 0x1,
-};
-
-// Bitmap for ScenesFeature
-enum class ScenesFeature : uint32_t
-{
-    kSceneNames = 0x1,
 };
 } // namespace Scenes
 
@@ -171,16 +171,16 @@ enum class OnOffStartUpOnOff : uint8_t
     kUnknownEnumValue = 3,
 };
 
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kLighting = 0x1,
+};
+
 // Bitmap for OnOffControl
 enum class OnOffControl : uint8_t
 {
     kAcceptOnlyWhenOn = 0x1,
-};
-
-// Bitmap for OnOffFeature
-enum class OnOffFeature : uint32_t
-{
-    kLighting = 0x1,
 };
 } // namespace OnOff
 
@@ -226,8 +226,8 @@ using StepMode                                                                  
 static StepMode __attribute__((unused)) kStepModekUnknownEnumValue                         = static_cast<StepMode>(2);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Bitmap for LevelControlFeature
-enum class LevelControlFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kOnOff     = 0x1,
     kLighting  = 0x2,
@@ -568,8 +568,8 @@ enum class TempUnitEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Bitmap for UnitLocalizationFeature
-enum class UnitLocalizationFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kTemperatureUnit = 0x1,
 };
@@ -827,8 +827,8 @@ enum class WiredFaultEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Bitmap for PowerSourceFeature
-enum class PowerSourceFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kWired        = 0x1,
     kBattery      = 0x2,
@@ -908,8 +908,8 @@ enum class WiFiBand : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Bitmap for NetworkCommissioningFeature
-enum class NetworkCommissioningFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kWiFiNetworkInterface     = 0x1,
     kThreadNetworkInterface   = 0x2,
@@ -1080,8 +1080,8 @@ static RadioFaultEnum __attribute__((unused)) kRadioFaultEnumkUnknownEnumValue  
 
 namespace SoftwareDiagnostics {
 
-// Bitmap for SoftwareDiagnosticsFeature
-enum class SoftwareDiagnosticsFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kWaterMarks = 0x1,
 };
@@ -1139,8 +1139,8 @@ using RoutingRole                                                               
 static RoutingRole __attribute__((unused)) kRoutingRolekUnknownEnumValue                   = static_cast<RoutingRole>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Bitmap for ThreadNetworkDiagnosticsFeature
-enum class ThreadNetworkDiagnosticsFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kPacketCounts = 0x1,
     kErrorCounts  = 0x2,
@@ -1209,8 +1209,8 @@ enum class WiFiVersionEnum : uint8_t
     kUnknownEnumValue = 6,
 };
 
-// Bitmap for WiFiNetworkDiagnosticsFeature
-enum class WiFiNetworkDiagnosticsFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kPacketCounts = 0x1,
     kErrorCounts  = 0x2,
@@ -1246,8 +1246,8 @@ using PHYRateEnum                                                               
 static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue                   = static_cast<PHYRateEnum>(10);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Bitmap for EthernetNetworkDiagnosticsFeature
-enum class EthernetNetworkDiagnosticsFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kPacketCounts = 0x1,
     kErrorCounts  = 0x2,
@@ -1322,8 +1322,8 @@ enum class TimeZoneDatabaseEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Bitmap for TimeSynchronizationFeature
-enum class TimeSynchronizationFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kTimeZone       = 0x1,
     kNTPClient      = 0x2,
@@ -1384,8 +1384,8 @@ enum class ProductFinishEnum : uint8_t
 
 namespace Switch {
 
-// Bitmap for SwitchFeature
-enum class SwitchFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kLatchingSwitch            = 0x1,
     kMomentarySwitch           = 0x2,
@@ -1488,8 +1488,8 @@ namespace BooleanState {} // namespace BooleanState
 
 namespace IcdManagement {
 
-// Bitmap for ICDManagementFeature
-enum class ICDManagementFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kCheckInProtocolSupport = 0x1,
 };
@@ -1497,166 +1497,12 @@ enum class ICDManagementFeature : uint32_t
 
 namespace ModeSelect {
 
-// Enum for ChangeToModeResponseStatus
-enum class ChangeToModeResponseStatus : uint8_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
-    kSuccess         = 0x00,
-    kUnsupportedMode = 0x01,
-    kGenericFailure  = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
-// Enum for SemanticTags
-enum class SemanticTags : uint16_t
-{
-    kAuto      = 0x00,
-    kQuick     = 0x01,
-    kQuiet     = 0x02,
-    kLowNoise  = 0x03,
-    kLowEnergy = 0x04,
-    kVacation  = 0x05,
-    kMin       = 0x06,
-    kMax       = 0x07,
-    kNight     = 0x08,
-    kDay       = 0x09,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 10,
-};
-
-// Bitmap for ModeSelectFeature
-enum class ModeSelectFeature : uint32_t
-{
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
+    kDeponoff = 0x1,
 };
 } // namespace ModeSelect
-
-namespace LaundryWasherModeSelect {
-
-// Enum for SemanticTags
-enum class SemanticTags : uint16_t
-{
-    kNormal   = 0x4000,
-    kDelicate = 0x4001,
-    kHeavy    = 0x4002,
-    kWhites   = 0x4003,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
-
-// Bitmap for ModeSelectFeature
-enum class ModeSelectFeature : uint32_t
-{
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
-};
-} // namespace LaundryWasherModeSelect
-
-namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
-
-// Enum for SemanticTags
-enum class SemanticTags : uint16_t
-{
-    kRapidCool   = 0x4000,
-    kRapidFreeze = 0x4001,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
-
-// Bitmap for ModeSelectFeature
-enum class ModeSelectFeature : uint32_t
-{
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
-};
-} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
-
-namespace RvcRunModeSelect {
-
-// Enum for ChangeToModeResponseStatus
-enum class ChangeToModeResponseStatus : uint8_t
-{
-    kStuck                 = 0x41,
-    kDustBinMissing        = 0x42,
-    kDustBinFull           = 0x43,
-    kWaterTankEmpty        = 0x44,
-    kWaterTankMissing      = 0x45,
-    kWaterTankLidOpen      = 0x46,
-    kMopCleaningPadMissing = 0x47,
-    kBatteryLow            = 0x48,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
-
-// Enum for SemanticTags
-enum class SemanticTags : uint16_t
-{
-    kIdle     = 0x4000,
-    kCleaning = 0x4001,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
-
-// Bitmap for ModeSelectFeature
-enum class ModeSelectFeature : uint32_t
-{
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
-};
-} // namespace RvcRunModeSelect
-
-namespace RvcCleanModeSelect {
-
-// Enum for ChangeToModeResponseStatus
-enum class ChangeToModeResponseStatus : uint8_t
-{
-    kCleaningInProgress = 0x40,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
-
-// Enum for SemanticTags
-enum class SemanticTags : uint16_t
-{
-    kDeepClean = 0x4000,
-    kVacuum    = 0x4001,
-    kMop       = 0x4002,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
-
-// Bitmap for ModeSelectFeature
-enum class ModeSelectFeature : uint32_t
-{
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
-};
-} // namespace RvcCleanModeSelect
 
 namespace TemperatureControl {
 
@@ -1668,28 +1514,14 @@ enum class Feature : uint32_t
 };
 } // namespace TemperatureControl
 
-namespace DishwasherModeSelect {
+namespace RefrigeratorAlarm {
 
-// Enum for SemanticTags
-enum class SemanticTags : uint16_t
+// Bitmap for AlarmMap
+enum class AlarmMap : uint32_t
 {
-    kNormal = 0x4000,
-    kHeavy  = 0x4001,
-    kLight  = 0x4002,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
+    kDoorOpen = 0x1,
 };
-
-// Bitmap for ModeSelectFeature
-enum class ModeSelectFeature : uint32_t
-{
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
-};
-} // namespace DishwasherModeSelect
+} // namespace RefrigeratorAlarm
 
 namespace AirQuality {
 
@@ -1809,8 +1641,8 @@ enum class SensitivityEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Bitmap for SmokeCOAlarmFeature
-enum class SmokeCOAlarmFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kSmokeAlarm = 0x1,
     kCoAlarm    = 0x2,
@@ -2726,8 +2558,8 @@ enum class DoorLockDayOfWeek : uint8_t
     kSaturday  = 0x40,
 };
 
-// Bitmap for DoorLockFeature
-enum class DoorLockFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kPinCredential               = 0x1,
     kRfidCredential              = 0x2,
@@ -2815,6 +2647,16 @@ enum class ConfigStatus : uint8_t
     kTiltEncoderControlled = 0x40,
 };
 
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kLift              = 0x1,
+    kTilt              = 0x2,
+    kPositionAwareLift = 0x4,
+    kAbsolutePosition  = 0x8,
+    kPositionAwareTilt = 0x10,
+};
+
 // Bitmap for Mode
 enum class Mode : uint8_t
 {
@@ -2847,16 +2689,6 @@ enum class SafetyStatus : uint16_t
     kHardwareFailure     = 0x200,
     kManualOperation     = 0x400,
     kProtection          = 0x800,
-};
-
-// Bitmap for WindowCoveringFeature
-enum class WindowCoveringFeature : uint32_t
-{
-    kLift              = 0x1,
-    kTilt              = 0x2,
-    kPositionAwareLift = 0x4,
-    kAbsolutePosition  = 0x8,
-    kPositionAwareTilt = 0x10,
 };
 } // namespace WindowCovering
 
@@ -2894,8 +2726,8 @@ enum class OperationModeEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Bitmap for PumpConfigurationAndControlFeature
-enum class PumpConfigurationAndControlFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kConstantPressure    = 0x1,
     kCompensatedPressure = 0x2,
@@ -2997,15 +2829,8 @@ enum class DayOfWeek : uint8_t
     kAway      = 0x80,
 };
 
-// Bitmap for ModeForSequence
-enum class ModeForSequence : uint8_t
-{
-    kHeatSetpointPresent = 0x1,
-    kCoolSetpointPresent = 0x2,
-};
-
-// Bitmap for ThermostatFeature
-enum class ThermostatFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kHeating               = 0x1,
     kCooling               = 0x2,
@@ -3013,6 +2838,13 @@ enum class ThermostatFeature : uint32_t
     kScheduleConfiguration = 0x8,
     kSetback               = 0x10,
     kAutoMode              = 0x20,
+};
+
+// Bitmap for ModeForSequence
+enum class ModeForSequence : uint8_t
+{
+    kHeatSetpointPresent = 0x1,
+    kCoolSetpointPresent = 0x2,
 };
 } // namespace Thermostat
 
@@ -3051,8 +2883,8 @@ enum class FanModeType : uint8_t
     kUnknownEnumValue = 7,
 };
 
-// Bitmap for FanControlFeature
-enum class FanControlFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kMultiSpeed = 0x1,
     kAuto       = 0x2,
@@ -3206,16 +3038,6 @@ enum class ColorCapabilities : uint16_t
     kColorTemperatureSupported = 0x10,
 };
 
-// Bitmap for ColorControlFeature
-enum class ColorControlFeature : uint32_t
-{
-    kHueAndSaturation = 0x1,
-    kEnhancedHue      = 0x2,
-    kColorLoop        = 0x4,
-    kXy               = 0x8,
-    kColorTemperature = 0x10,
-};
-
 // Bitmap for ColorLoopUpdateFlags
 enum class ColorLoopUpdateFlags : uint8_t
 {
@@ -3223,6 +3045,16 @@ enum class ColorLoopUpdateFlags : uint8_t
     kUpdateDirection = 0x2,
     kUpdateTime      = 0x4,
     kUpdateStartHue  = 0x8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kHueAndSaturation = 0x1,
+    kEnhancedHue      = 0x2,
+    kColorLoop        = 0x4,
+    kXy               = 0x8,
+    kColorTemperature = 0x10,
 };
 } // namespace ColorControl
 
@@ -3247,8 +3079,8 @@ namespace TemperatureMeasurement {} // namespace TemperatureMeasurement
 
 namespace PressureMeasurement {
 
-// Bitmap for PressureMeasurementFeature
-enum class PressureMeasurementFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kExtended = 0x1,
 };
@@ -3317,8 +3149,8 @@ enum class LineupInfoTypeEnum : uint8_t
     kUnknownEnumValue = 1,
 };
 
-// Bitmap for ChannelFeature
-enum class ChannelFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kChannelList = 0x1,
     kLineupInfo  = 0x2,
@@ -3373,8 +3205,8 @@ enum class PlaybackStateEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Bitmap for MediaPlaybackFeature
-enum class MediaPlaybackFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kAdvancedSeek  = 0x1,
     kVariableSpeed = 0x2,
@@ -3405,8 +3237,8 @@ enum class InputTypeEnum : uint8_t
     kUnknownEnumValue = 12,
 };
 
-// Bitmap for MediaInputFeature
-enum class MediaInputFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNameUpdates = 0x1,
 };
@@ -3525,8 +3357,8 @@ enum class KeypadInputStatusEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Bitmap for KeypadInputFeature
-enum class KeypadInputFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNavigationKeyCodes = 0x1,
     kLocationKeys       = 0x2,
@@ -3585,8 +3417,8 @@ enum class ParameterEnum : uint8_t
     kUnknownEnumValue = 14,
 };
 
-// Bitmap for ContentLauncherFeature
-enum class ContentLauncherFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kContentSearch = 0x1,
     kURLPlayback   = 0x2,
@@ -3618,8 +3450,8 @@ enum class OutputTypeEnum : uint8_t
     kUnknownEnumValue = 6,
 };
 
-// Bitmap for AudioOutputFeature
-enum class AudioOutputFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kNameUpdates = 0x1,
 };
@@ -3640,8 +3472,8 @@ enum class ApplicationLauncherStatusEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Bitmap for ApplicationLauncherFeature
-enum class ApplicationLauncherFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kApplicationPlatform = 0x1,
 };

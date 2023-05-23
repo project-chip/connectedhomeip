@@ -43,62 +43,6 @@ namespace Clusters {
 namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
-namespace SemanticTagStruct {
-enum class Fields : uint8_t
-{
-    kMfgCode = 0,
-    kValue   = 1,
-};
-
-struct Type
-{
-public:
-    chip::VendorId mfgCode = static_cast<chip::VendorId>(0);
-    uint16_t value         = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace SemanticTagStruct
-namespace ModeOptionStruct {
-enum class Fields : uint8_t
-{
-    kLabel        = 0,
-    kMode         = 1,
-    kSemanticTags = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan label;
-    uint8_t mode = static_cast<uint8_t>(0);
-    DataModel::List<const Structs::SemanticTagStruct::Type> semanticTags;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-struct DecodableType
-{
-public:
-    chip::CharSpan label;
-    uint8_t mode = static_cast<uint8_t>(0);
-    DataModel::DecodableList<Structs::SemanticTagStruct::DecodableType> semanticTags;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
-
-} // namespace ModeOptionStruct
 namespace ApplicationStruct {
 enum class Fields : uint8_t
 {
@@ -14030,31 +13974,61 @@ struct TypeInfo
 namespace ModeSelect {
 namespace Structs {
 namespace SemanticTagStruct {
-
-using Fields = Clusters::detail::Structs::SemanticTagStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::SemanticTagStruct::Type
+enum class Fields : uint8_t
 {
+    kMfgCode = 0,
+    kValue   = 1,
+};
+
+struct Type
+{
+public:
+    chip::VendorId mfgCode = static_cast<chip::VendorId>(0);
+    uint16_t value         = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
 using DecodableType = Type;
 
 } // namespace SemanticTagStruct
-
 namespace ModeOptionStruct {
-
-using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
+enum class Fields : uint8_t
 {
+    kLabel        = 0,
+    kMode         = 1,
+    kSemanticTags = 2,
 };
 
-struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
+struct Type
 {
+public:
+    chip::CharSpan label;
+    uint8_t mode = static_cast<uint8_t>(0);
+    DataModel::List<const Structs::SemanticTagStruct::Type> semanticTags;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    chip::CharSpan label;
+    uint8_t mode = static_cast<uint8_t>(0);
+    DataModel::DecodableList<Structs::SemanticTagStruct::DecodableType> semanticTags;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace ModeOptionStruct
-
 } // namespace Structs
 
 namespace Commands {
@@ -14064,16 +14038,6 @@ namespace ChangeToMode {
 struct Type;
 struct DecodableType;
 } // namespace ChangeToMode
-
-namespace ChangeToModeWithStatus {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeResponse
 
 } // namespace Commands
 
@@ -14110,73 +14074,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeToMode
-namespace ChangeToModeWithStatus {
-enum class Fields : uint8_t
-{
-    kNewMode = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeWithStatus
-namespace ChangeToModeResponse {
-enum class Fields : uint8_t
-{
-    kStatus     = 0,
-    kStatusText = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -14191,7 +14088,7 @@ struct TypeInfo
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 64; }
+    static constexpr size_t MaxLength() { return 32; }
 };
 } // namespace Description
 namespace StandardNamespace {
@@ -14317,1130 +14214,20 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ModeSelect
-namespace LaundryWasherModeSelect {
-namespace Structs {
-namespace SemanticTagStruct {
-
-using Fields = Clusters::detail::Structs::SemanticTagStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::SemanticTagStruct::Type
-{
-};
-
-using DecodableType = Type;
-
-} // namespace SemanticTagStruct
-
-namespace ModeOptionStruct {
-
-using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
-{
-};
-
-struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
-{
-};
-
-} // namespace ModeOptionStruct
-
-} // namespace Structs
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace ChangeToMode {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToMode
-
-namespace ChangeToModeWithStatus {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeResponse
-
-} // namespace Commands
-
-namespace Commands {
-namespace ChangeToMode {
-enum class Fields : uint8_t
-{
-    kNewMode = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToMode
-namespace ChangeToModeWithStatus {
-enum class Fields : uint8_t
-{
-    kNewMode = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeWithStatus
-namespace ChangeToModeResponse {
-enum class Fields : uint8_t
-{
-    kStatus     = 0,
-    kStatusText = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeResponse
-} // namespace Commands
-
-namespace Attributes {
-
-namespace Description {
-struct TypeInfo
-{
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 64; }
-};
-} // namespace Description
-namespace SupportedModes {
-struct TypeInfo
-{
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace SupportedModes
-namespace CurrentMode {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentMode
-namespace StartUpMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StartUpMode
-namespace OnMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace OnMode
-namespace GeneratedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-};
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-};
-} // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-};
-} // namespace EventList
-namespace AttributeList {
-struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-};
-} // namespace AttributeList
-namespace FeatureMap {
-struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-};
-} // namespace ClusterRevision
-
-struct TypeInfo
-{
-    struct DecodableType
-    {
-        static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
-
-        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
-
-        Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
-        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
-        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
-        Attributes::OnMode::TypeInfo::DecodableType onMode;
-        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
-        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
-        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
-        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
-    };
-};
-} // namespace Attributes
-} // namespace LaundryWasherModeSelect
-namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
-namespace Structs {
-namespace SemanticTagStruct {
-
-using Fields = Clusters::detail::Structs::SemanticTagStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::SemanticTagStruct::Type
-{
-};
-
-using DecodableType = Type;
-
-} // namespace SemanticTagStruct
-
-namespace ModeOptionStruct {
-
-using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
-{
-};
-
-struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
-{
-};
-
-} // namespace ModeOptionStruct
-
-} // namespace Structs
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace ChangeToMode {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToMode
-
-namespace ChangeToModeWithStatus {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeResponse
-
-} // namespace Commands
-
-namespace Commands {
-namespace ChangeToMode {
-enum class Fields : uint8_t
-{
-    kNewMode = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToMode
-namespace ChangeToModeWithStatus {
-enum class Fields : uint8_t
-{
-    kNewMode = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType =
-        Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeWithStatus
-namespace ChangeToModeResponse {
-enum class Fields : uint8_t
-{
-    kStatus     = 0,
-    kStatusText = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeResponse
-} // namespace Commands
-
-namespace Attributes {
-
-namespace Description {
-struct TypeInfo
-{
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 64; }
-};
-} // namespace Description
-namespace SupportedModes {
-struct TypeInfo
-{
-    using Type = chip::app::DataModel::List<
-        const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::DecodableType> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace SupportedModes
-namespace CurrentMode {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentMode
-namespace StartUpMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StartUpMode
-namespace OnMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace OnMode
-namespace GeneratedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-};
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-};
-} // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-};
-} // namespace EventList
-namespace AttributeList {
-struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-};
-} // namespace AttributeList
-namespace FeatureMap {
-struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-};
-} // namespace ClusterRevision
-
-struct TypeInfo
-{
-    struct DecodableType
-    {
-        static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
-
-        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
-
-        Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
-        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
-        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
-        Attributes::OnMode::TypeInfo::DecodableType onMode;
-        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
-        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
-        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
-        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
-    };
-};
-} // namespace Attributes
-} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
-namespace RvcRunModeSelect {
-namespace Structs {
-namespace SemanticTagStruct {
-
-using Fields = Clusters::detail::Structs::SemanticTagStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::SemanticTagStruct::Type
-{
-};
-
-using DecodableType = Type;
-
-} // namespace SemanticTagStruct
-
-namespace ModeOptionStruct {
-
-using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
-{
-};
-
-struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
-{
-};
-
-} // namespace ModeOptionStruct
-
-} // namespace Structs
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace ChangeToMode {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToMode
-
-namespace ChangeToModeWithStatus {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeResponse
-
-} // namespace Commands
-
-namespace Commands {
-namespace ChangeToMode {
-enum class Fields : uint8_t
-{
-    kNewMode = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToMode
-namespace ChangeToModeWithStatus {
-enum class Fields : uint8_t
-{
-    kNewMode = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeWithStatus
-namespace ChangeToModeResponse {
-enum class Fields : uint8_t
-{
-    kStatus     = 0,
-    kStatusText = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeResponse
-} // namespace Commands
-
-namespace Attributes {
-
-namespace Description {
-struct TypeInfo
-{
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 64; }
-};
-} // namespace Description
-namespace SupportedModes {
-struct TypeInfo
-{
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace SupportedModes
-namespace CurrentMode {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentMode
-namespace StartUpMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StartUpMode
-namespace OnMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace OnMode
-namespace GeneratedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-};
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-};
-} // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-};
-} // namespace EventList
-namespace AttributeList {
-struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-};
-} // namespace AttributeList
-namespace FeatureMap {
-struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-};
-} // namespace ClusterRevision
-
-struct TypeInfo
-{
-    struct DecodableType
-    {
-        static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
-
-        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
-
-        Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
-        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
-        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
-        Attributes::OnMode::TypeInfo::DecodableType onMode;
-        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
-        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
-        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
-        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
-    };
-};
-} // namespace Attributes
-} // namespace RvcRunModeSelect
-namespace RvcCleanModeSelect {
-namespace Structs {
-namespace SemanticTagStruct {
-
-using Fields = Clusters::detail::Structs::SemanticTagStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::SemanticTagStruct::Type
-{
-};
-
-using DecodableType = Type;
-
-} // namespace SemanticTagStruct
-
-namespace ModeOptionStruct {
-
-using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
-{
-};
-
-struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
-{
-};
-
-} // namespace ModeOptionStruct
-
-} // namespace Structs
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace ChangeToMode {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToMode
-
-namespace ChangeToModeWithStatus {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeResponse
-
-} // namespace Commands
-
-namespace Commands {
-namespace ChangeToMode {
-enum class Fields : uint8_t
-{
-    kNewMode = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToMode
-namespace ChangeToModeWithStatus {
-enum class Fields : uint8_t
-{
-    kNewMode = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeWithStatus
-namespace ChangeToModeResponse {
-enum class Fields : uint8_t
-{
-    kStatus     = 0,
-    kStatusText = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeResponse
-} // namespace Commands
-
-namespace Attributes {
-
-namespace Description {
-struct TypeInfo
-{
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 64; }
-};
-} // namespace Description
-namespace SupportedModes {
-struct TypeInfo
-{
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::DecodableType> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace SupportedModes
-namespace CurrentMode {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentMode
-namespace StartUpMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StartUpMode
-namespace OnMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace OnMode
-namespace GeneratedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-};
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-};
-} // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-};
-} // namespace EventList
-namespace AttributeList {
-struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-};
-} // namespace AttributeList
-namespace FeatureMap {
-struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-};
-} // namespace ClusterRevision
-
-struct TypeInfo
-{
-    struct DecodableType
-    {
-        static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
-
-        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
-
-        Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
-        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
-        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
-        Attributes::OnMode::TypeInfo::DecodableType onMode;
-        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
-        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
-        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
-        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
-    };
-};
-} // namespace Attributes
-} // namespace RvcCleanModeSelect
 namespace TemperatureControl {
 namespace Structs {
 namespace TemperatureLevelStruct {
 enum class Fields : uint8_t
 {
-    kLabel     = 0,
-    kTempLevel = 1,
+    kLabel            = 0,
+    kTemperatureLevel = 1,
 };
 
 struct Type
 {
 public:
     chip::CharSpan label;
-    uint8_t tempLevel = static_cast<uint8_t>(0);
+    uint8_t temperatureLevel = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -15639,71 +14426,35 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace TemperatureControl
-namespace DishwasherModeSelect {
-namespace Structs {
-namespace SemanticTagStruct {
-
-using Fields = Clusters::detail::Structs::SemanticTagStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::SemanticTagStruct::Type
-{
-};
-
-using DecodableType = Type;
-
-} // namespace SemanticTagStruct
-
-namespace ModeOptionStruct {
-
-using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
-
-struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
-{
-};
-
-struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
-{
-};
-
-} // namespace ModeOptionStruct
-
-} // namespace Structs
+namespace RefrigeratorAlarm {
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace ChangeToMode {
+namespace Reset {
 struct Type;
 struct DecodableType;
-} // namespace ChangeToMode
-
-namespace ChangeToModeWithStatus {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-struct Type;
-struct DecodableType;
-} // namespace ChangeToModeResponse
+} // namespace Reset
 
 } // namespace Commands
 
 namespace Commands {
-namespace ChangeToMode {
+namespace Reset {
 enum class Fields : uint8_t
 {
-    kNewMode = 0,
+    kAlarms = 0,
+    kMask   = 1,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
 
-    uint8_t newMode = static_cast<uint8_t>(0);
+    chip::BitMask<AlarmMap> alarms = static_cast<chip::BitMask<AlarmMap>>(0);
+    Optional<chip::BitMask<AlarmMap>> mask;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15715,181 +14466,88 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
 
-    uint8_t newMode = static_cast<uint8_t>(0);
+    chip::BitMask<AlarmMap> alarms = static_cast<chip::BitMask<AlarmMap>>(0);
+    Optional<chip::BitMask<AlarmMap>> mask;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ChangeToMode
-namespace ChangeToModeWithStatus {
-enum class Fields : uint8_t
-{
-    kNewMode = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
-
-    uint8_t newMode = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeWithStatus
-namespace ChangeToModeResponse {
-enum class Fields : uint8_t
-{
-    kStatus     = 0,
-    kStatusText = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
-
-    uint8_t status = static_cast<uint8_t>(0);
-    Optional<chip::CharSpan> statusText;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeToModeResponse
+}; // namespace Reset
 } // namespace Commands
 
 namespace Attributes {
 
-namespace Description {
+namespace Mask {
 struct TypeInfo
 {
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
+    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Mask::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 64; }
 };
-} // namespace Description
-namespace SupportedModes {
+} // namespace Mask
+namespace Latch {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::DecodableType> &;
+    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Latch::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SupportedModes
-namespace CurrentMode {
+} // namespace Latch
+namespace State {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::State::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CurrentMode
-namespace StartUpMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StartUpMode
-namespace OnMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace OnMode
+} // namespace State
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
 };
 } // namespace AcceptedCommandList
 namespace EventList {
 struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
 };
 } // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
 struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
 struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
 };
 } // namespace ClusterRevision
 
@@ -15897,15 +14555,16 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
-        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
-        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
-        Attributes::OnMode::TypeInfo::DecodableType onMode;
+        Attributes::Mask::TypeInfo::DecodableType mask =
+            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>(0);
+        Attributes::Latch::TypeInfo::DecodableType latch =
+            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>(0);
+        Attributes::State::TypeInfo::DecodableType state =
+            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -15915,7 +14574,51 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-} // namespace DishwasherModeSelect
+namespace Events {
+namespace Notify {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kActive   = 0,
+    kInactive = 1,
+    kState    = 2,
+    kMask     = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::Notify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    chip::BitMask<AlarmMap> active   = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> inactive = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::Notify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+
+    chip::BitMask<AlarmMap> active   = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> inactive = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace Notify
+} // namespace Events
+} // namespace RefrigeratorAlarm
 namespace AirQuality {
 
 namespace Attributes {
@@ -26289,7 +24992,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    uint16_t count = static_cast<uint16_t>(0);
+    int16_t count = static_cast<int16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -26304,7 +25007,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    uint16_t count = static_cast<uint16_t>(0);
+    int16_t count = static_cast<int16_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SkipChannel

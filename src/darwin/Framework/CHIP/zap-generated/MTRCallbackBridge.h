@@ -85,20 +85,6 @@ typedef void (*GroupKeyManagementClusterKeySetReadResponseCallbackType)(
     void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &);
 typedef void (*GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
     void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
-typedef void (*ModeSelectClusterChangeToModeResponseCallbackType)(
-    void *, const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType &);
-typedef void (*LaundryWasherModeSelectClusterChangeToModeResponseCallbackType)(
-    void *, const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType &);
-typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallbackType)(
-    void *,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::
-        DecodableType &);
-typedef void (*RVCRunModeSelectClusterChangeToModeResponseCallbackType)(
-    void *, const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType &);
-typedef void (*RVCCleanModeSelectClusterChangeToModeResponseCallbackType)(
-    void *, const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType &);
-typedef void (*DishwasherModeSelectClusterChangeToModeResponseCallbackType)(
-    void *, const chip::app::Clusters::DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType &);
 typedef void (*DoorLockClusterGetWeekDayScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
 typedef void (*DoorLockClusterGetYearDayScheduleResponseCallbackType)(
@@ -395,42 +381,6 @@ typedef void (*GroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallb
     void *, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum);
 typedef void (*NullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum> &);
-typedef void (*ModeSelectClusterChangeToModeResponseStatusAttributeCallback)(
-    void *, chip::app::Clusters::ModeSelect::ChangeToModeResponseStatus);
-typedef void (*NullableModeSelectClusterChangeToModeResponseStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::ChangeToModeResponseStatus> &);
-typedef void (*ModeSelectClusterSemanticTagsAttributeCallback)(void *, chip::app::Clusters::ModeSelect::SemanticTags);
-typedef void (*NullableModeSelectClusterSemanticTagsAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::SemanticTags> &);
-typedef void (*LaundryWasherModeSelectClusterSemanticTagsAttributeCallback)(
-    void *, chip::app::Clusters::LaundryWasherModeSelect::SemanticTags);
-typedef void (*NullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherModeSelect::SemanticTags> &);
-typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallback)(
-    void *, chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::SemanticTags);
-typedef void (*NullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallback)(
-    void *,
-    const chip::app::DataModel::Nullable<
-        chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::SemanticTags> &);
-typedef void (*RVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallback)(
-    void *, chip::app::Clusters::RvcRunModeSelect::ChangeToModeResponseStatus);
-typedef void (*NullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRunModeSelect::ChangeToModeResponseStatus> &);
-typedef void (*RVCRunModeSelectClusterSemanticTagsAttributeCallback)(void *, chip::app::Clusters::RvcRunModeSelect::SemanticTags);
-typedef void (*NullableRVCRunModeSelectClusterSemanticTagsAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRunModeSelect::SemanticTags> &);
-typedef void (*RVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallback)(
-    void *, chip::app::Clusters::RvcCleanModeSelect::ChangeToModeResponseStatus);
-typedef void (*NullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcCleanModeSelect::ChangeToModeResponseStatus> &);
-typedef void (*RVCCleanModeSelectClusterSemanticTagsAttributeCallback)(void *,
-                                                                       chip::app::Clusters::RvcCleanModeSelect::SemanticTags);
-typedef void (*NullableRVCCleanModeSelectClusterSemanticTagsAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcCleanModeSelect::SemanticTags> &);
-typedef void (*DishwasherModeSelectClusterSemanticTagsAttributeCallback)(void *,
-                                                                         chip::app::Clusters::DishwasherModeSelect::SemanticTags);
-typedef void (*NullableDishwasherModeSelectClusterSemanticTagsAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DishwasherModeSelect::SemanticTags> &);
 typedef void (*AirQualityClusterAirQualityEnumAttributeCallback)(void *, chip::app::Clusters::AirQuality::AirQualityEnum);
 typedef void (*NullableAirQualityClusterAirQualityEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AirQuality::AirQualityEnum> &);
@@ -1145,55 +1095,6 @@ typedef void (*ModeSelectEventListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ModeSelectAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*LaundryWasherModeSelectSupportedModesListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType> & data);
-typedef void (*LaundryWasherModeSelectGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LaundryWasherModeSelectAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*LaundryWasherModeSelectEventListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*LaundryWasherModeSelectAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::DecodableType> &
-        data);
-typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*RVCRunModeSelectSupportedModesListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType> &
-        data);
-typedef void (*RVCRunModeSelectGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*RVCRunModeSelectAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*RVCRunModeSelectEventListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*RVCRunModeSelectAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*RVCCleanModeSelectSupportedModesListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::DecodableType> &
-        data);
-typedef void (*RVCCleanModeSelectGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*RVCCleanModeSelectAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*RVCCleanModeSelectEventListListAttributeCallback)(void * context,
-                                                                 const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*RVCCleanModeSelectAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*TemperatureControlSupportedTemperatureLevelsListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
@@ -1206,17 +1107,16 @@ typedef void (*TemperatureControlEventListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*TemperatureControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DishwasherModeSelectSupportedModesListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::DecodableType> &
-        data);
-typedef void (*DishwasherModeSelectGeneratedCommandListListAttributeCallback)(
+typedef void (*RefrigeratorAlarmMaskAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
+typedef void (*RefrigeratorAlarmLatchAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
+typedef void (*RefrigeratorAlarmStateAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
+typedef void (*RefrigeratorAlarmGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*DishwasherModeSelectAcceptedCommandListListAttributeCallback)(
+typedef void (*RefrigeratorAlarmAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*DishwasherModeSelectEventListListAttributeCallback)(void * context,
-                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*DishwasherModeSelectAttributeListListAttributeCallback)(
+typedef void (*RefrigeratorAlarmEventListListAttributeCallback)(void * context,
+                                                                const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*RefrigeratorAlarmAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*AirQualityGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -8693,701 +8593,6 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherModeSelectSupportedModesListAttributeCallback>
-{
-public:
-    MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherModeSelectSupportedModesListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherModeSelectSupportedModesListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType> & value);
-};
-
-class MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackSubscriptionBridge
-    : public MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge
-{
-public:
-    MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherModeSelectGeneratedCommandListListAttributeCallback>
-{
-public:
-    MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherModeSelectGeneratedCommandListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherModeSelectAcceptedCommandListListAttributeCallback>
-{
-public:
-    MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherModeSelectAcceptedCommandListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherModeSelectEventListListAttributeCallback>
-{
-public:
-    MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherModeSelectEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherModeSelectEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
-};
-
-class MTRLaundryWasherModeSelectEventListListAttributeCallbackSubscriptionBridge
-    : public MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge
-{
-public:
-    MTRLaundryWasherModeSelectEventListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherModeSelectEventListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherModeSelectAttributeListListAttributeCallback>
-{
-public:
-    MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherModeSelectAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherModeSelectAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class MTRLaundryWasherModeSelectAttributeListListAttributeCallbackSubscriptionBridge
-    : public MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge
-{
-public:
-    MTRLaundryWasherModeSelectAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherModeSelectAttributeListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallbackBridge
-    : public MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallback>
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                      ResponseHandler handler) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallback>(queue, handler,
-                                                                                                                    OnSuccessFn){};
-
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                      ResponseHandler handler,
-                                                                                                      MTRActionBlock action) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallback>(
-            queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<
-            chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::DecodableType> &
-            value);
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallbackSubscriptionBridge
-    : public MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallbackBridge
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallback>
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallbackBridge(
-        dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallback>(
-            queue, handler, OnSuccessFn){};
-
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                            ResponseHandler handler,
-                                                                                                            MTRActionBlock action) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallback>(
-            queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRRefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallbackBridge(queue, handler,
-                                                                                                                action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallbackBridge::
-        KeepAliveOnCallback;
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectGeneratedCommandListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallback>
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallbackBridge(
-        dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallback>(
-            queue, handler, OnSuccessFn){};
-
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                           ResponseHandler handler,
-                                                                                                           MTRActionBlock action) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallback>(
-            queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallbackBridge(queue, handler,
-                                                                                                               action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallbackBridge::
-        KeepAliveOnCallback;
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAcceptedCommandListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallback>
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                 ResponseHandler handler) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallback>(queue, handler,
-                                                                                                               OnSuccessFn){};
-
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                 ResponseHandler handler,
-                                                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallback>(
-            queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallbackSubscriptionBridge
-    : public MTRRefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallbackBridge
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectEventListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallback>
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                     ResponseHandler handler) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallback>(queue, handler,
-                                                                                                                   OnSuccessFn){};
-
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                     ResponseHandler handler,
-                                                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallback>(
-            queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallbackSubscriptionBridge
-    : public MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallbackBridge
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCRunModeSelectSupportedModesListAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCRunModeSelectSupportedModesListAttributeCallback>
-{
-public:
-    MTRRVCRunModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCRunModeSelectSupportedModesListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCRunModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<RVCRunModeSelectSupportedModesListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType> &
-            value);
-};
-
-class MTRRVCRunModeSelectSupportedModesListAttributeCallbackSubscriptionBridge
-    : public MTRRVCRunModeSelectSupportedModesListAttributeCallbackBridge
-{
-public:
-    MTRRVCRunModeSelectSupportedModesListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action,
-                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCRunModeSelectSupportedModesListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCRunModeSelectSupportedModesListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCRunModeSelectSupportedModesListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCRunModeSelectGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCRunModeSelectGeneratedCommandListListAttributeCallback>
-{
-public:
-    MTRRVCRunModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCRunModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCRunModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       MTRActionBlock action) :
-        MTRCallbackBridge<RVCRunModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRRVCRunModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRRVCRunModeSelectGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRRVCRunModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCRunModeSelectGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCRunModeSelectGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCRunModeSelectGeneratedCommandListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCRunModeSelectAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCRunModeSelectAcceptedCommandListListAttributeCallback>
-{
-public:
-    MTRRVCRunModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCRunModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCRunModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRActionBlock action) :
-        MTRCallbackBridge<RVCRunModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRRVCRunModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRRVCRunModeSelectAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRRVCRunModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCRunModeSelectAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCRunModeSelectAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCRunModeSelectAcceptedCommandListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCRunModeSelectEventListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCRunModeSelectEventListListAttributeCallback>
-{
-public:
-    MTRRVCRunModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCRunModeSelectEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCRunModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRActionBlock action) :
-        MTRCallbackBridge<RVCRunModeSelectEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
-};
-
-class MTRRVCRunModeSelectEventListListAttributeCallbackSubscriptionBridge
-    : public MTRRVCRunModeSelectEventListListAttributeCallbackBridge
-{
-public:
-    MTRRVCRunModeSelectEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action,
-                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCRunModeSelectEventListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCRunModeSelectEventListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCRunModeSelectEventListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCRunModeSelectAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCRunModeSelectAttributeListListAttributeCallback>
-{
-public:
-    MTRRVCRunModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCRunModeSelectAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCRunModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                MTRActionBlock action) :
-        MTRCallbackBridge<RVCRunModeSelectAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class MTRRVCRunModeSelectAttributeListListAttributeCallbackSubscriptionBridge
-    : public MTRRVCRunModeSelectAttributeListListAttributeCallbackBridge
-{
-public:
-    MTRRVCRunModeSelectAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            MTRActionBlock action,
-                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCRunModeSelectAttributeListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCRunModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCRunModeSelectAttributeListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCCleanModeSelectSupportedModesListAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCCleanModeSelectSupportedModesListAttributeCallback>
-{
-public:
-    MTRRVCCleanModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCCleanModeSelectSupportedModesListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCCleanModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<RVCCleanModeSelectSupportedModesListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::DecodableType> & value);
-};
-
-class MTRRVCCleanModeSelectSupportedModesListAttributeCallbackSubscriptionBridge
-    : public MTRRVCCleanModeSelectSupportedModesListAttributeCallbackBridge
-{
-public:
-    MTRRVCCleanModeSelectSupportedModesListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCCleanModeSelectSupportedModesListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCCleanModeSelectSupportedModesListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCCleanModeSelectSupportedModesListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCCleanModeSelectGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCCleanModeSelectGeneratedCommandListListAttributeCallback>
-{
-public:
-    MTRRVCCleanModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCCleanModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCCleanModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<RVCCleanModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRRVCCleanModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRRVCCleanModeSelectGeneratedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRRVCCleanModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCCleanModeSelectGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCCleanModeSelectGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCCleanModeSelectGeneratedCommandListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCCleanModeSelectAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCCleanModeSelectAcceptedCommandListListAttributeCallback>
-{
-public:
-    MTRRVCCleanModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCCleanModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCCleanModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action) :
-        MTRCallbackBridge<RVCCleanModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
-};
-
-class MTRRVCCleanModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRRVCCleanModeSelectAcceptedCommandListListAttributeCallbackBridge
-{
-public:
-    MTRRVCCleanModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCCleanModeSelectAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCCleanModeSelectAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCCleanModeSelectAcceptedCommandListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCCleanModeSelectEventListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCCleanModeSelectEventListListAttributeCallback>
-{
-public:
-    MTRRVCCleanModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCCleanModeSelectEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCCleanModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRActionBlock action) :
-        MTRCallbackBridge<RVCCleanModeSelectEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
-};
-
-class MTRRVCCleanModeSelectEventListListAttributeCallbackSubscriptionBridge
-    : public MTRRVCCleanModeSelectEventListListAttributeCallbackBridge
-{
-public:
-    MTRRVCCleanModeSelectEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action,
-                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCCleanModeSelectEventListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCCleanModeSelectEventListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCCleanModeSelectEventListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCCleanModeSelectAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCCleanModeSelectAttributeListListAttributeCallback>
-{
-public:
-    MTRRVCCleanModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCCleanModeSelectAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCCleanModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<RVCCleanModeSelectAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class MTRRVCCleanModeSelectAttributeListListAttributeCallbackSubscriptionBridge
-    : public MTRRVCCleanModeSelectAttributeListListAttributeCallbackBridge
-{
-public:
-    MTRRVCCleanModeSelectAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCCleanModeSelectAttributeListListAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCCleanModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCCleanModeSelectAttributeListListAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge
     : public MTRCallbackBridge<TemperatureControlSupportedTemperatureLevelsListAttributeCallback>
 {
@@ -9555,168 +8760,223 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDishwasherModeSelectSupportedModesListAttributeCallbackBridge
-    : public MTRCallbackBridge<DishwasherModeSelectSupportedModesListAttributeCallback>
+class MTRRefrigeratorAlarmMaskAttributeCallbackBridge : public MTRCallbackBridge<RefrigeratorAlarmMaskAttributeCallback>
 {
 public:
-    MTRDishwasherModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DishwasherModeSelectSupportedModesListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRRefrigeratorAlarmMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmMaskAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDishwasherModeSelectSupportedModesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<DishwasherModeSelectSupportedModesListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRRefrigeratorAlarmMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmMaskAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::DecodableType> & value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
 };
 
-class MTRDishwasherModeSelectSupportedModesListAttributeCallbackSubscriptionBridge
-    : public MTRDishwasherModeSelectSupportedModesListAttributeCallbackBridge
+class MTRRefrigeratorAlarmMaskAttributeCallbackSubscriptionBridge : public MTRRefrigeratorAlarmMaskAttributeCallbackBridge
 {
 public:
-    MTRDishwasherModeSelectSupportedModesListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDishwasherModeSelectSupportedModesListAttributeCallbackBridge(queue, handler, action),
+    MTRRefrigeratorAlarmMaskAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action,
+                                                                MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmMaskAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRDishwasherModeSelectSupportedModesListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDishwasherModeSelectSupportedModesListAttributeCallbackBridge::OnDone;
+    using MTRRefrigeratorAlarmMaskAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmMaskAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDishwasherModeSelectGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<DishwasherModeSelectGeneratedCommandListListAttributeCallback>
+class MTRRefrigeratorAlarmLatchAttributeCallbackBridge : public MTRCallbackBridge<RefrigeratorAlarmLatchAttributeCallback>
 {
 public:
-    MTRDishwasherModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DishwasherModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRRefrigeratorAlarmLatchAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmLatchAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDishwasherModeSelectGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRActionBlock action) :
-        MTRCallbackBridge<DishwasherModeSelectGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRRefrigeratorAlarmLatchAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmLatchAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+};
+
+class MTRRefrigeratorAlarmLatchAttributeCallbackSubscriptionBridge : public MTRRefrigeratorAlarmLatchAttributeCallbackBridge
+{
+public:
+    MTRRefrigeratorAlarmLatchAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action,
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmLatchAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRefrigeratorAlarmLatchAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmLatchAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRefrigeratorAlarmStateAttributeCallbackBridge : public MTRCallbackBridge<RefrigeratorAlarmStateAttributeCallback>
+{
+public:
+    MTRRefrigeratorAlarmStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmStateAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRefrigeratorAlarmStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmStateAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+};
+
+class MTRRefrigeratorAlarmStateAttributeCallbackSubscriptionBridge : public MTRRefrigeratorAlarmStateAttributeCallbackBridge
+{
+public:
+    MTRRefrigeratorAlarmStateAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action,
+                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmStateAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRefrigeratorAlarmStateAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmStateAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RefrigeratorAlarmGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRDishwasherModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRDishwasherModeSelectGeneratedCommandListListAttributeCallbackBridge
+class MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRDishwasherModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+    MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDishwasherModeSelectGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRDishwasherModeSelectGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDishwasherModeSelectGeneratedCommandListListAttributeCallbackBridge::OnDone;
+    using MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDishwasherModeSelectAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<DishwasherModeSelectAcceptedCommandListListAttributeCallback>
+class MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RefrigeratorAlarmAcceptedCommandListListAttributeCallback>
 {
 public:
-    MTRDishwasherModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DishwasherModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDishwasherModeSelectAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action) :
-        MTRCallbackBridge<DishwasherModeSelectAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRDishwasherModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRDishwasherModeSelectAcceptedCommandListListAttributeCallbackBridge
+class MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRDishwasherModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+    MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDishwasherModeSelectAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRDishwasherModeSelectAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDishwasherModeSelectAcceptedCommandListListAttributeCallbackBridge::OnDone;
+    using MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDishwasherModeSelectEventListListAttributeCallbackBridge
-    : public MTRCallbackBridge<DishwasherModeSelectEventListListAttributeCallback>
+class MTRRefrigeratorAlarmEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RefrigeratorAlarmEventListListAttributeCallback>
 {
 public:
-    MTRDishwasherModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DishwasherModeSelectEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRRefrigeratorAlarmEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDishwasherModeSelectEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                MTRActionBlock action) :
-        MTRCallbackBridge<DishwasherModeSelectEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRRefrigeratorAlarmEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
 };
 
-class MTRDishwasherModeSelectEventListListAttributeCallbackSubscriptionBridge
-    : public MTRDishwasherModeSelectEventListListAttributeCallbackBridge
+class MTRRefrigeratorAlarmEventListListAttributeCallbackSubscriptionBridge
+    : public MTRRefrigeratorAlarmEventListListAttributeCallbackBridge
 {
 public:
-    MTRDishwasherModeSelectEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            MTRActionBlock action,
-                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDishwasherModeSelectEventListListAttributeCallbackBridge(queue, handler, action),
+    MTRRefrigeratorAlarmEventListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action,
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmEventListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRDishwasherModeSelectEventListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDishwasherModeSelectEventListListAttributeCallbackBridge::OnDone;
+    using MTRRefrigeratorAlarmEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmEventListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRDishwasherModeSelectAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<DishwasherModeSelectAttributeListListAttributeCallback>
+class MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<RefrigeratorAlarmAttributeListListAttributeCallback>
 {
 public:
-    MTRDishwasherModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DishwasherModeSelectAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRDishwasherModeSelectAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<DishwasherModeSelectAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class MTRDishwasherModeSelectAttributeListListAttributeCallbackSubscriptionBridge
-    : public MTRDishwasherModeSelectAttributeListListAttributeCallbackBridge
+class MTRRefrigeratorAlarmAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRDishwasherModeSelectAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDishwasherModeSelectAttributeListListAttributeCallbackBridge(queue, handler, action),
+    MTRRefrigeratorAlarmAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRDishwasherModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDishwasherModeSelectAttributeListListAttributeCallbackBridge::OnDone;
+    using MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -17055,101 +16315,6 @@ public:
                 const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
 };
 
-class MTRModeSelectClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<ModeSelectClusterChangeToModeResponseCallbackType>
-{
-public:
-    MTRModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<ModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
-};
-
-class MTRLaundryWasherModeSelectClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherModeSelectClusterChangeToModeResponseCallbackType>
-{
-public:
-    MTRLaundryWasherModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRLaundryWasherModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallbackType>
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue,
-                                                                                                      ResponseHandler handler) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallbackType>(
-            queue, handler, OnSuccessFn){};
-
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue,
-                                                                                                      ResponseHandler handler,
-                                                                                                      MTRActionBlock action) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallbackType>(
-            queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::
-                                ChangeToModeResponse::DecodableType & data);
-};
-
-class MTRRVCRunModeSelectClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<RVCRunModeSelectClusterChangeToModeResponseCallbackType>
-{
-public:
-    MTRRVCRunModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCRunModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRRVCRunModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<RVCRunModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
-};
-
-class MTRRVCCleanModeSelectClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<RVCCleanModeSelectClusterChangeToModeResponseCallbackType>
-{
-public:
-    MTRRVCCleanModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCCleanModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRRVCCleanModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<RVCCleanModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
-};
-
-class MTRDishwasherModeSelectClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<DishwasherModeSelectClusterChangeToModeResponseCallbackType>
-{
-public:
-    MTRDishwasherModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DishwasherModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRDishwasherModeSelectClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<DishwasherModeSelectClusterChangeToModeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
-};
-
 class MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge
     : public MTRCallbackBridge<DoorLockClusterGetWeekDayScheduleResponseCallbackType>
 {
@@ -22109,636 +21274,6 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<ModeSelectClusterChangeToModeResponseStatusAttributeCallback>
-{
-public:
-    MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action) :
-        MTRCallbackBridge<ModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::ModeSelect::ChangeToModeResponseStatus value);
-};
-
-class MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge
-    : public MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-{
-public:
-    MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableModeSelectClusterChangeToModeResponseStatusAttributeCallback>
-{
-public:
-    MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<NullableModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, action,
-                                                                                                OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::ChangeToModeResponseStatus> & value);
-};
-
-class MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-{
-public:
-    MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<ModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRActionBlock action) :
-        MTRCallbackBridge<ModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::ModeSelect::SemanticTags value);
-};
-
-class MTRModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action,
-                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRNullableModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<NullableModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::SemanticTags> & value);
-};
-
-class MTRNullableModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRNullableModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRNullableModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::LaundryWasherModeSelect::SemanticTags value);
-};
-
-class MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<NullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action,
-                                                                                               OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherModeSelect::SemanticTags> & value);
-};
-
-class MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableLaundryWasherModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                       ResponseHandler handler) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallback>(queue, handler,
-                                                                                                                     OnSuccessFn){};
-
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                                       ResponseHandler handler,
-                                                                                                       MTRActionBlock action) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallback>(
-            queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::SemanticTags value);
-};
-
-class MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRNullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge(
-        dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallback>(
-            queue, handler, OnSuccessFn){};
-
-    MTRNullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<NullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallback>(
-            queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<
-                                chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::SemanticTags> & value);
-};
-
-class MTRNullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRNullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRNullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler,
-                                                                                                                   action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge::
-        KeepAliveOnCallback;
-    using MTRNullableRefrigeratorAndTemperatureControlledCabinetModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallback>
-{
-public:
-    MTRRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                MTRActionBlock action) :
-        MTRCallbackBridge<RVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, action,
-                                                                                              OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::RvcRunModeSelect::ChangeToModeResponseStatus value);
-};
-
-class MTRRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge
-    : public MTRRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-{
-public:
-    MTRRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallback>
-{
-public:
-    MTRNullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler) :
-        MTRCallbackBridge<NullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler,
-                                                                                                      OnSuccessFn){};
-
-    MTRNullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler,
-                                                                                        MTRActionBlock action) :
-        MTRCallbackBridge<NullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, action,
-                                                                                                      OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRunModeSelect::ChangeToModeResponseStatus> & value);
-};
-
-class MTRNullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-{
-public:
-    MTRNullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableRVCRunModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCRunModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCRunModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<RVCRunModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::RvcRunModeSelect::SemanticTags value);
-};
-
-class MTRRVCRunModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRRVCRunModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableRVCRunModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRNullableRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableRVCRunModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action) :
-        MTRCallbackBridge<NullableRVCRunModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRunModeSelect::SemanticTags> & value);
-};
-
-class MTRNullableRVCRunModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRNullableRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRNullableRVCRunModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableRVCRunModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallback>
-{
-public:
-    MTRRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<RVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, action,
-                                                                                                OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::RvcCleanModeSelect::ChangeToModeResponseStatus value);
-};
-
-class MTRRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge
-    : public MTRRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-{
-public:
-    MTRRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallback>
-{
-public:
-    MTRNullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                          ResponseHandler handler) :
-        MTRCallbackBridge<NullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler,
-                                                                                                        OnSuccessFn){};
-
-    MTRNullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                          ResponseHandler handler,
-                                                                                          MTRActionBlock action) :
-        MTRCallbackBridge<NullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallback>(queue, handler, action,
-                                                                                                        OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::RvcCleanModeSelect::ChangeToModeResponseStatus> & value);
-};
-
-class MTRNullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge
-{
-public:
-    MTRNullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableRVCCleanModeSelectClusterChangeToModeResponseStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<RVCCleanModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCCleanModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<RVCCleanModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::RvcCleanModeSelect::SemanticTags value);
-};
-
-class MTRRVCCleanModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRRVCCleanModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableRVCCleanModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRNullableRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableRVCCleanModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            MTRActionBlock action) :
-        MTRCallbackBridge<NullableRVCCleanModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::RvcCleanModeSelect::SemanticTags> & value);
-};
-
-class MTRNullableRVCCleanModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRNullableRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRNullableRVCCleanModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableRVCCleanModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<DishwasherModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DishwasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRActionBlock action) :
-        MTRCallbackBridge<DishwasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::DishwasherModeSelect::SemanticTags value);
-};
-
-class MTRDishwasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRDishwasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableDishwasherModeSelectClusterSemanticTagsAttributeCallback>
-{
-public:
-    MTRNullableDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableDishwasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              MTRActionBlock action) :
-        MTRCallbackBridge<NullableDishwasherModeSelectClusterSemanticTagsAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::DishwasherModeSelect::SemanticTags> & value);
-};
-
-class MTRNullableDishwasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge
-    : public MTRNullableDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge
-{
-public:
-    MTRNullableDishwasherModeSelectClusterSemanticTagsAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableDishwasherModeSelectClusterSemanticTagsAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

@@ -77,6 +77,7 @@
         ],
         "PWM_CLUSTER": [],
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER": [],
+        "REFRIGERATOR_ALARM": [],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
         "RVC_CLEAN_MODE_SELECT_CLUSTER": [],
         "RVC_RUN_MODE_SELECT_CLUSTER": [],
@@ -187,6 +188,7 @@
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER": [
             "mode-select-server"
         ],
+        "REFRIGERATOR_ALARM_CLUSTER": ["refrigerator-alarm-server"],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
         "RVC_CLEAN_MODE_SELECT_CLUSTER": ["mode-select-server"],
         "RVC_RUN_MODE_SELECT_CLUSTER": ["mode-select-server"],

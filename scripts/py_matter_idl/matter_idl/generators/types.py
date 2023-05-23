@@ -344,6 +344,10 @@ class TypeLookupContext:
         """
         return any(map(lambda s: s.name == name, self.all_structs))
 
+    def is_untyped_bitmap_type(self, name: str):
+        """Determine if the given type is a untyped bitmap (just an interger size)."""
+        return name.lower() in {"bitmap8", "bitmap16", "bitmap24", "bitmap32", "bitmap64"}
+
     def is_bitmap_type(self, name: str):
         """
         Determine if the given type name is type that is known to be a bitmap.
@@ -351,7 +355,7 @@ class TypeLookupContext:
         Handles both standard/zcl names (like bitmap32) and types defined within
         the current lookup context.
         """
-        if name.lower() in ["bitmap8", "bitmap16", "bitmap24", "bitmap32", "bitmap64"]:
+        if self.is_untyped_bitmap_type(name):
             return True
 
         return any(map(lambda s: s.name == name, self.all_bitmaps))

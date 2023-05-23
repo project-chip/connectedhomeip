@@ -2934,7 +2934,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _label = @"";
 
-        _tempLevel = @(0);
+        _temperatureLevel = @(0);
     }
     return self;
 }
@@ -2944,15 +2944,52 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRTemperatureControlClusterTemperatureLevelStruct alloc] init];
 
     other.label = self.label;
-    other.tempLevel = self.tempLevel;
+    other.temperatureLevel = self.temperatureLevel;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: label:%@; tempLevel:%@; >", NSStringFromClass([self class]), _label, _tempLevel];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: label:%@; temperatureLevel:%@; >", NSStringFromClass([self class]), _label, _temperatureLevel];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRefrigeratorAlarmClusterNotifyEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _active = @(0);
+
+        _inactive = @(0);
+
+        _state = @(0);
+
+        _mask = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRRefrigeratorAlarmClusterNotifyEvent alloc] init];
+
+    other.active = self.active;
+    other.inactive = self.inactive;
+    other.state = self.state;
+    other.mask = self.mask;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: active:%@; inactive:%@; state:%@; mask:%@; >",
+                                             NSStringFromClass([self class]), _active, _inactive, _state, _mask];
     return descriptionString;
 }
 

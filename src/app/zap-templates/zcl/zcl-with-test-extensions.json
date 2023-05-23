@@ -74,6 +74,7 @@
         "pump-configuration-and-control-cluster.xml",
         "pwm-cluster.xml",
         "refrigerator-and-temperature-controlled-cabinet-mode-select-cluster.xml",
+        "refrigerator-alarm.xml",
         "relative-humidity-measurement-cluster.xml",
         "replacable-monitoring-cluster.xml",
         "rvc-clean-mode-select-cluster.xml ",

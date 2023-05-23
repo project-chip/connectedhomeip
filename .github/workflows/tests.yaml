@@ -174,6 +174,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/pump-configuration-and-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pwm-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/refrigerator-and-temperature-controlled-cabinet-mode-select-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/refrigerator-alarm.xml \
                       src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-select-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-select-cluster.xml \
