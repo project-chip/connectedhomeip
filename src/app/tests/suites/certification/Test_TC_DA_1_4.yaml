@@ -344,7 +344,7 @@ tests:
           [1684495876.441912][176910:176912] CHIP:DMG: ICR moving to [AddedComma]
           [1684495876.441967][176910:176912] CHIP:EM: <<< [E:25914i M:173255705] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:08 (IM:InvokeCommandRequest)
           [1684495876.441973][176910:176912] CHIP:IN: (S) Sending msg 173255705 on secure session with LSID: 21068
-          [1684495876.442029][176910:176912] CHIP:DMG: >> to UDP:[fe80::529f:9f59:cfec:7130%wlp0s20f3]:5540 | 173255705 | [Interaction Model  (1) / InvokeCommandRequest 
+          [1684495876.442029][176910:176912] CHIP:DMG: >> to UDP:[fe80::529f:9f59:cfec:7130%wlp0s20f3]:5540 | 173255705 | [Interaction Model  (1) / InvokeCommandRequest
 
 
 

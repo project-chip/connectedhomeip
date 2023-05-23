@@ -88,7 +88,7 @@ tests:
           [1658316948.574597][4039:4044] CHIP:DMG:                                   status = 0x00 (SUCCESS),
           [1658316948.574632][4039:4044] CHIP:DMG:                                },
 
-          Before adding the Groups by AddGroup execute below command 
+          Before adding the Groups by AddGroup execute below command
 
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId":2, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 3, "groupKeySetID": 1,"fabricIndex": 1} ]' 1 0
 
@@ -103,14 +103,14 @@ tests:
           [1662655615.539677][229172:229177] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1662655615.539688][229172:229177] CHIP:DMG:                                 ListIndex = Null,
           [1662655615.539693][229172:229177] CHIP:DMG:                         }
-          [1662655615.539707][229172:229177] CHIP:DMG:                                 
+          [1662655615.539707][229172:229177] CHIP:DMG:
           [1662655615.539715][229172:229177] CHIP:DMG:                         StatusIB =
           [1662655615.539729][229172:229177] CHIP:DMG:                         {
           [1662655615.539737][229172:229177] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1662655615.539743][229172:229177] CHIP:DMG:                         },
           [1662655615.539753][229172:229177] CHIP:DMG:
           [1662655615.539766][229172:229177] CHIP:DMG:                 },
-          [1662655615.539781][229172:229177] CHIP:DMG:                 
+          [1662655615.539781][229172:229177] CHIP:DMG:
           [1662655615.539792][229172:229177] CHIP:DMG:                 AttributeStatusIB =
           [1662655615.539802][229172:229177] CHIP:DMG:                 {
           [1662655615.539810][229172:229177] CHIP:DMG:                         AttributePathIB =
@@ -120,13 +120,13 @@ tests:
           [1662655615.539851][229172:229177] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1662655615.539858][229172:229177] CHIP:DMG:                                 ListIndex = Null,
           [1662655615.539864][229172:229177] CHIP:DMG:                         }
-          [1662655615.539877][229172:229177] CHIP:DMG:                                 
+          [1662655615.539877][229172:229177] CHIP:DMG:
           [1662655615.539885][229172:229177] CHIP:DMG:                         StatusIB =
           [1662655615.539896][229172:229177] CHIP:DMG:                         {
           [1662655615.539904][229172:229177] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1662655615.539910][229172:229177] CHIP:DMG:                         },
 
-          Before adding the Groups(0x0006 to Maxgroup)  by AddGroupIfIdentifying command execute this command 
+          Before adding the Groups(0x0006 to Maxgroup)  by AddGroupIfIdentifying command execute this command
 
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId":6, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 7, "groupKeySetID": 1, "fabricIndex": 1},{"groupId":8, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 9, "groupKeySetID": 1, "fabricIndex": 1},{"groupId":10, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 11, "groupKeySetID": 1, "fabricIndex": 1},{"groupId":12, "groupKeySetID": 1, "fabricIndex": 1},{"groupId":13, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 14, "groupKeySetID": 1, "fabricIndex": 1},{"groupId":15, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 16, "groupKeySetID": 1, "fabricIndex": 1},{"groupId":17, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 
@@ -144,14 +144,14 @@ tests:
           [1683882354.197208][7723:7725] CHIP:DMG:                                 Cluster = 0x3f,
           [1683882354.197213][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.197217][7723:7725] CHIP:DMG:                         }
-          [1683882354.197224][7723:7725] CHIP:DMG:                                 
+          [1683882354.197224][7723:7725] CHIP:DMG:
           [1683882354.197228][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.197233][7723:7725] CHIP:DMG:                         {
           [1683882354.197237][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.197242][7723:7725] CHIP:DMG:                         },
-          [1683882354.197247][7723:7725] CHIP:DMG:                         
+          [1683882354.197247][7723:7725] CHIP:DMG:
           [1683882354.197250][7723:7725] CHIP:DMG:                 },
-          [1683882354.197259][7723:7725] CHIP:DMG:                 
+          [1683882354.197259][7723:7725] CHIP:DMG:
           [1683882354.197263][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.197268][7723:7725] CHIP:DMG:                 {
           [1683882354.197271][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -161,14 +161,14 @@ tests:
           [1683882354.197290][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.197295][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.197299][7723:7725] CHIP:DMG:                         }
-          [1683882354.197306][7723:7725] CHIP:DMG:                                 
+          [1683882354.197306][7723:7725] CHIP:DMG:
           [1683882354.197310][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.197315][7723:7725] CHIP:DMG:                         {
           [1683882354.197319][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.197324][7723:7725] CHIP:DMG:                         },
-          [1683882354.197328][7723:7725] CHIP:DMG:                         
+          [1683882354.197328][7723:7725] CHIP:DMG:
           [1683882354.197332][7723:7725] CHIP:DMG:                 },
-          [1683882354.197343][7723:7725] CHIP:DMG:                 
+          [1683882354.197343][7723:7725] CHIP:DMG:
           [1683882354.197347][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.197351][7723:7725] CHIP:DMG:                 {
           [1683882354.197353][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -178,14 +178,14 @@ tests:
           [1683882354.197364][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.197366][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.197368][7723:7725] CHIP:DMG:                         }
-          [1683882354.197372][7723:7725] CHIP:DMG:                                 
+          [1683882354.197372][7723:7725] CHIP:DMG:
           [1683882354.197374][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.197377][7723:7725] CHIP:DMG:                         {
           [1683882354.197379][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.197381][7723:7725] CHIP:DMG:                         },
-          [1683882354.197384][7723:7725] CHIP:DMG:                         
+          [1683882354.197384][7723:7725] CHIP:DMG:
           [1683882354.197385][7723:7725] CHIP:DMG:                 },
-          [1683882354.197391][7723:7725] CHIP:DMG:                 
+          [1683882354.197391][7723:7725] CHIP:DMG:
           [1683882354.197393][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.197395][7723:7725] CHIP:DMG:                 {
           [1683882354.197398][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -195,14 +195,14 @@ tests:
           [1683882354.197417][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.197421][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.197426][7723:7725] CHIP:DMG:                         }
-          [1683882354.197432][7723:7725] CHIP:DMG:                                 
+          [1683882354.197432][7723:7725] CHIP:DMG:
           [1683882354.197437][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.197441][7723:7725] CHIP:DMG:                         {
           [1683882354.197445][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.197450][7723:7725] CHIP:DMG:                         },
-          [1683882354.197454][7723:7725] CHIP:DMG:                         
+          [1683882354.197454][7723:7725] CHIP:DMG:
           [1683882354.197458][7723:7725] CHIP:DMG:                 },
-          [1683882354.197467][7723:7725] CHIP:DMG:                 
+          [1683882354.197467][7723:7725] CHIP:DMG:
           [1683882354.197471][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.197475][7723:7725] CHIP:DMG:                 {
           [1683882354.197479][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -212,14 +212,14 @@ tests:
           [1683882354.197497][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.197502][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.197506][7723:7725] CHIP:DMG:                         }
-          [1683882354.197512][7723:7725] CHIP:DMG:                                 
+          [1683882354.197512][7723:7725] CHIP:DMG:
           [1683882354.197516][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.197521][7723:7725] CHIP:DMG:                         {
           [1683882354.197525][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.197529][7723:7725] CHIP:DMG:                         },
-          [1683882354.197534][7723:7725] CHIP:DMG:                         
+          [1683882354.197534][7723:7725] CHIP:DMG:
           [1683882354.197538][7723:7725] CHIP:DMG:                 },
-          [1683882354.197547][7723:7725] CHIP:DMG:                 
+          [1683882354.197547][7723:7725] CHIP:DMG:
           [1683882354.197551][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.197555][7723:7725] CHIP:DMG:                 {
           [1683882354.197559][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -229,14 +229,14 @@ tests:
           [1683882354.197578][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.197582][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.197586][7723:7725] CHIP:DMG:                         }
-          [1683882354.197593][7723:7725] CHIP:DMG:                                 
+          [1683882354.197593][7723:7725] CHIP:DMG:
           [1683882354.197597][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.197602][7723:7725] CHIP:DMG:                         {
           [1683882354.197606][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.197610][7723:7725] CHIP:DMG:                         },
-          [1683882354.197615][7723:7725] CHIP:DMG:                         
+          [1683882354.197615][7723:7725] CHIP:DMG:
           [1683882354.197618][7723:7725] CHIP:DMG:                 },
-          [1683882354.197627][7723:7725] CHIP:DMG:                 
+          [1683882354.197627][7723:7725] CHIP:DMG:
           [1683882354.197631][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.197635][7723:7725] CHIP:DMG:                 {
           [1683882354.197640][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -246,14 +246,14 @@ tests:
           [1683882354.197658][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.197663][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.197667][7723:7725] CHIP:DMG:                         }
-          [1683882354.197673][7723:7725] CHIP:DMG:                                 
+          [1683882354.197673][7723:7725] CHIP:DMG:
           [1683882354.197677][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.197682][7723:7725] CHIP:DMG:                         {
           [1683882354.197687][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.197690][7723:7725] CHIP:DMG:                         },
-          [1683882354.197695][7723:7725] CHIP:DMG:                         
+          [1683882354.197695][7723:7725] CHIP:DMG:
           [1683882354.197699][7723:7725] CHIP:DMG:                 },
-          [1683882354.197708][7723:7725] CHIP:DMG:                 
+          [1683882354.197708][7723:7725] CHIP:DMG:
           [1683882354.197712][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.197716][7723:7725] CHIP:DMG:                 {
           [1683882354.197720][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -263,14 +263,14 @@ tests:
           [1683882354.197738][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.197743][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.197747][7723:7725] CHIP:DMG:                         }
-          [1683882354.197753][7723:7725] CHIP:DMG:                                 
+          [1683882354.197753][7723:7725] CHIP:DMG:
           [1683882354.197757][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.197762][7723:7725] CHIP:DMG:                         {
           [1683882354.197767][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.197771][7723:7725] CHIP:DMG:                         },
-          [1683882354.197776][7723:7725] CHIP:DMG:                         
+          [1683882354.197776][7723:7725] CHIP:DMG:
           [1683882354.197779][7723:7725] CHIP:DMG:                 },
-          [1683882354.197789][7723:7725] CHIP:DMG:                 
+          [1683882354.197789][7723:7725] CHIP:DMG:
           [1683882354.197792][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.197797][7723:7725] CHIP:DMG:                 {
           [1683882354.197800][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -280,14 +280,14 @@ tests:
           [1683882354.197819][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.197824][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.197828][7723:7725] CHIP:DMG:                         }
-          [1683882354.197835][7723:7725] CHIP:DMG:                                 
+          [1683882354.197835][7723:7725] CHIP:DMG:
           [1683882354.197839][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.197843][7723:7725] CHIP:DMG:                         {
           [1683882354.197848][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.197852][7723:7725] CHIP:DMG:                         },
-          [1683882354.197857][7723:7725] CHIP:DMG:                         
+          [1683882354.197857][7723:7725] CHIP:DMG:
           [1683882354.197861][7723:7725] CHIP:DMG:                 },
-          [1683882354.197870][7723:7725] CHIP:DMG:                 
+          [1683882354.197870][7723:7725] CHIP:DMG:
           [1683882354.197874][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.197878][7723:7725] CHIP:DMG:                 {
           [1683882354.197882][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -297,14 +297,14 @@ tests:
           [1683882354.197900][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.197905][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.197909][7723:7725] CHIP:DMG:                         }
-          [1683882354.197917][7723:7725] CHIP:DMG:                                 
+          [1683882354.197917][7723:7725] CHIP:DMG:
           [1683882354.197921][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.197925][7723:7725] CHIP:DMG:                         {
           [1683882354.197930][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.197934][7723:7725] CHIP:DMG:                         },
-          [1683882354.197939][7723:7725] CHIP:DMG:                         
+          [1683882354.197939][7723:7725] CHIP:DMG:
           [1683882354.197943][7723:7725] CHIP:DMG:                 },
-          [1683882354.197952][7723:7725] CHIP:DMG:                 
+          [1683882354.197952][7723:7725] CHIP:DMG:
           [1683882354.197956][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.197960][7723:7725] CHIP:DMG:                 {
           [1683882354.197963][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -314,14 +314,14 @@ tests:
           [1683882354.197981][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.197984][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.197989][7723:7725] CHIP:DMG:                         }
-          [1683882354.197995][7723:7725] CHIP:DMG:                                 
+          [1683882354.197995][7723:7725] CHIP:DMG:
           [1683882354.197998][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.198002][7723:7725] CHIP:DMG:                         {
           [1683882354.198007][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.198011][7723:7725] CHIP:DMG:                         },
-          [1683882354.198015][7723:7725] CHIP:DMG:                         
+          [1683882354.198015][7723:7725] CHIP:DMG:
           [1683882354.198019][7723:7725] CHIP:DMG:                 },
-          [1683882354.198028][7723:7725] CHIP:DMG:                 
+          [1683882354.198028][7723:7725] CHIP:DMG:
           [1683882354.198032][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.198036][7723:7725] CHIP:DMG:                 {
           [1683882354.198040][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -331,14 +331,14 @@ tests:
           [1683882354.198058][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.198063][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.198067][7723:7725] CHIP:DMG:                         }
-          [1683882354.198073][7723:7725] CHIP:DMG:                                 
+          [1683882354.198073][7723:7725] CHIP:DMG:
           [1683882354.198077][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.198081][7723:7725] CHIP:DMG:                         {
           [1683882354.198086][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.198090][7723:7725] CHIP:DMG:                         },
-          [1683882354.198094][7723:7725] CHIP:DMG:                         
+          [1683882354.198094][7723:7725] CHIP:DMG:
           [1683882354.198098][7723:7725] CHIP:DMG:                 },
-          [1683882354.198107][7723:7725] CHIP:DMG:                 
+          [1683882354.198107][7723:7725] CHIP:DMG:
           [1683882354.198111][7723:7725] CHIP:DMG:                 AttributeStatusIB =
           [1683882354.198115][7723:7725] CHIP:DMG:                 {
           [1683882354.198119][7723:7725] CHIP:DMG:                         AttributePathIB =
@@ -348,16 +348,16 @@ tests:
           [1683882354.198137][7723:7725] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1683882354.198142][7723:7725] CHIP:DMG:                                 ListIndex = Null,
           [1683882354.198146][7723:7725] CHIP:DMG:                         }
-          [1683882354.198152][7723:7725] CHIP:DMG:                                 
+          [1683882354.198152][7723:7725] CHIP:DMG:
           [1683882354.198156][7723:7725] CHIP:DMG:                         StatusIB =
           [1683882354.198160][7723:7725] CHIP:DMG:                         {
           [1683882354.198165][7723:7725] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1683882354.198169][7723:7725] CHIP:DMG:                         },
-          [1683882354.198174][7723:7725] CHIP:DMG:                         
+          [1683882354.198174][7723:7725] CHIP:DMG:
           [1683882354.198178][7723:7725] CHIP:DMG:                 },
-          [1683882354.198184][7723:7725] CHIP:DMG:                 
+          [1683882354.198184][7723:7725] CHIP:DMG:
           [1683882354.198187][7723:7725] CHIP:DMG:         ],
-          [1683882354.198223][7723:7725] CHIP:DMG:         
+          [1683882354.198223][7723:7725] CHIP:DMG:
           [1683882354.198227][7723:7725] CHIP:DMG:         InteractionModelRevision = 1
           [1683882354.198230][7723:7725] CHIP:DMG: }
 
@@ -379,14 +379,14 @@ tests:
           [1674551849.075950][20994:20996] CHIP:DMG:                                 Cluster = 0x3f,
           [1674551849.075953][20994:20996] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1674551849.075956][20994:20996] CHIP:DMG:                         }
-          [1674551849.075961][20994:20996] CHIP:DMG:                                 
+          [1674551849.075961][20994:20996] CHIP:DMG:
           [1674551849.075964][20994:20996] CHIP:DMG:                         StatusIB =
           [1674551849.075967][20994:20996] CHIP:DMG:                         {
           [1674551849.075971][20994:20996] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1674551849.075974][20994:20996] CHIP:DMG:                         },
-          [1674551849.075977][20994:20996] CHIP:DMG:                         
+          [1674551849.075977][20994:20996] CHIP:DMG:
           [1674551849.075980][20994:20996] CHIP:DMG:                 },
-          [1674551849.075986][20994:20996] CHIP:DMG:                 
+          [1674551849.075986][20994:20996] CHIP:DMG:
           [1674551849.075989][20994:20996] CHIP:DMG:                 AttributeStatusIB =
           [1674551849.075991][20994:20996] CHIP:DMG:                 {
           [1674551849.075994][20994:20996] CHIP:DMG:                         AttributePathIB =
@@ -396,14 +396,14 @@ tests:
           [1674551849.076006][20994:20996] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1674551849.076010][20994:20996] CHIP:DMG:                                 ListIndex = Null,
           [1674551849.076012][20994:20996] CHIP:DMG:                         }
-          [1674551849.076017][20994:20996] CHIP:DMG:                                 
+          [1674551849.076017][20994:20996] CHIP:DMG:
           [1674551849.076020][20994:20996] CHIP:DMG:                         StatusIB =
           [1674551849.076022][20994:20996] CHIP:DMG:                         {
           [1674551849.076025][20994:20996] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1674551849.076028][20994:20996] CHIP:DMG:                         },
-          [1674551849.076031][20994:20996] CHIP:DMG:                         
+          [1674551849.076031][20994:20996] CHIP:DMG:
           [1674551849.076034][20994:20996] CHIP:DMG:                 },
-          [1674551849.076040][20994:20996] CHIP:DMG:                 
+          [1674551849.076040][20994:20996] CHIP:DMG:
           [1674551849.076043][20994:20996] CHIP:DMG:                 AttributeStatusIB =
           [1674551849.076046][20994:20996] CHIP:DMG:                 {
           [1674551849.076048][20994:20996] CHIP:DMG:                         AttributePathIB =
@@ -413,16 +413,16 @@ tests:
           [1674551849.076060][20994:20996] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1674551849.076063][20994:20996] CHIP:DMG:                                 ListIndex = Null,
           [1674551849.076066][20994:20996] CHIP:DMG:                         }
-          [1674551849.076071][20994:20996] CHIP:DMG:                                 
+          [1674551849.076071][20994:20996] CHIP:DMG:
           [1674551849.076074][20994:20996] CHIP:DMG:                         StatusIB =
           [1674551849.076076][20994:20996] CHIP:DMG:                         {
           [1674551849.076080][20994:20996] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1674551849.076082][20994:20996] CHIP:DMG:                         },
-          [1674551849.076085][20994:20996] CHIP:DMG:                         
+          [1674551849.076085][20994:20996] CHIP:DMG:
           [1674551849.076088][20994:20996] CHIP:DMG:                 },
-          [1674551849.076092][20994:20996] CHIP:DMG:                 
+          [1674551849.076092][20994:20996] CHIP:DMG:
           [1674551849.076094][20994:20996] CHIP:DMG:         ],
-          [1674551849.076102][20994:20996] CHIP:DMG:         
+          [1674551849.076102][20994:20996] CHIP:DMG:
           [1674551849.076105][20994:20996] CHIP:DMG:         InteractionModelRevision = 1
           [1674551849.076108][20994:20996] CHIP:DMG: }
       disabled: true
@@ -714,7 +714,7 @@ tests:
 
           ./chip-tool groups  add-group-if-identifying 0x000a gp10 1 0
 
-          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:        
+          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1683882426.604685][7756:7758] CHIP:DMG:                                 StatusIB =
           [1683882426.604688][7756:7758] CHIP:DMG:                                 {
@@ -723,17 +723,17 @@ tests:
 
           ./chip-tool groups  add-group-if-identifying 0x000b gp11 1 0
 
-          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:        
+          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1683882432.529527][7760:7762] CHIP:DMG:                                 StatusIB =
           [1683882432.529532][7760:7762] CHIP:DMG:                                 {
           [1683882432.529535][7760:7762] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1683882432.529538][7760:7762] CHIP:DMG:                                 },
-          [1683882432.529543][7760:7762] CHIP:DMG:                                 
+          [1683882432.529543][7760:7762] CHIP:DMG:
 
           ./chip-tool groups  add-group-if-identifying 0x000c gp12 1 0
 
-          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:        
+          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1683882437.464914][7763:7765] CHIP:DMG:                                 StatusIB =
           [1683882437.464927][7763:7765] CHIP:DMG:                                 {
@@ -742,7 +742,7 @@ tests:
 
           ./chip-tool groups  add-group-if-identifying 0x000d gp13 1 0
 
-          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:        
+          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1683882442.334908][7766:7768] CHIP:DMG:                                 StatusIB =
           [1683882442.334911][7766:7768] CHIP:DMG:                                 {
@@ -751,9 +751,9 @@ tests:
 
           ./chip-tool groups  add-group-if-identifying 0x000e gp14 1 0
 
-          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:        
+          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
-          1683882448.814358][7769:7771] CHIP:DMG:                                 
+          1683882448.814358][7769:7771] CHIP:DMG:
           [1683882448.814361][7769:7771] CHIP:DMG:                                 StatusIB =
           [1683882448.814367][7769:7771] CHIP:DMG:                                 {
           [1683882448.814371][7769:7771] CHIP:DMG:                                         status = 0x00 (SUCCESS),
@@ -761,9 +761,9 @@ tests:
 
           ./chip-tool groups  add-group-if-identifying 0x000e gp15 1 0
 
-          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:        
+          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
-          [1683882454.216005][7772:7774] CHIP:DMG:                                 
+          [1683882454.216005][7772:7774] CHIP:DMG:
           [1683882454.216016][7772:7774] CHIP:DMG:                                 StatusIB =
           [1683882454.216029][7772:7774] CHIP:DMG:                                 {
           [1683882454.216045][7772:7774] CHIP:DMG:                                         status = 0x00 (SUCCESS),
@@ -771,27 +771,27 @@ tests:
 
           ./chip-tool groups  add-group-if-identifying 0x000f gp15 1 0
 
-          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:        
+          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1683882460.656727][7775:7777] CHIP:DMG:                                 StatusIB =
           [1683882460.656730][7775:7777] CHIP:DMG:                                 {
           [1683882460.656733][7775:7777] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1683882460.656737][7775:7777] CHIP:DMG:                                 },
-          [1683882460.656740][7775:7777] CHIP:DMG:                                 
+          [1683882460.656740][7775:7777] CHIP:DMG:
 
           ./chip-tool groups  add-group-if-identifying 0x0010 gp16 1 0
 
-          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:        
+          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1683882470.921771][7779:7781] CHIP:DMG:                                 StatusIB =
           [1683882470.921775][7779:7781] CHIP:DMG:                                 {
           [1683882470.921779][7779:7781] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1683882470.921783][7779:7781] CHIP:DMG:                                 },
-          [1683882470.921787][7779:7781] CHIP:DMG:                                 
+          [1683882470.921787][7779:7781] CHIP:DMG:
 
           ./chip-tool groups  add-group-if-identifying 0x0011 gp17 1 0
 
-          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:        
+          Verify the "status is SUCCESS" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
 
           [1683882478.955105][7783:7785] CHIP:DMG:                                 StatusIB =
           [1683882478.955124][7783:7785] CHIP:DMG:                                 {

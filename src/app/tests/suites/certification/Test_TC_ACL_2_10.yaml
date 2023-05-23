@@ -260,14 +260,14 @@ tests:
           [1658329868.113788][4587:4592] CHIP:DMG:                                 Cluster = 0x1f,
           [1658329868.113833][4587:4592] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1658329868.113868][4587:4592] CHIP:DMG:                         }
-          [1658329868.113914][4587:4592] CHIP:DMG:                                 
+          [1658329868.113914][4587:4592] CHIP:DMG:
           [1658329868.113951][4587:4592] CHIP:DMG:                         StatusIB =
           [1658329868.113984][4587:4592] CHIP:DMG:                         {
           [1658329868.114028][4587:4592] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1658329868.114091][4587:4592] CHIP:DMG:                         },
-          [1658329868.114124][4587:4592] CHIP:DMG:                         
+          [1658329868.114124][4587:4592] CHIP:DMG:
           [1658329868.114160][4587:4592] CHIP:DMG:                 },
-          [1658329868.114197][4587:4592] CHIP:DMG:                 
+          [1658329868.114197][4587:4592] CHIP:DMG:
           [1658329868.114229][4587:4592] CHIP:DMG:                 AttributeStatusIB =
           [1658329868.114266][4587:4592] CHIP:DMG:                 {
           [1658329868.114294][4587:4592] CHIP:DMG:                         AttributePathIB =
@@ -277,14 +277,14 @@ tests:
           [1658329868.114458][4587:4592] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1658329868.114491][4587:4592] CHIP:DMG:                                 ListIndex = Null,
           [1658329868.114529][4587:4592] CHIP:DMG:                         }
-          [1658329868.114563][4587:4592] CHIP:DMG:                                 
+          [1658329868.114563][4587:4592] CHIP:DMG:
           [1658329868.114604][4587:4592] CHIP:DMG:                         StatusIB =
           [1658329868.114645][4587:4592] CHIP:DMG:                         {
           [1658329868.114677][4587:4592] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1658329868.114716][4587:4592] CHIP:DMG:                         },
-          [1658329868.114747][4587:4592] CHIP:DMG:                         
+          [1658329868.114747][4587:4592] CHIP:DMG:
           [1658329868.114782][4587:4592] CHIP:DMG:                 },
-          [1658329868.114826][4587:4592] CHIP:DMG:                 
+          [1658329868.114826][4587:4592] CHIP:DMG:
           [1658329868.114850][4587:4592] CHIP:DMG:                 AttributeStatusIB =
           [1658329868.114884][4587:4592] CHIP:DMG:                 {
           [1658329868.114910][4587:4592] CHIP:DMG:                         AttributePathIB =
@@ -294,16 +294,16 @@ tests:
           [1658329868.115067][4587:4592] CHIP:DMG:                                 Attribute = 0x0000_0000,
           [1658329868.115102][4587:4592] CHIP:DMG:                                 ListIndex = Null,
           [1658329868.115145][4587:4592] CHIP:DMG:                         }
-          [1658329868.115188][4587:4592] CHIP:DMG:                                 
+          [1658329868.115188][4587:4592] CHIP:DMG:
           [1658329868.115222][4587:4592] CHIP:DMG:                         StatusIB =
           [1658329868.115260][4587:4592] CHIP:DMG:                         {
           [1658329868.115291][4587:4592] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1658329868.115333][4587:4592] CHIP:DMG:                         },
-          [1658329868.115371][4587:4592] CHIP:DMG:                         
+          [1658329868.115371][4587:4592] CHIP:DMG:
           [1658329868.115398][4587:4592] CHIP:DMG:                 },
-          [1658329868.115438][4587:4592] CHIP:DMG:                 
+          [1658329868.115438][4587:4592] CHIP:DMG:
           [1658329868.115463][4587:4592] CHIP:DMG:         ],
-          [1658329868.115507][4587:4592] CHIP:DMG:         
+          [1658329868.115507][4587:4592] CHIP:DMG:
           [1658329868.115531][4587:4592] CHIP:DMG:         InteractionModelRevision = 1
           [1658329868.115565][4587:4592] CHIP:DMG: }
           [1658329868.115702][4587:4592] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -362,14 +362,14 @@ tests:
           [1658819083.843201][8349:8354] CHIP:DMG:                                 Cluster = 0x1f,
           [1658819083.843242][8349:8354] CHIP:DMG:                                 Attribute = 0x0000_0001,
           [1658819083.843277][8349:8354] CHIP:DMG:                         }
-          [1658819083.843319][8349:8354] CHIP:DMG:                                 
+          [1658819083.843319][8349:8354] CHIP:DMG:
           [1658819083.843355][8349:8354] CHIP:DMG:                         StatusIB =
           [1658819083.843393][8349:8354] CHIP:DMG:                         {
           [1658819083.843431][8349:8354] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1658819083.843466][8349:8354] CHIP:DMG:                         },
-          [1658819083.843504][8349:8354] CHIP:DMG:                         
+          [1658819083.843504][8349:8354] CHIP:DMG:
           [1658819083.843534][8349:8354] CHIP:DMG:                 },
-          [1658819083.843575][8349:8354] CHIP:DMG:                 
+          [1658819083.843575][8349:8354] CHIP:DMG:
           [1658819083.843604][8349:8354] CHIP:DMG:                 AttributeStatusIB =
           [1658819083.843636][8349:8354] CHIP:DMG:                 {
           [1658819083.843666][8349:8354] CHIP:DMG:                         AttributePathIB =
@@ -379,16 +379,16 @@ tests:
           [1658819083.843814][8349:8354] CHIP:DMG:                                 Attribute = 0x0000_0001,
           [1658819083.843853][8349:8354] CHIP:DMG:                                 ListIndex = Null,
           [1658819083.843888][8349:8354] CHIP:DMG:                         }
-          [1658819083.843926][8349:8354] CHIP:DMG:                                 
+          [1658819083.843926][8349:8354] CHIP:DMG:
           [1658819083.843962][8349:8354] CHIP:DMG:                         StatusIB =
           [1658819083.843996][8349:8354] CHIP:DMG:                         {
           [1658819083.844030][8349:8354] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1658819083.844065][8349:8354] CHIP:DMG:                         },
-          [1658819083.844103][8349:8354] CHIP:DMG:                         
+          [1658819083.844103][8349:8354] CHIP:DMG:
           [1658819083.844133][8349:8354] CHIP:DMG:                 },
-          [1658819083.844168][8349:8354] CHIP:DMG:                 
+          [1658819083.844168][8349:8354] CHIP:DMG:
           [1658819083.844194][8349:8354] CHIP:DMG:         ],
-          [1658819083.844230][8349:8354] CHIP:DMG:         
+          [1658819083.844230][8349:8354] CHIP:DMG:
           [1658819083.844256][8349:8354] CHIP:DMG:         InteractionModelRevision = 1
           [1658819083.844282][8349:8354] CHIP:DMG: }
           [1658819083.844389][8349:8354] CHIP:DMG: WriteClient moving to [AwaitingDe]
@@ -551,7 +551,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
-          On TH2(Chiptool) , Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1 
+          On TH2(Chiptool) , Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
 
           [1657289746.737641][19293:19298] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 1884338152
           [1657289746.737713][19293:19298] CHIP:TOO:   Extension: 1 entries
@@ -599,7 +599,7 @@ tests:
 
           On TH1(Chiptool), Verify successfully removed fabric F2 with statusCode as 0(Success)
 
-          [1661404505.702969][18706:18711] CHIP:DMG:         
+          [1661404505.702969][18706:18711] CHIP:DMG:
           [1661404505.702979][18706:18711] CHIP:DMG:         InteractionModelRevision = 1
           [1661404505.702987][18706:18711] CHIP:DMG: },
           [1661404505.703020][18706:18711] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008

@@ -183,7 +183,7 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList.Commission DUT to TH again"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool pumpconfigurationandcontrol read attribute-list  1 1
 
@@ -255,10 +255,10 @@ tests:
           [1651148412.274126][2336:2336] CHIP:DMG:                         Cluster = 0x200,
           [1651148412.274156][2336:2336] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1651148412.274186][2336:2336] CHIP:DMG:                 }
-          [1651148412.274216][2336:2336] CHIP:DMG:                         
+          [1651148412.274216][2336:2336] CHIP:DMG:
           [1651148412.274242][2336:2336] CHIP:DMG:         ],
-          [1651148412.274271][2336:2336] CHIP:DMG:                 
-          [1651148412.274298][2336:2336] CHIP:DMG:         isFabricFiltered = true, 
+          [1651148412.274271][2336:2336] CHIP:DMG:
+          [1651148412.274298][2336:2336] CHIP:DMG:         isFabricFiltered = true,
           [1651148412.274325][2336:2336] CHIP:DMG:         InteractionModelRevision = 1
           [1651148412.274349][2336:2336] CHIP:DMG: },
           [1651148412.274424][2336:2336] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -278,10 +278,10 @@ tests:
           [1651148440.471609][2336:2336] CHIP:DMG:                         Cluster = 0x200,
           [1651148440.471642][2336:2336] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1651148440.471681][2336:2336] CHIP:DMG:                 }
-          [1651148440.471719][2336:2336] CHIP:DMG:                         
+          [1651148440.471719][2336:2336] CHIP:DMG:
           [1651148440.471745][2336:2336] CHIP:DMG:         ],
-          [1651148440.471770][2336:2336] CHIP:DMG:                 
-          [1651148440.471806][2336:2336] CHIP:DMG:         isFabricFiltered = true, 
+          [1651148440.471770][2336:2336] CHIP:DMG:
+          [1651148440.471806][2336:2336] CHIP:DMG:         isFabricFiltered = true,
           [1651148440.471831][2336:2336] CHIP:DMG:         InteractionModelRevision = 1
           [1651148440.471867][2336:2336] CHIP:DMG: },
           [1651148440.471947][2336:2336] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -302,10 +302,10 @@ tests:
           [1651148472.519328][2336:2336] CHIP:DMG:                         Cluster = 0x200,
           [1651148472.519364][2336:2336] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1651148472.519400][2336:2336] CHIP:DMG:                 }
-          [1651148472.519459][2336:2336] CHIP:DMG:                         
+          [1651148472.519459][2336:2336] CHIP:DMG:
           [1651148472.519521][2336:2336] CHIP:DMG:         ],
-          [1651148472.519555][2336:2336] CHIP:DMG:                 
-          [1651148472.519584][2336:2336] CHIP:DMG:         isFabricFiltered = true, 
+          [1651148472.519555][2336:2336] CHIP:DMG:
+          [1651148472.519584][2336:2336] CHIP:DMG:         isFabricFiltered = true,
           [1651148472.519666][2336:2336] CHIP:DMG:         InteractionModelRevision = 1
           [1651148472.519695][2336:2336] CHIP:DMG: },
           [1651148472.519802][2336:2336] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -327,10 +327,10 @@ tests:
           [1651570515.207265][9246:9246] CHIP:DMG:                         Cluster = 0x200,
           [1651570515.207322][9246:9246] CHIP:DMG:                         Attribute = 0x0000_0011,
           [1651570515.207381][9246:9246] CHIP:DMG:                 }
-          [1651570515.207436][9246:9246] CHIP:DMG:                         
+          [1651570515.207436][9246:9246] CHIP:DMG:
           [1651570515.207483][9246:9246] CHIP:DMG:         ],
-          [1651570515.207535][9246:9246] CHIP:DMG:                 
-          [1651570515.207587][9246:9246] CHIP:DMG:         isFabricFiltered = true, 
+          [1651570515.207535][9246:9246] CHIP:DMG:
+          [1651570515.207587][9246:9246] CHIP:DMG:         isFabricFiltered = true,
           [1651570515.207634][9246:9246] CHIP:DMG:         InteractionModelRevision = 1
           [1651570515.207677][9246:9246] CHIP:DMG: }
 
@@ -349,9 +349,9 @@ tests:
           [1651570975.559465][9246:9246] CHIP:DMG:                         Cluster = 0x200,
           [1651570975.559602][9246:9246] CHIP:DMG:                         Attribute = 0x0000_0012,
           [1651570975.559626][9246:9246] CHIP:DMG:                 }
-          [1651570975.559655][9246:9246] CHIP:DMG:                         
+          [1651570975.559655][9246:9246] CHIP:DMG:
           [1651570975.559681][9246:9246] CHIP:DMG:         ],
-          [1651570975.559710][9246:9246] CHIP:DMG:            
+          [1651570975.559710][9246:9246] CHIP:DMG:
 
           ./chip-tool pumpconfigurationandcontrol read capacity  1 1
 
@@ -368,9 +368,9 @@ tests:
           [1651571009.295493][9246:9246] CHIP:DMG:                         Cluster = 0x200,
           [1651571009.295548][9246:9246] CHIP:DMG:                         Attribute = 0x0000_0013,
           [1651571009.295597][9246:9246] CHIP:DMG:                 }
-          [1651571009.295649][9246:9246] CHIP:DMG:                         
+          [1651571009.295649][9246:9246] CHIP:DMG:
           [1651571009.295696][9246:9246] CHIP:DMG:         ],
-          [1651571009.295747][9246:9246] CHIP:DMG:           
+          [1651571009.295747][9246:9246] CHIP:DMG:
 
           ./chip-tool pumpconfigurationandcontrol read  operation-mode 1 1
 
@@ -387,7 +387,7 @@ tests:
           [1651571334.617404][9337:9337] CHIP:DMG:                         Cluster = 0x200,
           [1651571334.617433][9337:9337] CHIP:DMG:                         Attribute = 0x0000_0020,
           [1651571334.617467][9337:9337] CHIP:DMG:                 }
-          [1651571334.617499][9337:9337] CHIP:DMG:                         
+          [1651571334.617499][9337:9337] CHIP:DMG:
           [1651571334.617537][9337:9337] CHIP:DMG:         ],
           [1651571334.617567][9337:9337] CHIP:DMG:    "
       cluster: "LogCommands"
@@ -404,7 +404,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
           ./chip-tool pumpconfigurationandcontrol read min-const-pressure 1 1
@@ -472,7 +472,7 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
           ./chip-tool pumpconfigurationandcontrol write control-mode 0 1 1

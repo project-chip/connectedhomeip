@@ -222,7 +222,7 @@ tests:
 
           Verify "OperationalStatus " on the TH(Chip-tool) Log: is currently not zero and is in closing mode
 
-          CHIP:DMG:                                         Data = 42, 
+          CHIP:DMG:                                         Data = 42,
           CHIP:DMG: }
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_000ADataVersion: 324132078
           CHIP:TOO:   OperationalStatus: 42

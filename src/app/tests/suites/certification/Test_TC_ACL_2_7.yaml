@@ -230,14 +230,14 @@ tests:
            [1657894672.480427][2433:2438] CHIP:DMG:                                 Cluster = 0x1f,
            [1657894672.480476][2433:2438] CHIP:DMG:                                 Attribute = 0x0000_0001,
            [1657894672.480521][2433:2438] CHIP:DMG:                         }
-           [1657894672.480570][2433:2438] CHIP:DMG:                                 
+           [1657894672.480570][2433:2438] CHIP:DMG:
            [1657894672.480612][2433:2438] CHIP:DMG:                         StatusIB =
            [1657894672.480657][2433:2438] CHIP:DMG:                         {
            [1657894672.480700][2433:2438] CHIP:DMG:                                 status = 0x00 (SUCCESS),
            [1657894672.480745][2433:2438] CHIP:DMG:                         },
-           [1657894672.480789][2433:2438] CHIP:DMG:                         
+           [1657894672.480789][2433:2438] CHIP:DMG:
            [1657894672.480826][2433:2438] CHIP:DMG:                 },
-           [1657894672.480877][2433:2438] CHIP:DMG:                 
+           [1657894672.480877][2433:2438] CHIP:DMG:
            [1657894672.480911][2433:2438] CHIP:DMG:                 AttributeStatusIB =
            [1657894672.480949][2433:2438] CHIP:DMG:                 {
            [1657894672.480986][2433:2438] CHIP:DMG:                         AttributePathIB =
@@ -247,16 +247,16 @@ tests:
            [1657894672.481168][2433:2438] CHIP:DMG:                                 Attribute = 0x0000_0001,
            [1657894672.481214][2433:2438] CHIP:DMG:                                 ListIndex = Null,
            [1657894672.481258][2433:2438] CHIP:DMG:                         }
-           [1657894672.481306][2433:2438] CHIP:DMG:                                 
+           [1657894672.481306][2433:2438] CHIP:DMG:
            [1657894672.481347][2433:2438] CHIP:DMG:                         StatusIB =
            [1657894672.481390][2433:2438] CHIP:DMG:                         {
            [1657894672.481433][2433:2438] CHIP:DMG:                                 status = 0x00 (SUCCESS),
            [1657894672.481482][2433:2438] CHIP:DMG:                         },
-           [1657894672.481526][2433:2438] CHIP:DMG:                         
+           [1657894672.481526][2433:2438] CHIP:DMG:
            [1657894672.481562][2433:2438] CHIP:DMG:                 },
-           [1657894672.481605][2433:2438] CHIP:DMG:                 
+           [1657894672.481605][2433:2438] CHIP:DMG:
            [1657894672.481639][2433:2438] CHIP:DMG:         ],
-           [1657894672.481686][2433:2438] CHIP:DMG:         
+           [1657894672.481686][2433:2438] CHIP:DMG:
            [1657894672.481720][2433:2438] CHIP:DMG:         InteractionModelRevision = 1
            [1657894672.481754][2433:2438] CHIP:DMG: }
       cluster: "LogCommands"
@@ -288,7 +288,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 2 0 --commissioner-name beta --commissioner-nodeid 223344
 
-          On TH2(Chiptool), Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1 
+          On TH2(Chiptool), Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
           [1658327214.683199][2749:2754] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 2953114587
           [1658327214.683283][2749:2754] CHIP:TOO:   Extension: 1 entries
           [1658327214.683348][2749:2754] CHIP:TOO:     [1]: {
