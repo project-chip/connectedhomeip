@@ -11,7 +11,7 @@
             "tags": ["version:2@v2023.05.22-nightly.1"]
         },
         {
-            "_comment": "Always get the arm64 version on mac until usable arm64 zap build is available",
+            "_comment": "Always get the amd64 version on mac until usable arm64 zap build is available",
             "path": "fuchsia/third_party/zap/mac-amd64",
             "platforms": [
                 "mac-arm64"
