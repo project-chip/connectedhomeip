@@ -1330,10 +1330,10 @@ std::pair<WiFiBand, uint16_t> GetBandAndChannelFromFrequency(uint32_t freq)
     if (freq <= 931)
     {
         ret.first = WiFiBand::k1g;
-        if (freq >= 916) 
+        if (freq >= 916)
         {
             ret.second = ((freq - 916) * 2) - 1;
-        } 
+        }
         else if (freq >= 902)
         {
             ret.second = (freq - 902) * 2;
@@ -1341,7 +1341,7 @@ std::pair<WiFiBand, uint16_t> GetBandAndChannelFromFrequency(uint32_t freq)
         else if (freq >= 863)
         {
             ret.second = (freq - 863) * 2;
-        } 
+        }
         else
         {
             ret.second = 1;
