@@ -36,7 +36,7 @@
 #endif
 #include "spidrv.h"
 
-#include "btl_interface.h"
+#include "silabs_utils.h"
 
 #include "gpiointerrupt.h"
 #include "sl_device_init_clocks.h"
@@ -47,7 +47,7 @@
 #include "event_groups.h"
 #include "task.h"
 
-#include "silabs_utils.h"
+#include "btl_interface.h"
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
