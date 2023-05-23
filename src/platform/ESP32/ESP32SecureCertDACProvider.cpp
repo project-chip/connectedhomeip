@@ -159,6 +159,7 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
     }
     else // This flow is for devices which do not support ECDSA peripheral
     {
+#if !CONFIG_USE_ESP32_ECDSA_PERIPHERAL
         Crypto::P256Keypair keypair;
         char * sc_keypair       = NULL;
         uint32_t sc_keypair_len = 0;
@@ -178,6 +179,9 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
         VerifyOrReturnError(chipError == CHIP_NO_ERROR, chipError, esp_secure_cert_free_priv_key(sc_keypair));
 
         esp_secure_cert_free_priv_key(sc_keypair);
+#else
+        return CHIP_ERROR_INCORRECT_STATE;
+#endif // !CONFIG_USE_ESP32_ECDSA_PERIPHERAL
     }
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
 }
