@@ -122,6 +122,7 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
     Status status                 = Status::Success;
     EmberAfStatus emberAfStatus   = EMBER_ZCL_STATUS_SUCCESS;
 
+
     if (TemperatureControlHasFeature(endpoint, Feature::kTemperatureNumber) &&
         TemperatureControlHasFeature(endpoint, Feature::kTemperatureLevel))
     {
