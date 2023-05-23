@@ -701,7 +701,7 @@ menu "CHIP Device Layer"
                 information from the esp_secure_cert partition
 
         config USE_ESP32_ECDSA_PERIPHERAL
-            bool
+            bool "Use ESP32 ECDSA Peripheral"
             depends on SEC_CERT_DAC_PROVIDER && SOC_ECDSA_SUPPORTED
             default y
             select MBEDTLS_HARDWARE_ECDSA_SIGN

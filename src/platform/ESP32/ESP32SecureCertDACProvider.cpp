@@ -135,7 +135,7 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
     // This flow is for devices supporting ECDSA peripheral
     if (keyType == ESP_SECURE_CERT_ECDSA_PERIPHERAL_KEY)
     {
-#if CONFIG_SOC_ECDSA_SUPPORTED
+#if CONFIG_USE_ESP32_ECDSA_PERIPHERAL
         Crypto::ESP32P256Keypair keypair;
         uint8_t efuseBlockId;
 
@@ -155,7 +155,7 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
             ESP_LOGE(TAG, "Failed to sign with device attestation key, err:%" CHIP_ERROR_FORMAT, chipError.Format()));
 #else
         return CHIP_ERROR_INCORRECT_STATE;
-#endif // CONFIG_SOC_ECDSA_SUPPORTED
+#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
     }
     else // This flow is for devices which do not support ECDSA peripheral
     {
