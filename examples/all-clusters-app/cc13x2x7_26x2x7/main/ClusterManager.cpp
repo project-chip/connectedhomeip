@@ -45,7 +45,7 @@ void OnIdentifyTriggerEffect(Identify * identify)
 {
     switch (identify->mCurrentEffectIdentifier)
     {
-    case Clusters::Identify::Clusters::Identify::EffectIdentifierEnum::kBlink:
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
         PLAT_LOG("Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:

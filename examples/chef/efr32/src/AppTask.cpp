@@ -86,7 +86,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
 
     switch (sIdentifyEffect)
     {
-    case Clusters::Identify::Clusters::Identify::EffectIdentifierEnum::kBlink:
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
         (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,

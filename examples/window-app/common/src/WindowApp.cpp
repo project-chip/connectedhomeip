@@ -50,7 +50,7 @@ void OnTriggerEffect(Identify * identify)
 
     switch (sIdentifyEffect)
     {
-    case Clusters::Identify::Clusters::Identify::EffectIdentifierEnum::kBlink:
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
         WindowApp::Instance().PostEvent(WindowApp::EventId::WinkOn);

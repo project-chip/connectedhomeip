@@ -117,7 +117,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
 
     switch (sIdentifyEffect)
     {
-    case Clusters::Identify::Clusters::Identify::EffectIdentifierEnum::kBlink:
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
         SystemLayer().ScheduleLambda([identify] {
