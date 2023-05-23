@@ -11,9 +11,9 @@ RUN set -x \
 
 # Install Sysconfig
 RUN set -x \
-    && wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.13.0.2553/sysconfig-1.13.0_2553-setup.run \
-    && chmod +x sysconfig-1.13.0_2553-setup.run \
-    && ./sysconfig-1.13.0_2553-setup.run --mode unattended \
+    && wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.15.0.2826/sysconfig-1.15.0_2826-setup.run \
+    && chmod +x sysconfig-1.15.0_2826-setup.run \
+    && ./sysconfig-1.15.0_2826-setup.run --mode unattended \
     && : # last line
 
-ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.13.0
+ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.15.0
