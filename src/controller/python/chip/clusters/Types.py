@@ -17,6 +17,7 @@
 
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class Nullable():
     def __repr__(self):
@@ -36,5 +37,6 @@ class Nullable():
 
     def __hash__(self):
         return 0
+
 
 NullValue = Nullable()
