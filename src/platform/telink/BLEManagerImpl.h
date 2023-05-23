@@ -26,8 +26,8 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <platform/Zephyr/BLEAdvertisingArbiter.h>
 #include <platform/NetworkCommissioning.h>
+#include <platform/Zephyr/BLEAdvertisingArbiter.h>
 
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/conn.h>
@@ -133,7 +133,7 @@ private:
     CHIP_ERROR HandleThreadStateChange(const ChipDeviceEvent * event);
     CHIP_ERROR HandleOperationalNetworkEnabled(const ChipDeviceEvent * event);
 
-    InternalScanCallback *mInternalScanCallback;
+    InternalScanCallback * mInternalScanCallback;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     CHIP_ERROR PrepareC3CharData(void);
@@ -174,14 +174,13 @@ public:
     CHIP_ERROR StartAdvertisingProcess(void);
 };
 
-class InternalScanCallback: public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
+class InternalScanCallback : public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
 {
 public:
-    explicit InternalScanCallback(BLEManagerImpl * aBLEManagerImpl)
+    explicit InternalScanCallback(BLEManagerImpl * aBLEManagerImpl) { mBLEManagerImpl = aBLEManagerImpl; }
+    void OnFinished(NetworkCommissioning::Status err, CharSpan debugText,
+                    NetworkCommissioning::ThreadScanResponseIterator * networks)
     {
-        mBLEManagerImpl = aBLEManagerImpl;
-    }
-    void OnFinished(NetworkCommissioning::Status err, CharSpan debugText, NetworkCommissioning::ThreadScanResponseIterator * networks) {
         mBLEManagerImpl->StartAdvertisingProcess();
     };
 

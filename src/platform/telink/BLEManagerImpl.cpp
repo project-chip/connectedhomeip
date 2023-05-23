@@ -147,8 +147,8 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init(void)
 {
-    mBLERadioInitialized = false;
-    mconId               = NULL;
+    mBLERadioInitialized  = false;
+    mconId                = NULL;
     mInternalScanCallback = new InternalScanCallback(this);
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
