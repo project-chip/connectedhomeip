@@ -57,7 +57,7 @@ namespace {
 
 LEDWidget sLightLED;
 
-EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+EmberAfIdentifyEffectIdentifier sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 /**********************************************************
  * Identify Callbacks
@@ -67,7 +67,7 @@ namespace {
 void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
     ChipLogProgress(Zcl, "Trigger Identify Complete");
-    sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+    sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
     AppTask::GetAppTask().StopStatusLEDTimer();
@@ -79,7 +79,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
 {
     sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
-    if (identify->mCurrentEffectIdentifier == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE)
+    if (identify->mCurrentEffectIdentifier == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
     {
         ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
                         identify->mEffectVariant);
@@ -92,20 +92,20 @@ void OnTriggerIdentifyEffect(Identify * identify)
 
     switch (sIdentifyEffect)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+    case Clusters::Identify::Clusters::Identify::EffectIdentifierEnum::kBlink:
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
         (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
                                                            identify);
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
         (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
         (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
                                                            identify);
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
         (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+        sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
         break;
     default:
         ChipLogProgress(Zcl, "No identifier effect");
@@ -116,7 +116,7 @@ Identify gIdentify = {
     chip::EndpointId{ 1 },
     AppTask::GetAppTask().OnIdentifyStart,
     AppTask::GetAppTask().OnIdentifyStop,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnTriggerIdentifyEffect,
 };
 

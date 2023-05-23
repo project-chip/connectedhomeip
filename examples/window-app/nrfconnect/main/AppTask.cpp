@@ -62,7 +62,7 @@ uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] =
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 Identify sIdentify = { WindowCovering::Endpoint(), AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
-                       EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED };
+                       Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator };
 
 LEDWidget sStatusLED;
 LEDWidget sIdentifyLED;
