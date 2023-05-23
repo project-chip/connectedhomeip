@@ -23,9 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
     - label: "DUT issues an Off command to the TH"
       PICS: OO.C.C00.Tx

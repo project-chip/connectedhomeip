@@ -24,9 +24,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
     - label: "PreCondition: Set TH OnOff to On"
       cluster: "On/Off"

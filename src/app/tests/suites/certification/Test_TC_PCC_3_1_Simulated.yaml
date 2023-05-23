@@ -27,9 +27,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
     #Read Mandatory attributes
     - label: "Read attribute MaxPressure"

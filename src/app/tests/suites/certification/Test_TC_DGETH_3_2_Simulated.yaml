@@ -23,9 +23,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
     - label: "DUT sends ResetCounts to TH"
       PICS: DGETH.C.C00.Tx

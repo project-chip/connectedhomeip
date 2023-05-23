@@ -25,9 +25,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
     - label:
           "If (PA_LF & LF) DUT sends GoToLiftPercentage command with 50% to DUT"
