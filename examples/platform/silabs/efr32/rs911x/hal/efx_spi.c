@@ -173,6 +173,17 @@ void rsi_hal_board_init(void)
 }
 
 #if defined(EFR32MG24)
+
+void SPIDRV_ReInit(uint32_t baudrate)
+{
+    if (EUSART_BaudrateGet(MY_USART) == baudrate)
+    {
+        // EUSART synced to baudrate already
+        return;
+    }
+    EUSART_BaudrateSet(MY_USART, 0, baudrate);
+}
+
 sl_status_t sl_wfx_host_spi_cs_assert()
 {
     // SILABS_LOG("%s started.", __func__);
@@ -182,12 +193,7 @@ sl_status_t sl_wfx_host_spi_cs_assert()
         SILABS_LOG("%s errored.", __func__);
         return SL_STATUS_TIMEOUT;
     }
-    // if (spi_enabled)
-    // {
-    //     SPIDRV_DeInit(SL_SPIDRV_HANDLE);
-    //     SILABS_LOG("%s did deinit.", __func__);
-    //     spi_enabled = false;
-    // }
+
     if (!spi_enabled) // Reduce SPIDRV_Init
     {
         SPIDRV_Init(SL_SPIDRV_HANDLE, &sl_spidrv_eusart_init_exp);
