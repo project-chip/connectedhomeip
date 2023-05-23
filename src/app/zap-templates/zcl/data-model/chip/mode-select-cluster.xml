@@ -17,14 +17,14 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="ChangeToModeResponseStatus" type="ENUM8">
+  <enum name="StatusCode" type="ENUM8">
     <cluster code="0x0050"/>
     <item value="0x0" name="Success"/>
     <item value="0x1" name="UnsupportedMode"/>
     <item value="0x2" name="GenericFailure"/>
   </enum>
 
-  <enum name="SemanticTags" type="ENUM16">
+  <enum name="ModeTag" type="ENUM16">
     <cluster code="0x0050"/>
     <item value="0x0" name="Auto"/>
     <item value="0x1" name="Quick"/>
@@ -38,7 +38,7 @@ limitations under the License.
     <item value="0x9" name="Day"/>
   </enum>
 
-  <struct name="SemanticTagStruct">
+  <struct name="ModeTagStruct">
     <cluster code="0x0050"/>
     <cluster code="0x0051"/>
     <cluster code="0x0052"/>
@@ -58,7 +58,7 @@ limitations under the License.
     <cluster code="0x0059"/>
     <item name="Label" type="CHAR_STRING" optional="false" length="64"/>
     <item name="Mode" type="INT8U" optional="false"/>
-    <item name="SemanticTags" type="SemanticTagStruct" array="true" optional="false"/>
+    <item name="ModeTags" type="ModeTagStruct" array="true" optional="false"/>
   </struct>
 
   <cluster>

@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="ChangeToModeResponseStatus" type="ENUM8">
+  <enum name="StatusCode" type="ENUM8">
     <cluster code="0x0054"/>
     <item value="0x41" name="Stuck"/>
     <item value="0x42" name="DustBinMissing"/>
@@ -29,7 +29,7 @@ limitations under the License.
     <item value="0x48" name="BatteryLow"/>
   </enum>
 
-  <enum name="SemanticTags" type="ENUM16">
+  <enum name="ModeTag" type="ENUM16">
     <cluster code="0x0054"/>
     <item value="0x4000" name="Idle"/>
     <item value="0x4001" name="Cleaning"/>
