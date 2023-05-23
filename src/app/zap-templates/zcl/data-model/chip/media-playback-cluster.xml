@@ -114,7 +114,7 @@ limitations under the License.
     <item name="SeekOutOfRange"         value="0x05"/>
   </enum>
 
-  <bitmap name="MediaPlaybackFeature" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0506"/>
     <field name="AdvancedSeek" mask="0x1"/>
     <field name="VariableSpeed" mask="0x2"/>

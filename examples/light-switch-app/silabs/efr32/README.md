@@ -162,7 +162,7 @@ arguments
 -   On the command line:
 
           $ cd ~/connectedhomeip/examples/light-switch-app/silabs/efr32
-          $ python3 out/debug/chip-efr32-light-switch-example.flash.py
+          $ python3 out/debug/matter-silabs-light-switch-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 

@@ -6826,11 +6826,11 @@ tests:
 
     - label:
           "Use TH/bridge-app to change the simulated temperature level of the
-          simulated temperature sensors (use key '<tbd>' in the console to
+          simulated temperature sensors (use key 't' in the console to
           bridge-app)"
       PICS: MCORE.DEVLIST.UseDeviceState
       verification: |
-          Press a key 'tbd' on bridge-app to change the simulated temperature
+          Press a key 't' on bridge-app to change the simulated temperature
 
 
           ./chip-tool temperaturemeasurement read measured-value 1 4

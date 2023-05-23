@@ -109,11 +109,11 @@ jobs:
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
              efr32 BRD4187C lighting-app \
-             out/efr32-brd4187c-light-rpc/chip-efr32-lighting-example.out \
+             out/efr32-brd4187c-light-rpc/matter-silabs-lighting-example.out \
              /tmp/bloat_reports/
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py  \
              efr32 BRD4187C window-app \
-             out/efr32-brd4187c-window-covering-additional_data_advertising/chip-efr32-window-example.out \
+             out/efr32-brd4187c-window-covering-additional_data_advertising/matter-silabs-window-example.out \
              /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
@@ -122,7 +122,7 @@ jobs:
         run: |
           scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/lock_app_wifi_wf200 BRD4161A is_debug=false chip_logging=false --wifi wf200 --docker
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+wf200 lock-app \
-            out/lock_app_wifi_wf200/BRD4161A/chip-efr32-lock-example.out /tmp/bloat_reports/
+            out/lock_app_wifi_wf200/BRD4161A/matter-silabs-lock-example.out /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
       - name: Build example EFR32+RS9116 WiFi Lighting app for BRD4161A
@@ -130,7 +130,7 @@ jobs:
         run: |
           scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_wifi_rs9116 BRD4161A --wifi rs9116 --docker
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rs9116 lighting-app \
-            out/lighting_app_wifi_rs9116/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
+            out/lighting_app_wifi_rs9116/BRD4161A/matter-silabs-lighting-example.out /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
       - name: Uploading Size Reports

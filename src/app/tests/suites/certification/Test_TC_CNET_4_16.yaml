@@ -66,13 +66,17 @@ tests:
 
           Verify "NetworkConfigResponse and its arguments" on the TH(Chip-tool) Log:
 
-          [1650392982.606392][10188:10193] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
-          [1650392982.606501][10188:10193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
-          [1650392982.606653][10188:10193] CHIP:TOO:   ConnectNetworkResponse: {
-          [1650392982.606753][10188:10193] CHIP:TOO:     networkingStatus: 3
-          [1650392982.606815][10188:10193] CHIP:TOO:     errorValue: 0
-          [1650392982.606872][10188:10193] CHIP:TOO:    }
-          [1650392982.606960][10188:10193] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1683268296.896031][12131:12134] CHIP:DMG:         InteractionModelRevision = 1
+          [1683268296.896239][12131:12134] CHIP:DMG: },
+          [1683268296.896474][12131:12134] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1683268296.897219][12131:12134] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1683268296.897526][12131:12134] CHIP:TOO:   NetworkConfigResponse: {
+          [1683268296.897745][12131:12134] CHIP:TOO:     networkingStatus: 3
+          [1683268296.898546][12131:12134] CHIP:TOO:    }
+          [1683268296.898769][12131:12134] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1683268296.901995][12131:12134] CHIP:EM: <<< [E:60271i S:53927 M:99281930 (Ack:250739545)] (S) Msg TX to 1:0000000000000036 [345E] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1683268296.903001][12131:12134] CHIP:IN: (S) Sending msg 99281930 on secure session with LSID: 53927
+          [1683268296.905843][12131:12134] CHIP:EM: Flushed pending ack for MessageCounter:250739545 on exchange 60271i
       disabled: true
 
     - label:

@@ -213,6 +213,7 @@ __CHIP_SIZED_TYPES__ = {
     "status": BasicInteger(idl_name="status", byte_count=2, is_signed=False),
     "systime_us": BasicInteger(idl_name="systime_us", byte_count=8, is_signed=False),
     "systime_ms": BasicInteger(idl_name="systime_ms", byte_count=8, is_signed=False),
+    "temperature": BasicInteger(idl_name="temperature", byte_count=2, is_signed=True),
     "tod": BasicInteger(idl_name="tod", byte_count=4, is_signed=False),
     "trans_id": BasicInteger(idl_name="trans_id", byte_count=4, is_signed=False),
     "vendor_id": BasicInteger(idl_name="vendor_id", byte_count=2, is_signed=False),
@@ -343,6 +344,10 @@ class TypeLookupContext:
         """
         return any(map(lambda s: s.name == name, self.all_structs))
 
+    def is_untyped_bitmap_type(self, name: str):
+        """Determine if the given type is a untyped bitmap (just an interger size)."""
+        return name.lower() in {"bitmap8", "bitmap16", "bitmap24", "bitmap32", "bitmap64"}
+
     def is_bitmap_type(self, name: str):
         """
         Determine if the given type name is type that is known to be a bitmap.
@@ -350,7 +355,7 @@ class TypeLookupContext:
         Handles both standard/zcl names (like bitmap32) and types defined within
         the current lookup context.
         """
-        if name.lower() in ["bitmap8", "bitmap16", "bitmap24", "bitmap32", "bitmap64"]:
+        if self.is_untyped_bitmap_type(name):
             return True
 
         return any(map(lambda s: s.name == name, self.all_bitmaps))

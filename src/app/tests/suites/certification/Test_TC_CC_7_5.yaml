@@ -122,7 +122,7 @@ tests:
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
 
-          After 20s, Verify response contains a EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
+          After 20s, Verify response contains  EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1666943789.581293][50952:50952] CHIP:DMG: {
           [1666943789.581297][50952:50952] CHIP:DMG:         AttributeReportIBs =
@@ -196,7 +196,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          After 10 Seconds, Verify response contains a EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
+          After 10 Seconds, Verify response contains  EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
            ReportDataMessage =
           [1666947043.201089][52174:52174] CHIP:DMG: {
           [1666947043.201091][52174:52174] CHIP:DMG:         AttributeReportIBs =
@@ -270,7 +270,7 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          After 20 Seconds, Verify response contains a EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
+          After 20 Seconds, Verify response contains  EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1666947270.561812][52174:52174] CHIP:DMG: {
           [1666947270.561820][52174:52174] CHIP:DMG:         AttributeReportIBs =
@@ -345,7 +345,7 @@ tests:
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
 
-          After 20 Seconds, Verify response contains a EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
+          After 20 Seconds, Verify response contains  EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1666947536.315693][52174:52174] CHIP:DMG: {
           [1666947536.315696][52174:52174] CHIP:DMG:         AttributeReportIBs =
@@ -448,7 +448,7 @@ tests:
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
 
-          Verify response contains a EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
+          Verify response contains EnhancedCurrentHue value in  TH(all-clusters-app)  Logs:
           ReportDataMessage =
           [1666947687.412287][52174:52174] CHIP:DMG: {
           [1666947687.412291][52174:52174] CHIP:DMG:         AttributeReportIBs =

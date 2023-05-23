@@ -15,6 +15,7 @@
 from .clusters.commissioner_commands import CommissionerCommands
 from .clusters.delay_commands import DelayCommands
 from .clusters.discovery_commands import DiscoveryCommands
+from .clusters.equality_commands import EqualityCommands
 from .clusters.log_commands import LogCommands
 from .clusters.system_commands import SystemCommands
 from .pseudo_cluster import PseudoCluster
@@ -51,6 +52,7 @@ def get_default_pseudo_clusters() -> PseudoClusters:
         CommissionerCommands(),
         DelayCommands(),
         DiscoveryCommands(),
+        EqualityCommands(),
         LogCommands(),
         SystemCommands()
     ]

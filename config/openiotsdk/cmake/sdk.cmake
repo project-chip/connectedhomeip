@@ -194,11 +194,11 @@ if(TARGET mcu-driver-hal)
             DOMAIN_NS=$<IF:$<BOOL:${TFM_SUPPORT}>,1,0>
     )
 
-    # Fixing the optimization issue for mcu-driver-hal target in the no-debug build.
-    # The default -Og optimization causes performance issues for the application.
+    # Fixing the optimization issue for mcu-driver-hal target in the release build.
+    # The default -Os optimization causes performance issues for the application.
     # We need to replace it with -O2 which is suitable for performance.
     # This fix can be removed in the future when the issue will be fixed in SDK directly.
-    if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
         target_compile_options(mcu-driver-hal INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-O2>)
         target_compile_options(mcu-driver-hal INTERFACE $<$<COMPILE_LANGUAGE:C>:-O2>)
     endif()

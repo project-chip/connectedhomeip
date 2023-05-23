@@ -467,7 +467,7 @@ tests:
 
            ./chip-tool any read-event-by-id 0x28 0 1 0
 
-          verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
+          verify DUT is responds with UNSUPPORTED_ACCESS  for the data sent in the above command
 
           [1653054249.514825][12265:12270] CHIP:DMG: ReportDataMessage =
           [1653054249.514833][12265:12270] CHIP:DMG: {
@@ -511,7 +511,7 @@ tests:
       verification: |
           To Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]" 1 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
           ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
           On TH(chip-tool) verify DUT sends Report Data Message with no entry for that event in EventReports list.
 

@@ -345,6 +345,8 @@ public class ClusterWriteMapping {
     writeBinaryInputBasicInteractionInfo.put(
         "writeReliabilityAttribute", writeBinaryInputBasicReliabilityAttributeInteractionInfo);
     writeAttributeMap.put("binaryInputBasic", writeBinaryInputBasicInteractionInfo);
+    Map<String, InteractionInfo> writePulseWidthModulationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("pulseWidthModulation", writePulseWidthModulationInteractionInfo);
     Map<String, InteractionInfo> writeDescriptorInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("descriptor", writeDescriptorInteractionInfo);
     Map<String, InteractionInfo> writeBindingInteractionInfo = new LinkedHashMap<>();
@@ -553,6 +555,8 @@ public class ClusterWriteMapping {
         new LinkedHashMap<>();
     writeAttributeMap.put(
         "ethernetNetworkDiagnostics", writeEthernetNetworkDiagnosticsInteractionInfo);
+    Map<String, InteractionInfo> writeTimeSynchronizationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("timeSynchronization", writeTimeSynchronizationInteractionInfo);
     Map<String, InteractionInfo> writeBridgedDeviceBasicInformationInteractionInfo =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeBridgedDeviceBasicInformationNodeLabelCommandParams =
@@ -589,8 +593,16 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("fixedLabel", writeFixedLabelInteractionInfo);
     Map<String, InteractionInfo> writeUserLabelInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("userLabel", writeUserLabelInteractionInfo);
+    Map<String, InteractionInfo> writeProxyConfigurationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("proxyConfiguration", writeProxyConfigurationInteractionInfo);
+    Map<String, InteractionInfo> writeProxyDiscoveryInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("proxyDiscovery", writeProxyDiscoveryInteractionInfo);
+    Map<String, InteractionInfo> writeProxyValidInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("proxyValid", writeProxyValidInteractionInfo);
     Map<String, InteractionInfo> writeBooleanStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("booleanState", writeBooleanStateInteractionInfo);
+    Map<String, InteractionInfo> writeIcdManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("icdManagement", writeIcdManagementInteractionInfo);
     Map<String, InteractionInfo> writeModeSelectInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeModeSelectStartUpModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -625,6 +637,80 @@ public class ClusterWriteMapping {
     writeModeSelectInteractionInfo.put(
         "writeOnModeAttribute", writeModeSelectOnModeAttributeInteractionInfo);
     writeAttributeMap.put("modeSelect", writeModeSelectInteractionInfo);
+    Map<String, InteractionInfo> writeTemperatureControlInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("temperatureControl", writeTemperatureControlInteractionInfo);
+    Map<String, InteractionInfo> writeRefrigeratorAlarmInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeRefrigeratorAlarmMaskCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo refrigeratorAlarmmaskCommandParameterInfo =
+        new CommandParameterInfo("value", Long.class, Long.class);
+    writeRefrigeratorAlarmMaskCommandParams.put("value", refrigeratorAlarmmaskCommandParameterInfo);
+    InteractionInfo writeRefrigeratorAlarmMaskAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.RefrigeratorAlarmCluster) cluster)
+                  .writeMaskAttribute(
+                      (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeRefrigeratorAlarmMaskCommandParams);
+    writeRefrigeratorAlarmInteractionInfo.put(
+        "writeMaskAttribute", writeRefrigeratorAlarmMaskAttributeInteractionInfo);
+    writeAttributeMap.put("refrigeratorAlarm", writeRefrigeratorAlarmInteractionInfo);
+    Map<String, InteractionInfo> writeAirQualityInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("airQuality", writeAirQualityInteractionInfo);
+    Map<String, InteractionInfo> writeSmokeCoAlarmInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeSmokeCoAlarmSensitivityLevelCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo smokeCoAlarmsensitivityLevelCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeSmokeCoAlarmSensitivityLevelCommandParams.put(
+        "value", smokeCoAlarmsensitivityLevelCommandParameterInfo);
+    InteractionInfo writeSmokeCoAlarmSensitivityLevelAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SmokeCoAlarmCluster) cluster)
+                  .writeSensitivityLevelAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeSmokeCoAlarmSensitivityLevelCommandParams);
+    writeSmokeCoAlarmInteractionInfo.put(
+        "writeSensitivityLevelAttribute",
+        writeSmokeCoAlarmSensitivityLevelAttributeInteractionInfo);
+    writeAttributeMap.put("smokeCoAlarm", writeSmokeCoAlarmInteractionInfo);
+    Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("hepaFilterMonitoring", writeHepaFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeActivatedCarbonFilterMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "activatedCarbonFilterMonitoring", writeActivatedCarbonFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeCeramicFilterMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("ceramicFilterMonitoring", writeCeramicFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeElectrostaticFilterMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put(
+        "electrostaticFilterMonitoring", writeElectrostaticFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeUvFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("uvFilterMonitoring", writeUvFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeIonizingFilterMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("ionizingFilterMonitoring", writeIonizingFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeZeoliteFilterMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("zeoliteFilterMonitoring", writeZeoliteFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeOzoneFilterMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("ozoneFilterMonitoring", writeOzoneFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeWaterTankMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("waterTankMonitoring", writeWaterTankMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeFuelTankMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("fuelTankMonitoring", writeFuelTankMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeInkCartridgeMonitoringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("inkCartridgeMonitoring", writeInkCartridgeMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeTonerCartridgeMonitoringInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("tonerCartridgeMonitoring", writeTonerCartridgeMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -3842,6 +3928,8 @@ public class ClusterWriteMapping {
     writeUnitTestingInteractionInfo.put(
         "writeWriteOnlyInt8uAttribute", writeUnitTestingWriteOnlyInt8uAttributeInteractionInfo);
     writeAttributeMap.put("unitTesting", writeUnitTestingInteractionInfo);
+    Map<String, InteractionInfo> writeFaultInjectionInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("faultInjection", writeFaultInjectionInteractionInfo);
     return writeAttributeMap;
   }
 }

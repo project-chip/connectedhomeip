@@ -39,7 +39,7 @@ public:
 
     void HandleChangeChannel(CommandResponseHelper<ChangeChannelResponseType> & helper, const CharSpan & match) override;
     bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) override;
-    bool HandleSkipChannel(const uint16_t & count) override;
+    bool HandleSkipChannel(const int16_t & count) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 

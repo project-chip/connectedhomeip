@@ -153,10 +153,10 @@ template("chip_data_model") {
     sources += [
       "${_app_root}/clusters/barrier-control-server/barrier-control-server.h",
       "${_app_root}/clusters/basic-information/basic-information.h",
-      "${_app_root}/clusters/client-monitoring-server/client-monitoring-server.h",
       "${_app_root}/clusters/color-control-server/color-control-server.h",
       "${_app_root}/clusters/door-lock-server/door-lock-server.h",
       "${_app_root}/clusters/groups-server/groups-server.h",
+      "${_app_root}/clusters/icd-management-server/icd-management-server.h",
       "${_app_root}/clusters/identify-server/identify-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",

@@ -1012,7 +1012,7 @@ tests:
       verification: |
           During commissioning, Verify that UpdateNOC Command is received in TH (all-clusters-app)
 
-          [1655968444.113753][21387:21392] CHIP:CTL: Performing next commissioning step "SendNOC"
+          [1655968444.113753][21387:21392] CHIP:CTL: Performing next commissioning step 'SendNOC'
           [1655968444.113880][21387:21392] CHIP:DMG: ICR moving to [AddingComm]
           [1655968444.113960][21387:21392] CHIP:DMG: ICR moving to [AddedComma]
           [1655968444.114671][21387:21392] CHIP:IN: Prepared secure message 0xffff9afdc988 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 11677i with MessageCounter:162800417.
@@ -1140,7 +1140,7 @@ tests:
           [1655968444.503901][21387:21392] CHIP:CTL: Operational credentials provisioned on device 0xffff88000b60
           [1655968444.503972][21387:21392] CHIP:TOO: Secure Pairing Success
           [1655968444.504021][21387:21392] CHIP:TOO: CASE establishment successful
-          [1655968444.504076][21387:21392] CHIP:CTL: Successfully finished commissioning step "SendNOC"
+          [1655968444.504076][21387:21392] CHIP:CTL: Successfully finished commissioning step 'SendNOC'
       disabled: true
 
     - label: "DUT sends UpdateFabricLabel to TH"
@@ -1566,28 +1566,28 @@ tests:
           [1666945062.193989][5129:5129] CHIP:EM: Handling via exchange: 55862r, Delegate: 0xaaaac10e0288
           [1666945062.194151][5129:5129] CHIP:DMG: InvokeRequestMessage =
           [1666945062.194246][5129:5129] CHIP:DMG: {
-          [1666945062.194305][5129:5129] CHIP:DMG: 	suppressResponse = false,
-          [1666945062.194372][5129:5129] CHIP:DMG: 	timedRequest = false,
-          [1666945062.194457][5129:5129] CHIP:DMG: 	InvokeRequests =
-          [1666945062.194535][5129:5129] CHIP:DMG: 	[
-          [1666945062.194624][5129:5129] CHIP:DMG: 		CommandDataIB =
-          [1666945062.194710][5129:5129] CHIP:DMG: 		{
-          [1666945062.194968][5129:5129] CHIP:DMG: 			CommandPathIB =
-          [1666945062.195074][5129:5129] CHIP:DMG: 			{
-          [1666945062.195165][5129:5129] CHIP:DMG: 				EndpointId = 0x0,
-          [1666945062.195257][5129:5129] CHIP:DMG: 				ClusterId = 0x3e,
-          [1666945062.195365][5129:5129] CHIP:DMG: 				CommandId = 0xa,
-          [1666945062.195446][5129:5129] CHIP:DMG: 			},
+          [1666945062.194305][5129:5129] CHIP:DMG:         suppressResponse = false,
+          [1666945062.194372][5129:5129] CHIP:DMG:         timedRequest = false,
+          [1666945062.194457][5129:5129] CHIP:DMG:         InvokeRequests =
+          [1666945062.194535][5129:5129] CHIP:DMG:         [
+          [1666945062.194624][5129:5129] CHIP:DMG:                 CommandDataIB =
+          [1666945062.194710][5129:5129] CHIP:DMG:                 {
+          [1666945062.194968][5129:5129] CHIP:DMG:                         CommandPathIB =
+          [1666945062.195074][5129:5129] CHIP:DMG:                         {
+          [1666945062.195165][5129:5129] CHIP:DMG:                                 EndpointId = 0x0,
+          [1666945062.195257][5129:5129] CHIP:DMG:                                 ClusterId = 0x3e,
+          [1666945062.195365][5129:5129] CHIP:DMG:                                 CommandId = 0xa,
+          [1666945062.195446][5129:5129] CHIP:DMG:                         },
           [1666945062.195550][5129:5129] CHIP:DMG:
-          [1666945062.195623][5129:5129] CHIP:DMG: 			CommandFields =
-          [1666945062.195726][5129:5129] CHIP:DMG: 			{
-          [1666945062.195794][5129:5129] CHIP:DMG: 				0x0 = 1,
-          [1666945062.195861][5129:5129] CHIP:DMG: 			},
-          [1666945062.195955][5129:5129] CHIP:DMG: 		},
+          [1666945062.195623][5129:5129] CHIP:DMG:                         CommandFields =
+          [1666945062.195726][5129:5129] CHIP:DMG:                         {
+          [1666945062.195794][5129:5129] CHIP:DMG:                                 0x0 = 1,
+          [1666945062.195861][5129:5129] CHIP:DMG:                         },
+          [1666945062.195955][5129:5129] CHIP:DMG:                 },
           [1666945062.196040][5129:5129] CHIP:DMG:
-          [1666945062.196123][5129:5129] CHIP:DMG: 	],
+          [1666945062.196123][5129:5129] CHIP:DMG:         ],
           [1666945062.196201][5129:5129] CHIP:DMG:
-          [1666945062.196284][5129:5129] CHIP:DMG: 	InteractionModelRevision = 1
+          [1666945062.196284][5129:5129] CHIP:DMG:         InteractionModelRevision = 1
           [1666945062.196346][5129:5129] CHIP:DMG: },
           [1666945062.196517][5129:5129] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003E e=0 p=a
           [1666945062.196599][5129:5129] CHIP:DMG: AccessControl: allowed
@@ -1723,19 +1723,19 @@ tests:
           [1666945062.315868][5129:5129] CHIP:DMG: Command handler moving to [AddedComma]
           [1666945062.315939][5129:5129] CHIP:IN: Expiring all sessions for fabric 0x1!!
           [1666945062.315996][5129:5129] CHIP:IN: SecureSession[0xaaaaf53b08f0]: MarkForEviction Type:2 LSID:49150
-          [1666945062.316053][5129:5129] CHIP:SC: SecureSession[0xaaaaf53b08f0]: Moving from state "kActive" --> "kPendingEviction"
+          [1666945062.316053][5129:5129] CHIP:SC: SecureSession[0xaaaaf53b08f0]: Moving from state 'kActive' --> 'kPendingEviction'
           [1666945062.316111][5129:5129] CHIP:IN: SecureSession[0xaaaaf53b08f0]: Released - Type:2 LSID:49150
           [1666945062.316211][5129:5129] CHIP:IN: SecureSession[0xaaaaf53d2ec0]: MarkForEviction Type:2 LSID:49151
-          [1666945062.316268][5129:5129] CHIP:SC: SecureSession[0xaaaaf53d2ec0]: Moving from state "kActive" --> "kPendingEviction"
+          [1666945062.316268][5129:5129] CHIP:SC: SecureSession[0xaaaaf53d2ec0]: Moving from state 'kActive' --> 'kPendingEviction'
           [1666945062.316324][5129:5129] CHIP:IN: SecureSession[0xaaaaf53d2ec0]: Released - Type:2 LSID:49151
           [1666945062.316406][5129:5129] CHIP:IN: SecureSession[0xaaaaf52e6e10]: MarkForEviction Type:2 LSID:49152
-          [1666945062.316464][5129:5129] CHIP:SC: SecureSession[0xaaaaf52e6e10]: Moving from state "kActive" --> "kPendingEviction"
+          [1666945062.316464][5129:5129] CHIP:SC: SecureSession[0xaaaaf52e6e10]: Moving from state 'kActive' --> 'kPendingEviction'
           [1666945062.316517][5129:5129] CHIP:IN: SecureSession[0xaaaaf52e6e10]: Released - Type:2 LSID:49152
           [1666945062.316574][5129:5129] CHIP:IN: SecureSession[0xaaaaf53cf6f0]: MarkForEviction Type:2 LSID:49153
-          [1666945062.316651][5129:5129] CHIP:SC: SecureSession[0xaaaaf53cf6f0]: Moving from state "kActive" --> "kPendingEviction"
+          [1666945062.316651][5129:5129] CHIP:SC: SecureSession[0xaaaaf53cf6f0]: Moving from state 'kActive' --> 'kPendingEviction'
           [1666945062.316705][5129:5129] CHIP:IN: SecureSession[0xaaaaf53cf6f0]: Released - Type:2 LSID:49153
           [1666945062.316761][5129:5129] CHIP:IN: SecureSession[0xaaaaf53d33c0]: MarkForEviction Type:2 LSID:49154
-          [1666945062.316834][5129:5129] CHIP:SC: SecureSession[0xaaaaf53d33c0]: Moving from state "kActive" --> "kPendingEviction"
+          [1666945062.316834][5129:5129] CHIP:SC: SecureSession[0xaaaaf53d33c0]: Moving from state 'kActive' --> 'kPendingEviction'
           [1666945062.316961][5129:5129] CHIP:DMG: Decreasing reference count for CommandHandler, remaining 0
           [1666945062.317650][5129:5129] CHIP:EM: <<< [E:55862r M:7155928 (Ack:103508994)] (S) Msg TX to 1:000000000001B669 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1666945062.317757][5129:5129] CHIP:IN: (S) Sending msg 7155928 on secure session with LSID: 49154
@@ -1757,28 +1757,28 @@ tests:
           [1666945062.319916][5129:5129] CHIP:DMG:
           [1666945062.320107][5129:5129] CHIP:DMG: InvokeResponseMessage =
           [1666945062.320172][5129:5129] CHIP:DMG: {
-          [1666945062.320254][5129:5129] CHIP:DMG: 	suppressResponse = false,
-          [1666945062.320318][5129:5129] CHIP:DMG: 	InvokeResponseIBs =
-          [1666945062.320394][5129:5129] CHIP:DMG: 	[
-          [1666945062.320456][5129:5129] CHIP:DMG: 		InvokeResponseIB =
-          [1666945062.320569][5129:5129] CHIP:DMG: 		{
-          [1666945062.320643][5129:5129] CHIP:DMG: 			CommandDataIB =
-          [1666945062.320754][5129:5129] CHIP:DMG: 			{
-          [1666945062.320841][5129:5129] CHIP:DMG: 				CommandPathIB =
-          [1666945062.320948][5129:5129] CHIP:DMG: 				{
-          [1666945062.321043][5129:5129] CHIP:DMG: 					EndpointId = 0x0,
-          [1666945062.321157][5129:5129] CHIP:DMG: 					ClusterId = 0x3e,
-          [1666945062.321257][5129:5129] CHIP:DMG: 					CommandId = 0x8,
-          [1666945062.321367][5129:5129] CHIP:DMG: 				},
+          [1666945062.320254][5129:5129] CHIP:DMG:         suppressResponse = false,
+          [1666945062.320318][5129:5129] CHIP:DMG:         InvokeResponseIBs =
+          [1666945062.320394][5129:5129] CHIP:DMG:         [
+          [1666945062.320456][5129:5129] CHIP:DMG:                 InvokeResponseIB =
+          [1666945062.320569][5129:5129] CHIP:DMG:                 {
+          [1666945062.320643][5129:5129] CHIP:DMG:                         CommandDataIB =
+          [1666945062.320754][5129:5129] CHIP:DMG:                         {
+          [1666945062.320841][5129:5129] CHIP:DMG:                                 CommandPathIB =
+          [1666945062.320948][5129:5129] CHIP:DMG:                                 {
+          [1666945062.321043][5129:5129] CHIP:DMG:                                         EndpointId = 0x0,
+          [1666945062.321157][5129:5129] CHIP:DMG:                                         ClusterId = 0x3e,
+          [1666945062.321257][5129:5129] CHIP:DMG:                                         CommandId = 0x8,
+          [1666945062.321367][5129:5129] CHIP:DMG:                                 },
           [1666945062.321465][5129:5129] CHIP:DMG:
-          [1666945062.321574][5129:5129] CHIP:DMG: 				CommandFields =
-          [1666945062.321659][5129:5129] CHIP:DMG: 				{
-          [1666945062.321777][5129:5129] CHIP:DMG: 					0x0 = 0,
-          [1666945062.321890][5129:5129] CHIP:DMG: 					0x1 = 1,
-          [1666945062.321981][5129:5129] CHIP:DMG: 				},
-          [1666945062.322084][5129:5129] CHIP:DMG: 			},
+          [1666945062.321574][5129:5129] CHIP:DMG:                                 CommandFields =
+          [1666945062.321659][5129:5129] CHIP:DMG:                                 {
+          [1666945062.321777][5129:5129] CHIP:DMG:                                         0x0 = 0,
+          [1666945062.321890][5129:5129] CHIP:DMG:                                         0x1 = 1,
+          [1666945062.321981][5129:5129] CHIP:DMG:                                 },
+          [1666945062.322084][5129:5129] CHIP:DMG:                         },
           [1666945062.322180][5129:5129] CHIP:DMG:
-          [1666945062.322276][5129:5129] CHIP:DMG: 		},
+          [1666945062.322276][5129:5129] CHIP:DMG:                 },
           [1666945062.322360][5129:5129] CHIP:DMG:
-          [1666945062.322448][5129:5129] CHIP:DMG: 	],
+          [1666945062.322448][5129:5129] CHIP:DMG:         ],
       disabled: true

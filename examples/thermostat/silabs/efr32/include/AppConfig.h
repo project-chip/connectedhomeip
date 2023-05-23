@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "silabs_utils.h"
+
 // ---- Lighting Example App Config ----
 
 #define APP_TASK_NAME "Lit"
@@ -58,21 +60,3 @@
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,    \
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 #define OFF_DEMO_BITMAP ON_DEMO_BITMAP
-
-// EFR Logging
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void silabsInitLog(void);
-
-void efr32Log(const char * aFormat, ...);
-#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
-void appError(int err);
-
-#ifdef __cplusplus
-}
-
-#include <lib/core/CHIPError.h>
-void appError(CHIP_ERROR error);
-#endif
