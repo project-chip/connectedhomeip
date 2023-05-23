@@ -220,7 +220,8 @@ bool emberAfIdentifyClusterTriggerEffectCallback(
     Identify * identify                      = inst(endpoint);
     uint16_t identifyTime                    = 0;
 
-    // ChipLogProgress(Zcl, "RX identify:trigger effect 0x%X variant 0x%X", effectIdentifier, effectVariant);
+    ChipLogProgress(Zcl, "RX identify:trigger effect identifier 0x%X variant 0x%X", (uint8_t) effectIdentifier,
+                    (uint8_t) effectVariant);
 
     if (identify == nullptr)
     {
