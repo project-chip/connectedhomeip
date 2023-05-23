@@ -35,7 +35,7 @@ tests:
       verification: |
           To generate the Attestation Nonce give below command
 
-          echo hex:$(hexdump -vn32 -e'4/4 "%08X"' /dev/urandom)
+          echo hex:$(hexdump -vn32 -e'4/4 "%08X" ' /dev/urandom)
 
           The generated Attestation Nonce is hex:97B823C0207728BEC509CFE4D413C95AA693140D1F5D60215913ABB1F220E631
       disabled: true
@@ -303,7 +303,7 @@ tests:
           AttestationResponse Command received by TH1 from DUT"
       verification: |
           To get attestation nonce give below command
-           echo hex:$(hexdump -vn32 -e'4/4 "%08X"' /dev/urandom)
+           echo hex:$(hexdump -vn32 -e'4/4 "%08X" ' /dev/urandom)
 
 
           ./chip-tool operationalcredentials attestation-request hex:3577CA6EFFFC560E287604663AE5BE2F11D1B1CF99BE326AF5B3B114A2E91395 1 0 --trace_decode 1
@@ -729,7 +729,7 @@ tests:
           ,security level = 0 ,security_information = 0 ,version_number is an
           integer in range 0..65535 ,certification_type has a value between 1..2"
       verification: |
-          Verify Verify for the following contents of CD (certificate declaration) in TH (chip-tool) log:
+          Verify for the following contents of CD (certificate declaration) in TH (chip-tool) log:
           format_version = 1,
           vendor_id matches the basic_info_vendor_id,
           product_id_array matches the basic_info_product_id saved earlier,
@@ -739,6 +739,8 @@ tests:
           security_information = 0,
           version_number should be in range 0..65535,
           certification_type should be  between 1..2
+
+          As per Spec, certification_type value for test_app_all-clusters-app)  can be 0 but in real devices the value should be between 1..2
 
           Verify if the VID PID info in here matches with the steps above
 
@@ -1092,7 +1094,7 @@ tests:
           verified with the well-known Certification Declaration public key used
           to originally sign the Certification Declaration"
       verification: |
-          Out of scope for V1.0,
+          Out of scope
       disabled: true
 
     - label:
@@ -1127,14 +1129,14 @@ tests:
           secure session over which the AttestationResponse was obtained, using
           the subject public key found in the DAC."
       verification: |
-          Out of scope for V1.0, which requires a specific decode tool in chip-cert tool to decode the signature & construct a new message.
+          Out of scope, which requires a specific decode tool in chip-cert tool to decode the signature & construct a new message.
       disabled: true
 
     - label:
           "Verify that the PAA subject public key and subject match one of the
           official PAA certificates found in the Distributed Compliance Ledger."
       verification: |
-          For SVE-2, verify if the PAA subject key matches with the list of PAA stored in the TH. For 1.0 certification, verify the PAA subject matches one of the official PAA certificates found in DCL.  To get the PAA subject public key from the test PAA stored in TH, use the command below. For 1.0 cert, Extract the subject public key in similar way and compare if it matches with the certs stored in DCL.
+          For certification, verify the PAA subject matches one of the official PAA certificates found in DCL.  To get the PAA subject public key from the test PAA stored in TH, use the command below. For cert, Extract the subject public key in a similar way and compare if it matches with the certs stored in DCL.
 
           $openssl x509 -in credentials/development/paa-root-certs/Chip-Test-PAA-FFF1-Cert.pem -text
           Certificate:

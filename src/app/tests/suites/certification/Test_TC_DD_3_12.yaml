@@ -37,7 +37,7 @@ tests:
       verification: |
           1 - DUT is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
 
-          2 - 5.1.3 - QR code is printed on the device or in additional provided materials (ex: manual).
+          2 - 5.1.3 - QR Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
 
           An example onboarding QR code could be "MT:-24J029Q00KA0648G00" (following 5.1.3 "QR Code", Table 34 "Packed Binary Data Structure for Onboarding Payload") which includes:
 
@@ -108,10 +108,10 @@ tests:
 
           Verify on the DUT (CHIP-TOOL):
           ./chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
-          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
-          [1657234147237] [31454:16822562] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1657234147237] [31454:16822562] CHIP: [CTL] Performing next commissioning step "Cleanup"
-          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1657234147237] [31454:16822562] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1657234147237] [31454:16822562] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1657234147237] [31454:16822562] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -162,10 +162,10 @@ tests:
 
           Verify on the DUT (CHIP-TOOL):
           ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
-          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
-          [1657234324847] [31475:16824564] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1657234324847] [31475:16824564] CHIP: [CTL] Performing next commissioning step "Cleanup"
-          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1657234324847] [31475:16824564] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1657234324847] [31475:16824564] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1657234324847] [31475:16824564] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
