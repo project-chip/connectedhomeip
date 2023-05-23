@@ -31,7 +31,7 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-silabs_project_dir = "${chip_root}/examples/light-switch-app/silabs/efr32"
+silabs_project_dir = "${chip_root}/examples/light-switch-app/silabs"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 if (wifi_soc) {
@@ -80,7 +80,6 @@ if (wifi_soc) {
     ]
 
     include_dirs = [
-      "${chip_root}/examples/light-switch-app/silabs/common",
       "${chip_root}/src/platform/silabs/efr32",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
@@ -116,13 +115,12 @@ silabs_executable("light_switch_app") {
   output_name = "matter-silabs-light-switch-example.out"
   include_dirs = [
     "include",
-    "${chip_root}/examples/light-switch-app/silabs/common/",
   ]
   defines = []
 
   sources = [
-    "${chip_root}/examples/light-switch-app/silabs/common/BindingHandler.cpp",
-    "${chip_root}/examples/light-switch-app/silabs/common/LightSwitchMgr.cpp",
+    "src/BindingHandler.cpp",
+    "src/LightSwitchMgr.cpp",
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/ZclCallbacks.cpp",
@@ -141,7 +139,7 @@ silabs_executable("light_switch_app") {
 
   if (chip_build_libshell) {
     sources += [
-      "${chip_root}/examples/light-switch-app/silabs/common/ShellCommands.cpp",
+      "src/ShellCommands.cpp",
     ]
   }
 
