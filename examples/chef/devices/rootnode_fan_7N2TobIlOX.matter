@@ -591,6 +591,7 @@ server cluster NetworkCommissioning = 49 {
     k5g = 2;
     k6g = 3;
     k60g = 4;
+    k1g = 5;
   }
 
   bitmap Feature : BITMAP32 {

@@ -1098,6 +1098,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kN = 3;
     kAc = 4;
     kAx = 5;
+    kAh = 6;
   }
 
   bitmap Feature : BITMAP32 {

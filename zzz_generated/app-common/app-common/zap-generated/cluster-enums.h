@@ -901,11 +901,12 @@ enum class WiFiBand : uint8_t
     k5g   = 0x02,
     k6g   = 0x03,
     k60g  = 0x04,
+    k1g   = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
+    kUnknownEnumValue = 6,
 };
 
 // Bitmap for Feature
@@ -1202,11 +1203,12 @@ enum class WiFiVersionEnum : uint8_t
     kN  = 0x03,
     kAc = 0x04,
     kAx = 0x05,
+    kAh = 0x06,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 6,
+    kUnknownEnumValue = 7,
 };
 
 // Bitmap for Feature

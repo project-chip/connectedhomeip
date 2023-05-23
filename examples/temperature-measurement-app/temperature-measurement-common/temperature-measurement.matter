@@ -355,6 +355,7 @@ server cluster NetworkCommissioning = 49 {
     k5g = 2;
     k6g = 3;
     k60g = 4;
+    k1g = 5;
   }
 
   bitmap Feature : BITMAP32 {
@@ -665,6 +666,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kN = 3;
     kAc = 4;
     kAx = 5;
+    kAh = 6;
   }
 
   bitmap Feature : BITMAP32 {
