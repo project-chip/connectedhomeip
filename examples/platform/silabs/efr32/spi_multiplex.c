@@ -25,23 +25,4 @@
 #include "em_usart.h"
 #include "spi_multiplex.h"
 
-void SPIDRV_ReInit(uint32_t baudrate)
-{
-    if (USART_BaudrateGet(USART0) == baudrate)
-    {
-        // USART synced to baudrate already
-        return;
-    }
-    // USART is used in MG24 + WF200 combination
-    USART_InitSync_TypeDef usartInit = USART_INITSYNC_DEFAULT;
-    usartInit.msbf                   = true;
-    usartInit.clockMode              = usartClockMode0;
-    usartInit.baudrate               = baudrate;
-    uint32_t databits      = SL_SPIDRV_FRAME_LENGTH - 4U + _USART_FRAME_DATABITS_FOUR;
-    usartInit.databits     = (USART_Databits_TypeDef) databits;
-    usartInit.autoCsEnable = true;
-
-    USART_InitSync(USART0, &usartInit);
-}
-
 #endif /* EFR32MG24 */

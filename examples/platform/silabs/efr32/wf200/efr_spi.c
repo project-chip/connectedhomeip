@@ -53,6 +53,7 @@
 extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 #define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
 #elif defined(EFR32MG24)
+#include "sl_spidrv_eusart_exp_config.h"
 #include "spi_multiplex.h"
 #else
 #error "Unknown platform"
@@ -378,6 +379,26 @@ void sl_wfx_host_gpio_init(void)
 }
 
 #if defined(EFR32MG24)
+
+void SPIDRV_ReInit(uint32_t baudrate)
+{
+    if (USART_BaudrateGet(MY_USART) == baudrate)
+    {
+        // USART synced to baudrate already
+        return;
+    }
+    // USART is used in MG24 + WF200 combination
+    USART_InitSync_TypeDef usartInit = USART_INITSYNC_DEFAULT;
+    usartInit.msbf                   = true;
+    usartInit.clockMode              = usartClockMode0;
+    usartInit.baudrate               = baudrate;
+    uint32_t databits                = SL_SPIDRV_FRAME_LENGTH - 4U + _USART_FRAME_DATABITS_FOUR;
+    usartInit.databits               = (USART_Databits_TypeDef) databits;
+    usartInit.autoCsEnable           = true;
+
+    USART_InitSync(MY_USART, &usartInit);
+}
+
 void sl_wfx_host_spiflash_cs_assert(void)
 {
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
