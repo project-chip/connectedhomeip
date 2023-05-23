@@ -373,11 +373,10 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(chip::EndpointId ep, uint64_t
         auto tz        = TimeSynchronizationServer::Instance().GetTimeZone().begin();
         timeZoneOffset = chip::kMicrosecondsPerSecond * static_cast<uint64_t>(tz->offset);
     }
-    if (isDSTOffsetAvailable())
-    {
-        auto dst  = TimeSynchronizationServer::Instance().GetDSTOffset().begin();
-        dstOffset = chip::kMicrosecondsPerSecond * static_cast<uint64_t>(dst->offset);
-    }
+    VerifyOrReturnError(isDSTOffsetAvailable() == true, CHIP_ERROR_INVALID_TIME);
+    auto dst  = TimeSynchronizationServer::Instance().GetDSTOffset().begin();
+    dstOffset = chip::kMicrosecondsPerSecond * static_cast<uint64_t>(dst->offset);
+
     localTime = chipEpochTime + timeZoneOffset + dstOffset;
     return CHIP_NO_ERROR;
 }
