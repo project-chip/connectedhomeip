@@ -7958,6 +7958,133 @@ public class ClusterReadMapping {
     return result;
   }
 
+  private static Map<String, InteractionInfo> readRefrigeratorAlarmInteractionInfo() {
+    Map<String, InteractionInfo> result = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readRefrigeratorAlarmMaskCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readRefrigeratorAlarmMaskAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.RefrigeratorAlarmCluster) cluster)
+                  .readMaskAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readRefrigeratorAlarmMaskCommandParams);
+    result.put("readMaskAttribute", readRefrigeratorAlarmMaskAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readRefrigeratorAlarmLatchCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readRefrigeratorAlarmLatchAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.RefrigeratorAlarmCluster) cluster)
+                  .readLatchAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readRefrigeratorAlarmLatchCommandParams);
+    result.put("readLatchAttribute", readRefrigeratorAlarmLatchAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readRefrigeratorAlarmStateCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readRefrigeratorAlarmStateAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.RefrigeratorAlarmCluster) cluster)
+                  .readStateAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readRefrigeratorAlarmStateCommandParams);
+    result.put("readStateAttribute", readRefrigeratorAlarmStateAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readRefrigeratorAlarmGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readRefrigeratorAlarmGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.RefrigeratorAlarmCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.RefrigeratorAlarmCluster.GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedRefrigeratorAlarmClusterGeneratedCommandListAttributeCallback(),
+            readRefrigeratorAlarmGeneratedCommandListCommandParams);
+    result.put(
+        "readGeneratedCommandListAttribute",
+        readRefrigeratorAlarmGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readRefrigeratorAlarmAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readRefrigeratorAlarmAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.RefrigeratorAlarmCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.RefrigeratorAlarmCluster.AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedRefrigeratorAlarmClusterAcceptedCommandListAttributeCallback(),
+            readRefrigeratorAlarmAcceptedCommandListCommandParams);
+    result.put(
+        "readAcceptedCommandListAttribute",
+        readRefrigeratorAlarmAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readRefrigeratorAlarmEventListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readRefrigeratorAlarmEventListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.RefrigeratorAlarmCluster) cluster)
+                  .readEventListAttribute(
+                      (ChipClusters.RefrigeratorAlarmCluster.EventListAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedRefrigeratorAlarmClusterEventListAttributeCallback(),
+            readRefrigeratorAlarmEventListCommandParams);
+    result.put("readEventListAttribute", readRefrigeratorAlarmEventListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readRefrigeratorAlarmAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readRefrigeratorAlarmAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.RefrigeratorAlarmCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.RefrigeratorAlarmCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedRefrigeratorAlarmClusterAttributeListAttributeCallback(),
+            readRefrigeratorAlarmAttributeListCommandParams);
+    result.put(
+        "readAttributeListAttribute", readRefrigeratorAlarmAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readRefrigeratorAlarmFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readRefrigeratorAlarmFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.RefrigeratorAlarmCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readRefrigeratorAlarmFeatureMapCommandParams);
+    result.put("readFeatureMapAttribute", readRefrigeratorAlarmFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readRefrigeratorAlarmClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readRefrigeratorAlarmClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.RefrigeratorAlarmCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readRefrigeratorAlarmClusterRevisionCommandParams);
+    result.put(
+        "readClusterRevisionAttribute",
+        readRefrigeratorAlarmClusterRevisionAttributeInteractionInfo);
+
+    return result;
+  }
+
   private static Map<String, InteractionInfo> readAirQualityInteractionInfo() {
     Map<String, InteractionInfo> result = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readAirQualityAirQualityCommandParams =
@@ -19704,6 +19831,7 @@ public class ClusterReadMapping {
         put("icdManagement", readIcdManagementInteractionInfo());
         put("modeSelect", readModeSelectInteractionInfo());
         put("temperatureControl", readTemperatureControlInteractionInfo());
+        put("refrigeratorAlarm", readRefrigeratorAlarmInteractionInfo());
         put("airQuality", readAirQualityInteractionInfo());
         put("smokeCoAlarm", readSmokeCoAlarmInteractionInfo());
         put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());

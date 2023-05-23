@@ -74,6 +74,7 @@
    <xi:include href="chip/wifi-network-diagnostics-cluster.xml" />
    <xi:include href="chip/window-covering.xml" />
    <xi:include href="chip/temperature-control-cluster.xml" />
+   <xi:include href="chip/refrigerator-alarm.xml" />
    <xi:include href="chip/matter-devices.xml" />
    <xi:include href="draft/barrier-control.xml" />
    <xi:include href="draft/electrical-measurement-cluster.xml" />

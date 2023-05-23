@@ -6493,6 +6493,40 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRRefrigeratorAlarmClusterResetParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _alarms = @(0);
+
+        _mask = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRefrigeratorAlarmClusterResetParams alloc] init];
+
+    other.alarms = self.alarms;
+    other.mask = self.mask;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: alarms:%@; mask:%@; >", NSStringFromClass([self class]), _alarms, _mask];
+    return descriptionString;
+}
+
+@end
 @implementation MTRSmokeCOAlarmClusterSelfTestRequestParams
 - (instancetype)init
 {

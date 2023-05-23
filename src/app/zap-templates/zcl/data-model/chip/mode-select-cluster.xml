@@ -56,7 +56,7 @@ limitations under the License.
 
   </cluster>
 
-  <bitmap name="ModeSelectFeature" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0050"/>
     <field name="DEPONOFF" mask="0x1"/>
   </bitmap>

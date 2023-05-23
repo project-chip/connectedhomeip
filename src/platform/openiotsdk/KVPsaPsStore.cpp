@@ -115,6 +115,15 @@ CHIP_ERROR KVPsaPsStore::Init(void)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR KVPsaPsStore::Shutdown(void)
+{
+    KVSKeyMapUpdate();
+
+    initialized = false;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR KVPsaPsStore::ReadConfigValue(Key key, bool & val)
 {
     if (!ConfigValueExists(key))

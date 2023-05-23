@@ -1,6 +1,4 @@
 {{> header}}
-{{#if_enabled_clusters side='client'}}
-
 package chip.devicecontroller;
 
 import javax.annotation.Nullable;
@@ -373,4 +371,3 @@ public class ClusterInfoMapping {
 
 }
 
-{{/if_enabled_clusters}}

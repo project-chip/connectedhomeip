@@ -1313,9 +1313,9 @@ void DoorLockServer::clearYearDayScheduleCommandHandler(chip::app::CommandHandle
     commandObj->AddStatus(commandPath, Status::Success);
 }
 
-chip::BitFlags<DoorLockFeature> DoorLockServer::GetFeatures(chip::EndpointId endpointId)
+chip::BitFlags<Feature> DoorLockServer::GetFeatures(chip::EndpointId endpointId)
 {
-    chip::BitFlags<DoorLockFeature> featureMap;
+    chip::BitFlags<Feature> featureMap;
     if (!GetAttribute(endpointId, Attributes::FeatureMap::Id, Attributes::FeatureMap::Get, *featureMap.RawStorage()))
     {
         ChipLogError(Zcl, "Unable to get the door lock feature map: attribute read error");

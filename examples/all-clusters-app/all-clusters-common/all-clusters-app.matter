@@ -59,7 +59,7 @@ server cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 server cluster Groups = 4 {
-  bitmap GroupsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kGroupNames = 0x1;
   }
 
@@ -124,12 +124,12 @@ server cluster Groups = 4 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 server cluster Scenes = 5 {
-  bitmap ScenesCopyMode : BITMAP8 {
-    kCopyAllScenes = 0x1;
+  bitmap Feature : BITMAP32 {
+    kSceneNames = 0x1;
   }
 
-  bitmap ScenesFeature : BITMAP32 {
-    kSceneNames = 0x1;
+  bitmap ScenesCopyMode : BITMAP8 {
+    kCopyAllScenes = 0x1;
   }
 
   struct AttributeValuePair {
@@ -262,12 +262,12 @@ client cluster OnOff = 6 {
     kTogglePreviousOnOff = 2;
   }
 
-  bitmap OnOffControl : BITMAP8 {
-    kAcceptOnlyWhenOn = 0x1;
+  bitmap Feature : BITMAP32 {
+    kLighting = 0x1;
   }
 
-  bitmap OnOffFeature : BITMAP32 {
-    kLighting = 0x1;
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -330,12 +330,12 @@ server cluster OnOff = 6 {
     kTogglePreviousOnOff = 2;
   }
 
-  bitmap OnOffControl : BITMAP8 {
-    kAcceptOnlyWhenOn = 0x1;
+  bitmap Feature : BITMAP32 {
+    kLighting = 0x1;
   }
 
-  bitmap OnOffFeature : BITMAP32 {
-    kLighting = 0x1;
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -393,7 +393,7 @@ server cluster LevelControl = 8 {
     kDown = 1;
   }
 
-  bitmap LevelControlFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kOnOff = 0x1;
     kLighting = 0x2;
     kFrequency = 0x4;
@@ -999,7 +999,7 @@ server cluster UnitLocalization = 45 {
     kKelvin = 2;
   }
 
-  bitmap UnitLocalizationFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kTemperatureUnit = 0x1;
   }
 
@@ -1203,7 +1203,7 @@ server cluster PowerSource = 47 {
     kUnderVoltage = 2;
   }
 
-  bitmap PowerSourceFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWired = 0x1;
     kBattery = 0x2;
     kRechargeable = 0x4;
@@ -1344,7 +1344,7 @@ server cluster NetworkCommissioning = 49 {
     k60g = 4;
   }
 
-  bitmap NetworkCommissioningFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
@@ -1601,7 +1601,7 @@ server cluster GeneralDiagnostics = 51 {
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster SoftwareDiagnostics = 52 {
-  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWaterMarks = 0x1;
   }
 
@@ -1657,7 +1657,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kLeader = 6;
   }
 
-  bitmap ThreadNetworkDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
     kMLECounts = 0x4;
@@ -1828,7 +1828,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kAx = 5;
   }
 
-  bitmap WiFiNetworkDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
   }
@@ -1884,7 +1884,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate400G = 9;
   }
 
-  bitmap EthernetNetworkDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
   }
@@ -1912,7 +1912,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 server cluster Switch = 59 {
-  bitmap SwitchFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kLatchingSwitch = 0x1;
     kMomentarySwitch = 0x2;
     kMomentarySwitchRelease = 0x4;
@@ -2240,7 +2240,7 @@ server cluster BooleanState = 69 {
 
 /** Allows servers to ensure that listed clients are notified when a server is available for communication. */
 server cluster IcdManagement = 70 {
-  bitmap ICDManagementFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCheckInProtocolSupport = 0x1;
   }
 
@@ -2287,7 +2287,7 @@ server cluster IcdManagement = 70 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 server cluster ModeSelect = 80 {
-  bitmap ModeSelectFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kDeponoff = 0x1;
   }
 
@@ -2644,7 +2644,7 @@ server cluster DoorLock = 257 {
     kSaturday = 0x40;
   }
 
-  bitmap DoorLockFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPinCredential = 0x1;
     kRfidCredential = 0x2;
     kFingerCredentials = 0x4;
@@ -2917,6 +2917,14 @@ server cluster WindowCovering = 258 {
     kTiltEncoderControlled = 0x40;
   }
 
+  bitmap Feature : BITMAP32 {
+    kLift = 0x1;
+    kTilt = 0x2;
+    kPositionAwareLift = 0x4;
+    kAbsolutePosition = 0x8;
+    kPositionAwareTilt = 0x10;
+  }
+
   bitmap Mode : BITMAP8 {
     kMotorDirectionReversed = 0x1;
     kCalibrationMode = 0x2;
@@ -2943,14 +2951,6 @@ server cluster WindowCovering = 258 {
     kHardwareFailure = 0x200;
     kManualOperation = 0x400;
     kProtection = 0x800;
-  }
-
-  bitmap WindowCoveringFeature : BITMAP32 {
-    kLift = 0x1;
-    kTilt = 0x2;
-    kPositionAwareLift = 0x4;
-    kAbsolutePosition = 0x8;
-    kPositionAwareTilt = 0x10;
   }
 
   readonly attribute Type type = 0;
@@ -3046,7 +3046,7 @@ server cluster PumpConfigurationAndControl = 512 {
     kLocal = 3;
   }
 
-  bitmap PumpConfigurationAndControlFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kConstantPressure = 0x1;
     kCompensatedPressure = 0x2;
     kConstantFlow = 0x4;
@@ -3196,18 +3196,18 @@ server cluster Thermostat = 513 {
     kAway = 0x80;
   }
 
-  bitmap ModeForSequence : BITMAP8 {
-    kHeatSetpointPresent = 0x1;
-    kCoolSetpointPresent = 0x2;
-  }
-
-  bitmap ThermostatFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kHeating = 0x1;
     kCooling = 0x2;
     kOccupancy = 0x4;
     kScheduleConfiguration = 0x8;
     kSetback = 0x10;
     kAutoMode = 0x20;
+  }
+
+  bitmap ModeForSequence : BITMAP8 {
+    kHeatSetpointPresent = 0x1;
+    kCoolSetpointPresent = 0x2;
   }
 
   struct ThermostatScheduleTransition {
@@ -3266,7 +3266,7 @@ server cluster FanControl = 514 {
     kSmart = 6;
   }
 
-  bitmap FanControlFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kMultiSpeed = 0x1;
     kAuto = 0x2;
     kRocking = 0x4;
@@ -3377,19 +3377,19 @@ server cluster ColorControl = 768 {
     kColorTemperatureSupported = 0x10;
   }
 
-  bitmap ColorControlFeature : BITMAP32 {
-    kHueAndSaturation = 0x1;
-    kEnhancedHue = 0x2;
-    kColorLoop = 0x4;
-    kXy = 0x8;
-    kColorTemperature = 0x10;
-  }
-
   bitmap ColorLoopUpdateFlags : BITMAP8 {
     kUpdateAction = 0x1;
     kUpdateDirection = 0x2;
     kUpdateTime = 0x4;
     kUpdateStartHue = 0x8;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kHueAndSaturation = 0x1;
+    kEnhancedHue = 0x2;
+    kColorLoop = 0x4;
+    kXy = 0x8;
+    kColorTemperature = 0x10;
   }
 
   readonly attribute int8u currentHue = 0;
@@ -3680,7 +3680,7 @@ server cluster TemperatureMeasurement = 1026 {
 
 /** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
 server cluster PressureMeasurement = 1027 {
-  bitmap PressureMeasurementFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kExtended = 0x1;
   }
 
@@ -3776,7 +3776,7 @@ server cluster Channel = 1284 {
     kMso = 0;
   }
 
-  bitmap ChannelFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kChannelList = 0x1;
     kLineupInfo = 0x2;
   }
@@ -3858,7 +3858,7 @@ server cluster MediaPlayback = 1286 {
     kBuffering = 3;
   }
 
-  bitmap MediaPlaybackFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kAdvancedSeek = 0x1;
     kVariableSpeed = 0x2;
   }
@@ -3899,7 +3899,7 @@ server cluster MediaInput = 1287 {
     kOther = 11;
   }
 
-  bitmap MediaInputFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNameUpdates = 0x1;
   }
 
@@ -4043,7 +4043,7 @@ server cluster KeypadInput = 1289 {
     kInvalidKeyInCurrentState = 2;
   }
 
-  bitmap KeypadInputFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNavigationKeyCodes = 0x1;
     kLocationKeys = 0x2;
     kNumberKeys = 0x4;
@@ -4097,7 +4097,7 @@ server cluster ContentLauncher = 1290 {
     kVideo = 13;
   }
 
-  bitmap ContentLauncherFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
   }
@@ -4164,7 +4164,7 @@ server cluster AudioOutput = 1291 {
     kOther = 5;
   }
 
-  bitmap AudioOutputFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNameUpdates = 0x1;
   }
 
@@ -4192,7 +4192,7 @@ server cluster ApplicationLauncher = 1292 {
     kSystemBusy = 2;
   }
 
-  bitmap ApplicationLauncherFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kApplicationPlatform = 0x1;
   }
 

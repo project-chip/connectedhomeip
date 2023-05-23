@@ -20,7 +20,7 @@ limitations under the License.
   <struct name="TemperatureLevelStruct">
     <cluster code="0x0056"/>
     <item fieldId="0" name="Label" type="char_string" length="64" isNullable="false" writable="false"/>
-    <item fieldId="1" name="TempLevel" type="int8u" isNullable="false" writable="false"/>
+    <item fieldId="1" name="TemperatureLevel" type="int8u" isNullable="false" writable="false"/>
   </struct>
 
   <cluster>
