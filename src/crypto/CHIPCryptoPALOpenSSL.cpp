@@ -1971,6 +1971,57 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
     return ExtractKIDFromX509Cert(false, certificate, akid);
 }
 
+CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certificate, MutableCharSpan & cdpurl)
+{
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    X509 * x509certificate               = nullptr;
+    const unsigned char * pCertificate   = certificate.data();
+    const unsigned char ** ppCertificate = &pCertificate;
+    STACK_OF(DIST_POINT) * crldp         = nullptr;
+    DIST_POINT * dp                      = nullptr;
+    GENERAL_NAMES * gens                 = nullptr;
+    GENERAL_NAME * gen                   = nullptr;
+    ASN1_STRING * uri                    = nullptr;
+    const char * urlptr                  = nullptr;
+    size_t len                           = 0;
+
+    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    x509certificate = d2i_X509(nullptr, ppCertificate, static_cast<long>(certificate.size()));
+    VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    crldp =
+        reinterpret_cast<STACK_OF(DIST_POINT) *>(X509_get_ext_d2i(x509certificate, NID_crl_distribution_points, nullptr, nullptr));
+    VerifyOrExit(crldp != nullptr, err = CHIP_ERROR_NOT_FOUND);
+    VerifyOrExit(sk_DIST_POINT_num(crldp) == 1, err = CHIP_ERROR_NOT_FOUND);
+
+    dp = sk_DIST_POINT_value(crldp, 0);
+    VerifyOrExit(dp != nullptr, err = CHIP_ERROR_NOT_FOUND);
+    VerifyOrExit(dp->distpoint != nullptr && dp->distpoint->type == 0, err = CHIP_ERROR_NOT_FOUND);
+
+    gens = dp->distpoint->name.fullname;
+    VerifyOrExit(sk_GENERAL_NAME_num(gens) == 1, err = CHIP_ERROR_NOT_FOUND);
+
+    gen = sk_GENERAL_NAME_value(gens, 0);
+    VerifyOrExit(gen->type == GEN_URI, err = CHIP_ERROR_NOT_FOUND);
+
+    uri    = reinterpret_cast<ASN1_STRING *>(GENERAL_NAME_get0_value(gen, nullptr));
+    urlptr = reinterpret_cast<const char *>(ASN1_STRING_get0_data(uri));
+    len    = strlen(urlptr);
+    VerifyOrExit(
+        (len > strlen(kValidCDPURIHttpPrefix) && strncmp(urlptr, kValidCDPURIHttpPrefix, strlen(kValidCDPURIHttpPrefix)) == 0) ||
+            (len > strlen(kValidCDPURIHttpsPrefix) &&
+             strncmp(urlptr, kValidCDPURIHttpsPrefix, strlen(kValidCDPURIHttpsPrefix)) == 0),
+        err = CHIP_ERROR_NOT_FOUND);
+    err = CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(urlptr), cdpurl);
+
+exit:
+    sk_DIST_POINT_pop_free(crldp, DIST_POINT_free);
+    X509_free(x509certificate);
+
+    return err;
+}
+
 CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, MutableByteSpan & serialNumber)
 {
     CHIP_ERROR err                        = CHIP_NO_ERROR;

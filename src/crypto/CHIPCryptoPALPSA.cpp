@@ -1218,6 +1218,7 @@ constexpr uint8_t sOID_Extension_BasicConstraints[]       = { 0x55, 0x1D, 0x13 }
 constexpr uint8_t sOID_Extension_KeyUsage[]               = { 0x55, 0x1D, 0x0F };
 constexpr uint8_t sOID_Extension_SubjectKeyIdentifier[]   = { 0x55, 0x1D, 0x0E };
 constexpr uint8_t sOID_Extension_AuthorityKeyIdentifier[] = { 0x55, 0x1D, 0x23 };
+constexpr uint8_t sOID_Extension_CRLDistributionPoint[]   = { 0x55, 0x1D, 0x1F };
 
 /**
  * Compares an mbedtls_asn1_buf structure (oidBuf) to a reference OID represented as uint8_t array (oid).
@@ -1682,6 +1683,98 @@ CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
 {
     return ExtractKIDFromX509Cert(false, certificate, akid);
+}
+
+CHIP_ERROR ExtractCRLDistributionPointURIFromX509Cert(const ByteSpan & certificate, MutableCharSpan & cdpurl)
+{
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+    CHIP_ERROR error = CHIP_ERROR_NOT_FOUND;
+    mbedtls_x509_crt mbed_cert;
+    unsigned char * p         = nullptr;
+    const unsigned char * end = nullptr;
+    size_t len                = 0;
+    size_t cdpExtCount        = 0;
+
+    VerifyOrReturnError(!certificate.empty() && CanCastTo<long>(certificate.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mbedtls_x509_crt_init(&mbed_cert);
+
+    int result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(certificate.data()), certificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    p   = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(v3_ext).CHIP_CRYPTO_PAL_PRIVATE_X509(p);
+    end = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(v3_ext).CHIP_CRYPTO_PAL_PRIVATE_X509(p) +
+        mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(v3_ext).CHIP_CRYPTO_PAL_PRIVATE_X509(len);
+    result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_WRONG_CERT_TYPE);
+
+    while (p < end)
+    {
+        result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_WRONG_CERT_TYPE);
+        result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_OID);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_WRONG_CERT_TYPE);
+
+        mbedtls_x509_buf extOID = { MBEDTLS_ASN1_OID, len, p };
+        bool isCurrentExtCDP    = OID_CMP(sOID_Extension_CRLDistributionPoint, extOID);
+        p += len;
+
+        int is_critical = 0;
+        result          = mbedtls_asn1_get_bool(&p, end, &is_critical);
+        VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_WRONG_CERT_TYPE);
+
+        result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_OCTET_STRING);
+        VerifyOrExit(result == 0, error = CHIP_ERROR_WRONG_CERT_TYPE);
+
+        unsigned char * end_of_ext = p + len;
+
+        if (isCurrentExtCDP)
+        {
+            cdpExtCount++;
+            VerifyOrExit(cdpExtCount <= 1, error = CHIP_ERROR_NOT_FOUND);
+
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+            VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
+            VerifyOrExit(p + len == end_of_ext, error = CHIP_ERROR_NOT_FOUND);
+
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
+            VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
+            VerifyOrExit(p + len == end_of_ext, error = CHIP_ERROR_NOT_FOUND);
+
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED | 0);
+            VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
+
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | MBEDTLS_ASN1_CONSTRUCTED | 0);
+            VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
+
+            result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONTEXT_SPECIFIC | 6);
+            VerifyOrExit(result == 0, error = CHIP_ERROR_NOT_FOUND);
+
+            const char * urlptr = reinterpret_cast<const char *>(p);
+            VerifyOrExit((len > strlen(kValidCDPURIHttpPrefix) &&
+                          strncmp(urlptr, kValidCDPURIHttpPrefix, strlen(kValidCDPURIHttpPrefix)) == 0) ||
+                             (len > strlen(kValidCDPURIHttpsPrefix) &&
+                              strncmp(urlptr, kValidCDPURIHttpsPrefix, strlen(kValidCDPURIHttpsPrefix)) == 0),
+                         error = CHIP_ERROR_NOT_FOUND);
+            error = CopyCharSpanToMutableCharSpan(CharSpan(urlptr, len), cdpurl);
+            SuccessOrExit(error);
+        }
+        p = end_of_ext;
+    }
+
+    VerifyOrExit(cdpExtCount == 1, error = CHIP_ERROR_NOT_FOUND);
+
+exit:
+    logMbedTLSError(result);
+    mbedtls_x509_crt_free(&mbed_cert);
+
+#else
+    (void) certificate;
+    (void) cdpurl;
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
+    return error;
 }
 
 CHIP_ERROR ExtractSerialNumberFromX509Cert(const ByteSpan & certificate, MutableByteSpan & serialNumber)
