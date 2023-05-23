@@ -64,30 +64,6 @@ StaticSupportedTemperatureLevelsManager::GetTemperatureLevelOptionsProvider(Endp
     return TemperatureLevelOptionsProvider(nullptr, nullptr);
 }
 
-Status StaticSupportedTemperatureLevelsManager::GetTemperatureLevelOptionByTemperatureLevel(
-    unsigned short endpointId, unsigned char temperatureLevel, const TemperatureLevelStructType ** dataPtr) const
-{
-    auto temperatureLevelOptionsProvider = this->GetTemperatureLevelOptionsProvider(endpointId);
-    if (temperatureLevelOptionsProvider.begin() == nullptr)
-    {
-        return Status::UnsupportedCluster;
-    }
-    auto * begin = temperatureLevelOptionsProvider.begin();
-    auto * end   = temperatureLevelOptionsProvider.end();
-
-    for (auto * it = begin; it != end; ++it)
-    {
-        auto & temperatureLevelOption = *it;
-        if (temperatureLevelOption.temperatureLevel == temperatureLevel)
-        {
-            *dataPtr = &temperatureLevelOption;
-            return Status::Success;
-        }
-    }
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the temperatureLevel %u", temperatureLevel);
-    return Status::ConstraintError;
-}
-
 const TemperatureControl::SupportedTemperatureLevelsManager * TemperatureControl::GetSupportedTemperatureLevelsManager()
 {
     return &StaticSupportedTemperatureLevelsManager::instance;

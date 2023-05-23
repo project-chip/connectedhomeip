@@ -21,6 +21,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/error-mapping.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -97,53 +98,77 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
     auto & targetTemperatureLevel = commandData.targetTemperatureLevel;
     EndpointId endpoint           = commandPath.mEndpointId;
     Status status                 = Status::Success;
+    EmberAfStatus emberAfStatus   = EMBER_ZCL_STATUS_SUCCESS;
+
+    if (TemperatureControlHasFeature(endpoint, Feature::kTemperatureNumber) &&
+        TemperatureControlHasFeature(endpoint, Feature::kTemperatureLevel))
+    {
+        commandObj->AddStatus(commandPath, Status::Failure);
+        return false;
+    }
 
     if (TemperatureControlHasFeature(endpoint, TemperatureControl::Feature::kTemperatureNumber))
     {
-        if (!targetTemperature.HasValue())
+        if (targetTemperature.HasValue())
         {
-            status = Status::Failure;
-        }
+            int16_t minTemperature = 0;
+            int16_t maxTemperature = 0;
+            emberAfStatus          = MinTemperature::Get(endpoint, &minTemperature);
+            if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                status = app::ToInteractionModelStatus(emberAfStatus);
+            }
 
-        int16_t minTemperature = 0;
-        int16_t maxTemperature = 0;
-        if (MinTemperature::Get(endpoint, &minTemperature) != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            status = Status::Failure;
-        }
-        if (MaxTemperature::Get(endpoint, &maxTemperature) != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            status = Status::Failure;
-        }
+            emberAfStatus = MaxTemperature::Get(endpoint, &maxTemperature);
+            if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                status = app::ToInteractionModelStatus(emberAfStatus);
+            }
 
-        if (targetTemperature.Value() < minTemperature || targetTemperature.Value() > maxTemperature)
-        {
-            status = Status::ConstraintError;
-        }
+            if (targetTemperature.Value() < minTemperature || targetTemperature.Value() > maxTemperature)
+            {
+                status = Status::ConstraintError;
+            }
 
-        if (TemperatureSetpoint::Set(endpoint, targetTemperature.Value()) != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            status = Status::Failure;
+            emberAfStatus = TemperatureSetpoint::Set(endpoint, targetTemperature.Value());
+            if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                status = app::ToInteractionModelStatus(emberAfStatus);
+            }
         }
     }
     if (TemperatureControlHasFeature(endpoint, TemperatureControl::Feature::kTemperatureLevel))
     {
-        if (!targetTemperatureLevel.HasValue())
+        if (targetTemperatureLevel.HasValue())
         {
-            status = Status::Failure;
-        }
-        const Structs::TemperatureLevelStruct::Type * dataPtr;
-        // TODO: Update implemetation when https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/7005 fixed.
-        const TemperatureControl::SupportedTemperatureLevelsManager * gSupportedTemperatureLevelManager =
-            TemperatureControl::GetSupportedTemperatureLevelsManager();
-        status = gSupportedTemperatureLevelManager->GetTemperatureLevelOptionByTemperatureLevel(
-            endpoint, targetTemperatureLevel.Value(), &dataPtr);
+            bool foundEntryInStruct = false;
+            // TODO: Update implemetation when https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/7005 fixed.
+            const TemperatureControl::SupportedTemperatureLevelsManager * gSupportedTemperatureLevelManager =
+                TemperatureControl::GetSupportedTemperatureLevelsManager();
 
-        if (status == Status::Success)
-        {
-            if (CurrentTemperatureLevelIndex::Set(endpoint, targetTemperatureLevel.Value()) != EMBER_ZCL_STATUS_SUCCESS)
+            const TemperatureControl::SupportedTemperatureLevelsManager::TemperatureLevelOptionsProvider
+                temperatureLevelOptionsProvider = gSupportedTemperatureLevelManager->GetTemperatureLevelOptionsProvider(endpoint);
+            if (temperatureLevelOptionsProvider.begin() != nullptr)
             {
-                status = Status::Failure;
+                auto * begin = temperatureLevelOptionsProvider.begin();
+                auto * end   = temperatureLevelOptionsProvider.end();
+                for (auto * it = begin; it != end; ++it)
+                {
+                    auto & temperatureLevelOption = *it;
+                    if (temperatureLevelOption.temperatureLevel == targetTemperatureLevel.Value())
+                    {
+                        foundEntryInStruct = true;
+                        emberAfStatus      = CurrentTemperatureLevelIndex::Set(endpoint, targetTemperatureLevel.Value());
+                        if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
+                        {
+                            status = app::ToInteractionModelStatus(emberAfStatus);
+                        }
+                    }
+                }
+                if (!foundEntryInStruct)
+                {
+                    status = Status::ConstraintError;
+                }
             }
         }
     }

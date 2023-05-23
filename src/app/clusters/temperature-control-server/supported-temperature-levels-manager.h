@@ -68,18 +68,6 @@ public:
      */
     virtual TemperatureLevelOptionsProvider GetTemperatureLevelOptionsProvider(EndpointId endpointId) const = 0;
 
-    /**
-     * Given the endpointId and a temperature level value, find the TemperatureLevelStruct that matches the temperature level.
-     * @param endpointId The endpoint for which to search the TemperatureLevelStruct.
-     * @param temperatureLevel The temperature level for which to search the TemperatureLevelStruct.
-     * @param dataPtr The pointer to receive the TemperatureLevelStruct, if one is found.
-     * @return Status::Success if successfully found the option. Otherwise, returns appropriate status code (found in
-     * <app/util/af-enums.h>)
-     */
-    virtual Protocols::InteractionModel::Status
-    GetTemperatureLevelOptionByTemperatureLevel(EndpointId endpointId, uint8_t temperatureLevel,
-                                                const TemperatureLevelStructType ** dataPtr) const = 0;
-
     virtual ~SupportedTemperatureLevelsManager() {}
 };
 

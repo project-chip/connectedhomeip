@@ -58,10 +58,6 @@ public:
     SupportedTemperatureLevelsManager::TemperatureLevelOptionsProvider
     GetTemperatureLevelOptionsProvider(EndpointId endpointId) const override;
 
-    Protocols::InteractionModel::Status
-    GetTemperatureLevelOptionByTemperatureLevel(EndpointId endpointId, uint8_t temperatureLevel,
-                                                const TemperatureLevelStructType ** dataPtr) const override;
-
     ~StaticSupportedTemperatureLevelsManager(){};
 
     StaticSupportedTemperatureLevelsManager() {}
