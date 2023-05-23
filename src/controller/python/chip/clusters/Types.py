@@ -15,7 +15,9 @@
 #    limitations under the License.
 #
 
+from dataclasses import dataclass
 
+@dataclass(frozen=True)
 class Nullable():
     def __repr__(self):
         return 'Null'
