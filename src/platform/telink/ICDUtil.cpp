@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "../include/ICDUtil.h"
+#include "ICDUtil.h"
 
 ICDUtil ICDUtil::sICDUtil;
 

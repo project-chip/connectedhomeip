@@ -21,7 +21,6 @@ assert(chip_device_platform == "telink")
 
 static_library("telink") {
   sources = [
-    "${chip_root}/examples/platform/telink/util/src/ICDUtil.cpp",
     "../SingletonConfigurationManager.cpp",
     "../Zephyr/BLEAdvertisingArbiter.cpp",
     "../Zephyr/BLEAdvertisingArbiter.h",
@@ -44,6 +43,7 @@ static_library("telink") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "ICDUtil.cpp",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.h",
