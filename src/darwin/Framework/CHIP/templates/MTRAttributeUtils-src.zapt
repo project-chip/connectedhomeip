@@ -14,7 +14,7 @@ static BOOL MTRAttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=tr
 {
     using namespace Clusters::{{asUpperCamelCase name}};
     switch (aAttributeId) {
-        {{#zcl_attributes_server removeKeys='isOptional'}}
+        {{#zcl_attributes_server}}
         {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
         case Attributes::{{asUpperCamelCase name}}::Id: {
             return YES;
