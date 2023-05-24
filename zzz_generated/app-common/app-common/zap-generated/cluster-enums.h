@@ -103,6 +103,12 @@ enum class Feature : uint32_t
 {
     kGroupNames = 0x1,
 };
+
+// Bitmap for NameSupportBitmap
+enum class NameSupportBitmap : uint8_t
+{
+    kGroupNames = 0x80,
+};
 } // namespace Groups
 
 namespace Scenes {

@@ -293,6 +293,9 @@ class Groups(Cluster):
         class Feature(IntFlag):
             kGroupNames = 0x1
 
+        class NameSupportBitmap(IntFlag):
+            kGroupNames = 0x80
+
     class Commands:
         @dataclass
         class AddGroup(ClusterCommand):
