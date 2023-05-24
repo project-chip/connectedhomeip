@@ -185,10 +185,7 @@ public:
         return GetFeatures(endpointId).Has(Feature::kUser) && SupportsAnyCredential(endpointId);
     }
 
-    inline bool SupportsUnbolt(chip::EndpointId endpointId)
-    {
-        return GetFeatures(endpointId).Has(Feature::kUnbolt);
-    }
+    inline bool SupportsUnbolt(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kUnbolt); }
 
     bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 

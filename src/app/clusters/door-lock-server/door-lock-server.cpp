@@ -114,7 +114,13 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     // DlLockState::kNotFullyLocked has no appropriate event to send. Also it is unclear whether
     // it should schedule auto-relocking. So skip it here. Check for supported states explicitly
     // to handle possible enum extending in future.
-    VerifyOrReturnError(DlLockState::kLocked == newLockState || DlLockState::kUnlocked == newLockState, success);
+    VerifyOrReturnError(DlLockState::kLocked == newLockState || DlLockState::kUnlocked == newLockState || DlLockState::kUnlatched == newLockState, success);
+
+    if (DlLockState::kUnlatched == newLockState)
+    {
+        SendLockOperationEvent(endpointId, LockOperationTypeEnum::kUnlatch, opSource, OperationErrorEnum::kUnspecified, userIndex, Nullable<chip::FabricIndex>(),
+                               Nullable<chip::NodeId>(), credentials, success);
+    }
 
     // Send LockOperation event
     auto opType = (DlLockState::kLocked == newLockState) ? LockOperationTypeEnum::kLock : LockOperationTypeEnum::kUnlock;

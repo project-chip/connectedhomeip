@@ -31,7 +31,8 @@ bool LockEndpoint::Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEn
 {
     if (DoorLockServer::Instance().SupportsUnbolt(mEndpointId))
     {
-        setLockState(DlLockState::kUnlatched, pin, err, opSource);
+        // If Unbolt is supported Unlock is supposed to pull the latch
+        return setLockState(DlLockState::kUnlatched, pin, err, opSource);
     }
 
     return setLockState(DlLockState::kUnlocked, pin, err, opSource);
