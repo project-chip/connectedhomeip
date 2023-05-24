@@ -102,18 +102,18 @@ class TC_CGEN_2_4(MatterBaseTest):
         logging.info('Step 18 - TH1 reads the location capability')
         attr = Clusters.GeneralCommissioning.Attributes.LocationCapability
         cap = await self.read_single_attribute(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=0, attribute=attr)
-        if cap == Clusters.GeneralCommissioning.Enums.RegulatoryLocationType.kIndoor:
-            newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationType.kOutdoor
-        elif cap == Clusters.GeneralCommissioning.Enums.RegulatoryLocationType.kOutdoor:
-            newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationType.kIndoor
+        if cap == Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kIndoor:
+            newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kOutdoor
+        elif cap == Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kOutdoor:
+            newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.kIndoor
         else:
-            newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationType.extend_enum_if_value_doesnt_exist(3)
+            newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum.extend_enum_if_value_doesnt_exist(3)
 
         logging.info('Step 19 Send SetRgulatoryConfig with incorrect location newloc = {}'.format(newloc))
         cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
             newRegulatoryConfig=newloc, countryCode="XX", breadcrumb=0)
         ret = await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
-        asserts.assert_true(ret.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningError.kValueOutsideRange)
+        asserts.assert_true(ret.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kValueOutsideRange)
 
         logging.info('Step 20 - TH2 sends CommissioningComplete')
         cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
@@ -121,7 +121,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         asserts.assert_true(isinstance(resp, Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse),
                             'Incorrect response type from command')
         asserts.assert_true(
-            resp.errorCode == Clusters.GeneralCommissioning.Enums.CommissioningError.kInvalidAuthentication, 'Incorrect error code')
+            resp.errorCode == Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kInvalidAuthentication, 'Incorrect error code')
 
         logging.info('Step 21 - TH1 sends an arm failsafe with timeout==0')
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
@@ -133,7 +133,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         resp = await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
         asserts.assert_true(isinstance(resp, Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse),
                             'Incorrect response type from command')
-        asserts.assert_true(resp.errorCode == Clusters.GeneralCommissioning.Enums.CommissioningError.kNoFailSafe,
+        asserts.assert_true(resp.errorCode == Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kNoFailSafe,
                             'Incorrect error code')
 
         logging.info('Step 23 - TH2 reads fabric index')

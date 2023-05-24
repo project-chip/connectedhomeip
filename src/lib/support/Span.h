@@ -43,11 +43,11 @@ public:
 
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
     constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
-    template <size_t N>
-    constexpr explicit Span(T (&databuf)[N]) : Span(databuf, N)
+    template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
+    constexpr explicit Span(U (&databuf)[N]) : Span(databuf, N)
     {}
 
-    template <class U, size_t N, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr Span(std::array<U, N> & arr) : mDataBuf(arr.data()), mDataLen(N)
     {}
 
@@ -60,14 +60,20 @@ public:
     }
 
     // Allow implicit construction from a Span over a type that matches our
-    // type, up to const-ness.
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    // type's size, if a pointer to the other type can be treated as a pointer
+    // to our type (e.g. other type is same as ours, or is a same-size
+    // subclass).  The size check is really important to make sure we don't get
+    // confused about where our object boundaries are.
+    template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr Span(const Span<U> & other) : Span(other.data(), other.size())
     {}
 
     // Allow implicit construction from a FixedSpan over a type that matches our
-    // type, up to const-ness.
-    template <class U, size_t N, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    // type's size, if a pointer to the other type can be treated as a pointer
+    // to our type (e.g. other type is same as ours, or is a same-size
+    // subclass).  The size check is really important to make sure we don't get
+    // confused about where our object boundaries are.
+    template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr inline Span(const FixedSpan<U, N> & other);
 
     constexpr pointer data() const { return mDataBuf; }
@@ -169,28 +175,25 @@ public:
     //
     // To do that we have a template constructor enabled only when the type
     // passed to it is a pointer type, and that pointer is to a type that
-    // matches T up to const-ness.  Importantly, we do NOT want to allow
-    // subclasses of T here, because they would have a different size and our
-    // Span would not work right.
-    template <
-        class U,
-        typename = std::enable_if_t<std::is_pointer<U>::value &&
-                                    std::is_same<std::remove_const_t<T>, std::remove_const_t<std::remove_pointer_t<U>>>::value>>
+    // matches T's size and can convert to T*.
+    template <class U,
+              typename = std::enable_if_t<std::is_pointer<U>::value && sizeof(std::remove_pointer_t<U>) == sizeof(T) &&
+                                          std::is_convertible<U, T *>::value>>
     constexpr explicit FixedSpan(U databuf) : mDataBuf(databuf)
     {}
-    template <class U, size_t M, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    template <class U, size_t M, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr explicit FixedSpan(U (&databuf)[M]) : mDataBuf(databuf)
     {
         static_assert(M >= N, "Passed-in buffer too small for FixedSpan");
     }
 
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr FixedSpan(std::array<U, N> & arr) : mDataBuf(arr.data())
     {}
 
     // Allow implicit construction from a FixedSpan of sufficient size over a
-    // type that matches our type, up to const-ness.
-    template <class U, size_t M, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    // type that has the same size as ours, as long as the pointers are convertible.
+    template <class U, size_t M, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr FixedSpan(FixedSpan<U, M> const & other) : mDataBuf(other.data())
     {
         static_assert(M >= N, "Passed-in FixedSpan is smaller than we are");

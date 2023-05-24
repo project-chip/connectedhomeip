@@ -7,6 +7,6 @@ dependencies:
             - if: "target != esp32h2"
 
     espressif/esp_secure_cert_mgr:
-        version: "^2.2.1"
+        version: "^2.3.0"
         rules:
             - if: "idf_version >=4.3"
