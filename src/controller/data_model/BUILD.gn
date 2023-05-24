@@ -88,6 +88,8 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/DescriptorClient-ReadImpl.cpp",
       "jni/DiagnosticLogsClient-InvokeSubscribeImpl.cpp",
       "jni/DiagnosticLogsClient-ReadImpl.cpp",
+      "jni/DishwasherAlarmClient-InvokeSubscribeImpl.cpp",
+      "jni/DishwasherAlarmClient-ReadImpl.cpp",
       "jni/DoorLockClient-InvokeSubscribeImpl.cpp",
       "jni/DoorLockClient-ReadImpl.cpp",
       "jni/ElectricalMeasurementClient-InvokeSubscribeImpl.cpp",
