@@ -16392,7 +16392,15 @@ class DishwasherAlarm(Cluster):
             kDoorError = 0x4
             kTempTooLow = 0x8
             kTempTooHigh = 0x10
-            kWaterLevelError = 0x11
+            kWaterLevelError = 0x20
+
+        class Feature(IntFlag):
+            kInflowError = 0x1
+            kDrainError = 0x2
+            kDoorError = 0x4
+            kTempTooLow = 0x8
+            kTempTooHigh = 0x10
+            kWaterLevelError = 0x20
 
     class Commands:
         @dataclass

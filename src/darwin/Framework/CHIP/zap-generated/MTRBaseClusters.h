@@ -23551,7 +23551,16 @@ typedef NS_OPTIONS(uint32_t, MTRDishwasherAlarmAlarmMap) {
     MTRDishwasherAlarmAlarmMapDoorError MTR_NEWLY_AVAILABLE = 0x4,
     MTRDishwasherAlarmAlarmMapTempTooLow MTR_NEWLY_AVAILABLE = 0x8,
     MTRDishwasherAlarmAlarmMapTempTooHigh MTR_NEWLY_AVAILABLE = 0x10,
-    MTRDishwasherAlarmAlarmMapWaterLevelError MTR_NEWLY_AVAILABLE = 0x11,
+    MTRDishwasherAlarmAlarmMapWaterLevelError MTR_NEWLY_AVAILABLE = 0x20,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint32_t, MTRDishwasherAlarmFeature) {
+    MTRDishwasherAlarmFeatureInflowError MTR_NEWLY_AVAILABLE = 0x1,
+    MTRDishwasherAlarmFeatureDrainError MTR_NEWLY_AVAILABLE = 0x2,
+    MTRDishwasherAlarmFeatureDoorError MTR_NEWLY_AVAILABLE = 0x4,
+    MTRDishwasherAlarmFeatureTempTooLow MTR_NEWLY_AVAILABLE = 0x8,
+    MTRDishwasherAlarmFeatureTempTooHigh MTR_NEWLY_AVAILABLE = 0x10,
+    MTRDishwasherAlarmFeatureWaterLevelError MTR_NEWLY_AVAILABLE = 0x20,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRHEPAFilterMonitoringChangeIndication) {

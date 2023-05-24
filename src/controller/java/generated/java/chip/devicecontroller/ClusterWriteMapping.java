@@ -679,6 +679,24 @@ public class ClusterWriteMapping {
         "writeSensitivityLevelAttribute",
         writeSmokeCoAlarmSensitivityLevelAttributeInteractionInfo);
     writeAttributeMap.put("smokeCoAlarm", writeSmokeCoAlarmInteractionInfo);
+    Map<String, InteractionInfo> writeDishwasherAlarmInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeDishwasherAlarmMaskCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo dishwasherAlarmmaskCommandParameterInfo =
+        new CommandParameterInfo("value", Long.class, Long.class);
+    writeDishwasherAlarmMaskCommandParams.put("value", dishwasherAlarmmaskCommandParameterInfo);
+    InteractionInfo writeDishwasherAlarmMaskAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DishwasherAlarmCluster) cluster)
+                  .writeMaskAttribute(
+                      (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDishwasherAlarmMaskCommandParams);
+    writeDishwasherAlarmInteractionInfo.put(
+        "writeMaskAttribute", writeDishwasherAlarmMaskAttributeInteractionInfo);
+    writeAttributeMap.put("dishwasherAlarm", writeDishwasherAlarmInteractionInfo);
     Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("hepaFilterMonitoring", writeHepaFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeActivatedCarbonFilterMonitoringInteractionInfo =
