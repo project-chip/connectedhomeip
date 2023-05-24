@@ -151,6 +151,18 @@ class AppFabricTableDelegate : public FabricTable::Delegate
     }
 };
 
+class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
+{
+    void OnShutDown() override
+    {
+        if (ThreadStackManagerImpl().IsThreadEnabled())
+        {
+            ThreadStackManagerImpl().SetThreadEnabled(false);
+            ThreadStackManagerImpl().SetRadioBlocked(true);
+        }
+    }
+};
+
 #if CONFIG_CHIP_LIB_SHELL
 #include <sys.h>
 #include <zephyr/shell/shell.h>
@@ -263,6 +275,10 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif
+
+    // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs
+    // For this the OnShutdown function is used
+    PlatformMgr().SetDelegate(new PlatformMgrDelegate);
 
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
