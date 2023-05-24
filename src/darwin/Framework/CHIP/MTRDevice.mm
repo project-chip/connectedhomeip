@@ -770,7 +770,7 @@ static BOOL _MTRAttributeHasChangesOmittedQuality(MTRAttributePath * attributePa
     // 1. The attribute is not in the specification (so we don't know whether hasChangesOmittedQuality can be trusted).
     // 2. Subscription not in a state we can expect reports
     // 3. There is subscription but attribute has Changes Omitted quality
-    // 4. When cache has no entry
+    // 4. Cache has no entry
     // TODO: add option for BaseSubscriptionCallback to report during priming, to reduce when case 4 is hit
     if (!attributeIsSpecified || ![self _subscriptionAbleToReport] || hasChangesOmittedQuality || !attributeValueToReturn) {
         // Create work item, set ready handler to perform task, then enqueue the work
