@@ -356,10 +356,10 @@ chip_python_wheel_action("chip-clusters") {
         "chip/ChipUtility.py",
         "chip/clusters/CHIPClusters.py",
         "chip/clusters/ClusterObjects.py",
-        "chip/clusters/enum.py",
         "chip/clusters/Objects.py",
         "chip/clusters/TestObjects.py",
         "chip/clusters/Types.py",
+        "chip/clusters/enum.py",
         "chip/tlv/__init__.py",
       ]
     },
