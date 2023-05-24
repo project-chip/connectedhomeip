@@ -104,8 +104,6 @@ functionality can still work fine.
     ```
     $ rm sdkconfig
     $ idf.py -D 'SDKCONFIG_DEFAULTS=sdkconfig_m5stack.defaults' build
-    $ idf.py -D 'SDKCONFIG_DEFAULTS=sdkconfig.defaults.esp32h2' build
-    $ idf.py -D 'SDKCONFIG_DEFAULTS=sdkconfig.defaults.esp32c6' build
     ```
 
     Note: If using a specific device configuration, it is highly recommended to
