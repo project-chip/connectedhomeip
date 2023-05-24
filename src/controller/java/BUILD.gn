@@ -41,6 +41,8 @@ shared_library("jni") {
     "AndroidClusterExceptions.h",
     "AndroidCommissioningWindowOpener.cpp",
     "AndroidCommissioningWindowOpener.h",
+    "AndroidControllerExceptions.cpp",
+    "AndroidControllerExceptions.h",
     "AndroidCurrentFabricRemover.cpp",
     "AndroidCurrentFabricRemover.h",
     "AndroidDeviceControllerWrapper.cpp",
@@ -281,6 +283,7 @@ android_library("java") {
   data_deps = [ ":jni" ]
 
   sources = [
+    "generated/java/chip/devicecontroller/ClusterIDMapping.java",
     "generated/java/chip/devicecontroller/ClusterReadMapping.java",
     "generated/java/chip/devicecontroller/ClusterWriteMapping.java",
     "src/chip/clusterinfo/ClusterCommandCallback.java",

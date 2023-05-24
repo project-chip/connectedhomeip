@@ -50,31 +50,6 @@ public:
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion) override;
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
     CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
-    CHIP_ERROR GetWiFiBeaconRxCount(uint32_t & beaconRxCount) override;
-    CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount) override;
-    CHIP_ERROR GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount) override;
-    CHIP_ERROR GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount) override;
-    CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount) override;
-    CHIP_ERROR GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount) override;
-    CHIP_ERROR GetWiFiCurrentMaxRate(uint64_t & currentMaxRate) override;
-    CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
-    CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
-    /* These variables will be set to 0 during start up and will be updated when reset-counts
-     * zcl command is received.
-     * These are considered as base for below attributes of WiFi Diagnostics Cluster:
-     * BeaconLostCount, BeaconRxCount, PacketMulticastRxCount, PacketMulticastTxCount,
-     * PacketUnicastRxCount, PacketUnicastTxCount, OverrunCount.
-     * Each attributes read will be difference of WLAN counters minus equivalent variables below.
-     */
-    uint32_t mBeaconRxCount          = 0;
-    uint32_t mBeaconLostCount        = 0;
-    uint32_t mPacketMulticastRxCount = 0;
-    uint32_t mPacketMulticastTxCount = 0;
-    uint32_t mPacketUnicastRxCount   = 0;
-    uint32_t mPacketUnicastTxCount   = 0;
-    uint64_t mOverrunCount           = 0;
-    bool mipv4_offpremise            = false;
-    bool mipv6_offpremise            = false;
 };
 
 /**
