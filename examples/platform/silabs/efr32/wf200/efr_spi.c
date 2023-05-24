@@ -144,7 +144,7 @@ sl_status_t sl_wfx_host_spi_cs_assert()
     {
         return SL_STATUS_TIMEOUT;
     }
-    SPIDRV_ReInit(SL_BIT_RATE_EXP_HDR);
+    SPIDRV_ReInit(SL_SPIDRV_EXP_BITRATE);
 #endif /* EFR32MG24 */
     GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
     return SL_STATUS_OK;
@@ -418,7 +418,7 @@ void sl_wfx_host_pre_bootloader_spi_transfer(void)
     /*
      * Assert CS pin for EXT SPI Flash
      */
-    SPIDRV_ReInit(SL_BIT_RATE_SPI_FLASH);
+    SPIDRV_ReInit(SL_SPIDRV_MX25_FLASH_BITRATE);
     sl_wfx_host_spiflash_cs_assert();
 }
 
@@ -437,7 +437,7 @@ void sl_wfx_host_pre_lcd_spi_transfer(void)
     {
         return;
     }
-    SPIDRV_ReInit(SL_BIT_RATE_LCD);
+    SPIDRV_ReInit(SL_SPIDRV_LCD_BITRATE);
     /*LCD CS is handled as part of LCD gsdk*/
 }
 
