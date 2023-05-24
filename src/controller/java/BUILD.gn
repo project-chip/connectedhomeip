@@ -41,6 +41,8 @@ shared_library("jni") {
     "AndroidClusterExceptions.h",
     "AndroidCommissioningWindowOpener.cpp",
     "AndroidCommissioningWindowOpener.h",
+    "AndroidControllerExceptions.cpp",
+    "AndroidControllerExceptions.h",
     "AndroidCurrentFabricRemover.cpp",
     "AndroidCurrentFabricRemover.h",
     "AndroidDeviceControllerWrapper.cpp",
