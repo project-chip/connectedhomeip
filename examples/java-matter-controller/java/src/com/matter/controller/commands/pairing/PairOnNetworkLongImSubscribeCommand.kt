@@ -57,7 +57,7 @@ class PairOnNetworkLongImSubscribeCommand(
   }
 
   private inner class InternalResubscriptionAttemptCallback : ResubscriptionAttemptCallback {
-    override fun onResubscriptionAttempt(terminationCause: Long, nextResubscribeIntervalMsec: Long) {
+    override fun onResubscriptionAttempt(terminationCause: Int, nextResubscribeIntervalMsec: Int) {
       logger.log(Level.INFO, "ResubscriptionAttemptCallback");
     }
   }
