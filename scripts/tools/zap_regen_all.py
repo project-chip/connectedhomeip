@@ -500,15 +500,15 @@ def main():
         # We split codegen into two generations to not be racy
         first, second = [], []
         for target in targets:
-           if isinstance(target, ZAPGenerateTarget) and target.is_matter_idl_generation:
-               first.append(target)
-           else:
-               second.append(target)
+            if isinstance(target, ZAPGenerateTarget) and target.is_matter_idl_generation:
+                first.append(target)
+            else:
+                second.append(target)
 
         for items in [first, second]:
-           with multiprocessing.Pool() as pool:
-               for timing in pool.imap_unordered(_ParallelGenerateOne, items):
-                   timings.append(timing)
+            with multiprocessing.Pool() as pool:
+                for timing in pool.imap_unordered(_ParallelGenerateOne, items):
+                    timings.append(timing)
     else:
         for target in targets:
             timings.append(target.generate())
