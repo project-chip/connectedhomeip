@@ -33,6 +33,7 @@
 #include <app/WriteHandler.h>
 #include <app/att-storage.h>
 #include <app/data-model/Decode.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>

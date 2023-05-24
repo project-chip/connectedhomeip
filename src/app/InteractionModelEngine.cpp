@@ -31,15 +31,9 @@
 #include "access/SubjectDescriptor.h"
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
-
-extern bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
-extern const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId);
-extern const EmberAfCluster * emberAfFindServerCluster(chip::EndpointId endpoint, chip::ClusterId clusterId);
-extern uint16_t emberAfEndpointCount(void);
-extern bool emberAfEndpointIndexIsEnabled(uint16_t index);
-extern chip::EndpointId emberAfEndpointFromIndex(uint16_t index);
 
 namespace chip {
 namespace app {
