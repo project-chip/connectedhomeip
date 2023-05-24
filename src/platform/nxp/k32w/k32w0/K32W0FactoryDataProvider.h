@@ -21,12 +21,8 @@
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 
 #include "CHIPPlatformConfig.h"
-#include "K32W0Config.h"
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <src/lib/core/CHIPError.h>
-
-#include "OtaUtils.h"
-#include "SecLib.h"
 
 #include <vector>
 
@@ -112,11 +108,8 @@ public:
     static constexpr uint32_t kHashLen      = 4;
     static constexpr size_t kHashId         = 0xCE47BA5E;
 
-    typedef otaUtilsResult_t (*OtaUtils_EEPROM_ReadData)(uint16_t nbBytes, uint32_t address, uint8_t * pInbuf);
-
     using RestoreMechanism = CHIP_ERROR (*)(void);
 
-    static uint8_t ReadDataMemcpy(uint16_t num, uint32_t src, uint8_t * dst);
     static K32W0FactoryDataProvider & GetDefaultInstance();
 
     K32W0FactoryDataProvider();
