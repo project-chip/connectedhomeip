@@ -152,12 +152,14 @@ CHIP_ERROR AppTask::Init()
         appError(err);
     }
 
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     err = app::Clusters::Scenes::ScenesServer::Instance().Init();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("ScenesServer.Init() failed");
         appError(err);
     }
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 

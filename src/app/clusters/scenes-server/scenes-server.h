@@ -31,7 +31,7 @@ namespace app {
 namespace Clusters {
 namespace Scenes {
 
-class ScenesServer : public CommandHandlerInterface
+class ScenesServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
     static ScenesServer & Instance();
@@ -42,6 +42,9 @@ public:
     // CommandHanlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
 
+    // AttributeAccessInterface
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
     // Callbacks
     void GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId);
     void MakeSceneInvalid(EndpointId aEndpointId);
@@ -49,7 +52,7 @@ public:
     void RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId);
 
 private:
-    ScenesServer() : CommandHandlerInterface(Optional<EndpointId>(), Id) {}
+    ScenesServer() : CommandHandlerInterface(Optional<EndpointId>(), Id), AttributeAccessInterface(Optional<EndpointId>(), Id) {}
     ~ScenesServer() {}
 
     bool mIsInitialized = false;
