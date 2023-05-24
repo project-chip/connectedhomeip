@@ -93,7 +93,11 @@ static_library("CYW30739") {
     }
 
     if (chip_mdns == "platform") {
-      sources += [ "../../OpenThread/DnssdImpl.cpp" ]
+      sources += [
+        "../../OpenThread/DnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.h",
+      ]
 
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }

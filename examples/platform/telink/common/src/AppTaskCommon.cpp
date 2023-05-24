@@ -127,6 +127,8 @@ static int cmd_telink_reboot(const struct shell * shell, size_t argc, char ** ar
 
     shell_print(shell, "Performing board reboot...");
     sys_reboot();
+
+    return 0;
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_telink, SHELL_CMD(reboot, NULL, "Reboot board command", cmd_telink_reboot),
