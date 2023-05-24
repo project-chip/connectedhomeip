@@ -416,28 +416,44 @@ def BuildK32WTarget():
     return target
 
 
-def BuildTITargets():
+def BuildCC13x2x7Target():
     target = BuildTarget('ti', TIBuilder)
 
     # board
     target.AppendFixedTargets([
         TargetPart('cc13x2x7_26x2x7', board=TIBoard.LP_CC2652R7),
+    ])
+
+    target.AppendFixedTargets([
+        TargetPart('lighting', app=TIApp.LIGHTING),
+        TargetPart('lock', app=TIApp.LOCK),
+        TargetPart('pump', app=TIApp.PUMP),
+        TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER),
+    ])
+    target.AppendModifier(name="mtd", openthread_ftd=False)
+
+    return target
+
+def BuildCC13x4Target():
+    target = BuildTarget('ti', TIBuilder)
+
+    # board
+    target.AppendFixedTargets([
         TargetPart('cc13x4_26x4', board=TIBoard.LP_EM_CC1354P10_6)
     ])
 
     target.AppendFixedTargets([
-        TargetPart('all-clusters', app=TIApp.ALL_CLUSTERS).OnlyIfRe("-(cc13x4_26x4)-"),
+        TargetPart('all-clusters', app=TIApp.ALL_CLUSTERS),
         TargetPart('lighting', app=TIApp.LIGHTING),
-        TargetPart('lock-ftd', app=TIApp.LOCK, openthread_ftd=True).OnlyIfRe("-(cc13x4_26x4)-"),
-        TargetPart('lock-mtd', app=TIApp.LOCK, openthread_ftd=False),
-        TargetPart('pump-ftd', app=TIApp.PUMP, openthread_ftd=True).OnlyIfRe("-(cc13x4_26x4)-"),
-        TargetPart('pump-mtd', app=TIApp.PUMP, openthread_ftd=False),
-        TargetPart('pump-controller-ftd', app=TIApp.PUMP_CONTROLLER, openthread_ftd=True).OnlyIfRe("-(cc13x4_26x4)-"),
-        TargetPart('pump-controller-mtd', app=TIApp.PUMP_CONTROLLER, openthread_ftd=False),
+        TargetPart('lock', app=TIApp.LOCK, openthread_ftd=True),
+        TargetPart('pump', app=TIApp.PUMP, openthread_ftd=False),
+        TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER, openthread_ftd=False),
     ])
 
-    return target
+    target.AppendModifier(name="mtd", openthread_ftd=False)
+    target.AppendModifier(name="ftd", openthread_ftd=True)
 
+    return target
 
 def Buildcc32xxTarget():
     target = BuildTarget('cc32xx', cc32xxBuilder)
@@ -613,7 +629,8 @@ BUILD_TARGETS = [
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
     Buildcc32xxTarget(),
-    BuildTITargets(),
+    BuildCC13x2x7Target(),
+    BuildCC13x4Target(),
     BuildCyw30739Target(),
     BuildEfr32Target(),
     BuildEsp32Target(),
