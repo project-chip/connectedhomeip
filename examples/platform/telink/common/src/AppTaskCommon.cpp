@@ -118,34 +118,34 @@ class AppFabricTableDelegate : public FabricTable::Delegate
         {
             ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
 
-            #ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
-                void * storage = nullptr;
-                int status     = settings_storage_get(&storage);
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
+            void * storage = nullptr;
+            int status     = settings_storage_get(&storage);
 
-                if (status == 0)
-                {
-                    status = nvs_clear(static_cast<nvs_fs *>(storage));
-                }
+            if (status == 0)
+            {
+                status = nvs_clear(static_cast<nvs_fs *>(storage));
+            }
 
-                if (!status)
-                {
-                   status = nvs_mount(static_cast<nvs_fs *>(storage));
-                }
+            if (!status)
+            {
+                status = nvs_mount(static_cast<nvs_fs *>(storage));
+            }
 
-                if (status)
-                {
-                    ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
-                }
-            #else
-                const CHIP_ERROR err = PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
+            if (status)
+            {
+                ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
+            }
+#else
+            const CHIP_ERROR err = PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
 
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(DeviceLayer, "Factory reset failed: %" CHIP_ERROR_FORMAT, err.Format());
-                }
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Factory reset failed: %" CHIP_ERROR_FORMAT, err.Format());
+            }
 
-                ConnectivityMgr().ErasePersistentInfo();
-            #endif
+            ConnectivityMgr().ErasePersistentInfo();
+#endif
         }
     }
 };
