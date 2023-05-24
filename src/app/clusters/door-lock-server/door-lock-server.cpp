@@ -122,6 +122,11 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     {
         SendLockOperationEvent(endpointId, LockOperationTypeEnum::kUnlatch, opSource, OperationErrorEnum::kUnspecified, userIndex,
                                Nullable<chip::FabricIndex>(), Nullable<chip::NodeId>(), credentials, success);
+
+        success = SetLockState(endpointId, DlLockState::kUnlocked);
+
+        // Remote operations are handled separately as they use more data unavailable here
+        VerifyOrReturnError(OperationSourceEnum::kRemote != opSource, success);
     }
 
     // Send LockOperation event
