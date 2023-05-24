@@ -24,8 +24,6 @@ import subprocess
 import sys
 import tempfile
 import time
-import traceback
-import urllib.request
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
