@@ -7,9 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ClusterIDMapping
+import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.OpenCommissioningCallback
+import chip.devicecontroller.model.InvokeElement
+import chip.tlv.AnonymousTag
+import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -129,22 +133,31 @@ class MultiAdminClientFragment : Fragment() {
 
   private suspend fun sendRevokeCommandClick() {
     val timedInvokeTimeout = 10000
-    getAdministratorCommissioningClusterForDevice().revokeCommissioning(object : ChipClusters.DefaultClusterCallback {
-      override fun onSuccess() {
-        showMessage("Revoke Commissioning success")
-      }
+    // TODO : Need to be implement poj-to-tlv
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+    tlvWriter.endStructure()
+    val invokeElement = InvokeElement.newInstance(0
+            , ClusterIDMapping.AdministratorCommissioning.ID
+            , ClusterIDMapping.AdministratorCommissioning.Command.RevokeCommissioning.id
+            , tlvWriter.getEncoded(), null)
 
-      override fun onError(ex: Exception) {
+    deviceController.invoke(object: InvokeCallback {
+      override fun onError(ex: Exception?) {
         showMessage("Revoke Commissioning  failure $ex")
         Log.e(TAG, "Revoke Commissioning  failure", ex)
       }
-    }, timedInvokeTimeout)
+
+      override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+        Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
+        showMessage("Revoke Commissioning success")
+      }
+
+    }, getConnectedDevicePointer(), invokeElement, timedInvokeTimeout, 0)
   }
 
-  private suspend fun getAdministratorCommissioningClusterForDevice(): ChipClusters.AdministratorCommissioningCluster {
-    return ChipClusters.AdministratorCommissioningCluster(
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId), 0
-    )
+  private suspend fun getConnectedDevicePointer(): Long {
+    return ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
   }
 
   private fun showMessage(msg: String) {

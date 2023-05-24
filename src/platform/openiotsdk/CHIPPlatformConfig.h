@@ -30,7 +30,9 @@
 
 // ==================== General Platform Adaptations ====================
 
-#define CHIP_CONFIG_EXPECTED_LOW_PROCESSING_TIME 10
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 5
+#endif
 
 // ==================== Security Adaptations ====================
 
