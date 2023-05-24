@@ -19,8 +19,8 @@
 #include "AppTaskCommon.h"
 #include "AppTask.h"
 
-#include "ButtonManager.h"
 #include "BLEManagerImpl.h"
+#include "ButtonManager.h"
 
 #include "ThreadUtil.h"
 
@@ -108,7 +108,7 @@ uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] =
 class AppCallbacks : public AppDelegate
 {
 public:
-    void OnCommissioningWindowClosed() override { chip::DeviceLayer::Internal::BLEMgr().Shutdown();}
+    void OnCommissioningWindowClosed() override { chip::DeviceLayer::Internal::BLEMgr().Shutdown(); }
 };
 
 AppCallbacks sCallbacks;
@@ -217,7 +217,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Init ZCL Data Model and start server
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.appDelegate  = &sCallbacks;
+    initParams.appDelegate = &sCallbacks;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
 #if APP_SET_DEVICE_INFO_PROVIDER
