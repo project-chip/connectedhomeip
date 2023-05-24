@@ -434,6 +434,7 @@ def BuildCC13x2x7Target():
 
     return target
 
+
 def BuildCC13x4Target():
     target = BuildTarget('ti', TIBuilder)
 
@@ -454,6 +455,7 @@ def BuildCC13x4Target():
     target.AppendModifier(name="ftd", openthread_ftd=True)
 
     return target
+
 
 def Buildcc32xxTarget():
     target = BuildTarget('cc32xx', cc32xxBuilder)
