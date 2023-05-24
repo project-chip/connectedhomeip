@@ -37,7 +37,7 @@ tests:
           Preconditions
           1 - DUT is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
 
-          2 - 5.1.4.2 - 21-digit Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual).
+          2 - 5.1.4.2 - 21-digit Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
 
           An example onboarding payload could be "749701123365521327694" (21-digit) (following 5.1.4. Table 37. "Manual Pairing Code Elements") which each include:
 
@@ -89,7 +89,7 @@ tests:
           code but substituting out the current VERSION with an invalid VERSION:
           2"
       verification: |
-          1. Use chip-tool"s "payload verhoeff-generate" command to help generate the new, invalid Manual code
+          1. Use chip-tool's "payload verhoeff-generate" command to help generate the new, invalid Manual code
           No applicable TH or DUT logs.
 
            ./chip-tool payload verhoeff-generate  84970112336552132769
@@ -115,7 +115,7 @@ tests:
           manual code but substituting out the current VID_PID_PRESENT with an
           invalid VID_PID_PRESENT set to 0"
       verification: |
-          1. Use chip-tool"s "payload verhoeff-generate" command to help generate the new, invalid Manual code
+          1. Use chip-tool's "payload verhoeff-generate" command to help generate the new, invalid Manual code
           Verify in DUT (Chip-tool):
 
            ./chip-tool payload verhoeff-generate 34970112336552132769
@@ -147,7 +147,7 @@ tests:
           discriminator value and adheres to rules of section 5.1.1.5.
           'Discriminator value')"
       verification: |
-          1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
+          1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
           Verify in DUT (Chip-tool):
 
            ./chip-tool payload generate-manualcode --existing-payload 749701123365521327694 --allow-invalid-payload 1 --discriminator 3584
@@ -180,7 +180,7 @@ tests:
           1. Use this as an example of how to generate a manual code with an invalid passcode. In this example the invalid passcode=00000000
           Verify in DUT (Chip-tool):
 
-          Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
+          Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
 
            ./chip-tool payload generate-manualcode --existing-payload 749701123365521327694 --allow-invalid-payload 1 --setup-pin-code 00000000
           [1657239062245] [32164:16876812] CHIP: [TOO] Manual Code: 749152000065521327698
@@ -286,13 +286,13 @@ tests:
            (0xFFF4)
              ./chip-tool pairing code 1 749701123365524327693
 
-          [1667893519.289945][2201:2203] CHIP:CTL: Successfully finished commissioning step "SendComplete"
-          [1667893519.290002][2201:2203] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1667893519.290101][2201:2203] CHIP:CTL: Performing next commissioning step "Cleanup"
+          [1667893519.289945][2201:2203] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1667893519.290002][2201:2203] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1667893519.290101][2201:2203] CHIP:CTL: Performing next commissioning step 'Cleanup'
           [1667893519.290169][2201:2203] CHIP:IN: SecureSession[0xffff8000aa10]: MarkForEviction Type:1 LSID:45403
-          [1667893519.290227][2201:2203] CHIP:SC: SecureSession[0xffff8000aa10]: Moving from state "kActive" --> "kPendingEviction"
+          [1667893519.290227][2201:2203] CHIP:SC: SecureSession[0xffff8000aa10]: Moving from state 'kActive' --> 'kPendingEviction'
           [1667893519.290365][2201:2203] CHIP:IN: SecureSession[0xffff8000aa10]: Released - Type:1 LSID:45403
-          [1667893519.290450][2201:2203] CHIP:CTL: Successfully finished commissioning step "Cleanup"
+          [1667893519.290450][2201:2203] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
           [1667893519.290540][2201:2203] CHIP:TOO: Device commissioning completed with success
           [1667893519.290691][2201:2203] CHIP:DMG: ICR moving to [AwaitingDe]
           [1667893519.290894][2201:2203] CHIP:EM: <<< [E:27144i M:100805848 (Ack:153455649)] (S) Msg TX to 1:0000000000000001 [3FBC] --- Type 0000:10 (SecureChannel:StandaloneAck)
@@ -303,7 +303,7 @@ tests:
           [1667893519.292017][2201:2201] CHIP:CTL: Shutting down the controller
           [1667893519.292084][2201:2201] CHIP:IN: Expiring all sessions for fabric 0x1!!
           [1667893519.292143][2201:2201] CHIP:IN: SecureSession[0xffff80010440]: MarkForEviction Type:2 LSID:45404
-          [1667893519.292199][2201:2201] CHIP:SC: SecureSession[0xffff80010440]: Moving from state "kActive" --> "kPendingEviction"
+          [1667893519.292199][2201:2201] CHIP:SC: SecureSession[0xffff80010440]: Moving from state 'kActive' --> 'kPendingEviction'
           [1667893519.292254][2201:2201] CHIP:IN: SecureSession[0xffff80010440]: Released - Type:2 LSID:45404
           [1667893519.292315][2201:2201] CHIP:FP: Forgetting fabric 0x1
           [1667893519.292390][2201:2201] CHIP:TS: Pending Last Known Good Ti
@@ -315,7 +315,7 @@ tests:
           PRODUCT_ID of 0x0000(i.e. While following section 2.5.3. 'Product
           Identifier')"
       verification: |
-          1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
+          1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
           Verify in DUT (Chip-tool):
 
            ./chip-tool payload generate-manualcode --existing-payload 749701123365521327694 --allow-invalid-payload 1 --product-id 0x0000
@@ -339,7 +339,7 @@ tests:
           CHECK_DIGIT while following Table 39. Encoding Method with Vendor and
           Product IDs included (VID_PID_Present == 1))"
       verification: |
-          1. Use chip-tool"s "payload verhoeff-verify" command to help verify that the check-digit is invalid
+          1. Use chip-tool's "payload verhoeff-verify" command to help verify that the check-digit is invalid
           Verify in DUT (Chip-tool):
 
            ./chip-tool payload verhoeff-verify 749701123365521327693 20

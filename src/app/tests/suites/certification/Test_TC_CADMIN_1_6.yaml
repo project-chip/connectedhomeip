@@ -36,9 +36,6 @@ config:
     waitAfterCommissioning:
         type: int16u
         defaultValue: 5000
-    discriminator:
-        type: int16u
-        defaultValue: 3840
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically

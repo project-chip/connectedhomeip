@@ -30,13 +30,14 @@ config:
 tests:
     - label: "Preconditions"
       verification: |
-          1 - 5.1.3 - QR code/ Manual Pairing Code is printed on the device or in additional provided materials (ex: manual)
+          QR Code/ Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
       disabled: true
 
     - label: "Scan the DUTs QR code using the TH."
       verification: |
           1. Run DUT. Example for DUT=all-clusters-app
           ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
+
           ...
           [1657213978.633542][366513:366513] CHIP:DL: Device Configuration:
           [1657213978.633637][366513:366513] CHIP:DL:   Serial Number: (not set)
@@ -71,7 +72,7 @@ tests:
 
           Verify in TH (CHIP-TOOL)
 
-           ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
+          ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           ...
           [1657214364908] [29006:16612760] CHIP: [CTL] Starting commissioning discovery over DNS-SD

@@ -128,25 +128,12 @@ tests:
           switch to next position - Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
-          Raspi device doesn't support more than 2 position ,so this step is not verifiable by using raspi device
-          echo '{"Name":"SwitchLatched","NewPosition":2}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
-
-
-
-
-          Verify SwitchLatched event with NewPosition set to 2 on DUT(all-cluster-app) log:
-
-          [1659600438.058928][7312:7321] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":2}"
-          [1659600438.059436][7312:7312] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 1755409d
-          [1659600438.059519][7312:7312] CHIP:-: The latching switch is moved to a new position:2
-          [1659600438.059644][7312:7312] CHIP:ZCL: SwitchServer: OnSwitchLatch
-          [1659600438.059857][7312:7312] CHIP:EVL: LogEvent event number: 0x0000000000020006 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Sys timestamp: 0x0000000000F10746
-
-          In the current SDK development, Max number of positions are configured as 2, hence the current  test step should fail as its reached more than the numberof position. If the DUT supports more number of positions, then for the above command, it should increase to the next level. Below is the sample command to execute , if the DUT supports more than 2 NumberOfPositions.
+          In the current SDK development, Max number of positions is configured as 2, hence the current  test step should fail as NewPosition reached more than the Max NumberOfPositions.
+          If the DUT supports more number of positions, then for the command in previous step, position should increase to the next level. Below is the sample command to execute, if the DUT supports NumberOfPositions >  2 .
 
           ./chip-tool switch read current-position 1 1
 
-          Verify current position value inTH(chip-tool) Log:
+          Verify CurrentPosition value in TH(chip-tool) Log:
 
           [1659600502.023560][4306:4311] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001 DataVersion: 391463069
           [1659600502.023631][4306:4311] CHIP:TOO:   current position: 2
@@ -158,9 +145,6 @@ tests:
           Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
-          Raspi device doesn't support more than 2 position ,so this step is not verifiable by using raspi device
-
-
           In Raspi platform to change the switch to third position use the below sample command, its required to  use equivalent command on the respective DUT. Open one more terminal on DUT side to execute the echo command .
 
           echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
