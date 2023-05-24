@@ -243,7 +243,7 @@ combination with JLinkRTTClient as follows:
 
 -   For this example to work, it is necessary to have a second efr32 device
     running the
-    [lighting app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/lighting-app/silabs/efr32/README.md)
+    [lighting app example](https://github.com/project-chip/connectedhomeip/blob/master/examples/lighting-app/silabs/README.md)
     commissioned on the same openthread network
 
 -   User interface : **LCD** The LCD on Silabs WSTK shows a QR Code. This QR
