@@ -20,15 +20,15 @@ package com.chip.casting;
 import java.util.Objects;
 
 public class MatterError {
-  private int errorCode;
+  private long errorCode;
   private String errorMessage;
 
   public static final MatterError DISCOVERY_SERVICE_LOST =
-      new MatterError(4, "Discovery service was lost.");
+      new MatterError(4L, "Discovery service was lost.");
 
   public static final MatterError NO_ERROR = new MatterError(0, null);
 
-  public MatterError(int errorCode, String errorMessage) {
+  public MatterError(long errorCode, String errorMessage) {
     this.errorCode = errorCode;
     this.errorMessage = errorMessage;
   }
@@ -37,7 +37,7 @@ public class MatterError {
     return this.equals(NO_ERROR);
   }
 
-  public int getErrorCode() {
+  public long getErrorCode() {
     return errorCode;
   }
 
