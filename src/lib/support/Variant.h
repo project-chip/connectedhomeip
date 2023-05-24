@@ -225,6 +225,10 @@ public:
         return *reinterpret_cast<const T *>(&mData);
     }
 
+    // TODO this is not ideal, while we prevent the Optional version of this from causing an issue we could be suppressing real
+    // errors.
+
+    // NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage): When ~Value() is called the mData.~T(); is not called
     ~Variant() { Curry::Destroy(mTypeId, &mData); }
 };
 

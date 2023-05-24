@@ -26,6 +26,10 @@ class ReferenceCountedHandle
 {
 public:
     explicit ReferenceCountedHandle(Target & target) : mTarget(target) { mTarget.Retain(); }
+    // TODO this is not ideal, while we prevent the Optional version of this from causing an issue we could be suppressing reall
+    // errors.
+
+    // NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage): When ~Value() is called the mData.~T(); is not called
     ~ReferenceCountedHandle() { mTarget.Release(); }
 
     ReferenceCountedHandle(const ReferenceCountedHandle & that) : mTarget(that.mTarget) { mTarget.Retain(); }

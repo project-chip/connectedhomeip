@@ -1377,6 +1377,7 @@ chip::NodeId DoorLockServer::getNodeId(const chip::app::CommandHandler * command
     if (nullptr == secureSession)
     {
         ChipLogError(Zcl, "Cannot access Secure session handle of Command Object for Node ID");
+        return kUndefinedNodeId;
     }
     return secureSession->GetPeerNodeId();
 }
