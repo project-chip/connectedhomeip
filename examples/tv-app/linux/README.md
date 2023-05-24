@@ -7,7 +7,7 @@ Desktop 20.10 (aarch64)**
 
 <hr>
 
--   [Matter TV Example](#chip-tv-example)
+-   [Matter TV Example](#matter-tv-example)
     -   [Building](#building)
     -   [Exercising Commissioning](#exercising-commissioning)
     -   [App Platform commands](#app-platform-commands)
