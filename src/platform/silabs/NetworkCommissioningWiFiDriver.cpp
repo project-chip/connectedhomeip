@@ -180,7 +180,7 @@ void SlWiFiDriver::UpdateNetworkingStatus()
     if (!wfx_is_sta_connected())
     {
         mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId),
-                                                         MakeOptional((int32_t) SL_STATUS_FAIL));
+                                                         MakeOptional(static_cast<int32_t>(SL_STATUS_FAIL)));
         return;
     }
     mpStatusChangeCallback->OnNetworkingStatusChange(Status::kSuccess, MakeOptional(networkId), NullOptional);
