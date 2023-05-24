@@ -1,5 +1,5 @@
 {
-  "featureLevel": 92,
+  "featureLevel": 96,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -2409,7 +2409,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "RegulatoryLocationType",
+              "type": "RegulatoryLocationTypeEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -2425,7 +2425,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "RegulatoryLocationType",
+              "type": "RegulatoryLocationTypeEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,

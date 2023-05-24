@@ -1381,6 +1381,78 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace ModeSelect
 
+namespace TemperatureControl {
+namespace Attributes {
+
+namespace TemperatureSetpoint {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace TemperatureSetpoint
+
+namespace MinTemperature {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace MinTemperature
+
+namespace MaxTemperature {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace MaxTemperature
+
+namespace Step {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace Step
+
+namespace CurrentTemperatureLevelIndex {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace CurrentTemperatureLevelIndex
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TemperatureControl
+
+namespace RefrigeratorAlarm {
+namespace Attributes {
+
+namespace Mask {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * value); // AlarmMap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+} // namespace Mask
+
+namespace Latch {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * value); // AlarmMap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+} // namespace Latch
+
+namespace State {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * value); // AlarmMap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+} // namespace State
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace RefrigeratorAlarm
+
 namespace AirQuality {
 namespace Attributes {
 
@@ -1401,6 +1473,83 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 } // namespace Attributes
 } // namespace AirQuality
+
+namespace SmokeCoAlarm {
+namespace Attributes {
+
+namespace ExpressedState {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum * value); // ExpressedStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum value);
+} // namespace ExpressedState
+
+namespace SmokeState {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum * value); // AlarmStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value);
+} // namespace SmokeState
+
+namespace COState {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum * value); // AlarmStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value);
+} // namespace COState
+
+namespace BatteryAlert {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum * value); // AlarmStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value);
+} // namespace BatteryAlert
+
+namespace DeviceMuted {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum * value); // MuteStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum value);
+} // namespace DeviceMuted
+
+namespace TestInProgress {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace TestInProgress
+
+namespace HardwareFaultAlert {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace HardwareFaultAlert
+
+namespace EndOfServiceAlert {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum * value); // EndOfServiceEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum value);
+} // namespace EndOfServiceAlert
+
+namespace InterconnectSmokeAlarm {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum * value); // AlarmStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value);
+} // namespace InterconnectSmokeAlarm
+
+namespace InterconnectCOAlarm {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum * value); // AlarmStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value);
+} // namespace InterconnectCOAlarm
+
+namespace ContaminationState {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum * value); // ContaminationStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum value);
+} // namespace ContaminationState
+
+namespace SensitivityLevel {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum * value); // SensitivityEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value);
+} // namespace SensitivityLevel
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace SmokeCoAlarm
 
 namespace HepaFilterMonitoring {
 namespace Attributes {

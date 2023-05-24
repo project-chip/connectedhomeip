@@ -202,7 +202,7 @@ void SetConfigurationMgr(ConfigurationManager * configurationManager);
 
 inline CHIP_ERROR ConfigurationManager::GetLocationCapability(uint8_t & location)
 {
-    location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+    location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
     return CHIP_NO_ERROR;
 }
 

@@ -1,5 +1,4 @@
 {{> header}}
-{{#if_enabled_clusters side='client'}}
 #include <jni/CHIPCallbackTypes.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -8,7 +7,7 @@
 
 namespace chip {
 
-{{#all_user_clusters}}
+{{#zcl_clusters}}
    {{#zcl_commands_source_server}}
 class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase commandName}}Callback : public Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase commandName}}CallbackType>
 {
@@ -24,6 +23,5 @@ private:
 };
 
   {{/zcl_commands_source_server}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 } // namespace chip
-{{/if_enabled_clusters}}

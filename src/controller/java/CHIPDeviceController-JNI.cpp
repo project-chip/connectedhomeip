@@ -428,11 +428,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             using namespace app::Clusters::GeneralCommissioning;
 
             jint regulatoryLocationJint = chip::JniReferences::GetInstance().IntegerToPrimitive(regulatoryLocation);
-            VerifyOrExit(chip::CanCastTo<RegulatoryLocationType>(regulatoryLocationJint), err = CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrExit(chip::CanCastTo<RegulatoryLocationTypeEnum>(regulatoryLocationJint), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-            RegulatoryLocationType regulatoryLocationType = static_cast<RegulatoryLocationType>(regulatoryLocationJint);
-            VerifyOrExit(regulatoryLocationType >= RegulatoryLocationType::kIndoor, err = CHIP_ERROR_INVALID_ARGUMENT);
-            VerifyOrExit(regulatoryLocationType <= RegulatoryLocationType::kIndoorOutdoor, err = CHIP_ERROR_INVALID_ARGUMENT);
+            auto regulatoryLocationType = static_cast<RegulatoryLocationTypeEnum>(regulatoryLocationJint);
+            VerifyOrExit(regulatoryLocationType >= RegulatoryLocationTypeEnum::kIndoor, err = CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrExit(regulatoryLocationType <= RegulatoryLocationTypeEnum::kIndoorOutdoor, err = CHIP_ERROR_INVALID_ARGUMENT);
 
             chip::Controller::CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
             commissioningParams.SetDeviceRegulatoryLocation(regulatoryLocationType);

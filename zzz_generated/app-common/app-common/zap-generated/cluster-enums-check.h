@@ -720,9 +720,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::WiredFault
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::CommissioningError val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::CommissioningErrorEnum val)
 {
-    using EnumType = GeneralCommissioning::CommissioningError;
+    using EnumType = GeneralCommissioning::CommissioningErrorEnum;
     switch (val)
     {
     case EnumType::kOk:
@@ -735,9 +735,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::C
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::RegulatoryLocationType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::RegulatoryLocationTypeEnum val)
 {
-    using EnumType = GeneralCommissioning::RegulatoryLocationType;
+    using EnumType = GeneralCommissioning::RegulatoryLocationTypeEnum;
     switch (val)
     {
     case EnumType::kIndoor:
@@ -1302,6 +1302,90 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AirQuality::AirQualityE
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::AlarmStateEnum val)
+{
+    using EnumType = SmokeCoAlarm::AlarmStateEnum;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kWarning:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::ContaminationStateEnum val)
+{
+    using EnumType = SmokeCoAlarm::ContaminationStateEnum;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kLow:
+    case EnumType::kWarning:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::EndOfServiceEnum val)
+{
+    using EnumType = SmokeCoAlarm::EndOfServiceEnum;
+    switch (val)
+    {
+    case EnumType::kExpired:
+    case EnumType::kNormal:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::ExpressedStateEnum val)
+{
+    using EnumType = SmokeCoAlarm::ExpressedStateEnum;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kSmokeAlarm:
+    case EnumType::kCOAlarm:
+    case EnumType::kBatteryAlert:
+    case EnumType::kTesting:
+    case EnumType::kHardwareFault:
+    case EnumType::kEndOfService:
+    case EnumType::kInterconnectSmoke:
+    case EnumType::kInterconnectCO:
+        return val;
+    default:
+        return static_cast<EnumType>(9);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::MuteStateEnum val)
+{
+    using EnumType = SmokeCoAlarm::MuteStateEnum;
+    switch (val)
+    {
+    case EnumType::kNotMuted:
+    case EnumType::kMuted:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::SensitivityEnum val)
+{
+    using EnumType = SmokeCoAlarm::SensitivityEnum;
+    switch (val)
+    {
+    case EnumType::kHigh:
+    case EnumType::kStandard:
+    case EnumType::kLow:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(HepaFilterMonitoring::ChangeIndicationEnum val)
 {
     using EnumType = HepaFilterMonitoring::ChangeIndicationEnum;
@@ -1682,9 +1766,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlLockState v
     case EnumType::kNotFullyLocked:
     case EnumType::kLocked:
     case EnumType::kUnlocked:
+    case EnumType::kUnlatched:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(4);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlLockType val)
@@ -1703,9 +1788,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlLockType va
     case EnumType::kInterconnectedLock:
     case EnumType::kDeadLatch:
     case EnumType::kDoorFurniture:
+    case EnumType::kEurocylinder:
         return val;
     default:
-        return static_cast<EnumType>(11);
+        return static_cast<EnumType>(12);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlStatus val)
@@ -1857,9 +1943,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockOperation
     case EnumType::kUnlock:
     case EnumType::kNonAccessUserEvent:
     case EnumType::kForcedUserEvent:
+    case EnumType::kUnlatch:
         return val;
     default:
-        return static_cast<EnumType>(4);
+        return static_cast<EnumType>(5);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::OperatingModeEnum val)

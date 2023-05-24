@@ -2251,7 +2251,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "RegulatoryLocationType",
+              "type": "RegulatoryLocationTypeEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -2267,7 +2267,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "RegulatoryLocationType",
+              "type": "RegulatoryLocationTypeEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -13403,7 +13403,7 @@
               "side": "server",
               "type": "LineupInfoStruct",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -13419,7 +13419,7 @@
               "side": "server",
               "type": "ChannelInfoStruct",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -14782,6 +14782,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 769
     }
-  ],
-  "log": []
+  ]
 }

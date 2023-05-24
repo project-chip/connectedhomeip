@@ -41,7 +41,7 @@ declare_args() {
   # By default, the resources used by each fabric is unlimited if they are allocated on heap. This flag is for checking the resource usage even when they are allocated on heap to increase code coverage in integration tests.
   chip_im_force_fabric_quota_check = false
 
-  enable_eventlist_attribute = false
+  enable_eventlist_attribute = true
 }
 
 buildconfig_header("app_buildconfig") {

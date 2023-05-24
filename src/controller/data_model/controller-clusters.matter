@@ -61,7 +61,7 @@ client cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 client cluster Groups = 4 {
-  bitmap GroupsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kGroupNames = 0x1;
   }
 
@@ -132,12 +132,12 @@ client cluster Groups = 4 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 client cluster Scenes = 5 {
-  bitmap ScenesCopyMode : BITMAP8 {
-    kCopyAllScenes = 0x1;
+  bitmap Feature : BITMAP32 {
+    kSceneNames = 0x1;
   }
 
-  bitmap ScenesFeature : BITMAP32 {
-    kSceneNames = 0x1;
+  bitmap ScenesCopyMode : BITMAP8 {
+    kCopyAllScenes = 0x1;
   }
 
   struct AttributeValuePair {
@@ -326,12 +326,12 @@ client cluster OnOff = 6 {
     kTogglePreviousOnOff = 2;
   }
 
-  bitmap OnOffControl : BITMAP8 {
-    kAcceptOnlyWhenOn = 0x1;
+  bitmap Feature : BITMAP32 {
+    kLighting = 0x1;
   }
 
-  bitmap OnOffFeature : BITMAP32 {
-    kLighting = 0x1;
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -395,7 +395,7 @@ client cluster LevelControl = 8 {
     kDown = 1;
   }
 
-  bitmap LevelControlFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kOnOff = 0x1;
     kLighting = 0x2;
     kFrequency = 0x4;
@@ -517,6 +517,16 @@ client cluster BinaryInputBasic = 15 {
   attribute optional enum8 reliability = 103;
   readonly attribute bitmap8 statusFlags = 111;
   readonly attribute optional int32u applicationType = 256;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Cluster to control pulse width modulation */
+client cluster PulseWidthModulation = 28 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1116,7 +1126,7 @@ client cluster UnitLocalization = 45 {
     kKelvin = 2;
   }
 
-  bitmap UnitLocalizationFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kTemperatureUnit = 0x1;
   }
 
@@ -1320,7 +1330,7 @@ client cluster PowerSource = 47 {
     kUnderVoltage = 2;
   }
 
-  bitmap PowerSourceFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWired = 0x1;
     kBattery = 0x2;
     kRechargeable = 0x4;
@@ -1398,7 +1408,7 @@ client cluster PowerSource = 47 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 client cluster GeneralCommissioning = 48 {
-  enum CommissioningError : ENUM8 {
+  enum CommissioningErrorEnum : ENUM8 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -1406,7 +1416,7 @@ client cluster GeneralCommissioning = 48 {
     kBusyWithOtherAdmin = 4;
   }
 
-  enum RegulatoryLocationType : ENUM8 {
+  enum RegulatoryLocationTypeEnum : ENUM8 {
     kIndoor = 0;
     kOutdoor = 1;
     kIndoorOutdoor = 2;
@@ -1419,8 +1429,8 @@ client cluster GeneralCommissioning = 48 {
 
   attribute access(write: administer) int64u breadcrumb = 0;
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
-  readonly attribute RegulatoryLocationType regulatoryConfig = 2;
-  readonly attribute RegulatoryLocationType locationCapability = 3;
+  readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
+  readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1435,23 +1445,23 @@ client cluster GeneralCommissioning = 48 {
   }
 
   response struct ArmFailSafeResponse = 1 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   request struct SetRegulatoryConfigRequest {
-    RegulatoryLocationType newRegulatoryConfig = 0;
+    RegulatoryLocationTypeEnum newRegulatoryConfig = 0;
     CHAR_STRING countryCode = 1;
     INT64U breadcrumb = 2;
   }
 
   response struct SetRegulatoryConfigResponse = 3 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct CommissioningCompleteResponse = 5 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
@@ -1489,7 +1499,7 @@ client cluster NetworkCommissioning = 49 {
     k60g = 4;
   }
 
-  bitmap NetworkCommissioningFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
@@ -1761,7 +1771,7 @@ client cluster GeneralDiagnostics = 51 {
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 client cluster SoftwareDiagnostics = 52 {
-  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWaterMarks = 0x1;
   }
 
@@ -1818,7 +1828,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
     kLeader = 6;
   }
 
-  bitmap ThreadNetworkDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
     kMLECounts = 0x4;
@@ -1990,7 +2000,7 @@ client cluster WiFiNetworkDiagnostics = 54 {
     kAx = 5;
   }
 
-  bitmap WiFiNetworkDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
   }
@@ -2047,7 +2057,7 @@ client cluster EthernetNetworkDiagnostics = 55 {
     kRate400G = 9;
   }
 
-  bitmap EthernetNetworkDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
   }
@@ -2070,6 +2080,152 @@ client cluster EthernetNetworkDiagnostics = 55 {
 
   /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
   command ResetCounts(): DefaultSuccess = 0;
+}
+
+/** Accurate time is required for a number of reasons, including scheduling, display and validating security materials. */
+client cluster TimeSynchronization = 56 {
+  enum GranularityEnum : ENUM8 {
+    kNoTimeGranularity = 0;
+    kMinutesGranularity = 1;
+    kSecondsGranularity = 2;
+    kMillisecondsGranularity = 3;
+    kMicrosecondsGranularity = 4;
+  }
+
+  enum StatusCode : ENUM8 {
+    kTimeNotAccepted = 2;
+  }
+
+  enum TimeSourceEnum : ENUM8 {
+    kNone = 0;
+    kUnknown = 1;
+    kAdmin = 2;
+    kNodeTimeCluster = 3;
+    kNonMatterSNTP = 4;
+    kNonMatterNTP = 5;
+    kMatterSNTP = 6;
+    kMatterNTP = 7;
+    kMixedNTP = 8;
+    kNonMatterSNTPNTS = 9;
+    kNonMatterNTPNTS = 10;
+    kMatterSNTPNTS = 11;
+    kMatterNTPNTS = 12;
+    kMixedNTPNTS = 13;
+    kCloudSource = 14;
+    kPtp = 15;
+    kGnss = 16;
+  }
+
+  enum TimeZoneDatabaseEnum : ENUM8 {
+    kFull = 0;
+    kPartial = 1;
+    kNone = 2;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kTimeZone = 0x1;
+    kNTPClient = 0x2;
+    kNTPServer = 0x4;
+    kTimeSyncClient = 0x8;
+  }
+
+  struct DSTOffsetStruct {
+    int32s offset = 0;
+    epoch_us validStarting = 1;
+    nullable epoch_us validUntil = 2;
+  }
+
+  struct FabricScopedTrustedTimeSourceStruct {
+    node_id nodeID = 0;
+    endpoint_no endpoint = 1;
+  }
+
+  struct TimeZoneStruct {
+    int32s offset = 0;
+    epoch_us validAt = 1;
+    optional char_string<64> name = 2;
+  }
+
+  struct TrustedTimeSourceStruct {
+    fabric_idx fabricIndex = 0;
+    node_id nodeID = 1;
+    endpoint_no endpoint = 2;
+  }
+
+  info event DSTTableEmpty = 0 {
+  }
+
+  info event DSTStatus = 1 {
+    boolean DSTOffsetActive = 0;
+  }
+
+  info event TimeZoneStatus = 2 {
+    INT32S offset = 0;
+    optional CHAR_STRING name = 1;
+  }
+
+  info event TimeFailure = 3 {
+  }
+
+  info event MissingTrustedTimeSource = 4 {
+  }
+
+  readonly attribute nullable epoch_us UTCTime = 0;
+  readonly attribute GranularityEnum granularity = 1;
+  readonly attribute optional TimeSourceEnum timeSource = 2;
+  readonly attribute optional nullable TrustedTimeSourceStruct trustedTimeSource = 3;
+  readonly attribute optional nullable char_string<128> defaultNTP = 4;
+  readonly attribute optional TimeZoneStruct timeZone[] = 5;
+  readonly attribute optional DSTOffsetStruct DSTOffset[] = 6;
+  readonly attribute optional nullable epoch_us localTime = 7;
+  readonly attribute optional TimeZoneDatabaseEnum timeZoneDatabase = 8;
+  readonly attribute optional boolean NTPServerAvailable = 9;
+  readonly attribute optional int8u timeZoneListMaxSize = 10;
+  readonly attribute optional int8u DSTOffsetListMaxSize = 11;
+  readonly attribute optional boolean supportsDNSResolve = 12;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetUTCTimeRequest {
+    epoch_us UTCTime = 0;
+    GranularityEnum granularity = 1;
+    optional TimeSourceEnum timeSource = 2;
+  }
+
+  request struct SetTrustedTimeSourceRequest {
+    nullable FabricScopedTrustedTimeSourceStruct trustedTimeSource = 0;
+  }
+
+  request struct SetTimeZoneRequest {
+    TimeZoneStruct timeZone[] = 0;
+  }
+
+  response struct SetTimeZoneResponse = 3 {
+    boolean DSTOffsetRequired = 0;
+  }
+
+  request struct SetDSTOffsetRequest {
+    DSTOffsetStruct DSTOffset[] = 0;
+  }
+
+  request struct SetDefaultNTPRequest {
+    nullable CHAR_STRING<128> defaultNTP = 0;
+  }
+
+  /** This command MAY be issued by Administrator to set the time. */
+  command access(invoke: administer) SetUTCTime(SetUTCTimeRequest): DefaultSuccess = 0;
+  /** This command SHALL set TrustedTimeSource. */
+  fabric command access(invoke: administer) SetTrustedTimeSource(SetTrustedTimeSourceRequest): DefaultSuccess = 1;
+  /** This command SHALL set TimeZone. */
+  command access(invoke: manage) SetTimeZone(SetTimeZoneRequest): SetTimeZoneResponse = 2;
+  /** This command SHALL set DSTOffset. */
+  command access(invoke: manage) SetDSTOffset(SetDSTOffsetRequest): DefaultSuccess = 4;
+  /** This command is used to set DefaultNTP. */
+  command access(invoke: administer) SetDefaultNTP(SetDefaultNTPRequest): DefaultSuccess = 5;
 }
 
 /** This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
@@ -2157,7 +2313,7 @@ client cluster BridgedDeviceBasicInformation = 57 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 client cluster Switch = 59 {
-  bitmap SwitchFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kLatchingSwitch = 0x1;
     kMomentarySwitch = 0x2;
     kMomentarySwitchRelease = 0x4;
@@ -2483,6 +2639,36 @@ client cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Cluster to control Proxy Configuration */
+client cluster ProxyConfiguration = 66 {
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Cluster to control Proxy Discovery */
+client cluster ProxyDiscovery = 67 {
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Cluster to control Proxy Valid */
+client cluster ProxyValid = 68 {
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster provides an interface to a boolean state called StateValue. */
 client cluster BooleanState = 69 {
   info event StateChange = 0 {
@@ -2500,7 +2686,7 @@ client cluster BooleanState = 69 {
 
 /** Allows servers to ensure that listed clients are notified when a server is available for communication. */
 client cluster IcdManagement = 70 {
-  bitmap ICDManagementFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCheckInProtocolSupport = 0x1;
   }
 
@@ -2550,7 +2736,7 @@ client cluster IcdManagement = 70 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 client cluster ModeSelect = 80 {
-  bitmap ModeSelectFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kDeponoff = 0x1;
   }
 
@@ -2586,6 +2772,72 @@ client cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** Attributes and commands for configuring the temperature control, and reporting temperature. */
+client cluster TemperatureControl = 86 {
+  bitmap Feature : BITMAP32 {
+    kTemperatureNumber = 0x1;
+    kTemperatureLevel = 0x2;
+  }
+
+  struct TemperatureLevelStruct {
+    char_string<64> label = 0;
+    int8u temperatureLevel = 1;
+  }
+
+  readonly attribute optional int16s temperatureSetpoint = 0;
+  readonly attribute optional int16s minTemperature = 1;
+  readonly attribute optional int16s maxTemperature = 2;
+  readonly attribute optional int16s step = 3;
+  readonly attribute optional int8u currentTemperatureLevelIndex = 4;
+  readonly attribute optional TemperatureLevelStruct supportedTemperatureLevels[] = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetTemperatureRequest {
+    optional INT16S targetTemperature = 0;
+    optional INT8U targetTemperatureLevel = 1;
+  }
+
+  /** Set Temperature */
+  command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
+}
+
+/** Attributes and commands for configuring the Refrigerator alarm. */
+client cluster RefrigeratorAlarm = 87 {
+  bitmap AlarmMap : BITMAP32 {
+    kDoorOpen = 0x1;
+  }
+
+  info event Notify = 0 {
+    AlarmMap active = 0;
+    AlarmMap inactive = 1;
+    AlarmMap state = 2;
+    AlarmMap mask = 3;
+  }
+
+  attribute AlarmMap mask = 0;
+  readonly attribute AlarmMap latch = 1;
+  readonly attribute AlarmMap state = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ResetRequest {
+    AlarmMap alarms = 0;
+    optional AlarmMap mask = 1;
+  }
+
+  /** Reset alarm */
+  command Reset(ResetRequest): DefaultSuccess = 0;
+}
+
 /** Attributes for reporting air quality classification */
 client cluster AirQuality = 91 {
   enum AirQualityEnum : ENUM8 {
@@ -2614,6 +2866,110 @@ client cluster AirQuality = 91 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
+client cluster SmokeCoAlarm = 92 {
+  enum AlarmStateEnum : ENUM8 {
+    kNormal = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum ContaminationStateEnum : ENUM8 {
+    kNormal = 0;
+    kLow = 1;
+    kWarning = 2;
+    kCritical = 3;
+  }
+
+  enum EndOfServiceEnum : ENUM8 {
+    kExpired = 0;
+    kNormal = 1;
+  }
+
+  enum ExpressedStateEnum : ENUM8 {
+    kNormal = 0;
+    kSmokeAlarm = 1;
+    kCOAlarm = 2;
+    kBatteryAlert = 3;
+    kTesting = 4;
+    kHardwareFault = 5;
+    kEndOfService = 6;
+    kInterconnectSmoke = 7;
+    kInterconnectCO = 8;
+  }
+
+  enum MuteStateEnum : ENUM8 {
+    kNotMuted = 0;
+    kMuted = 1;
+  }
+
+  enum SensitivityEnum : ENUM8 {
+    kHigh = 0;
+    kStandard = 1;
+    kLow = 2;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kSmokeAlarm = 0x1;
+    kCoAlarm = 0x2;
+  }
+
+  info event SmokeAlarm = 0 {
+  }
+
+  info event COAlarm = 1 {
+  }
+
+  info event LowBattery = 2 {
+  }
+
+  info event HardwareFault = 3 {
+  }
+
+  info event EndOfService = 4 {
+  }
+
+  info event SelfTestComplete = 5 {
+  }
+
+  info event AlarmMuted = 6 {
+  }
+
+  info event MuteEnded = 7 {
+  }
+
+  info event InterconnectSmokeAlarm = 8 {
+  }
+
+  info event InterconnectCOAlarm = 9 {
+  }
+
+  info event AllClear = 10 {
+  }
+
+  readonly attribute ExpressedStateEnum expressedState = 0;
+  readonly attribute optional AlarmStateEnum smokeState = 1;
+  readonly attribute optional AlarmStateEnum COState = 2;
+  readonly attribute AlarmStateEnum batteryAlert = 3;
+  readonly attribute optional MuteStateEnum deviceMuted = 4;
+  readonly attribute boolean testInProgress = 5;
+  readonly attribute boolean hardwareFaultAlert = 6;
+  readonly attribute EndOfServiceEnum endOfServiceAlert = 7;
+  readonly attribute optional AlarmStateEnum interconnectSmokeAlarm = 8;
+  readonly attribute optional AlarmStateEnum interconnectCOAlarm = 9;
+  readonly attribute optional ContaminationStateEnum contaminationState = 10;
+  attribute optional SensitivityEnum sensitivityLevel = 11;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  /** This command SHALL initiate a device self-test. */
+  command SelfTestRequest(): DefaultSuccess = 0;
+}
+
 /** Attributes and commands for monitoring HEPA filters in a device */
 client cluster HepaFilterMonitoring = 113 {
   enum ChangeIndicationEnum : ENUM8 {
@@ -2627,7 +2983,7 @@ client cluster HepaFilterMonitoring = 113 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2660,7 +3016,7 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2693,7 +3049,7 @@ client cluster CeramicFilterMonitoring = 115 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2726,7 +3082,7 @@ client cluster ElectrostaticFilterMonitoring = 116 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2759,7 +3115,7 @@ client cluster UvFilterMonitoring = 117 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2792,7 +3148,7 @@ client cluster IonizingFilterMonitoring = 118 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2825,7 +3181,7 @@ client cluster ZeoliteFilterMonitoring = 119 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2858,7 +3214,7 @@ client cluster OzoneFilterMonitoring = 120 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2891,7 +3247,7 @@ client cluster WaterTankMonitoring = 121 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2924,7 +3280,7 @@ client cluster FuelTankMonitoring = 122 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2957,7 +3313,7 @@ client cluster InkCartridgeMonitoring = 123 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -2990,7 +3346,7 @@ client cluster TonerCartridgeMonitoring = 124 {
     kDown = 1;
   }
 
-  bitmap Features : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
   }
@@ -3048,6 +3404,7 @@ client cluster DoorLock = 257 {
     kNotFullyLocked = 0;
     kLocked = 1;
     kUnlocked = 2;
+    kUnlatched = 3;
   }
 
   enum DlLockType : ENUM8 {
@@ -3062,6 +3419,7 @@ client cluster DoorLock = 257 {
     kInterconnectedLock = 8;
     kDeadLatch = 9;
     kDoorFurniture = 10;
+    kEurocylinder = 11;
   }
 
   enum DlStatus : ENUM8 {
@@ -3153,6 +3511,7 @@ client cluster DoorLock = 257 {
     kUnlock = 1;
     kNonAccessUserEvent = 2;
     kForcedUserEvent = 3;
+    kUnlatch = 4;
   }
 
   enum OperatingModeEnum : ENUM8 {
@@ -3328,7 +3687,7 @@ client cluster DoorLock = 257 {
     kSaturday = 0x40;
   }
 
-  bitmap DoorLockFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPinCredential = 0x1;
     kRfidCredential = 0x2;
     kFingerCredentials = 0x4;
@@ -3341,6 +3700,7 @@ client cluster DoorLock = 257 {
     kNotification = 0x200;
     kYearDayAccessSchedules = 0x400;
     kHolidaySchedules = 0x800;
+    kUnbolt = 0x1000;
   }
 
   struct CredentialStruct {
@@ -3582,6 +3942,10 @@ client cluster DoorLock = 257 {
     nullable CredentialStruct credential = 0;
   }
 
+  request struct UnboltDoorRequest {
+    optional OCTET_STRING PINCode = 0;
+  }
+
   /** This command causes the lock device to lock the door. */
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
   /** This command causes the lock device to unlock the door. */
@@ -3618,6 +3982,8 @@ client cluster DoorLock = 257 {
   command access(invoke: administer) GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
   /** Clear one, one type, or all credentials except ProgrammingPIN credential. */
   timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
+  /** This command causes the lock device to unlock the door without pulling the latch. */
+  timed command UnboltDoor(UnboltDoorRequest): DefaultSuccess = 39;
 }
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
@@ -3674,6 +4040,14 @@ client cluster WindowCovering = 258 {
     kTiltEncoderControlled = 0x40;
   }
 
+  bitmap Feature : BITMAP32 {
+    kLift = 0x1;
+    kTilt = 0x2;
+    kPositionAwareLift = 0x4;
+    kAbsolutePosition = 0x8;
+    kPositionAwareTilt = 0x10;
+  }
+
   bitmap Mode : BITMAP8 {
     kMotorDirectionReversed = 0x1;
     kCalibrationMode = 0x2;
@@ -3700,14 +4074,6 @@ client cluster WindowCovering = 258 {
     kHardwareFailure = 0x200;
     kManualOperation = 0x400;
     kProtection = 0x800;
-  }
-
-  bitmap WindowCoveringFeature : BITMAP32 {
-    kLift = 0x1;
-    kTilt = 0x2;
-    kPositionAwareLift = 0x4;
-    kAbsolutePosition = 0x8;
-    kPositionAwareTilt = 0x10;
   }
 
   readonly attribute Type type = 0;
@@ -3818,7 +4184,7 @@ client cluster PumpConfigurationAndControl = 512 {
     kLocal = 3;
   }
 
-  bitmap PumpConfigurationAndControlFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kConstantPressure = 0x1;
     kCompensatedPressure = 0x2;
     kConstantFlow = 0x4;
@@ -3968,18 +4334,18 @@ client cluster Thermostat = 513 {
     kAway = 0x80;
   }
 
-  bitmap ModeForSequence : BITMAP8 {
-    kHeatSetpointPresent = 0x1;
-    kCoolSetpointPresent = 0x2;
-  }
-
-  bitmap ThermostatFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kHeating = 0x1;
     kCooling = 0x2;
     kOccupancy = 0x4;
     kScheduleConfiguration = 0x8;
     kSetback = 0x10;
     kAutoMode = 0x20;
+  }
+
+  bitmap ModeForSequence : BITMAP8 {
+    kHeatSetpointPresent = 0x1;
+    kCoolSetpointPresent = 0x2;
   }
 
   struct ThermostatScheduleTransition {
@@ -4099,7 +4465,7 @@ client cluster FanControl = 514 {
     kSmart = 6;
   }
 
-  bitmap FanControlFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kMultiSpeed = 0x1;
     kAuto = 0x2;
     kRocking = 0x4;
@@ -4210,19 +4576,19 @@ client cluster ColorControl = 768 {
     kColorTemperatureSupported = 0x10;
   }
 
-  bitmap ColorControlFeature : BITMAP32 {
-    kHueAndSaturation = 0x1;
-    kEnhancedHue = 0x2;
-    kColorLoop = 0x4;
-    kXy = 0x8;
-    kColorTemperature = 0x10;
-  }
-
   bitmap ColorLoopUpdateFlags : BITMAP8 {
     kUpdateAction = 0x1;
     kUpdateDirection = 0x2;
     kUpdateTime = 0x4;
     kUpdateStartHue = 0x8;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kHueAndSaturation = 0x1;
+    kEnhancedHue = 0x2;
+    kColorLoop = 0x4;
+    kXy = 0x8;
+    kColorTemperature = 0x10;
   }
 
   readonly attribute optional int8u currentHue = 0;
@@ -4532,7 +4898,7 @@ client cluster TemperatureMeasurement = 1026 {
 
 /** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
 client cluster PressureMeasurement = 1027 {
-  bitmap PressureMeasurementFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kExtended = 0x1;
   }
 
@@ -4643,7 +5009,7 @@ client cluster Channel = 1284 {
     kMso = 0;
   }
 
-  bitmap ChannelFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kChannelList = 0x1;
     kLineupInfo = 0x2;
   }
@@ -4688,7 +5054,7 @@ client cluster Channel = 1284 {
   }
 
   request struct SkipChannelRequest {
-    INT16U count = 0;
+    INT16S count = 0;
   }
 
   /** Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. */
@@ -4753,7 +5119,7 @@ client cluster MediaPlayback = 1286 {
     kBuffering = 3;
   }
 
-  bitmap MediaPlaybackFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kAdvancedSeek = 0x1;
     kVariableSpeed = 0x2;
   }
@@ -4835,7 +5201,7 @@ client cluster MediaInput = 1287 {
     kOther = 11;
   }
 
-  bitmap MediaInputFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNameUpdates = 0x1;
   }
 
@@ -4984,7 +5350,7 @@ client cluster KeypadInput = 1289 {
     kInvalidKeyInCurrentState = 2;
   }
 
-  bitmap KeypadInputFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNavigationKeyCodes = 0x1;
     kLocationKeys = 0x2;
     kNumberKeys = 0x4;
@@ -5039,7 +5405,7 @@ client cluster ContentLauncher = 1290 {
     kVideo = 13;
   }
 
-  bitmap ContentLauncherFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
   }
@@ -5128,7 +5494,7 @@ client cluster AudioOutput = 1291 {
     kOther = 5;
   }
 
-  bitmap AudioOutputFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNameUpdates = 0x1;
   }
 
@@ -5170,7 +5536,7 @@ client cluster ApplicationLauncher = 1292 {
     kSystemBusy = 2;
   }
 
-  bitmap ApplicationLauncherFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kApplicationPlatform = 0x1;
   }
 
@@ -5890,87 +6256,40 @@ client cluster UnitTesting = 4294048773 {
   command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): TestEmitTestFabricScopedEventResponse = 21;
 }
 
-endpoint 1 {
-  device type rootdevice = 22, version 1;
-  binding cluster Identify;
-  binding cluster Groups;
-  binding cluster Scenes;
-  binding cluster OnOff;
-  binding cluster OnOffSwitchConfiguration;
-  binding cluster LevelControl;
-  binding cluster BinaryInputBasic;
-  binding cluster Descriptor;
-  binding cluster Binding;
-  binding cluster AccessControl;
-  binding cluster Actions;
-  binding cluster BasicInformation;
-  binding cluster OtaSoftwareUpdateProvider;
-  binding cluster OtaSoftwareUpdateRequestor;
-  binding cluster LocalizationConfiguration;
-  binding cluster TimeFormatLocalization;
-  binding cluster UnitLocalization;
-  binding cluster PowerSourceConfiguration;
-  binding cluster PowerSource;
-  binding cluster GeneralCommissioning;
-  binding cluster NetworkCommissioning;
-  binding cluster DiagnosticLogs;
-  binding cluster GeneralDiagnostics;
-  binding cluster SoftwareDiagnostics;
-  binding cluster ThreadNetworkDiagnostics;
-  binding cluster WiFiNetworkDiagnostics;
-  binding cluster EthernetNetworkDiagnostics;
-  binding cluster BridgedDeviceBasicInformation;
-  binding cluster Switch;
-  binding cluster AdministratorCommissioning;
-  binding cluster OperationalCredentials;
-  binding cluster GroupKeyManagement;
-  binding cluster FixedLabel;
-  binding cluster UserLabel;
-  binding cluster BooleanState;
-  binding cluster IcdManagement;
-  binding cluster ModeSelect;
-  binding cluster AirQuality;
-  binding cluster HepaFilterMonitoring;
-  binding cluster ActivatedCarbonFilterMonitoring;
-  binding cluster CeramicFilterMonitoring;
-  binding cluster ElectrostaticFilterMonitoring;
-  binding cluster UvFilterMonitoring;
-  binding cluster IonizingFilterMonitoring;
-  binding cluster ZeoliteFilterMonitoring;
-  binding cluster OzoneFilterMonitoring;
-  binding cluster WaterTankMonitoring;
-  binding cluster FuelTankMonitoring;
-  binding cluster InkCartridgeMonitoring;
-  binding cluster TonerCartridgeMonitoring;
-  binding cluster DoorLock;
-  binding cluster WindowCovering;
-  binding cluster BarrierControl;
-  binding cluster PumpConfigurationAndControl;
-  binding cluster Thermostat;
-  binding cluster FanControl;
-  binding cluster ThermostatUserInterfaceConfiguration;
-  binding cluster ColorControl;
-  binding cluster BallastConfiguration;
-  binding cluster IlluminanceMeasurement;
-  binding cluster TemperatureMeasurement;
-  binding cluster PressureMeasurement;
-  binding cluster FlowMeasurement;
-  binding cluster RelativeHumidityMeasurement;
-  binding cluster OccupancySensing;
-  binding cluster WakeOnLan;
-  binding cluster Channel;
-  binding cluster TargetNavigator;
-  binding cluster MediaPlayback;
-  binding cluster MediaInput;
-  binding cluster LowPower;
-  binding cluster KeypadInput;
-  binding cluster ContentLauncher;
-  binding cluster AudioOutput;
-  binding cluster ApplicationLauncher;
-  binding cluster ApplicationBasic;
-  binding cluster AccountLogin;
-  binding cluster ElectricalMeasurement;
-  binding cluster UnitTesting;
-}
+/** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */
+client cluster FaultInjection = 4294048774 {
+  enum FaultType : ENUM8 {
+    kUnspecified = 0;
+    kSystemFault = 1;
+    kInetFault = 2;
+    kChipFault = 3;
+    kCertFault = 4;
+  }
 
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct FailAtFaultRequest {
+    FaultType type = 0;
+    INT32U id = 1;
+    INT32U numCallsToSkip = 2;
+    INT32U numCallsToFail = 3;
+    BOOLEAN takeMutex = 4;
+  }
+
+  request struct FailRandomlyAtFaultRequest {
+    FaultType type = 0;
+    INT32U id = 1;
+    INT8U percentage = 2;
+  }
+
+  /** Configure a fault to be triggered deterministically */
+  command access(invoke: manage) FailAtFault(FailAtFaultRequest): DefaultSuccess = 0;
+  /** Configure a fault to be triggered randomly, with a given probability defined as a percentage */
+  command access(invoke: manage) FailRandomlyAtFault(FailRandomlyAtFaultRequest): DefaultSuccess = 1;
+}
 

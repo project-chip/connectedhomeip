@@ -53,7 +53,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+              contains: [0, 1, 2, 65528, 65529, 65530, 65531, 65532, 65533]
 
     - label: "Read the optional attribute(Tolerance) in AttributeList"
       command: "readAttribute"
@@ -79,18 +79,26 @@ tests:
           value: []
           constraints:
               type: list
-    #Commenting out the step EventList attribute which is out of scope for matter V1.0
-    #- label:
-    #      "Read EventList attribute from the DUT and Verify that the DUT
-    #      response provides a list of supported events."
-    #  verification: |
-    #      Not implemented in chip-tool
-    #  cluster: "LogCommands"
-    #  command: "UserPrompt"
-    #  PICS: PICS_USER_PROMPT
-    #  arguments:
-    #      values:
-    #          - name: "message"
-    #            value: "Please enter 'y' for success"
-    #          - name: "expectedValue"
-    #            value: "y"
+
+    #Manufacturer specific event IDs check not possible
+    - label:
+          "Read EventList attribute from the DUT.For this cluster the list is
+          usually empty but it can contain manufacturer specific event IDs."
+      verification: |
+          ./chip-tool relativehumiditymeasurement read event-list 1 1
+
+            Verify " EventList " consists the list of supported events, in this cluster in RPI the value is 0 on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+
+            [1676357956.011759][8095:8097] CHIP:DMG: }
+            [1676357956.011914][8095:8097] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0405 Attribute 0x0000_FFFA DataVersion: 3619476420
+            [1676357956.011967][8095:8097] CHIP:TOO:   EventList: 0 entries
+                cluster: "LogCommands"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

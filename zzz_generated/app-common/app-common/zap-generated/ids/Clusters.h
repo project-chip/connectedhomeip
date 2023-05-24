@@ -151,9 +151,18 @@ static constexpr ClusterId Id = 0x00000046;
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
+namespace TemperatureControl {
+static constexpr ClusterId Id = 0x00000056;
+} // namespace TemperatureControl
+namespace RefrigeratorAlarm {
+static constexpr ClusterId Id = 0x00000057;
+} // namespace RefrigeratorAlarm
 namespace AirQuality {
 static constexpr ClusterId Id = 0x0000005B;
 } // namespace AirQuality
+namespace SmokeCoAlarm {
+static constexpr ClusterId Id = 0x0000005C;
+} // namespace SmokeCoAlarm
 namespace HepaFilterMonitoring {
 static constexpr ClusterId Id = 0x00000071;
 } // namespace HepaFilterMonitoring

@@ -11,12 +11,16 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import chip.devicecontroller.ChipClusters
+import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ReportCallback
+import chip.devicecontroller.model.ChipAttributePath
+import chip.devicecontroller.model.ChipEventPath
+import chip.devicecontroller.model.NodeState
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
-import com.google.chip.chiptool.databinding.AttestationTestFragmentBinding
 import com.google.chip.chiptool.databinding.SensorClientFragmentBinding
 import com.google.chip.chiptool.util.DeviceIdUtil
+import com.google.chip.chiptool.util.TlvParseUtil
 import com.jjoe64.graphview.LabelFormatter
 import com.jjoe64.graphview.Viewport
 import com.jjoe64.graphview.series.DataPoint
@@ -26,18 +30,12 @@ import java.util.Calendar
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
-private typealias ReadCallback = ChipClusters.IntegerAttributeCallback
-private typealias TemperatureReadCallback =
-    ChipClusters.TemperatureMeasurementCluster.MeasuredValueAttributeCallback
-
-private typealias PressureReadCallback =
-    ChipClusters.PressureMeasurementCluster.MeasuredValueAttributeCallback
-
-private typealias RelativeHumidityReadCallback =
-    ChipClusters.RelativeHumidityMeasurementCluster.MeasuredValueAttributeCallback
+import chip.devicecontroller.ClusterIDMapping.*
 
 class SensorClientFragment : Fragment() {
+  private val deviceController: ChipDeviceController
+    get() = ChipClient.getDeviceController(requireContext())
+
   private lateinit var scope: CoroutineScope
 
   // History of sensor values
@@ -150,12 +148,14 @@ class SensorClientFragment : Fragment() {
       val deviceId = binding.deviceIdEd.text.toString().toULong().toLong()
       val endpointId = binding.endpointIdEd.text.toString().toInt()
       val clusterName = binding.clusterNameSpinner.selectedItem.toString()
-      val clusterRead = CLUSTERS[clusterName]!!["read"] as (Long, Int, ReadCallback) -> Unit
+      val clusterId = CLUSTERS[clusterName]!!["clusterId"] as Long
+      val attributeId = CLUSTERS[clusterName]!!["attributeId"] as Long
       val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
       val callback = makeReadCallback(clusterName, false)
 
-      clusterRead(device, endpointId, callback)
+      deviceController.readAttributePath(callback, device, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), 0)
     } catch (ex: Exception) {
+      Log.d(TAG, "Failed to read the sensor : ", ex)
       showMessage(R.string.sensor_client_read_error_text, ex.toString())
     }
   }
@@ -165,13 +165,15 @@ class SensorClientFragment : Fragment() {
       val deviceId = binding.deviceIdEd.text.toString().toULong().toLong()
       val endpointId = binding.endpointIdEd.text.toString().toInt()
       val clusterName = binding.clusterNameSpinner.selectedItem.toString()
-      val clusterSubscribe = CLUSTERS[clusterName]!!["subscribe"] as (Long, Int, ReadCallback) -> Unit
+      val clusterId = CLUSTERS[clusterName]!!["clusterId"] as Long
+      val attributeId = CLUSTERS[clusterName]!!["attributeId"] as Long
       val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
       val callback = makeReadCallback(clusterName, true)
 
-      clusterSubscribe(device, endpointId, callback)
+      deviceController.subscribeToAttributePath({ Log.d(TAG, "onSubscriptionEstablished") }, callback, device, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), MIN_REFRESH_PERIOD_S, MAX_REFRESH_PERIOD_S, 0)
       subscribedDevicePtr = device
     } catch (ex: Exception) {
+      Log.d(TAG, "Failed to subscribe", ex)
       showMessage(R.string.sensor_client_subscribe_error_text, ex.toString())
     }
   }
@@ -188,17 +190,29 @@ class SensorClientFragment : Fragment() {
     }
   }
 
-  private fun makeReadCallback(clusterName: String, addToGraph: Boolean): ReadCallback {
-    return object : ReadCallback {
+  private fun makeReadCallback(clusterName: String, addToGraph: Boolean): ReportCallback {
+    return object : ReportCallback {
       val clusterConfig = CLUSTERS[clusterName]!!
+      val endpointId = binding.endpointIdEd.text.toString().toInt()
+      val clusterId = clusterConfig["clusterId"] as Long
+      val attributeId = clusterConfig["attributeId"] as Long
 
-      override fun onSuccess(value: Int) {
+      override fun onReport(nodeState: NodeState?) {
+        val tlv = nodeState?.getEndpointState(endpointId)?.getClusterState(clusterId)?.getAttributeState(attributeId)?.tlv ?: return
+        // TODO : Need to be implement poj-to-tlv
+        val value =
+                try {
+                  TlvParseUtil.decodeInt(tlv)
+                } catch (ex: Exception) {
+                  showMessage(R.string.sensor_client_read_error_text, "value is null")
+                  return
+                }
         val unitValue = clusterConfig["unitValue"] as Double
         val unitSymbol = clusterConfig["unitSymbol"] as String
         consumeSensorValue(value * unitValue, unitSymbol, addToGraph)
       }
 
-      override fun onError(ex: Exception) {
+      override fun onError(attributePath: ChipAttributePath?, eventPath: ChipEventPath?, ex: Exception) {
         showMessage(R.string.sensor_client_read_error_text, ex.toString())
       }
     }
@@ -241,84 +255,24 @@ class SensorClientFragment : Fragment() {
     private const val MAX_DATA_POINTS = 60
     private val CLUSTERS = mapOf(
         "Temperature" to mapOf(
-            "read" to { device: Long, endpointId: Int, callback: ReadCallback ->
-              val cluster = ChipClusters.TemperatureMeasurementCluster(device, endpointId)
-              cluster.readMeasuredValueAttribute(makeTemperatureReadCallback(callback))
-            },
-            "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
-              val cluster = ChipClusters.TemperatureMeasurementCluster(device, endpointId)
-              cluster.subscribeMeasuredValueAttribute(makeTemperatureReadCallback(callback),
-                  MIN_REFRESH_PERIOD_S,
-                  MAX_REFRESH_PERIOD_S)
-            },
+            "clusterId" to TemperatureMeasurement.ID,
+            "attributeId" to TemperatureMeasurement.Attribute.MeasuredValue.id,
             "unitValue" to 0.01,
             "unitSymbol" to "\u00B0C"
         ),
         "Pressure" to mapOf(
-            "read" to { device: Long, endpointId: Int, callback: ReadCallback ->
-              val cluster = ChipClusters.PressureMeasurementCluster(device, endpointId)
-              cluster.readMeasuredValueAttribute(makePressureReadCallback(callback))
-            },
-            "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
-              val cluster = ChipClusters.PressureMeasurementCluster(device, endpointId)
-              cluster.subscribeMeasuredValueAttribute(makePressureReadCallback(callback),
-                  MIN_REFRESH_PERIOD_S,
-                  MAX_REFRESH_PERIOD_S)
-            },
+            "clusterId" to PressureMeasurement.ID,
+            "attributeId" to PressureMeasurement.Attribute.MeasuredValue.id,
             "unitValue" to 1.0,
             "unitSymbol" to "hPa"
         ),
         "Relative Humidity" to mapOf(
-            "read" to { device: Long, endpointId: Int, callback: ReadCallback ->
-              val cluster = ChipClusters.RelativeHumidityMeasurementCluster(device, endpointId)
-              cluster.readMeasuredValueAttribute(makeHumidityReadCallback(callback))
-            },
-            "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
-              val cluster = ChipClusters.RelativeHumidityMeasurementCluster(device, endpointId)
-              cluster.subscribeMeasuredValueAttribute(makeHumidityReadCallback(callback),
-                  MIN_REFRESH_PERIOD_S,
-                  MAX_REFRESH_PERIOD_S)
-            },
+            "clusterId" to RelativeHumidityMeasurement.ID,
+            "attributeId" to RelativeHumidityMeasurement.Attribute.MeasuredValue.id,
             "unitValue" to 0.01,
             "unitSymbol" to "%"
         )
     )
-
-    private fun makeTemperatureReadCallback(callback: ReadCallback): TemperatureReadCallback {
-      return object : TemperatureReadCallback {
-        override fun onSuccess(value: Int?) {
-          value?.let { callback.onSuccess(it) }
-        }
-
-        override fun onError(error: java.lang.Exception?) {
-          callback.onError(error)
-        }
-      }
-    }
-
-    private fun makePressureReadCallback(callback: ReadCallback): PressureReadCallback {
-      return object : PressureReadCallback {
-        override fun onSuccess(value: Int?) {
-          value?.let { callback.onSuccess(it) }
-        }
-
-        override fun onError(error: java.lang.Exception?) {
-          callback.onError(error)
-        }
-      }
-    }
-
-    private fun makeHumidityReadCallback(callback: ReadCallback): RelativeHumidityReadCallback {
-      return object : RelativeHumidityReadCallback {
-        override fun onSuccess(value: Int?) {
-          value?.let { callback.onSuccess(it) }
-        }
-
-        override fun onError(error: java.lang.Exception?) {
-          callback.onError(error)
-        }
-      }
-    }
 
     fun newInstance(): SensorClientFragment = SensorClientFragment()
   }

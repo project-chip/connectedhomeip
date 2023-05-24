@@ -20,8 +20,6 @@
 #import "MTRBaseClusters.h"
 #import "MTRBaseDevice.h"
 
-#include <zap-generated/CHIPClusters.h>
-
 @interface MTRBaseClusterIdentify ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
@@ -197,17 +195,27 @@
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
-@interface MTRBaseClusterICDManagement ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
 @interface MTRBaseClusterModeSelect ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
+@interface MTRBaseClusterTemperatureControl ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
+@interface MTRBaseClusterRefrigeratorAlarm ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
 @interface MTRBaseClusterAirQuality ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
+@end
+
+@interface MTRBaseClusterSmokeCOAlarm ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end

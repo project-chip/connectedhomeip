@@ -84,7 +84,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-bool HasFeature(chip::EndpointId endpoint, AudioOutputFeature feature)
+bool HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     bool hasFeature     = false;
     uint32_t featureMap = 0;
@@ -181,7 +181,7 @@ bool emberAfAudioOutputClusterRenameOutputCallback(app::CommandHandler * command
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
-    if (!HasFeature(endpoint, AudioOutputFeature::kNameUpdates))
+    if (!HasFeature(endpoint, Feature::kNameUpdates))
     {
         ChipLogError(Zcl, "AudioOutput no name updates feature");
         err = CHIP_ERROR_INCORRECT_STATE;

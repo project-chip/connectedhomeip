@@ -107,6 +107,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::PulseWidthModulation::Id: {
+        using namespace app::Clusters::PulseWidthModulation;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::Descriptor::Id: {
         using namespace app::Clusters::Descriptor;
         switch (aPath.mEventId)
@@ -1707,6 +1717,177 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::TimeSynchronization::Id: {
+        using namespace app::Clusters::TimeSynchronization;
+        switch (aPath.mEventId)
+        {
+        case Events::DSTTableEmpty::Id: {
+            Events::DSTTableEmpty::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass DSTTableEmptyStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$TimeSynchronizationClusterDSTTableEmptyEvent",
+                DSTTableEmptyStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$TimeSynchronizationClusterDSTTableEmptyEvent");
+                return nullptr;
+            }
+            jmethodID DSTTableEmptyStructCtor = env->GetMethodID(DSTTableEmptyStructClass, "<init>", "()V");
+            if (DSTTableEmptyStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$TimeSynchronizationClusterDSTTableEmptyEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(DSTTableEmptyStructClass, DSTTableEmptyStructCtor);
+
+            return value;
+        }
+        case Events::DSTStatus::Id: {
+            Events::DSTStatus::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_DSTOffsetActive;
+            std::string value_DSTOffsetActiveClassName     = "java/lang/Boolean";
+            std::string value_DSTOffsetActiveCtorSignature = "(Z)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<bool>(value_DSTOffsetActiveClassName.c_str(),
+                                                                       value_DSTOffsetActiveCtorSignature.c_str(),
+                                                                       cppValue.DSTOffsetActive, value_DSTOffsetActive);
+
+            jclass DSTStatusStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$TimeSynchronizationClusterDSTStatusEvent", DSTStatusStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$TimeSynchronizationClusterDSTStatusEvent");
+                return nullptr;
+            }
+            jmethodID DSTStatusStructCtor = env->GetMethodID(DSTStatusStructClass, "<init>", "(Ljava/lang/Boolean;)V");
+            if (DSTStatusStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$TimeSynchronizationClusterDSTStatusEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(DSTStatusStructClass, DSTStatusStructCtor, value_DSTOffsetActive);
+
+            return value;
+        }
+        case Events::TimeZoneStatus::Id: {
+            Events::TimeZoneStatus::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_offset;
+            std::string value_offsetClassName     = "java/lang/Long";
+            std::string value_offsetCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<int32_t>(
+                value_offsetClassName.c_str(), value_offsetCtorSignature.c_str(), cppValue.offset, value_offset);
+
+            jobject value_name;
+            if (!cppValue.name.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_name);
+            }
+            else
+            {
+                jobject value_nameInsideOptional;
+                LogErrorOnFailure(
+                    chip::JniReferences::GetInstance().CharToStringUTF(cppValue.name.Value(), value_nameInsideOptional));
+                chip::JniReferences::GetInstance().CreateOptional(value_nameInsideOptional, value_name);
+            }
+
+            jclass timeZoneStatusStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$TimeSynchronizationClusterTimeZoneStatusEvent",
+                timeZoneStatusStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$TimeSynchronizationClusterTimeZoneStatusEvent");
+                return nullptr;
+            }
+            jmethodID timeZoneStatusStructCtor =
+                env->GetMethodID(timeZoneStatusStructClass, "<init>", "(Ljava/lang/Long;Ljava/util/Optional;)V");
+            if (timeZoneStatusStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$TimeSynchronizationClusterTimeZoneStatusEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(timeZoneStatusStructClass, timeZoneStatusStructCtor, value_offset, value_name);
+
+            return value;
+        }
+        case Events::TimeFailure::Id: {
+            Events::TimeFailure::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass timeFailureStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$TimeSynchronizationClusterTimeFailureEvent", timeFailureStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$TimeSynchronizationClusterTimeFailureEvent");
+                return nullptr;
+            }
+            jmethodID timeFailureStructCtor = env->GetMethodID(timeFailureStructClass, "<init>", "()V");
+            if (timeFailureStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$TimeSynchronizationClusterTimeFailureEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(timeFailureStructClass, timeFailureStructCtor);
+
+            return value;
+        }
+        case Events::MissingTrustedTimeSource::Id: {
+            Events::MissingTrustedTimeSource::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass missingTrustedTimeSourceStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$TimeSynchronizationClusterMissingTrustedTimeSourceEvent",
+                missingTrustedTimeSourceStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$TimeSynchronizationClusterMissingTrustedTimeSourceEvent");
+                return nullptr;
+            }
+            jmethodID missingTrustedTimeSourceStructCtor = env->GetMethodID(missingTrustedTimeSourceStructClass, "<init>", "()V");
+            if (missingTrustedTimeSourceStructCtor == nullptr)
+            {
+                ChipLogError(Zcl,
+                             "Could not find ChipEventStructs$TimeSynchronizationClusterMissingTrustedTimeSourceEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(missingTrustedTimeSourceStructClass, missingTrustedTimeSourceStructCtor);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::BridgedDeviceBasicInformation::Id: {
         using namespace app::Clusters::BridgedDeviceBasicInformation;
         switch (aPath.mEventId)
@@ -2149,6 +2330,36 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::ProxyConfiguration::Id: {
+        using namespace app::Clusters::ProxyConfiguration;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ProxyDiscovery::Id: {
+        using namespace app::Clusters::ProxyDiscovery;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ProxyValid::Id: {
+        using namespace app::Clusters::ProxyValid;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::BooleanState::Id: {
         using namespace app::Clusters::BooleanState;
         switch (aPath.mEventId)
@@ -2211,10 +2422,381 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::TemperatureControl::Id: {
+        using namespace app::Clusters::TemperatureControl;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::RefrigeratorAlarm::Id: {
+        using namespace app::Clusters::RefrigeratorAlarm;
+        switch (aPath.mEventId)
+        {
+        case Events::Notify::Id: {
+            Events::Notify::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_active;
+            std::string value_activeClassName     = "java/lang/Long";
+            std::string value_activeCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                value_activeClassName.c_str(), value_activeCtorSignature.c_str(), cppValue.active.Raw(), value_active);
+
+            jobject value_inactive;
+            std::string value_inactiveClassName     = "java/lang/Long";
+            std::string value_inactiveCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                value_inactiveClassName.c_str(), value_inactiveCtorSignature.c_str(), cppValue.inactive.Raw(), value_inactive);
+
+            jobject value_state;
+            std::string value_stateClassName     = "java/lang/Long";
+            std::string value_stateCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                value_stateClassName.c_str(), value_stateCtorSignature.c_str(), cppValue.state.Raw(), value_state);
+
+            jobject value_mask;
+            std::string value_maskClassName     = "java/lang/Long";
+            std::string value_maskCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                value_maskClassName.c_str(), value_maskCtorSignature.c_str(), cppValue.mask.Raw(), value_mask);
+
+            jclass notifyStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$RefrigeratorAlarmClusterNotifyEvent", notifyStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$RefrigeratorAlarmClusterNotifyEvent");
+                return nullptr;
+            }
+            jmethodID notifyStructCtor = env->GetMethodID(notifyStructClass, "<init>",
+                                                          "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
+            if (notifyStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$RefrigeratorAlarmClusterNotifyEvent constructor");
+                return nullptr;
+            }
+
+            jobject value =
+                env->NewObject(notifyStructClass, notifyStructCtor, value_active, value_inactive, value_state, value_mask);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::AirQuality::Id: {
         using namespace app::Clusters::AirQuality;
         switch (aPath.mEventId)
         {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::SmokeCoAlarm::Id: {
+        using namespace app::Clusters::SmokeCoAlarm;
+        switch (aPath.mEventId)
+        {
+        case Events::SmokeAlarm::Id: {
+            Events::SmokeAlarm::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass smokeAlarmStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterSmokeAlarmEvent", smokeAlarmStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterSmokeAlarmEvent");
+                return nullptr;
+            }
+            jmethodID smokeAlarmStructCtor = env->GetMethodID(smokeAlarmStructClass, "<init>", "()V");
+            if (smokeAlarmStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterSmokeAlarmEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(smokeAlarmStructClass, smokeAlarmStructCtor);
+
+            return value;
+        }
+        case Events::COAlarm::Id: {
+            Events::COAlarm::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass COAlarmStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterCOAlarmEvent", COAlarmStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterCOAlarmEvent");
+                return nullptr;
+            }
+            jmethodID COAlarmStructCtor = env->GetMethodID(COAlarmStructClass, "<init>", "()V");
+            if (COAlarmStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterCOAlarmEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(COAlarmStructClass, COAlarmStructCtor);
+
+            return value;
+        }
+        case Events::LowBattery::Id: {
+            Events::LowBattery::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass lowBatteryStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterLowBatteryEvent", lowBatteryStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterLowBatteryEvent");
+                return nullptr;
+            }
+            jmethodID lowBatteryStructCtor = env->GetMethodID(lowBatteryStructClass, "<init>", "()V");
+            if (lowBatteryStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterLowBatteryEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(lowBatteryStructClass, lowBatteryStructCtor);
+
+            return value;
+        }
+        case Events::HardwareFault::Id: {
+            Events::HardwareFault::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass hardwareFaultStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterHardwareFaultEvent", hardwareFaultStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterHardwareFaultEvent");
+                return nullptr;
+            }
+            jmethodID hardwareFaultStructCtor = env->GetMethodID(hardwareFaultStructClass, "<init>", "()V");
+            if (hardwareFaultStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterHardwareFaultEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(hardwareFaultStructClass, hardwareFaultStructCtor);
+
+            return value;
+        }
+        case Events::EndOfService::Id: {
+            Events::EndOfService::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass endOfServiceStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterEndOfServiceEvent", endOfServiceStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterEndOfServiceEvent");
+                return nullptr;
+            }
+            jmethodID endOfServiceStructCtor = env->GetMethodID(endOfServiceStructClass, "<init>", "()V");
+            if (endOfServiceStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterEndOfServiceEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(endOfServiceStructClass, endOfServiceStructCtor);
+
+            return value;
+        }
+        case Events::SelfTestComplete::Id: {
+            Events::SelfTestComplete::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass selfTestCompleteStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterSelfTestCompleteEvent",
+                selfTestCompleteStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterSelfTestCompleteEvent");
+                return nullptr;
+            }
+            jmethodID selfTestCompleteStructCtor = env->GetMethodID(selfTestCompleteStructClass, "<init>", "()V");
+            if (selfTestCompleteStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterSelfTestCompleteEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(selfTestCompleteStructClass, selfTestCompleteStructCtor);
+
+            return value;
+        }
+        case Events::AlarmMuted::Id: {
+            Events::AlarmMuted::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass alarmMutedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterAlarmMutedEvent", alarmMutedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterAlarmMutedEvent");
+                return nullptr;
+            }
+            jmethodID alarmMutedStructCtor = env->GetMethodID(alarmMutedStructClass, "<init>", "()V");
+            if (alarmMutedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterAlarmMutedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(alarmMutedStructClass, alarmMutedStructCtor);
+
+            return value;
+        }
+        case Events::MuteEnded::Id: {
+            Events::MuteEnded::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass muteEndedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterMuteEndedEvent", muteEndedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterMuteEndedEvent");
+                return nullptr;
+            }
+            jmethodID muteEndedStructCtor = env->GetMethodID(muteEndedStructClass, "<init>", "()V");
+            if (muteEndedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterMuteEndedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(muteEndedStructClass, muteEndedStructCtor);
+
+            return value;
+        }
+        case Events::InterconnectSmokeAlarm::Id: {
+            Events::InterconnectSmokeAlarm::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass interconnectSmokeAlarmStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterInterconnectSmokeAlarmEvent",
+                interconnectSmokeAlarmStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterInterconnectSmokeAlarmEvent");
+                return nullptr;
+            }
+            jmethodID interconnectSmokeAlarmStructCtor = env->GetMethodID(interconnectSmokeAlarmStructClass, "<init>", "()V");
+            if (interconnectSmokeAlarmStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterInterconnectSmokeAlarmEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(interconnectSmokeAlarmStructClass, interconnectSmokeAlarmStructCtor);
+
+            return value;
+        }
+        case Events::InterconnectCOAlarm::Id: {
+            Events::InterconnectCOAlarm::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass interconnectCOAlarmStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterInterconnectCOAlarmEvent",
+                interconnectCOAlarmStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterInterconnectCOAlarmEvent");
+                return nullptr;
+            }
+            jmethodID interconnectCOAlarmStructCtor = env->GetMethodID(interconnectCOAlarmStructClass, "<init>", "()V");
+            if (interconnectCOAlarmStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterInterconnectCOAlarmEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(interconnectCOAlarmStructClass, interconnectCOAlarmStructCtor);
+
+            return value;
+        }
+        case Events::AllClear::Id: {
+            Events::AllClear::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass allClearStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SmokeCoAlarmClusterAllClearEvent", allClearStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SmokeCoAlarmClusterAllClearEvent");
+                return nullptr;
+            }
+            jmethodID allClearStructCtor = env->GetMethodID(allClearStructClass, "<init>", "()V");
+            if (allClearStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SmokeCoAlarmClusterAllClearEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(allClearStructClass, allClearStructCtor);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
@@ -3810,6 +4392,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::FaultInjection::Id: {
+        using namespace app::Clusters::FaultInjection;
+        switch (aPath.mEventId)
+        {
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

@@ -9,15 +9,23 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import chip.devicecontroller.ChipClusters
-import chip.devicecontroller.ChipClusters.BasicInformationCluster
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ReportCallback
+import chip.devicecontroller.WriteAttributesCallback
+import chip.devicecontroller.model.AttributeWriteRequest
+import chip.devicecontroller.model.ChipAttributePath
+import chip.devicecontroller.model.ChipEventPath
+import chip.devicecontroller.model.NodeState
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.BasicClientFragmentBinding
+import com.google.chip.chiptool.util.TlvParseUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.Optional
+
+import chip.devicecontroller.ClusterIDMapping.*
 
 class BasicClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -43,15 +51,20 @@ class BasicClientFragment : Fragment() {
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
     binding.writeNodeLabelBtn.setOnClickListener { scope.launch {
-      sendWriteNodeLabelAttribute()
+      // TODO : Need to be implement poj-to-tlv
+      sendWriteAttribute(BasicInformation.Attribute.NodeLabel, TlvParseUtil.encode(binding.nodeLabelEd.text.toString()))
       binding.nodeLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
     }}
     binding.writeLocationBtn.setOnClickListener { scope.launch {
-      sendWriteLocationAttribute()
+      // TODO : Need to be implement poj-to-tlv
+      sendWriteAttribute(BasicInformation.Attribute.Location, TlvParseUtil.encode(binding.locationEd.text.toString()))
       binding.locationEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
     }}
     binding.writeLocalConfigDisabledSwitch.setOnCheckedChangeListener { _, isChecked ->
-      scope.launch { sendWriteLocalConfigDisabledAttribute(isChecked) }
+      scope.launch {
+        // TODO : Need to be implement poj-to-tlv
+        sendWriteAttribute(BasicInformation.Attribute.LocalConfigDisabled, TlvParseUtil.encode(isChecked))
+      }
     }
     makeAttributeList()
     binding.attributeNameSpinner.adapter = makeAttributeNamesAdapter()
@@ -105,382 +118,55 @@ class BasicClientFragment : Fragment() {
   }
 
   private suspend fun readBasicClusters(itemIndex: Int) {
-    when(ATTRIBUTES[itemIndex]) {
-      getString(R.string.basic_cluster_data_model_revision_text) -> sendReadDataModelRevisionAttribute()
-      getString(R.string.basic_cluster_vendor_name_text) -> sendReadVendorNameAttribute()
-      getString(R.string.basic_cluster_vendor_id_text) -> sendReadVendorIDAttribute()
-      getString(R.string.basic_cluster_product_name_text) -> sendReadProductNameAttribute()
-      getString(R.string.basic_cluster_product_id_text) -> sendReadProductIDAttribute()
-      getString(R.string.basic_cluster_node_label_text) -> sendReadNodeLabelAttribute()
-      getString(R.string.basic_cluster_location_text) -> sendReadLocationAttribute()
-      getString(R.string.basic_cluster_hardware_version_text) -> sendReadHardwareVersionAttribute()
-      getString(R.string.basic_cluster_hardware_version_string_text) -> sendReadHardwareVersionStringAttribute()
-      getString(R.string.basic_cluster_software_version_text) -> sendReadSoftwareVersionAttribute()
-      getString(R.string.basic_cluster_software_version_string_text) -> sendReadSoftwareVersionStringAttribute()
-      getString(R.string.basic_cluster_manufacturing_date_text) -> sendReadManufacturingDateAttribute()
-      getString(R.string.basic_cluster_part_number_text) -> sendReadPartNumberAttribute()
-      getString(R.string.basic_cluster_product_url_text) -> sendReadProductURLAttribute()
-      getString(R.string.basic_cluster_product_label_text) -> sendReadProductLabelAttribute()
-      getString(R.string.basic_cluster_serial_number_text) -> sendReadSerialNumberAttribute()
-      getString(R.string.basic_cluster_local_config_disabled_text) -> sendReadLocalConfigDisabledAttribute()
-      getString(R.string.basic_cluster_reachable_text) -> sendReadReachableAttribute()
-      getString(R.string.basic_cluster_unique_id_text) -> sendReadUniqueIDAttribute()
-      getString(R.string.basic_cluster_cluster_revision_text) -> sendReadClusterRevisionAttribute()
-    }
+    val endpointId = addressUpdateFragment.endpointId
+    val clusterId = BasicInformation.ID
+    val attributeName = ATTRIBUTES[itemIndex]
+    val attributeId = BasicInformation.Attribute.valueOf(attributeName).id
+
+    val devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+
+    ChipClient.getDeviceController(requireContext()).readPath(object: ReportCallback {
+      override fun onError(attributePath: ChipAttributePath?, eventPath: ChipEventPath?, ex: java.lang.Exception) {
+        showMessage("Read $attributeName failure $ex")
+        Log.e(TAG, "Read $attributeName failure", ex)
+      }
+
+      override fun onReport(nodeState: NodeState?) {
+        val value = nodeState?.getEndpointState(endpointId)?.getClusterState(clusterId)?.getAttributeState(attributeId)?.value ?: "null"
+        Log.i(TAG,"[Read Success] $attributeName: $value")
+        showMessage("[Read Success] $attributeName: $value")
+      }
+
+    }, devicePtr, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), null, false, 0 /* imTimeoutMs */)
   }
 
   private fun makeAttributeList() {
-    ATTRIBUTES.add(getString(R.string.basic_cluster_data_model_revision_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_vendor_name_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_vendor_id_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_product_name_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_product_id_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_node_label_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_location_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_hardware_version_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_hardware_version_string_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_software_version_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_software_version_string_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_manufacturing_date_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_part_number_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_product_url_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_product_label_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_serial_number_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_local_config_disabled_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_reachable_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_unique_id_text))
-    ATTRIBUTES.add(getString(R.string.basic_cluster_cluster_revision_text))
+    for (attribute in BasicInformation.Attribute.values()) {
+      ATTRIBUTES.add(attribute.name)
+    }
   }
 
-  private suspend fun sendReadDataModelRevisionAttribute() {
-    getBasicClusterForDevice().readDataModelRevisionAttribute(object : ChipClusters.IntegerAttributeCallback {
-      override fun onSuccess(value: Int) {
-        Log.i(TAG,"[Read Success] DataModelRevision: $value")
-        showMessage("[Read Success] DataModelRevision: $value")
+  private suspend fun sendWriteAttribute(attribute: BasicInformation.Attribute, tlv: ByteArray) {
+    val clusterId = BasicInformation.ID
+    val devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+
+    ChipClient.getDeviceController(requireContext()).write(object: WriteAttributesCallback {
+      override fun onError(attributePath: ChipAttributePath?, ex: java.lang.Exception?) {
+        showMessage("Write ${attribute.name} failure $ex")
+        Log.e(TAG, "Write ${attribute.name} failure", ex)
       }
 
-      override fun onError(ex: Exception) {
-        showMessage("Read DataModelRevision failure $ex")
-        Log.e(TAG, "Read DataModelRevision failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadVendorNameAttribute() {
-    getBasicClusterForDevice().readVendorNameAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] VendorName: $value")
-        showMessage("[Read Success] VendorName: $value")
+      override fun onResponse(attributePath: ChipAttributePath?) {
+        showMessage("Write ${attribute.name} success")
       }
 
-      override fun onError(ex: Exception) {
-        showMessage("Read VendorName failure $ex")
-        Log.e(TAG, "Read VendorName failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadVendorIDAttribute() {
-    getBasicClusterForDevice().readVendorIDAttribute(object : ChipClusters.IntegerAttributeCallback {
-      override fun onSuccess(value: Int) {
-        Log.i(TAG,"[Read Success] VendorID: $value")
-        showMessage("[Read Success] VendorID: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read VendorID failure $ex")
-        Log.e(TAG, "Read VendorID failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadProductNameAttribute() {
-    getBasicClusterForDevice().readProductNameAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] ProductName: $value")
-        showMessage("[Read Success] ProductName: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read ProductName failure $ex")
-        Log.e(TAG, "Read ProductName failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadProductIDAttribute() {
-    getBasicClusterForDevice().readProductIDAttribute(object : ChipClusters.IntegerAttributeCallback {
-      override fun onSuccess(value: Int) {
-        Log.i(TAG,"[Read Success] ProductID: $value")
-        showMessage("[Read Success] ProductID: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read ProductID failure $ex")
-        Log.e(TAG, "Read ProductID failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadNodeLabelAttribute() {
-    getBasicClusterForDevice().readNodeLabelAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] NodeLabel: $value")
-        showMessage("[Read Success] NodeLabel: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read NodeLabel failure $ex")
-        Log.e(TAG, "Read NodeLabel failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendWriteNodeLabelAttribute() {
-    getBasicClusterForDevice().writeNodeLabelAttribute(object : ChipClusters.DefaultClusterCallback {
-      override fun onSuccess() {
-        showMessage("Write NodeLabel success")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Write NodeLabel failure $ex")
-        Log.e(TAG, "Write NodeLabel failure", ex)
-      }
-    }, binding.nodeLabelEd.text.toString())
-  }
-
-  private suspend fun sendReadLocationAttribute() {
-    getBasicClusterForDevice().readLocationAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] Location: $value")
-        showMessage("[Read Success] Location: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read Location failure $ex")
-        Log.e(TAG, "Read Location failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendWriteLocationAttribute() {
-    getBasicClusterForDevice().writeLocationAttribute(object : ChipClusters.DefaultClusterCallback {
-      override fun onSuccess() {
-        showMessage("Write Location success")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Write Location failure $ex")
-        Log.e(TAG, "Write Location failure", ex)
-      }
-    }, binding.locationEd.text.toString())
-  }
-
-  private suspend fun sendReadHardwareVersionAttribute() {
-    getBasicClusterForDevice().readHardwareVersionAttribute(object : ChipClusters.IntegerAttributeCallback {
-      override fun onSuccess(value: Int) {
-        Log.i(TAG,"[Read Success] HardwareVersion: $value")
-        showMessage("[Read Success] HardwareVersion: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read HardwareVersion failure $ex")
-        Log.e(TAG, "Read HardwareVersion failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadHardwareVersionStringAttribute() {
-    getBasicClusterForDevice().readHardwareVersionStringAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] HardwareVersionString: $value")
-        showMessage("[Read Success] HardwareVersionString: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read HardwareVersionString failure $ex")
-        Log.e(TAG, "Read HardwareVersionString failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadSoftwareVersionAttribute() {
-    getBasicClusterForDevice().readSoftwareVersionAttribute(object : ChipClusters.LongAttributeCallback {
-      override fun onSuccess(value: Long) {
-        Log.i(TAG,"[Read Success] SoftwareVersion: $value")
-        showMessage("[Read Success] SoftwareVersion: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read SoftwareVersion failure $ex")
-        Log.e(TAG, "Read SoftwareVersion failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadSoftwareVersionStringAttribute() {
-    getBasicClusterForDevice().readSoftwareVersionStringAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] SoftwareVersionString $value")
-        showMessage("[Read Success] SoftwareVersionString: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read SoftwareVersionString failure $ex")
-        Log.e(TAG, "Read SoftwareVersionString failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadManufacturingDateAttribute() {
-    getBasicClusterForDevice().readManufacturingDateAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] ManufacturingDate $value")
-        showMessage("[Read Success] ManufacturingDate: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read ManufacturingDate failure $ex")
-        Log.e(TAG, "Read ManufacturingDate failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadPartNumberAttribute() {
-    getBasicClusterForDevice().readPartNumberAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] PartNumber $value")
-        showMessage("[Read Success] PartNumber: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read PartNumber failure $ex")
-        Log.e(TAG, "Read PartNumber failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadProductURLAttribute() {
-    getBasicClusterForDevice().readProductURLAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] ProductURL $value")
-        showMessage("[Read Success] ProductURL: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read ProductURL failure $ex")
-        Log.e(TAG, "Read ProductURL failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadProductLabelAttribute() {
-    getBasicClusterForDevice().readProductLabelAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] ProductLabel $value")
-        showMessage("[Read Success] ProductLabel: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read ProductLabel failure $ex")
-        Log.e(TAG, "Read ProductLabel failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadSerialNumberAttribute() {
-    getBasicClusterForDevice().readSerialNumberAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] SerialNumber $value")
-        showMessage("[Read Success] SerialNumber: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read SerialNumber failure $ex")
-        Log.e(TAG, "Read SerialNumber failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadLocalConfigDisabledAttribute() {
-    getBasicClusterForDevice().readLocalConfigDisabledAttribute(object : ChipClusters.BooleanAttributeCallback {
-      override fun onSuccess(value: Boolean) {
-        Log.i(TAG,"[Read Success] LocalConfigDisabled $value")
-        showMessage("[Read Success] LocalConfigDisabled: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read LocalConfigDisabled failure $ex")
-        Log.e(TAG, "Read LocalConfigDisabled failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendWriteLocalConfigDisabledAttribute(localConfigDisabled: Boolean) {
-    getBasicClusterForDevice().writeLocalConfigDisabledAttribute(object : ChipClusters.DefaultClusterCallback {
-      override fun onSuccess() {
-        showMessage("Write LocalConfigDisabled success")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Write LocalConfigDisabled failure $ex")
-        Log.e(TAG, "Write LocalConfigDisabled failure", ex)
-      }
-    }, localConfigDisabled)
-  }
-
-  private suspend fun sendReadReachableAttribute() {
-    getBasicClusterForDevice().readReachableAttribute(object : ChipClusters.BooleanAttributeCallback {
-      override fun onSuccess(value: Boolean) {
-        Log.i(TAG,"[Read Success] Reachable $value")
-        showMessage("[Read Success] Reachable: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read Reachable failure $ex")
-        Log.e(TAG, "Read Reachable failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadUniqueIDAttribute() {
-    getBasicClusterForDevice().readUniqueIDAttribute(object : ChipClusters.CharStringAttributeCallback {
-      override fun onSuccess(value: String) {
-        Log.i(TAG,"[Read Success] UniqueID $value")
-        showMessage("[Read Success] UniqueID: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read UniqueID failure $ex")
-        Log.e(TAG, "Read UniqueID failure", ex)
-      }
-    })
-  }
-
-  private suspend fun sendReadClusterRevisionAttribute() {
-    getBasicClusterForDevice().readClusterRevisionAttribute(object : ChipClusters.IntegerAttributeCallback {
-      override fun onSuccess(value: Int) {
-        Log.i(TAG,"[Read Success] ClusterRevision $value")
-        showMessage("[Read Success] ClusterRevision: $value")
-      }
-
-      override fun onError(ex: Exception) {
-        showMessage("Read ClusterRevision failure $ex")
-        Log.e(TAG, "Read ClusterRevision failure", ex)
-      }
-    })
+    }, devicePtr, listOf(AttributeWriteRequest.newInstance(addressUpdateFragment.endpointId, clusterId, attribute.id, tlv, Optional.empty())), 0, 0)
   }
 
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread {
       binding.basicClusterCommandStatus.text = msg
     }
-  }
-
-  private suspend fun getBasicClusterForDevice(): BasicInformationCluster {
-    return BasicInformationCluster(
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId), addressUpdateFragment.endpointId
-    )
   }
 
   override fun onResume() {

@@ -2,7 +2,7 @@
 #include <jni/CHIPReadCallbacks.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <zap-generated/CHIPClusters.h>
+#include <controller/CHIPCluster.h>
 
 #include <controller/java/AndroidClusterExceptions.h>
 #include <controller/java/CHIPDefaultCallbacks.h>
@@ -23,7 +23,7 @@ JNI_METHOD(void, FirstCluster, readSomeIntegerAttribute)(JNIEnv * env, jobject s
     VerifyOrReturn(onFailure.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Controller::FirstCluster * cppCluster = reinterpret_cast<chip::Controller::FirstCluster *>(clusterPtr);
+    chip::Controller::ClusterBase * cppCluster = reinterpret_cast<chip::Controller::ClusterBase *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn = chip::Callback::Callback<CHIPFirstClusterSomeIntegerAttributeCallbackType>::FromCancelable(onSuccess->Cancel());

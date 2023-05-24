@@ -22,6 +22,8 @@
 
 #include "sl_status.h"
 
+#include "silabs_utils.h"
+
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"

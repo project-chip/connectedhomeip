@@ -48,7 +48,7 @@ chip_persist_subscriptions = enable_sleepy_device
 
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
-import("${silabs_common_plat_dir}/efr32/args.gni")
+import("${silabs_common_plat_dir}/args.gni")
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
@@ -58,7 +58,7 @@ assert(!(use_wf200 && chip_enable_openthread))
 
 if (chip_enable_wifi) {
   assert(use_rs9116 || use_wf200 || use_SiWx917)
-  import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
+  import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
   if (use_rs9116) {
     wiseconnect_sdk_root =

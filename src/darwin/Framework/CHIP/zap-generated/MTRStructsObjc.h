@@ -513,6 +513,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterStartUpEvent")
 @interface MTRBridgedDeviceBasicClusterStartUpEvent : MTRBridgedDeviceBasicInformationClusterStartUpEvent
 @end
 
@@ -521,6 +522,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterShutDownEvent")
 @interface MTRBridgedDeviceBasicClusterShutDownEvent : MTRBridgedDeviceBasicInformationClusterShutDownEvent
 @end
 
@@ -529,6 +531,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterLeaveEvent")
 @interface MTRBridgedDeviceBasicClusterLeaveEvent : MTRBridgedDeviceBasicInformationClusterLeaveEvent
 @end
 
@@ -538,6 +541,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBridgedDeviceBasicInformationClusterReachableChangedEvent")
 @interface MTRBridgedDeviceBasicClusterReachableChangedEvent : MTRBridgedDeviceBasicInformationClusterReachableChangedEvent
 @end
 
@@ -658,14 +662,6 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull stateValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
-MTR_NEWLY_AVAILABLE
-@interface MTRICDManagementClusterMonitoringRegistrationStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull checkInNodeID MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull monitoredSubject MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSData * _Nonnull key MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_NEWLY_AVAILABLE;
-@end
-
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRModeSelectClusterSemanticTagStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -681,6 +677,64 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSString * _Nonnull label API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSNumber * _Nonnull mode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @property (nonatomic, copy) NSArray * _Nonnull semanticTags API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRTemperatureControlClusterTemperatureLevelStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull temperatureLevel MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRRefrigeratorAlarmClusterNotifyEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull active MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull inactive MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull state MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull mask MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterSmokeAlarmEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterCOAlarmEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterLowBatteryEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterHardwareFaultEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterEndOfServiceEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterSelfTestCompleteEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterAlarmMutedEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterMuteEndedEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterInterconnectSmokeAlarmEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterInterconnectCOAlarmEvent : NSObject <NSCopying>
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRSmokeCOAlarmClusterAllClearEvent : NSObject <NSCopying>
 @end
 
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
