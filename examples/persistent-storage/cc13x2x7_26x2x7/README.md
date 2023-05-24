@@ -1,11 +1,11 @@
-# Matter CC1352 CC2652 Persistent Storage Example Application
+# Matter Persistent Storage Example Application
 
 An example test application showing the persistent storage system for
 [Matter][matter] on the Texas Instruments CC13X2_26X2 family of Wireless MCUs.
 
 ---
 
--   [Matter CC1352 CC2652 Persistent Storage Application](#matter-cc1352-cc2652-persistent-storage-example-application)
+-   [Matter Persistent Storage Application](#matter-persistent-storage-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -64,8 +64,7 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
         packaged with the TI SDK. Check the following section for a list of
         changes needed.
 
--   Download and install [SysConfig][sysconfig] ([recommended
-    version][sysconfig_recommended])
+-   Download and install [SysConfig][sysconfig].
 
     -   This may have already been installed with your SimpleLink SDK install.
 
@@ -208,7 +207,11 @@ the session.
 
 Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
-extension.
+extension. For OTA enabled applications, the standalone image will instead end
+with the `*-bim.hex` file extension. This this is a combined image with
+application and and `BIM` included. The flag to enable or disable the OTA
+feature is determined by "chip_enable_ota_requestor" in the application's
+args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -235,7 +238,7 @@ terminal emulator to that port to see the output with the following options:
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
-[matter]: https://github.com/project-chip/connectedhomeip
+[matter]: https://csa-iot.org/all-solutions/matter/
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch
@@ -245,9 +248,8 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
+[e2e]:
+    https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
-[sysconfig_recommended]:
-    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.10.0_2163-setup.run
 [ti_cc13x2_26x2_r7_matter_request]: https://ti.com/chip_sdk
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH

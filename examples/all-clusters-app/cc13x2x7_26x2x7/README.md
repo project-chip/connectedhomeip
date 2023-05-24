@@ -63,9 +63,8 @@ Some initial setup is necessary for preparing the build environment. This
 section will need to be done when migrating to new versions of the SDK. This
 guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
--   Download and install [SysConfig][sysconfig] ([recommended
-    version][sysconfig_recommended]). This can be done simply with the following
-    commands.
+-   Download and install [SysConfig][sysconfig]. This can be done simply with
+    the following commands.
 
     ```
     $ cd ~
@@ -236,8 +235,6 @@ Additionally, we welcome any feedback.
 [matter-e2e-faq]:
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
-[sysconfig_recommended]:
-    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
 [ti_thread_dnd]:
     https://www.ti.com/wireless-connectivity/thread/design-development.html
 [ot_border_router_setup]: https://openthread.io/guides/border-router/build
