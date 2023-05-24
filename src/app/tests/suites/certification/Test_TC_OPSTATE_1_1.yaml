@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -111,8 +111,8 @@ tests:
           constraints:
               type: list
               contains: [
-                            0,
-                            1
+                            1,
+                            2
                         ]
 
     - label: "Read the optional command(Stop) in AcceptedCommandList"
@@ -133,7 +133,7 @@ tests:
           constraints:
               type: list
               contains: [
-                            2,
+                            0,
                             3
                         ]
 
@@ -145,7 +145,7 @@ tests:
           constraints:
               type: list
               contains: [
-                            2,
+                            0,
                             3
                         ]
 
