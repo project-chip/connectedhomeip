@@ -205,8 +205,6 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/UnitLocalizationClient-InvokeSubscribeImpl.cpp",
       "jni/UnitLocalizationClient-ReadImpl.cpp",
       "jni/UnitTestingClient-InvokeSubscribeImpl.cpp",
-      "jni/TimeSynchronizationClient-ReadImpl.cpp",
-      "jni/TimeSynchronizationClient-InvokeSubscribeImpl.cpp",
       "jni/UnitTestingClient-ReadImpl.cpp",
       "jni/UserLabelClient-InvokeSubscribeImpl.cpp",
       "jni/UserLabelClient-ReadImpl.cpp",
