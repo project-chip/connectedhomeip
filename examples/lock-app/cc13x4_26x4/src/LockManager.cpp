@@ -641,7 +641,7 @@ const char * LockManager::lockStateToString(DlLockState lockState) const
     case DlLockState::kUnknownEnumValue:
         break;
     default:
-	break;
+        break;
     }
 
     return "Unknown";
