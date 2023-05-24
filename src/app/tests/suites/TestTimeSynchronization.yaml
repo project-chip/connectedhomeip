@@ -32,13 +32,13 @@ tests:
       command: "readAttribute"
       attribute: "TimeZone"
       response:
-          value: []
+          value: [{Offset: 0, ValidAt: 0}]
 
     - label: "Set Time Zone list"
       command: "SetTimeZone"
       arguments:
           values:
-              - name: "timeZone"
+              - name: "TimeZone"
                 value:
                     [
                         {Offset: 100, ValidAt: 0, Name: "CET"},
@@ -60,7 +60,7 @@ tests:
       command: "SetTimeZone"
       arguments:
           values:
-              - name: "timeZone"
+              - name: "TimeZone"
                 value:
                     [
                         {Offset: 100, ValidAt: 0},
@@ -82,7 +82,7 @@ tests:
       command: "SetTimeZone"
       arguments:
           values:
-              - name: "timeZone"
+              - name: "TimeZone"
                 value:
                     [
                         {Offset: 100, ValidAt: 1, Name: "CDT"},
@@ -94,7 +94,7 @@ tests:
       command: "SetTimeZone"
       arguments:
           values:
-              - name: "timeZone"
+              - name: "TimeZone"
                 value:
                     [
                         {Offset: 100, ValidAt: 0, Name: "CST"},
