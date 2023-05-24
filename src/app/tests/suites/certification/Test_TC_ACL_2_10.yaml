@@ -97,6 +97,7 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
     - label:
           "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
           node ID N2"
@@ -239,6 +240,7 @@ tests:
                   },
               ]
 
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
     - label:
           "Step 6:TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
       verification: |
@@ -339,6 +341,7 @@ tests:
       arguments:
           value: [{ Data: D_OK_SINGLE, FabricIndex: TH2FabricIndex }]
 
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
     - label:
           "Step 8:TH2 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 1
@@ -499,6 +502,7 @@ tests:
                   },
               ]
 
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
     - label:
           "Step 12:TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
       verification: |
@@ -535,6 +539,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
     - label:
           "Step 13:TH2 reads DUT Endpoint 0 AccessControl cluster Extension
           attribute"
@@ -593,6 +598,7 @@ tests:
               - name: "FabricIndex"
                 value: TH2FabricIndex
 
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
     - label: "Step 15:TH1 removes fabric F2 from DUT"
       verification: |
           ./chip-tool operationalcredentials remove-fabric 2 1 0

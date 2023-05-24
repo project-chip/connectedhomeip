@@ -216,6 +216,7 @@ tests:
               type: bitmap8
               hasMasksClear: [0x10, 0x20]
 
+    #Issue https://github.com/CHIP-Specifications/chip-test-scripts/issues/509
     - label: "3a: TH reads OperationalStatus attribute from DUT"
       verification: |
           ./chip-tool windowcovering read operational-status 1 1

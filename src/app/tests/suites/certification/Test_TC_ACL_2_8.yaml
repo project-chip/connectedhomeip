@@ -89,6 +89,7 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
     - label:
           "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
           node ID N2"
@@ -161,6 +162,7 @@ tests:
       response:
           saveAs: TH2FabricIndex
 
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
     - label:
           "TH2 reads OperationalCredentials cluster CurrentFabricIndex attribute"
       verification: |
@@ -223,6 +225,7 @@ tests:
                   },
               ]
 
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
     - label: "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
       verification: |
           ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [223344,2222], "targets":null}]' 2 0  --commissioner-nodeid 223344 --commissioner-name beta
@@ -316,6 +319,7 @@ tests:
                   },
               ]
 
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
     - label: "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
       verification: |
           ./chip-tool accesscontrol read acl 2 0 --commissioner-name beta --commissioner-nodeid 223344
@@ -459,6 +463,7 @@ tests:
                           FabricIndex: TH2FabricIndex,
                       }
 
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
     - label:
           "TH2 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
@@ -567,6 +572,7 @@ tests:
                   },
               ]
 
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
     - label: "TH2 writes ACL attribute default value"
       verification: |
           ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [223344], "targets":null}]' 2 0  --commissioner-nodeid 223344 --commissioner-name beta
