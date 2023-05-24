@@ -13262,10 +13262,27 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 value_errorStateIDClassName.c_str(), value_errorStateIDCtorSignature.c_str(),
                 static_cast<uint8_t>(cppValue.errorStateID), value_errorStateID);
             jobject value_errorStateLabel;
-            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorStateLabel, value_errorStateLabel));
+            if (cppValue.errorStateLabel.IsNull())
+            {
+                value_errorStateLabel = nullptr;
+            }
+            else
+            {
+                LogErrorOnFailure(
+                    chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorStateLabel.Value(), value_errorStateLabel));
+            }
             jobject value_errorStateDetails;
-            LogErrorOnFailure(
-                chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorStateDetails, value_errorStateDetails));
+            if (!cppValue.errorStateDetails.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_errorStateDetails);
+            }
+            else
+            {
+                jobject value_errorStateDetailsInsideOptional;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorStateDetails.Value(),
+                                                                                     value_errorStateDetailsInsideOptional));
+                chip::JniReferences::GetInstance().CreateOptional(value_errorStateDetailsInsideOptional, value_errorStateDetails);
+            }
 
             jclass errorStateStructStructClass_0;
             err = chip::JniReferences::GetInstance().GetClassRef(
@@ -13275,8 +13292,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 ChipLogError(Zcl, "Could not find class ChipStructs$OperationalStateClusterErrorStateStruct");
                 return nullptr;
             }
-            jmethodID errorStateStructStructCtor_0 = env->GetMethodID(errorStateStructStructClass_0, "<init>",
-                                                                      "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V");
+            jmethodID errorStateStructStructCtor_0 = env->GetMethodID(
+                errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;Ljava/util/Optional;)V");
             if (errorStateStructStructCtor_0 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$OperationalStateClusterErrorStateStruct constructor");

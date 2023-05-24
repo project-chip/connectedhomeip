@@ -2995,9 +2995,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _errorStateID = @(0);
 
-        _errorStateLabel = @"";
+        _errorStateLabel = nil;
 
-        _errorStateDetails = @"";
+        _errorStateDetails = nil;
     }
     return self;
 }
@@ -3088,9 +3088,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _completionErrorCode = @(0);
 
-        _totalOperationalTime = @(0);
+        _totalOperationalTime = nil;
 
-        _pausedTime = @(0);
+        _pausedTime = nil;
     }
     return self;
 }

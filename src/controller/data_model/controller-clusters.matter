@@ -2992,8 +2992,8 @@ client cluster OperationalState = 96 {
 
   struct ErrorStateStruct {
     ErrorStateEnum errorStateID = 0;
-    char_string<64> errorStateLabel = 1;
-    char_string<64> errorStateDetails = 2;
+    nullable char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
   }
 
   struct OperationalStateStruct {
@@ -3007,13 +3007,13 @@ client cluster OperationalState = 96 {
 
   info event OperationCompletion = 1 {
     ErrorStateEnum completionErrorCode = 0;
-    INT32U totalOperationalTime = 1;
-    INT32U pausedTime = 2;
+    optional nullable elapsed_s totalOperationalTime = 1;
+    optional nullable elapsed_s pausedTime = 2;
   }
 
   readonly attribute nullable CHAR_STRING phaseList[] = 0;
   readonly attribute nullable int8u currentPhase = 1;
-  readonly attribute optional nullable int32u countdownTime = 2;
+  readonly attribute optional nullable elapsed_s countdownTime = 2;
   readonly attribute OperationalStateStruct operationalStateList[] = 3;
   readonly attribute OperationalStateStruct operationalState = 4;
   readonly attribute ErrorStateStruct operationalError = 5;

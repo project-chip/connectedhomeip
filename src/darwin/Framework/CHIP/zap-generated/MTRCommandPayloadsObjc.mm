@@ -6739,14 +6739,22 @@ NS_ASSUME_NONNULL_BEGIN
         self.commandResponseState = [MTROperationalStateClusterErrorStateStruct new];
         self.commandResponseState.errorStateID =
             [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.commandResponseState.errorStateID)];
-        self.commandResponseState.errorStateLabel =
-            [[NSString alloc] initWithBytes:decodableStruct.commandResponseState.errorStateLabel.data()
-                                     length:decodableStruct.commandResponseState.errorStateLabel.size()
-                                   encoding:NSUTF8StringEncoding];
-        self.commandResponseState.errorStateDetails =
-            [[NSString alloc] initWithBytes:decodableStruct.commandResponseState.errorStateDetails.data()
-                                     length:decodableStruct.commandResponseState.errorStateDetails.size()
-                                   encoding:NSUTF8StringEncoding];
+        if (decodableStruct.commandResponseState.errorStateLabel.IsNull()) {
+            self.commandResponseState.errorStateLabel = nil;
+        } else {
+            self.commandResponseState.errorStateLabel =
+                [[NSString alloc] initWithBytes:decodableStruct.commandResponseState.errorStateLabel.Value().data()
+                                         length:decodableStruct.commandResponseState.errorStateLabel.Value().size()
+                                       encoding:NSUTF8StringEncoding];
+        }
+        if (decodableStruct.commandResponseState.errorStateDetails.HasValue()) {
+            self.commandResponseState.errorStateDetails =
+                [[NSString alloc] initWithBytes:decodableStruct.commandResponseState.errorStateDetails.Value().data()
+                                         length:decodableStruct.commandResponseState.errorStateDetails.Value().size()
+                                       encoding:NSUTF8StringEncoding];
+        } else {
+            self.commandResponseState.errorStateDetails = nil;
+        }
     }
     return CHIP_NO_ERROR;
 }

@@ -1544,11 +1544,13 @@ public class ChipStructs {
 
   public static class OperationalStateClusterErrorStateStruct {
     public Integer errorStateID;
-    public String errorStateLabel;
-    public String errorStateDetails;
+    public @Nullable String errorStateLabel;
+    public Optional<String> errorStateDetails;
 
     public OperationalStateClusterErrorStateStruct(
-        Integer errorStateID, String errorStateLabel, String errorStateDetails) {
+        Integer errorStateID,
+        @Nullable String errorStateLabel,
+        Optional<String> errorStateDetails) {
       this.errorStateID = errorStateID;
       this.errorStateLabel = errorStateLabel;
       this.errorStateDetails = errorStateDetails;

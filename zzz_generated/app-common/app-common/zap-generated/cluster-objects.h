@@ -15281,8 +15281,8 @@ struct Type
 {
 public:
     ErrorStateEnum errorStateID = static_cast<ErrorStateEnum>(0);
-    chip::CharSpan errorStateLabel;
-    chip::CharSpan errorStateDetails;
+    DataModel::Nullable<chip::CharSpan> errorStateLabel;
+    Optional<chip::CharSpan> errorStateDetails;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -15685,8 +15685,8 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     ErrorStateEnum completionErrorCode = static_cast<ErrorStateEnum>(0);
-    uint32_t totalOperationalTime      = static_cast<uint32_t>(0);
-    uint32_t pausedTime                = static_cast<uint32_t>(0);
+    Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
+    Optional<DataModel::Nullable<uint32_t>> pausedTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -15699,8 +15699,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
 
     ErrorStateEnum completionErrorCode = static_cast<ErrorStateEnum>(0);
-    uint32_t totalOperationalTime      = static_cast<uint32_t>(0);
-    uint32_t pausedTime                = static_cast<uint32_t>(0);
+    Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
+    Optional<DataModel::Nullable<uint32_t>> pausedTime;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

@@ -1769,12 +1769,20 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
             MTROperationalStateClusterErrorStateStruct * _Nonnull memberValue;
             memberValue = [MTROperationalStateClusterErrorStateStruct new];
             memberValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorState.errorStateID)];
-            memberValue.errorStateLabel = [[NSString alloc] initWithBytes:cppValue.errorState.errorStateLabel.data()
-                                                                   length:cppValue.errorState.errorStateLabel.size()
-                                                                 encoding:NSUTF8StringEncoding];
-            memberValue.errorStateDetails = [[NSString alloc] initWithBytes:cppValue.errorState.errorStateDetails.data()
-                                                                     length:cppValue.errorState.errorStateDetails.size()
-                                                                   encoding:NSUTF8StringEncoding];
+            if (cppValue.errorState.errorStateLabel.IsNull()) {
+                memberValue.errorStateLabel = nil;
+            } else {
+                memberValue.errorStateLabel = [[NSString alloc] initWithBytes:cppValue.errorState.errorStateLabel.Value().data()
+                                                                       length:cppValue.errorState.errorStateLabel.Value().size()
+                                                                     encoding:NSUTF8StringEncoding];
+            }
+            if (cppValue.errorState.errorStateDetails.HasValue()) {
+                memberValue.errorStateDetails = [[NSString alloc] initWithBytes:cppValue.errorState.errorStateDetails.Value().data()
+                                                                         length:cppValue.errorState.errorStateDetails.Value().size()
+                                                                       encoding:NSUTF8StringEncoding];
+            } else {
+                memberValue.errorStateDetails = nil;
+            }
             value.errorState = memberValue;
         } while (0);
 
@@ -1795,13 +1803,29 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
             value.completionErrorCode = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedInt:cppValue.totalOperationalTime];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.totalOperationalTime.HasValue()) {
+                if (cppValue.totalOperationalTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.totalOperationalTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
             value.totalOperationalTime = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedInt:cppValue.pausedTime];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.pausedTime.HasValue()) {
+                if (cppValue.pausedTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.pausedTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
             value.pausedTime = memberValue;
         } while (0);
 

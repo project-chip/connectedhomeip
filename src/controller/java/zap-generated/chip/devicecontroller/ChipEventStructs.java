@@ -1162,11 +1162,13 @@ public class ChipEventStructs {
 
   public static class OperationalStateClusterOperationCompletionEvent {
     public Integer completionErrorCode;
-    public Long totalOperationalTime;
-    public Long pausedTime;
+    public @Nullable Optional<Long> totalOperationalTime;
+    public @Nullable Optional<Long> pausedTime;
 
     public OperationalStateClusterOperationCompletionEvent(
-        Integer completionErrorCode, Long totalOperationalTime, Long pausedTime) {
+        Integer completionErrorCode,
+        @Nullable Optional<Long> totalOperationalTime,
+        @Nullable Optional<Long> pausedTime) {
       this.completionErrorCode = completionErrorCode;
       this.totalOperationalTime = totalOperationalTime;
       this.pausedTime = pausedTime;

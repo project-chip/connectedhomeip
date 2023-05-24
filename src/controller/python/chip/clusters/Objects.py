@@ -16422,13 +16422,13 @@ class OperationalState(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=OperationalState.Enums.ErrorStateEnum),
-                        ClusterObjectFieldDescriptor(Label="errorStateLabel", Tag=1, Type=str),
-                        ClusterObjectFieldDescriptor(Label="errorStateDetails", Tag=2, Type=str),
+                        ClusterObjectFieldDescriptor(Label="errorStateLabel", Tag=1, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="errorStateDetails", Tag=2, Type=typing.Optional[str]),
                     ])
 
             errorStateID: 'OperationalState.Enums.ErrorStateEnum' = 0
-            errorStateLabel: 'str' = ""
-            errorStateDetails: 'str' = ""
+            errorStateLabel: 'typing.Union[Nullable, str]' = NullValue
+            errorStateDetails: 'typing.Optional[str]' = None
 
         @dataclass
         class OperationalStateStruct(ClusterObject):
@@ -16740,13 +16740,13 @@ class OperationalState(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="completionErrorCode", Tag=0, Type=OperationalState.Enums.ErrorStateEnum),
-                        ClusterObjectFieldDescriptor(Label="totalOperationalTime", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="pausedTime", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="totalOperationalTime", Tag=1, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="pausedTime", Tag=2, Type=typing.Union[None, Nullable, uint]),
                     ])
 
             completionErrorCode: 'OperationalState.Enums.ErrorStateEnum' = 0
-            totalOperationalTime: 'uint' = 0
-            pausedTime: 'uint' = 0
+            totalOperationalTime: 'typing.Union[None, Nullable, uint]' = None
+            pausedTime: 'typing.Union[None, Nullable, uint]' = None
 
 
 @dataclass

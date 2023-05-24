@@ -8971,12 +8971,20 @@ void MTROperationalStateOperationalErrorStructAttributeCallbackBridge::OnSuccess
     MTROperationalStateClusterErrorStateStruct * _Nonnull objCValue;
     objCValue = [MTROperationalStateClusterErrorStateStruct new];
     objCValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.errorStateID)];
-    objCValue.errorStateLabel = [[NSString alloc] initWithBytes:value.errorStateLabel.data()
-                                                         length:value.errorStateLabel.size()
-                                                       encoding:NSUTF8StringEncoding];
-    objCValue.errorStateDetails = [[NSString alloc] initWithBytes:value.errorStateDetails.data()
-                                                           length:value.errorStateDetails.size()
-                                                         encoding:NSUTF8StringEncoding];
+    if (value.errorStateLabel.IsNull()) {
+        objCValue.errorStateLabel = nil;
+    } else {
+        objCValue.errorStateLabel = [[NSString alloc] initWithBytes:value.errorStateLabel.Value().data()
+                                                             length:value.errorStateLabel.Value().size()
+                                                           encoding:NSUTF8StringEncoding];
+    }
+    if (value.errorStateDetails.HasValue()) {
+        objCValue.errorStateDetails = [[NSString alloc] initWithBytes:value.errorStateDetails.Value().data()
+                                                               length:value.errorStateDetails.Value().size()
+                                                             encoding:NSUTF8StringEncoding];
+    } else {
+        objCValue.errorStateDetails = nil;
+    }
     DispatchSuccess(context, objCValue);
 };
 

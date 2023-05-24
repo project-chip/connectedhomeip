@@ -9961,12 +9961,20 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(
         MTROperationalStateClusterErrorStateStruct * _Nonnull value;
         value = [MTROperationalStateClusterErrorStateStruct new];
         value.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorStateID)];
-        value.errorStateLabel = [[NSString alloc] initWithBytes:cppValue.errorStateLabel.data()
-                                                         length:cppValue.errorStateLabel.size()
-                                                       encoding:NSUTF8StringEncoding];
-        value.errorStateDetails = [[NSString alloc] initWithBytes:cppValue.errorStateDetails.data()
-                                                           length:cppValue.errorStateDetails.size()
-                                                         encoding:NSUTF8StringEncoding];
+        if (cppValue.errorStateLabel.IsNull()) {
+            value.errorStateLabel = nil;
+        } else {
+            value.errorStateLabel = [[NSString alloc] initWithBytes:cppValue.errorStateLabel.Value().data()
+                                                             length:cppValue.errorStateLabel.Value().size()
+                                                           encoding:NSUTF8StringEncoding];
+        }
+        if (cppValue.errorStateDetails.HasValue()) {
+            value.errorStateDetails = [[NSString alloc] initWithBytes:cppValue.errorStateDetails.Value().data()
+                                                               length:cppValue.errorStateDetails.Value().size()
+                                                             encoding:NSUTF8StringEncoding];
+        } else {
+            value.errorStateDetails = nil;
+        }
         return value;
     }
     case Attributes::GeneratedCommandList::Id: {
