@@ -33,6 +33,40 @@ tests:
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 10000
 
+    - label: "Verify that lock state attribute value is set to Unlatched"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 3
+
+    - label: "Wait for the Unlatch to end"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 2000
+
+    - label: "Verify that lock state attribute value is set to Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Try to lock the door without a PIN"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Verify that lock state attribute value is set to Locked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    - label: "Try to unbolt the door without PIN"
+      command: "UnboltDoor"
+      timedInteractionTimeoutMs: 10000
+
     - label: "Verify that lock state attribute value is set to Unlocked"
       command: "readAttribute"
       attribute: "LockState"
@@ -105,8 +139,8 @@ tests:
       arguments:
           value: 20
 
-    - label: "Try to unlock the door with invalid PIN"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with invalid PIN"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -121,8 +155,8 @@ tests:
       response:
           value: 1
 
-    - label: "Try to unlock the door with valid PIN"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with valid PIN"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -226,8 +260,8 @@ tests:
       arguments:
           value: 3
 
-    - label: "Try to unlock the door when OperatingMode is NoRemoteLockUnlock"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door when OperatingMode is NoRemoteLockUnlock"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       response:
           error: FAILURE
@@ -239,9 +273,9 @@ tests:
           value: 0
 
     # Test resetting wrong code entry retry attempts
-    # Set the retry limit to 3. Try to unlock with incorrect PIN 2 times followed by a third time
+    # Set the retry limit to 3. Try to unbolt with incorrect PIN 2 times followed by a third time
     # with correct PIN code. The retry attempts should be reset to 0. Try to unock with incorrect
-    # PIN 2 times followed by a third time with correct PIN code. We should be able to unlock since
+    # PIN 2 times followed by a third time with correct PIN code. We should be able to unbolt since
     # the count has been reset and we are not in lockout.
 
     - label: "Set the WrongCodeEntryLimit to small value so we can test lockout"
@@ -250,8 +284,8 @@ tests:
       arguments:
           value: 3
 
-    - label: "Try to unlock the door with invalid PIN for the first time"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with invalid PIN for the first time"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -260,8 +294,8 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Try to unlock the door with invalid PIN for the second time"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with invalid PIN for the second time"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -270,8 +304,8 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Try to unlock the door with valid PIN for the third time"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with valid PIN for the third time"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -298,8 +332,8 @@ tests:
       response:
           value: 1
 
-    - label: "Try to unlock the door with invalid PIN for the first time"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with invalid PIN for the first time"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -308,8 +342,8 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Try to unlock the door with invalid PIN for the second time"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with invalid PIN for the second time"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -318,8 +352,8 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Try to unlock the door with valid PIN for the third time"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with valid PIN for the third time"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -352,8 +386,8 @@ tests:
       response:
           value: 10
 
-    - label: "Try to unlock the door with invalid PIN for the first time"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with invalid PIN for the first time"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -362,8 +396,8 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Try to unlock the door with invalid PIN for the second time"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with invalid PIN for the second time"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -372,8 +406,8 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Try to unlock the door with invalid PIN for the third time"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with invalid PIN for the third time"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -383,9 +417,9 @@ tests:
           error: FAILURE
 
     - label:
-          "Try to unlock the door with valid PIN and make sure it fails due to
+          "Try to unbolt the door with valid PIN and make sure it fails due to
           lockout"
-      command: "UnlockDoor"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -412,8 +446,8 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "Try to unlock the door with valid PIN and make sure it succeeds"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with valid PIN and make sure it succeeds"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -460,8 +494,8 @@ tests:
               - name: "NextCredentialIndex"
                 value: 4
 
-    - label: "Try to unlock the door with disabled user PIN"
-      command: "UnlockDoor"
+    - label: "Try to unbolt the door with disabled user PIN"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -477,7 +511,7 @@ tests:
           value: 1
 
     - label: "Unlock the door with enabled user PIN"
-      command: "UnlockDoor"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
