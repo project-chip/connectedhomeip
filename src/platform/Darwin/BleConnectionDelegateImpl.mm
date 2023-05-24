@@ -651,9 +651,16 @@ namespace DeviceLayer {
 {
     dispatch_source_t timeoutTimer;
 
+    bool shouldLogData = true;
     if ([_cachedPeripherals objectForKey:peripheral]) {
+        shouldLogData = ![data isEqualToData:_cachedPeripherals[peripheral][@"data"]];
+        if (shouldLogData) {
+            ChipLogProgress(Ble, "Updating peripheral %p from the cache", peripheral);
+        }
+
         timeoutTimer = _cachedPeripherals[peripheral][@"timer"];
     } else {
+        ChipLogProgress(Ble, "Adding peripheral %p to the cache", peripheral);
         auto delegate = _scannerDelegate;
         if (delegate) {
             dispatch_async(_chipWorkQueue, ^{
@@ -678,12 +685,25 @@ namespace DeviceLayer {
         @"data" : data,
         @"timer" : timeoutTimer,
     };
+
+    if (shouldLogData) {
+        ChipBLEDeviceIdentificationInfo info;
+        auto bytes = (const uint8_t *) [data bytes];
+        memcpy(&info, bytes, sizeof(info));
+
+        ChipLogProgress(Ble, "  - Version: %u", info.GetAdvertisementVersion());
+        ChipLogProgress(Ble, "  - Discriminator: %u", info.GetDeviceDiscriminator());
+        ChipLogProgress(Ble, "  - VendorId: %u", info.GetVendorId());
+        ChipLogProgress(Ble, "  - ProductId: %u", info.GetVendorId());
+    }
 }
 
 - (void)removePeripheralFromCache:(CBPeripheral *)peripheral
 {
     auto entry = [_cachedPeripherals objectForKey:peripheral];
     if (entry) {
+        ChipLogProgress(Ble, "Removing peripheral %p from the cache", peripheral);
+
         dispatch_source_cancel(entry[@"timer"]);
         [_cachedPeripherals removeObjectForKey:peripheral];
 

@@ -29,6 +29,7 @@ declare_args() {
   chip_bt_bluedroid_enabled = false
   chip_enable_ble_controller = false
   chip_use_secure_cert_dac_provider = false
+  chip_use_esp32_ecdsa_peripheral = false
 }
 
 defines = [
@@ -173,6 +174,13 @@ static_library("ESP32") {
     sources += [
       "ESP32SecureCertDACProvider.cpp",
       "ESP32SecureCertDACProvider.h",
+    ]
+  }
+
+  if (chip_use_esp32_ecdsa_peripheral) {
+    sources += [
+      "ESP32CHIPCryptoPAL.cpp",
+      "ESP32CHIPCryptoPAL.h",
     ]
   }
 

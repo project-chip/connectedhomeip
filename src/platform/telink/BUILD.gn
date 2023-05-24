@@ -43,6 +43,7 @@ static_library("telink") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "ICDUtil.cpp",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.h",
@@ -56,6 +57,8 @@ static_library("telink") {
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  defines = [ "CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>" ]
 
   if (chip_enable_factory_data) {
     sources += [

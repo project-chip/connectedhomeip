@@ -7678,18 +7678,15 @@
                   - Unlatch
           SmokeCOAlarm:
               AlarmStateEnum:
-                  - Unknown
                   - Normal
                   - Warning
                   - Critical
               ContaminationStateEnum:
-                  - Unknown
                   - Normal
                   - Low
                   - Warning
                   - Critical
               EndOfServiceEnum:
-                  - Unknown
                   - Expired
                   - Normal
               ExpressedStateEnum:
@@ -7703,7 +7700,6 @@
                   - InterconnectSmoke
                   - InterconnectCO
               MuteStateEnum:
-                  - Unknown
                   - NotMuted
                   - Muted
               SensitivityEnum:
