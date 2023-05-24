@@ -39,9 +39,9 @@ void Button::Configure(const gpio_dt_spec * input_button_dt, const gpio_dt_spec 
         LOG_ERR("Input port %s is not ready\n", input_button_dt->port->name);
     }
 
-    mInput_button = input_button_dt;
+    mInput_button      = input_button_dt;
     mOutput_matrix_pin = output_button_dt;
-    mCallback = callback;
+    mCallback          = callback;
 }
 
 int Button::Init(void)
@@ -194,8 +194,8 @@ void ButtonManager::PollIRQ(const struct device * dev, uint32_t pins)
 
 void Button::PollIRQ(const struct device * dev, uint32_t pins)
 {
-    if ((BIT(mInput_button->pin) & pins) && (mCallback != NULL)
-    && (dev == mInput_button->port)) {
+    if ((BIT(mInput_button->pin) & pins) && (mCallback != NULL) && (dev == mInput_button->port))
+    {
         mCallback();
     }
 }
@@ -208,7 +208,7 @@ void Button::Configure(const gpio_dt_spec * input_button_dt, void (*callback)(vo
     }
 
     mInput_button = input_button_dt;
-    mCallback = callback;
+    mCallback     = callback;
 
     Init();
 }

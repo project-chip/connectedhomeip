@@ -42,7 +42,7 @@ constexpr int kAppEventQueueSize       = 10;
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
 const struct gpio_dt_spec sFactoryResetButtonDt = BUTTON_FACTORY_RESET;
-const struct gpio_dt_spec sBleStartButtonDt = BUTTON_BLE_START;
+const struct gpio_dt_spec sBleStartButtonDt     = BUTTON_BLE_START;
 #if APP_USE_THREAD_START_BUTTON
 const struct gpio_dt_spec sThreadStartButtonDt = BUTTON_THREAD_START;
 #endif

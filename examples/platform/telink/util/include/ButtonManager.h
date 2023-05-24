@@ -38,7 +38,7 @@ private:
 
     const struct gpio_dt_spec * mInput_button;
     const struct gpio_dt_spec * mOutput_matrix_pin;
-    int mPreviousState      = STATE_LOW;
+    int mPreviousState = STATE_LOW;
     struct gpio_callback mButton_cb_data;
     void (*mCallback)(void) = NULL;
 };
