@@ -407,7 +407,7 @@ bool TimeSynchronizationServer::isTimeZoneAvailable()
     }
     if (activeTzIndex != 0)
     {
-        mTimeZoneListSize    = static_cast<uint8_t>(tzList.size()) - activeTzIndex;
+        mTimeZoneListSize    = static_cast<uint8_t>(tzList.size() - activeTzIndex);
         auto newTimeZoneList = tzList.SubSpan(activeTzIndex);
         VerifyOrReturnValue(mTimeSyncDataProvider.StoreTimeZone(newTimeZoneList) == CHIP_NO_ERROR, false);
         VerifyOrReturnValue(mTimeSyncDataProvider.LoadTimeZone(TimeSynchronizationServer::Instance().GetTimeZone(),
@@ -442,7 +442,7 @@ bool TimeSynchronizationServer::isDSTOffsetAvailable()
     }
     if (activeDstIndex != 0)
     {
-        mDstOffsetListSize    = static_cast<uint8_t>(dstList.size()) - activeDstIndex;
+        mDstOffsetListSize    = static_cast<uint8_t>(dstList.size() - activeDstIndex);
         auto newDstOffsetList = dstList.SubSpan(activeDstIndex);
         VerifyOrReturnValue(mTimeSyncDataProvider.StoreDSTOffset(newDstOffsetList) == CHIP_NO_ERROR, false);
         VerifyOrReturnValue(mTimeSyncDataProvider.LoadDSTOffset(TimeSynchronizationServer::Instance().GetDSTOffset(),
