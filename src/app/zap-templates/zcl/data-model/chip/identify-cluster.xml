@@ -17,11 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="BITMAP32">
-    <cluster code="0x0003"/>
-    <field name="Query" mask="0x1"/>
-  </bitmap>
-
   <enum name="IdentifyTypeEnum" type="ENUM8">
     <cluster code="0x0003"/>
     <item name="None" value="0x00"/>
@@ -57,15 +52,8 @@ limitations under the License.
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
-    <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="INT16U" writable="true"  default="0x00" optional="false">
-      <description>IdentifyTime</description>
-      <access op="read" privilege="view"/>
-      <access op="write" privilege="operate"/>
-    </attribute>
-    <attribute side="server" code="0x0001" define="IDENTIFY_TYPE" type="IdentifyTypeEnum" writable="false" default="0x00" optional="false">
-      <description>IdentifyType</description>	
-      <access op="read" privilege="view"/>
-    </attribute>
+    <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="INT16U" writable="true"  default="0x00" optional="false">IdentifyTime</attribute>
+    <attribute side="server" code="0x0001" define="IDENTIFY_TYPE" type="IdentifyTypeEnum" writable="false" default="0x00" optional="false">IdentifyType</attribute>
 
     <command source="client" code="0x00" name="Identify" optional="false">
       <description>
