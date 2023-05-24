@@ -29,7 +29,7 @@ import uuid
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Tuple
 
 from chip.tlv import float32, uint
@@ -181,6 +181,16 @@ def utc_time_in_matter_epoch(desired_datetime: datetime = None):
     utc_th_delta = utc_native - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
     utc_th_us = int(utc_th_delta.total_seconds() * 1000000)
     return utc_th_us
+
+
+def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
+    if utc is None:
+        utc = utc_time_in_matter_epoch()
+
+    expected = utc + offset.microseconds
+    delta_us = abs(expected - received)
+    delta = timedelta(microseconds=delta_us)
+    asserts.assert_less(delta, tolerance, "Received time is out of tolerance")
 
 
 @dataclass

@@ -28,6 +28,7 @@
 #else
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 #endif
+#include <atomic>
 namespace chip {
 namespace DeviceLayer {
 
@@ -83,23 +84,15 @@ private:
     void _UnlockChipStack(void);
     CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout durationMS);
-    void SetEventFlags(uint32_t flags);
-    void HandleTimerEvent(void);
-    void HandlePostEvent(void);
-
-    lega_thread_t mThread;
-    lega_event_flags_t mEventFlags;
-    lega_queue_t mEventQueue;
-    lega_timer_t mTimer;
-    lega_mutex_t mChipMutex;
-    lega_mutex_t mEventMutex;
+    std::atomic<bool> mShouldRunEventLoop;
+    bool mChipTimerActive;
+    lega_thread_t mThread    = NULL;
+    lega_queue_t mEventQueue = NULL;
+    lega_mutex_t mChipMutex  = NULL;
+    lega_timeout_t mNextTimerBaseTime;
+    lega_tick_t mNextTimerDurationTicks;
     static void EventLoopTaskMain(uint32_t arg);
     void RunEventLoopInternal(void);
-    static void TimerCallback(void * params);
-    uint32_t kTaskRunningEventFlag;
-    static constexpr uint32_t kTaskStopEventFlag = 1 << 0;
-    static constexpr uint32_t kPostEventFlag     = 1 << 1;
-    static constexpr uint32_t kTimerEventFlag    = 1 << 2;
 #endif
 };
 

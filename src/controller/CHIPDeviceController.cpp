@@ -2070,7 +2070,7 @@ void DeviceCommissioner::OnArmFailSafe(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received ArmFailSafe response errorCode=%u", to_underlying(data.errorCode));
-    if (data.errorCode != GeneralCommissioning::CommissioningError::kOk)
+    if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
         report.Set<CommissioningErrorInfo>(data.errorCode);
@@ -2087,7 +2087,7 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received SetRegulatoryConfig response errorCode=%u", to_underlying(data.errorCode));
-    if (data.errorCode != GeneralCommissioning::CommissioningError::kOk)
+    if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
         report.Set<CommissioningErrorInfo>(data.errorCode);
@@ -2181,7 +2181,7 @@ void DeviceCommissioner::OnCommissioningCompleteResponse(
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received CommissioningComplete response, errorCode=%u", to_underlying(data.errorCode));
-    if (data.errorCode != GeneralCommissioning::CommissioningError::kOk)
+    if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
         err = CHIP_ERROR_INTERNAL;
         report.Set<CommissioningErrorInfo>(data.errorCode);
@@ -2309,10 +2309,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // TODO(cecille): Where is the country config actually set?
         ChipLogProgress(Controller, "Setting Regulatory Config");
         auto capability =
-            params.GetLocationCapability().ValueOr(app::Clusters::GeneralCommissioning::RegulatoryLocationType::kOutdoor);
-        app::Clusters::GeneralCommissioning::RegulatoryLocationType regulatoryConfig;
+            params.GetLocationCapability().ValueOr(app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kOutdoor);
+        app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum regulatoryConfig;
         // Value is only switchable on the devices with indoor/outdoor capability
-        if (capability == app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor)
+        if (capability == app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor)
         {
             // If the device supports indoor and outdoor configs, use the setting from the commissioner, otherwise fall back to
             // the current device setting then to outdoor (most restrictive)
@@ -2330,7 +2330,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             }
             else
             {
-                regulatoryConfig = app::Clusters::GeneralCommissioning::RegulatoryLocationType::kOutdoor;
+                regulatoryConfig = app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kOutdoor;
                 ChipLogProgress(Controller, "No overrride or device regulatory config supplied, setting to outdoor");
             }
         }

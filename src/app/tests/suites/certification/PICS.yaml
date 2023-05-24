@@ -3617,6 +3617,14 @@ PICS:
       id: GRPKEY.C
 
     #
+    # server / features
+    #
+    - label:
+          "Does the DUT(Server) support Group Key Management CacheAndSync
+          feature?"
+      id: GRPKEY.S.F00
+
+    #
     # client / attributes
     #
     - label:

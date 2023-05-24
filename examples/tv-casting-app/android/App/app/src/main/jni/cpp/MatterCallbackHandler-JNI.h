@@ -37,6 +37,7 @@ public:
 protected:
     jobject mObject               = nullptr;
     jclass mClazz                 = nullptr;
+    jclass mSuperClazz            = nullptr;
     jmethodID mMethod             = nullptr;
     const char * mMethodSignature = nullptr;
 };

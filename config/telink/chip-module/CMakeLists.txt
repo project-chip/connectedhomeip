@@ -48,7 +48,7 @@ include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
 # Prepare compiler flags
 
 if (CONFIG_POSIX_API)
-    matter_add_flags(-D_SYS__PTHREADTYPES_H_)
+    matter_add_flags(-D_DEFAULT_SOURCE)
     matter_add_flags(-isystem${ZEPHYR_BASE}/include/zephyr/posix)
 endif()
 
