@@ -76,7 +76,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x3]
+              hasMasksSet: [0x4]
 
 
     - label: "TH reads the AttributeList attribute from the DUT"
@@ -137,13 +137,14 @@ tests:
               excludes: [0]
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: RVCCLEANMS.S.Afff8
+      PICS: RVCCLEANMS.S.Afff8 && !RVCCLEANMS.S.F01
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           value: []
           constraints:
               type: list
+              excludes: [2]
 
     - label: "Read the global attribute: GeneratedCommandList. Check if it contains the Feature dependent (RVCCLEANMS.S.F01 - EXT) command with id 0x2 (ChangeToModeResponse)"
       PICS: RVCCLEANMS.S.Afff8 && RVCCLEANMS.S.F01
