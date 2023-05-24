@@ -469,7 +469,7 @@ tests:
           data type string."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_String
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool modeselect read description  1 1
 
@@ -487,10 +487,10 @@ tests:
           [1655722750.452854][10909:10909] CHIP:DMG:                         Cluster = 0x50,
           [1655722750.452926][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1655722750.452986][10909:10909] CHIP:DMG:                 }
-          [1655722750.453049][10909:10909] CHIP:DMG:                         
+          [1655722750.453049][10909:10909] CHIP:DMG:
           [1655722750.453102][10909:10909] CHIP:DMG:         ],
-          [1655722750.453160][10909:10909] CHIP:DMG:                 
-          [1655722750.453215][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
+          [1655722750.453160][10909:10909] CHIP:DMG:
+          [1655722750.453215][10909:10909] CHIP:DMG:         isFabricFiltered = true,
           [1655722750.453268][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655722750.453316][10909:10909] CHIP:DMG: },
           [1655722750.453457][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -508,7 +508,7 @@ tests:
           data type unsigned integer."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_UnsignedInteger
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool any read-by-id 0x3 0x1 1 0
 
@@ -525,10 +525,10 @@ tests:
           [1655722980.957207][10909:10909] CHIP:DMG:                         Cluster = 0x3,
           [1655722980.957245][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1655722980.957282][10909:10909] CHIP:DMG:                 }
-          [1655722980.957328][10909:10909] CHIP:DMG:                         
+          [1655722980.957328][10909:10909] CHIP:DMG:
           [1655722980.957359][10909:10909] CHIP:DMG:         ],
-          [1655722980.957404][10909:10909] CHIP:DMG:                 
-          [1655722980.957436][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
+          [1655722980.957404][10909:10909] CHIP:DMG:
+          [1655722980.957436][10909:10909] CHIP:DMG:         isFabricFiltered = true,
           [1655722980.957477][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655722980.957506][10909:10909] CHIP:DMG: },
           [1655722980.957605][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -547,7 +547,7 @@ tests:
           data type signed integer."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_SignedInteger
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool pressuremeasurement read measured-value 1 1
 
@@ -564,10 +564,10 @@ tests:
           [1655723021.113096][10909:10909] CHIP:DMG:                         Cluster = 0x403,
           [1655723021.113125][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1655723021.113166][10909:10909] CHIP:DMG:                 }
-          [1655723021.113195][10909:10909] CHIP:DMG:                         
+          [1655723021.113195][10909:10909] CHIP:DMG:
           [1655723021.113228][10909:10909] CHIP:DMG:         ],
-          [1655723021.113257][10909:10909] CHIP:DMG:                 
-          [1655723021.113292][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
+          [1655723021.113257][10909:10909] CHIP:DMG:
+          [1655723021.113292][10909:10909] CHIP:DMG:         isFabricFiltered = true,
           [1655723021.113318][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723021.113349][10909:10909] CHIP:DMG: },
           [1655723021.113441][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -596,7 +596,7 @@ tests:
           data type Octet String."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_OctetString
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
@@ -614,10 +614,10 @@ tests:
           [1655723062.690980][10909:10909] CHIP:DMG:                         Cluster = 0x3e,
           [1655723062.691047][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0004,
           [1655723062.691123][10909:10909] CHIP:DMG:                 }
-          [1655723062.691186][10909:10909] CHIP:DMG:                         
+          [1655723062.691186][10909:10909] CHIP:DMG:
           [1655723062.691257][10909:10909] CHIP:DMG:         ],
-          [1655723062.691317][10909:10909] CHIP:DMG:                 
-          [1655723062.691389][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
+          [1655723062.691317][10909:10909] CHIP:DMG:
+          [1655723062.691389][10909:10909] CHIP:DMG:         isFabricFiltered = true,
           [1655723062.691441][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723062.691494][10909:10909] CHIP:DMG: },
           [1655723062.691635][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -635,7 +635,7 @@ tests:
           data type Struct."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Struct
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool  generalcommissioning read  basic-commissioning-info   1 0
 
@@ -653,10 +653,10 @@ tests:
           [1655723112.902291][10909:10909] CHIP:DMG:                         Cluster = 0x30,
           [1655723112.902339][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1655723112.902395][10909:10909] CHIP:DMG:                 }
-          [1655723112.902437][10909:10909] CHIP:DMG:                         
+          [1655723112.902437][10909:10909] CHIP:DMG:
           [1655723112.902487][10909:10909] CHIP:DMG:         ],
-          [1655723112.902529][10909:10909] CHIP:DMG:                 
-          [1655723112.902580][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
+          [1655723112.902529][10909:10909] CHIP:DMG:
+          [1655723112.902580][10909:10909] CHIP:DMG:         isFabricFiltered = true,
           [1655723112.902618][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723112.902664][10909:10909] CHIP:DMG: },
           [1655723112.902782][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -678,7 +678,7 @@ tests:
           data type List."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_List
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool modeselect read  supported-modes 1 1
 
@@ -696,10 +696,10 @@ tests:
           [1655723151.159847][10909:10909] CHIP:DMG:                         Cluster = 0x50,
           [1655723151.159892][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1655723151.159934][10909:10909] CHIP:DMG:                 }
-          [1655723151.159967][10909:10909] CHIP:DMG:                         
+          [1655723151.159967][10909:10909] CHIP:DMG:
           [1655723151.160007][10909:10909] CHIP:DMG:         ],
-          [1655723151.160039][10909:10909] CHIP:DMG:                 
-          [1655723151.160081][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
+          [1655723151.160039][10909:10909] CHIP:DMG:
+          [1655723151.160081][10909:10909] CHIP:DMG:         isFabricFiltered = true,
           [1655723151.160110][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723151.160147][10909:10909] CHIP:DMG: },
           [1655723151.160243][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -745,7 +745,7 @@ tests:
           data type enum."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Enum
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -762,10 +762,10 @@ tests:
           [1655723234.548510][10909:10909] CHIP:DMG:                         Cluster = 0x406,
           [1655723234.548566][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1655723234.548634][10909:10909] CHIP:DMG:                 }
-          [1655723234.548687][10909:10909] CHIP:DMG:                         
+          [1655723234.548687][10909:10909] CHIP:DMG:
           [1655723234.548749][10909:10909] CHIP:DMG:         ],
-          [1655723234.548800][10909:10909] CHIP:DMG:                 
-          [1655723234.548988][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
+          [1655723234.548800][10909:10909] CHIP:DMG:
+          [1655723234.548988][10909:10909] CHIP:DMG:         isFabricFiltered = true,
           [1655723234.549038][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723234.549097][10909:10909] CHIP:DMG: },
           [1655723234.549241][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -782,7 +782,7 @@ tests:
           data type bitmap."
       PICS: MCORE.IDM.C.ReadRequest.Attribute.DataType_Bitmap
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool levelcontrol read options 1 1
 
@@ -799,10 +799,10 @@ tests:
           [1655723282.097923][10909:10909] CHIP:DMG:                         Cluster = 0x8,
           [1655723282.097954][10909:10909] CHIP:DMG:                         Attribute = 0x0000_000F,
           [1655723282.097982][10909:10909] CHIP:DMG:                 }
-          [1655723282.098009][10909:10909] CHIP:DMG:                         
+          [1655723282.098009][10909:10909] CHIP:DMG:
           [1655723282.098034][10909:10909] CHIP:DMG:         ],
-          [1655723282.098061][10909:10909] CHIP:DMG:                 
-          [1655723282.098087][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
+          [1655723282.098061][10909:10909] CHIP:DMG:
+          [1655723282.098087][10909:10909] CHIP:DMG:         isFabricFiltered = true,
           [1655723282.098112][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723282.098134][10909:10909] CHIP:DMG: },
           [1655723282.098206][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -820,7 +820,7 @@ tests:
           "DUT sends the Read Request Message to the TH to read an attribute
           Repeat the above steps 3 times."
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
            ./chip-tool  occupancysensing read occupancy    1 1
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
@@ -836,10 +836,10 @@ tests:
           [1655723372.328644][10909:10909] CHIP:DMG:                         Cluster = 0x406,
           [1655723372.328707][10909:10909] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1655723372.328763][10909:10909] CHIP:DMG:                 }
-          [1655723372.328808][10909:10909] CHIP:DMG:                         
+          [1655723372.328808][10909:10909] CHIP:DMG:
           [1655723372.328861][10909:10909] CHIP:DMG:         ],
-          [1655723372.328903][10909:10909] CHIP:DMG:                 
-          [1655723372.328954][10909:10909] CHIP:DMG:         isFabricFiltered = true, 
+          [1655723372.328903][10909:10909] CHIP:DMG:
+          [1655723372.328954][10909:10909] CHIP:DMG:         isFabricFiltered = true,
           [1655723372.328994][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723372.329041][10909:10909] CHIP:DMG: },
           [1655723372.329162][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -866,9 +866,9 @@ tests:
           spec can be chunked. For every chunked data message received, except
           the last one, DUT sends a status response."
       verification: |
-          DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes) 
+          DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes)
           Below sample wildcard read command will read all the attributes from the all-clusters-app and generates 1 MTU size of data.
-          If the dut doesn't support generating the large chunk data, then this test step can be skipped. 
+          If the dut doesn't support generating the large chunk data, then this test step can be skipped.
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
