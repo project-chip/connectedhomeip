@@ -123,9 +123,9 @@ sl_status_t sl_wfx_host_init_bus(void)
 sl_status_t sl_wfx_host_deinit_bus(void)
 {
     vSemaphoreDelete(spi_sem);
-    #if defined(EFR32MG24)
+#if defined(EFR32MG24)
     vSemaphoreDelete(spi_sem_sync_hdl);
-    #endif /* EFR32MG24 */
+#endif /* EFR32MG24 */
     // Stop DMAs.
     DMADRV_StopTransfer(rx_dma_channel);
     DMADRV_StopTransfer(tx_dma_channel);

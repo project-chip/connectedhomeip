@@ -17,12 +17,12 @@
 
 #if defined(EFR32MG24)
 
+#include "spi_multiplex.h"
 #include "dmadrv.h"
 #include "em_bus.h"
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "em_usart.h"
-#include "spi_multiplex.h"
 
 #endif /* EFR32MG24 */
