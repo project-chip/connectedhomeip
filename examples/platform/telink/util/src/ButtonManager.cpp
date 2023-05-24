@@ -194,7 +194,7 @@ void ButtonManager::PollIRQ(const struct device * dev, uint32_t pins)
 
 void Button::PollIRQ(const struct device * dev, uint32_t pins)
 {
-    if ((BIT(mInput_button->pin) & pins) && (mCallback != NULL) 
+    if ((BIT(mInput_button->pin) & pins) && (mCallback != NULL)
     && (dev == mInput_button->port)) {
         mCallback();
     }
