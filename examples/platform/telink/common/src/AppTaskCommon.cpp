@@ -116,7 +116,6 @@ class AppFabricTableDelegate : public FabricTable::Delegate
     {
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            // chip::Server::GetInstance().ScheduleFactoryReset();
             ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
 
             #ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
