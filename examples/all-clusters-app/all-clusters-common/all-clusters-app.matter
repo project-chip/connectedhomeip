@@ -1948,7 +1948,7 @@ server cluster TimeSynchronization = 56 {
     kNone = 2;
   }
 
-  bitmap TimeSynchronizationFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kTimeZone = 0x1;
     kNTPClient = 0x2;
     kNTPServer = 0x4;

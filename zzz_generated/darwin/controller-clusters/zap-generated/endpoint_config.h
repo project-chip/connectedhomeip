@@ -59,7 +59,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 // This is an array of EmberAfCluster structures.
-#define GENERATED_CLUSTER_COUNT 81
+#define GENERATED_CLUSTER_COUNT 82
 // clang-format off
 #define GENERATED_CLUSTERS { \
   { \
@@ -1137,7 +1137,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 81, 0 },                                                                                           \
+        { ZAP_CLUSTER_INDEX(0), 82, 0 },                                                                                           \
     }
 
 // Largest attribute size is needed for various buffers
