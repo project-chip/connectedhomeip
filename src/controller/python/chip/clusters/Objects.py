@@ -99,10 +99,6 @@ class Identify(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 6,
 
-    class Bitmaps:
-        class Feature(IntFlag):
-            kQuery = 0x1
-
     class Commands:
         @dataclass
         class Identify(ClusterCommand):

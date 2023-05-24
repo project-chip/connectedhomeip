@@ -22045,10 +22045,6 @@ typedef NS_ENUM(uint8_t, MTRIdentifyType) {
     MTRIdentifyTypeActuator MTR_NEWLY_AVAILABLE = 0x05,
 } MTR_NEWLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRIdentifyFeature) {
-    MTRIdentifyFeatureQuery MTR_NEWLY_AVAILABLE = 0x1,
-} MTR_NEWLY_AVAILABLE;
-
 typedef NS_OPTIONS(uint32_t, MTRGroupsFeature) {
     MTRGroupsFeatureGroupNames MTR_NEWLY_AVAILABLE = 0x1,
 } MTR_NEWLY_AVAILABLE;
