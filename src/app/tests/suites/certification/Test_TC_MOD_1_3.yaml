@@ -36,6 +36,7 @@ tests:
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
+      PICS: MOD.C.AM-READ
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
@@ -253,6 +254,7 @@ tests:
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
+      PICS: MOD.C.AO-READ
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
@@ -317,13 +319,15 @@ tests:
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
+      PICS: MOD.C.AM-WRITE
       verification: |
-          This cluster doesn"t have any writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
+      PICS: MOD.C.AO-WRITE
       verification: |
           ./chip-tool modeselect write on-mode 0 1 1
 
@@ -826,6 +830,7 @@ tests:
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
+      PICS: MOD.C.AO-READ
       verification: |
           TH all-clusters-minimal-app does not support optional attributes
 
@@ -838,6 +843,7 @@ tests:
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
+      PICS: MOD.C.AO-WRITE
       verification: |
           ./chip-tool modeselect write on-mode 0 1 1
           ./chip-tool modeselect write start-up-mode 0 1 1

@@ -28,7 +28,8 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       enableAddressSanitizer = "YES"
-      enableASanStackUseAfterReturn = "YES">
+      enableASanStackUseAfterReturn = "YES"
+      enableUBSanitizer = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">

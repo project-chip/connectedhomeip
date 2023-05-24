@@ -19,7 +19,6 @@
 package chip.tlv
 
 import com.google.common.truth.Truth.assertThat
-import com.google.protobuf.ByteString
 import java.math.BigInteger
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,6 +44,9 @@ private val fabricConfig =
 
 @RunWith(JUnit4::class)
 class TlvReaderTest {
+  private fun String.octetsToByteArray(): ByteArray =
+    replace(" ", "").chunked(2).map { it.toInt(16) and 0xFF }.map { it.toByte() }.toByteArray()
+
   @Test
   fun parsingFabricConfig_extractsFabricId() {
     val reader = TlvReader(fabricConfig)
@@ -88,7 +90,7 @@ class TlvReaderTest {
       assertThat((tag as ContextSpecificTag).tagNumber).isEqualTo(3)
       assertThat(value).isInstanceOf(ByteStringValue::class.java)
       assertThat((value as ByteStringValue).value)
-        .isEqualTo(ByteString.fromHex("149BF1430B26F5E4BBF380D3DB855BA1"))
+        .isEqualTo("149BF1430B26F5E4BBF380D3DB855BA1".octetsToByteArray())
     }
 
     reader.nextElement().apply {
@@ -96,7 +98,7 @@ class TlvReaderTest {
       assertThat((tag as ContextSpecificTag).tagNumber).isEqualTo(4)
       assertThat(value).isInstanceOf(ByteStringValue::class.java)
       assertThat((value as ByteStringValue).value)
-        .isEqualTo(ByteString.fromHex("E0E8BAA1CAC6E8E7216D720BD13C61C5E0E7B901"))
+        .isEqualTo("E0E8BAA1CAC6E8E7216D720BD13C61C5E0E7B901".octetsToByteArray())
     }
 
     reader.nextElement().apply {
@@ -178,16 +180,16 @@ class TlvReaderTest {
     // Common-profile 2-bytes Tag with ByteString 1-byte type
     val control = 0b01010000.toByte()
     val length = 0b10000.toByte()
-    val v = ByteString.copyFromUtf8("byte_string_utf8")
-    assertThat(v.toByteArray().size).isEqualTo(16)
+    val v = "byte_string_utf8".toByteArray()
+    assertThat(v.size).isEqualTo(16)
 
-    val reader = TlvReader(byteArrayOf(control, 0x0, 0x0, length, *v.toByteArray()))
+    val reader = TlvReader(byteArrayOf(control, 0x0, 0x0, length, *v))
     reader.nextElement().apply {
       assertThat(tag).isInstanceOf(CommonProfileTag::class.java)
       assertThat((tag as CommonProfileTag).size).isEqualTo(2)
       assertThat(value).isInstanceOf(ByteStringValue::class.java)
       assertThat((value as ByteStringValue).value)
-        .isEqualTo(ByteString.copyFromUtf8("byte_string_utf8"))
+        .isEqualTo("byte_string_utf8".toByteArray())
     }
   }
 

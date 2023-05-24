@@ -162,14 +162,19 @@ arguments
 -   On the command line:
 
           $ cd ~/connectedhomeip/examples/light-switch-app/silabs/efr32
-          $ python3 out/debug/chip-efr32-light-switch-example.flash.py
+          $ python3 out/debug/matter-silabs-light-switch-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 
 All EFR32 boards require a bootloader, see Silicon Labs documentation for more
 info. Pre-built bootloader binaries are available in the Assets section of the
 Releases page on
-[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
+[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases).
+
+-   On the command line:
+
+
+          $ commander flash bootloader_binaries/bootloader-storage-internal-single-512k-BRD4187C-gsdk4.1.s37
 
 ## Viewing Logging Output
 
@@ -211,9 +216,15 @@ combination with JLinkRTTClient as follows:
 
           $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
 
+
     For MG21 use:
 
           $ JLinkExe -device EFR32MG21AXXXF1024 -if SWD -speed 4000 -autoconnect 1
+
+
+    For MG24 use:
+
+          $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 

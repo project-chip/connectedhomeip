@@ -89,8 +89,8 @@ tests:
           struct Data field: D_OK_EMPTY"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool   accesscontrol  write extension "[{"data":"1718"}]" 1 0
-          On TH1(Chiptool), Verify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element
+          ./chip-tool   accesscontrol  write extension '[{"data":"1718"}]' 1 0
+          On TH1(Chiperify  AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element
 
           217.510779][2371:2376] CHIP:DMG:                        AttributePathIB =
           [1657284217.510818][2371:2376] CHIP:DMG:                        {
@@ -165,7 +165,7 @@ tests:
           struct Data field: D_OK_SINGLE"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
+          ./chip-tool   accesscontrol  write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 1 0
           On TH1(Chiptool) , Verify   Successfully extension attribute list containing one element
           7284747.131523][2411:2416] CHIP:DMG:                        StatusIB =
           [1657284747.131568][2411:2416] CHIP:DMG:                        {
@@ -245,7 +245,7 @@ tests:
           struct Data field: D_BAD_LENGTH"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool   accesscontrol  write extension "[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"}]" 1 0
+          ./chip-tool   accesscontrol  write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"}]' 1 0
 
           On TH1(Chiptool) , Verify AccessControl cluster Extension attribute value is list of AccessControlExtensionStruct containing 1 element Data, exceeds maximum length.
 
@@ -298,7 +298,7 @@ tests:
           struct Data field: D_OK_EMPTY struct Data field: D_OK_SINGLE"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool   accesscontrol  write extension "[{"data":"1718"},{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]" 1 0
+          ./chip-tool   accesscontrol  write extension '[{"data":"1718"},{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 1 0
 
           On TH1(Chiptool) , Verify AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 2 elements Returns 0x87 (CONSTRAINT_ERROR)-as there are more than 1 entry
 
@@ -351,7 +351,7 @@ tests:
           value is an empty list"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool accesscontrol write extension "[]" 1 0
+          ./chip-tool accesscontrol write extension '[]' 1 0
 
           On TH1(Chiptool) , Verify  AccessControl cluster Extension attribute, value is an empty list
 

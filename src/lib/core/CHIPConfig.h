@@ -1424,21 +1424,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE
+ * @def CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
  *
- * Defines the size of the time zone list
- */
-#ifndef CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE
-#define CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE 2
-#endif
-
-/**
- * @def CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE
+ * @brief Controls whether core data model code will try to include app-specific generated headers.
  *
- * Defines the size of the DSTOffset list
+ * If this is set to true, data model code will be compiled with no client or
+ * server clusters enabled and all required access control levels set to their
+ * defaults: (view for all attribute/event reads, operate for all writes and
+ * invokes).
  */
-#ifndef CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE
-#define CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE 2
+#ifndef CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
+#define CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES 0
 #endif
 
 /**

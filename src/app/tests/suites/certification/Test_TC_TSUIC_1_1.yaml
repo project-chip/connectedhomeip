@@ -53,7 +53,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+              contains: [0, 1, 2, 65528, 65529, 65530, 65531, 65532, 65533]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
@@ -70,18 +70,25 @@ tests:
           value: []
           constraints:
               type: list
-    #Commenting out the step EventList attribute which is out of scope for matter V1.0
-    #- label:
-    #      "Read EventList attribute from the DUT and Verify that the DUT
-    #      response provides a list of supported events."
-    #  verification: |
-    #      Not implemented in chip-tool
-    #  cluster: "LogCommands"
-    #  command: "UserPrompt"
-    #  PICS: PICS_USER_PROMPT
-    #  arguments:
-    #      values:
-    #          - name: "message"
-    #            value: "Please enter 'y' for success"
-    #          - name: "expectedValue"
-    #            value: "y"
+
+    #Manufacturer specific event IDs check not possible
+    - label:
+          "Read EventList attribute from the DUT.For this cluster the list is
+          usually empty but it can contain manufacturer specific event IDs."
+      verification: |
+          ./chip-tool thermostatuserinterfaceconfiguration read event-list 1 1
+          On TH(chip-tool), Verify that the DUT response provides a list of supported events. For this cluster the list is usually empty but it can contain manufacturer specific event IDs.
+          [1676466144.926927][28127:28129] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_FFFA DataVersion: 317726044
+          [1676466144.926964][28127:28129] CHIP:TOO:   EventList: 0 entries
+          [1676466144.927021][28127:28129] CHIP:EM: <<< [E:22756i S:22644 M:99305003 (Ack:156666885)] (S) Msg TX to 1:0000000000000001 [110F] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1676466144.927035][28127:28129] CHIP:IN: (S) Sending msg 99305003 on secure session with LSID: 22644
+          [1676466144.927067][28127:28129] CHIP:EM: Flushed pending ack for MessageCounter:156666885 on exchange 22756i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"

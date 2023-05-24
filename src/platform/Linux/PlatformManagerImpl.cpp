@@ -56,9 +56,14 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 namespace {
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
-void * GLibMainLoopThread(void * loop)
+void * GLibMainLoopThread(void * userData)
 {
-    g_main_loop_run(static_cast<GMainLoop *>(loop));
+    GMainLoop * loop       = static_cast<GMainLoop *>(userData);
+    GMainContext * context = g_main_loop_get_context(loop);
+
+    g_main_context_push_thread_default(context);
+    g_main_loop_run(loop);
+
     return nullptr;
 }
 #endif
@@ -172,11 +177,15 @@ CHIP_ERROR RunWiFiIPChangeListener()
         return CHIP_ERROR_INTERNAL;
     }
 
-    GIOChannel * ch = g_io_channel_unix_new(sock);
-    g_io_add_watch_full(ch, G_PRIORITY_DEFAULT, G_IO_IN, WiFiIPChangeListener, nullptr, nullptr);
-
+    GIOChannel * ch       = g_io_channel_unix_new(sock);
+    GSource * watchSource = g_io_create_watch(ch, G_IO_IN);
+    g_source_set_callback(watchSource, G_SOURCE_FUNC(WiFiIPChangeListener), nullptr, nullptr);
     g_io_channel_set_close_on_unref(ch, TRUE);
     g_io_channel_set_encoding(ch, nullptr, nullptr);
+
+    PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
+
+    g_source_unref(watchSource);
     g_io_channel_unref(ch);
 
     return CHIP_NO_ERROR;
@@ -190,8 +199,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
-    mGLibMainLoop       = g_main_loop_new(nullptr, FALSE);
+    auto * context      = g_main_context_new();
+    mGLibMainLoop       = g_main_loop_new(context, FALSE);
     mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
+    g_main_context_unref(context);
 
     {
         // Wait for the GLib main loop to start. It is required that the context used
@@ -212,7 +223,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
                 return G_SOURCE_REMOVE;
             },
             &invokeData, nullptr);
-        g_source_attach(idleSource, g_main_loop_get_context(mGLibMainLoop));
+        GLibMatterContextAttachSource(idleSource);
         g_source_unref(idleSource);
 
         invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });

@@ -66,7 +66,7 @@ Interactions with the switch device are exposed as attributes (for the latching 
 
   </cluster>
 
-  <bitmap name="SwitchFeature" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x003B" />
     <field name="Latching Switch" mask="0x1" />
     <field name="Momentary Switch" mask="0x2" />

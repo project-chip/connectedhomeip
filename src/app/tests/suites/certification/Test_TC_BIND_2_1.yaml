@@ -78,7 +78,7 @@ tests:
           Entry 2: Node = 3 Cluster = 0x0006(onoff) Endpoint = 2 Note: Node 2
           corresponds to TH2s Node ID Node 3 corresponds to TH3s Node ID"
       verification: |
-          ./chip-tool binding write binding "[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }, { "node" : 3 , "cluster" : "0x0006" , "endpoint" : 2  }]" 1 1
+          ./chip-tool binding write binding '[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }, { "node" : 3 , "cluster" : "0x0006" , "endpoint" : 2  }]' 1 1
 
           On TH1(Chip-tool), Verify the success response for binding entries
 
@@ -106,7 +106,7 @@ tests:
     - label: "DUT is triggered to send On command to its binding node entries"
       PICS: OO.C.C01.Tx
       verification: |
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}]}]" 2 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}]}]' 2 0
 
           on TH1 (Chip-tool), Verify the on command receives success response
 
@@ -116,7 +116,7 @@ tests:
           [1652330385.328298][3240:3245] CHIP:DMG:                        },
 
 
-          ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 2, "deviceType": null}]}]" 3 0
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [1], "targets": [{"cluster": 6, "endpoint": 2, "deviceType": null}]}]' 3 0
 
           on TH1(Chip-tool), Verify the on command receives success response
 
@@ -246,7 +246,7 @@ tests:
 
     - label: "TH1 removes second binding entry corresponding to TH3 from DUT"
       verification: |
-          ./chip-tool binding write binding "[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }]" 1 1
+          ./chip-tool binding write binding '[{"node" : 2 , "cluster" : "0x0006" , "endpoint" : 1 }]' 1 1
 
           Verify on TH1(Chip-tool) ,binding entry receives success response
 

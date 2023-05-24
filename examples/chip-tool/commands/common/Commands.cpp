@@ -149,7 +149,7 @@ exit:
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-int Commands::RunInteractive(const char * command)
+int Commands::RunInteractive(const char * command, const chip::Optional<char *> & storageDirectory)
 {
     std::vector<std::string> arguments;
     VerifyOrReturnValue(DecodeArgumentsFromInteractiveMode(command, arguments), EXIT_FAILURE);
@@ -174,7 +174,7 @@ int Commands::RunInteractive(const char * command)
     }
 
     ChipLogProgress(chipTool, "Command: %s", commandStr.c_str());
-    auto err = RunCommand(argc, argv, true);
+    auto err = RunCommand(argc, argv, true, storageDirectory);
 
     // Do not delete arg[0]
     for (auto i = 1; i < argc; i++)
@@ -185,7 +185,8 @@ int Commands::RunInteractive(const char * command)
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
+CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive,
+                                const chip::Optional<char *> & interactiveStorageDirectory)
 {
     Command * command = nullptr;
 
@@ -271,7 +272,25 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return interactive ? command->RunAsInteractive() : command->Run();
+    if (interactive)
+    {
+        return command->RunAsInteractive(interactiveStorageDirectory);
+    }
+
+    // Now that the command is initialized, get our storage from it as needed
+    // and set up our loging level.
+#ifdef CONFIG_USE_LOCAL_STORAGE
+    CHIP_ERROR err = mStorage.Init(nullptr, command->GetStorageDirectory().ValueOr(nullptr));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err));
+        return err;
+    }
+
+    chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
+#endif // CONFIG_USE_LOCAL_STORAGE
+
+    return command->Run();
 }
 
 Commands::ClusterMap::iterator Commands::GetCluster(std::string clusterName)

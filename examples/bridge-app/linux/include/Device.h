@@ -180,7 +180,7 @@ public:
     } Changed;
 
     DevicePowerSource(const char * szDeviceName, std::string szLocation,
-                      chip::BitFlags<chip::app::Clusters::PowerSource::PowerSourceFeature> aFeatureMap) :
+                      chip::BitFlags<chip::app::Clusters::PowerSource::Feature> aFeatureMap) :
         Device(szDeviceName, szLocation),
         mFeatureMap(aFeatureMap){};
 
@@ -204,7 +204,7 @@ private:
     uint8_t mOrder           = 0;
     uint8_t mStatus          = 0;
     std::string mDescription = "Primary Battery";
-    chip::BitFlags<chip::app::Clusters::PowerSource::PowerSourceFeature> mFeatureMap;
+    chip::BitFlags<chip::app::Clusters::PowerSource::Feature> mFeatureMap;
     DeviceCallback_fn mChanged_CB;
 };
 

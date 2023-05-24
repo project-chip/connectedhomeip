@@ -30,7 +30,7 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     {
     case kLogCategory_Error: {
         {
-            printf(LOG_COLOR_E "E (%u) %s: ", esp_log_timestamp(), tag);
+            printf(LOG_COLOR_E "E (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_ERROR, tag, msg, v);
             printf(LOG_RESET_COLOR "\n");
         }
@@ -40,7 +40,7 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     case kLogCategory_Progress:
     default: {
         {
-            printf(LOG_COLOR_I "I (%u) %s: ", esp_log_timestamp(), tag);
+            printf(LOG_COLOR_I "I (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_INFO, tag, msg, v);
             printf(LOG_RESET_COLOR "\n");
         }
@@ -49,7 +49,7 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
 
     case kLogCategory_Detail: {
         {
-            printf(LOG_COLOR_D "D (%u) %s: ", esp_log_timestamp(), tag);
+            printf(LOG_COLOR_D "D (%" PRIu32 ") %s: ", esp_log_timestamp(), tag);
             esp_log_writev(ESP_LOG_DEBUG, tag, msg, v);
             printf(LOG_RESET_COLOR "\n");
         }

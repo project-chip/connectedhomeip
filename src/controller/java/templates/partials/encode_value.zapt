@@ -51,11 +51,11 @@
     {{#if_chip_enum type}}
       {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}}));
     {{else}}
-      {{#if_is_bitmap type}}
-        {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}}));
+      {{#if_is_strongly_typed_bitmap type}}
+        {{target}}.SetRaw(static_cast<std::remove_reference_t<decltype({{target}})>::IntegerType>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}})));
       {{else}}
         {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>(chip::JniReferences::GetInstance().{{asJavaType type null parent.parent.name forceNotList=true}}ToPrimitive({{source}}));
-      {{/if_is_bitmap}}
+      {{/if_is_strongly_typed_bitmap}}
     {{/if_chip_enum}}
   {{/if_is_struct}}
 {{/if}}

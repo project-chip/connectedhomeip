@@ -94,7 +94,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-bool Delegate::HasFeature(chip::EndpointId endpoint, ChannelFeature feature)
+bool Delegate::HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     uint32_t featureMap = GetFeatureMap(endpoint);
     return (featureMap & chip::to_underlying(feature));
@@ -134,7 +134,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
     switch (aPath.mAttributeId)
     {
     case app::Clusters::Channel::Attributes::ChannelList::Id: {
-        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, ChannelFeature::kChannelList))
+        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, Feature::kChannelList))
         {
             return aEncoder.EncodeEmptyList();
         }
@@ -142,7 +142,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
         return ReadChannelListAttribute(aEncoder, delegate);
     }
     case app::Clusters::Channel::Attributes::Lineup::Id: {
-        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, ChannelFeature::kLineupInfo))
+        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, Feature::kLineupInfo))
         {
             return CHIP_NO_ERROR;
         }

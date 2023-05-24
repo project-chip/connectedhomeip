@@ -229,8 +229,16 @@ function install_tizen_sdk() {
         'capi-network-bluetooth-devel-*.armv7l.rpm'
         'capi-network-nsd-*.armv7l.rpm'
         'capi-network-thread-*.armv7l.rpm'
+        'capi-system-peripheral-io-*.armv7l.rpm'
+        'capi-system-peripheral-io-devel-*.armv7l.rpm'
         'capi-system-resource-1*.armv7l.rpm'
         'libnsd-dns-sd-*.armv7l.rpm')
+    download "$URL" "${PKG_ARR[@]}"
+
+    # Tizen Developer Platform Certificate
+    URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
+    PKG_ARR=(
+        "$TIZEN_VERSION-iot-things-add-ons_*_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
 
     # Install all
@@ -253,6 +261,10 @@ function install_tizen_sdk() {
     echo "TIZEN_SDK_INSTALLED_PATH=$TIZEN_SDK_ROOT" >"$TIZEN_SDK_ROOT/sdk.info"
     echo "TIZEN_SDK_DATA_PATH=$TIZEN_SDK_DATA_PATH" >>"$TIZEN_SDK_ROOT/sdk.info"
     ln -sf "$TIZEN_SDK_DATA_PATH/.tizen-cli-config" "$TIZEN_SDK_ROOT/tools/.tizen-cli-config"
+
+    # Use Tizen developer platform certificate as default
+    cp "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/sdk-platform/* \
+        "$TIZEN_SDK_ROOT"/tools/certificate-generator/certificates/distributor/
 
     # Make symbolic links relative
     find "$TIZEN_SDK_SYSROOT/usr/lib" -maxdepth 1 -type l | while IFS= read -r LNK; do

@@ -26,7 +26,6 @@
 #else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-
 #include <lwip/def.h>
 #include <lwip/opt.h>
 
@@ -49,7 +48,11 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
-#if BYTE_ORDER == BIG_ENDIAN
+#ifndef __BYTE_ORDER__
+#error Endianness is not defined
+#endif // BYTE_ORDER
+
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #ifndef htons
 #define htons(x) (x)
 #endif
@@ -63,7 +66,7 @@
 #define ntohl(x) (x)
 #endif
 
-#else // BYTE_ORDER != BIG_ENDIAN
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #ifndef htons
 #define htons(x) ((u16_t)((((x) & (u16_t) 0x00ffU) << 8) | (((x) & (u16_t) 0xff00U) >> 8)))
 #endif
@@ -78,7 +81,10 @@
 #ifndef ntohl
 #define ntohl(x) htonl(x)
 #endif
-#endif // BYTE_ORDER == BIG_ENDIAN
+
+#else
+#error __BYTE_ORDER__ value not recognized
+#endif // __BYTE_ORDER__ ==
 
 #endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 

@@ -36,6 +36,7 @@ tests:
     - label:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order."
+      PICS: PCC.C.AM-READ
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
@@ -194,6 +195,7 @@ tests:
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order."
+      PICS: PCC.C.AO-READ
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
@@ -382,7 +384,7 @@ tests:
           [1651564281.858131][8748:8748] CHIP:DMG:
           [1651564281.858157][8748:8748] CHIP:DMG:         isFabricFiltered = true,
           [1651564281.858183][8748:8748] CHIP:DMG:         InteractionModelRevision = 1
-          [1651564281.858206][8748:8748] CHIP:DMG: },"
+          [1651564281.858206][8748:8748] CHIP:DMG: },
 
           ./chip-tool pumpconfigurationandcontrol read min-const-temp 1 1
 
@@ -404,7 +406,7 @@ tests:
           [1651564317.488983][8748:8748] CHIP:DMG:
           [1651564317.489011][8748:8748] CHIP:DMG:         isFabricFiltered = true,
           [1651564317.489038][8748:8748] CHIP:DMG:         InteractionModelRevision = 1
-          [1651564317.489063][8748:8748] CHIP:DMG: },"
+          [1651564317.489063][8748:8748] CHIP:DMG: },
 
           ./chip-tool pumpconfigurationandcontrol read max-const-temp 1 1
 
@@ -426,7 +428,7 @@ tests:
           [1651564350.267918][8748:8748] CHIP:DMG:
           [1651564350.267945][8748:8748] CHIP:DMG:         isFabricFiltered = true,
           [1651564350.267970][8748:8748] CHIP:DMG:         InteractionModelRevision = 1
-          [1651564350.268092][8748:8748] CHIP:DMG: },"
+          [1651564350.268092][8748:8748] CHIP:DMG: },
 
            ./chip-tool pumpconfigurationandcontrol read pump-status 1 1
 
@@ -448,7 +450,7 @@ tests:
           [1651564415.273477][8748:8748] CHIP:DMG:
           [1651564415.273520][8748:8748] CHIP:DMG:         isFabricFiltered = true,
           [1651564415.273562][8748:8748] CHIP:DMG:         InteractionModelRevision = 1
-          [1651564415.273600][8748:8748] CHIP:DMG: },"
+          [1651564415.273600][8748:8748] CHIP:DMG: },
 
           ./chip-tool pumpconfigurationandcontrol read speed  1 1
 
@@ -470,7 +472,7 @@ tests:
           [1651571041.252955][9246:9246] CHIP:DMG:
           [1651571041.252990][9246:9246] CHIP:DMG:         isFabricFiltered = true,
           [1651571041.253016][9246:9246] CHIP:DMG:         InteractionModelRevision = 1
-          [1651571041.253049][9246:9246] CHIP:DMG: },"
+          [1651571041.253049][9246:9246] CHIP:DMG: },
 
           ./chip-tool pumpconfigurationandcontrol read lifetime-running-hours 1 1
 
@@ -492,7 +494,7 @@ tests:
           [1651571194.810979][9337:9337] CHIP:DMG:
           [1651571194.811005][9337:9337] CHIP:DMG:         isFabricFiltered = true,
           [1651571194.811030][9337:9337] CHIP:DMG:         InteractionModelRevision = 1
-          [1651571194.811053][9337:9337] CHIP:DMG: },"
+          [1651571194.811053][9337:9337] CHIP:DMG: },
 
           ./chip-tool pumpconfigurationandcontrol read  power 1 1
 
@@ -514,7 +516,7 @@ tests:
           [1651571264.122391][9337:9337] CHIP:DMG:
           [1651571264.122418][9337:9337] CHIP:DMG:         isFabricFiltered = true,
           [1651571264.122444][9337:9337] CHIP:DMG:         InteractionModelRevision = 1
-          [1651571264.122468][9337:9337] CHIP:DMG: },"
+          [1651571264.122468][9337:9337] CHIP:DMG: },
 
           ./chip-tool pumpconfigurationandcontrol read  lifetime-energy-consumed  1  1
 
@@ -536,7 +538,7 @@ tests:
           [1651571293.018204][9337:9337] CHIP:DMG:
           [1651571293.018256][9337:9337] CHIP:DMG:         isFabricFiltered = true,
           [1651571293.018304][9337:9337] CHIP:DMG:         InteractionModelRevision = 1
-          [1651571293.018348][9337:9337] CHIP:DMG: },"
+          [1651571293.018348][9337:9337] CHIP:DMG: },
 
           ./chip-tool pumpconfigurationandcontrol read  control-mode 1 1
 
@@ -558,12 +560,13 @@ tests:
           [1651571369.366646][9337:9337] CHIP:DMG:
           [1651571369.366713][9337:9337] CHIP:DMG:         isFabricFiltered = true,
           [1651571369.366770][9337:9337] CHIP:DMG:         InteractionModelRevision = 1
-          [1651571369.366827][9337:9337] CHIP:DMG: },"
+          [1651571369.366827][9337:9337] CHIP:DMG: },
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order."
+      PICS: PCC.C.AM-WRITE
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
@@ -604,6 +607,7 @@ tests:
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order."
+      PICS: PCC.C.AO-WRITE
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
@@ -931,20 +935,21 @@ tests:
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order."
+      PICS: PCC.C.AO-READ
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
-          "./chip-tool pumpconfigurationandcontrol read min-const-pressure 1 1
+          ./chip-tool pumpconfigurationandcontrol read min-const-pressure 1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          "./chip-tool pumpconfigurationandcontrol read max-const-pressure 1 1
+          ./chip-tool pumpconfigurationandcontrol read max-const-pressure 1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          "./chip-tool pumpconfigurationandcontrol read min-comp-pressure  1 1
+          ./chip-tool pumpconfigurationandcontrol read min-comp-pressure  1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          "./chip-tool pumpconfigurationandcontrol read max-comp-pressure  1 1
+          ./chip-tool pumpconfigurationandcontrol read max-comp-pressure  1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
           ./chip-tool pumpconfigurationandcontrol read min-const-speed 1 1
@@ -957,40 +962,41 @@ tests:
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
 
-          "./chip-tool pumpconfigurationandcontrol read min-const-flow 1 1
+          ./chip-tool pumpconfigurationandcontrol read min-const-flow 1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          "./chip-tool pumpconfigurationandcontrol read max-const-flow  1 1
+          ./chip-tool pumpconfigurationandcontrol read max-const-flow  1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          "./chip-tool pumpconfigurationandcontrol read min-const-temp 1 1
+          ./chip-tool pumpconfigurationandcontrol read min-const-temp 1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          "./chip-tool pumpconfigurationandcontrol read max-const-temp 1 1
+          ./chip-tool pumpconfigurationandcontrol read max-const-temp 1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          " ./chip-tool pumpconfigurationandcontrol read pump-status 1 1
+           ./chip-tool pumpconfigurationandcontrol read pump-status 1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          "./chip-tool pumpconfigurationandcontrol read speed  1 1
+          ./chip-tool pumpconfigurationandcontrol read speed  1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          "./chip-tool pumpconfigurationandcontrol read lifetime-running-hours 1 1
+          ./chip-tool pumpconfigurationandcontrol read lifetime-running-hours 1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          "./chip-tool pumpconfigurationandcontrol read  power 1 1
+          ./chip-tool pumpconfigurationandcontrol read  power 1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          " ./chip-tool pumpconfigurationandcontrol read  lifetime-energy-consumed  1  1
+           ./chip-tool pumpconfigurationandcontrol read  lifetime-energy-consumed  1  1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
-          "./chip-tool pumpconfigurationandcontrol read  control-mode 1 1
+          ./chip-tool pumpconfigurationandcontrol read  control-mode 1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order."
+      PICS: PCC.C.AO-WRITE
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 

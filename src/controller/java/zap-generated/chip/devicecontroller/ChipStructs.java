@@ -1427,6 +1427,41 @@ public class ChipStructs {
     }
   }
 
+  public static class IcdManagementClusterMonitoringRegistrationStruct {
+    public Long checkInNodeID;
+    public Long monitoredSubject;
+    public byte[] key;
+    public Integer fabricIndex;
+
+    public IcdManagementClusterMonitoringRegistrationStruct(
+        Long checkInNodeID, Long monitoredSubject, byte[] key, Integer fabricIndex) {
+      this.checkInNodeID = checkInNodeID;
+      this.monitoredSubject = monitoredSubject;
+      this.key = key;
+      this.fabricIndex = fabricIndex;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("IcdManagementClusterMonitoringRegistrationStruct {\n");
+      output.append("\tcheckInNodeID: ");
+      output.append(checkInNodeID);
+      output.append("\n");
+      output.append("\tmonitoredSubject: ");
+      output.append(monitoredSubject);
+      output.append("\n");
+      output.append("\tkey: ");
+      output.append(Arrays.toString(key));
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class ModeSelectClusterSemanticTagStruct {
     public Integer mfgCode;
     public Integer value;
@@ -1477,6 +1512,30 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tsemanticTags: ");
       output.append(semanticTags);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TemperatureControlClusterTemperatureLevelStruct {
+    public String label;
+    public Integer temperatureLevel;
+
+    public TemperatureControlClusterTemperatureLevelStruct(String label, Integer temperatureLevel) {
+      this.label = label;
+      this.temperatureLevel = temperatureLevel;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TemperatureControlClusterTemperatureLevelStruct {\n");
+      output.append("\tlabel: ");
+      output.append(label);
+      output.append("\n");
+      output.append("\ttemperatureLevel: ");
+      output.append(temperatureLevel);
       output.append("\n");
       output.append("}\n");
       return output.toString();

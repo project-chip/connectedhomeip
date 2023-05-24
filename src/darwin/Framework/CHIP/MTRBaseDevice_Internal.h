@@ -26,6 +26,7 @@
 #include <app/EventHeader.h>
 #include <app/EventLoggingTypes.h>
 #include <app/EventPathParams.h>
+#include <system/SystemPacketBuffer.h>
 
 @class MTRDeviceController;
 
@@ -83,6 +84,19 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
  * (e.g. when TLV decoding failed).
  */
 + (NSDictionary *)eventReportForHeader:(const chip::app::EventHeader &)header andData:(id _Nullable)data;
+
+/**
+ * Extract a data-value for the given response command from the given response-value
+ * dictionary, encode it to TLV, and return a System::PacketBufferHandle with
+ * the encoded data.
+ *
+ * Will return a null handle and an error if the given response-value does not represent a
+ * data command response or is the wrong response command, or if encoding to TLV fails.
+ */
++ (chip::System::PacketBufferHandle)_responseDataForCommand:(NSDictionary<NSString *, id> *)responseValue
+                                                  clusterID:(chip::ClusterId)clusterID
+                                                  commandID:(chip::CommandId)commandID
+                                                      error:(NSError * __autoreleasing *)error;
 @end
 
 @interface MTRClusterPath ()
@@ -108,12 +122,12 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 @end
 
 @interface MTREventReport ()
+- (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path error:(NSError *)error;
 - (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path
                  eventNumber:(NSNumber *)eventNumber
                     priority:(chip::app::PriorityLevel)priority
                    timestamp:(const chip::app::Timestamp &)timestamp
-                       value:(id _Nullable)value
-                       error:(NSError * _Nullable)error;
+                       value:(id)value;
 @end
 
 @interface MTRAttributeRequestPath ()

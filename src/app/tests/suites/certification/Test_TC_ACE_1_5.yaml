@@ -52,10 +52,40 @@ tests:
       response:
           saveAs: th1FabricIndex
 
+    - label:
+          "Step 3 & 4: TH1 puts DUT into commissioning mode, TH2 commissions DUT
+          using admin node ID N2"
+      verification: |
+          Open a commissioning window On TH1(Chiptool)using below command
+
+          ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3841
+
+          [1657186324.710951][10820:10825] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1657186324.710980][10820:10825] CHIP:CTL: Successfully opened pairing window On TH(Chiptool)e device
+          [1657186324.711048][10820:10825] CHIP:CTL: Manual pairing code: [36253605617]
+          [1657186324.711108][10820:10825] CHIP:CTL: SetupQRCode: [MT:-24J0IRV01A7TB7E700]
+
+
+          Commission TH2(Chiptool) to DUT using manualcode generated in TH1 using open commission window
+
+          ./chip-tool pairing code 2 36253605617 --commissioner-name beta --commissioner-nodeid 223344
+          [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "Open Commissioning Window from alpha"
       cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: PICS_SDK_CI_ONLY
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -72,6 +102,7 @@ tests:
     - label: "Waiting after opening commissioning window"
       cluster: "DelayCommands"
       command: "WaitForMs"
+      PICS: PICS_SDK_CI_ONLY
       arguments:
           values:
               - name: "ms"
@@ -81,6 +112,7 @@ tests:
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
+      PICS: PICS_SDK_CI_ONLY
       arguments:
           values:
               - name: "nodeId"
@@ -92,6 +124,7 @@ tests:
       identity: beta
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      PICS: PICS_SDK_CI_ONLY
       arguments:
           values:
               - name: "nodeId"
