@@ -210,6 +210,11 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(DataModel::DecodableList<TimeS
 
     while (newTzL.Next() && i < CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE)
     {
+        if (newTzL.GetValue().offset < -43200 || newTzL.GetValue().offset > 50400)
+        {
+            mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize);
+            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+        }
         // first element shall have validAt entry of 0
         if (i == 0 && newTzL.GetValue().validAt != 0)
         {
@@ -762,7 +767,7 @@ bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
     TimeSynchronization::TimeZoneDatabaseEnum tzDb;
     TimeZoneDatabase::Get(commandPath.mEndpointId, &tzDb);
     Commands::SetTimeZoneResponse::Type response;
-    if (GetDelegate()->HasFeature(commandPath.mEndpointId, TimeSynchronization::TimeSynchronizationFeature::kTimeZone) &&
+    if (GetDelegate()->HasFeature(commandPath.mEndpointId, TimeSynchronization::Feature::kTimeZone) &&
         tzDb != TimeSynchronization::TimeZoneDatabaseEnum::kNone)
     {
         auto tzL = TimeSynchronizationServer::Instance().GetTimeZone();

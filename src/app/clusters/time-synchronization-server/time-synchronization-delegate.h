@@ -34,7 +34,7 @@ using TimeZoneList = DataModel::List<chip::app::Clusters::TimeSynchronization::S
 class Delegate
 {
 public:
-    inline bool HasFeature(chip::EndpointId ep, TimeSynchronizationFeature feature)
+    inline bool HasFeature(chip::EndpointId ep, Feature feature)
     {
         uint32_t map;
         bool success = (Attributes::FeatureMap::Get(ep, &map) == EMBER_ZCL_STATUS_SUCCESS);
