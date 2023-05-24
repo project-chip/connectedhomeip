@@ -2828,12 +2828,13 @@ enum class DayOfWeek : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kHeating               = 0x1,
-    kCooling               = 0x2,
-    kOccupancy             = 0x4,
-    kScheduleConfiguration = 0x8,
-    kSetback               = 0x10,
-    kAutoMode              = 0x20,
+    kHeating                    = 0x1,
+    kCooling                    = 0x2,
+    kOccupancy                  = 0x4,
+    kScheduleConfiguration      = 0x8,
+    kSetback                    = 0x10,
+    kAutoMode                   = 0x20,
+    kLocalTemperatureNotExposed = 0x40,
 };
 
 // Bitmap for ModeForSequence

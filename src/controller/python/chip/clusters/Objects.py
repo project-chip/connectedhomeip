@@ -23088,6 +23088,7 @@ class Thermostat(Cluster):
             kScheduleConfiguration = 0x8
             kSetback = 0x10
             kAutoMode = 0x20
+            kLocalTemperatureNotExposed = 0x40
 
         class ModeForSequence(IntFlag):
             kHeatSetpointPresent = 0x1
