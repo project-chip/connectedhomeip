@@ -18,7 +18,7 @@
 #import <os/lock.h>
 
 #import "MTRAsyncCallbackWorkQueue.h"
-#import "MTRAttributeUtils.h"
+#import "MTRAttributeSpecifiedCheck.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRCluster.h"
@@ -629,7 +629,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 // Helper function to determine whether an attribute has "Changes Omitted" quality, which indicates that past the priming report in
 // a subscription, this attribute is not expected to be reported when its value changes
 //   * TODO: xml+codegen version to replace this hardcoded list.
-static BOOL _MTRAttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
+static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     switch (attributePath.cluster.unsignedLongValue) {
     case MTRClusterEthernetNetworkDiagnosticsID:
@@ -638,6 +638,7 @@ static BOOL _MTRAttributeHasChangesOmittedQuality(MTRAttributePath * attributePa
         case MTRClusterEthernetNetworkDiagnosticsAttributePacketTxCountID:
         case MTRClusterEthernetNetworkDiagnosticsAttributeTxErrCountID:
         case MTRClusterEthernetNetworkDiagnosticsAttributeCollisionCountID:
+        case MTRClusterEthernetNetworkDiagnosticsAttributeOverrunCountID:
         case MTRClusterEthernetNetworkDiagnosticsAttributeCarrierDetectID:
         case MTRClusterEthernetNetworkDiagnosticsAttributeTimeSinceResetID:
             return YES;
@@ -682,6 +683,7 @@ static BOOL _MTRAttributeHasChangesOmittedQuality(MTRAttributePath * attributePa
         case MTRClusterThreadNetworkDiagnosticsAttributeTxErrBusyChannelCountID:
         case MTRClusterThreadNetworkDiagnosticsAttributeRxTotalCountID:
         case MTRClusterThreadNetworkDiagnosticsAttributeRxUnicastCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxBroadcastCountID:
         case MTRClusterThreadNetworkDiagnosticsAttributeRxDataCountID:
         case MTRClusterThreadNetworkDiagnosticsAttributeRxDataPollCountID:
         case MTRClusterThreadNetworkDiagnosticsAttributeRxBeaconCountID:
@@ -761,7 +763,7 @@ static BOOL _MTRAttributeHasChangesOmittedQuality(MTRAttributePath * attributePa
                                                                          attributeID:attributeID];
 
     BOOL attributeIsSpecified = MTRAttributeIsSpecified(clusterID.unsignedIntValue, attributeID.unsignedIntValue);
-    BOOL hasChangesOmittedQuality = _MTRAttributeHasChangesOmittedQuality(attributePath);
+    BOOL hasChangesOmittedQuality = AttributeHasChangesOmittedQuality(attributePath);
 
     // Return current known / expected value right away
     NSDictionary<NSString *, id> * attributeValueToReturn = [self _attributeValueDictionaryForAttributePath:attributePath];

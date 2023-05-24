@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRAttributeUtils.h"
+#import "MTRAttributeSpecifiedCheck.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -23,7 +23,7 @@
 using namespace chip;
 using namespace chip::app;
 
-static BOOL MTRAttributeIsSpecifiedInIdentifyCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInIdentifyCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Identify;
     switch (aAttributeId) {
@@ -56,7 +56,7 @@ static BOOL MTRAttributeIsSpecifiedInIdentifyCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInGroupsCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInGroupsCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Groups;
     switch (aAttributeId) {
@@ -86,7 +86,7 @@ static BOOL MTRAttributeIsSpecifiedInGroupsCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInScenesCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInScenesCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Scenes;
     switch (aAttributeId) {
@@ -131,7 +131,7 @@ static BOOL MTRAttributeIsSpecifiedInScenesCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInOnOffCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInOnOffCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OnOff;
     switch (aAttributeId) {
@@ -173,7 +173,7 @@ static BOOL MTRAttributeIsSpecifiedInOnOffCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInOnOffSwitchConfigurationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInOnOffSwitchConfigurationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OnOffSwitchConfiguration;
     switch (aAttributeId) {
@@ -206,7 +206,7 @@ static BOOL MTRAttributeIsSpecifiedInOnOffSwitchConfigurationCluster(AttributeId
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInLevelControlCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInLevelControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::LevelControl;
     switch (aAttributeId) {
@@ -275,7 +275,7 @@ static BOOL MTRAttributeIsSpecifiedInLevelControlCluster(AttributeId aAttributeI
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInBinaryInputBasicCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInBinaryInputBasicCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::BinaryInputBasic;
     switch (aAttributeId) {
@@ -329,7 +329,7 @@ static BOOL MTRAttributeIsSpecifiedInBinaryInputBasicCluster(AttributeId aAttrib
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInDescriptorCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInDescriptorCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Descriptor;
     switch (aAttributeId) {
@@ -368,7 +368,7 @@ static BOOL MTRAttributeIsSpecifiedInDescriptorCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInBindingCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInBindingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Binding;
     switch (aAttributeId) {
@@ -398,7 +398,7 @@ static BOOL MTRAttributeIsSpecifiedInBindingCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInAccessControlCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInAccessControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AccessControl;
     switch (aAttributeId) {
@@ -440,7 +440,7 @@ static BOOL MTRAttributeIsSpecifiedInAccessControlCluster(AttributeId aAttribute
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInActionsCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInActionsCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Actions;
     switch (aAttributeId) {
@@ -476,7 +476,7 @@ static BOOL MTRAttributeIsSpecifiedInActionsCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::BasicInformation;
     switch (aAttributeId) {
@@ -566,7 +566,7 @@ static BOOL MTRAttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttrib
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInOTASoftwareUpdateProviderCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInOTASoftwareUpdateProviderCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OtaSoftwareUpdateProvider;
     switch (aAttributeId) {
@@ -593,7 +593,7 @@ static BOOL MTRAttributeIsSpecifiedInOTASoftwareUpdateProviderCluster(AttributeI
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInOTASoftwareUpdateRequestorCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInOTASoftwareUpdateRequestorCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OtaSoftwareUpdateRequestor;
     switch (aAttributeId) {
@@ -632,7 +632,7 @@ static BOOL MTRAttributeIsSpecifiedInOTASoftwareUpdateRequestorCluster(Attribute
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInLocalizationConfigurationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInLocalizationConfigurationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::LocalizationConfiguration;
     switch (aAttributeId) {
@@ -665,7 +665,7 @@ static BOOL MTRAttributeIsSpecifiedInLocalizationConfigurationCluster(AttributeI
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInTimeFormatLocalizationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInTimeFormatLocalizationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::TimeFormatLocalization;
     switch (aAttributeId) {
@@ -701,7 +701,7 @@ static BOOL MTRAttributeIsSpecifiedInTimeFormatLocalizationCluster(AttributeId a
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInUnitLocalizationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInUnitLocalizationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitLocalization;
     switch (aAttributeId) {
@@ -731,7 +731,7 @@ static BOOL MTRAttributeIsSpecifiedInUnitLocalizationCluster(AttributeId aAttrib
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInPowerSourceConfigurationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInPowerSourceConfigurationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::PowerSourceConfiguration;
     switch (aAttributeId) {
@@ -761,7 +761,7 @@ static BOOL MTRAttributeIsSpecifiedInPowerSourceConfigurationCluster(AttributeId
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInPowerSourceCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInPowerSourceCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::PowerSource;
     switch (aAttributeId) {
@@ -881,7 +881,7 @@ static BOOL MTRAttributeIsSpecifiedInPowerSourceCluster(AttributeId aAttributeId
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::GeneralCommissioning;
     switch (aAttributeId) {
@@ -923,7 +923,7 @@ static BOOL MTRAttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAt
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInNetworkCommissioningCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInNetworkCommissioningCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::NetworkCommissioning;
     switch (aAttributeId) {
@@ -974,7 +974,7 @@ static BOOL MTRAttributeIsSpecifiedInNetworkCommissioningCluster(AttributeId aAt
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInDiagnosticLogsCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInDiagnosticLogsCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DiagnosticLogs;
     switch (aAttributeId) {
@@ -1001,7 +1001,7 @@ static BOOL MTRAttributeIsSpecifiedInDiagnosticLogsCluster(AttributeId aAttribut
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInGeneralDiagnosticsCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInGeneralDiagnosticsCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::GeneralDiagnostics;
     switch (aAttributeId) {
@@ -1055,7 +1055,7 @@ static BOOL MTRAttributeIsSpecifiedInGeneralDiagnosticsCluster(AttributeId aAttr
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInSoftwareDiagnosticsCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInSoftwareDiagnosticsCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::SoftwareDiagnostics;
     switch (aAttributeId) {
@@ -1094,7 +1094,7 @@ static BOOL MTRAttributeIsSpecifiedInSoftwareDiagnosticsCluster(AttributeId aAtt
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInThreadNetworkDiagnosticsCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInThreadNetworkDiagnosticsCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ThreadNetworkDiagnostics;
     switch (aAttributeId) {
@@ -1310,7 +1310,7 @@ static BOOL MTRAttributeIsSpecifiedInThreadNetworkDiagnosticsCluster(AttributeId
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInWiFiNetworkDiagnosticsCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInWiFiNetworkDiagnosticsCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkDiagnostics;
     switch (aAttributeId) {
@@ -1376,7 +1376,7 @@ static BOOL MTRAttributeIsSpecifiedInWiFiNetworkDiagnosticsCluster(AttributeId a
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInEthernetNetworkDiagnosticsCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInEthernetNetworkDiagnosticsCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EthernetNetworkDiagnostics;
     switch (aAttributeId) {
@@ -1430,7 +1430,7 @@ static BOOL MTRAttributeIsSpecifiedInEthernetNetworkDiagnosticsCluster(Attribute
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::BridgedDeviceBasicInformation;
     switch (aAttributeId) {
@@ -1505,7 +1505,7 @@ static BOOL MTRAttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attrib
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInSwitchCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInSwitchCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Switch;
     switch (aAttributeId) {
@@ -1541,7 +1541,7 @@ static BOOL MTRAttributeIsSpecifiedInSwitchCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInAdministratorCommissioningCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInAdministratorCommissioningCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AdministratorCommissioning;
     switch (aAttributeId) {
@@ -1577,7 +1577,7 @@ static BOOL MTRAttributeIsSpecifiedInAdministratorCommissioningCluster(Attribute
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInOperationalCredentialsCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInOperationalCredentialsCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OperationalCredentials;
     switch (aAttributeId) {
@@ -1622,7 +1622,7 @@ static BOOL MTRAttributeIsSpecifiedInOperationalCredentialsCluster(AttributeId a
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInGroupKeyManagementCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInGroupKeyManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::GroupKeyManagement;
     switch (aAttributeId) {
@@ -1661,7 +1661,7 @@ static BOOL MTRAttributeIsSpecifiedInGroupKeyManagementCluster(AttributeId aAttr
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInFixedLabelCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInFixedLabelCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::FixedLabel;
     switch (aAttributeId) {
@@ -1691,7 +1691,7 @@ static BOOL MTRAttributeIsSpecifiedInFixedLabelCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInUserLabelCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInUserLabelCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UserLabel;
     switch (aAttributeId) {
@@ -1721,7 +1721,7 @@ static BOOL MTRAttributeIsSpecifiedInUserLabelCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInBooleanStateCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInBooleanStateCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::BooleanState;
     switch (aAttributeId) {
@@ -1751,7 +1751,7 @@ static BOOL MTRAttributeIsSpecifiedInBooleanStateCluster(AttributeId aAttributeI
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ModeSelect;
     switch (aAttributeId) {
@@ -1796,7 +1796,7 @@ static BOOL MTRAttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInTemperatureControlCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInTemperatureControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::TemperatureControl;
     switch (aAttributeId) {
@@ -1841,7 +1841,7 @@ static BOOL MTRAttributeIsSpecifiedInTemperatureControlCluster(AttributeId aAttr
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInRefrigeratorAlarmCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInRefrigeratorAlarmCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::RefrigeratorAlarm;
     switch (aAttributeId) {
@@ -1877,7 +1877,7 @@ static BOOL MTRAttributeIsSpecifiedInRefrigeratorAlarmCluster(AttributeId aAttri
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInAirQualityCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInAirQualityCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AirQuality;
     switch (aAttributeId) {
@@ -1907,7 +1907,7 @@ static BOOL MTRAttributeIsSpecifiedInAirQualityCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::SmokeCoAlarm;
     switch (aAttributeId) {
@@ -1970,7 +1970,7 @@ static BOOL MTRAttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeI
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInHEPAFilterMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInHEPAFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::HepaFilterMonitoring;
     switch (aAttributeId) {
@@ -2009,7 +2009,7 @@ static BOOL MTRAttributeIsSpecifiedInHEPAFilterMonitoringCluster(AttributeId aAt
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ActivatedCarbonFilterMonitoring;
     switch (aAttributeId) {
@@ -2048,7 +2048,7 @@ static BOOL MTRAttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attr
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInCeramicFilterMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInCeramicFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::CeramicFilterMonitoring;
     switch (aAttributeId) {
@@ -2087,7 +2087,7 @@ static BOOL MTRAttributeIsSpecifiedInCeramicFilterMonitoringCluster(AttributeId 
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInElectrostaticFilterMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInElectrostaticFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectrostaticFilterMonitoring;
     switch (aAttributeId) {
@@ -2126,7 +2126,7 @@ static BOOL MTRAttributeIsSpecifiedInElectrostaticFilterMonitoringCluster(Attrib
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInUVFilterMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInUVFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UvFilterMonitoring;
     switch (aAttributeId) {
@@ -2165,7 +2165,7 @@ static BOOL MTRAttributeIsSpecifiedInUVFilterMonitoringCluster(AttributeId aAttr
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInIonizingFilterMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInIonizingFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::IonizingFilterMonitoring;
     switch (aAttributeId) {
@@ -2204,7 +2204,7 @@ static BOOL MTRAttributeIsSpecifiedInIonizingFilterMonitoringCluster(AttributeId
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInZeoliteFilterMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInZeoliteFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ZeoliteFilterMonitoring;
     switch (aAttributeId) {
@@ -2243,7 +2243,7 @@ static BOOL MTRAttributeIsSpecifiedInZeoliteFilterMonitoringCluster(AttributeId 
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInOzoneFilterMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInOzoneFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OzoneFilterMonitoring;
     switch (aAttributeId) {
@@ -2282,7 +2282,7 @@ static BOOL MTRAttributeIsSpecifiedInOzoneFilterMonitoringCluster(AttributeId aA
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInWaterTankMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInWaterTankMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WaterTankMonitoring;
     switch (aAttributeId) {
@@ -2321,7 +2321,7 @@ static BOOL MTRAttributeIsSpecifiedInWaterTankMonitoringCluster(AttributeId aAtt
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInFuelTankMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInFuelTankMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::FuelTankMonitoring;
     switch (aAttributeId) {
@@ -2360,7 +2360,7 @@ static BOOL MTRAttributeIsSpecifiedInFuelTankMonitoringCluster(AttributeId aAttr
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInInkCartridgeMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInInkCartridgeMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::InkCartridgeMonitoring;
     switch (aAttributeId) {
@@ -2399,7 +2399,7 @@ static BOOL MTRAttributeIsSpecifiedInInkCartridgeMonitoringCluster(AttributeId a
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInTonerCartridgeMonitoringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInTonerCartridgeMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::TonerCartridgeMonitoring;
     switch (aAttributeId) {
@@ -2438,7 +2438,7 @@ static BOOL MTRAttributeIsSpecifiedInTonerCartridgeMonitoringCluster(AttributeId
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
     switch (aAttributeId) {
@@ -2573,7 +2573,7 @@ static BOOL MTRAttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInWindowCoveringCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInWindowCoveringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WindowCovering;
     switch (aAttributeId) {
@@ -2666,7 +2666,7 @@ static BOOL MTRAttributeIsSpecifiedInWindowCoveringCluster(AttributeId aAttribut
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInBarrierControlCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInBarrierControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::BarrierControl;
     switch (aAttributeId) {
@@ -2723,7 +2723,7 @@ static BOOL MTRAttributeIsSpecifiedInBarrierControlCluster(AttributeId aAttribut
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInPumpConfigurationAndControlCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInPumpConfigurationAndControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::PumpConfigurationAndControl;
     switch (aAttributeId) {
@@ -2819,7 +2819,7 @@ static BOOL MTRAttributeIsSpecifiedInPumpConfigurationAndControlCluster(Attribut
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Thermostat;
     switch (aAttributeId) {
@@ -2993,7 +2993,7 @@ static BOOL MTRAttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInFanControlCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInFanControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::FanControl;
     switch (aAttributeId) {
@@ -3053,7 +3053,7 @@ static BOOL MTRAttributeIsSpecifiedInFanControlCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInThermostatUserInterfaceConfigurationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInThermostatUserInterfaceConfigurationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ThermostatUserInterfaceConfiguration;
     switch (aAttributeId) {
@@ -3089,7 +3089,7 @@ static BOOL MTRAttributeIsSpecifiedInThermostatUserInterfaceConfigurationCluster
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInColorControlCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInColorControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ColorControl;
     switch (aAttributeId) {
@@ -3272,7 +3272,7 @@ static BOOL MTRAttributeIsSpecifiedInColorControlCluster(AttributeId aAttributeI
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInBallastConfigurationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInBallastConfigurationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::BallastConfiguration;
     switch (aAttributeId) {
@@ -3341,7 +3341,7 @@ static BOOL MTRAttributeIsSpecifiedInBallastConfigurationCluster(AttributeId aAt
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInIlluminanceMeasurementCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInIlluminanceMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::IlluminanceMeasurement;
     switch (aAttributeId) {
@@ -3383,7 +3383,7 @@ static BOOL MTRAttributeIsSpecifiedInIlluminanceMeasurementCluster(AttributeId a
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInTemperatureMeasurementCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInTemperatureMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::TemperatureMeasurement;
     switch (aAttributeId) {
@@ -3422,7 +3422,7 @@ static BOOL MTRAttributeIsSpecifiedInTemperatureMeasurementCluster(AttributeId a
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInPressureMeasurementCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInPressureMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::PressureMeasurement;
     switch (aAttributeId) {
@@ -3476,7 +3476,7 @@ static BOOL MTRAttributeIsSpecifiedInPressureMeasurementCluster(AttributeId aAtt
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInFlowMeasurementCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInFlowMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::FlowMeasurement;
     switch (aAttributeId) {
@@ -3515,7 +3515,7 @@ static BOOL MTRAttributeIsSpecifiedInFlowMeasurementCluster(AttributeId aAttribu
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInRelativeHumidityMeasurementCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInRelativeHumidityMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::RelativeHumidityMeasurement;
     switch (aAttributeId) {
@@ -3554,7 +3554,7 @@ static BOOL MTRAttributeIsSpecifiedInRelativeHumidityMeasurementCluster(Attribut
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInOccupancySensingCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInOccupancySensingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OccupancySensing;
     switch (aAttributeId) {
@@ -3617,7 +3617,7 @@ static BOOL MTRAttributeIsSpecifiedInOccupancySensingCluster(AttributeId aAttrib
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInWakeOnLANCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInWakeOnLANCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WakeOnLan;
     switch (aAttributeId) {
@@ -3647,7 +3647,7 @@ static BOOL MTRAttributeIsSpecifiedInWakeOnLANCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInChannelCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInChannelCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Channel;
     switch (aAttributeId) {
@@ -3683,7 +3683,7 @@ static BOOL MTRAttributeIsSpecifiedInChannelCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInTargetNavigatorCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInTargetNavigatorCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::TargetNavigator;
     switch (aAttributeId) {
@@ -3716,7 +3716,7 @@ static BOOL MTRAttributeIsSpecifiedInTargetNavigatorCluster(AttributeId aAttribu
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInMediaPlaybackCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInMediaPlaybackCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::MediaPlayback;
     switch (aAttributeId) {
@@ -3764,7 +3764,7 @@ static BOOL MTRAttributeIsSpecifiedInMediaPlaybackCluster(AttributeId aAttribute
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInMediaInputCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInMediaInputCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::MediaInput;
     switch (aAttributeId) {
@@ -3797,7 +3797,7 @@ static BOOL MTRAttributeIsSpecifiedInMediaInputCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInLowPowerCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInLowPowerCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::LowPower;
     switch (aAttributeId) {
@@ -3824,7 +3824,7 @@ static BOOL MTRAttributeIsSpecifiedInLowPowerCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInKeypadInputCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInKeypadInputCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::KeypadInput;
     switch (aAttributeId) {
@@ -3851,7 +3851,7 @@ static BOOL MTRAttributeIsSpecifiedInKeypadInputCluster(AttributeId aAttributeId
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInContentLauncherCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInContentLauncherCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ContentLauncher;
     switch (aAttributeId) {
@@ -3884,7 +3884,7 @@ static BOOL MTRAttributeIsSpecifiedInContentLauncherCluster(AttributeId aAttribu
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInAudioOutputCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInAudioOutputCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AudioOutput;
     switch (aAttributeId) {
@@ -3917,7 +3917,7 @@ static BOOL MTRAttributeIsSpecifiedInAudioOutputCluster(AttributeId aAttributeId
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInApplicationLauncherCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInApplicationLauncherCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ApplicationLauncher;
     switch (aAttributeId) {
@@ -3950,7 +3950,7 @@ static BOOL MTRAttributeIsSpecifiedInApplicationLauncherCluster(AttributeId aAtt
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInApplicationBasicCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInApplicationBasicCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ApplicationBasic;
     switch (aAttributeId) {
@@ -4001,7 +4001,7 @@ static BOOL MTRAttributeIsSpecifiedInApplicationBasicCluster(AttributeId aAttrib
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInAccountLoginCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInAccountLoginCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AccountLogin;
     switch (aAttributeId) {
@@ -4028,7 +4028,7 @@ static BOOL MTRAttributeIsSpecifiedInAccountLoginCluster(AttributeId aAttributeI
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInElectricalMeasurementCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInElectricalMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalMeasurement;
     switch (aAttributeId) {
@@ -4439,7 +4439,7 @@ static BOOL MTRAttributeIsSpecifiedInElectricalMeasurementCluster(AttributeId aA
     }
     }
 }
-static BOOL MTRAttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitTesting;
     switch (aAttributeId) {
@@ -4717,247 +4717,247 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
 {
     switch (aClusterId) {
     case Clusters::Identify::Id: {
-        return MTRAttributeIsSpecifiedInIdentifyCluster(aAttributeId);
+        return AttributeIsSpecifiedInIdentifyCluster(aAttributeId);
     }
     case Clusters::Groups::Id: {
-        return MTRAttributeIsSpecifiedInGroupsCluster(aAttributeId);
+        return AttributeIsSpecifiedInGroupsCluster(aAttributeId);
     }
     case Clusters::Scenes::Id: {
-        return MTRAttributeIsSpecifiedInScenesCluster(aAttributeId);
+        return AttributeIsSpecifiedInScenesCluster(aAttributeId);
     }
     case Clusters::OnOff::Id: {
-        return MTRAttributeIsSpecifiedInOnOffCluster(aAttributeId);
+        return AttributeIsSpecifiedInOnOffCluster(aAttributeId);
     }
     case Clusters::OnOffSwitchConfiguration::Id: {
-        return MTRAttributeIsSpecifiedInOnOffSwitchConfigurationCluster(aAttributeId);
+        return AttributeIsSpecifiedInOnOffSwitchConfigurationCluster(aAttributeId);
     }
     case Clusters::LevelControl::Id: {
-        return MTRAttributeIsSpecifiedInLevelControlCluster(aAttributeId);
+        return AttributeIsSpecifiedInLevelControlCluster(aAttributeId);
     }
     case Clusters::BinaryInputBasic::Id: {
-        return MTRAttributeIsSpecifiedInBinaryInputBasicCluster(aAttributeId);
+        return AttributeIsSpecifiedInBinaryInputBasicCluster(aAttributeId);
     }
     case Clusters::Descriptor::Id: {
-        return MTRAttributeIsSpecifiedInDescriptorCluster(aAttributeId);
+        return AttributeIsSpecifiedInDescriptorCluster(aAttributeId);
     }
     case Clusters::Binding::Id: {
-        return MTRAttributeIsSpecifiedInBindingCluster(aAttributeId);
+        return AttributeIsSpecifiedInBindingCluster(aAttributeId);
     }
     case Clusters::AccessControl::Id: {
-        return MTRAttributeIsSpecifiedInAccessControlCluster(aAttributeId);
+        return AttributeIsSpecifiedInAccessControlCluster(aAttributeId);
     }
     case Clusters::Actions::Id: {
-        return MTRAttributeIsSpecifiedInActionsCluster(aAttributeId);
+        return AttributeIsSpecifiedInActionsCluster(aAttributeId);
     }
     case Clusters::BasicInformation::Id: {
-        return MTRAttributeIsSpecifiedInBasicInformationCluster(aAttributeId);
+        return AttributeIsSpecifiedInBasicInformationCluster(aAttributeId);
     }
     case Clusters::OtaSoftwareUpdateProvider::Id: {
-        return MTRAttributeIsSpecifiedInOTASoftwareUpdateProviderCluster(aAttributeId);
+        return AttributeIsSpecifiedInOTASoftwareUpdateProviderCluster(aAttributeId);
     }
     case Clusters::OtaSoftwareUpdateRequestor::Id: {
-        return MTRAttributeIsSpecifiedInOTASoftwareUpdateRequestorCluster(aAttributeId);
+        return AttributeIsSpecifiedInOTASoftwareUpdateRequestorCluster(aAttributeId);
     }
     case Clusters::LocalizationConfiguration::Id: {
-        return MTRAttributeIsSpecifiedInLocalizationConfigurationCluster(aAttributeId);
+        return AttributeIsSpecifiedInLocalizationConfigurationCluster(aAttributeId);
     }
     case Clusters::TimeFormatLocalization::Id: {
-        return MTRAttributeIsSpecifiedInTimeFormatLocalizationCluster(aAttributeId);
+        return AttributeIsSpecifiedInTimeFormatLocalizationCluster(aAttributeId);
     }
     case Clusters::UnitLocalization::Id: {
-        return MTRAttributeIsSpecifiedInUnitLocalizationCluster(aAttributeId);
+        return AttributeIsSpecifiedInUnitLocalizationCluster(aAttributeId);
     }
     case Clusters::PowerSourceConfiguration::Id: {
-        return MTRAttributeIsSpecifiedInPowerSourceConfigurationCluster(aAttributeId);
+        return AttributeIsSpecifiedInPowerSourceConfigurationCluster(aAttributeId);
     }
     case Clusters::PowerSource::Id: {
-        return MTRAttributeIsSpecifiedInPowerSourceCluster(aAttributeId);
+        return AttributeIsSpecifiedInPowerSourceCluster(aAttributeId);
     }
     case Clusters::GeneralCommissioning::Id: {
-        return MTRAttributeIsSpecifiedInGeneralCommissioningCluster(aAttributeId);
+        return AttributeIsSpecifiedInGeneralCommissioningCluster(aAttributeId);
     }
     case Clusters::NetworkCommissioning::Id: {
-        return MTRAttributeIsSpecifiedInNetworkCommissioningCluster(aAttributeId);
+        return AttributeIsSpecifiedInNetworkCommissioningCluster(aAttributeId);
     }
     case Clusters::DiagnosticLogs::Id: {
-        return MTRAttributeIsSpecifiedInDiagnosticLogsCluster(aAttributeId);
+        return AttributeIsSpecifiedInDiagnosticLogsCluster(aAttributeId);
     }
     case Clusters::GeneralDiagnostics::Id: {
-        return MTRAttributeIsSpecifiedInGeneralDiagnosticsCluster(aAttributeId);
+        return AttributeIsSpecifiedInGeneralDiagnosticsCluster(aAttributeId);
     }
     case Clusters::SoftwareDiagnostics::Id: {
-        return MTRAttributeIsSpecifiedInSoftwareDiagnosticsCluster(aAttributeId);
+        return AttributeIsSpecifiedInSoftwareDiagnosticsCluster(aAttributeId);
     }
     case Clusters::ThreadNetworkDiagnostics::Id: {
-        return MTRAttributeIsSpecifiedInThreadNetworkDiagnosticsCluster(aAttributeId);
+        return AttributeIsSpecifiedInThreadNetworkDiagnosticsCluster(aAttributeId);
     }
     case Clusters::WiFiNetworkDiagnostics::Id: {
-        return MTRAttributeIsSpecifiedInWiFiNetworkDiagnosticsCluster(aAttributeId);
+        return AttributeIsSpecifiedInWiFiNetworkDiagnosticsCluster(aAttributeId);
     }
     case Clusters::EthernetNetworkDiagnostics::Id: {
-        return MTRAttributeIsSpecifiedInEthernetNetworkDiagnosticsCluster(aAttributeId);
+        return AttributeIsSpecifiedInEthernetNetworkDiagnosticsCluster(aAttributeId);
     }
     case Clusters::BridgedDeviceBasicInformation::Id: {
-        return MTRAttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(aAttributeId);
+        return AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(aAttributeId);
     }
     case Clusters::Switch::Id: {
-        return MTRAttributeIsSpecifiedInSwitchCluster(aAttributeId);
+        return AttributeIsSpecifiedInSwitchCluster(aAttributeId);
     }
     case Clusters::AdministratorCommissioning::Id: {
-        return MTRAttributeIsSpecifiedInAdministratorCommissioningCluster(aAttributeId);
+        return AttributeIsSpecifiedInAdministratorCommissioningCluster(aAttributeId);
     }
     case Clusters::OperationalCredentials::Id: {
-        return MTRAttributeIsSpecifiedInOperationalCredentialsCluster(aAttributeId);
+        return AttributeIsSpecifiedInOperationalCredentialsCluster(aAttributeId);
     }
     case Clusters::GroupKeyManagement::Id: {
-        return MTRAttributeIsSpecifiedInGroupKeyManagementCluster(aAttributeId);
+        return AttributeIsSpecifiedInGroupKeyManagementCluster(aAttributeId);
     }
     case Clusters::FixedLabel::Id: {
-        return MTRAttributeIsSpecifiedInFixedLabelCluster(aAttributeId);
+        return AttributeIsSpecifiedInFixedLabelCluster(aAttributeId);
     }
     case Clusters::UserLabel::Id: {
-        return MTRAttributeIsSpecifiedInUserLabelCluster(aAttributeId);
+        return AttributeIsSpecifiedInUserLabelCluster(aAttributeId);
     }
     case Clusters::BooleanState::Id: {
-        return MTRAttributeIsSpecifiedInBooleanStateCluster(aAttributeId);
+        return AttributeIsSpecifiedInBooleanStateCluster(aAttributeId);
     }
     case Clusters::ModeSelect::Id: {
-        return MTRAttributeIsSpecifiedInModeSelectCluster(aAttributeId);
+        return AttributeIsSpecifiedInModeSelectCluster(aAttributeId);
     }
     case Clusters::TemperatureControl::Id: {
-        return MTRAttributeIsSpecifiedInTemperatureControlCluster(aAttributeId);
+        return AttributeIsSpecifiedInTemperatureControlCluster(aAttributeId);
     }
     case Clusters::RefrigeratorAlarm::Id: {
-        return MTRAttributeIsSpecifiedInRefrigeratorAlarmCluster(aAttributeId);
+        return AttributeIsSpecifiedInRefrigeratorAlarmCluster(aAttributeId);
     }
     case Clusters::AirQuality::Id: {
-        return MTRAttributeIsSpecifiedInAirQualityCluster(aAttributeId);
+        return AttributeIsSpecifiedInAirQualityCluster(aAttributeId);
     }
     case Clusters::SmokeCoAlarm::Id: {
-        return MTRAttributeIsSpecifiedInSmokeCOAlarmCluster(aAttributeId);
+        return AttributeIsSpecifiedInSmokeCOAlarmCluster(aAttributeId);
     }
     case Clusters::HepaFilterMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInHEPAFilterMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInHEPAFilterMonitoringCluster(aAttributeId);
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
     }
     case Clusters::CeramicFilterMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInCeramicFilterMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInCeramicFilterMonitoringCluster(aAttributeId);
     }
     case Clusters::ElectrostaticFilterMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInElectrostaticFilterMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInElectrostaticFilterMonitoringCluster(aAttributeId);
     }
     case Clusters::UvFilterMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInUVFilterMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInUVFilterMonitoringCluster(aAttributeId);
     }
     case Clusters::IonizingFilterMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInIonizingFilterMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInIonizingFilterMonitoringCluster(aAttributeId);
     }
     case Clusters::ZeoliteFilterMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInZeoliteFilterMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInZeoliteFilterMonitoringCluster(aAttributeId);
     }
     case Clusters::OzoneFilterMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInOzoneFilterMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInOzoneFilterMonitoringCluster(aAttributeId);
     }
     case Clusters::WaterTankMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInWaterTankMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInWaterTankMonitoringCluster(aAttributeId);
     }
     case Clusters::FuelTankMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInFuelTankMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInFuelTankMonitoringCluster(aAttributeId);
     }
     case Clusters::InkCartridgeMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInInkCartridgeMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInInkCartridgeMonitoringCluster(aAttributeId);
     }
     case Clusters::TonerCartridgeMonitoring::Id: {
-        return MTRAttributeIsSpecifiedInTonerCartridgeMonitoringCluster(aAttributeId);
+        return AttributeIsSpecifiedInTonerCartridgeMonitoringCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
-        return MTRAttributeIsSpecifiedInDoorLockCluster(aAttributeId);
+        return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);
     }
     case Clusters::WindowCovering::Id: {
-        return MTRAttributeIsSpecifiedInWindowCoveringCluster(aAttributeId);
+        return AttributeIsSpecifiedInWindowCoveringCluster(aAttributeId);
     }
     case Clusters::BarrierControl::Id: {
-        return MTRAttributeIsSpecifiedInBarrierControlCluster(aAttributeId);
+        return AttributeIsSpecifiedInBarrierControlCluster(aAttributeId);
     }
     case Clusters::PumpConfigurationAndControl::Id: {
-        return MTRAttributeIsSpecifiedInPumpConfigurationAndControlCluster(aAttributeId);
+        return AttributeIsSpecifiedInPumpConfigurationAndControlCluster(aAttributeId);
     }
     case Clusters::Thermostat::Id: {
-        return MTRAttributeIsSpecifiedInThermostatCluster(aAttributeId);
+        return AttributeIsSpecifiedInThermostatCluster(aAttributeId);
     }
     case Clusters::FanControl::Id: {
-        return MTRAttributeIsSpecifiedInFanControlCluster(aAttributeId);
+        return AttributeIsSpecifiedInFanControlCluster(aAttributeId);
     }
     case Clusters::ThermostatUserInterfaceConfiguration::Id: {
-        return MTRAttributeIsSpecifiedInThermostatUserInterfaceConfigurationCluster(aAttributeId);
+        return AttributeIsSpecifiedInThermostatUserInterfaceConfigurationCluster(aAttributeId);
     }
     case Clusters::ColorControl::Id: {
-        return MTRAttributeIsSpecifiedInColorControlCluster(aAttributeId);
+        return AttributeIsSpecifiedInColorControlCluster(aAttributeId);
     }
     case Clusters::BallastConfiguration::Id: {
-        return MTRAttributeIsSpecifiedInBallastConfigurationCluster(aAttributeId);
+        return AttributeIsSpecifiedInBallastConfigurationCluster(aAttributeId);
     }
     case Clusters::IlluminanceMeasurement::Id: {
-        return MTRAttributeIsSpecifiedInIlluminanceMeasurementCluster(aAttributeId);
+        return AttributeIsSpecifiedInIlluminanceMeasurementCluster(aAttributeId);
     }
     case Clusters::TemperatureMeasurement::Id: {
-        return MTRAttributeIsSpecifiedInTemperatureMeasurementCluster(aAttributeId);
+        return AttributeIsSpecifiedInTemperatureMeasurementCluster(aAttributeId);
     }
     case Clusters::PressureMeasurement::Id: {
-        return MTRAttributeIsSpecifiedInPressureMeasurementCluster(aAttributeId);
+        return AttributeIsSpecifiedInPressureMeasurementCluster(aAttributeId);
     }
     case Clusters::FlowMeasurement::Id: {
-        return MTRAttributeIsSpecifiedInFlowMeasurementCluster(aAttributeId);
+        return AttributeIsSpecifiedInFlowMeasurementCluster(aAttributeId);
     }
     case Clusters::RelativeHumidityMeasurement::Id: {
-        return MTRAttributeIsSpecifiedInRelativeHumidityMeasurementCluster(aAttributeId);
+        return AttributeIsSpecifiedInRelativeHumidityMeasurementCluster(aAttributeId);
     }
     case Clusters::OccupancySensing::Id: {
-        return MTRAttributeIsSpecifiedInOccupancySensingCluster(aAttributeId);
+        return AttributeIsSpecifiedInOccupancySensingCluster(aAttributeId);
     }
     case Clusters::WakeOnLan::Id: {
-        return MTRAttributeIsSpecifiedInWakeOnLANCluster(aAttributeId);
+        return AttributeIsSpecifiedInWakeOnLANCluster(aAttributeId);
     }
     case Clusters::Channel::Id: {
-        return MTRAttributeIsSpecifiedInChannelCluster(aAttributeId);
+        return AttributeIsSpecifiedInChannelCluster(aAttributeId);
     }
     case Clusters::TargetNavigator::Id: {
-        return MTRAttributeIsSpecifiedInTargetNavigatorCluster(aAttributeId);
+        return AttributeIsSpecifiedInTargetNavigatorCluster(aAttributeId);
     }
     case Clusters::MediaPlayback::Id: {
-        return MTRAttributeIsSpecifiedInMediaPlaybackCluster(aAttributeId);
+        return AttributeIsSpecifiedInMediaPlaybackCluster(aAttributeId);
     }
     case Clusters::MediaInput::Id: {
-        return MTRAttributeIsSpecifiedInMediaInputCluster(aAttributeId);
+        return AttributeIsSpecifiedInMediaInputCluster(aAttributeId);
     }
     case Clusters::LowPower::Id: {
-        return MTRAttributeIsSpecifiedInLowPowerCluster(aAttributeId);
+        return AttributeIsSpecifiedInLowPowerCluster(aAttributeId);
     }
     case Clusters::KeypadInput::Id: {
-        return MTRAttributeIsSpecifiedInKeypadInputCluster(aAttributeId);
+        return AttributeIsSpecifiedInKeypadInputCluster(aAttributeId);
     }
     case Clusters::ContentLauncher::Id: {
-        return MTRAttributeIsSpecifiedInContentLauncherCluster(aAttributeId);
+        return AttributeIsSpecifiedInContentLauncherCluster(aAttributeId);
     }
     case Clusters::AudioOutput::Id: {
-        return MTRAttributeIsSpecifiedInAudioOutputCluster(aAttributeId);
+        return AttributeIsSpecifiedInAudioOutputCluster(aAttributeId);
     }
     case Clusters::ApplicationLauncher::Id: {
-        return MTRAttributeIsSpecifiedInApplicationLauncherCluster(aAttributeId);
+        return AttributeIsSpecifiedInApplicationLauncherCluster(aAttributeId);
     }
     case Clusters::ApplicationBasic::Id: {
-        return MTRAttributeIsSpecifiedInApplicationBasicCluster(aAttributeId);
+        return AttributeIsSpecifiedInApplicationBasicCluster(aAttributeId);
     }
     case Clusters::AccountLogin::Id: {
-        return MTRAttributeIsSpecifiedInAccountLoginCluster(aAttributeId);
+        return AttributeIsSpecifiedInAccountLoginCluster(aAttributeId);
     }
     case Clusters::ElectricalMeasurement::Id: {
-        return MTRAttributeIsSpecifiedInElectricalMeasurementCluster(aAttributeId);
+        return AttributeIsSpecifiedInElectricalMeasurementCluster(aAttributeId);
     }
     case Clusters::UnitTesting::Id: {
-        return MTRAttributeIsSpecifiedInUnitTestingCluster(aAttributeId);
+        return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);
     }
     default: {
         return NO;

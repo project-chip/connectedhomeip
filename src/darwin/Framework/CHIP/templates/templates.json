@@ -134,9 +134,9 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterConstants.h"
         },
         {
-            "path": "MTRAttributeUtils-src.zapt",
-            "name": "Utility functions for attributes",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeUtils.mm"
+            "path": "MTRAttributeSpecifiedCheck-src.zapt",
+            "name": "Function to check if attribute is specified",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeSpecifiedCheck.mm"
         }
     ]
 }
