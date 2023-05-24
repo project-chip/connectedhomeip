@@ -420,7 +420,7 @@ class AttributeCache:
 
             clusterType = _ClusterIndex[cluster]
 
-            if (clusterType not in endpointCache):
+            if clusterType not in endpointCache:
                 endpointCache[clusterType] = {}
 
             clusterCache = endpointCache[clusterType]
