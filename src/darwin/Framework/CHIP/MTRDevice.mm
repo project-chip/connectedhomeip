@@ -767,7 +767,7 @@ static BOOL _MTRAttributeHasChangesOmittedQuality(MTRAttributePath * attributePa
     NSDictionary<NSString *, id> * attributeValueToReturn = [self _attributeValueDictionaryForAttributePath:attributePath];
 
     // Send read request to device if:
-    // 1. The attribute is not in the specification
+    // 1. The attribute is not in the specification (so we don't know whether hasChangesOmittedQuality can be trusted).
     // 2. Subscription not in a state we can expect reports
     // 3. There is subscription but attribute has Changes Omitted quality
     // 4. When cache has no entry
