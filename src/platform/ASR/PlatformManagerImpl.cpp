@@ -51,24 +51,25 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::InitLwIPCoreLock();
     SuccessOrExit(err);
 
-    /* Initialize the event flags. */
-    result = lega_rtos_init_event_flags(&mEventFlags);
-    VerifyOrExit(result == kNoErr, err = CHIP_ERROR_NO_MEMORY);
+    if (mEventQueue == NULL)
+    {
+        /* Initialize the event queue. */
+        result = lega_rtos_init_queue(&mEventQueue, "EventQueue", sizeof(ChipDeviceEvent), CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
+        VerifyOrExit(result == kNoErr, err = CHIP_ERROR_NO_MEMORY);
+    }
 
-    /* Initialize the event queue. */
-    result = lega_rtos_init_queue(&mEventQueue, "EventQueue", sizeof(ChipDeviceEvent), CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
-    VerifyOrExit(result == kNoErr, err = CHIP_ERROR_NO_MEMORY);
+    /* Initialize the timeout. */
+    lega_rtos_set_timeout(&mNextTimerBaseTime);
 
-    /* Initialize the timer. */
-    result = lega_rtos_init_timer(&mTimer, 1000, (timer_handler_t) TimerCallback, (void *) this);
-    VerifyOrExit(result == kNoErr, err = CHIP_ERROR_INTERNAL);
+    if (mChipMutex == NULL)
+    {
+        /* Initialize the mutex. */
+        result = lega_rtos_init_mutex(&mChipMutex);
+        VerifyOrExit(result == kNoErr, err = CHIP_ERROR_INTERNAL);
+    }
 
-    /* Initialize the mutex. */
-    result = lega_rtos_init_mutex(&mChipMutex);
-    VerifyOrExit(result == kNoErr, err = CHIP_ERROR_INTERNAL);
-
-    result = lega_rtos_init_mutex(&mEventMutex);
-    VerifyOrExit(result == kNoErr, err = CHIP_ERROR_INTERNAL);
+    mChipTimerActive = false;
+    mShouldRunEventLoop.store(false);
 
     ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 #else
@@ -93,45 +94,81 @@ exit:
 
 void PlatformManagerImpl::_RunEventLoop()
 {
-    kTaskRunningEventFlag = 1;
-
     RunEventLoopInternal();
 }
 
 void PlatformManagerImpl::RunEventLoopInternal(void)
 {
-    while (true)
+    CHIP_ERROR err;
+    ChipDeviceEvent event;
+
+    // Lock the CHIP stack.
+    StackLock lock;
+
+    bool oldShouldRunEventLoop = false;
+    if (!mShouldRunEventLoop.compare_exchange_strong(oldShouldRunEventLoop /* expected */, true /* desired */))
     {
-        uint32_t flags_set = 0;
+        ChipLogError(DeviceLayer, "Error trying to run the event loop while it is already running");
+        return;
+    }
 
-        OSStatus result = lega_rtos_wait_for_event_flags(&mEventFlags, kPostEventFlag | kTimerEventFlag | kTaskStopEventFlag,
-                                                         &flags_set, TRUE, WAIT_FOR_ANY_EVENT, LEGA_WAIT_FOREVER);
+    while (mShouldRunEventLoop.load())
+    {
+        uint32_t waitTime;
 
-        if (result != kNoErr)
+        // If one or more CHIP timers are active...
+        if (mChipTimerActive)
         {
-            ChipLogError(DeviceLayer, "lega_rtos_wait_for_event_flags 0x%08x", result);
-            continue;
+            // Adjust the base time and remaining duration for the next scheduled timer based on the
+            // amount of time that has elapsed since it was started.
+            // IF the timer's expiration time has already arrived...
+            if (lega_rtos_check_timeout(&mNextTimerBaseTime, &mNextTimerDurationTicks) == TRUE)
+            {
+                // Reset the 'timer active' flag.  This will be set to true again by _StartChipTimer()
+                // if there are further timers beyond the expired one that are still active.
+                mChipTimerActive = false;
+
+                // Call into the system layer to dispatch the callback functions for all timers
+                // that have expired.
+                err = static_cast<System::LayerImplFreeRTOS &>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "Error handling CHIP timers: %" CHIP_ERROR_FORMAT, err.Format());
+                }
+
+                // When processing the event queue below, do not wait if the queue is empty.  Instead
+                // immediately loop around and process timers again
+                waitTime = 0;
+            }
+
+            // If there is still time before the next timer expires, arrange to wait on the event queue
+            // until that timer expires.
+            else
+            {
+                waitTime = mNextTimerDurationTicks;
+            }
         }
 
-        if (flags_set & kTaskStopEventFlag)
+        // Otherwise no CHIP timers are active, so wait indefinitely for an event to arrive on the event
+        // queue.
+        else
         {
-            kTaskRunningEventFlag = 0;
-            break;
+            waitTime = LEGA_WAIT_FOREVER;
         }
 
-        if (flags_set & kTimerEventFlag)
+        OSStatus result;
         {
-            HandleTimerEvent();
+            // Unlock the CHIP stack, allowing other threads to enter CHIP while
+            // the event loop thread is sleeping.
+            StackUnlock unlock;
+            result = lega_rtos_pop_from_queue(&mEventQueue, &event, waitTime);
         }
 
-        if (flags_set & kPostEventFlag)
+        // If an event was received, dispatch it and continue until the queue is empty.
+        while (result == kNoErr)
         {
-            HandlePostEvent();
-        }
-
-        if (kTaskRunningEventFlag == 0)
-        {
-            break;
+            DispatchEvent(&event);
+            result = lega_rtos_pop_from_queue(&mEventQueue, &event, LEGA_NO_WAIT);
         }
     }
 }
@@ -140,45 +177,22 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask(void)
 {
     lega_task_config_t cfg;
 
-    lega_rtos_lock_mutex(&mEventMutex, LEGA_WAIT_FOREVER);
-
-    if (kTaskRunningEventFlag == 1)
-    {
-        lega_rtos_unlock_mutex(&mEventMutex);
-        return CHIP_ERROR_BUSY;
-    }
-
     MatterInitializer::Matter_Task_Config(&cfg);
-
-    kTaskRunningEventFlag = 1;
 
     OSStatus result = lega_rtos_create_thread(&mThread, cfg.task_priority, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME,
                                               (lega_thread_function_t) EventLoopTaskMain, cfg.stack_size, (lega_thread_arg_t) this);
 
     if (result != kNoErr)
     {
-        lega_rtos_unlock_mutex(&mEventMutex);
         return CHIP_ERROR_INTERNAL;
     }
-
-    lega_rtos_unlock_mutex(&mEventMutex);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 {
-    lega_rtos_lock_mutex(&mEventMutex, LEGA_WAIT_FOREVER);
-
-    if (kTaskRunningEventFlag == 0)
-    {
-        lega_rtos_unlock_mutex(&mEventMutex);
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    PlatformMgrImpl().SetEventFlags(kTaskStopEventFlag);
-
-    lega_rtos_unlock_mutex(&mEventMutex);
+    mShouldRunEventLoop.store(false);
 
     return CHIP_NO_ERROR;
 }
@@ -187,6 +201,18 @@ void PlatformManagerImpl::_LockChipStack(void)
 {
     OSStatus result = lega_rtos_lock_mutex(&mChipMutex, LEGA_WAIT_FOREVER);
     VerifyOrReturn(result == kNoErr, ChipLogError(DeviceLayer, "%s %x", __func__, result));
+}
+
+bool PlatformManagerImpl::_TryLockChipStack(void)
+{
+    if (lega_rtos_lock_mutex(&mChipMutex, LEGA_NO_WAIT) == kNoErr)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void PlatformManagerImpl::_UnlockChipStack(void)
@@ -204,29 +230,31 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
         return CHIP_ERROR_INTERNAL;
     }
 
-    PlatformMgrImpl().SetEventFlags(kPostEventFlag);
-
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout durationMS)
 {
-    if (durationMS.count() == 0)
+    mChipTimerActive = true;
+    lega_rtos_set_timeout(&mNextTimerBaseTime);
+    mNextTimerDurationTicks = (lega_tick_t) ms_to_tick(System::Clock::Milliseconds64(durationMS).count());
+    // If the platform timer is being updated by a thread other than the event loop thread,
+    // trigger the event loop thread to recalculate its wait time by posting a no-op event
+    // to the event queue.
+    if (lega_rtos_get_current_thread() != mThread)
     {
-        TimerCallback(0);
+        ChipDeviceEvent noop{ .Type = DeviceEventType::kNoOp };
+        ReturnErrorOnFailure(PostEvent(&noop));
     }
-    else
-    {
-        lega_rtos_deinit_timer(&mTimer);
-        lega_rtos_init_timer(&mTimer, durationMS.count(), (timer_handler_t) TimerCallback, (void *) this);
-        OSStatus result = lega_rtos_start_timer(&mTimer);
-        if (kNoErr != result)
-        {
-            ChipLogError(DeviceLayer, "wiced_start_timer 0x%02x", result);
-            return CHIP_ERROR_INTERNAL;
-        }
-    }
+
     return CHIP_NO_ERROR;
+}
+
+void PlatformManagerImpl::EventLoopTaskMain(uint32_t arg)
+{
+    ChipLogDetail(DeviceLayer, "CHIP task running");
+    PlatformMgrImpl().RunEventLoopInternal();
+    lega_rtos_delete_thread(NULL);
 }
 #else
 CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
@@ -261,93 +289,11 @@ void PlatformManagerImpl::_Shutdown()
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
     //
-
-    (void) _StopEventLoopTask();
-
-    // the task thread is self terminating, we might have to wait if it's still processing
-    while (true)
-    {
-        if (kTaskRunningEventFlag == 0)
-        {
-            break;
-        }
-        lega_rtos_delay_milliseconds(1);
-    }
-
-    ChipLogError(DeviceLayer, "StopEventLoopTask done.");
-
-    lega_rtos_deinit_event_flags(&mEventFlags);
-    lega_rtos_deinit_queue(&mEventQueue);
-    lega_rtos_deinit_timer(&mTimer);
-    lega_rtos_deinit_mutex(&mChipMutex);
-    lega_rtos_deinit_mutex(&mEventMutex);
-
     Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_Shutdown();
 #else
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 #endif
 }
-
-#if CONFIG_ENABLE_ASR_LEGA_RTOS
-void PlatformManagerImpl::SetEventFlags(uint32_t flags)
-{
-    if (lega_rtos_set_event_flags(&mEventFlags, flags) != kNoErr)
-    {
-        ChipLogError(DeviceLayer, "%s lega_rtos_set_event_flags %08lx", __func__, flags);
-    }
-}
-
-void PlatformManagerImpl::HandleTimerEvent(void)
-{
-    const CHIP_ERROR err = static_cast<System::LayerImplFreeRTOS &>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "HandlePlatformTimer %ld", err.AsInteger());
-    }
-}
-
-void PlatformManagerImpl::HandlePostEvent(void)
-{
-    OSStatus result;
-    ChipDeviceEvent event;
-
-    /* Check the event queue. */
-    if (lega_rtos_is_queue_empty(&mEventQueue))
-    {
-        return;
-    }
-
-    /* Pop one event from the event queue. */
-    result = lega_rtos_pop_from_queue(&mEventQueue, &event, LEGA_WAIT_FOREVER);
-
-    if (kNoErr != result)
-    {
-        ChipLogError(DeviceLayer, "lega_rtos_pop_from_queue %u", result);
-        return;
-    }
-
-    /* Process this event. */
-    DispatchEvent(&event);
-
-    /* Set another application thread event if the event queue is not empty. */
-    if (!lega_rtos_is_queue_empty(&mEventQueue))
-    {
-        PlatformMgrImpl().SetEventFlags(kPostEventFlag);
-    }
-}
-
-void PlatformManagerImpl::EventLoopTaskMain(uint32_t arg)
-{
-    ChipLogDetail(DeviceLayer, "CHIP task running");
-    PlatformMgrImpl().RunEventLoopInternal();
-    lega_rtos_delete_thread(NULL);
-}
-
-void PlatformManagerImpl::TimerCallback(void * params)
-{
-    PlatformMgrImpl().SetEventFlags(kTimerEventFlag);
-}
-#endif
 
 } // namespace DeviceLayer
 } // namespace chip
