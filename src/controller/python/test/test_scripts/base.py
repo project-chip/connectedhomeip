@@ -351,7 +351,7 @@ class BaseTestHelper:
                 "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
             return False
 
-        if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
+        if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk:
             self.logger.error(
                 "Incorrect response received from arm failsafe - wanted OK, received {}".format(resp))
             return False
@@ -431,7 +431,7 @@ class BaseTestHelper:
             self.logger.error(
                 "Failed to send arm failsafe command error is {} with im response{}".format(err, resp))
             return False
-        if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningError.kBusyWithOtherAdmin:
+        if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin:
             return True
         return False
 

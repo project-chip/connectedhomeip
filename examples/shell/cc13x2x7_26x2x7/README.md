@@ -1,6 +1,6 @@
-# Matter CC1352 CC2652 Shell Application
+# Matter Shell Application
 
-A [chip-shell](../README.md) project on the Texas Instruments CC13X2_26X2 family
+A [chip-shell](../README.md) project on the Texas Instruments CC13XX_26XX family
 of Wireless MCUs.
 
 ## Building
@@ -11,15 +11,14 @@ Some initial setup is necessary for preparing the build environment. This
 section will need to be done when migrating to new versions of the SDK. This
 guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
--   Download and install [SysConfig][sysconfig] ([recommended
-    version][sysconfig_recommended]). This can be done simply with the following
-    commands.
+-   Download and install [SysConfig][sysconfig]. This can be done simply with
+    the following commands.
 
     ```
     $ cd ~
-    $ wget https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
-    $ chmod +x sysconfig-1.11.0_2225-setup.run
-    $ ./sysconfig-1.11.0_2225-setup.run
+    $ `wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.15.0.2826/sysconfig-1.15.0_2826-setup.run`
+    $ chmod +x sysconfig-1.15.0_2826-setup.run
+    $ ./sysconfig-1.15.0_2826-setup.run
     ```
 
 -   Run the bootstrap script to setup the build environment.
@@ -46,15 +45,25 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/sysconfig_1.11.0`. On Windows the default directory is
+    `/home/username/ti/sysconfig_1.15.0`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
     ```
-    $ cd ~/connectedhomeip/examples/all-clusters-app/cc13x2x7_26x2x7
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.11.0\""
+    $ cd ~/connectedhomeip/examples/shell/cc13x2x7_26x2x7
+    OR
+    $ cd ~/connectedhomeip/examples/shell/cc13x4_26x4
+
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\""
     $ ninja -C out/debug
 
+    ```
+
+    If you would like to define arguments on the command line you may add them
+    to the GN call.
+
+    ```
+    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
     ```
 
 ## Programming
@@ -137,7 +146,7 @@ terminal emulator to that port to see the output with the following options:
 ## Running the Example
 
 Once a device has been flashed with this example, it can now join and operate in
-an existing Thread network. The following sections assume that a Thread network
+an existing Matter network. The following sections assume that a Matter network
 is already active, and has at least one [OpenThread Border
 Router][ot_border_router_setup].
 
@@ -152,6 +161,7 @@ For help with the shell itself, refer to the
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
+[matter]: https://csa-iot.org/all-solutions/matter/
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch
@@ -161,9 +171,12 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
+[e2e]:
+    https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
+[matter-e2e-faq]:
+    https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
-[sysconfig_recommended]:
-    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.10.0_2163-setup.run
-[ti_cc13x2_26x2_r7_matter_request]: https://ti.com/chip_sdk
+[ti_thread_dnd]:
+    https://www.ti.com/wireless-connectivity/thread/design-development.html
+[ot_border_router_setup]: https://openthread.io/guides/border-router/build
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH

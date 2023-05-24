@@ -73,3 +73,6 @@ CONFIG_ENABLE_OTA_REQUESTOR=y
 
 # Enable chip shell
 CONFIG_ENABLE_CHIP_SHELL=y
+
+# Enable HKDF in mbedtls
+CONFIG_MBEDTLS_HKDF_C=y

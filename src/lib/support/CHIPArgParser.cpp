@@ -45,6 +45,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <strings.h>
+#include <unistd.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
