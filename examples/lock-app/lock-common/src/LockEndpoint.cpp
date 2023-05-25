@@ -32,7 +32,7 @@ bool LockEndpoint::Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEn
     if (DoorLockServer::Instance().SupportsUnbolt(mEndpointId))
     {
         // If Unbolt is supported Unlock is supposed to pull the latch
-        return setLockState(DlLockState::kUnlatched, pin, err, opSource);
+        setLockState(DlLockState::kUnlatched, pin, err, opSource);
     }
 
     return setLockState(DlLockState::kUnlocked, pin, err, opSource);
@@ -406,7 +406,7 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
             ChipLogProgress(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
                             mEndpointId);
 
-            DoorLockServer::Instance().SetLockState(mEndpointId, lockState, opSource, Nullable<uint16_t>(), Nullable<List<const LockOpCredentials>>());
+            DoorLockServer::Instance().SetLockState(mEndpointId, lockState);
 
             return true;
         }

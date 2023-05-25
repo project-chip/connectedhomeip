@@ -174,36 +174,12 @@ def test_lock_ctrl(device, controller):
     assert err == 0
     assert res.value == DoorLock.Enums.DlLockState.kLocked
 
-    err, res = send_zcl_command(devCtrl, "DoorLock", "UnboltDoor",  nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
-                                dict(PINCode=LOCK_CTRL_TEST_PIN_CODE),
-                                requestTimeoutMs=1000)
-    assert err == 0
-
-    ret = device.wait_for_output("setting door lock state to \"Unlocked\"")
-    assert ret is not None and len(ret) > 0
-
-    err, res = read_zcl_attribute(devCtrl, "DoorLock", "LockState", nodeId, LOCK_CTRL_TEST_ENDPOINT_ID)
-    assert err == 0
-    assert res.value == DoorLock.Enums.DlLockState.kUnlocked
-
-    err, res = send_zcl_command(devCtrl, "DoorLock", "LockDoor",  nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
-                                dict(PINCode=LOCK_CTRL_TEST_PIN_CODE),
-                                requestTimeoutMs=1000)
-    assert err == 0
-
-    ret = device.wait_for_output("setting door lock state to \"Locked\"")
-    assert ret is not None and len(ret) > 0
-
-    err, res = read_zcl_attribute(devCtrl, "DoorLock", "LockState", nodeId, LOCK_CTRL_TEST_ENDPOINT_ID)
-    assert err == 0
-    assert res.value == DoorLock.Enums.DlLockState.kLocked
-
     err, res = send_zcl_command(devCtrl, "DoorLock", "UnlockDoor",  nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
                                 dict(PINCode=LOCK_CTRL_TEST_PIN_CODE),
                                 requestTimeoutMs=1000)
     assert err == 0
 
-    ret = device.wait_for_output("setting door lock state to \"Unlatched\"")
+    ret = device.wait_for_output("setting door lock state to \"Unlocked\"")
     assert ret is not None and len(ret) > 0
 
     err, res = read_zcl_attribute(devCtrl, "DoorLock", "LockState", nodeId, LOCK_CTRL_TEST_ENDPOINT_ID)

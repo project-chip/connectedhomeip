@@ -108,17 +108,6 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
 {
     bool success = SetLockState(endpointId, newLockState);
 
-    if (success && DlLockState::kUnlatched == newLockState)
-    {
-        if (OperationSourceEnum::kRemote != opSource)
-        {
-            SendLockOperationEvent(endpointId, LockOperationTypeEnum::kUnlatch, opSource, OperationErrorEnum::kUnspecified, userIndex,
-                                   Nullable<chip::FabricIndex>(), Nullable<chip::NodeId>(), credentials, success);
-        }
-
-        success = SetLockState(endpointId, DlLockState::kUnlocked);
-    }
-
     // Remote operations are handled separately as they use more data unavailable here
     VerifyOrReturnError(OperationSourceEnum::kRemote != opSource, success);
 
