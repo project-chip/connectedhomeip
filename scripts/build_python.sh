@@ -166,7 +166,7 @@ if [ -n "$include_yamltests" ]; then
 fi
 
 if [ -n "$extra_packages" ]; then
-    WHEEL+=(${extra_packages})
+    WHEEL+=("$extra_packages")
 fi
 
 if [ "$install_wheel" = "no" ]; then
