@@ -64,7 +64,7 @@ $CHIP_CERT/out/chip-cert gen-cd \
 
 printf "\nExample: command without input option specified\n"
 python3 ../ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn $VERSION -vs "1.0" -da sha256 \
-./out/app-standard-example-50000.ota || printf "Command failed because no option was specified.\n" 
+./out/app-standard-example-50000.ota || printf "Command failed because no option was specified.\n"
 
 printf "\nExample: generate app OTA image with default descriptor\n"
 python3 ../ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn $VERSION -vs "1.0" -da sha256 \
