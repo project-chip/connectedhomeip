@@ -241,7 +241,7 @@ tests:
       command: "readAttribute"
       attribute: "SceneCount"
       response:
-          value: 1
+          value: PIXIT.S.SceneTableEntriesOnFactoryNew.value + 1
           constraints:
               type: int8u
 
@@ -457,6 +457,9 @@ tests:
                 value: (maxScenes/2)
               - name: "GroupID"
                 value: 0x0001
+                # TODO : For Capacity, replace "value: (maxScenes/2)" by following lines when new backend for test is used in CI
+                #  constraints:
+                #      anyOf: [(maxScenes/2), 0xfe ,0x89]
 
     - label:
           "TH sends a AddScene command to DUT with the GroupID field set to
@@ -587,6 +590,10 @@ tests:
                 value: 0x0001
               - name: "SceneList"
                 value: [0x01]
+                # TODO : For Capacity, replace "value: (maxScenes/2)" by following lines when new backend for test is used in CI
+                #  constraints:
+                #      anyOf: [(maxScenes/2), 0xfe ,0x89]
+                
 
     - label:
           "TH sends a RemoveScene command to DUT with the GroupID field set to
@@ -625,7 +632,10 @@ tests:
                 value: (maxScenes/2)
               - name: "GroupID"
                 value: 0x0001
-
+                # TODO : For Capacity, replace "value: (maxScenes/2)" by following lines when new backend for test is used in CI
+                #  constraints:
+                #      anyOf: [(maxScenes/2), 0xfe ,0x89]
+                
     - label:
           "TH configures AC2 on DUT for all implemented application clusters
           supporting scenes."
