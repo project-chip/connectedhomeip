@@ -201,7 +201,7 @@ static id _Nullable DecodeAttributeValueForGroupsCluster(AttributeId aAttributeI
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::GeneratedCommandList::Id: {
