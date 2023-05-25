@@ -11927,17 +11927,39 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     auto & entry_2 = iter_newElement_0_modeTags_2.GetValue();
                     jobject newElement_2;
                     jobject newElement_2_mfgCode;
-                    std::string newElement_2_mfgCodeClassName     = "java/lang/Integer";
-                    std::string newElement_2_mfgCodeCtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                        newElement_2_mfgCodeClassName.c_str(), newElement_2_mfgCodeCtorSignature.c_str(),
-                        static_cast<uint16_t>(entry_2.mfgCode), newElement_2_mfgCode);
+                    if (!entry_2.mfgCode.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_mfgCode);
+                    }
+                    else
+                    {
+                        jobject newElement_2_mfgCodeInsideOptional;
+                        std::string newElement_2_mfgCodeInsideOptionalClassName     = "java/lang/Integer";
+                        std::string newElement_2_mfgCodeInsideOptionalCtorSignature = "(I)V";
+                        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                            newElement_2_mfgCodeInsideOptionalClassName.c_str(),
+                            newElement_2_mfgCodeInsideOptionalCtorSignature.c_str(), static_cast<uint16_t>(entry_2.mfgCode.Value()),
+                            newElement_2_mfgCodeInsideOptional);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_mfgCodeInsideOptional, newElement_2_mfgCode);
+                    }
                     jobject newElement_2_value;
                     std::string newElement_2_valueClassName     = "java/lang/Integer";
                     std::string newElement_2_valueCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_2_valueClassName.c_str(),
                                                                                    newElement_2_valueCtorSignature.c_str(),
                                                                                    entry_2.value, newElement_2_value);
+                    jobject newElement_2_tagName;
+                    if (!entry_2.tagName.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_tagName);
+                    }
+                    else
+                    {
+                        jobject newElement_2_tagNameInsideOptional;
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_2.tagName.Value(),
+                                                                                             newElement_2_tagNameInsideOptional));
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_tagNameInsideOptional, newElement_2_tagName);
+                    }
 
                     jclass modeTagStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
@@ -11947,8 +11969,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         ChipLogError(Zcl, "Could not find class ChipStructs$ModeSelectClusterModeTagStruct");
                         return nullptr;
                     }
-                    jmethodID modeTagStructStructCtor_3 =
-                        env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                    jmethodID modeTagStructStructCtor_3 = env->GetMethodID(
+                        modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;)V");
                     if (modeTagStructStructCtor_3 == nullptr)
                     {
                         ChipLogError(Zcl, "Could not find ChipStructs$ModeSelectClusterModeTagStruct constructor");
@@ -11956,7 +11978,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_2 = env->NewObject(modeTagStructStructClass_3, modeTagStructStructCtor_3, newElement_2_mfgCode,
-                                                  newElement_2_value);
+                                                  newElement_2_value, newElement_2_tagName);
                     chip::JniReferences::GetInstance().AddToList(newElement_0_modeTags, newElement_2);
                 }
 
@@ -12221,17 +12243,39 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     auto & entry_2 = iter_newElement_0_modeTags_2.GetValue();
                     jobject newElement_2;
                     jobject newElement_2_mfgCode;
-                    std::string newElement_2_mfgCodeClassName     = "java/lang/Integer";
-                    std::string newElement_2_mfgCodeCtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                        newElement_2_mfgCodeClassName.c_str(), newElement_2_mfgCodeCtorSignature.c_str(),
-                        static_cast<uint16_t>(entry_2.mfgCode), newElement_2_mfgCode);
+                    if (!entry_2.mfgCode.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_mfgCode);
+                    }
+                    else
+                    {
+                        jobject newElement_2_mfgCodeInsideOptional;
+                        std::string newElement_2_mfgCodeInsideOptionalClassName     = "java/lang/Integer";
+                        std::string newElement_2_mfgCodeInsideOptionalCtorSignature = "(I)V";
+                        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                            newElement_2_mfgCodeInsideOptionalClassName.c_str(),
+                            newElement_2_mfgCodeInsideOptionalCtorSignature.c_str(), static_cast<uint16_t>(entry_2.mfgCode.Value()),
+                            newElement_2_mfgCodeInsideOptional);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_mfgCodeInsideOptional, newElement_2_mfgCode);
+                    }
                     jobject newElement_2_value;
                     std::string newElement_2_valueClassName     = "java/lang/Integer";
                     std::string newElement_2_valueCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_2_valueClassName.c_str(),
                                                                                    newElement_2_valueCtorSignature.c_str(),
                                                                                    entry_2.value, newElement_2_value);
+                    jobject newElement_2_tagName;
+                    if (!entry_2.tagName.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_tagName);
+                    }
+                    else
+                    {
+                        jobject newElement_2_tagNameInsideOptional;
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_2.tagName.Value(),
+                                                                                             newElement_2_tagNameInsideOptional));
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_tagNameInsideOptional, newElement_2_tagName);
+                    }
 
                     jclass modeTagStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
@@ -12242,8 +12286,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         ChipLogError(Zcl, "Could not find class ChipStructs$LaundryWasherModeSelectClusterModeTagStruct");
                         return nullptr;
                     }
-                    jmethodID modeTagStructStructCtor_3 =
-                        env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                    jmethodID modeTagStructStructCtor_3 = env->GetMethodID(
+                        modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;)V");
                     if (modeTagStructStructCtor_3 == nullptr)
                     {
                         ChipLogError(Zcl, "Could not find ChipStructs$LaundryWasherModeSelectClusterModeTagStruct constructor");
@@ -12251,7 +12295,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_2 = env->NewObject(modeTagStructStructClass_3, modeTagStructStructCtor_3, newElement_2_mfgCode,
-                                                  newElement_2_value);
+                                                  newElement_2_value, newElement_2_tagName);
                     chip::JniReferences::GetInstance().AddToList(newElement_0_modeTags, newElement_2);
                 }
 
@@ -12517,17 +12561,39 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     auto & entry_2 = iter_newElement_0_modeTags_2.GetValue();
                     jobject newElement_2;
                     jobject newElement_2_mfgCode;
-                    std::string newElement_2_mfgCodeClassName     = "java/lang/Integer";
-                    std::string newElement_2_mfgCodeCtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                        newElement_2_mfgCodeClassName.c_str(), newElement_2_mfgCodeCtorSignature.c_str(),
-                        static_cast<uint16_t>(entry_2.mfgCode), newElement_2_mfgCode);
+                    if (!entry_2.mfgCode.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_mfgCode);
+                    }
+                    else
+                    {
+                        jobject newElement_2_mfgCodeInsideOptional;
+                        std::string newElement_2_mfgCodeInsideOptionalClassName     = "java/lang/Integer";
+                        std::string newElement_2_mfgCodeInsideOptionalCtorSignature = "(I)V";
+                        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                            newElement_2_mfgCodeInsideOptionalClassName.c_str(),
+                            newElement_2_mfgCodeInsideOptionalCtorSignature.c_str(), static_cast<uint16_t>(entry_2.mfgCode.Value()),
+                            newElement_2_mfgCodeInsideOptional);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_mfgCodeInsideOptional, newElement_2_mfgCode);
+                    }
                     jobject newElement_2_value;
                     std::string newElement_2_valueClassName     = "java/lang/Integer";
                     std::string newElement_2_valueCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_2_valueClassName.c_str(),
                                                                                    newElement_2_valueCtorSignature.c_str(),
                                                                                    entry_2.value, newElement_2_value);
+                    jobject newElement_2_tagName;
+                    if (!entry_2.tagName.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_tagName);
+                    }
+                    else
+                    {
+                        jobject newElement_2_tagNameInsideOptional;
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_2.tagName.Value(),
+                                                                                             newElement_2_tagNameInsideOptional));
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_tagNameInsideOptional, newElement_2_tagName);
+                    }
 
                     jclass modeTagStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
@@ -12542,8 +12608,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                      "ChipStructs$RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct");
                         return nullptr;
                     }
-                    jmethodID modeTagStructStructCtor_3 =
-                        env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                    jmethodID modeTagStructStructCtor_3 = env->GetMethodID(
+                        modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;)V");
                     if (modeTagStructStructCtor_3 == nullptr)
                     {
                         ChipLogError(
@@ -12554,7 +12620,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_2 = env->NewObject(modeTagStructStructClass_3, modeTagStructStructCtor_3, newElement_2_mfgCode,
-                                                  newElement_2_value);
+                                                  newElement_2_value, newElement_2_tagName);
                     chip::JniReferences::GetInstance().AddToList(newElement_0_modeTags, newElement_2);
                 }
 
@@ -12827,17 +12893,39 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     auto & entry_2 = iter_newElement_0_modeTags_2.GetValue();
                     jobject newElement_2;
                     jobject newElement_2_mfgCode;
-                    std::string newElement_2_mfgCodeClassName     = "java/lang/Integer";
-                    std::string newElement_2_mfgCodeCtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                        newElement_2_mfgCodeClassName.c_str(), newElement_2_mfgCodeCtorSignature.c_str(),
-                        static_cast<uint16_t>(entry_2.mfgCode), newElement_2_mfgCode);
+                    if (!entry_2.mfgCode.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_mfgCode);
+                    }
+                    else
+                    {
+                        jobject newElement_2_mfgCodeInsideOptional;
+                        std::string newElement_2_mfgCodeInsideOptionalClassName     = "java/lang/Integer";
+                        std::string newElement_2_mfgCodeInsideOptionalCtorSignature = "(I)V";
+                        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                            newElement_2_mfgCodeInsideOptionalClassName.c_str(),
+                            newElement_2_mfgCodeInsideOptionalCtorSignature.c_str(), static_cast<uint16_t>(entry_2.mfgCode.Value()),
+                            newElement_2_mfgCodeInsideOptional);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_mfgCodeInsideOptional, newElement_2_mfgCode);
+                    }
                     jobject newElement_2_value;
                     std::string newElement_2_valueClassName     = "java/lang/Integer";
                     std::string newElement_2_valueCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_2_valueClassName.c_str(),
                                                                                    newElement_2_valueCtorSignature.c_str(),
                                                                                    entry_2.value, newElement_2_value);
+                    jobject newElement_2_tagName;
+                    if (!entry_2.tagName.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_tagName);
+                    }
+                    else
+                    {
+                        jobject newElement_2_tagNameInsideOptional;
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_2.tagName.Value(),
+                                                                                             newElement_2_tagNameInsideOptional));
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_tagNameInsideOptional, newElement_2_tagName);
+                    }
 
                     jclass modeTagStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
@@ -12847,8 +12935,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         ChipLogError(Zcl, "Could not find class ChipStructs$RvcRunModeSelectClusterModeTagStruct");
                         return nullptr;
                     }
-                    jmethodID modeTagStructStructCtor_3 =
-                        env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                    jmethodID modeTagStructStructCtor_3 = env->GetMethodID(
+                        modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;)V");
                     if (modeTagStructStructCtor_3 == nullptr)
                     {
                         ChipLogError(Zcl, "Could not find ChipStructs$RvcRunModeSelectClusterModeTagStruct constructor");
@@ -12856,7 +12944,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_2 = env->NewObject(modeTagStructStructClass_3, modeTagStructStructCtor_3, newElement_2_mfgCode,
-                                                  newElement_2_value);
+                                                  newElement_2_value, newElement_2_tagName);
                     chip::JniReferences::GetInstance().AddToList(newElement_0_modeTags, newElement_2);
                 }
 
@@ -13122,17 +13210,39 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     auto & entry_2 = iter_newElement_0_modeTags_2.GetValue();
                     jobject newElement_2;
                     jobject newElement_2_mfgCode;
-                    std::string newElement_2_mfgCodeClassName     = "java/lang/Integer";
-                    std::string newElement_2_mfgCodeCtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                        newElement_2_mfgCodeClassName.c_str(), newElement_2_mfgCodeCtorSignature.c_str(),
-                        static_cast<uint16_t>(entry_2.mfgCode), newElement_2_mfgCode);
+                    if (!entry_2.mfgCode.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_mfgCode);
+                    }
+                    else
+                    {
+                        jobject newElement_2_mfgCodeInsideOptional;
+                        std::string newElement_2_mfgCodeInsideOptionalClassName     = "java/lang/Integer";
+                        std::string newElement_2_mfgCodeInsideOptionalCtorSignature = "(I)V";
+                        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                            newElement_2_mfgCodeInsideOptionalClassName.c_str(),
+                            newElement_2_mfgCodeInsideOptionalCtorSignature.c_str(), static_cast<uint16_t>(entry_2.mfgCode.Value()),
+                            newElement_2_mfgCodeInsideOptional);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_mfgCodeInsideOptional, newElement_2_mfgCode);
+                    }
                     jobject newElement_2_value;
                     std::string newElement_2_valueClassName     = "java/lang/Integer";
                     std::string newElement_2_valueCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_2_valueClassName.c_str(),
                                                                                    newElement_2_valueCtorSignature.c_str(),
                                                                                    entry_2.value, newElement_2_value);
+                    jobject newElement_2_tagName;
+                    if (!entry_2.tagName.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_tagName);
+                    }
+                    else
+                    {
+                        jobject newElement_2_tagNameInsideOptional;
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_2.tagName.Value(),
+                                                                                             newElement_2_tagNameInsideOptional));
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_tagNameInsideOptional, newElement_2_tagName);
+                    }
 
                     jclass modeTagStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
@@ -13143,8 +13253,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         ChipLogError(Zcl, "Could not find class ChipStructs$RvcCleanModeSelectClusterModeTagStruct");
                         return nullptr;
                     }
-                    jmethodID modeTagStructStructCtor_3 =
-                        env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                    jmethodID modeTagStructStructCtor_3 = env->GetMethodID(
+                        modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;)V");
                     if (modeTagStructStructCtor_3 == nullptr)
                     {
                         ChipLogError(Zcl, "Could not find ChipStructs$RvcCleanModeSelectClusterModeTagStruct constructor");
@@ -13152,7 +13262,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_2 = env->NewObject(modeTagStructStructClass_3, modeTagStructStructCtor_3, newElement_2_mfgCode,
-                                                  newElement_2_value);
+                                                  newElement_2_value, newElement_2_tagName);
                     chip::JniReferences::GetInstance().AddToList(newElement_0_modeTags, newElement_2);
                 }
 
@@ -13858,17 +13968,39 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     auto & entry_2 = iter_newElement_0_modeTags_2.GetValue();
                     jobject newElement_2;
                     jobject newElement_2_mfgCode;
-                    std::string newElement_2_mfgCodeClassName     = "java/lang/Integer";
-                    std::string newElement_2_mfgCodeCtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-                        newElement_2_mfgCodeClassName.c_str(), newElement_2_mfgCodeCtorSignature.c_str(),
-                        static_cast<uint16_t>(entry_2.mfgCode), newElement_2_mfgCode);
+                    if (!entry_2.mfgCode.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_mfgCode);
+                    }
+                    else
+                    {
+                        jobject newElement_2_mfgCodeInsideOptional;
+                        std::string newElement_2_mfgCodeInsideOptionalClassName     = "java/lang/Integer";
+                        std::string newElement_2_mfgCodeInsideOptionalCtorSignature = "(I)V";
+                        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                            newElement_2_mfgCodeInsideOptionalClassName.c_str(),
+                            newElement_2_mfgCodeInsideOptionalCtorSignature.c_str(), static_cast<uint16_t>(entry_2.mfgCode.Value()),
+                            newElement_2_mfgCodeInsideOptional);
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_mfgCodeInsideOptional, newElement_2_mfgCode);
+                    }
                     jobject newElement_2_value;
                     std::string newElement_2_valueClassName     = "java/lang/Integer";
                     std::string newElement_2_valueCtorSignature = "(I)V";
                     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_2_valueClassName.c_str(),
                                                                                    newElement_2_valueCtorSignature.c_str(),
                                                                                    entry_2.value, newElement_2_value);
+                    jobject newElement_2_tagName;
+                    if (!entry_2.tagName.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_2_tagName);
+                    }
+                    else
+                    {
+                        jobject newElement_2_tagNameInsideOptional;
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_2.tagName.Value(),
+                                                                                             newElement_2_tagNameInsideOptional));
+                        chip::JniReferences::GetInstance().CreateOptional(newElement_2_tagNameInsideOptional, newElement_2_tagName);
+                    }
 
                     jclass modeTagStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
@@ -13879,8 +14011,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         ChipLogError(Zcl, "Could not find class ChipStructs$DishwasherModeSelectClusterModeTagStruct");
                         return nullptr;
                     }
-                    jmethodID modeTagStructStructCtor_3 =
-                        env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                    jmethodID modeTagStructStructCtor_3 = env->GetMethodID(
+                        modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;)V");
                     if (modeTagStructStructCtor_3 == nullptr)
                     {
                         ChipLogError(Zcl, "Could not find ChipStructs$DishwasherModeSelectClusterModeTagStruct constructor");
@@ -13888,7 +14020,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     newElement_2 = env->NewObject(modeTagStructStructClass_3, modeTagStructStructCtor_3, newElement_2_mfgCode,
-                                                  newElement_2_value);
+                                                  newElement_2_value, newElement_2_tagName);
                     chip::JniReferences::GetInstance().AddToList(newElement_0_modeTags, newElement_2);
                 }
 

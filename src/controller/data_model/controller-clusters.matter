@@ -2,8 +2,9 @@
 // It is for view/code review purposes only.
 
 struct ModeTagStruct {
-    vendor_id mfgCode = 0;
+    optional vendor_id mfgCode = 0;
     enum16 value = 1;
+    optional char_string<64> tagName = 2;
 }
 
 struct ModeOptionStruct {
@@ -2772,8 +2773,9 @@ client cluster ModeSelect = 80 {
   }
 
   struct ModeTagStruct {
-    vendor_id mfgCode = 0;
+    optional vendor_id mfgCode = 0;
     enum16 value = 1;
+    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
@@ -2833,8 +2835,9 @@ client cluster LaundryWasherModeSelect = 81 {
   }
 
   struct ModeTagStruct {
-    vendor_id mfgCode = 0;
+    optional vendor_id mfgCode = 0;
     enum16 value = 1;
+    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
@@ -2891,8 +2894,9 @@ client cluster RefrigeratorAndTemperatureControlledCabinetModeSelect = 82 {
   }
 
   struct ModeTagStruct {
-    vendor_id mfgCode = 0;
+    optional vendor_id mfgCode = 0;
     enum16 value = 1;
+    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
@@ -2959,8 +2963,9 @@ client cluster RvcRunModeSelect = 84 {
   }
 
   struct ModeTagStruct {
-    vendor_id mfgCode = 0;
+    optional vendor_id mfgCode = 0;
     enum16 value = 1;
+    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
@@ -3022,8 +3027,9 @@ client cluster RvcCleanModeSelect = 85 {
   }
 
   struct ModeTagStruct {
-    vendor_id mfgCode = 0;
+    optional vendor_id mfgCode = 0;
     enum16 value = 1;
+    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
@@ -3147,8 +3153,9 @@ client cluster DishwasherModeSelect = 89 {
   }
 
   struct ModeTagStruct {
-    vendor_id mfgCode = 0;
+    optional vendor_id mfgCode = 0;
     enum16 value = 1;
+    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {

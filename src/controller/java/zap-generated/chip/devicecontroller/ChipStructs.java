@@ -1463,12 +1463,15 @@ public class ChipStructs {
   }
 
   public static class ModeSelectClusterModeTagStruct {
-    public Integer mfgCode;
+    public Optional<Integer> mfgCode;
     public Integer value;
+    public Optional<String> tagName;
 
-    public ModeSelectClusterModeTagStruct(Integer mfgCode, Integer value) {
+    public ModeSelectClusterModeTagStruct(
+        Optional<Integer> mfgCode, Integer value, Optional<String> tagName) {
       this.mfgCode = mfgCode;
       this.value = value;
+      this.tagName = tagName;
     }
 
     @Override
@@ -1480,6 +1483,9 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tvalue: ");
       output.append(value);
+      output.append("\n");
+      output.append("\ttagName: ");
+      output.append(tagName);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1519,12 +1525,15 @@ public class ChipStructs {
   }
 
   public static class LaundryWasherModeSelectClusterModeTagStruct {
-    public Integer mfgCode;
+    public Optional<Integer> mfgCode;
     public Integer value;
+    public Optional<String> tagName;
 
-    public LaundryWasherModeSelectClusterModeTagStruct(Integer mfgCode, Integer value) {
+    public LaundryWasherModeSelectClusterModeTagStruct(
+        Optional<Integer> mfgCode, Integer value, Optional<String> tagName) {
       this.mfgCode = mfgCode;
       this.value = value;
+      this.tagName = tagName;
     }
 
     @Override
@@ -1536,6 +1545,9 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tvalue: ");
       output.append(value);
+      output.append("\n");
+      output.append("\ttagName: ");
+      output.append(tagName);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1575,13 +1587,15 @@ public class ChipStructs {
   }
 
   public static class RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct {
-    public Integer mfgCode;
+    public Optional<Integer> mfgCode;
     public Integer value;
+    public Optional<String> tagName;
 
     public RefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct(
-        Integer mfgCode, Integer value) {
+        Optional<Integer> mfgCode, Integer value, Optional<String> tagName) {
       this.mfgCode = mfgCode;
       this.value = value;
+      this.tagName = tagName;
     }
 
     @Override
@@ -1594,6 +1608,9 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tvalue: ");
       output.append(value);
+      output.append("\n");
+      output.append("\ttagName: ");
+      output.append(tagName);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1639,12 +1656,15 @@ public class ChipStructs {
   }
 
   public static class RvcRunModeSelectClusterModeTagStruct {
-    public Integer mfgCode;
+    public Optional<Integer> mfgCode;
     public Integer value;
+    public Optional<String> tagName;
 
-    public RvcRunModeSelectClusterModeTagStruct(Integer mfgCode, Integer value) {
+    public RvcRunModeSelectClusterModeTagStruct(
+        Optional<Integer> mfgCode, Integer value, Optional<String> tagName) {
       this.mfgCode = mfgCode;
       this.value = value;
+      this.tagName = tagName;
     }
 
     @Override
@@ -1656,6 +1676,9 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tvalue: ");
       output.append(value);
+      output.append("\n");
+      output.append("\ttagName: ");
+      output.append(tagName);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1695,12 +1718,15 @@ public class ChipStructs {
   }
 
   public static class RvcCleanModeSelectClusterModeTagStruct {
-    public Integer mfgCode;
+    public Optional<Integer> mfgCode;
     public Integer value;
+    public Optional<String> tagName;
 
-    public RvcCleanModeSelectClusterModeTagStruct(Integer mfgCode, Integer value) {
+    public RvcCleanModeSelectClusterModeTagStruct(
+        Optional<Integer> mfgCode, Integer value, Optional<String> tagName) {
       this.mfgCode = mfgCode;
       this.value = value;
+      this.tagName = tagName;
     }
 
     @Override
@@ -1712,6 +1738,9 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tvalue: ");
       output.append(value);
+      output.append("\n");
+      output.append("\ttagName: ");
+      output.append(tagName);
       output.append("\n");
       output.append("}\n");
       return output.toString();
@@ -1775,12 +1804,15 @@ public class ChipStructs {
   }
 
   public static class DishwasherModeSelectClusterModeTagStruct {
-    public Integer mfgCode;
+    public Optional<Integer> mfgCode;
     public Integer value;
+    public Optional<String> tagName;
 
-    public DishwasherModeSelectClusterModeTagStruct(Integer mfgCode, Integer value) {
+    public DishwasherModeSelectClusterModeTagStruct(
+        Optional<Integer> mfgCode, Integer value, Optional<String> tagName) {
       this.mfgCode = mfgCode;
       this.value = value;
+      this.tagName = tagName;
     }
 
     @Override
@@ -1792,6 +1824,9 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tvalue: ");
       output.append(value);
+      output.append("\n");
+      output.append("\ttagName: ");
+      output.append(tagName);
       output.append("\n");
       output.append("}\n");
       return output.toString();

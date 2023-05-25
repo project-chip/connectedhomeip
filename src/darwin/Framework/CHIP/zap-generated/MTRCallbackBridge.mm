@@ -7943,8 +7943,19 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
                     auto & entry_2 = iter_2.GetValue();
                     MTRModeSelectClusterModeTagStruct * newElement_2;
                     newElement_2 = [MTRModeSelectClusterModeTagStruct new];
-                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                    if (entry_2.mfgCode.HasValue()) {
+                        newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
+                    } else {
+                        newElement_2.mfgCode = nil;
+                    }
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                    if (entry_2.tagName.HasValue()) {
+                        newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
+                                                                        length:entry_2.tagName.Value().size()
+                                                                      encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_2.tagName = nil;
+                    }
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();
@@ -8156,8 +8167,19 @@ void MTRLaundryWasherModeSelectSupportedModesListAttributeCallbackBridge::OnSucc
                     auto & entry_2 = iter_2.GetValue();
                     MTRLaundryWasherModeSelectClusterModeTagStruct * newElement_2;
                     newElement_2 = [MTRLaundryWasherModeSelectClusterModeTagStruct new];
-                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                    if (entry_2.mfgCode.HasValue()) {
+                        newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
+                    } else {
+                        newElement_2.mfgCode = nil;
+                    }
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                    if (entry_2.tagName.HasValue()) {
+                        newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
+                                                                        length:entry_2.tagName.Value().size()
+                                                                      encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_2.tagName = nil;
+                    }
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();
@@ -8370,8 +8392,19 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeSelectSupportedModesListA
                     auto & entry_2 = iter_2.GetValue();
                     MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct * newElement_2;
                     newElement_2 = [MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct new];
-                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                    if (entry_2.mfgCode.HasValue()) {
+                        newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
+                    } else {
+                        newElement_2.mfgCode = nil;
+                    }
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                    if (entry_2.tagName.HasValue()) {
+                        newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
+                                                                        length:entry_2.tagName.Value().size()
+                                                                      encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_2.tagName = nil;
+                    }
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();
@@ -8588,8 +8621,19 @@ void MTRRVCRunModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(v
                     auto & entry_2 = iter_2.GetValue();
                     MTRRVCRunModeSelectClusterModeTagStruct * newElement_2;
                     newElement_2 = [MTRRVCRunModeSelectClusterModeTagStruct new];
-                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                    if (entry_2.mfgCode.HasValue()) {
+                        newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
+                    } else {
+                        newElement_2.mfgCode = nil;
+                    }
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                    if (entry_2.tagName.HasValue()) {
+                        newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
+                                                                        length:entry_2.tagName.Value().size()
+                                                                      encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_2.tagName = nil;
+                    }
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();
@@ -8801,8 +8845,19 @@ void MTRRVCCleanModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn
                     auto & entry_2 = iter_2.GetValue();
                     MTRRVCCleanModeSelectClusterModeTagStruct * newElement_2;
                     newElement_2 = [MTRRVCCleanModeSelectClusterModeTagStruct new];
-                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                    if (entry_2.mfgCode.HasValue()) {
+                        newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
+                    } else {
+                        newElement_2.mfgCode = nil;
+                    }
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                    if (entry_2.tagName.HasValue()) {
+                        newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
+                                                                        length:entry_2.tagName.Value().size()
+                                                                      encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_2.tagName = nil;
+                    }
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();
@@ -9430,8 +9485,19 @@ void MTRDishwasherModeSelectSupportedModesListAttributeCallbackBridge::OnSuccess
                     auto & entry_2 = iter_2.GetValue();
                     MTRDishwasherModeSelectClusterModeTagStruct * newElement_2;
                     newElement_2 = [MTRDishwasherModeSelectClusterModeTagStruct new];
-                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                    if (entry_2.mfgCode.HasValue()) {
+                        newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
+                    } else {
+                        newElement_2.mfgCode = nil;
+                    }
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                    if (entry_2.tagName.HasValue()) {
+                        newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
+                                                                        length:entry_2.tagName.Value().size()
+                                                                      encoding:NSUTF8StringEncoding];
+                    } else {
+                        newElement_2.tagName = nil;
+                    }
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();

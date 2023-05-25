@@ -14897,12 +14897,14 @@ class ModeSelect(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="tagName", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            mfgCode: 'uint' = 0
+            mfgCode: 'typing.Optional[uint]' = None
             value: 'uint' = 0
+            tagName: 'typing.Optional[str]' = None
 
         @dataclass
         class ModeOptionStruct(ClusterObject):
@@ -15221,12 +15223,14 @@ class LaundryWasherModeSelect(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="tagName", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            mfgCode: 'uint' = 0
+            mfgCode: 'typing.Optional[uint]' = None
             value: 'uint' = 0
+            tagName: 'typing.Optional[str]' = None
 
         @dataclass
         class ModeOptionStruct(ClusterObject):
@@ -15527,12 +15531,14 @@ class RefrigeratorAndTemperatureControlledCabinetModeSelect(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="tagName", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            mfgCode: 'uint' = 0
+            mfgCode: 'typing.Optional[uint]' = None
             value: 'uint' = 0
+            tagName: 'typing.Optional[str]' = None
 
         @dataclass
         class ModeOptionStruct(ClusterObject):
@@ -15848,12 +15854,14 @@ class RvcRunModeSelect(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="tagName", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            mfgCode: 'uint' = 0
+            mfgCode: 'typing.Optional[uint]' = None
             value: 'uint' = 0
+            tagName: 'typing.Optional[str]' = None
 
         @dataclass
         class ModeOptionStruct(ClusterObject):
@@ -16163,12 +16171,14 @@ class RvcCleanModeSelect(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="tagName", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            mfgCode: 'uint' = 0
+            mfgCode: 'typing.Optional[uint]' = None
             value: 'uint' = 0
+            tagName: 'typing.Optional[str]' = None
 
         @dataclass
         class ModeOptionStruct(ClusterObject):
@@ -16961,12 +16971,14 @@ class DishwasherModeSelect(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="tagName", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            mfgCode: 'uint' = 0
+            mfgCode: 'typing.Optional[uint]' = None
             value: 'uint' = 0
+            tagName: 'typing.Optional[str]' = None
 
         @dataclass
         class ModeOptionStruct(ClusterObject):

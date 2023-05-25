@@ -2604,9 +2604,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _mfgCode = @(0);
+        _mfgCode = nil;
 
         _value = @(0);
+
+        _tagName = nil;
     }
     return self;
 }
@@ -2617,14 +2619,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
+    other.tagName = self.tagName;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: mfgCode:%@; value:%@; tagName:%@; >", NSStringFromClass([self class]), _mfgCode, _value, _tagName];
     return descriptionString;
 }
 
@@ -2669,9 +2672,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _mfgCode = @(0);
+        _mfgCode = nil;
 
         _value = @(0);
+
+        _tagName = nil;
     }
     return self;
 }
@@ -2682,14 +2687,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
+    other.tagName = self.tagName;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: mfgCode:%@; value:%@; tagName:%@; >", NSStringFromClass([self class]), _mfgCode, _value, _tagName];
     return descriptionString;
 }
 
@@ -2734,9 +2740,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _mfgCode = @(0);
+        _mfgCode = nil;
 
         _value = @(0);
+
+        _tagName = nil;
     }
     return self;
 }
@@ -2747,14 +2755,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
+    other.tagName = self.tagName;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: mfgCode:%@; value:%@; tagName:%@; >", NSStringFromClass([self class]), _mfgCode, _value, _tagName];
     return descriptionString;
 }
 
@@ -2799,9 +2808,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _mfgCode = @(0);
+        _mfgCode = nil;
 
         _value = @(0);
+
+        _tagName = nil;
     }
     return self;
 }
@@ -2812,14 +2823,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
+    other.tagName = self.tagName;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: mfgCode:%@; value:%@; tagName:%@; >", NSStringFromClass([self class]), _mfgCode, _value, _tagName];
     return descriptionString;
 }
 
@@ -2864,9 +2876,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _mfgCode = @(0);
+        _mfgCode = nil;
 
         _value = @(0);
+
+        _tagName = nil;
     }
     return self;
 }
@@ -2877,14 +2891,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
+    other.tagName = self.tagName;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: mfgCode:%@; value:%@; tagName:%@; >", NSStringFromClass([self class]), _mfgCode, _value, _tagName];
     return descriptionString;
 }
 
@@ -2997,9 +3012,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _mfgCode = @(0);
+        _mfgCode = nil;
 
         _value = @(0);
+
+        _tagName = nil;
     }
     return self;
 }
@@ -3010,14 +3027,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
+    other.tagName = self.tagName;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: mfgCode:%@; value:%@; tagName:%@; >", NSStringFromClass([self class]), _mfgCode, _value, _tagName];
     return descriptionString;
 }
 

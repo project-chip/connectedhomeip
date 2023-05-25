@@ -1671,6 +1671,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("TagName", indent + 1, value.tagName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TagName'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -1727,6 +1735,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Value'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TagName", indent + 1, value.tagName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TagName'");
             return err;
         }
     }
@@ -1790,6 +1806,14 @@ CHIP_ERROR DataModelLogger::LogValue(
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("TagName", indent + 1, value.tagName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TagName'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -1850,6 +1874,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("TagName", indent + 1, value.tagName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TagName'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -1905,6 +1937,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Value'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TagName", indent + 1, value.tagName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TagName'");
             return err;
         }
     }
@@ -1990,6 +2030,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Value'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TagName", indent + 1, value.tagName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TagName'");
             return err;
         }
     }

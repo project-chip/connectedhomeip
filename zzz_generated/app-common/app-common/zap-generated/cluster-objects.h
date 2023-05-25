@@ -48,13 +48,15 @@ enum class Fields : uint8_t
 {
     kMfgCode = 0,
     kValue   = 1,
+    kTagName = 2,
 };
 
 struct Type
 {
 public:
-    chip::VendorId mfgCode = static_cast<chip::VendorId>(0);
-    uint16_t value         = static_cast<uint16_t>(0);
+    Optional<chip::VendorId> mfgCode;
+    uint16_t value = static_cast<uint16_t>(0);
+    Optional<chip::CharSpan> tagName;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
