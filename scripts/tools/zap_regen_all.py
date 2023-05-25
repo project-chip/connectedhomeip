@@ -107,6 +107,10 @@ class ZAPGenerateTarget:
         else:
             self.output_dir = None
 
+    @property
+    def is_matter_idl_generation(self):
+        return (self.output_dir is None)
+
     def distinct_output(self):
         if not self.template and not self.output_dir:
             # Matter IDL templates have no template/output dir as they go with the
@@ -463,9 +467,22 @@ def main():
     if args.parallel:
         # Ensure each zap run is independent
         os.environ['ZAP_TEMPSTATE'] = '1'
-        with multiprocessing.Pool() as pool:
-            for timing in pool.imap_unordered(_ParallelGenerateOne, targets):
-                timings.append(timing)
+
+        # There is a sequencing here:
+        #   - ZAP will generate ".matter" files
+        #   - various codegen may generate from ".matter" files (like java)
+        # We split codegen into two generations to not be racy
+        first, second = [], []
+        for target in targets:
+            if isinstance(target, ZAPGenerateTarget) and target.is_matter_idl_generation:
+                first.append(target)
+            else:
+                second.append(target)
+
+        for items in [first, second]:
+            with multiprocessing.Pool() as pool:
+                for timing in pool.imap_unordered(_ParallelGenerateOne, items):
+                    timings.append(timing)
     else:
         for target in targets:
             timings.append(target.generate())

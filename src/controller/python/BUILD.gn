@@ -214,7 +214,6 @@ chip_python_wheel_action("chip-core") {
         "chip/clusters/Attribute.py",
         "chip/clusters/Command.py",
         "chip/clusters/__init__.py",
-        "chip/clusters/enum.py",
         "chip/commissioning/__init__.py",
         "chip/commissioning/commissioning_flow_blocks.py",
         "chip/commissioning/pase.py",
@@ -300,7 +299,6 @@ chip_python_wheel_action("chip-core") {
   }
 
   py_package_reqs = [
-    "aenum",
     "coloredlogs",
     "construct",
     "dacite",
@@ -361,6 +359,7 @@ chip_python_wheel_action("chip-clusters") {
         "chip/clusters/Objects.py",
         "chip/clusters/TestObjects.py",
         "chip/clusters/Types.py",
+        "chip/clusters/enum.py",
         "chip/tlv/__init__.py",
       ]
     },
@@ -378,7 +377,10 @@ chip_python_wheel_action("chip-clusters") {
     "chip.tlv",
   ]
 
-  py_package_reqs = [ "dacite" ]
+  py_package_reqs = [
+    "dacite",
+    "aenum",
+  ]
 
   py_package_name = "${chip_python_package_prefix}-clusters"
   py_package_output = string_replace(py_package_name, "-", "_")
