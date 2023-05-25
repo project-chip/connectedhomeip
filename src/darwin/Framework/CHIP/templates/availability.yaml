@@ -7779,6 +7779,9 @@
           Scenes:
               Feature:
                   - SceneNames
+          Thermostat:
+              Feature:
+                  - LocalTemperatureNotExposed
           HEPAFilterMonitoring:
               Feature:
                   - Condition
