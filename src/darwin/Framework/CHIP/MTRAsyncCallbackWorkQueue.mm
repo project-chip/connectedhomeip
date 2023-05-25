@@ -69,8 +69,14 @@
 
 - (NSString *)description
 {
-    return [NSString
+    os_unfair_lock_lock(&_lock);
+
+    auto * desc = [NSString
         stringWithFormat:@"MTRAsyncCallbackWorkQueue context: %@ items count: %lu", self.context, (unsigned long) self.items.count];
+
+    os_unfair_lock_unlock(&_lock);
+
+    return desc;
 }
 
 - (void)enqueueWorkItem:(MTRAsyncCallbackQueueWorkItem *)item
