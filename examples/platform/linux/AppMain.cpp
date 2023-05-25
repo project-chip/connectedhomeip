@@ -131,6 +131,7 @@ void Cleanup()
 // We should stop using signals for those faults, and move to a different notification
 // means, like a pipe. (see issue #19114)
 #if !defined(ENABLE_CHIP_SHELL)
+extern "C" {
 void StopSignalHandler(int signal)
 {
     if (gMainLoopImplementation != nullptr)
@@ -142,6 +143,7 @@ void StopSignalHandler(int signal)
         Server::GetInstance().GenerateShutDownEvent();
         PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
     }
+}
 }
 #endif // !defined(ENABLE_CHIP_SHELL)
 

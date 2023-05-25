@@ -23,6 +23,7 @@
 #include "platform/CHIPDeviceLayer.h"
 #include "platform/PlatformManager.h"
 #include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 
 using chip::Dnssd::DnssdService;
@@ -61,7 +62,7 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     auto * suite = ctx->mTestSuite;
     char addrBuf[100];
 
-    NL_TEST_ASSERT(suite, result != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(suite, result != nullptr);
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
 
     if (!addresses.empty())
