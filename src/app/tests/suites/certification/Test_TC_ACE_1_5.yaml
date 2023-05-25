@@ -65,7 +65,7 @@ tests:
           [1684416077.831771][118314:118316] CHIP:CTL: SetupQRCode: [MT:-24J0IRV010UJE7ZH10]
           [1684416077.831791][118314:118316] CHIP:DMG: ICR moving to [AwaitingDe]
 
-          ./chip-tool pairing code 2 36283142515 --commissioner-name beta 
+          ./chip-tool pairing code 2 36283142515 --commissioner-name beta
 
           On TH2 (chip-tool) verify the commissioning completed with success
 
