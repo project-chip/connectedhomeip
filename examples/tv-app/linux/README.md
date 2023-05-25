@@ -1,9 +1,9 @@
 # Matter TV Example
 
 An example showing the use of CHIP on the Linux. The document will describe how
-to build and run Matter TV Example on Raspberry Pi. This doc is tested on **Ubuntu
-for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for Raspberry Pi
-Desktop 20.10 (aarch64)**
+to build and run Matter TV Example on Raspberry Pi. This doc is tested on
+**Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
+Raspberry Pi Desktop 20.10 (aarch64)**
 
 <hr>
 
@@ -181,8 +181,8 @@ TODO
 
     1. A Raspberry Pi 4 board
     2. A USB Bluetooth Dongle, Ubuntu desktop will send Bluetooth advertisement,
-       which will block Matter from connecting via BLE. On Ubuntu server, you need
-       to install `pi-bluetooth` via APT.
+       which will block Matter from connecting via BLE. On Ubuntu server, you
+       need to install `pi-bluetooth` via APT.    
     3. Ubuntu 20.04 or newer image for ARM64 platform.
 
 -   Building
