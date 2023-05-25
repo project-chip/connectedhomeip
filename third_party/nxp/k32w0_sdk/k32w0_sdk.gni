@@ -45,8 +45,8 @@ declare_args() {
   chip_reduce_ssbl_size = false
   chip_enable_ota_firmware_processor = 1
   chip_enable_ota_factory_data_processor = 0
-  chip_with_pdm_encryption=1
-  ota_custom_entry_address="0x000C1000"
+  chip_with_pdm_encryption = 1
+  ota_custom_entry_address = "0x000C1000"
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -85,12 +85,14 @@ template("k32w0_sdk") {
       "Please set chip_with_factory_data=1 if using custom factory provider.")
 
   assert(
-    chip_enable_ota_factory_data_processor == 0 || chip_enable_ota_firmware_processor == 1,
-    "Please set chip_enable_ota_firmware_processor=1 if using default factory data processor.")
+      chip_enable_ota_factory_data_processor == 0 ||
+          chip_enable_ota_firmware_processor == 1,
+      "Please set chip_enable_ota_firmware_processor=1 if using default factory data processor.")
 
   assert(
-    chip_enable_ota_factory_data_processor == 0 || chip_with_factory_data == 1,
-    "Please set chip_with_factory_data=1 if using default factory data processor.")
+      chip_enable_ota_factory_data_processor == 0 ||
+          chip_with_factory_data == 1,
+      "Please set chip_with_factory_data=1 if using default factory data processor.")
 
   if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
       build_for_k32w041 == 1) {
@@ -137,7 +139,8 @@ template("k32w0_sdk") {
   print("FRO32k: ", use_fro_32k)
   print("low power: ", chip_with_low_power)
   print("OTA default firmware processor: ", chip_enable_ota_firmware_processor)
-  print("OTA default factory data processor: ", chip_enable_ota_factory_data_processor)
+  print("OTA default factory data processor: ",
+        chip_enable_ota_factory_data_processor)
   print("PDM Encryption: ", chip_with_pdm_encryption)
 
   if (chip_with_low_power == 1 && chip_logging == true) {
@@ -250,7 +253,7 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/middleware/wireless/ieee-802.15.4/lib/libMiniMac_Sched.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/PDM/Library/libPDM_extFlash.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/XCVR/lib/libRadio.a",
-      "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a"
+      "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a",
     ]
 
     defines = [
@@ -318,13 +321,11 @@ template("k32w0_sdk") {
         "gOTAAllowCustomStartAddress=1",
         "gOTAUseCustomOtaEntry=1",
         "gOTACustomOtaEntryMemory=1",
-        "OTA_ENTRY_TOP_ADDR=${ota_custom_entry_address}"
+        "OTA_ENTRY_TOP_ADDR=${ota_custom_entry_address}",
       ]
 
       if (chip_enable_ota_factory_data_processor == 1) {
-        defines += [
-          "CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR=1",
-        ]
+        defines += [ "CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR=1" ]
       }
     }
 

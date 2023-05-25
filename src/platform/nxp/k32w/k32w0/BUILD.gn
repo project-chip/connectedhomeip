@@ -95,7 +95,8 @@ static_library("k32w0") {
         "OTAHooks.cpp",
       ]
 
-      if (chip_with_factory_data == 1 && chip_enable_ota_factory_data_processor == 1) {
+      if (chip_with_factory_data == 1 &&
+          chip_enable_ota_factory_data_processor == 1) {
         sources += [
           "OTAFactoryDataProcessor.cpp",
           "OTAFactoryDataProcessor.h",
