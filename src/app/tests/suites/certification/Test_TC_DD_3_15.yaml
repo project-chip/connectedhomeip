@@ -37,7 +37,7 @@ tests:
           Preconditions
           1 - DUT is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
 
-          2 - 5.1.4.2 - Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual).
+          2 - 5.1.4.2 - Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
 
           An example onboarding payload could be "34970112332" (11-digit) or could be "749701123365521327694" (21-digit) (following 5.1.4. Table 37. "Manual Pairing Code Elements") which each include:
 
@@ -95,10 +95,10 @@ tests:
            ./chip-tool pairing code 1 34970112332
 
           [1651109112823] [95528:65650355] CHIP: [CTL] Received CommissioningComplete response
-          [1651109112823] [95528:65650355] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
-          [1651109112823] [95528:65650355] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1651109112823] [95528:65650355] CHIP: [CTL] Performing next commissioning step "Cleanup"
-          [1651109112823] [95528:65650355] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1651109112823] [95528:65650355] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651109112823] [95528:65650355] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651109112823] [95528:65650355] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651109112823] [95528:65650355] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1651109112823] [95528:65650355] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
@@ -150,9 +150,9 @@ tests:
            ./chip-tool pairing code 1 749701123365521327694
 
           [1651109219028] [95536:65652322] CHIP: [CTL] Received CommissioningComplete response
-          [1651109219028] [95536:65652322] CHIP: [CTL] Successfully finished commissioning step "SendComplete"
-          [1651109219028] [95536:65652322] CHIP: [CTL] Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1651109219028] [95536:65652322] CHIP: [CTL] Performing next commissioning step "Cleanup"
-          [1651109219028] [95536:65652322] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1651109219028] [95536:65652322] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1651109219028] [95536:65652322] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1651109219028] [95536:65652322] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1651109219028] [95536:65652322] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1651109219028] [95536:65652322] CHIP: [TOO] Device commissioning completed with success
       disabled: true

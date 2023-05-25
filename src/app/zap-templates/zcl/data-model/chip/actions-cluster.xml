@@ -35,8 +35,8 @@ limitations under the License.
 
   <enum name="ActionErrorEnum" type="ENUM8">
     <cluster code="0x0025"/>
-    <item value="0" name="unknown"/>
-    <item value="1" name="interrupted"/>
+    <item value="0" name="Unknown"/>
+    <item value="1" name="Interrupted"/>
   </enum>
 
   <enum name="ActionStateEnum" type="ENUM8">
@@ -49,20 +49,20 @@ limitations under the License.
 
   <enum name="ActionTypeEnum" type="ENUM8">
     <cluster code="0x0025"/>
-    <item value="0" name="other"/>
-    <item value="1" name="scene"/>
-    <item value="2" name="sequence"/>
-    <item value="3" name="automation"/>
-    <item value="4" name="exception"/>
-    <item value="5" name="notification"/>
-    <item value="6" name="alarm"/>
+    <item value="0" name="Other"/>
+    <item value="1" name="Scene"/>
+    <item value="2" name="Sequence"/>
+    <item value="3" name="Automation"/>
+    <item value="4" name="Exception"/>
+    <item value="5" name="Notification"/>
+    <item value="6" name="Alarm"/>
   </enum>
 
   <enum name="EndpointListTypeEnum" type="ENUM8">
     <cluster code="0x0025"/>
-    <item value="0" name="other"/>
-    <item value="1" name="room"/>
-    <item value="2" name="zone"/>
+    <item value="0" name="Other"/>
+    <item value="1" name="Room"/>
+    <item value="2" name="Zone"/>
   </enum>
 
   <struct name="ActionStruct">

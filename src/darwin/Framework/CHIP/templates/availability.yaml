@@ -7410,6 +7410,8 @@
                   - targetTemperature
                   - targetTemperatureLevel
       structs:
+          AccessControl:
+              - AccessControlTargetStruct
           BasicInformation:
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
@@ -7417,6 +7419,11 @@
           TemperatureControl:
               - TemperatureLevelStruct
       struct fields:
+          AccessControl:
+              AccessControlTargetStruct:
+                  - cluster
+                  - endpoint
+                  - deviceType
           BasicInformation:
               ProductAppearanceStruct:
                   - finish
@@ -7850,6 +7857,9 @@
           # We apparently forgot to deprecate BridgedDeviceBasic when we
           # introduced BridgedDeviceBasicInformation.
           - BridgedDeviceBasic
+      structs:
+          AccessControl:
+              - Target
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -7866,6 +7876,9 @@
       commands:
           TimeSynchronization:
               SetUTCTime: SetUtcTime
+      structs:
+          AccessControl:
+              AccessControlTargetStruct: Target
       enum values:
           TimeSynchronization:
               TimeSourceEnum:

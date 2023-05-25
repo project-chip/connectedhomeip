@@ -44,7 +44,7 @@ tests:
           [1645743053317] [97806:20280749] CHIP: [ZCL] OTA Provider received QueryImage
           [1645743053317] [97806:20280749] CHIP: [ZCL]   VendorID: 0xfff1
           [1645743053317] [97806:20280749] CHIP: [ZCL]   ProductID: 32769
-          [1645743053317] [97806:20280749] CHIP: [ZCL]   SoftwareVersion: 0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   SoftwareVersion: 2
           [1645743053317] [97806:20280749] CHIP: [ZCL]   ProtocolsSupported: [
           [1645743053317] [97806:20280749] CHIP: [ZCL]     0
           [1645743053317] [97806:20280749] CHIP: [ZCL]   ]
@@ -79,7 +79,7 @@ tests:
           [1645743053317] [97806:20280749] CHIP: [ZCL] OTA Provider received QueryImage
           [1645743053317] [97806:20280749] CHIP: [ZCL]   VendorID: 0xfff1
           [1645743053317] [97806:20280749] CHIP: [ZCL]   ProductID: 32769
-          [1645743053317] [97806:20280749] CHIP: [ZCL]   SoftwareVersion: 0
+          [1645743053317] [97806:20280749] CHIP: [ZCL]   SoftwareVersion: 2
           [1645743053317] [97806:20280749] CHIP: [ZCL]   ProtocolsSupported: [
           [1645743053317] [97806:20280749] CHIP: [ZCL]     0
           [1645743053317] [97806:20280749] CHIP: [ZCL]   ]
