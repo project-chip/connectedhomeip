@@ -1,5 +1,5 @@
-import subprocess
 import os
+import subprocess
 
 sign_images_path = os.environ["NXP_K32W0_SDK_ROOT"] + "/tools/imagetool/sign_images.sh"
 
