@@ -31,10 +31,6 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/nxp/k32w/common/FactoryDataProvider.h>
 
-extern "C" {
-#include "Flash_Adapter.h"
-}
-
 #include <cctype>
 
 namespace chip {
@@ -50,43 +46,6 @@ OtaUtils_EEPROM_ReadData pFunctionEepromRead = (OtaUtils_EEPROM_ReadData) K32W0F
 uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t)__FACTORY_DATA_START;
 uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t)__FACTORY_DATA_SIZE;
 uint32_t FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(FactoryDataProvider::Header);
-
-FactoryDataProvider & FactoryDataProvider::GetDefaultInstance()
-{
-    static FactoryDataProvider sInstance;
-    return sInstance;
-}
-
-extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
-{
-    CHIP_ERROR error      = CHIP_NO_ERROR;
-    uint16_t backupLength = 0;
-
-#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
-    // Check if PDM id related to factory data backup exists.
-    // If it does, it means an external event (such as a power loss)
-    // interrupted the factory data update process and the section
-    // from internal flash is most likely erased and should be restored.
-    if (PDM_bDoesDataExist(kNvmId_FactoryDataBackup, &backupLength))
-    {
-        chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
-        buffer.Calloc(FactoryDataProvider::kFactoryDataSize);
-        ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
-
-        auto status = PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void*)buffer.Get(),
-                                              FactoryDataProvider::kFactoryDataSize, &backupLength);
-        ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
-
-        error = FactoryDataProvider::GetDefaultInstance().UpdateData(buffer.Get());
-        if (error == CHIP_NO_ERROR)
-        {
-            ChipLogProgress(DeviceLayer, "Factory data was restored successfully");
-        }
-    }
-#endif
-
-    return error;
-}
 
 FactoryDataProvider::FactoryDataProvider()
 {
@@ -111,62 +70,9 @@ FactoryDataProvider::FactoryDataProvider()
     maxLengths[FactoryDataId::kPartNumber]           = ConfigurationManager::kMaxPartNumberLength;
     maxLengths[FactoryDataId::kProductURL]           = ConfigurationManager::kMaxProductURLLength;
     maxLengths[FactoryDataId::kProductLabel]         = ConfigurationManager::kMaxProductLabelLength;
-
-    RegisterRestoreMechanism(FactoryDataDefaultRestoreMechanism);
 }
 
-CHIP_ERROR FactoryDataProvider::Init()
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    uint32_t sum     = 0;
-
-    ReturnErrorOnFailure(SetCustomIds());
-
-    for (uint8_t i = 1; i < FactoryDataProvider::kNumberOfIds; i++)
-    {
-        sum += maxLengths[i];
-    }
-
-    if (sum > kFactoryDataSize)
-    {
-        ChipLogError(DeviceLayer,
-            "Max size of factory data: %lu is bigger than reserved factory data size: %lu",
-            sum, kFactoryDataSize
-        );
-    }
-
-    VerifyOrReturnError(mRestoreMechanisms.size() > 0, CHIP_FACTORY_DATA_RESTORE_MECHANISM);
-
-    for (auto & restore : mRestoreMechanisms)
-    {
-        error = restore();
-        if (error != CHIP_NO_ERROR)
-        {
-            continue;
-        }
-
-        error = Validate();
-        if (error != CHIP_NO_ERROR)
-        {
-            continue;
-        }
-
-        break;
-    }
-
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Factory data init failed with: %s", ErrorStr(error));
-    }
-    else
-    {
-#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
-        PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
-#endif
-    }
-
-    return error;
-}
+FactoryDataProvider::~FactoryDataProvider() { }
 
 CHIP_ERROR FactoryDataProvider::Validate()
 {
@@ -177,25 +83,6 @@ CHIP_ERROR FactoryDataProvider::Validate()
 
     ReturnErrorOnFailure(Crypto::Hash_SHA256((uint8_t *)kFactoryDataPayloadStart, mHeader.size, output));
     ReturnErrorCodeIf(memcmp(output, mHeader.hash, kHashLen) != 0, CHIP_FACTORY_DATA_SHA_CHECK);
-
-    return CHIP_NO_ERROR;
-}
-
-void FactoryDataProvider::RegisterRestoreMechanism(RestoreMechanism restore)
-{
-    mRestoreMechanisms.insert(mRestoreMechanisms.end(), restore);
-}
-
-CHIP_ERROR FactoryDataProvider::UpdateData(uint8_t* pBuf)
-{
-    NV_Init();
-
-    auto status = NV_FlashEraseSector(kFactoryDataStart, kFactoryDataSize);
-    ReturnErrorCodeIf(status != kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_ERASE);
-
-    Header * header = (Header *) pBuf;
-    status          = NV_FlashProgramUnaligned(kFactoryDataStart, sizeof(Header) + header->size, pBuf);
-    ReturnErrorCodeIf(status != kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_PROGRAM);
 
     return CHIP_NO_ERROR;
 }
@@ -237,12 +124,6 @@ CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR FactoryDataProvider::SetCustomIds()
-{
-    ChipLogError(DeviceLayer, "SetCustomIds() is not implemented for default FactoryDataProvider");
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
     uint16_t declarationSize = 0;
@@ -275,29 +156,7 @@ CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByt
 
 CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
-    Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
-    Crypto::P256SerializedKeypair serializedKeypair;
-
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    /* Get private key of DAC certificate from reserved section */
-    uint8_t keyBuf[Crypto::kP256_PrivateKey_Length];
-    MutableByteSpan dacPrivateKeySpan(keyBuf);
-    uint16_t keySize = 0;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize));
-    dacPrivateKeySpan.reduce_size(keySize);
-
-    /* Only the private key is used when signing */
-    ReturnErrorOnFailure(serializedKeypair.SetLength(Crypto::kP256_PublicKey_Length + dacPrivateKeySpan.size()));
-    memcpy(serializedKeypair.Bytes() + Crypto::kP256_PublicKey_Length, dacPrivateKeySpan.data(), dacPrivateKeySpan.size());
-
-    ReturnErrorOnFailure(keypair.Deserialize(serializedKeypair));
-    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
-
-    return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
+    return SignWithDacKey(messageToSign, outSignBuffer);
 }
 
 CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)

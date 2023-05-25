@@ -79,7 +79,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
     SuccessOrExit(error = Update((uint8_t) Tags::kPaiCertificateId, mPayload.mCertPai));
     SuccessOrExit(error = Update((uint8_t) Tags::kCertDeclarationId, mPayload.mCertDeclaration));
 
-    error = FactoryProvider::GetDefaultInstance().UpdateData(mFactoryData);
+    error = FactoryProviderImpl::UpdateData(mFactoryData);
 
 exit:
     if (error != CHIP_NO_ERROR)
@@ -97,7 +97,7 @@ exit:
 CHIP_ERROR OTAFactoryDataProcessor::AbortAction()
 {
     ReturnErrorOnFailure(Restore());
-    ReturnErrorOnFailure(FactoryProvider::GetDefaultInstance().UpdateData(mFactoryData));
+    ReturnErrorOnFailure(FactoryProviderImpl::UpdateData(mFactoryData));
 
     PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
 

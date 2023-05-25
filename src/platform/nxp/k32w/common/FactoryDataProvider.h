@@ -108,21 +108,11 @@ public:
     static constexpr uint32_t kHashLen      = 4;
     static constexpr size_t kHashId         = 0xCE47BA5E;
 
-    using RestoreMechanism = CHIP_ERROR (*)(void);
-
-    static FactoryDataProvider & GetDefaultInstance();
-
 	FactoryDataProvider();
+    virtual ~FactoryDataProvider();
 
-    CHIP_ERROR Init();
-    CHIP_ERROR Validate();
-    void RegisterRestoreMechanism(RestoreMechanism mechanism);
-    CHIP_ERROR UpdateData(uint8_t * pBuf);
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length, uint32_t * offset = nullptr);
-
-    // Custom factory data providers must implement this method in order to define
-    // their own custom IDs.
-    virtual CHIP_ERROR SetCustomIds();
+    virtual CHIP_ERROR Init() = 0;
+    virtual CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) = 0;
 
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
@@ -155,9 +145,11 @@ public:
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
 
 protected:
+    CHIP_ERROR Validate();
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length, uint32_t * offset=nullptr);
+
     uint16_t maxLengths[kNumberOfIds];
     Header mHeader;
-    std::vector<RestoreMechanism> mRestoreMechanisms;
 };
 
 } // namespace DeviceLayer

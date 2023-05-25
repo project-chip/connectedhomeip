@@ -27,7 +27,7 @@
 #include "CHIPProjectConfig.h"
 
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-#include <platform/nxp/k32w/common/FactoryDataProvider.h>
+#include <platform/nxp/k32w/k32w0/FactoryDataProviderImpl.h>
 #if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
 #include "CustomFactoryDataProvider.h"
 #endif
@@ -45,7 +45,7 @@ public:
 #if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
     using FactoryDataProvider = chip::DeviceLayer::CustomFactoryDataProvider;
 #else
-    using FactoryDataProvider = chip::DeviceLayer::FactoryDataProvider;
+    using FactoryDataProvider = chip::DeviceLayer::FactoryDataProviderImpl;
 #endif
 #endif
 

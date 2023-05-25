@@ -4,24 +4,23 @@ orphan: true
 
 ## Usage of custom Factory Data Provider
 
-`FactoryDataProvider` is the default factory data provider. It implements
-three interfaces from common Matter stack:
+`FactoryDataProviderImpl` is the default factory data provider.
+It is an extension of `FactoryDataProvider` K32W common class,
+which implements the following interfaces:
 
 -   CommissionableDataProvider
 -   DeviceAttestationCredentialsProvider
 -   DeviceInstanceInfoProvider
 
-A user can inherit `FactoryDataProvider` to provide additional
-functionality (such as parsing custom factory data fields) that is customer
-specific. Additionally, each method from the above three interfaces could be
-overwritten in the custom provider, but the current platform provider
-implementation should be enough for most use cases.
+A user can inherit `FactoryDataProviderImpl` to provide additional
+functionality (such as parsing custom factory data fields) that is
+customer specific.
 
-What **MUST** be done to enable usage of a custom factory provider:
+What **shall** be done to enable usage of a custom factory provider:
 
 -   Set `use_custom_factory_provider=1`. This option is only available when
-    factory data is used (`chip_with_factory_data=1`). An assert will be raised
-    if the condition is not met.
+    factory data is used (`chip_with_factory_data=1`). An assert will be
+    raised if the condition is not met.
 -   Modify the `BUILD.gn` of the application to take into account the new files
     where the custom factory provider is implemented:
 
@@ -43,7 +42,7 @@ What **MUST** be done to enable usage of a custom factory provider:
     Note that new flags were introduced:
 
     -   `CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER`: select between using
-        `FactoryDataProvider` or `CustomFactoryDataProvider` when
+        `FactoryDataProviderImpl` or `CustomFactoryDataProvider` when
         registering the provider.
     -   `CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS`: set the number of
         custom IDs (which are different than the default IDs). If this macro is
@@ -59,4 +58,4 @@ What **MUST** be done to enable usage of a custom factory provider:
 Please refer to `CustomFactoryDataProvider` for a minimal example of a custom
 factory data provider and note that its implementation is just an example of how
 to integrate a custom provider into the application, while still using the
-default implementation provided by `FactoryDataProvider`.
+default implementation provided by `FactoryDataProviderImpl`.
