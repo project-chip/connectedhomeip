@@ -7580,6 +7580,9 @@
                   - Rugged
                   - Fabric
                   - Other
+          NetworkCommissioning:
+              WiFiBand:
+                  - 1G
           HEPAFilterMonitoring:
               ChangeIndicationEnum:
                   - OK
@@ -7713,6 +7716,9 @@
                   - High
                   - Standard
                   - Low
+          WiFiNetworkDiagnostics:
+              WiFiVersionEnum:
+                  - Ah
       bitmaps:
           AirQuality:
               - Feature
