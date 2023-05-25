@@ -131,7 +131,7 @@ tests:
                 value: 0x0001
               - name: "SceneList"
                 value: [0x03]
-              
+
 
     - label:
           "TH sends a EnhancedAddScene command to DUT with the GroupID field set
@@ -450,11 +450,11 @@ tests:
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
-          ./chip-tool scenes enhanced-view-scene GroupId SceneId Node-Id EndpointId 
+          ./chip-tool scenes enhanced-view-scene GroupId SceneId Node-Id EndpointId
 
           Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
 
-          Verify that the extension fields in the log match the ones expected and that 
+          Verify that the extension fields in the log match the ones expected and that
           Status = 0x00
           GroupID = 0x0001
           SceneID = 0x01
@@ -477,11 +477,11 @@ tests:
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
-          ./chip-tool scenes view-scene GroupId SceneId Node-Id EndpointId 
+          ./chip-tool scenes view-scene GroupId SceneId Node-Id EndpointId
 
           Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
 
-          Verify that the extension fields in the log match the ones expected and that 
+          Verify that the extension fields in the log match the ones expected and that
           Status = 0x00
           GroupID = 0x0001
           SceneID = 0x01
@@ -564,7 +564,7 @@ tests:
                 value: 0x0001
               - name: "SceneID"
                 value: 0x01
-                
+
     - label: "Wait 1s"
       PICS: PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
