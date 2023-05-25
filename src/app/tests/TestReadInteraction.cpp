@@ -1901,10 +1901,11 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
         // And attribute 3/2/4 is a list with 6 elements and list chunking is
         // applied to it, but the way the packet boundaries fall we get two of
         // its items as a single list, followed by 4 more single items for one
-        // of our subscriptions, but every item as a separate IB for the other.
+        // of our subscriptions, and 3 as a single list followed by 3 single
+        // items for the other.
         //
-        // Thus we should receive 29*2 + 4 + 6 = 68 attribute data in total.
-        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 68);
+        // Thus we should receive 29*2 + 4 + 3 = 65 attribute data in total.
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 65);
         NL_TEST_ASSERT(apSuite, delegate.mNumArrayItems == 12);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);

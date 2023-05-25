@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Project CHIP Authors
+# Copyright (c) 2020-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -146,8 +146,6 @@ if (chip_link_tests) {
 kotlin_library("tlv") {
   output_name = "libCHIPTlv.jar"
 
-  deps = [ "${chip_root}/third_party/java_deps:protobuf-java" ]
-
   sources = [
     "src/chip/tlv/Element.kt",
     "src/chip/tlv/TlvReader.kt",
@@ -204,6 +202,74 @@ kotlin_library("tlv_read_write_test") {
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
+kotlin_library("jsontlv") {
+  output_name = "libCHIPJson.jar"
+
+  deps = [
+    ":tlv",
+    "${chip_root}/third_party/java_deps:gson",
+    "${chip_root}/third_party/java_deps:protobuf-java",
+  ]
+
+  sources = [
+    "src/chip/jsontlv/JsonToTlv.kt",
+    "src/chip/jsontlv/TlvToJson.kt",
+    "src/chip/jsontlv/types.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_library("json_to_tlv_to_json_test") {
+  output_name = "JsonToTlvToJsonTest.jar"
+
+  deps = [
+    ":jsontlv",
+    "${chip_root}/third_party/java_deps:gson",
+    "${chip_root}/third_party/java_deps:junit-4",
+    "${chip_root}/third_party/java_deps:kotlin-test",
+    "${chip_root}/third_party/java_deps:truth",
+  ]
+
+  sources = [ "tests/chip/jsontlv/JsonToTlvToJsonTest.kt" ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+shared_library("jni_for_onboarding_payload") {
+  output_name = "libOnboardingPayload"
+  if (build_java_matter_controller) {
+    include_dirs = java_matter_controller_dependent_paths
+    output_dir = "${root_out_dir}/lib/jni"
+  } else {
+    output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+  }
+
+  sources = [ "OnboardingPayloadParser-JNI.cpp" ]
+
+  deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+}
+
+kotlin_library("onboarding_payload") {
+  output_name = "OnboardingPayload.jar"
+
+  data_deps = [ ":jni_for_onboarding_payload" ]
+
+  if (!build_java_matter_controller) {
+    data_deps += [ "${chip_root}/build/chip/java:shared_cpplib" ]
+  }
+
+  sources = [
+    "src/chip/onboardingpayload/DiscoveryCapability.kt",
+    "src/chip/onboardingpayload/OnboardingPayload.kt",
+    "src/chip/onboardingpayload/OnboardingPayloadParser.kt",
+    "src/chip/onboardingpayload/OptionalQRCodeInfo.kt",
+  ]
+}
+
 android_library("java") {
   output_name = "CHIPController.jar"
 
@@ -215,6 +281,7 @@ android_library("java") {
   data_deps = [ ":jni" ]
 
   sources = [
+    "generated/java/chip/devicecontroller/ClusterIDMapping.java",
     "generated/java/chip/devicecontroller/ClusterReadMapping.java",
     "generated/java/chip/devicecontroller/ClusterWriteMapping.java",
     "src/chip/clusterinfo/ClusterCommandCallback.java",

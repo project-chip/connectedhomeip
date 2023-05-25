@@ -32,11 +32,6 @@
     ],
     "templates": [
         {
-            "path": "../../zap-templates/templates/app/att-storage.zapt",
-            "name": "ZCL att-storage header",
-            "output": "att-storage.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/attribute-size.zapt",
             "name": "ZCL attribute-size header",
             "output": "attribute-size.h"

@@ -69,7 +69,7 @@ limitations under the License.
         <define>BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
-        <globalAttribute side="either" code="0xFFFD" value="1"/>
+        <globalAttribute side="either" code="0xFFFD" value="2"/>
 
         <attribute side="server" code="1"  define="VENDOR_NAME"               type="char_string"               length="32"                              optional="true">VendorName</attribute>
         <attribute side="server" code="2"  define="VENDOR_ID"                 type="vendor_id"                                                          optional="true">VendorID</attribute>

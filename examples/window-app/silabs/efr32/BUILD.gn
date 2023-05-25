@@ -19,57 +19,85 @@ import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
 import("${efr32_sdk_build_root}/silabs_executable.gni")
-
 assert(current_os == "freertos")
 
 project_dir = "${chip_root}/examples/window-app"
-efr32_project_dir = "${project_dir}/silabs/efr32"
-examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+silabs_project_dir = "${project_dir}/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
-if (chip_enable_ble_rs911x) {
-  src_plat_dir = "${chip_root}/src/platform/silabs/efr32"
+
+if (wifi_soc) {
+  import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+} else {
+  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 }
 
-import("${examples_plat_dir}/args.gni")
+import("${examples_common_plat_dir}/args.gni")
 
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
 }
 
-efr32_sdk("sdk") {
-  sources = [
-    "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_plat_dir}/FreeRTOSConfig.h",
-  ]
-
-  include_dirs = [
-    "${chip_root}/src/platform/silabs/efr32",
-    "${efr32_project_dir}/include",
-    "${examples_plat_dir}",
-    "${chip_root}/src/lib",
-    "${examples_common_plat_dir}",
-  ]
-
-  if (use_wf200) {
-    # TODO efr32_sdk should not need a header from this location
-    include_dirs += [ "${examples_plat_dir}/wf200" ]
-  }
-
-  if (chip_enable_ble_rs911x) {
-    # TODO efr32_sdk should not need a header from this location
-    include_dirs += [
-      "${src_plat_dir}/rs911x",
-      "${examples_plat_dir}/rs911x",
-      "${examples_plat_dir}/rs911x/hal",
+if (wifi_soc) {
+  siwx917_sdk("sdk") {
+    sources = [
+      "${examples_plat_dir}/FreeRTOSConfig.h",
+      "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
+
+    include_dirs = [
+      "${chip_root}/src/platform/silabs/SiWx917",
+      "${silabs_project_dir}/include",
+      "${examples_plat_dir}",
+      "${chip_root}/src/lib",
+      "${examples_common_plat_dir}",
+    ]
+
+    defines = []
+    if (chip_enable_pw_rpc) {
+      defines += [
+        "HAL_VCOM_ENABLE=1",
+        "PW_RPC_ENABLED",
+      ]
+    }
+  }
+} else {
+  efr32_sdk("sdk") {
+    sources = [
+      "${examples_plat_dir}/FreeRTOSConfig.h",
+      "${silabs_project_dir}/include/CHIPProjectConfig.h",
+    ]
+
+    include_dirs = [
+      "${chip_root}/src/platform/silabs/efr32",
+      "${silabs_project_dir}/include",
+      "${examples_plat_dir}",
+      "${chip_root}/src/lib",
+      "${examples_common_plat_dir}",
+    ]
+
+    if (use_wf200) {
+      # TODO efr32_sdk should not need a header from this location
+      include_dirs += [ "${examples_plat_dir}/wf200" ]
+    }
+
+    if (chip_enable_ble_rs911x) {
+      # TODO efr32_sdk should not need a header from this location
+      include_dirs += [
+        "${chip_root}/src/platform/silabs/efr32/rs911x",
+        "${examples_plat_dir}/rs911x",
+        "${examples_plat_dir}/rs911x/hal",
+      ]
+    }
   }
 }
 
 silabs_executable("window_app") {
-  output_name = "chip-efr32-window-example.out"
+  output_name = "matter-silabs-window-example.out"
   output_dir = root_out_dir
   include_dirs = [
     "include",
@@ -90,10 +118,14 @@ silabs_executable("window_app") {
 
   deps = [
     ":sdk",
-    "${examples_plat_dir}:efr32-common",
     app_data_model,
   ]
 
+  if (wifi_soc) {
+    deps += [ "${examples_plat_dir}:siwx917-common" ]
+  } else {
+    deps += [ "${examples_plat_dir}:efr32-common" ]
+  }
   ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
@@ -116,10 +148,10 @@ silabs_executable("window_app") {
   }
 }
 
-group("efr32") {
+group("silabs") {
   deps = [ ":window_app" ]
 }
 
 group("default") {
-  deps = [ ":efr32" ]
+  deps = [ ":silabs" ]
 }

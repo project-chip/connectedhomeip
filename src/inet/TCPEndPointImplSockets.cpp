@@ -96,39 +96,41 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
 
     if (res == CHIP_NO_ERROR)
     {
+        SockAddr sa;
+        memset(&sa, 0, sizeof(sa));
+        socklen_t sockaddrsize = 0;
+
         if (addrType == IPAddressType::kIPv6)
         {
-            struct sockaddr_in6 sa;
-            memset(&sa, 0, sizeof(sa));
-            sa.sin6_family   = AF_INET6;
-            sa.sin6_port     = htons(port);
-            sa.sin6_flowinfo = 0;
-            sa.sin6_addr     = addr.ToIPv6();
-            sa.sin6_scope_id = 0;
+            sa.in6.sin6_family   = AF_INET6;
+            sa.in6.sin6_port     = htons(port);
+            sa.in6.sin6_flowinfo = 0;
+            sa.in6.sin6_addr     = addr.ToIPv6();
+            sa.in6.sin6_scope_id = 0;
 
-            if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
-            {
-                res = CHIP_ERROR_POSIX(errno);
-            }
+            sockaddrsize = sizeof(sa.in6);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (addrType == IPAddressType::kIPv4)
         {
-            struct sockaddr_in sa;
-            memset(&sa, 0, sizeof(sa));
-            sa.sin_family = AF_INET;
-            sa.sin_port   = htons(port);
-            sa.sin_addr   = addr.ToIPv4();
+            sa.in.sin_family = AF_INET;
+            sa.in.sin_port   = htons(port);
+            sa.in.sin_addr   = addr.ToIPv4();
 
-            if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
-            {
-                res = CHIP_ERROR_POSIX(errno);
-            }
+            sockaddrsize = sizeof(sa.in);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
         else
         {
             res = INET_ERROR_WRONG_ADDRESS_TYPE;
+        }
+
+        if (res == CHIP_NO_ERROR)
+        {
+            if (bind(mSocket, &sa.any, sockaddrsize) != 0)
+            {
+                res = CHIP_ERROR_POSIX(errno);
+            }
         }
     }
 
@@ -218,8 +220,7 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
     int flags = fcntl(mSocket, F_GETFL, 0);
     fcntl(mSocket, F_SETFL, flags | O_NONBLOCK);
 
-    socklen_t sockaddrsize       = 0;
-    const sockaddr * sockaddrptr = nullptr;
+    socklen_t sockaddrsize = 0;
 
     SockAddr sa;
     memset(&sa, 0, sizeof(sa));
@@ -232,7 +233,6 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
         sa.in6.sin6_addr     = addr.ToIPv6();
         sa.in6.sin6_scope_id = intfId.GetPlatformInterface();
         sockaddrsize         = sizeof(sockaddr_in6);
-        sockaddrptr          = reinterpret_cast<const sockaddr *>(&sa.in6);
     }
 #if INET_CONFIG_ENABLE_IPV4
     else if (addrType == IPAddressType::kIPv4)
@@ -241,7 +241,6 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
         sa.in.sin_port   = htons(port);
         sa.in.sin_addr   = addr.ToIPv4();
         sockaddrsize     = sizeof(sockaddr_in);
-        sockaddrptr      = reinterpret_cast<const sockaddr *>(&sa.in);
     }
 #endif // INET_CONFIG_ENABLE_IPV4
     else
@@ -249,7 +248,7 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
         return INET_ERROR_WRONG_ADDRESS_TYPE;
     }
 
-    int conRes = connect(mSocket, sockaddrptr, sockaddrsize);
+    int conRes = connect(mSocket, &sa.any, sockaddrsize);
 
     if (conRes == -1 && errno != EINPROGRESS)
     {

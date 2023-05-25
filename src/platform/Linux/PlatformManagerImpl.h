@@ -72,6 +72,12 @@ public:
         return _GLibMatterContextInvokeSync((CHIP_ERROR(*)(void *)) func, (void *) userData);
     }
 
+    unsigned int GLibMatterContextAttachSource(GSource * source)
+    {
+        VerifyOrDie(mGLibMainLoop != nullptr);
+        return g_source_attach(source, g_main_loop_get_context(mGLibMainLoop));
+    }
+
 #endif
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
@@ -121,8 +127,8 @@ private:
     //      event loop thread before the call to g_source_attach().
     std::mutex mGLibMainLoopCallbackIndirectionMutex;
 
-    GMainLoop * mGLibMainLoop;
-    GThread * mGLibMainLoopThread;
+    GMainLoop * mGLibMainLoop     = nullptr;
+    GThread * mGLibMainLoopThread = nullptr;
 
 #endif // CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 };

@@ -147,19 +147,19 @@ tests:
       verification: |
           To perform an OTA update on Thread device follow the cmmds below:
 
-          Step-1 : Where we builded OTA provider app execute this cmmd . (In my case I ran connectedhomeip/out/debug ./chip-ota-provider-app -f  )
+          Step-1 : Where we builded OTA provider app execute this cmmd . (In my case I ran connectedhomeip/out/debug ./chip-otaprovider-app -f  )
 
-          ./chip-ota-provider-app -f ~/chip_repos/connectedhomeip/examples/all-clusters-app/nrfconnect/build2/zephyr/matter.ota
+          ./chip-otaprovider-app -f ~/chip_repos/connectedhomeip/examples/all-clusters-app/nrfconnect/build2/zephyr/matter.ota
 
           Ran on chip-tool:
 
           Step-2: ./chip-tool pairing onnetwork 2 20202021
 
-          Step-3 : ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]" 2 0
+          Step-3 : ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 2 0
 
-          Step-4: ./chip-tool otasoftwareupdaterequestor write default-ota-providers "[{"fabricIndex": 1, "providerNodeID": 2, "endpoint": 0}]" 1 0
+          Step-4: ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 2, "endpoint": 0}]' 1 0
 
-          Step-5: ./chip-tool otasoftwareupdaterequestor announce-ota-provider 2 0 0 0 1 0
+          Step-5: ./chip-tool otasoftwareupdaterequestor announce-otaprovider 2 0 0 0 1 0
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"

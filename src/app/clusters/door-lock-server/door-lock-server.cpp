@@ -453,6 +453,20 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
         return;
     }
 
+    Commands::GetUserResponse::Type response;
+
+    // appclusters, 5.2.4.36.1: We need to add next occupied user after userIndex if any.
+    //
+    // We want to do this before we call emberAfPluginDoorLockGetUser, because this will
+    // make its own emberAfPluginDoorLockGetUser calls, and a
+    // EmberAfPluginDoorLockUserInfo might be pointing into some application-static
+    // buffers (for its credentials and whatnot).
+    uint16_t nextAvailableUserIndex = 0;
+    if (findOccupiedUserSlot(commandPath.mEndpointId, static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
+    {
+        response.nextUserIndex.SetNonNull(nextAvailableUserIndex);
+    }
+
     EmberAfPluginDoorLockUserInfo user;
     if (!emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user))
     {
@@ -461,7 +475,6 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
         return;
     }
 
-    Commands::GetUserResponse::Type response;
     response.userIndex = userIndex;
 
     // appclusters, 5.2.4.36: we should not set user-specific fields to non-null if the user status is set to Available
@@ -498,12 +511,6 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
         emberAfDoorLockClusterPrintln("[GetUser] User not found [userIndex=%d]", userIndex);
     }
 
-    // appclusters, 5.2.4.36.1: We need to add next occupied user after userIndex if any.
-    uint16_t nextAvailableUserIndex = 0;
-    if (findOccupiedUserSlot(commandPath.mEndpointId, static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
-    {
-        response.nextUserIndex.SetNonNull(nextAvailableUserIndex);
-    }
     commandObj->AddResponse(commandPath, response);
 }
 
@@ -1306,9 +1313,9 @@ void DoorLockServer::clearYearDayScheduleCommandHandler(chip::app::CommandHandle
     commandObj->AddStatus(commandPath, Status::Success);
 }
 
-chip::BitFlags<DoorLockFeature> DoorLockServer::GetFeatures(chip::EndpointId endpointId)
+chip::BitFlags<Feature> DoorLockServer::GetFeatures(chip::EndpointId endpointId)
 {
-    chip::BitFlags<DoorLockFeature> featureMap;
+    chip::BitFlags<Feature> featureMap;
     if (!GetAttribute(endpointId, Attributes::FeatureMap::Id, Attributes::FeatureMap::Get, *featureMap.RawStorage()))
     {
         ChipLogError(Zcl, "Unable to get the door lock feature map: attribute read error");
@@ -1360,18 +1367,29 @@ chip::FabricIndex DoorLockServer::getFabricIndex(const chip::app::CommandHandler
 
 chip::NodeId DoorLockServer::getNodeId(const chip::app::CommandHandler * commandObj)
 {
+    // TODO: Why are we doing all these checks?  At all the callsites we have
+    // just received a command, so we better have a handler, exchange, session,
+    // etc.  The only thing we should be checking is that it's a CASE session.
     if (nullptr == commandObj || nullptr == commandObj->GetExchangeContext())
     {
         ChipLogError(Zcl, "Cannot access ExchangeContext of Command Object for Node ID");
         return kUndefinedNodeId;
     }
 
-    auto secureSession = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
-    if (nullptr == secureSession)
+    if (!commandObj->GetExchangeContext()->HasSessionHandle())
     {
-        ChipLogError(Zcl, "Cannot access Secure session handle of Command Object for Node ID");
+        ChipLogError(Zcl, "Cannot access session of Command Object for Node ID");
+        return kUndefinedNodeId;
     }
-    return secureSession->GetPeerNodeId();
+
+    auto descriptor = commandObj->GetExchangeContext()->GetSessionHandle()->GetSubjectDescriptor();
+    if (descriptor.authMode != Access::AuthMode::kCase)
+    {
+        ChipLogError(Zcl, "Cannot get Node ID from non-CASE session of Command Object");
+        return kUndefinedNodeId;
+    }
+
+    return descriptor.subject;
 }
 
 bool DoorLockServer::userIndexValid(chip::EndpointId endpointId, uint16_t userIndex)

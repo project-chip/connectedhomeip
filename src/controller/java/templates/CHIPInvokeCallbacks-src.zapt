@@ -14,7 +14,7 @@
 
 namespace chip {
 
-{{#all_user_clusters}}
+{{#zcl_clusters}}
    {{#zcl_commands_source_server}}
 CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback::CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(jobject javaCallback): Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackType>(CallbackFn, this)
 {
@@ -70,5 +70,5 @@ void CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callbac
     env->CallVoidMethod(javaCallbackRef, javaMethod{{#zcl_command_arguments}}, {{asSymbol label}}{{/zcl_command_arguments}});
 }
    {{/zcl_commands_source_server}}
-{{/all_user_clusters}}
+{{/zcl_clusters}}
 } // namespace chip

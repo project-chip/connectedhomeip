@@ -28,9 +28,9 @@ tizen_qemu_mkisofs("test-runner") {
 
   # Use artifacts created by the dependencies.
   assets = [
-    rebase_path("${root_build_dir}/chip-tool"),
+    rebase_path("${root_out_dir}/chip-tool"),
     rebase_path(
-        "${root_build_dir}/org.tizen.matter.example.lighting/out/org.tizen.matter.example.lighting-1.0.0.tpk"),
+        "${root_out_dir}/org.tizen.matter.example.lighting/out/org.tizen.matter.example.lighting-1.0.0.tpk"),
   ]
 }
 

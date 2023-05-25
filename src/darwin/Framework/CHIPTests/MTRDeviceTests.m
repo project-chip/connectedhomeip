@@ -293,6 +293,19 @@ static BOOL sNeedsStackShutdown = YES;
                                           XCTAssertNil(result[@"error"]);
                                           XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
                                           XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Array"]);
+
+                                          __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:result
+                                                                                                             error:nil];
+                                          XCTAssertNotNil(report);
+                                          XCTAssertEqualObjects(report.path.cluster, @(29));
+                                          XCTAssertEqualObjects(report.path.attribute, @(0));
+                                          XCTAssertNil(report.error);
+                                          XCTAssertNotNil(report.value);
+                                          XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+
+                                          for (id entry in report.value) {
+                                              XCTAssertTrue([entry isKindOfClass:[MTRDescriptorClusterDeviceTypeStruct class]]);
+                                          }
                                       }
                                       XCTAssertTrue([resultArray count] > 0);
                                   }
@@ -465,16 +478,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
         NSDictionary * result = values[0];
+
+        __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:result error:nil];
+        XCTAssertNotNil(report);
+        XCTAssertEqualObjects(report.path.endpoint, @(1));
+        XCTAssertEqualObjects(report.path.cluster, @(6));
+        XCTAssertEqualObjects(report.path.attribute, @(0));
+        XCTAssertNil(report.error);
+        XCTAssertNotNil(report.value);
+        XCTAssertEqualObjects(report.value, @(YES));
+
         MTRAttributePath * path = result[@"attributePath"];
         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
         XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
         XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
         XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
-        if ([result[@"data"][@"value"] boolValue] == YES) {
-            [reportExpectation fulfill];
-            globalReportHandler = nil;
-        }
+        XCTAssertTrue([result[@"data"][@"value"] boolValue]);
+        [reportExpectation fulfill];
+        globalReportHandler = nil;
     };
 
     // Send commands to trigger attribute change
@@ -517,16 +539,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
         NSDictionary * result = values[0];
+
+        __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:result error:nil];
+        XCTAssertNotNil(report);
+        XCTAssertEqualObjects(report.path.endpoint, @(1));
+        XCTAssertEqualObjects(report.path.cluster, @(6));
+        XCTAssertEqualObjects(report.path.attribute, @(0));
+        XCTAssertNil(report.error);
+        XCTAssertNotNil(report.value);
+        XCTAssertEqualObjects(report.value, @(NO));
+
         MTRAttributePath * path = result[@"attributePath"];
         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
         XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
         XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
         XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
-        if ([result[@"data"][@"value"] boolValue] == NO) {
-            [reportExpectation fulfill];
-            globalReportHandler = nil;
-        }
+        XCTAssertFalse([result[@"data"][@"value"] boolValue]);
+        [reportExpectation fulfill];
+        globalReportHandler = nil;
     };
 
     // Send command to trigger attribute change
@@ -591,6 +622,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                       NSArray * resultArray = values;
                                       XCTAssertEqual([resultArray count], 1);
                                       NSDictionary * result = resultArray[0];
+
+                                      __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:result error:nil];
+                                      XCTAssertNotNil(report);
+                                      XCTAssertEqualObjects(report.path.endpoint, @(0));
+                                      XCTAssertEqualObjects(report.path.cluster, @(10000));
+                                      XCTAssertEqualObjects(report.path.attribute, @(0));
+                                      XCTAssertNotNil(report.error);
+                                      XCTAssertNil(report.value);
+                                      XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:report.error],
+                                          EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
 
                                       MTRAttributePath * path = result[@"attributePath"];
                                       XCTAssertEqual(path.endpoint.unsignedIntegerValue, 0);
@@ -925,6 +966,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               NSLog(@"Read attribute cache value: %@, error %@", values, error);
                               XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
                               XCTAssertEqual([values count], 1);
+
+                              __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:values[0] error:nil];
+                              XCTAssertNotNil(report);
+                              XCTAssertEqualObjects(report.path.endpoint, @(1));
+                              XCTAssertEqualObjects(report.path.cluster, @(6));
+                              XCTAssertEqualObjects(report.path.attribute, @(0));
+                              XCTAssertNil(report.error);
+                              XCTAssertNotNil(report.value);
+                              XCTAssertEqualObjects(report.value, @(NO));
+
                               MTRAttributePath * path = values[0][@"attributePath"];
                               XCTAssertEqual([path.endpoint unsignedShortValue], 1);
                               XCTAssertEqual([path.cluster unsignedLongValue], 6);
@@ -950,6 +1001,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
                               XCTAssertTrue([values count] > 0);
                               for (NSDictionary<NSString *, id> * value in values) {
+                                  __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:value error:nil];
+                                  XCTAssertNotNil(report);
+                                  XCTAssertEqualObjects(report.path.cluster, @(6));
+                                  XCTAssertEqualObjects(report.path.attribute, @(0));
+                                  XCTAssertNil(report.error);
+                                  XCTAssertNotNil(report.value);
+                                  XCTAssertTrue([report.value isKindOfClass:[NSNumber class]]);
+
                                   MTRAttributePath * path = value[@"attributePath"];
                                   XCTAssertEqual([path.cluster unsignedLongValue], 6);
                                   XCTAssertEqual([path.attribute unsignedLongValue], 0);
@@ -1212,6 +1271,17 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      };
                                      XCTAssertEqualObjects(result[MTRDataKey], expectedResult);
                                      XCTAssertNil(result[MTRErrorKey]);
+
+                                     // Now check our strong-typed parsing bits.
+                                     NSError * parseError;
+                                     __auto_type * response =
+                                         [[MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams alloc]
+                                             initWithResponseValue:result
+                                                             error:&parseError];
+                                     XCTAssertNil(parseError);
+                                     XCTAssertNotNil(response);
+                                     XCTAssertEqual(response.groupKeySetIDs.count, 1);
+                                     XCTAssertEqualObjects(response.groupKeySetIDs[0], @(0));
                                  }
                                  XCTAssertEqual([resultArray count], 1);
                              }
@@ -1436,6 +1506,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // nonexistent attribute
     [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation ] timeout:5 enforceOrder:YES];
 
+    // Test if errors are properly received
+    XCTestExpectation * attributeReportErrorExpectation = [self expectationWithDescription:@"Attribute read error"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
+            if (attributeReponseValue[MTRErrorKey]) {
+                [attributeReportErrorExpectation fulfill];
+            }
+        }
+    };
+    // use the nonexistent attribute and expect read error
+    [device readAttributeWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID params:nil];
+    [self waitForExpectations:@[ attributeReportErrorExpectation ] timeout:10];
+
     // reset the onAttributeDataReceived to validate the following resubscribe test
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
         attributeReportsReceived += data.count;
@@ -1460,7 +1543,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                          subscriptionEstablished:^() {
                          }];
 
-    [self waitForExpectations:@[ subscriptionDroppedExpectation, resubscriptionExpectation ] timeout:60 enforceOrder:YES];
+    [self waitForExpectations:@[ subscriptionDroppedExpectation ] timeout:60];
+
+    // Check that device resets start time on subscription drop
+    XCTAssertNil(device.estimatedStartTime);
+
+    [self waitForExpectations:@[ resubscriptionExpectation ] timeout:60];
 
     // Now make sure we ignore later tests.  Ideally we would just unsubscribe
     // or remove the delegate, but there's no good way to do that.
@@ -1474,9 +1562,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // with data versions) during the resubscribe.
     XCTAssertEqual(attributeReportsReceived, 0);
     XCTAssertEqual(eventReportsReceived, 0);
-
-    // Check that device resets start time on subscription drop
-    XCTAssertNil(device.estimatedStartTime);
 }
 
 - (void)test018_SubscriptionErrorWhenNotResubscribing
@@ -1635,8 +1720,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@7]
     ];
 
-    NSArray<MTREventRequestPath *> * eventPaths =
-        [NSArray arrayWithObjects:[MTREventRequestPath requestPathWithEndpointID:nil clusterID:@40 eventID:@0], nil];
+    NSArray<MTREventRequestPath *> * eventPaths = @[ [MTREventRequestPath requestPathWithEndpointID:nil clusterID:@40 eventID:@0] ];
 
     [device readAttributePaths:attributePaths
                     eventPaths:eventPaths
@@ -1655,6 +1739,21 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                         for (NSDictionary * result in resultArray) {
                             if ([result objectForKey:@"eventPath"]) {
                                 ++eventResultCount;
+
+                                __auto_type * report = [[MTREventReport alloc] initWithResponseValue:result error:nil];
+                                XCTAssertNotNil(report);
+                                XCTAssertNotNil(report.path);
+                                XCTAssertEqualObjects(report.path.endpoint, @(0));
+                                XCTAssertEqualObjects(report.path.cluster, @(40));
+                                XCTAssertEqualObjects(report.path.event, @(0));
+                                XCTAssertNotNil(report.eventNumber);
+                                XCTAssertEqualObjects(report.priority, @(MTREventPriorityCritical));
+                                XCTAssertEqual(report.eventTimeType, MTREventTimeTypeTimestampDate);
+                                XCTAssertNotNil(report.timestampDate);
+                                XCTAssertNotNil(report.value);
+                                XCTAssertTrue([report.value isKindOfClass:[MTRBasicInformationClusterStartUpEvent class]]);
+                                XCTAssertNil(report.error);
+
                                 MTREventPath * path = result[@"eventPath"];
                                 XCTAssertEqualObjects(path.endpoint, @0);
                                 XCTAssertEqualObjects(path.cluster, @40);
@@ -1682,6 +1781,62 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                 }
                             } else if ([result objectForKey:@"attributePath"]) {
                                 ++attributeResultCount;
+
+                                __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:result error:nil];
+                                XCTAssertNotNil(report);
+                                XCTAssertNil(report.error);
+                                XCTAssertNotNil(report.value);
+                                switch ([report.path.attribute unsignedLongValue]) {
+                                case 0:
+                                    XCTAssertEqualObjects(report.path.cluster, @29);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+                                    for (id entry in report.value) {
+                                        XCTAssertTrue([entry isKindOfClass:[MTRDescriptorClusterDeviceTypeStruct class]]);
+                                    }
+                                    break;
+                                case 1:
+                                    XCTAssertEqualObjects(report.path.cluster, @29);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+                                    for (id entry in report.value) {
+                                        XCTAssertTrue([entry isKindOfClass:[NSNumber class]]);
+                                    }
+                                    break;
+                                case 2:
+                                    XCTAssertEqualObjects(report.path.cluster, @29);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+                                    for (id entry in report.value) {
+                                        XCTAssertTrue([entry isKindOfClass:[NSNumber class]]);
+                                    }
+                                    break;
+                                case 3:
+                                    XCTAssertEqualObjects(report.path.cluster, @29);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+                                    for (id entry in report.value) {
+                                        XCTAssertTrue([entry isKindOfClass:[NSNumber class]]);
+                                    }
+                                    break;
+                                case 4:
+                                    XCTAssertEqualObjects(report.path.cluster, @40);
+                                    XCTAssertEqualObjects(report.path.endpoint, @0);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSNumber class]]);
+                                    break;
+                                case 5:
+                                    XCTAssertEqualObjects(report.path.cluster, @40);
+                                    XCTAssertEqualObjects(report.path.endpoint, @0);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSString class]]);
+                                    break;
+                                case 6:
+                                    XCTAssertEqualObjects(report.path.cluster, @40);
+                                    XCTAssertEqualObjects(report.path.endpoint, @0);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSString class]]);
+                                    break;
+                                case 7:
+                                    XCTAssertEqualObjects(report.path.cluster, @40);
+                                    XCTAssertEqualObjects(report.path.endpoint, @0);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSNumber class]]);
+                                    break;
+                                }
+
                                 MTRAttributePath * path = result[@"attributePath"];
                                 if ([path.attribute unsignedIntegerValue] < 4) {
                                     XCTAssertEqualObjects(path.cluster, @29);

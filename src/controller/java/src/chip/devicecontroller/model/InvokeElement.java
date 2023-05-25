@@ -119,7 +119,7 @@ public final class InvokeElement {
 
   /** Create a new {@link InvokeElement} with only concrete ids. */
   public static InvokeElement newInstance(
-      long endpointId,
+      int endpointId,
       long clusterId,
       long commandId,
       @Nullable byte[] tlv,

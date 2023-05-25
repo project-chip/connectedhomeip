@@ -29,6 +29,7 @@ declare_args() {
   chip_bt_bluedroid_enabled = false
   chip_enable_ble_controller = false
   chip_use_secure_cert_dac_provider = false
+  chip_use_esp32_ecdsa_peripheral = false
 }
 
 defines = [
@@ -90,6 +91,10 @@ static_library("ESP32") {
     ]
   }
 
+  if (chip_enable_ble_controller) {
+    sources += [ "ChipDeviceScanner.h" ]
+  }
+
   if (chip_bt_nimble_enabled) {
     sources += [ "nimble/BLEManagerImpl.cpp" ]
     if (chip_enable_ble_controller) {
@@ -121,15 +126,18 @@ static_library("ESP32") {
     ]
     if (chip_mdns == "platform") {
       sources += [
-        "DnssdImpl.cpp",
-        "DnssdImpl.h",
+        "WiFiDnssdImpl.cpp",
+        "WiFiDnssdImpl.h",
       ]
     }
   }
 
+  if (chip_mdns == "platform") {
+    sources += [ "DnssdImpl.cpp" ]
+  }
+
   if (chip_enable_openthread) {
     sources += [
-      "../OpenThread/DnssdImpl.cpp",
       "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
       "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
       "../OpenThread/OpenThreadUtils.cpp",
@@ -139,6 +147,12 @@ static_library("ESP32") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    if (chip_mdns == "platform") {
+      sources += [
+        "../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.h",
+      ]
+    }
     configs -= [ "${chip_root}/build/config/compiler:warnings_default" ]
   }
 
@@ -160,6 +174,13 @@ static_library("ESP32") {
     sources += [
       "ESP32SecureCertDACProvider.cpp",
       "ESP32SecureCertDACProvider.h",
+    ]
+  }
+
+  if (chip_use_esp32_ecdsa_peripheral) {
+    sources += [
+      "ESP32CHIPCryptoPAL.cpp",
+      "ESP32CHIPCryptoPAL.h",
     ]
   }
 
