@@ -60,6 +60,14 @@ config CHIP_OTA_IMAGE_BUILD
 	bool
 	default y if CHIP_OTA_REQUESTOR
 
+config CHIP_ROTATING_DEVICE_ID
+	bool "Generate rotating device ID"
+	default y
+	help
+	  Enables the rotating device identifier that provides a non-trackable
+	  identifier. The identifier is unique per device and rotates at pre-defined
+	  moments.
+
 config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 	bool "Include default device information provider build"
 	default y

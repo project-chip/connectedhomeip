@@ -152,11 +152,11 @@ tests:
                     {
                         GroupKeySetID: 0x01a3,
                         GroupKeySecurityPolicy: 0,
-                        EpochKey0: "0x00000000000000000000000000000001",
+                        EpochKey0: "hex:00000000000000000000000000000001",
                         EpochStartTime0: 111,
-                        EpochKey1: "0x00000000000000000000000000000002",
+                        EpochKey1: "hex:00000000000000000000000000000002",
                         EpochStartTime1: 222,
-                        EpochKey2: "0x00000000000000000000000000000003",
+                        EpochKey2: "hex:00000000000000000000000000000003",
                         EpochStartTime2: 333,
                     }
 
@@ -217,11 +217,11 @@ tests:
                     {
                         GroupKeySetID: 0x01a3,
                         GroupKeySecurityPolicy: 0,
-                        EpochKey0: "0xd0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime0: 2220000,
-                        EpochKey1: "0xd1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime1: 2220001,
-                        EpochKey2: "0xd2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 2220002,
                     }
 
