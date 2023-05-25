@@ -42,7 +42,7 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: " !MEDIAPLAYBACK.S.AS && !MEDIAPLAYBACK.S.VS "
+      PICS: " !MEDIAPLAYBACK.S.F00 && !MEDIAPLAYBACK.S.F01 "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -51,8 +51,9 @@ tests:
               type: bitmap32
 
     - label:
-          "Given MEDIAPLAYBACK.S.AS ensure featuremap has the correct bit set"
-      PICS: MEDIAPLAYBACK.S.AS
+          "Given MEDIAPLAYBACK.S.F00(AS) ensure featuremap has the correct bit
+          set"
+      PICS: MEDIAPLAYBACK.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -61,8 +62,9 @@ tests:
               hasMasksSet: [0x1]
 
     - label:
-          "Given MEDIAPLAYBACK.S.VS ensure featuremap has the correct bit set"
-      PICS: MEDIAPLAYBACK.S.VS
+          "Given MEDIAPLAYBACK.S.F01(VS) ensure featuremap has the correct bit
+          set"
+      PICS: MEDIAPLAYBACK.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
       response:

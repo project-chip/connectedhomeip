@@ -18,7 +18,7 @@ name:
     Verification (DUT as Server)
 
 PICS:
-    - MC.S.UDCLOGIN
+    - MC.S.M.UDCLOGIN
 
 config:
     nodeId: 0x12344321

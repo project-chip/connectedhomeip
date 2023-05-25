@@ -19,8 +19,8 @@
 #include "MediaCommandBase.h"
 #include "MediaSubscriptionBase.h"
 
+#include <controller/CHIPCluster.h>
 #include <functional>
-#include <zap-generated/CHIPClusters.h>
 
 // COMMAND CLASSES
 class NavigateTargetCommand
