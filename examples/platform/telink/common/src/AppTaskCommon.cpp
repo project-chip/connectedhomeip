@@ -285,6 +285,11 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 #endif
 
     // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs
+    // The OpenThread thread is running during factory reset. The nvs_clear function is called during
+    // factory reset, which makes the NVS storage innaccessible, but the OpenThread knows nothing
+    // about this and tries to store the parameters to NVS. Because of this the OpenThread need to be
+    // shut down before NVS. This delegate fixes the issue "Failed to store setting , ret -13",
+    // which means that the NVS is already disabled.
     // For this the OnShutdown function is used
     PlatformMgr().SetDelegate(new PlatformMgrDelegate);
 
