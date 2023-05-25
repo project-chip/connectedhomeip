@@ -15,11 +15,16 @@ import com.google.chip.chiptool.databinding.OpCredClientFragmentBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-import chip.devicecontroller.ClusterIDMapping.*
+import chip.devicecontroller.ClusterIDMapping.OperationalCredentials
+import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
+import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
+import chip.tlv.AnonymousTag
+import chip.tlv.ContextSpecificTag
+import chip.tlv.TlvWriter
 
 class OpCredClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -47,6 +52,8 @@ class OpCredClientFragment : Fragment() {
 
     binding.readSupportedFabricBtn.setOnClickListener { scope.launch { readClusterAttribute(OperationalCredentials.Attribute.SupportedFabrics) } }
     binding.readCommissionedFabricBtn.setOnClickListener { scope.launch { readClusterAttribute(OperationalCredentials.Attribute.CommissionedFabrics) } }
+    binding.readFabricsBtn.setOnClickListener { scope.launch { readClusterAttribute(OperationalCredentials.Attribute.Fabrics) } }
+    binding.removeFabricsBtn.setOnClickListener { scope.launch { sendRemoveFabricsBtnClick(binding.fabricIndexEd.text.toString().toUInt()) } }
 
     return binding.root
   }
@@ -97,6 +104,32 @@ class OpCredClientFragment : Fragment() {
       }
 
     }, devicePtr, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), null, false, 0 /* imTimeoutMs */)
+  }
+
+  private suspend fun sendRemoveFabricsBtnClick(fabricIndex: UInt) {
+    val devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+    // TODO : Need to be implement poj-to-tlv
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+    tlvWriter.put(ContextSpecificTag(OperationalCredentials.RemoveFabricCommandField.FabricIndex.id), fabricIndex)
+    tlvWriter.endStructure()
+    val invokeElement = InvokeElement.newInstance(addressUpdateFragment.endpointId
+            , OperationalCredentials.ID
+            , OperationalCredentials.Command.RemoveFabric.id
+            , tlvWriter.getEncoded(), null)
+
+    deviceController.invoke(object: InvokeCallback {
+      override fun onError(ex: Exception?) {
+        showMessage("RemoveFabric failure $ex")
+        Log.e(TAG, "RemoveFabric failure", ex)
+      }
+
+      override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+        Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
+        showMessage("RemoveFabric success")
+      }
+
+    }, devicePtr, invokeElement, 0, 0)
   }
 
   private fun showMessage(msg: String) {
