@@ -4117,7 +4117,7 @@ PICS:
     - label:
           "Does the DUT support the Content Launcher server cluster, Content
           Search feature?"
-      id: CONTENTLAUNCHER.S.CS
+      id: CONTENTLAUNCHER.S.F00
 
     #
     # server / attributes
@@ -4125,12 +4125,12 @@ PICS:
     - label:
           "Does the DUT support the Application Launcher server cluster,
           Application Platform feature?"
-      id: APPLAUNCHER.S.AP
+      id: APPLAUNCHER.S.F00
 
     - label:
           "Does the DUT support the Media Playback server cluster, Advanced Seek
           feature?"
-      id: MEDIAPLAYBACK.S.AS
+      id: MEDIAPLAYBACK.S.F00
 
     - label:
           "Does the DUT support the Wake On LAN server cluster, MACAddress
@@ -4431,44 +4431,44 @@ PICS:
     - label:
           "Does the DUT support the Keypad Input server cluster, Navigation
           Keys?"
-      id: KEYPADINPUT.S.NV
+      id: KEYPADINPUT.S.F00
 
     - label:
           "Does the DUT support the Keypad Input server cluster, Location Keys?"
-      id: KEYPADINPUT.S.LK
+      id: KEYPADINPUT.S.F01
 
     - label:
           "Does the DUT support the Keypad Input server cluster, Number Keys?"
-      id: KEYPADINPUT.S.NK
+      id: KEYPADINPUT.S.F02
 
     - label:
           "Does the DUT support the Media Input server cluster, Name Updates
           feature?"
-      id: MEDIAINPUT.S.NU
+      id: MEDIAINPUT.S.F00
 
     - label:
           "Does the DUT support the Channel server cluster, Channel List
           feature?"
-      id: CHANNEL.S.CL
+      id: CHANNEL.S.F00
 
     - label:
           "Does the DUT support the Channel server cluster, Lineup Info feature?"
-      id: CHANNEL.S.LI
+      id: CHANNEL.S.F01
 
     - label:
           "Does the DUT support the Media Playback server cluster, Variable
           Speed feature?"
-      id: MEDIAPLAYBACK.S.VS
+      id: MEDIAPLAYBACK.S.F01
 
     - label:
           "Does the DUT support the Audio Ouput server cluster, Name Updates
           feature?"
-      id: AUDIOOUTPUT.S.NU
+      id: AUDIOOUTPUT.S.F00
 
     - label:
           "Does the DUT support the Content Launcher server cluster, URL
           Playback feature?"
-      id: CONTENTLAUNCHER.S.UP
+      id: CONTENTLAUNCHER.S.F01
 
     - label:
           "Does the DUT support the Content Launcher server cluster and is
@@ -4478,12 +4478,12 @@ PICS:
     - label:
           "Does the DUT support the commissioning procedure initiated by a
           commissionee using User Directed Commissioning?"
-      id: MC.S.UDC
+      id: MC.S.M.UDC
 
     - label:
           "Does the DUT support the commissioning procedure initiated by a
           commissionee using User Directed Commissioning without PIN code entry?"
-      id: MC.S.UDCLOGIN
+      id: MC.S.M.UDCLOGIN
 
     #
     # client / commandsGenerated

@@ -255,8 +255,7 @@ void CastingServer::ReadServerClusters(EndpointId endpointId)
     }
 
     // GetOperationalDeviceProxy only passes us a deviceProxy if we can get a SessionHandle.
-    chip::Controller::DescriptorCluster cluster(*deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(),
-                                                endpointId);
+    chip::Controller::ClusterBase cluster(*deviceProxy->GetExchangeManager(), deviceProxy->GetSecureSession().Value(), endpointId);
 
     TargetEndpointInfo * endpointInfo = mActiveTargetVideoPlayerInfo.GetOrAddEndpoint(endpointId);
 

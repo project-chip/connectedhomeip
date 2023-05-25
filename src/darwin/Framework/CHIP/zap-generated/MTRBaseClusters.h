@@ -24619,6 +24619,7 @@ typedef NS_OPTIONS(uint32_t, MTRThermostatFeature) {
     MTRThermostatFeatureAutomode MTR_DEPRECATED(
         "Please use MTRThermostatFeatureAutoMode", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x20,
+    MTRThermostatFeatureLocalTemperatureNotExposed MTR_NEWLY_AVAILABLE = 0x40,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTRThermostatModeForSequence) {
