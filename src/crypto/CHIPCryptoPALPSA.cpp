@@ -1773,7 +1773,7 @@ CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certif
     dn.reduce_size(len);
 
 exit:
-    _log_mbedTLS_error(result);
+    logMbedTLSError(result);
     mbedtls_x509_crt_free(&mbedCertificate);
 
 #else

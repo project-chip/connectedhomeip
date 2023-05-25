@@ -185,7 +185,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAccessControlClusterTarget
+@implementation MTRAccessControlClusterAccessControlTargetStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -201,7 +201,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRAccessControlClusterTarget alloc] init];
+    auto other = [[MTRAccessControlClusterAccessControlTargetStruct alloc] init];
 
     other.cluster = self.cluster;
     other.endpoint = self.endpoint;
@@ -217,6 +217,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRAccessControlClusterTarget : MTRAccessControlClusterAccessControlTargetStruct
 @end
 
 @implementation MTRAccessControlClusterAccessControlEntryStruct

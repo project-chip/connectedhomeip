@@ -467,6 +467,14 @@ void pychip_ReadClient_OverrideLivenessTimeout(ReadClient * pReadClient, uint32_
     pReadClient->OverrideLivenessTimeout(System::Clock::Milliseconds32(livenessTimeoutMs));
 }
 
+PyChipError pychip_ReadClient_GetReportingIntervals(ReadClient * pReadClient, uint16_t * minIntervalSec, uint16_t * maxIntervalSec)
+{
+    VerifyOrDie(pReadClient != nullptr);
+    CHIP_ERROR err = pReadClient->GetReportingIntervals(*minIntervalSec, *maxIntervalSec);
+
+    return ToPyChipError(err);
+}
+
 PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
                                    DeviceProxy * device, uint8_t * readParamsBuf, size_t numAttributePaths,
                                    size_t numDataversionFilters, size_t numEventPaths, uint64_t * eventNumberFilter, ...)

@@ -181,7 +181,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
             Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
             commandObj->GetSubjectDescriptor().authMode == Access::AuthMode::kCase)
         {
-            response.errorCode = CommissioningError::kBusyWithOtherAdmin;
+            response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
             commandObj->AddResponse(commandPath, response);
         }
         else if (commandData.expiryLengthSeconds == 0)
@@ -190,7 +190,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
             failSafeContext.ForceFailSafeTimerExpiry();
             // Don't set the breadcrumb, since expiring the failsafe should
             // reset it anyway.
-            response.errorCode = CommissioningError::kOk;
+            response.errorCode = CommissioningErrorEnum::kOk;
             commandObj->AddResponse(commandPath, response);
         }
         else
@@ -199,13 +199,13 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                 failSafeContext.ArmFailSafe(accessingFabricIndex, System::Clock::Seconds16(commandData.expiryLengthSeconds)),
                 Failure);
             Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
-            response.errorCode = CommissioningError::kOk;
+            response.errorCode = CommissioningErrorEnum::kOk;
             commandObj->AddResponse(commandPath, response);
         }
     }
     else
     {
-        response.errorCode = CommissioningError::kBusyWithOtherAdmin;
+        response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
         commandObj->AddResponse(commandPath, response);
     }
 
@@ -227,7 +227,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     Commands::CommissioningCompleteResponse::Type response;
     if (!failSafe.IsFailSafeArmed())
     {
-        response.errorCode = CommissioningError::kNoFailSafe;
+        response.errorCode = CommissioningErrorEnum::kNoFailSafe;
     }
     else
     {
@@ -238,7 +238,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
             handle->AsSecureSession()->GetSecureSessionType() != SecureSession::Type::kCASE ||
             !failSafe.MatchesFabricIndex(commandObj->GetAccessingFabricIndex()))
         {
-            response.errorCode = CommissioningError::kInvalidAuthentication;
+            response.errorCode = CommissioningErrorEnum::kInvalidAuthentication;
             ChipLogError(FailSafe, "GeneralCommissioning: Got commissioning complete in invalid security context");
         }
         else
@@ -270,7 +270,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
                 Failure);
 
             Breadcrumb::Set(commandPath.mEndpointId, 0);
-            response.errorCode = CommissioningError::kOk;
+            response.errorCode = CommissioningErrorEnum::kOk;
         }
     }
 
@@ -287,9 +287,9 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     Commands::SetRegulatoryConfigResponse::Type response;
 
-    if (commandData.newRegulatoryConfig > RegulatoryLocationType::kIndoorOutdoor)
+    if (commandData.newRegulatoryConfig > RegulatoryLocationTypeEnum::kIndoorOutdoor)
     {
-        response.errorCode = CommissioningError::kValueOutsideRange;
+        response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
         response.debugText = commandData.countryCode;
     }
     else
@@ -301,16 +301,16 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
 
         // If the LocationCapability attribute is not Indoor/Outdoor and the NewRegulatoryConfig value received does not match
         // either the Indoor or Outdoor fixed value in LocationCapability.
-        if ((locationCapability != to_underlying(RegulatoryLocationType::kIndoorOutdoor)) && (location != locationCapability))
+        if ((locationCapability != to_underlying(RegulatoryLocationTypeEnum::kIndoorOutdoor)) && (location != locationCapability))
         {
-            response.errorCode = CommissioningError::kValueOutsideRange;
+            response.errorCode = CommissioningErrorEnum::kValueOutsideRange;
             response.debugText = commandData.countryCode;
         }
         else
         {
             CheckSuccess(server->SetRegulatoryConfig(location, commandData.countryCode), Failure);
             Breadcrumb::Set(commandPath.mEndpointId, commandData.breadcrumb);
-            response.errorCode = CommissioningError::kOk;
+            response.errorCode = CommissioningErrorEnum::kOk;
         }
     }
 

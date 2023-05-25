@@ -16,7 +16,6 @@ from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
-from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
@@ -32,6 +31,7 @@ from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
+from builders.ti import TIApp, TIBoard, TIBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 
 from .target import BuildTarget, TargetPart
@@ -416,21 +416,43 @@ def BuildK32WTarget():
     return target
 
 
-def Buildcc13x2x7_26x2x7Target():
-    target = BuildTarget('cc13x2x7_26x2x7', cc13x2x7_26x2x7Builder)
+def BuildCC13x2x7Target():
+    target = BuildTarget('ti', TIBuilder)
 
-    # apps
+    # board
     target.AppendFixedTargets([
-        TargetPart('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL),
-        TargetPart('lock', app=cc13x2x7_26x2x7App.LOCK),
-        TargetPart('pump', app=cc13x2x7_26x2x7App.PUMP),
-        TargetPart('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER),
-        TargetPart('shell', app=cc13x2x7_26x2x7App.SHELL),
+        TargetPart('cc13x2x7_26x2x7', board=TIBoard.LP_CC2652R7),
     ])
 
-    target.AppendModifier(name="ftd", openthread_ftd=True).ExceptIfRe("-mtd")
-    target.AppendModifier(name="mtd", openthread_ftd=False).ExceptIfRe("-ftd")
+    target.AppendFixedTargets([
+        TargetPart('lighting', app=TIApp.LIGHTING),
+        TargetPart('lock', app=TIApp.LOCK),
+        TargetPart('pump', app=TIApp.PUMP),
+        TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER),
+    ])
+    target.AppendModifier(name="mtd", openthread_ftd=False)
+
+    return target
+
+
+def BuildCC13x4Target():
+    target = BuildTarget('ti', TIBuilder)
+
+    # board
+    target.AppendFixedTargets([
+        TargetPart('cc13x4_26x4', board=TIBoard.LP_EM_CC1354P10_6)
+    ])
+
+    target.AppendFixedTargets([
+        TargetPart('all-clusters', app=TIApp.ALL_CLUSTERS),
+        TargetPart('lighting', app=TIApp.LIGHTING),
+        TargetPart('lock', app=TIApp.LOCK, openthread_ftd=True),
+        TargetPart('pump', app=TIApp.PUMP, openthread_ftd=False),
+        TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER, openthread_ftd=False),
+    ])
+
+    target.AppendModifier(name="mtd", openthread_ftd=False)
+    target.AppendModifier(name="ftd", openthread_ftd=True)
 
     return target
 
@@ -473,7 +495,7 @@ def BuildQorvoTarget():
         TargetPart('qpg6105', board=QpgBoard.QPG6105),
     ])
 
-    # apps
+   # apps
     target.AppendFixedTargets([
         TargetPart('lock', app=QpgApp.LOCK),
         TargetPart('light', app=QpgApp.LIGHT),
@@ -585,6 +607,7 @@ def BuildTelinkTarget():
         TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
     ])
 
+    target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('factory-data', enable_factory_data=True)
 
@@ -607,8 +630,9 @@ BUILD_TARGETS = [
     BuildASRTarget(),
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
-    Buildcc13x2x7_26x2x7Target(),
     Buildcc32xxTarget(),
+    BuildCC13x2x7Target(),
+    BuildCC13x4Target(),
     BuildCyw30739Target(),
     BuildEfr32Target(),
     BuildEsp32Target(),

@@ -24,8 +24,6 @@ import subprocess
 import sys
 import tempfile
 import time
-import traceback
-import urllib.request
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
@@ -108,6 +106,10 @@ class ZAPGenerateTarget:
             self.output_dir = str(output_dir)
         else:
             self.output_dir = None
+
+    @property
+    def is_matter_idl_generation(self):
+        return (self.output_dir is None)
 
     def distinct_output(self):
         if not self.template and not self.output_dir:
@@ -216,34 +218,10 @@ class JinjaCodegenTarget():
         self.command = ["./scripts/codegen.py", "--output-dir", output_directory,
                         "--generator", generator, idl_path]
 
-    def runJavaPrettifier(self):
-        try:
-            java_outputs = subprocess.check_output(["./scripts/codegen.py", "--name-only", "--generator",
-                                                   self.generator, "--log-level", "fatal", self.idl_path]).decode("utf8").split("\n")
-            java_outputs = [os.path.join(self.output_directory, name) for name in java_outputs if name]
-
-            logging.info("Prettifying %d java files:", len(java_outputs))
-            for name in java_outputs:
-                logging.info("    %s" % name)
-
-            # Keep this version in sync with what restyler uses (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml).
-            FORMAT_VERSION = "1.6"
-            URL_PREFIX = 'https://github.com/google/google-java-format/releases/download/google-java-format'
-            JAR_NAME = f"google-java-format-{FORMAT_VERSION}-all-deps.jar"
-            jar_url = f"{URL_PREFIX}-{FORMAT_VERSION}/{JAR_NAME}"
-
-            path, http_message = urllib.request.urlretrieve(jar_url, Path.home().joinpath(JAR_NAME).as_posix())
-
-            subprocess.check_call(['java', '-jar', path, '--replace'] + java_outputs)
-        except Exception as err:
-            traceback.print_exception(err)
-            print('google-java-format error:', err)
-
     def generate(self) -> TargetRunStats:
         generate_start = time.time()
 
         subprocess.check_call(self.command)
-        self.runJavaPrettifier()
 
         generate_end = time.time()
 
@@ -351,16 +329,6 @@ def getGlobalTemplatesTargets():
         targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
 
     targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/data_model/controller-clusters.zap', client_side=True))
-
-    # This generates app headers for darwin only, for easier/clearer include
-    # in .pbxproj files.
-    #
-    # TODO: These files can be code generated at compile time, we should figure
-    #       out a path for this codegen to not be required.
-    targets.append(ZAPGenerateTarget(
-        'src/controller/data_model/controller-clusters.zap',
-        template="src/app/zap-templates/app-templates.json",
-        output_dir='zzz_generated/darwin/controller-clusters/zap-generated'))
 
     return targets
 
@@ -499,9 +467,22 @@ def main():
     if args.parallel:
         # Ensure each zap run is independent
         os.environ['ZAP_TEMPSTATE'] = '1'
-        with multiprocessing.Pool() as pool:
-            for timing in pool.imap_unordered(_ParallelGenerateOne, targets):
-                timings.append(timing)
+
+        # There is a sequencing here:
+        #   - ZAP will generate ".matter" files
+        #   - various codegen may generate from ".matter" files (like java)
+        # We split codegen into two generations to not be racy
+        first, second = [], []
+        for target in targets:
+            if isinstance(target, ZAPGenerateTarget) and target.is_matter_idl_generation:
+                first.append(target)
+            else:
+                second.append(target)
+
+        for items in [first, second]:
+            with multiprocessing.Pool() as pool:
+                for timing in pool.imap_unordered(_ParallelGenerateOne, items):
+                    timings.append(timing)
     else:
         for target in targets:
             timings.append(target.generate())

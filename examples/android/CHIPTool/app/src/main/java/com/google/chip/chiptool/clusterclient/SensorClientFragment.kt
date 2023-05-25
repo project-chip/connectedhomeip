@@ -153,7 +153,7 @@ class SensorClientFragment : Fragment() {
       val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
       val callback = makeReadCallback(clusterName, false)
 
-      deviceController.readAttributePath(callback, device, listOf(ChipAttributePath.newInstance(endpointId.toLong(), clusterId, attributeId)), 0)
+      deviceController.readAttributePath(callback, device, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), 0)
     } catch (ex: Exception) {
       Log.d(TAG, "Failed to read the sensor : ", ex)
       showMessage(R.string.sensor_client_read_error_text, ex.toString())
@@ -170,7 +170,7 @@ class SensorClientFragment : Fragment() {
       val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
       val callback = makeReadCallback(clusterName, true)
 
-      deviceController.subscribeToAttributePath({ Log.d(TAG, "onSubscriptionEstablished") }, callback, device, listOf(ChipAttributePath.newInstance(endpointId.toLong(), clusterId, attributeId)), MIN_REFRESH_PERIOD_S, MAX_REFRESH_PERIOD_S, 0)
+      deviceController.subscribeToAttributePath({ Log.d(TAG, "onSubscriptionEstablished") }, callback, device, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), MIN_REFRESH_PERIOD_S, MAX_REFRESH_PERIOD_S, 0)
       subscribedDevicePtr = device
     } catch (ex: Exception) {
       Log.d(TAG, "Failed to subscribe", ex)

@@ -25,9 +25,6 @@ config:
         type: node_id
         defaultValue: 0xCAFE
     endpoint: 0
-    discriminator:
-        type: int16u
-        defaultValue: 3840
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"

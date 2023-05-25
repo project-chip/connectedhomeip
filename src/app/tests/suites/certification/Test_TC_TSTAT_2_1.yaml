@@ -76,6 +76,13 @@ tests:
       response:
           saveAs: MaxCoolSetpointLimit
 
+    - label: "Saving value for comparision in step 17 read MaxHeatSetpointLimit"
+      PICS: TSTAT.S.A0016
+      command: "readAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      response:
+          saveAs: MaxHeatSetpointLimit
+
     - label:
           "Saving value for comparision in step 13 read attribute
           OccupiedCoolingSetpoint"
@@ -326,7 +333,7 @@ tests:
               maxValue: 3000
 
     - label: "Reads attribute from DUT: MinHeatSetpointLimit"
-      PICS: TSTAT.S.A0015 && TSTAT.S.F05 && TSTAT.S.A0017
+      PICS: TSTAT.S.A0015 && TSTAT.S.F05 && TSTAT.S.A0017 && TSTAT.S.A0003
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
       response:
@@ -335,10 +342,25 @@ tests:
               minValue: 700
               maxValue: MinCoolSetpointLimit - MinSetpointDeadBand
 
-    - label: "Read attribute MinHeatSetpointLimit from the DUT"
-      PICS: TSTAT.S.A0015 && !TSTAT.S.F05
+    - label:
+          "Reads MinHeatSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
+      PICS: TSTAT.S.A0015 && TSTAT.S.A0016 && TSTAT.S.A0003 && !TSTAT.S.F05
+      response:
+          constraints:
+              type: int16s
+              minValue: AbsMinHeat
+              maxValue: MaxHeatSetpointLimit
+
+    #Using hard coded values when optional attributes are not available
+    - label:
+          "Reads MinHeatSetpointLimit attribute from Server DUT and verifies
+          that the value is within range"
+      command: "readAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: TSTAT.S.A0003 && !TSTAT.S.A0015 && !TSTAT.S.A0016 && !TSTAT.S.F05
       response:
           constraints:
               type: int16s

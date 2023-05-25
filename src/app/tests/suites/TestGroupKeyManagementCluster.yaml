@@ -91,8 +91,9 @@ tests:
                         EpochStartTime2: 1110002,
                     }
 
-    - label: "KeySet Write 2"
+    - label: "KeySet Write 2 CacheAndSync"
       command: "KeySetWrite"
+      PICS: GRPKEY.S.F00
       arguments:
           values:
               - name: "GroupKeySet"
@@ -108,9 +109,28 @@ tests:
                         EpochStartTime2: 2110002,
                     }
 
-    - label: "KeySet Write 3"
+    - label: "KeySet Write 2 TrustFirst"
+      command: "KeySetWrite"
+      PICS: "!GRPKEY.S.F00"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 2110001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Write 3 CacheAndSync"
       identity: "beta"
       command: "KeySetWrite"
+      PICS: GRPKEY.S.F00
       arguments:
           values:
               - name: "GroupKeySet"
@@ -118,6 +138,27 @@ tests:
                     {
                         GroupKeySetID: 0x01a3,
                         GroupKeySecurityPolicy: 1,
+                        EpochKey0:
+                            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
+                        EpochStartTime1: 2110001,
+                        EpochKey2:
+                            "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f",
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Write 3 TrustFirst"
+      identity: "beta"
+      command: "KeySetWrite"
+      PICS: "!GRPKEY.S.F00"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
                         EpochKey0:
                             "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
                         EpochStartTime0: 2110000,
@@ -502,8 +543,9 @@ tests:
       response:
           error: NOT_FOUND
 
-    - label: "KeySet Read (not removed)"
+    - label: "KeySet Read (not removed) CacheAndSync"
       command: "KeySetRead"
+      PICS: GRPKEY.S.F00
       arguments:
           values:
               - name: "GroupKeySetID"
@@ -515,6 +557,28 @@ tests:
                     {
                         GroupKeySetID: 0x01a2,
                         GroupKeySecurityPolicy: 1,
+                        EpochKey0: null,
+                        EpochStartTime0: 2110000,
+                        EpochKey1: null,
+                        EpochStartTime1: 2110001,
+                        EpochKey2: null,
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Read (not removed) TrustFirst"
+      command: "KeySetRead"
+      PICS: GRPKEY.S.F00
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a2
+      response:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 0,
                         EpochKey0: null,
                         EpochStartTime0: 2110000,
                         EpochKey1: null,
@@ -608,8 +672,9 @@ tests:
                         EpochStartTime2: 1110002,
                     }
 
-    - label: "KeySet Write 2"
+    - label: "KeySet Write 2 CacheAndSync"
       command: "KeySetWrite"
+      PICS: GRPKEY.S.F00
       arguments:
           values:
               - name: "GroupKeySet"
@@ -617,6 +682,24 @@ tests:
                     {
                         GroupKeySetID: 0x01a2,
                         GroupKeySecurityPolicy: 1,
+                        EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 2110001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Write 2 TrustFirst"
+      command: "KeySetWrite"
+      PICS: "!GRPKEY.S.F00"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 0,
                         EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
                         EpochStartTime0: 2110000,
                         EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",

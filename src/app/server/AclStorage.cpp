@@ -27,7 +27,7 @@ using Entry            = AccessControl::Entry;
 using EntryListener    = AccessControl::EntryListener;
 using StagingAuthMode  = Clusters::AccessControl::AccessControlEntryAuthModeEnum;
 using StagingPrivilege = Clusters::AccessControl::AccessControlEntryPrivilegeEnum;
-using StagingTarget    = Clusters::AccessControl::Structs::Target::Type;
+using StagingTarget    = Clusters::AccessControl::Structs::AccessControlTargetStruct::Type;
 using Target           = AccessControl::Entry::Target;
 
 namespace {

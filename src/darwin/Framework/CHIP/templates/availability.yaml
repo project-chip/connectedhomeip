@@ -3098,8 +3098,16 @@
               - WiredCurrentTypeEnum
               - WiredFaultEnum
           GeneralCommissioning:
-              - CommissioningError
-              - RegulatoryLocationType
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              - CommissioningErrorEnum
+              # RegulatoryLocationTypeEnum was originally just named
+              # RegulatoryLocationType, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              - RegulatoryLocationTypeEnum
           NetworkCommissioning:
               - NetworkCommissioningStatus
               - WiFiBand
@@ -3414,13 +3422,21 @@
                   - OverVoltage
                   - UnderVoltage
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   - Ok
                   - ValueOutsideRange
                   - InvalidAuthentication
                   - NoFailSafe
                   - BusyWithOtherAdmin
-              RegulatoryLocationType:
+              # RegulatoryLocationTypeEnum was originally just named
+              # RegulatoryLocationType, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              RegulatoryLocationTypeEnum:
                   - Indoor
                   - Outdoor
                   - IndoorOutdoor
@@ -5646,7 +5662,11 @@
                   - ValueB
                   - ValueC
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   - OK
           AccessControl:
               AccessControlEntryPrivilegeEnum:
@@ -6211,7 +6231,11 @@
               - DoorLockProgrammingEventCode
       enum values:
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   - Ok
           PowerSource:
               BatChargeLevelEnum:
@@ -6569,7 +6593,11 @@
               UserTypeEnum: DlUserType
       enum values:
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   OK: Ok
           PowerSource:
               BatChargeLevelEnum:
@@ -7006,6 +7034,7 @@
           - FuelTankMonitoring
           - InkCartridgeMonitoring
           - TonerCartridgeMonitoring
+          - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
       attributes:
@@ -7293,6 +7322,16 @@
               - EventList
               - FeatureMap
               - ClusterRevision
+          RefrigeratorAlarm:
+              - Mask
+              - Latch
+              - State
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
           TemperatureControl:
               - TemperatureSetpoint
               - MinTemperature
@@ -7350,6 +7389,8 @@
               - ResetCondition
           TonerCartridgeMonitoring:
               - ResetCondition
+          RefrigeratorAlarm:
+              - Reset
           TemperatureControl:
               - SetTemperature
           DoorLock:
@@ -7360,11 +7401,17 @@
           DoorLock:
               UnboltDoor:
                   - pinCode
+          RefrigeratorAlarm:
+              Reset:
+                  - alarms
+                  - mask
           TemperatureControl:
               SetTemperature:
                   - targetTemperature
                   - targetTemperatureLevel
       structs:
+          AccessControl:
+              - AccessControlTargetStruct
           BasicInformation:
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
@@ -7372,6 +7419,11 @@
           TemperatureControl:
               - TemperatureLevelStruct
       struct fields:
+          AccessControl:
+              AccessControlTargetStruct:
+                  - cluster
+                  - endpoint
+                  - deviceType
           BasicInformation:
               ProductAppearanceStruct:
                   - finish
@@ -7385,6 +7437,8 @@
                   - label
                   - temperatureLevel
       events:
+          RefrigeratorAlarm:
+              - Notify
           SmokeCOAlarm:
               - SmokeAlarm
               - COAlarm
@@ -7397,6 +7451,13 @@
               - InterconnectSmokeAlarm
               - InterconnectCOAlarm
               - AllClear
+      event fields:
+          RefrigeratorAlarm:
+              Notify:
+                  - active
+                  - inactive
+                  - state
+                  - mask
       enums:
           AirQuality:
               - AirQualityEnum
@@ -7519,6 +7580,9 @@
                   - Rugged
                   - Fabric
                   - Other
+          NetworkCommissioning:
+              WiFiBand:
+                  - 1G
           HEPAFilterMonitoring:
               ChangeIndicationEnum:
                   - OK
@@ -7624,18 +7688,15 @@
                   - Unlatch
           SmokeCOAlarm:
               AlarmStateEnum:
-                  - Unknown
                   - Normal
                   - Warning
                   - Critical
               ContaminationStateEnum:
-                  - Unknown
                   - Normal
                   - Low
                   - Warning
                   - Critical
               EndOfServiceEnum:
-                  - Unknown
                   - Expired
                   - Normal
               ExpressedStateEnum:
@@ -7649,18 +7710,21 @@
                   - InterconnectSmoke
                   - InterconnectCO
               MuteStateEnum:
-                  - Unknown
                   - NotMuted
                   - Muted
               SensitivityEnum:
                   - High
                   - Standard
                   - Low
+          WiFiNetworkDiagnostics:
+              WiFiVersionEnum:
+                  - Ah
       bitmaps:
           AirQuality:
               - Feature
           Groups:
               - Feature
+              - NameSupportBitmap
           PressureMeasurement:
               - Feature
           PumpConfigurationAndControl:
@@ -7691,6 +7755,8 @@
               - Feature
           TonerCartridgeMonitoring:
               - Feature
+          RefrigeratorAlarm:
+              - AlarmMap
           TemperatureControl:
               - Feature
           SmokeCOAlarm:
@@ -7704,6 +7770,8 @@
                   - ExtremelyPoor
           Groups:
               Feature:
+                  - GroupNames
+              NameSupportBitmap:
                   - GroupNames
           PressureMeasurement:
               Feature:
@@ -7720,6 +7788,9 @@
           Scenes:
               Feature:
                   - SceneNames
+          Thermostat:
+              Feature:
+                  - LocalTemperatureNotExposed
           HEPAFilterMonitoring:
               Feature:
                   - Condition
@@ -7774,6 +7845,9 @@
               # here.
               Feature:
                   - Unbolt
+          RefrigeratorAlarm:
+              AlarmMap:
+                  - DoorOpen
           TemperatureControl:
               Feature:
                   - TemperatureNumber
@@ -7795,6 +7869,9 @@
           # We apparently forgot to deprecate BridgedDeviceBasic when we
           # introduced BridgedDeviceBasicInformation.
           - BridgedDeviceBasic
+      structs:
+          AccessControl:
+              - Target
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -7811,6 +7888,9 @@
       commands:
           TimeSynchronization:
               SetUTCTime: SetUtcTime
+      structs:
+          AccessControl:
+              AccessControlTargetStruct: Target
       enum values:
           TimeSynchronization:
               TimeSourceEnum:

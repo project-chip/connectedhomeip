@@ -233,7 +233,7 @@ class CommissioningFlowBlocks:
     async def send_regulatory_config(self, parameter: commissioning.Parameters, node_id: int):
         self._logger.info("Sending Regulatory Config")
         response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
-            newRegulatoryConfig=Clusters.GeneralCommissioning.Enums.RegulatoryLocationType(
+            newRegulatoryConfig=Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(
                 parameter.regulatory_config.location_type),
             countryCode=parameter.regulatory_config.country_code
         ))

@@ -720,9 +720,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::WiredFault
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::CommissioningError val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::CommissioningErrorEnum val)
 {
-    using EnumType = GeneralCommissioning::CommissioningError;
+    using EnumType = GeneralCommissioning::CommissioningErrorEnum;
     switch (val)
     {
     case EnumType::kOk:
@@ -735,9 +735,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::C
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::RegulatoryLocationType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::RegulatoryLocationTypeEnum val)
 {
-    using EnumType = GeneralCommissioning::RegulatoryLocationType;
+    using EnumType = GeneralCommissioning::RegulatoryLocationTypeEnum;
     switch (val)
     {
     case EnumType::kIndoor:
@@ -782,9 +782,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::W
     case EnumType::k5g:
     case EnumType::k6g:
     case EnumType::k60g:
+    case EnumType::k1g:
         return val;
     default:
-        return static_cast<EnumType>(5);
+        return static_cast<EnumType>(6);
     }
 }
 
@@ -1054,9 +1055,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics:
     case EnumType::kN:
     case EnumType::kAc:
     case EnumType::kAx:
+    case EnumType::kAh:
         return val;
     default:
-        return static_cast<EnumType>(6);
+        return static_cast<EnumType>(7);
     }
 }
 
@@ -1307,13 +1309,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::AlarmStat
     using EnumType = SmokeCoAlarm::AlarmStateEnum;
     switch (val)
     {
-    case EnumType::kUnknown:
     case EnumType::kNormal:
     case EnumType::kWarning:
     case EnumType::kCritical:
         return val;
     default:
-        return static_cast<EnumType>(4);
+        return static_cast<EnumType>(3);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::ContaminationStateEnum val)
@@ -1321,14 +1322,13 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::Contamina
     using EnumType = SmokeCoAlarm::ContaminationStateEnum;
     switch (val)
     {
-    case EnumType::kUnknown:
     case EnumType::kNormal:
     case EnumType::kLow:
     case EnumType::kWarning:
     case EnumType::kCritical:
         return val;
     default:
-        return static_cast<EnumType>(5);
+        return static_cast<EnumType>(4);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::EndOfServiceEnum val)
@@ -1336,12 +1336,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::EndOfServ
     using EnumType = SmokeCoAlarm::EndOfServiceEnum;
     switch (val)
     {
-    case EnumType::kUnknown:
     case EnumType::kExpired:
     case EnumType::kNormal:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(2);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::ExpressedStateEnum val)
@@ -1368,12 +1367,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::MuteState
     using EnumType = SmokeCoAlarm::MuteStateEnum;
     switch (val)
     {
-    case EnumType::kUnknown:
     case EnumType::kNotMuted:
     case EnumType::kMuted:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(2);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::SensitivityEnum val)

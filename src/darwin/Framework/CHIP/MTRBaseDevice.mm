@@ -819,12 +819,14 @@ private:
         //
         VerifyOrDie(!aPath.IsListItemOperation());
 
-        VerifyOrExit(aStatus.IsSuccess(), err = aStatus.ToChipError());
         VerifyOrExit(
             std::find_if(mAttributePathParamsList, mAttributePathParamsList + mAttributePathParamsSize,
                 [aPath](app::AttributePathParams & pathParam) -> bool { return pathParam.IsAttributePathSupersetOf(aPath); })
                 != mAttributePathParamsList + mAttributePathParamsSize,
             err = CHIP_ERROR_SCHEMA_MISMATCH);
+
+        VerifyOrExit(aStatus.IsSuccess(), err = aStatus.ToChipError());
+
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
@@ -852,6 +854,9 @@ private:
                          })
                 != mEventPathParamsList + mEventPathParamsSize,
             err = CHIP_ERROR_SCHEMA_MISMATCH);
+
+        VerifyOrExit(apStatus == nullptr, err = apStatus->ToChipError());
+
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
@@ -1366,7 +1371,7 @@ exit:
                            ConcreteEventPath pathCopy(*eventPath);
                            dispatch_async(queue, ^{
                                reportHandler(@[ @ {
-                                   MTRAttributePathKey : [[MTREventPath alloc] initWithPath:pathCopy],
+                                   MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy],
                                    MTRErrorKey : [MTRError errorForCHIPErrorCode:error]
                                } ],
                                    nil);

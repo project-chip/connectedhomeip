@@ -201,7 +201,7 @@ static id _Nullable DecodeAttributeValueForGroupsCluster(AttributeId aAttributeI
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -1939,8 +1939,8 @@ static id _Nullable DecodeAttributeValueForAccessControlCluster(
                         auto iter_3 = entry_0.targets.Value().begin();
                         while (iter_3.Next()) {
                             auto & entry_3 = iter_3.GetValue();
-                            MTRAccessControlClusterTarget * newElement_3;
-                            newElement_3 = [MTRAccessControlClusterTarget new];
+                            MTRAccessControlClusterAccessControlTargetStruct * newElement_3;
+                            newElement_3 = [MTRAccessControlClusterAccessControlTargetStruct new];
                             if (entry_3.cluster.IsNull()) {
                                 newElement_3.cluster = nil;
                             } else {
