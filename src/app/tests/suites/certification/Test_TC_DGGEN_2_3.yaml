@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.3. [TC-DGGEN-2.3] Command Received [DUT Server]
+name: 88.2.3. [TC-DGGEN-2.3] Command Received [DUT as Server]
 
 PICS:
     - DGGEN.S

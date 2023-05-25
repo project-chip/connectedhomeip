@@ -30,7 +30,41 @@ tests:
           initiatorSessionId destinationId resumptionID initiatorResumeMIC
           initiatorEphPubKey initiatorSEDParams"
       verification: |
-          Verify that the Responder receives the Sigma1 message from Initiator
+          On Initiator(chip-tool) verify that, Initiator(chip-tool)  constructs and sends a TLV-encoded Sigma1 message to Responder with resumption containing
+          initiatorRandom
+          initiatorSessionId
+          destinationId
+          resumptionID
+          initiatorResumeMIC
+          initiatorEphPubKey
+          initiatorSEDParams
+          here is the log to verify on chip-tool
+
+          1683884120.041635][5134:5136] CHIP:DMG: Decrypted Payload (182 bytes) =
+          [1683884120.041641][5134:5136] CHIP:DMG: {
+          [1683884120.041647][5134:5136] CHIP:DMG:     data = 153001202445b334fd30bc8c53955932724b371c085cbe9322cc9cd5a1f2e1094034a1462502faae300320adde97e1cb85749bebb3ed17b9ff3132eca00f7b374e482575322683ab460adc300441046c30cdef1fcbf383e11df64a3d6820ade9a6850b4eb401a99c4be5242ae5a0a0f5473b2ff098976de6bb2ae4e126138ebcc97cf44d8651ae0048ceed2681c8b9300610164874f435aa47c7505ca5ad59ba8974300710df3d4e94f1014d0e037c74eabce4accc18
+          [1683884120.041655][5134:5136] CHIP:DMG: }
+          [1683884120.041660][5134:5136] CHIP:DMG:
+          [1683884120.041689][5134:5136] CHIP:DMG: Parameters =
+          [1683884120.041695][5134:5136] CHIP:DMG: {
+          [1683884120.041704][5134:5136] CHIP:DMG:     InitiatorRandom (32) = 2445B334FD30BC8C53955932724B371C085CBE9322CC9CD5A1F2E1094034A146
+          [1683884120.041711][5134:5136] CHIP:DMG:     InitiatorSessionId = 44794
+          [1683884120.041720][5134:5136] CHIP:DMG:     DestinationId (32) = ADDE97E1CB85749BEBB3ED17B9FF3132ECA00F7B374E482575322683AB460ADC
+          [1683884120.041730][5134:5136] CHIP:DMG:     InitiatorEphPubKey (65) = 046C30CDEF1FCBF383E11DF64A3D6820ADE9A6850B4EB401A99C4BE5242AE5A0A0F5473B2FF098976DE6BB2AE4E126138EBCC97CF44D8651AE0048CEED2681C8B9
+          [1683884120.041766][5134:5136] CHIP:DMG:     ResumptionID (16) = 164874F435AA47C7505CA5AD59BA8974
+          [1683884120.041775][5134:5136] CHIP:DMG:     InitiatorResumeMIC (16) = DF3D4E94F1014D0E037C74EABCE4ACCC
+          [1683884120.041782][5134:5136] CHIP:DMG: }
+          [1683884120.041787][5134:5136] CHIP:DMG:
+          [1683884120.041794][5134:5136] CHIP:DMG:
+          [1683884120.041883][5134:5136] CHIP:SC: Sent Sigma1 msg
+
+
+          On Responder(all-clusters-app), Verify that responder received the Sigma1 message from Initiator(chip-tool)
+
+          [1683884120.042774][5117:5117] CHIP:IN: CASE Server received Sigma1 message . Starting handshake. EC 0x558aa452e2e0
+          [1683884120.042783][5117:5117] CHIP:IN: CASE Server disabling CASE session setups
+          [1683884120.042798][5117:5117] CHIP:SC: Received Sigma1 msg
+          [1683884120.042819][5117:5117] CHIP:SC: Peer assigned session key ID 44794
       disabled: true
 
     - label:
@@ -38,10 +72,88 @@ tests:
           following values resumptionID responderSessionID sigma2ResumeMIC
           responderMRPParams"
       verification: |
-          Verify that the message is properly formatted: I Flag is set to 0 S flag and DIZ fields of message flags are set to 0 Encryption Type of security flags is set to 0 The Session Key Type field is set to 0 The Protocol ID field is set to 0x0000 and The Protocol Opcode field is set to 0x33 Verify that the resumptionID is of Octet String maximum of length 16 bytes Verify that the responderSessionID is of uint16 Verify that the sigma2ResumeMIC is of Octet String maximum of length 16 bytes Verify that the responderSEDParams is from any one of the following: SLEEPY_IDLE_INTERVAL Verify that it is of uint32 SLEEPY_ACTIVE_INTERVAL Verify that it is of uint32
+          On initiator(chip-tool) verify that the Sigma2_Resume message and extracts the following values
+          resumptionID
+          responderSessionID
+          sigma2ResumeMIC
+          And
+          Verify that the message is properly formatted:
+
+           I Flag is set to 1
+          S flag and DIZ fields of message flags are set to 0
+          Encryption Type of security flags is set to 0
+          The Session Key Type field is set to 0
+          The Protocol ID field is set to 0x0000 and
+          The Protocol Opcode field is set to 0x33
+          resumptionID is of Octet String maximum of length 16 bytes
+          responderSessionID is of uint16
+           sigma2ResumeMIC is of Octet String maximum of length 16 bytes
+          responderSEDParams is from any one of the following:
+                SLEEPY_IDLE_INTERVAL - Verify that it is of uint32
+                SLEEPY_ACTIVE_INTERVAL - Verify that it is of uint32
+
+          here is the log to verify on chip-tool
+
+          [1683884120.044173][5134:5136] CHIP:DMG: << from UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:5540 | 8440488 | [Secure Channel  (0) / Certificate Authenticated Session Establishment Sigma '2' Resume (0x33) / Session = 0 / Exchange = 29430]
+          [1683884120.044205][5134:5136] CHIP:DMG: Header Flags =
+          [1683884120.044210][5134:5136] CHIP:DMG: {
+          [1683884120.044219][5134:5136] CHIP:DMG:     Message (0x01) =
+          [1683884120.044224][5134:5136] CHIP:DMG:     {
+          [1683884120.044229][5134:5136] CHIP:DMG:         DestinationNodeId = A8F9BB8984959B9C
+          [1683884120.044234][5134:5136] CHIP:DMG:     }
+          [1683884120.044244][5134:5136] CHIP:DMG:     Exchange (0x06) =
+          [1683884120.044248][5134:5136] CHIP:DMG:     {
+          [1683884120.044253][5134:5136] CHIP:DMG:         AckMsg = 265414754
+          [1683884120.044258][5134:5136] CHIP:DMG:         NeedsAck = true
+          [1683884120.044262][5134:5136] CHIP:DMG:     }
+          [1683884120.044271][5134:5136] CHIP:DMG: }
+          [1683884120.044276][5134:5136] CHIP:DMG:
+          [1683884120.044287][5134:5136] CHIP:DMG: Encrypted Payload (70 bytes) =
+          [1683884120.044292][5134:5136] CHIP:DMG: {
+          [1683884120.044300][5134:5136] CHIP:DMG:     data = 01000000a8ca80009c9b958489bbf9a80633f672000062e8d10f1530011098f83a1529d6cfa34f386cdbbbd842613002106223c9bf3f0d1fa0e4122f921711543a2503e59318
+          [1683884120.044308][5134:5136] CHIP:DMG:     buffer_ptr = 139986540250736
+          [1683884120.044313][5134:5136] CHIP:DMG: }
+          [1683884120.044318][5134:5136] CHIP:DMG:
+          [1683884120.044327][5134:5136] CHIP:DMG: Decrypted Payload (44 bytes) =
+          [1683884120.044333][5134:5136] CHIP:DMG: {
+          [1683884120.044337][5134:5136] CHIP:DMG:     data = 1530011098f83a1529d6cfa34f386cdbbbd842613002106223c9bf3f0d1fa0e4122f921711543a2503e59318
+          [1683884120.044345][5134:5136] CHIP:DMG: }
+          [1683884120.044351][5134:5136] CHIP:DMG:
+          [1683884120.044371][5134:5136] CHIP:DMG: Parameters =
+          [1683884120.044377][5134:5136] CHIP:DMG: {
+          [1683884120.044385][5134:5136] CHIP:DMG:     ResumptionID (16) = 98F83A1529D6CFA34F386CDBBBD84261
+          [1683884120.044392][5134:5136] CHIP:DMG:     Sigma2ResumeMIC (16) = 6223C9BF3F0D1FA0E4122F921711543A
+          [1683884120.044399][5134:5136] CHIP:DMG:     ResponderSessionId = 37861
+          [1683884120.044406][5134:5136] CHIP:DMG: }
+          [1683884120.044411][5134:5136] CHIP:DMG:
+          [1683884120.044419][5134:5136] CHIP:DMG:
+          [1683884120.044432][5134:5136] CHIP:DMG: Additional Fields =
+          [1683884120.044441][5134:5136] CHIP:DMG: {
+          [1683884120.044449][5134:5136] CHIP:DMG:     peer_address = UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:5540
+          [1683884120.044455][5134:5136] CHIP:DMG: }
+          [1683884120.044461][5134:5136] CHIP:DMG:
       disabled: true
 
     - label: "Initiator sends SigmaFinished message to Responder"
       verification: |
+          On Responder(all-clusters-app),  verify that responder(all-clusters-app) received  the SigmaFinished(The status report should be GeneralCode:SUCCESS,
+          ProtocolId:SECURE_CHANNEL, and ProtocolCode:SESSION_ESTABLISHMENT_SUCCESS). message from Initiator
 
+          [1683884120.046690][5117:5117] CHIP:DMG: Parameters =
+          [1683884120.046692][5117:5117] CHIP:DMG: {
+          [1683884120.046694][5117:5117] CHIP:DMG:     GeneralStatusCode = 0
+          [1683884120.046696][5117:5117] CHIP:DMG:     ProtocolId = 0
+          [1683884120.046698][5117:5117] CHIP:DMG:     ProtocolCode = 0
+          [1683884120.046701][5117:5117] CHIP:DMG: }
+          [1683884120.046703][5117:5117] CHIP:DMG:
+          [1683884120.046706][5117:5117] CHIP:DMG:
+          [1683884120.046711][5117:5117] CHIP:DMG: Additional Fields =
+          [1683884120.046713][5117:5117] CHIP:DMG: {
+          [1683884120.046715][5117:5117] CHIP:DMG:     peer_address = UDP:[fe80::e9f6:2c08:2794:357d%wlp0s20f3]:38377
+          [1683884120.046718][5117:5117] CHIP:DMG: }
+          [1683884120.046720][5117:5117] CHIP:DMG:
+          [1683884120.046725][5117:5117] CHIP:EM: >>> [E:29430r S:0 M:265414755 (Ack:8440488)] (U) Msg RX from 0:A8F9BB8984959B9C [0000] --- Type 0000:40 (SecureChannel:StatusReport)
+          [1683884120.046729][5117:5117] CHIP:EM: Found matching exchange: 29430r, Delegate: 0x558aa3e3ef18
+          [1683884120.046735][5117:5117] CHIP:EM: Rxd Ack; Removing MessageCounter:8440488 from Retrans Table on exchange 29430r
+          [1683884120.046743][5117:5117] CHIP:SC: Success status report received. Session was established
       disabled: true

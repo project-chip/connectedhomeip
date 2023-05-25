@@ -252,7 +252,7 @@ Example:
 ##### Guides
 
 -   [Bouffalo Lab](/examples/lighting-app/bouffalolab/README.md)
--   [EFR32 Window Covering](/examples/window-app/silabs/efr32/README.md)
+-   [EFR32 Window Covering](/examples/window-app/silabs/README.md)
 -   [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
 -   [ESP32 Lighting](/examples/lighting-app/esp32/README.md)
 -   [ESP32 Temperature Sensor](/examples/temperature-measurement-app/esp32/README.md)
@@ -268,7 +268,7 @@ Example:
 -   [Simulated Linux](./simulated_device_linux.md)
 -   [Telink](/examples/lighting-app/telink/README.md)
 -   [TI Platform](./ti_platform_overview.md)
--   [TI All Clusters](/examples/all-clusters-app/cc13x2x7_26x2x7/README.md)
+-   [TI All Clusters](/examples/all-clusters-app/cc13x4_26x4/README.md)
 -   [Tizen](/examples/lighting-app/tizen/README.md)
 
 ## Providing Feedback to Apple

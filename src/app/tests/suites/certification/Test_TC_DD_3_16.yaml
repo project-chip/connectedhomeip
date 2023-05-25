@@ -35,7 +35,7 @@ tests:
       verification: |
           1 - DUT is on an operational network and has accurate date, time, timezone, regulatory, and fabric information available.
 
-          2 - 5.1.4.2 - 11-digit Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual).
+          2 - 5.1.4.2 - 11-digit Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
 
           An example onboarding payload could be "34970112332" (following 5.1.4. Table 37. "Manual Pairing Code Elements") which each include:
 
@@ -82,7 +82,7 @@ tests:
           code but substituting out the current VERSION with an invalid VERSION:
           2"
       verification: |
-          1. Use chip-tool"s "payload verhoeff-generate" command to help generate the new, invalid Manual code
+          1. Use chip-tool's "payload verhoeff-generate" command to help generate the new, invalid Manual code
           Verify on the DUT (Chip-tool):
 
            ./chip-tool payload verhoeff-generate 8497011233
@@ -108,7 +108,7 @@ tests:
           manual code but substituting out the current VID_PID_PRESENT with an
           invalid VID_PID_PRESENT set to 1"
       verification: |
-          1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
+          1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
 
           Verify on the DUT (Chip-tool):
            ./chip-tool payload generate-manualcode --discriminator 0xF00 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 2 --force-short-code 1
@@ -137,7 +137,7 @@ tests:
           discriminator value and adheres to rules of section 5.1.1.5.
           'Discriminator value')"
       verification: |
-          1. Use chip-tool"s "payload generate-manualcode" command to help generate the new, invalid Manual code
+          1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
           Verify on the DUT (Chip-tool):
 
            ./chip-tool payload generate-manualcode --existing-payload 34970112332 --discriminator 0xE00

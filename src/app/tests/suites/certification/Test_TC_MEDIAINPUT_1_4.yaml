@@ -42,7 +42,7 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: " !MEDIAINPUT.S.NU "
+      PICS: " !MEDIAINPUT.S.F00 "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -50,8 +50,9 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given MEDIAINPUT.S.NU ensure featuremap has the correct bit set"
-      PICS: MEDIAINPUT.S.NU
+    - label:
+          "Given MEDIAINPUT.S.F00(NU) ensure featuremap has the correct bit set"
+      PICS: MEDIAINPUT.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:

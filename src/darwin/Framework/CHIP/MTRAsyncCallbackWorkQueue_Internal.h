@@ -26,9 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRAsyncCallbackWorkQueue ()
 // The MTRDevice object is only held and passed back as a reference and is opaque to the queue
 - (instancetype)initWithContext:(id _Nullable)context queue:(dispatch_queue_t)queue;
-
-// Called by DeviceController at device clean up time
-- (void)invalidate;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 47.1.1. [TC-DGETH-1.1] Global Attributes [DUT as Server]
+name: 47.1.1. [TC-DGETH-1.1] Global Attributes with DUT as Server
 
 PICS:
     - DGETH.S
@@ -212,6 +212,34 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    - label:
+          "TH reads EventList attribute from DUT. 1.The list MAY contain values
+          in the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
+          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
+          these values SHALL be ignored. 2.The list SHALL NOT contain any values
+          in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
+          (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
+          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
+      verification: |
+          ./chip-tool  ethernetnetworkdiagnostics read event-list 1 0
+          Verify "  EventList attribute " consists the list of supported events,  which for this cluster should be an empty list on the TH(Chip-tool) Log:
+
+          [1676459303.132712][25176:25178] CHIP:DMG: }
+          [1676459303.132751][25176:25178] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFFA DataVersion: 2330608789
+          [1676459303.132772][25176:25178] CHIP:TOO:   EventList: 0 entries
+          [1676459303.132795][25176:25178] CHIP:EM: <<< [E:41866i S:29076 M:220910528 (Ack:11574043)] (S) Msg TX to 1:0000000000000001 [110F] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1676459303.132799][25176:25178] CHIP:IN: (S) Sending msg 220910528 on secure session with LSID: 29076
+          [1676459303.132809][25176:25178] CHIP:EM: Flushed pending ack for MessageCounter:11574043 on exchange 41866i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DGETH.S.Afffa
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH reads AcceptedCommandList from DUT"
       PICS: ( DGETH.S.F00 || DGETH.S.F01 ) && DGETH.S.Afff9
       command: "readAttribute"
@@ -276,34 +304,6 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && DGETH.S.Afff8
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label:
-          "TH reads EventList attribute from DUT. 1.The list MAY contain values
-          in the Manufacturer Extensible Identifier (MEI) range: (0xXXXX_0000 -
-          0xXXXX_00FF), where XXXX is the allowed MEI range (0x0001 - 0xFFF1),
-          these values SHALL be ignored. 2.The list SHALL NOT contain any values
-          in the Test Vendor or invalid range: (0x0000_0100 - 0x0000_FFFF),
-          (0xXXXX_0100 - 0xXXXX_FFFF) and (0xFFF1_0000 - 0xFFFF_FFFF), where
-          XXXX is the allowed MEI range (0x0001 - 0xFFF1)"
-      verification: |
-          ./chip-tool  ethernetnetworkdiagnostics read event-list 1 0
-          Verify "  EventList attribute " consists the list of supported events,  which for this cluster should be an empty list on the TH(Chip-tool) Log:
-
-          [1676459303.132712][25176:25178] CHIP:DMG: }
-          [1676459303.132751][25176:25178] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFFA DataVersion: 2330608789
-          [1676459303.132772][25176:25178] CHIP:TOO:   EventList: 0 entries
-          [1676459303.132795][25176:25178] CHIP:EM: <<< [E:41866i S:29076 M:220910528 (Ack:11574043)] (S) Msg TX to 1:0000000000000001 [110F] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1676459303.132799][25176:25178] CHIP:IN: (S) Sending msg 220910528 on secure session with LSID: 29076
-          [1676459303.132809][25176:25178] CHIP:EM: Flushed pending ack for MessageCounter:11574043 on exchange 41866i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGETH.S.Afffa
       arguments:
           values:
               - name: "message"
