@@ -252,7 +252,7 @@ Example:
 ##### Guides
 
 -   [Bouffalo Lab](/examples/lighting-app/bouffalolab/README.md)
--   [EFR32 Window Covering](/examples/window-app/silabs/efr32/README.md)
+-   [EFR32 Window Covering](/examples/window-app/silabs/README.md)
 -   [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
 -   [ESP32 Lighting](/examples/lighting-app/esp32/README.md)
 -   [ESP32 Temperature Sensor](/examples/temperature-measurement-app/esp32/README.md)
