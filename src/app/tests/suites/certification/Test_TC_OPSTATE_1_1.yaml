@@ -104,7 +104,7 @@ tests:
               contains: [0x01]
 
     - label: "Read the optional command(Start) in AcceptedCommandList"
-      PICS: OPSTATE.S.C00 && OPSTATE.S.Afff9
+      PICS: OPSTATE.S.C02 && OPSTATE.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -126,7 +126,7 @@ tests:
 
 
     - label: "Read the optional command(Pause) in AcceptedCommandList"
-      PICS: OPSTATE.S.C02 && OPSTATE.S.Afff9
+      PICS: OPSTATE.S.C00 && OPSTATE.S.Afff9
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
