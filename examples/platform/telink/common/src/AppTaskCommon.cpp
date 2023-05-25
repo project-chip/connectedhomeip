@@ -280,7 +280,7 @@ void AppTaskCommon::InitButtons(void)
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
-        sExampleActionButton.Configure(&sButtonRow2Dt, &sButtonCol2Dt, ExampleActionButtonEventHandler);
+        sExampleActionButton.Configure(&sButtonRow1Dt, &sButtonCol2Dt, ExampleActionButtonEventHandler);
     }
 #endif
 #if APP_USE_THREAD_START_BUTTON
