@@ -29,6 +29,11 @@ Currently, this script only supports Certification Declaration update,
 but it could be modified to support all factory data fields.
 '''
 
+import ota_image_tool
+from chip.tlv import TLVWriter
+from generate import set_logger
+from default import InputArgument
+from custom import CertDeclaration, DacCert, DacPKey, PaiCert
 import argparse
 import glob
 import json
@@ -44,12 +49,6 @@ sys.path.insert(0, os.path.join(
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../../../../src/app/'))
 
-from custom import CertDeclaration, DacCert, DacPKey, PaiCert
-from default import InputArgument
-from generate import set_logger
-
-from chip.tlv import TLVWriter
-import ota_image_tool
 
 OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_app_tlv.bin")
 OTA_BOOTLOADER_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_ssbl_tlv.bin")
@@ -61,11 +60,13 @@ class TAG:
     BOOTLOADER = 2
     FACTORY_DATA = 3
 
+
 def write_to_temp(path: str, payload: bytearray):
     with open(path, "wb") as _handle:
         _handle.write(payload)
 
     logging.info(f"Data payload size for {path.split('/')[-1]}: {len(payload)}")
+
 
 def generate_header(tag: int, length: int):
     header = bytearray(tag.to_bytes(4, "little"))
@@ -97,6 +98,7 @@ def generate_factory_data(args: object):
 
     return [OTA_FACTORY_TLV_TEMP]
 
+
 def generate_descriptor(version: int, versionStr: str, buildDate: str):
     """
     Generate descriptor as bytearray for app/SSBL payload.
@@ -115,6 +117,7 @@ def generate_descriptor(version: int, versionStr: str, buildDate: str):
 
     return v + vs + bd
 
+
 def generate_app(args: object):
     """
     Generate app payload with descriptor. If a certain option is not specified, use the default values.
@@ -128,6 +131,7 @@ def generate_app(args: object):
     write_to_temp(OTA_APP_TLV_TEMP, payload)
 
     return [OTA_APP_TLV_TEMP, args.app_input_file]
+
 
 def generate_bootloader(args: object):
     """
@@ -143,6 +147,7 @@ def generate_bootloader(args: object):
 
     return [OTA_BOOTLOADER_TLV_TEMP, args.bl_input_file]
 
+
 def validate_json(data: str):
     with open(os.path.join(os.path.dirname(__file__), 'ota_payload.schema'), 'r') as fd:
         payload_schema = json.load(fd)
@@ -153,6 +158,7 @@ def validate_json(data: str):
     except jsonschema.exceptions.ValidationError as err:
         logging.error(f"JSON data is invalid: {err}")
         sys.exit(1)
+
 
 def generate_custom_tlvs(data):
     """

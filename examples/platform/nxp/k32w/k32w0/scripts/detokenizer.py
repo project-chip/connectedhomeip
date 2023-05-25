@@ -76,7 +76,7 @@ def decode_serial(serialport, outfile, database):
     if input:
 
         try:
-            while(True):
+            while (True):
                 # read line from serial port and ascii decode
                 line = input.readline().decode('ascii').strip()
                 # find token start and detokenize
