@@ -86,14 +86,14 @@ following states:
 Identify command of the Identify cluster is received. The command's argument can
 be used to specify the the effect. It is able to be in following effects:
 
-| Effect                          | Description                                                               |
-| :------------------------------ | :------------------------------------------------------------------------ |
-| Blinks (200 ms on/200 ms off)   | Blink (Clusters::Identify::EffectIdentifierEnum::kBlink)                  |
-| Breathe (during 1000 ms)        | Breathe (Clusters::Identify::EffectIdentifierEnum::kBreathe)              |
-| Blinks (50 ms on/950 ms off)    | Okay (Clusters::Identify::EffectIdentifierEnum::kOkay)                    |
-| Blinks (1000 ms on/1000 ms off) | Channel Change (Clusters::Identify::EffectIdentifierEnum::kChannelChange) |
-| Blinks (950 ms on/50 ms off)    | Finish (Clusters::Identify::EffectIdentifierEnum::kFinishEffect)          |
-| LED off                         | Stop (Clusters::Identify::EffectIdentifierEnum::kStopEffect)              |
+| Effect                          | Description                                                                  |
+| :------------------------------ | :--------------------------------------------------------------------------- |
+| Blinks (200 ms on/200 ms off)   | Blink (`Clusters::Identify::EffectIdentifierEnum::kBlink`)                   |
+| Breathe (during 1000 ms)        | Breathe (`Clusters::Identify::EffectIdentifierEnum::kBreathe`)               |
+| Blinks (50 ms on/950 ms off)    | Okay (`Clusters::Identify::EffectIdentifierEnum::kOkay`)                     |
+| Blinks (1000 ms on/1000 ms off) | Channel Change ( `Clusters::Identify::EffectIdentifierEnum::kChannelChange`) |
+| Blinks (950 ms on/50 ms off)    | Finish ( `Clusters::Identify::EffectIdentifierEnum::kFinishEffect`)          |
+| LED off                         | Stop (`Clusters::Identify::EffectIdentifierEnum::kStopEffect`)               |
 
 #### Indicate current Pump state
 
