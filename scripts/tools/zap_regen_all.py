@@ -24,8 +24,6 @@ import subprocess
 import sys
 import tempfile
 import time
-import traceback
-import urllib.request
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
@@ -216,34 +214,10 @@ class JinjaCodegenTarget():
         self.command = ["./scripts/codegen.py", "--output-dir", output_directory,
                         "--generator", generator, idl_path]
 
-    def runJavaPrettifier(self):
-        try:
-            java_outputs = subprocess.check_output(["./scripts/codegen.py", "--name-only", "--generator",
-                                                   self.generator, "--log-level", "fatal", self.idl_path]).decode("utf8").split("\n")
-            java_outputs = [os.path.join(self.output_directory, name) for name in java_outputs if name]
-
-            logging.info("Prettifying %d java files:", len(java_outputs))
-            for name in java_outputs:
-                logging.info("    %s" % name)
-
-            # Keep this version in sync with what restyler uses (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml).
-            FORMAT_VERSION = "1.6"
-            URL_PREFIX = 'https://github.com/google/google-java-format/releases/download/google-java-format'
-            JAR_NAME = f"google-java-format-{FORMAT_VERSION}-all-deps.jar"
-            jar_url = f"{URL_PREFIX}-{FORMAT_VERSION}/{JAR_NAME}"
-
-            path, http_message = urllib.request.urlretrieve(jar_url, Path.home().joinpath(JAR_NAME).as_posix())
-
-            subprocess.check_call(['java', '-jar', path, '--replace'] + java_outputs)
-        except Exception as err:
-            traceback.print_exception(err)
-            print('google-java-format error:', err)
-
     def generate(self) -> TargetRunStats:
         generate_start = time.time()
 
         subprocess.check_call(self.command)
-        self.runJavaPrettifier()
 
         generate_end = time.time()
 
