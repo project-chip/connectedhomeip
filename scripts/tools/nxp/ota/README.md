@@ -52,12 +52,12 @@ The list of **custom options**:
 --dac_key          --> DAC private key.
 --pai_cert         --> PAI certificate.
 
-# Custom TLVs options
+# Custom TLV options
 --json             --> Path to a JSON file following ota_payload.schema
 ```
 
 Please note that the options above are separated into four categories:
-application, bootloader, factory data and custom TLVs (`--json` option). If no
+application, bootloader, factory data and custom TLV (`--json` option). If no
 descriptor options are specified for app/SSBL, the script will use the default
 values (`50000`, `"50000-default"`, `"2023-01-01"`). The descriptor feature is
 optional, TLV processors having the option to register a callback for descriptor
@@ -67,7 +67,7 @@ processing.
 
 When defining a custom processor, a user is able to also specify the custom
 format of the TLV by creating a JSON file based on the `ota_payload.schema`. The
-tool offers support for describing multiple TLVs in the same JSON file. Please
+tool offers support for describing multiple TLV in the same JSON file. Please
 see the `examples/ota_max_entries_example.json` for a multi-app + SSBL example.
 Option `--json` must be used to specify the path to the JSON file.
 

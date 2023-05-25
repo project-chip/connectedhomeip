@@ -253,8 +253,8 @@ The resulting output file can be found in out/debug/chip-k32w0x-light-example.
 ## Rotating device id
 
 This is an optional feature and can be used in multiple ways (please see section
-5.4.2.4.5 from Matter specification). One use case is Amazon FFS, which
-leverages the C3 Characteristic (Additional commissioning-related data) to offer
+5.4.2.4.5 from Matter specification). One use case is Amazon Frustration Free Setup,
+which leverages the C3 Characteristic (Additional commissioning-related data) to offer
 an easier way to set up the device. The rotating device id will be encoded in
 this additional data and is programmed to rotate at pre-defined moments. The
 algorithm uses a unique per-device identifier that must be programmed during
@@ -419,13 +419,13 @@ following defines:
 -   `gOTAUseCustomOtaEntry=1` - support custom OTA entry for multi-image.
 -   `gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash` - K32W0 uses
     `OTACustomStorage_ExtFlash` (1) by default.
--   `SPIFI_DUAL_MODE_SUPPORT=1` - only for configurations that use dual SPIFI
+-   `SPIFI_DUAL_MODE_SUPPORT=1` - only for configurations that use dual `SPIFI`
     flash (e.g. K32W041AM variant).
 
 Optionally, add the following defines:
 
 -   `SPIFI_OPTIM_SIZE=1` - to optimize SSBL size.
--   `EXTERNAL_FLASH_DATA_OTA=1` - to support external RO data.
+-   `EXTERNAL_FLASH_DATA_OTA=1` - to support external read only data.
 
 ![SSBL_MULTI_IMAGE](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_multi_image.JPG)
 
@@ -582,7 +582,7 @@ user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examp
 
 Build OTA image:
 
-In order to build an OTA image, use NXP's wrapper over the standard tool
+In order to build an OTA image, use NXP wrapper over the standard tool
 `src/app/ota_image_tool.py`:
 
 -   `scripts/tools/nxp/ota/ota_image_tool.py`
@@ -593,7 +593,7 @@ The tool can be used to generate an OTA image with the following format:
     | OTA image header | TLV1 | TLV2 | ... | TLVn |
 ```
 
-where TLVx is in the form `|tag|length|value|`.
+where each TLV is in the form `|tag|length|value|`.
 
 Note that "standard" TLV format is used. Matter TLV format is only used for
 factory data TLV value.

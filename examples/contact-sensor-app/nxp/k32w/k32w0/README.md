@@ -240,8 +240,8 @@ The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
 ## Rotating device id
 
 This is an optional feature and can be used in multiple ways (please see section
-5.4.2.4.5 from Matter specification). One use case is Amazon FFS, which
-leverages the C3 Characteristic (Additional commissioning-related data) to offer
+5.4.2.4.5 from Matter specification). One use case is Amazon Frustration Free Setup,
+which leverages the C3 Characteristic (Additional commissioning-related data) to offer
 an easier way to set up the device. The rotating device id will be encoded in
 this additional data and is programmed to rotate at pre-defined moments. The
 algorithm uses a unique per-device identifier that must be programmed during
@@ -406,13 +406,13 @@ following defines:
 -   `gOTAUseCustomOtaEntry=1` - support custom OTA entry for multi-image.
 -   `gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash` - K32W0 uses
     `OTACustomStorage_ExtFlash` (1) by default.
--   `SPIFI_DUAL_MODE_SUPPORT=1` - only for configurations that use dual SPIFI
+-   `SPIFI_DUAL_MODE_SUPPORT=1` - only for configurations that use dual `SPIFI`
     flash (e.g. K32W041AM variant).
 
 Optionally, add the following defines:
 
 -   `SPIFI_OPTIM_SIZE=1` - to optimize SSBL size.
--   `EXTERNAL_FLASH_DATA_OTA=1` - to support external RO data.
+-   `EXTERNAL_FLASH_DATA_OTA=1` - to support external read only data.
 
 ![SSBL_MULTI_IMAGE](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_multi_image.JPG)
 
