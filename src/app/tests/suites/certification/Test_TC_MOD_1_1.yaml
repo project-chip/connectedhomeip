@@ -99,14 +99,25 @@ tests:
               contains: [4]
 
     - label:
-          "Read the Feature dependent(MOD.S.F00 - DEPONOFF) and optional attribute(OnMode) in AttributeList from the DUT"
-      PICS: MOD.S.A0005 && MOD.S.F00
+          "Read the Feature dependent(MOD.S.F00 - DEPONOFF) and check that optional attribute(OnMode) is in AttributeList from the DUT"
+      PICS: MOD.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [5]
+
+    - label:
+          "Read the Feature dependent(MOD.S.F00 - DEPONOFF) and optional attribute(OnMode) is not in AttributeList from the DUT"
+      PICS: " !MOD.S.F00 "
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              excludes: [5]
+
 
     - label: "Read the global attribute AcceptedCommandList. Check if it contains the Feature dependent (MOD.S.F02 - DEPCTM) command with id 0x0 (ChangeToMode)"
       PICS: MOD.S.Afff9 && !MOD.S.F02
@@ -127,6 +138,15 @@ tests:
               type: list
               contains: [1]
 
+    - label: "Read the global attribute AcceptedCommandList. Check if it excludes the Feature dependent (MOD.S.F01 - EXT) command with id 0x1 (ChangeToModeWithStatus)"
+      PICS: MOD.S.Afff9 && !MOD.S.F01
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              excludes: [1]
+
     - label: "Read the global attribute AcceptedCommandList. Check if it excludes the Feature dependent (MOD.S.F02 - DEPCTM) command with id 0x0 (ChangeToMode)"
       PICS: MOD.S.Afff9 && MOD.S.F02
       command: "readAttribute"
@@ -136,12 +156,11 @@ tests:
               type: list
               excludes: [0]
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label: "Read the global attribute: GeneratedCommandList. Check if it excludes the Feature dependent (RVCRUNMS.S.F01 - EXT) command with id 0x2 (ChangeToModeResponse)"
       PICS: MOD.S.Afff8 && !MOD.S.F01
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: []
           constraints:
               type: list
               excludes: [2]
@@ -151,7 +170,6 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: []
           constraints:
               type: list
               contains: [2]

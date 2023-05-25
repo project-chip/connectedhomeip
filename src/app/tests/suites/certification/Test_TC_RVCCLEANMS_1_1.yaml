@@ -99,14 +99,24 @@ tests:
               contains: [4]
 
     - label:
-          "Read the Feature dependent(RVCCLEANMS.S.F00 - DEPONOFF) and optional attribute(OnMode) in AttributeList from the DUT"
-      PICS: RVCCLEANMS.S.A0005 && RVCCLEANMS.S.F00
+          "Read the Feature dependent(RVCCLEANMS.S.F00 - DEPONOFF) and optional attribute(OnMode) is in AttributeList from the DUT"
+      PICS: RVCCLEANMS.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [5]
+
+    - label:
+          "Read the Feature dependent(RVCCLEANMS.S.F00 - DEPONOFF) and optional attribute(OnMode) is not in AttributeList from the DUT"
+      PICS: " !RVCCLEANMS.S.F00 "
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              excludes: [5]
 
     - label: "Read the global attribute AcceptedCommandList. Check if it contains the Feature dependent (RVCCLEANMS.S.F02 - DEPCTM) command with id 0x0 (ChangeToMode)"
       PICS: RVCCLEANMS.S.Afff9 && !RVCCLEANMS.S.F02
@@ -127,6 +137,15 @@ tests:
               type: list
               contains: [1]
 
+    - label: "Read the global attribute AcceptedCommandList. Check if it excludes the Feature dependent (RVCCLEANMS.S.F01 - EXT) command with id 0x1 (ChangeToModeWithStatus)"
+      PICS: RVCCLEANMS.S.Afff9 && !RVCCLEANMS.S.F01
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              excludes: [1]
+
     - label: "Read the global attribute AcceptedCommandList. Check if it excludes the Feature dependent (RVCCLEANMS.S.F02 - DEPCTM) command with id 0x0 (ChangeToMode)"
       PICS: RVCCLEANMS.S.Afff9 && RVCCLEANMS.S.F02
       command: "readAttribute"
@@ -136,12 +155,11 @@ tests:
               type: list
               excludes: [0]
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label: "Read the global attribute: GeneratedCommandList. Check if it excludes the Feature dependent (RVCRUNMS.S.F01 - EXT) command with id 0x2 (ChangeToModeResponse)"
       PICS: RVCCLEANMS.S.Afff8 && !RVCCLEANMS.S.F01
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: []
           constraints:
               type: list
               excludes: [2]
@@ -151,7 +169,6 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: []
           constraints:
               type: list
               contains: [2]
