@@ -94,9 +94,11 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 // be touched from both whatever queue is starting controllers and from the
 // Matter queue.  The way this lock is used assumes that:
 //
-// 1) The only mutating accesses to the controllers array happen from outside
-//    the Matter queue (which is a good assumption, because those functions do
-//    sync dispatch to the Matter queue).
+// 1) The only mutating accesses to the controllers array happen when the
+//    current queue is not the Matter queue.  This is a good assumption, because
+//    the implementation of the fucntions that mutate the array do sync dispatch
+//    to the Matter queue, which would deadlock if they were called when that
+//    queue was the current queue.
 // 2) It's our API consumer's responsibility to serialize access to us from
 //    outside.
 //
@@ -183,8 +185,15 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     [self cleanupInitObjects];
 }
 
+- (void)_assertCurrentQueueIsNotMatterQueue
+{
+    VerifyOrDie(!DeviceLayer::PlatformMgrImpl().IsWorkQueueCurrentQueue());
+}
+
 - (BOOL)checkIsRunning:(NSError * __autoreleasing *)error
 {
+    [self _assertCurrentQueueIsNotMatterQueue];
+
     if ([self isRunning]) {
         return YES;
     }
@@ -272,6 +281,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (nullable NSArray<MTRFabricInfo *> *)knownFabrics
 {
+    [self _assertCurrentQueueIsNotMatterQueue];
+
     if (!self.isRunning) {
         return nil;
     }
@@ -320,6 +331,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (BOOL)startControllerFactory:(MTRDeviceControllerFactoryParams *)startupParams error:(NSError * __autoreleasing *)error;
 {
+    [self _assertCurrentQueueIsNotMatterQueue];
+
     if ([self isRunning]) {
         MTR_LOG_DEBUG("Ignoring duplicate call to startup, Matter controller factory already started...");
         return YES;
@@ -518,6 +531,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (void)stopControllerFactory
 {
+    [self _assertCurrentQueueIsNotMatterQueue];
+
     if (![self isRunning]) {
         return;
     }
@@ -541,6 +556,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 - (MTRDeviceController * _Nullable)createControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                               error:(NSError * __autoreleasing *)error
 {
+    [self _assertCurrentQueueIsNotMatterQueue];
+
     if (![self checkIsRunning:error]) {
         MTR_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
         return nil;
@@ -632,6 +649,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 - (MTRDeviceController * _Nullable)createControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                          error:(NSError * __autoreleasing *)error
 {
+    [self _assertCurrentQueueIsNotMatterQueue];
+
     if (![self isRunning]) {
         MTR_LOG_ERROR("Trying to start controller while Matter controller factory is not running");
         return nil;
@@ -716,6 +735,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (MTRDeviceController * _Nullable)createController
 {
+    [self _assertCurrentQueueIsNotMatterQueue];
+
     MTRDeviceController * controller = [[MTRDeviceController alloc] initWithFactory:self queue:_chipWorkQueue];
     if (controller == nil) {
         MTR_LOG_ERROR("Failed to init controller");
@@ -752,6 +773,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
                     params:(MTRDeviceControllerStartupParams *)params
                     fabric:(const FabricInfo * _Nullable * _Nonnull)fabric
 {
+    assertChipStackLockedByCurrentThread();
+
     CHIP_ERROR err = fabricTable.Init(
         { .storage = _persistentStorageDelegateBridge, .operationalKeystore = _keystore, .opCertStore = _opCertStore });
     if (err != CHIP_NO_ERROR) {
@@ -787,6 +810,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 //
 - (MTRDeviceController * _Nullable)maybeInitializeOTAProvider:(MTRDeviceController * _Nonnull)controller
 {
+    [self _assertCurrentQueueIsNotMatterQueue];
+
     VerifyOrReturnValue(_otaProviderDelegateBridge != nil, controller);
     VerifyOrReturnValue([_controllers count] == 1, controller);
 
@@ -810,6 +835,8 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (void)controllerShuttingDown:(MTRDeviceController *)controller
 {
+    [self _assertCurrentQueueIsNotMatterQueue];
+
     if (![_controllers containsObject:controller]) {
         MTR_LOG_ERROR("Controller we don't know about shutting down");
         return;
@@ -862,7 +889,13 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex
 {
-    for (MTRDeviceController * existing in _controllers) {
+    assertChipStackLockedByCurrentThread();
+
+    os_unfair_lock_lock(&_controllersLock);
+    NSArray<MTRDeviceController *> * controllersCopy = [_controllers copy];
+    os_unfair_lock_unlock(&_controllersLock);
+
+    for (MTRDeviceController * existing in controllersCopy) {
         if ([existing fabricIndex] == fabricIndex) {
             return existing;
         }

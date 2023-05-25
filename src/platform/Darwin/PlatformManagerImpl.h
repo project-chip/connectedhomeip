@@ -56,6 +56,8 @@ public:
         return mWorkQueue;
     }
 
+    bool IsWorkQueueCurrentQueue() const;
+
     CHIP_ERROR StartBleScan(BleScannerDelegate * delegate = nullptr);
     CHIP_ERROR StopBleScan();
     CHIP_ERROR PrepareCommissioning();
