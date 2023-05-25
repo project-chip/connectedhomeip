@@ -150,7 +150,6 @@ void MatterUvFilterMonitoringPluginServerInitCallback() {}
 void MatterWaterTankMonitoringPluginServerInitCallback() {}
 void MatterZeoliteFilterMonitoringPluginServerInitCallback() {}
 
-
 // ****************************************
 // Print out information about each cluster
 // ****************************************
