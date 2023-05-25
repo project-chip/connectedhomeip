@@ -295,7 +295,7 @@ TimeSynchronizationServer::SetDSTOffset(DataModel::DecodableList<TimeSynchroniza
     {
         const auto & dstItem = TimeSynchronizationServer::Instance().GetDSTOffset()[i];
         // list should be sorted by validStarting
-        for (uint8_t j = i + 1; j < mDstOffsetListSize; j++)
+        for (uint8_t j = static_cast<uint8_t>(i + 1); j < mDstOffsetListSize; j++)
         {
             const auto & nextDstItem = TimeSynchronizationServer::Instance().GetDSTOffset()[j];
             if (dstItem.validStarting > nextDstItem.validStarting)

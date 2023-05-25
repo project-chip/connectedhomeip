@@ -32,7 +32,7 @@ tests:
       command: "readAttribute"
       attribute: "TimeZone"
       response:
-          value: [{ Offset: 0, ValidAt: 0, Name: "" }]
+          value: [{ Offset: 0, ValidAt: 0 }]
 
     - label: "Set Time Zone list"
       command: "SetTimeZone"
@@ -105,7 +105,7 @@ tests:
       command: "readAttribute"
       attribute: "TimeZone"
       response:
-          value: [{ Offset: 0, ValidAt: 0, Name: "" }]
+          value: [{ Offset: 0, ValidAt: 0 }]
 
     - label: "Read DSTOffset"
       command: "readAttribute"
