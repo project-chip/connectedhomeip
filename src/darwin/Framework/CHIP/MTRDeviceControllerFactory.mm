@@ -34,6 +34,8 @@
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "NSDataSpanConversion.h"
 
+#import <os/lock.h>
+
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
@@ -88,6 +90,20 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 @property () chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
 @property (readonly) BOOL advertiseOperational;
 @property (nonatomic, readonly) Credentials::IgnoreCertificateValidityPeriodPolicy * certificateValidityPolicy;
+// Lock used to serialize access to the "controllers" array, since it needs to
+// be touched from both whatever queue is starting controllers and from the
+// Matter queue.  The way this lock is used assumes that:
+//
+// 1) The only mutating accesses to the controllers array happen from outside
+//    the Matter queue (which is a good assumption, because those functions do
+//    sync dispatch to the Matter queue).
+// 2) It's our API consumer's responsibility to serialize access to us from
+//    outside.
+//
+// This means that we only take the lock around mutations of the array and
+// accesses to the array that are from code running on the Matter queue.
+
+@property (nonatomic, readonly) os_unfair_lock controllersLock;
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(MTRDeviceControllerStartupParams *)params
@@ -123,6 +139,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     _running = NO;
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
+    _controllersLock = OS_UNFAIR_LOCK_INIT;
 
     _sessionKeystore = new chip::Crypto::RawKeySessionKeystore();
     if ([self checkForInitError:(_sessionKeystore != nullptr) logMsg:kErrorSessionKeystoreInit]) {
@@ -716,7 +733,9 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
     // Add the controller to _controllers now, so if we fail partway through its
     // startup we will still do the right cleanups.
+    os_unfair_lock_lock(&_controllersLock);
     [_controllers addObject:controller];
+    os_unfair_lock_unlock(&_controllersLock);
 
     return controller;
 }
@@ -808,7 +827,9 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         });
     }
 
+    os_unfair_lock_lock(&_controllersLock);
     [_controllers removeObject:controller];
+    os_unfair_lock_unlock(&_controllersLock);
 
     if ([_controllers count] == 0) {
         dispatch_sync(_chipWorkQueue, ^{
@@ -852,7 +873,13 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 - (void)operationalInstanceAdded:(chip::PeerId &)operationalID
 {
-    for (MTRDeviceController * controller in _controllers) {
+    assertChipStackLockedByCurrentThread();
+
+    os_unfair_lock_lock(&_controllersLock);
+    NSArray<MTRDeviceController *> * controllersCopy = [_controllers copy];
+    os_unfair_lock_unlock(&_controllersLock);
+
+    for (MTRDeviceController * controller in controllersCopy) {
         auto * compressedFabricId = controller.compressedFabricID;
         if (compressedFabricId != nil && compressedFabricId.unsignedLongLongValue == operationalID.GetCompressedFabricId()) {
             ChipLogProgress(Controller, "Notifying controller at fabric index %u about new operational node 0x" ChipLogFormatX64,
