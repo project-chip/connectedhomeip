@@ -89,6 +89,7 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
     - label:
           "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
           node ID N2"
@@ -143,6 +144,7 @@ tests:
 
     - label: "Read the TH2 commissioner node ID"
       identity: "beta"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "CommissionerCommands"
       command: "GetCommissionerNodeId"
       response:
@@ -153,11 +155,42 @@ tests:
     - label:
           "TH2 reads OperationalCredentials cluster CurrentFabricIndex attribute"
       identity: "beta"
+      PICS: PICS_SDK_CI_ONLY
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "CurrentFabricIndex"
       response:
           saveAs: TH2FabricIndex
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label:
+          "TH2 reads OperationalCredentials cluster CurrentFabricIndex attribute"
+      verification: |
+          ./chip-tool  operationalcredentials read current-fabric-index 2 0 --commissioner-nodeid 223344 --commissioner-name beta
+
+          On TH2(Chiptool),verify  CurrentFabricIndex attribute of operationalCredential cluster  as 2
+
+          1658747098.843523][3024:3029] CHIP:DMG:                 },
+          [1658747098.843552][3024:3029] CHIP:DMG:
+          [1658747098.843575][3024:3029] CHIP:DMG:         ],
+          [1658747098.843604][3024:3029] CHIP:DMG:
+          [1658747098.843628][3024:3029] CHIP:DMG:         SuppressResponse = true,
+          [1658747098.843653][3024:3029] CHIP:DMG:         InteractionModelRevision = 1
+          [1658747098.843676][3024:3029] CHIP:DMG: }
+          [1658747098.843805][3024:3029] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 2815046656
+          [1658747098.846044][3024:3029] CHIP:TOO:   CurrentFabricIndex: 2
+          [1658747098.846131][3024:3029] CHIP:EM: Sending Standalone Ack for MessageCounter:263449390 on exchange 10738i
+          [1658747098.846202][3024:3029] CHIP:IN: Prepared secure message 0xffffb67cd9e8 to 0x0000000000000002 (2)  of type 0x10 and protocolId (0, 0) on exchange 10738i with MessageCounter:175421270.
+          [1658747098.846282][3024:3029] CHIP:IN: Sending encrypted msg 0xffffb67cd9e8 with MessageCounter:175421270 to 0x0000000000000002 (2) at monotonic time: 00000000009FA528 msec
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
       PICS: ACL.S.A0000
@@ -176,7 +209,7 @@ tests:
               ]
 
     - label: "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
-      PICS: ACL.S.A0000
+      PICS: ACL.S.A0000 && PICS_SDK_CI_ONLY
       identity: "beta"
       command: "writeAttribute"
       attribute: "ACL"
@@ -191,6 +224,67 @@ tests:
                       FabricIndex: TH2FabricIndex,
                   },
               ]
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label: "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
+      verification: |
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [223344,2222], "targets":null}]' 2 0  --commissioner-nodeid 223344 --commissioner-name beta
+
+          On TH2(Chiptool), verify AccessControl cluster ACL attribute value is list of AccessControlEntryStruct containing 1 element
+
+          [1658747124.117113][3031:3036] CHIP:DMG: {
+          [1658747124.117163][3031:3036] CHIP:DMG:         AttributeStatusIBs =
+          [1658747124.117214][3031:3036] CHIP:DMG:         [
+          [1658747124.117269][3031:3036] CHIP:DMG:                 AttributeStatusIB =
+          [1658747124.117317][3031:3036] CHIP:DMG:                 {
+          [1658747124.117377][3031:3036] CHIP:DMG:                         AttributePathIB =
+          [1658747124.117434][3031:3036] CHIP:DMG:                         {
+          [1658747124.117488][3031:3036] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658747124.117548][3031:3036] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658747124.117602][3031:3036] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1658747124.117657][3031:3036] CHIP:DMG:                         }
+          [1658747124.117715][3031:3036] CHIP:DMG:
+          [1658747124.117764][3031:3036] CHIP:DMG:                         StatusIB =
+          [1658747124.117814][3031:3036] CHIP:DMG:                         {
+          [1658747124.117866][3031:3036] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658747124.117921][3031:3036] CHIP:DMG:                         },
+          [1658747124.117972][3031:3036] CHIP:DMG:
+          [1658747124.118016][3031:3036] CHIP:DMG:                 },
+          [1658747124.118077][3031:3036] CHIP:DMG:
+          [1658747124.118116][3031:3036] CHIP:DMG:                 AttributeStatusIB =
+          [1658747124.118161][3031:3036] CHIP:DMG:                 {
+          [1658747124.118205][3031:3036] CHIP:DMG:                         AttributePathIB =
+          [1658747124.118285][3031:3036] CHIP:DMG:                         {
+          [1658747124.118340][3031:3036] CHIP:DMG:                                 Endpoint = 0x0,
+          [1658747124.118394][3031:3036] CHIP:DMG:                                 Cluster = 0x1f,
+          [1658747124.118453][3031:3036] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1658747124.118505][3031:3036] CHIP:DMG:                                 ListIndex = Null,
+          [1658747124.118555][3031:3036] CHIP:DMG:                         }
+          [1658747124.118609][3031:3036] CHIP:DMG:
+          [1658747124.118658][3031:3036] CHIP:DMG:                         StatusIB =
+          [1658747124.118707][3031:3036] CHIP:DMG:                         {
+          [1658747124.118757][3031:3036] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1658747124.118810][3031:3036] CHIP:DMG:                         },
+          [1658747124.118861][3031:3036] CHIP:DMG:
+          [1658747124.118904][3031:3036] CHIP:DMG:                 },
+          [1658747124.118954][3031:3036] CHIP:DMG:
+          [1658747124.118992][3031:3036] CHIP:DMG:         ],
+          [1658747124.119044][3031:3036] CHIP:DMG:
+          [1658747124.119082][3031:3036] CHIP:DMG:         InteractionModelRevision = 1
+          [1658747124.119119][3031:3036] CHIP:DMG: }
+          [1658747124.119272][3031:3036] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1658747124.119359][3031:3036] CHIP:EM: Sending Standalone Ack for MessageCounter:33509818 on exchange 38117i
+          [1658747124.119446][3031:3036] CHIP:IN: Prepared secure message 0xffff7a7cd9e8 to 0x0000000000000002 (2)  of type 0x10 and protocolId (0, 0) on exchange 38117i with MessageCounter:75755402.
+          [1658747124.119505][3031:3036] CHIP:IN: Sending encrypted msg 0xffff7a7cd9e8 with MessageCounter:7575
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
       PICS: ACL.S.A0000
@@ -209,7 +303,7 @@ tests:
               ]
 
     - label: "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
-      PICS: ACL.S.A0000
+      PICS: ACL.S.A0000 && PICS_SDK_CI_ONLY
       identity: "beta"
       command: "readAttribute"
       attribute: "ACL"
@@ -224,6 +318,37 @@ tests:
                       FabricIndex: TH2FabricIndex,
                   },
               ]
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label: "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
+      verification: |
+          ./chip-tool accesscontrol read acl 2 0 --commissioner-name beta --commissioner-nodeid 223344
+
+          On TH2(Chiptool), verify  AccessControlEntryStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
+
+          [1661407263.740571][2355:2360] CHIP:DMG:         SuppressResponse = true,
+          [1661407263.740605][2355:2360] CHIP:DMG:         InteractionModelRevision = 1
+          [1661407263.740640][2355:2360] CHIP:DMG: }
+          [1661407263.741000][2355:2360] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 2445703657
+          [1661407263.741100][2355:2360] CHIP:TOO:   ACL: 1 entries
+          [1661407263.741165][2355:2360] CHIP:TOO:     [1]: {
+          [1661407263.741222][2355:2360] CHIP:TOO:       Privilege: 5
+          [1661407263.741260][2355:2360] CHIP:TOO:       AuthMode: 2
+          [1661407263.741409][2355:2360] CHIP:TOO:       Subjects: 2 entries
+          [1661407263.741453][2355:2360] CHIP:TOO:         [1]: 223344
+          [1661407263.741487][2355:2360] CHIP:TOO:         [2]: 2222
+          [1661407263.741518][2355:2360] CHIP:TOO:       Targets: null
+          [1661407263.741553][2355:2360] CHIP:TOO:       FabricIndex: 2
+          [1661407263.741587][2355:2360] CHIP:TOO:      }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH1 reads DUT Endpoint 0 AccessControl cluster
@@ -284,7 +409,7 @@ tests:
     - label:
           "TH2 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
-      PICS: ACL.S.E00
+      PICS: ACL.S.E00 && PICS_SDK_CI_ONLY
       identity: "beta"
       command: "readEvent"
       event: "AccessControlEntryChanged"
@@ -338,17 +463,125 @@ tests:
                           FabricIndex: TH2FabricIndex,
                       }
 
-    - label: "TH1 writes ACL attribute value is an empty list"
-      PICS: ACL.S.A0000
-      command: "writeAttribute"
-      attribute: "ACL"
-      arguments:
-          value: []
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label:
+          "TH2 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlEntryChanged event"
+      verification: |
+          ./chip-tool  accesscontrol  read-event  access-control-entry-changed  2 0 --commissioner-name beta --commissioner-nodeid 223344
 
-    - label: "TH2 writes ACL attribute value is an empty list"
-      identity: "beta"
+          On TH2(Chiptool), verify AccessControl cluster AccessControlEntryChanged containing 3 elements, and MUST NOT contain any element with FabricIndex F1
+
+          [1661354915.731697][4136:4141] CHIP:DMG:
+          [1661354915.731730][4136:4141] CHIP:DMG:         SuppressResponse = true,
+          [1661354915.731759][4136:4141] CHIP:DMG:         InteractionModelRevision = 1
+          [1661354915.731790][4136:4141] CHIP:DMG: }
+          [1661354915.732074][4136:4141] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1661354915.732104][4136:4141] CHIP:TOO:   Event number: 4
+          [1661354915.732133][4136:4141] CHIP:TOO:   Priority: Info
+          [1661354915.732159][4136:4141] CHIP:TOO:   Timestamp: 22322302
+          [1661354915.732291][4136:4141] CHIP:TOO:   AccessControlEntryChanged: {
+          [1661354915.732328][4136:4141] CHIP:TOO:     AdminNodeID: null
+          [1661354915.732374][4136:4141] CHIP:TOO:     AdminPasscodeID: 0
+          [1661354915.732423][4136:4141] CHIP:TOO:     ChangeType: 1
+          [1661354915.732456][4136:4141] CHIP:TOO:     LatestValue: {
+          [1661354915.732486][4136:4141] CHIP:TOO:       Privilege: 5
+          [1661354915.732516][4136:4141] CHIP:TOO:       AuthMode: 2
+          [1661354915.732554][4136:4141] CHIP:TOO:       Subjects: 1 entries
+          [1661354915.732593][4136:4141] CHIP:TOO:         [1]: 223344
+          [1661354915.732625][4136:4141] CHIP:TOO:       Targets: null
+          [1661354915.732658][4136:4141] CHIP:TOO:       FabricIndex: 2
+          [1661354915.732688][4136:4141] CHIP:TOO:      }
+          [1661354915.732720][4136:4141] CHIP:TOO:     FabricIndex: 2
+          [1661354915.732749][4136:4141] CHIP:TOO:    }
+          [1661354915.732896][4136:4141] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1661354915.732929][4136:4141] CHIP:TOO:   Event number: 9
+          [1661354915.732955][4136:4141] CHIP:TOO:   Priority: Info
+          [1661354915.732980][4136:4141] CHIP:TOO:   Timestamp: 22566955
+          [1661354915.733031][4136:4141] CHIP:TOO:   AccessControlEntryChanged: {
+          [1661354915.733065][4136:4141] CHIP:TOO:     AdminNodeID: 223344
+          [1661354915.733097][4136:4141] CHIP:TOO:     AdminPasscodeID: null
+          [1661354915.733128][4136:4141] CHIP:TOO:     ChangeType: 2
+          [1661354915.733158][4136:4141] CHIP:TOO:     LatestValue: {
+          [1661354915.733187][4136:4141] CHIP:TOO:       Privilege: 5
+          [1661354915.733219][4136:4141] CHIP:TOO:       AuthMode: 2
+          [1661354915.733252][4136:4141] CHIP:TOO:       Subjects: 1 entries
+          [1661354915.733287][4136:4141] CHIP:TOO:         [1]: 223344
+          [1661354915.733319][4136:4141] CHIP:TOO:       Targets: null
+          [1661354915.733349][4136:4141] CHIP:TOO:       FabricIndex: 2
+          [1661354915.733379][4136:4141] CHIP:TOO:      }
+          [1661354915.733408][4136:4141] CHIP:TOO:     FabricIndex: 2
+          [1661354915.733437][4136:4141] CHIP:TOO:    }
+          [1661354915.733578][4136:4141] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1661354915.733610][4136:4141] CHIP:TOO:   Event number: 10
+          [1661354915.733637][4136:4141] CHIP:TOO:   Priority: Info
+          [1661354915.733662][4136:4141] CHIP:TOO:   Timestamp: 22566957
+          [1661354915.733709][4136:4141] CHIP:TOO:   AccessControlEntryChanged: {
+          [1661354915.733743][4136:4141] CHIP:TOO:     AdminNodeID: 223344
+          [1661354915.733772][4136:4141] CHIP:TOO:     AdminPasscodeID: null
+          [1661354915.733803][4136:4141] CHIP:TOO:     ChangeType: 1
+          [1661354915.733833][4136:4141] CHIP:TOO:     LatestValue: {
+          [1661354915.733863][4136:4141] CHIP:TOO:       Privilege: 5
+          [1661354915.733891][4136:4141] CHIP:TOO:       AuthMode: 2
+          [1661354915.733923][4136:4141] CHIP:TOO:       Subjects: 2 entries
+          [1661354915.733957][4136:4141] CHIP:TOO:         [1]: 223344
+          [1661354915.733991][4136:4141] CHIP:TOO:         [2]: 2222
+          [1661354915.734018][4136:4141] CHIP:TOO:       Targets: null
+          [1661354915.734048][4136:4141] CHIP:TOO:       FabricIndex: 2
+          [1661354915.734077][4136:4141] CHIP:TOO:      }
+          [1661354915.734107][4136:4141] CHIP:TOO:     FabricIndex: 2
+          [1661354915.734136][4136:4141] CHIP:TOO:    }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E00
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH1 writes ACL attribute"
       PICS: ACL.S.A0000
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value: []
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [TH1CommissionerNodeId],
+                      Targets: null,
+                  },
+              ]
+
+    - label: "TH2 writes ACL attribute default value"
+      identity: "beta"
+      PICS: ACL.S.A0000 && PICS_SDK_CI_ONLY
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [TH2CommissionerNodeId],
+                      Targets: null,
+                  },
+              ]
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label: "TH2 writes ACL attribute default value"
+      verification: |
+          ./chip-tool accesscontrol write acl '[{ "privilege": 5, "authMode": 2, "subjects": [223344], "targets":null}]' 2 0  --commissioner-nodeid 223344 --commissioner-name beta
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

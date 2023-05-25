@@ -88,6 +88,7 @@ tests:
               - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
     - label:
           "Step 3 & 4: TH1 puts DUT into commissioning mode, TH2 commissions DUT
           using admin node ID N2"
@@ -149,6 +150,7 @@ tests:
                 value: nodeId2
 
     - label: "Read the TH2 commissioner node ID"
+      PICS: PICS_SDK_CI_ONLY
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "GetCommissionerNodeId"
@@ -161,11 +163,31 @@ tests:
           "Step 5:TH2 reads OperationalCredentials cluster CurrentFabricIndex
           attribute"
       identity: "beta"
+      PICS: PICS_SDK_CI_ONLY
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "CurrentFabricIndex"
       response:
           saveAs: TH2FabricIndex
+
+    - label:
+          "Step 5:TH2 reads OperationalCredentials cluster CurrentFabricIndex
+          attribute"
+      verification: |
+          ./chip-tool operationalcredentials read current-fabric-index 2 0 --commissioner-name beta --commissioner-nodeid 223344
+
+          On TH2(Chiptool), verify  CurrentFabricIndex attribute of operationalCredential cluster  as 2
+          [1657186956.724761][3910:3915] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 3161849734
+          [1657186956.731658][3910:3915] CHIP:TOO:   CurrentFabricIndex: 2
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 6:TH1 writes DUT Endpoint 0 AccessControl cluster Extension
@@ -181,12 +203,73 @@ tests:
           "Step 7:TH2 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 1
           element"
-      PICS: ACL.S.A0001
+      PICS: ACL.S.A0001 && PICS_SDK_CI_ONLY
       identity: "beta"
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
           value: [{ Data: D_OK_SINGLE, FabricIndex: TH2FabricIndex }]
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label:
+          "Step 7:TH2 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element"
+      verification: |
+          ./chip-tool   accesscontrol  write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 2 0 --commissioner-name beta --commissioner-nodeid 223344
+
+           On TH2(Chiptool),Verify Successfully to extension attribute list containg one element .
+           1657894672.479983][2433:2438] CHIP:DMG: WriteClient moving to [ResponseRe]
+           [1657894672.480057][2433:2438] CHIP:DMG: WriteResponseMessage =
+           [1657894672.480092][2433:2438] CHIP:DMG: {
+           [1657894672.480124][2433:2438] CHIP:DMG:         AttributeStatusIBs =
+           [1657894672.480175][2433:2438] CHIP:DMG:         [
+           [1657894672.480211][2433:2438] CHIP:DMG:                 AttributeStatusIB =
+           [1657894672.480251][2433:2438] CHIP:DMG:                 {
+           [1657894672.480288][2433:2438] CHIP:DMG:                         AttributePathIB =
+           [1657894672.480333][2433:2438] CHIP:DMG:                         {
+           [1657894672.480379][2433:2438] CHIP:DMG:                                 Endpoint = 0x0,
+           [1657894672.480427][2433:2438] CHIP:DMG:                                 Cluster = 0x1f,
+           [1657894672.480476][2433:2438] CHIP:DMG:                                 Attribute = 0x0000_0001,
+           [1657894672.480521][2433:2438] CHIP:DMG:                         }
+           [1657894672.480570][2433:2438] CHIP:DMG:
+           [1657894672.480612][2433:2438] CHIP:DMG:                         StatusIB =
+           [1657894672.480657][2433:2438] CHIP:DMG:                         {
+           [1657894672.480700][2433:2438] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+           [1657894672.480745][2433:2438] CHIP:DMG:                         },
+           [1657894672.480789][2433:2438] CHIP:DMG:
+           [1657894672.480826][2433:2438] CHIP:DMG:                 },
+           [1657894672.480877][2433:2438] CHIP:DMG:
+           [1657894672.480911][2433:2438] CHIP:DMG:                 AttributeStatusIB =
+           [1657894672.480949][2433:2438] CHIP:DMG:                 {
+           [1657894672.480986][2433:2438] CHIP:DMG:                         AttributePathIB =
+           [1657894672.481028][2433:2438] CHIP:DMG:                         {
+           [1657894672.481072][2433:2438] CHIP:DMG:                                 Endpoint = 0x0,
+           [1657894672.481120][2433:2438] CHIP:DMG:                                 Cluster = 0x1f,
+           [1657894672.481168][2433:2438] CHIP:DMG:                                 Attribute = 0x0000_0001,
+           [1657894672.481214][2433:2438] CHIP:DMG:                                 ListIndex = Null,
+           [1657894672.481258][2433:2438] CHIP:DMG:                         }
+           [1657894672.481306][2433:2438] CHIP:DMG:
+           [1657894672.481347][2433:2438] CHIP:DMG:                         StatusIB =
+           [1657894672.481390][2433:2438] CHIP:DMG:                         {
+           [1657894672.481433][2433:2438] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+           [1657894672.481482][2433:2438] CHIP:DMG:                         },
+           [1657894672.481526][2433:2438] CHIP:DMG:
+           [1657894672.481562][2433:2438] CHIP:DMG:                 },
+           [1657894672.481605][2433:2438] CHIP:DMG:
+           [1657894672.481639][2433:2438] CHIP:DMG:         ],
+           [1657894672.481686][2433:2438] CHIP:DMG:
+           [1657894672.481720][2433:2438] CHIP:DMG:         InteractionModelRevision = 1
+           [1657894672.481754][2433:2438] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 8:TH1 reads AccessControl cluster Extension attribute"
       PICS: ACL.S.A0001
@@ -196,12 +279,34 @@ tests:
           value: [{ Data: D_OK_EMPTY, FabricIndex: TH1FabricIndex }]
 
     - label: "Step 9:TH2 reads AccessControl cluster Extension attribute"
-      PICS: ACL.S.A0001
+      PICS: ACL.S.A0001 && PICS_SDK_CI_ONLY
       identity: "beta"
       command: "readAttribute"
       attribute: "Extension"
       response:
           value: [{ Data: D_OK_SINGLE, FabricIndex: TH2FabricIndex }]
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label: "Step 9:TH2 reads AccessControl cluster Extension attribute"
+      verification: |
+          ./chip-tool accesscontrol read extension 2 0 --commissioner-name beta --commissioner-nodeid 223344
+
+          On TH2(Chiptool), Verify AccessControlExtensionStruct containing 1 element, and MUST NOT contain an element with FabricIndex F1
+          [1658327214.683199][2749:2754] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0001 DataVersion: 2953114587
+          [1658327214.683283][2749:2754] CHIP:TOO:   Extension: 1 entries
+          [1658327214.683348][2749:2754] CHIP:TOO:     [1]: {
+          [1658327214.683388][2749:2754] CHIP:TOO:       Data: 17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018
+          [1658327214.683423][2749:2754] CHIP:TOO:       FabricIndex: 2
+          [1658327214.683454][2749:2754] CHIP:TOO:      }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 10:TH1 reads DUT Endpoint 0 AccessControl cluster
@@ -223,7 +328,7 @@ tests:
     - label:
           "Step 11:TH2 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
-      PICS: ACL.S.E01
+      PICS: ACL.S.E01 && PICS_SDK_CI_ONLY
       identity: "beta"
       command: "readEvent"
       event: "AccessControlExtensionChanged"
@@ -238,6 +343,36 @@ tests:
                   FabricIndex: TH2FabricIndex,
               }
 
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label:
+          "Step 11:TH2 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlExtensionChanged event"
+      verification: |
+          ./chip-tool accesscontrol read-event access-control-extension-changed  2 0 --commissioner-name beta  --commissioner-nodeid 223344
+
+          On TH2(Chiptool) , Verify AccessControlExtensionChanged containing 1 element, and MUST NOT contain an element with FabricIndex F1
+          [1663242753.957097][4264:4270] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
+          [1663242753.957400][4264:4270] CHIP:TOO:   Event number: 8
+          [1663242753.957459][4264:4270] CHIP:TOO:   Priority: Info
+          [1663242753.957507][4264:4270] CHIP:TOO:   Timestamp: 20785045
+          [1663242753.957708][4264:4270] CHIP:TOO:   AccessControlExtensionChanged: {
+          [1663242753.957801][4264:4270] CHIP:TOO:     AdminNodeID: 223344
+          [1663242753.957867][4264:4270] CHIP:TOO:     AdminPasscodeID: null
+          [1663242753.957931][4264:4270] CHIP:TOO:     ChangeType: 1
+          [1663242753.957991][4264:4270] CHIP:TOO:     LatestValue: {
+          [1663242753.958055][4264:4270] CHIP:TOO:       Data: 17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018
+          [1663242753.958118][4264:4270] CHIP:TOO:       FabricIndex: 2
+          [1663242753.958183][4264:4270] CHIP:TOO:      }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E01
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH1 writes Extension attribute value as empty list"
       PICS: ACL.S.A0001
       command: "writeAttribute"
@@ -247,8 +382,22 @@ tests:
 
     - label: "TH2 writes Extension attribute value as empty list"
       identity: "beta"
-      PICS: ACL.S.A0001
+      PICS: ACL.S.A0001 && PICS_SDK_CI_ONLY
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
           value: []
+
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/768
+    - label: "TH2 writes Extension attribute value as empty list"
+      verification: |
+          ./chip-tool accesscontrol write extension '[{}]' 2 0 --commissioner-name beta --commissioner-nodeid 223344
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
