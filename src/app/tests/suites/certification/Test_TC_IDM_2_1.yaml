@@ -160,22 +160,20 @@ tests:
 
           verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
 
-          [1655721447.462511][10909:10909] CHIP:EM: Handling via exchange: 28866r, Delegate: 0xaaaac37ce418
-          [1655721447.462589][10909:10909] CHIP:IM: Received Read request
-          [1655721447.462717][10909:10909] CHIP:DMG: ReadRequestMessage =
-          [1655721447.462770][10909:10909] CHIP:DMG: {
-          [1655721447.462817][10909:10909] CHIP:DMG:         AttributePathIBs =
-          [1655721447.462908][10909:10909] CHIP:DMG:         [
-          [1655721447.462961][10909:10909] CHIP:DMG:                 AttributePathIB =
-          [1655721447.463014][10909:10909] CHIP:DMG:                 {
-          [1655721447.463066][10909:10909] CHIP:DMG:                 }
-          [1655721447.463121][10909:10909] CHIP:DMG:
-          [1655721447.463173][10909:10909] CHIP:DMG:         ],
-          [1655721447.463228][10909:10909] CHIP:DMG:
-          [1655721447.463282][10909:10909] CHIP:DMG:         isFabricFiltered = true,
-          [1655721447.463334][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
-          [1655721447.463382][10909:10909] CHIP:DMG: },
-          [1655721447.463503][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1684327544.654910][138835:138837] CHIP:DMG: ReportDataMessage =
+          [1684327544.654915][138835:138837] CHIP:DMG: {
+          [1684327544.654920][138835:138837] CHIP:DMG: 	AttributeReportIBs =
+          [1684327544.654926][138835:138837] CHIP:DMG: 	[
+          [1684327544.654929][138835:138837] CHIP:DMG: 		AttributeReportIB =
+          [1684327544.654940][138835:138837] CHIP:DMG: 		{
+          [1684327544.654949][138835:138837] CHIP:DMG: 			AttributeDataIB =
+          [1684327544.654956][138835:138837] CHIP:DMG: 			{
+          [1684327544.654964][138835:138837] CHIP:DMG: 				DataVersion = 0x91861588,
+          [1684327544.654970][138835:138837] CHIP:DMG: 				AttributePathIB =
+          [1684327544.654978][138835:138837] CHIP:DMG: 				{
+          [1684327544.654995][138835:138837] CHIP:DMG: 					Attribute = 0x0000_FFFD,
+          [1684327544.655002][138835:138837] CHIP:DMG: 				}
+
 
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
       disabled: true

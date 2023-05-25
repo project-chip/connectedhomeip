@@ -98,7 +98,7 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
             ret = await self.send_set_time_zone_cmd(tz=tz)
 
         self.print_step(10, "Send SetTimeZone command - bad validAt time")
-        tz = [tz_struct(offset=3600, validAt=0, name="Europe/Dublin")]
+        tz = [tz_struct(offset=3600, validAt=utc_time_in_matter_epoch(), name="Europe/Dublin")]
         await self.send_set_time_zone_cmd_expect_error(tz=tz, error=Status.ConstraintError)
 
         self.print_step(11, "Send SetTimeZone command - bad second entry")

@@ -336,7 +336,7 @@ server cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
-  struct Target {
+  struct AccessControlTargetStruct {
     nullable cluster_id cluster = 0;
     nullable endpoint_no endpoint = 1;
     nullable devtype_id deviceType = 2;
@@ -346,7 +346,7 @@ server cluster AccessControl = 31 {
     fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
-    nullable fabric_sensitive Target targets[] = 4;
+    nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -2285,27 +2285,27 @@ endpoint 1 {
   }
 
   server cluster ColorControl {
-    ram      attribute currentHue default = 0x00;
-    ram      attribute currentSaturation default = 0x00;
+    persist  attribute currentHue default = 0x00;
+    persist  attribute currentSaturation default = 0x00;
     ram      attribute remainingTime default = 0x0000;
-    ram      attribute currentX default = 0x616B;
-    ram      attribute currentY default = 0x607D;
-    ram      attribute colorTemperatureMireds default = 0x00FA;
-    ram      attribute colorMode default = 0x01;
+    persist  attribute currentX default = 0x616B;
+    persist  attribute currentY default = 0x607D;
+    persist  attribute colorTemperatureMireds default = 0x00FA;
+    persist  attribute colorMode default = 0x01;
     ram      attribute options default = 0x00;
     ram      attribute numberOfPrimaries;
-    ram      attribute enhancedCurrentHue default = 0x0000;
-    ram      attribute enhancedColorMode default = 0x01;
-    ram      attribute colorLoopActive default = 0x00;
-    ram      attribute colorLoopDirection default = 0x00;
-    ram      attribute colorLoopTime default = 0x0019;
+    persist  attribute enhancedCurrentHue default = 0x0000;
+    persist  attribute enhancedColorMode default = 0x01;
+    persist  attribute colorLoopActive default = 0x00;
+    persist  attribute colorLoopDirection default = 0x00;
+    persist  attribute colorLoopTime default = 0x0019;
     ram      attribute colorLoopStartEnhancedHue default = 0x2300;
     ram      attribute colorLoopStoredEnhancedHue default = 0x0000;
     ram      attribute colorCapabilities default = 0x1F;
     ram      attribute colorTempPhysicalMinMireds default = 0x0000;
     ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
     ram      attribute coupleColorTempToLevelMinMireds;
-    ram      attribute startUpColorTemperatureMireds;
+    persist  attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0x1F;
     ram      attribute clusterRevision default = 5;
   }
