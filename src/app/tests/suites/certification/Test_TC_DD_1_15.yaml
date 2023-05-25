@@ -27,7 +27,7 @@ config:
 tests:
     - label: "Preconditions"
       verification: |
-          1 - 5.1 - Onboarding payload is printed on the device or in additional provided materials (ex: manual) through a QR Code, a manually entered code or as content in an NFC tag.
+          1 - 5.1 - Onboarding payload is printed on the device or in additional provided materials (ex: manual, companion app, web service) through a QR Code, a Manual Pairing Code or as content in an NFC tag.
       disabled: true
 
     - label:

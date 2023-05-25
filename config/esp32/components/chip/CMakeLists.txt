@@ -238,6 +238,9 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     chip_gn_arg_append("chip_use_secure_cert_dac_provider"                 "true")
 endif()
 
+if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
+    chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
+endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")

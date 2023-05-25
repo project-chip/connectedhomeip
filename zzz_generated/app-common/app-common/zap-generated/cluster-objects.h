@@ -3413,7 +3413,7 @@ struct TypeInfo
 } // namespace Binding
 namespace AccessControl {
 namespace Structs {
-namespace Target {
+namespace AccessControlTargetStruct {
 enum class Fields : uint8_t
 {
     kCluster    = 0,
@@ -3437,7 +3437,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace Target
+} // namespace AccessControlTargetStruct
 namespace AccessControlEntryStruct {
 enum class Fields : uint8_t
 {
@@ -3454,7 +3454,7 @@ public:
     AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
     AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
     DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
-    DataModel::Nullable<DataModel::List<const Structs::Target::Type>> targets;
+    DataModel::Nullable<DataModel::List<const Structs::AccessControlTargetStruct::Type>> targets;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     static constexpr bool kIsFabricScoped = true;
@@ -3476,7 +3476,7 @@ public:
     AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
     AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
-    DataModel::Nullable<DataModel::DecodableList<Structs::Target::DecodableType>> targets;
+    DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlTargetStruct::DecodableType>> targets;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6813,7 +6813,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ArmFailSafeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -6829,7 +6829,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ArmFailSafeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6849,7 +6849,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    RegulatoryLocationType newRegulatoryConfig = static_cast<RegulatoryLocationType>(0);
+    RegulatoryLocationTypeEnum newRegulatoryConfig = static_cast<RegulatoryLocationTypeEnum>(0);
     chip::CharSpan countryCode;
     uint64_t breadcrumb = static_cast<uint64_t>(0);
 
@@ -6866,7 +6866,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    RegulatoryLocationType newRegulatoryConfig = static_cast<RegulatoryLocationType>(0);
+    RegulatoryLocationTypeEnum newRegulatoryConfig = static_cast<RegulatoryLocationTypeEnum>(0);
     chip::CharSpan countryCode;
     uint64_t breadcrumb = static_cast<uint64_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6886,7 +6886,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -6902,7 +6902,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6949,7 +6949,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissioningCompleteResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -6965,7 +6965,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissioningCompleteResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -7001,9 +7001,9 @@ struct TypeInfo
 namespace RegulatoryConfig {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
-    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
-    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
+    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
+    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RegulatoryConfig::Id; }
@@ -7013,9 +7013,9 @@ struct TypeInfo
 namespace LocationCapability {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
-    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
-    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
+    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
+    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocationCapability::Id; }
@@ -7082,9 +7082,9 @@ struct TypeInfo
         Attributes::Breadcrumb::TypeInfo::DecodableType breadcrumb = static_cast<uint64_t>(0);
         Attributes::BasicCommissioningInfo::TypeInfo::DecodableType basicCommissioningInfo;
         Attributes::RegulatoryConfig::TypeInfo::DecodableType regulatoryConfig =
-            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType>(0);
+            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum>(0);
         Attributes::LocationCapability::TypeInfo::DecodableType locationCapability =
-            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType>(0);
+            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum>(0);
         Attributes::SupportsConcurrentConnection::TypeInfo::DecodableType supportsConcurrentConnection = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;

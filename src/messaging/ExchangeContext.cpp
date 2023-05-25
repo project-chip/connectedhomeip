@@ -203,6 +203,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             return CHIP_ERROR_MISSING_SECURE_SESSION;
         }
 
+        SessionHandle session = GetSessionHandle();
         CHIP_ERROR err;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -213,17 +214,29 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         else
         {
 #endif
-            err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Get().Value(), mExchangeId, IsInitiator(),
+            err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), session, mExchangeId, IsInitiator(),
                                         GetReliableMessageContext(), reliableTransmissionRequested, protocolId, msgType,
                                         std::move(msgBuf));
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         }
 #endif
-        // We should only cancel the response timer if the ExchangeContext fails to send the message that starts the response timer.
-        if (err != CHIP_NO_ERROR && startedResponseTimer)
+        if (err != CHIP_NO_ERROR)
         {
-            CancelResponseTimer();
-            SetResponseExpected(false);
+            // We should only cancel the response timer if the ExchangeContext fails to send the message that starts the response
+            // timer.
+            if (startedResponseTimer)
+            {
+                CancelResponseTimer();
+                SetResponseExpected(false);
+            }
+
+            // If we can't even send a message (send failed with a non-transient
+            // error), mark the session as defunct, just like we would if we
+            // thought we sent the message and never got a response.
+            if (session->IsSecureSession() && session->AsSecureSession()->IsCASESession())
+            {
+                session->AsSecureSession()->MarkAsDefunct();
+            }
         }
 
         // Standalone acks are not application-level message sends.

@@ -451,7 +451,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
 
     // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
-    commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
+    commissionerParams.controllerVendorId             = mCommissionerVendorId.ValueOr(chip::VendorId::TestVendor1);
 
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *(commissioner.get())));
 

@@ -28,6 +28,9 @@ class PseudoClusters:
     def supports(self, request) -> bool:
         return False if self.__get_command(request) is None else True
 
+    def add(self, cluster: PseudoCluster):
+        self.clusters.append(cluster)
+
     async def execute(self, request):
         status = {'error': 'FAILURE'}
 
