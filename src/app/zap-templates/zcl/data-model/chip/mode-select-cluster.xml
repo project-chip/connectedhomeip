@@ -47,6 +47,7 @@ limitations under the License.
     <cluster code="0x0059"/>
     <item name="MfgCode" type="vendor_id" optional="false"/>
     <item name="Value" type="ENUM16" optional="false"/>
+    <item name="TagName" type="CHAR_STRING" length="64" optional="true"/>
   </struct>
 
   <struct name="ModeOptionStruct">
