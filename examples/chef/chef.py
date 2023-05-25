@@ -662,7 +662,7 @@ def main() -> int:
                 shell.run_cmd(f"rm -rf out/{options.sample_device_type_name}")
             efr32_cmd_args = []
             efr32_cmd_args.append(
-                f'{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh')
+                f'{_REPO_BASE_PATH}/scripts/examples/gn_silabs_example.sh')
             efr32_cmd_args.append('./')
             efr32_cmd_args.append(f'out/{options.sample_device_type_name}')
             efr32_cmd_args.append(f'{silabs_board}')

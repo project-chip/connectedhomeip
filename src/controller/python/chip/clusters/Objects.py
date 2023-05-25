@@ -3164,7 +3164,7 @@ class AccessControl(Cluster):
 
     class Structs:
         @dataclass
-        class Target(ClusterObject):
+        class AccessControlTargetStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -3187,14 +3187,14 @@ class AccessControl(Cluster):
                         ClusterObjectFieldDescriptor(Label="privilege", Tag=1, Type=AccessControl.Enums.AccessControlEntryPrivilegeEnum),
                         ClusterObjectFieldDescriptor(Label="authMode", Tag=2, Type=AccessControl.Enums.AccessControlEntryAuthModeEnum),
                         ClusterObjectFieldDescriptor(Label="subjects", Tag=3, Type=typing.Union[Nullable, typing.List[uint]]),
-                        ClusterObjectFieldDescriptor(Label="targets", Tag=4, Type=typing.Union[Nullable, typing.List[AccessControl.Structs.Target]]),
+                        ClusterObjectFieldDescriptor(Label="targets", Tag=4, Type=typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlTargetStruct]]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             privilege: 'AccessControl.Enums.AccessControlEntryPrivilegeEnum' = 0
             authMode: 'AccessControl.Enums.AccessControlEntryAuthModeEnum' = 0
             subjects: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
-            targets: 'typing.Union[Nullable, typing.List[AccessControl.Structs.Target]]' = NullValue
+            targets: 'typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlTargetStruct]]' = NullValue
             fabricIndex: 'uint' = 0
 
         @dataclass

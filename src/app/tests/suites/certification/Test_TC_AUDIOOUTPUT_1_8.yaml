@@ -42,13 +42,22 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
+      PICS: AUDIOOUTPUT.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           constraints:
               type: bitmap32
-              minValue: 0
-              maxValue: 3
+              hasMasksSet: [0x2]
+
+    - label: "Read the global attribute: FeatureMap"
+      PICS: " !AUDIOOUTPUT.S.F00 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x2]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

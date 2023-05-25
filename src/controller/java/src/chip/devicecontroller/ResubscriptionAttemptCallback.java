@@ -18,5 +18,5 @@
 package chip.devicecontroller;
 
 public interface ResubscriptionAttemptCallback {
-  void onResubscriptionAttempt(long terminationCause, long nextResubscribeIntervalMsec);
+  void onResubscriptionAttempt(int terminationCause, int nextResubscribeIntervalMsec);
 }
