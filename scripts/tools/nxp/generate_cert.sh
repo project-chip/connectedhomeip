@@ -124,5 +124,5 @@ fi
 
 if [ -n "$FACTORY_DATA_DEST" ]; then
     echo "Moving certificates to $FACTORY_DATA_DEST"
-    mv Chip-* $FACTORY_DATA_DEST
+    mv Chip-* "$FACTORY_DATA_DEST"
 fi
