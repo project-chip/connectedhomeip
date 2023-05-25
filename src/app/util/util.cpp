@@ -137,6 +137,19 @@ void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}
 void MatterFanControlPluginServerInitCallback() {}
+void MatterActivatedCarbonFilterMonitoringPluginServerInitCallback() {}
+void MatterCeramicFilterMonitoringPluginServerInitCallback() {}
+void MatterElectrostaticFilterMonitoringPluginServerInitCallback() {}
+void MatterFuelTankMonitoringPluginServerInitCallback() {}
+void MatterHepaFilterMonitoringPluginServerInitCallback() {}
+void MatterInkCartridgeMonitoringPluginServerInitCallback() {}
+void MatterIonizingFilterMonitoringPluginServerInitCallback() {}
+void MatterOzoneFilterMonitoringPluginServerInitCallback() {}
+void MatterTonerCartridgeMonitoringPluginServerInitCallback() {}
+void MatterUvFilterMonitoringPluginServerInitCallback() {}
+void MatterWaterTankMonitoringPluginServerInitCallback() {}
+void MatterZeoliteFilterMonitoringPluginServerInitCallback() {}
+
 
 // ****************************************
 // Print out information about each cluster
