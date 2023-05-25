@@ -213,8 +213,8 @@ bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, co
     EndpointId endpoint = commandPath.mEndpointId;
 
     // cmd TriggerEffect
-    Identify * identify                      = inst(endpoint);
-    uint16_t identifyTime                    = 0;
+    Identify * identify   = inst(endpoint);
+    uint16_t identifyTime = 0;
 
     ChipLogProgress(Zcl, "RX identify:trigger effect identifier 0x%X variant 0x%X", to_underlying(effectIdentifier),
                     to_underlying(effectVariant));

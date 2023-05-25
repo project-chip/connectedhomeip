@@ -773,7 +773,7 @@ void AppTask::OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * 
         // to stop Identify command for each effect
         gIdentify.mCurrentEffectIdentifier = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
         gIdentify.mTargetEffectIdentifier  = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
-        gIdentify.mEffectVariant = Clusters::Identify::EffectVariantEnum::kDefault;
+        gIdentify.mEffectVariant           = Clusters::Identify::EffectVariantEnum::kDefault;
 
         RestoreLightingState();
     }
