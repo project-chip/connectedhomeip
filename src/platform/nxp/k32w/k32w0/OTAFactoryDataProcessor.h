@@ -22,7 +22,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <platform/nxp/k32w/common/OTATlvProcessor.h>
-#include <platform/nxp/k32w/k32w0/FactoryDataProvider.h>
+#include <platform/nxp/k32w/common/FactoryDataProvider.h>
 
 namespace chip {
 

@@ -29,8 +29,8 @@
 #include <lib/support/Base64.h>
 #include <lib/support/Span.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/nxp/k32w/common/FactoryDataProvider.h>
 
-#include "FactoryDataProvider.h"
 extern "C" {
 #include "Flash_Adapter.h"
 }

@@ -68,8 +68,8 @@ static_library("k32w0") {
 
   if (chip_with_factory_data == 1) {
     sources += [
-      "FactoryDataProvider.cpp",
-      "FactoryDataProvider.h",
+      "../common/FactoryDataProvider.cpp",
+      "../common/FactoryDataProvider.h",
     ]
     public += [
       "${chip_root}/src/credentials/CHIPCert.h",

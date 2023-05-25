@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include "FactoryDataProvider.h"
+#include <platform/nxp/k32w/common/FactoryDataProvider.h>
 
 namespace chip {
 namespace DeviceLayer {

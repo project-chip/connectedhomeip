@@ -27,7 +27,7 @@
 #include "CHIPProjectConfig.h"
 
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-#include "FactoryDataProvider.h"
+#include <platform/nxp/k32w/common/FactoryDataProvider.h>
 #if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
 #include "CustomFactoryDataProvider.h"
 #endif
