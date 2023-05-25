@@ -258,14 +258,14 @@ void OTAImageProcessorImpl::AbortAllProcessors()
 {
     ChipLogError(SoftwareUpdate, "All selected processors will call abort action");
 
-    for (auto const& pair : mProcessorMap)
+    for (auto const & pair : mProcessorMap)
     {
         if (pair.second->WasSelected())
         {
             pair.second->AbortAction();
             pair.second->Clear();
             pair.second->SetWasSelected(false);
-         }
+        }
     }
 }
 
@@ -369,7 +369,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         }
     }
 
-    for (auto const& pair : imageProcessor->mProcessorMap)
+    for (auto const & pair : imageProcessor->mProcessorMap)
     {
         pair.second->Clear();
         pair.second->SetWasSelected(false);

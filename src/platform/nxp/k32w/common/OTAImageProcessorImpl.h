@@ -54,7 +54,7 @@ namespace chip {
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
-	using ProviderLocation = chip::OTARequestorInterface::ProviderLocationType;
+    using ProviderLocation = chip::OTARequestorInterface::ProviderLocationType;
 
     CHIP_ERROR Init(OTADownloader * downloader);
     void Clear();
@@ -72,7 +72,7 @@ public:
     CHIP_ERROR ProcessPayload(ByteSpan & block);
     CHIP_ERROR SelectProcessor(ByteSpan & block);
     CHIP_ERROR RegisterProcessor(uint32_t tag, OTATlvProcessor * processor);
-    Optional<ProviderLocation>& GetBackupProvider() { return mBackupProviderLocation; }
+    Optional<ProviderLocation> & GetBackupProvider() { return mBackupProviderLocation; }
 
     static void FetchNextData(uint32_t context);
     static OTAImageProcessorImpl & GetDefaultInstance();
@@ -102,11 +102,11 @@ private:
      */
     void AbortAllProcessors();
 
-    MutableByteSpan      mBlock;
-    OTADownloader *      mDownloader;
+    MutableByteSpan mBlock;
+    OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    OTATlvProcessor *    mCurrentProcessor = nullptr;
-    OTADataAccumulator   mAccumulator;
+    OTATlvProcessor * mCurrentProcessor = nullptr;
+    OTADataAccumulator mAccumulator;
     std::map<uint32_t, OTATlvProcessor *> mProcessorMap;
     Optional<ProviderLocation> mBackupProviderLocation;
 };

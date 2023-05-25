@@ -116,7 +116,7 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
 
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
-    bootReason     = to_underlying(BootReasonType::kUnspecified);
+    bootReason = to_underlying(BootReasonType::kUnspecified);
     // rebootCause is obtained at bootup.
     if (rebootCause == RESET_UNDEFINED)
     {
@@ -139,7 +139,6 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
         bootReason = to_underlying(BootReasonType::kSoftwareWatchdogReset);
         /* Reboot can be due to hardware or software watchdog */
     }
-
 
     return CHIP_NO_ERROR;
 }

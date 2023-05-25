@@ -32,7 +32,7 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
     ReturnErrorCodeIf(gOtaSuccess_c != OTA_ClientInit(), CHIP_OTA_PROCESSOR_CLIENT_INIT);
 
     auto offset = OTA_GetCurrentEepromAddressOffset();
-    if(offset != 0)
+    if (offset != 0)
     {
         offset += 1;
     }
@@ -79,7 +79,7 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 {
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-    ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void*>(mAccumulator.data())));
+    ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void *>(mAccumulator.data())));
 
     mDescriptorProcessed = true;
     mAccumulator.Clear();

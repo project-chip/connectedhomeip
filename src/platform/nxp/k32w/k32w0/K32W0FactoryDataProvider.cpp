@@ -65,7 +65,7 @@ K32W0FactoryDataProvider & K32W0FactoryDataProvider::GetDefaultInstance()
 
 extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error      = CHIP_NO_ERROR;
     uint16_t backupLength = 0;
 
 #if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
@@ -79,8 +79,8 @@ extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
         buffer.Calloc(K32W0FactoryDataProvider::kFactoryDataSize);
         ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
 
-        auto status =
-            PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void*)buffer.Get(), K32W0FactoryDataProvider::kFactoryDataSize, &backupLength);
+        auto status = PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) buffer.Get(),
+                                              K32W0FactoryDataProvider::kFactoryDataSize, &backupLength);
         ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
 
         error = K32W0FactoryDataProvider::GetDefaultInstance().UpdateData(buffer.Get());
@@ -141,7 +141,7 @@ CHIP_ERROR K32W0FactoryDataProvider::Init()
 
     VerifyOrReturnError(mRestoreMechanisms.size() > 0, CHIP_FACTORY_DATA_RESTORE_MECHANISM);
 
-    for (auto& restore : mRestoreMechanisms)
+    for (auto & restore : mRestoreMechanisms)
     {
         error = restore();
         if (error != CHIP_NO_ERROR)
@@ -503,7 +503,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan
     static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
                   "Length of unique ID for rotating device ID is smaller than minimum.");
     uint16_t uniqueIdLen = 0;
-    err = SearchForId(FactoryDataId::kUniqueId, (uint8_t *) uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
+    err                  = SearchForId(FactoryDataId::kUniqueId, (uint8_t *) uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
 #if defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     if (err != CHIP_NO_ERROR)
     {
@@ -512,7 +512,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan
         ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
         uniqueIdLen = sizeof(uniqueId);
-        err = CHIP_NO_ERROR;
+        err         = CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
     ReturnErrorOnFailure(err);

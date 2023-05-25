@@ -39,9 +39,9 @@
 
 extern "C" void ResetMCU(void);
 
-CHIP_ERROR ProcessDescriptor(void* descriptor)
+CHIP_ERROR ProcessDescriptor(void * descriptor)
 {
-    auto desc = static_cast<chip::OTAFirmwareProcessor::Descriptor*>(descriptor);
+    auto desc = static_cast<chip::OTAFirmwareProcessor::Descriptor *>(descriptor);
     ChipLogDetail(SoftwareUpdate, "Descriptor: %ld, %s, %s", desc->version, desc->versionString, desc->buildDate);
 
     return CHIP_NO_ERROR;
@@ -61,7 +61,7 @@ extern "C" WEAK CHIP_ERROR OtaHookInit()
     sApplicationProcessor.RegisterDescriptorCallback(ProcessDescriptor);
     sBootloaderProcessor.RegisterDescriptorCallback(ProcessDescriptor);
 
-    auto& imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
+    auto & imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(1, &sApplicationProcessor));
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(2, &sBootloaderProcessor));
 #if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
@@ -94,12 +94,12 @@ extern "C" WEAK void OtaHookAbort()
      This hook is called inside OTAImageProcessorImpl::HandleAbort to schedule a retry (when enabled).
     */
 #if CONFIG_CHIP_K32W0_OTA_ABORT_HOOK
-    auto& imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
-    auto& providerLocation = imageProcessor.GetBackupProvider();
+    auto & imageProcessor   = chip::OTAImageProcessorImpl::GetDefaultInstance();
+    auto & providerLocation = imageProcessor.GetBackupProvider();
 
     if (providerLocation.HasValue())
     {
-        auto* requestor = chip::GetRequestorInstance();
+        auto * requestor = chip::GetRequestorInstance();
         requestor->SetCurrentProviderLocation(providerLocation.Value());
         if (requestor->GetCurrentUpdateState() == chip::OTARequestorInterface::OTAUpdateStateEnum::kIdle)
         {

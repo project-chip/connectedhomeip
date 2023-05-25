@@ -48,9 +48,9 @@ namespace DeviceLayer {
 #define CHIP_FACTORY_DATA_FLASH_ERASE CHIP_FACTORY_DATA_ERROR(0x06)
 #define CHIP_FACTORY_DATA_FLASH_PROGRAM CHIP_FACTORY_DATA_ERROR(0x07)
 #define CHIP_FACTORY_DATA_INTERNAL_FLASH_READ CHIP_FACTORY_DATA_ERROR(0x08)
-#define CHIP_FACTORY_DATA_PDM_SAVE_RECORD     CHIP_FACTORY_DATA_ERROR(0x09)
-#define CHIP_FACTORY_DATA_PDM_READ_RECORD     CHIP_FACTORY_DATA_ERROR(0x0A)
-#define CHIP_FACTORY_DATA_RESTORE_MECHANISM   CHIP_FACTORY_DATA_ERROR(0x0B)
+#define CHIP_FACTORY_DATA_PDM_SAVE_RECORD CHIP_FACTORY_DATA_ERROR(0x09)
+#define CHIP_FACTORY_DATA_PDM_READ_RECORD CHIP_FACTORY_DATA_ERROR(0x0A)
+#define CHIP_FACTORY_DATA_RESTORE_MECHANISM CHIP_FACTORY_DATA_ERROR(0x0B)
 
 /**
  * @brief This class provides Commissionable data, Device Attestation Credentials,
@@ -124,8 +124,8 @@ public:
     CHIP_ERROR Init();
     CHIP_ERROR Validate();
     void RegisterRestoreMechanism(RestoreMechanism mechanism);
-    CHIP_ERROR UpdateData(uint8_t* pBuf);
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length, uint32_t * offset=nullptr);
+    CHIP_ERROR UpdateData(uint8_t * pBuf);
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length, uint32_t * offset = nullptr);
 
     // Custom factory data providers must implement this method in order to define
     // their own custom IDs.
