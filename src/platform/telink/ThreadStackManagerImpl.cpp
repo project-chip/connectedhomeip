@@ -112,5 +112,10 @@ ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset 
     return result;
 }
 
+void ThreadStackManagerImpl::Finalize(void)
+{
+    otInstanceFinalize(openthread_get_default_instance());
+}
+
 } // namespace DeviceLayer
 } // namespace chip

@@ -161,8 +161,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
     {
         if (ThreadStackManagerImpl().IsThreadEnabled())
         {
-            ThreadStackManagerImpl().SetThreadEnabled(false);
-            ThreadStackManagerImpl().SetRadioBlocked(true);
+            ThreadStackManagerImpl().Finalize();
         }
     }
 };
