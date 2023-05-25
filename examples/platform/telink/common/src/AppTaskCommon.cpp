@@ -107,8 +107,15 @@ uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] =
 
 class AppCallbacks : public AppDelegate
 {
+    bool isComissioningStarted;
 public:
-    void OnCommissioningWindowClosed() override { chip::DeviceLayer::Internal::BLEMgr().Shutdown(); }
+    void OnCommissioningSessionStarted() override { isComissioningStarted = true;}
+    void OnCommissioningSessionStopped() override { isComissioningStarted = false;}
+    void OnCommissioningWindowClosed() override 
+    {
+        if (!isComissioningStarted)
+        chip::DeviceLayer::Internal::BLEMgr().Shutdown(); 
+    }
 };
 
 AppCallbacks sCallbacks;
