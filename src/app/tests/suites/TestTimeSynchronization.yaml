@@ -32,17 +32,14 @@ tests:
       command: "readAttribute"
       attribute: "TimeZone"
       response:
-          value: [{Offset: 0, ValidAt: 0}]
+          value: [{ Offset: 0, ValidAt: 0 }]
 
     - label: "Set Time Zone list"
       command: "SetTimeZone"
       arguments:
           values:
               - name: "TimeZone"
-                value:
-                    [
-                        {Offset: 100, ValidAt: 0, Name: "CET"},
-                    ]
+                value: [{ Offset: 100, ValidAt: 0, Name: "CET" }]
       response:
           values:
               - name: "DSTOffsetRequired"
@@ -52,19 +49,14 @@ tests:
       command: "readAttribute"
       attribute: "TimeZone"
       response:
-          value: [
-                      {Offset: 100, ValidAt: 0, Name: "CET"},
-                 ]
+          value: [{ Offset: 100, ValidAt: 0, Name: "CET" }]
 
     - label: "Set Time Zone with missing optional name field"
       command: "SetTimeZone"
       arguments:
           values:
               - name: "TimeZone"
-                value:
-                    [
-                        {Offset: 100, ValidAt: 0},
-                    ]
+                value: [{ Offset: 100, ValidAt: 0 }]
       response:
           values:
               - name: "DSTOffsetRequired"
@@ -74,19 +66,14 @@ tests:
       command: "readAttribute"
       attribute: "TimeZone"
       response:
-          value: [
-                      {Offset: 100, ValidAt: 0},
-                 ]
+          value: [{ Offset: 100, ValidAt: 0 }]
 
     - label: "Set Time Zone with first item validAt not zero"
       command: "SetTimeZone"
       arguments:
           values:
               - name: "TimeZone"
-                value:
-                    [
-                        {Offset: 100, ValidAt: 1, Name: "CDT"},
-                    ]
+                value: [{ Offset: 100, ValidAt: 1, Name: "CDT" }]
       response:
           error: CONSTRAINT_ERROR
 
@@ -97,8 +84,8 @@ tests:
               - name: "TimeZone"
                 value:
                     [
-                        {Offset: 100, ValidAt: 0, Name: "CST"},
-                        {Offset: 200, ValidAt: 0, Name: "CDT"},
+                        { Offset: 100, ValidAt: 0, Name: "CST" },
+                        { Offset: 200, ValidAt: 0, Name: "CDT" },
                     ]
       response:
           error: CONSTRAINT_ERROR
@@ -108,8 +95,7 @@ tests:
       arguments:
           values:
               - name: "TimeZone"
-                value:
-                    []
+                value: []
       response:
           values:
               - name: "DSTOffsetRequired"
@@ -119,9 +105,7 @@ tests:
       command: "readAttribute"
       attribute: "TimeZone"
       response:
-          value: [
-                      {Offset: 0, ValidAt: 0},
-                 ]
+          value: [{ Offset: 0, ValidAt: 0 }]
 
     - label: "Read DSTOffset"
       command: "readAttribute"
@@ -133,30 +117,26 @@ tests:
       command: "SetDSTOffset"
       arguments:
           values:
-            - name: "DSTOffset"
-              value:
-                [
-                    {Offset: 1, ValidStarting: 1, ValidUntil: 2},
-                ]
+              - name: "DSTOffset"
+                value: [{ Offset: 1, ValidStarting: 1, ValidUntil: 2 }]
 
     - label: "Set DSTOffset empty"
       command: "SetDSTOffset"
       arguments:
           values:
-            - name: "DSTOffset"
-              value:
-                []
+              - name: "DSTOffset"
+                value: []
 
     - label: "Set DSTOffset with more than 1 null value"
       command: "SetDSTOffset"
       arguments:
           values:
-            - name: "DSTOffset"
-              value:
-                [
-                    {Offset: 1, ValidStarting: 1, ValidUntil: null},
-                    {Offset: 0, ValidStarting: 2, ValidUntil: null},
-                ]
+              - name: "DSTOffset"
+                value:
+                    [
+                        { Offset: 1, ValidStarting: 1, ValidUntil: null },
+                        { Offset: 0, ValidStarting: 2, ValidUntil: null },
+                    ]
       response:
           error: CONSTRAINT_ERROR
 
@@ -164,30 +144,28 @@ tests:
       command: "SetDSTOffset"
       arguments:
           values:
-            - name: "DSTOffset"
-              value:
-                [
-                    {Offset: 1, ValidStarting: 3, ValidUntil: null},
-                    {Offset: 0, ValidStarting: 1, ValidUntil: 2},
-                ]
+              - name: "DSTOffset"
+                value:
+                    [
+                        { Offset: 1, ValidStarting: 3, ValidUntil: null },
+                        { Offset: 0, ValidStarting: 1, ValidUntil: 2 },
+                    ]
 
     - label: "Read sorted DSTOffset"
       command: "readAttribute"
       attribute: "DSTOffset"
       response:
-          value: [
-                      {Offset: 0, ValidStarting: 1, ValidUntil: 2},
-                      {Offset: 1, ValidStarting: 3, ValidUntil: null},
-                 ]
+          value:
+              [
+                  { Offset: 0, ValidStarting: 1, ValidUntil: 2 },
+                  { Offset: 1, ValidStarting: 3, ValidUntil: null },
+              ]
 
     - label: "Set DSTOffset with same validStarting and validUntil"
       command: "SetDSTOffset"
       arguments:
           values:
-            - name: "DSTOffset"
-              value:
-                [
-                    {Offset: 0, ValidStarting: 1, ValidUntil: 1}
-                ]
+              - name: "DSTOffset"
+                value: [{ Offset: 0, ValidStarting: 1, ValidUntil: 1 }]
       response:
           error: CONSTRAINT_ERROR

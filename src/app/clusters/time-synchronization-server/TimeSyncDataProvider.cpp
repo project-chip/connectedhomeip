@@ -26,13 +26,13 @@ namespace chip {
 //   dict([(0 , 0xff),(1, bytearray([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])), (2, 0xffff), ])
 //   w.put(None, s)
 //   len(w.encoding)
-constexpr size_t kTrustedTimeSourceMaxSerializedSize = 23u + 9u;   // adding 9 as buffer
-constexpr size_t kTimeZoneMaxSerializedSize          = 90u + 6u;   // adding 6 as buffer
-constexpr size_t kDSTOffsetMaxSerializedSize         = 34u + 6u;   // adding 6 as buffer
+constexpr size_t kTrustedTimeSourceMaxSerializedSize = 23u + 9u; // adding 9 as buffer
+constexpr size_t kTimeZoneMaxSerializedSize          = 90u + 6u; // adding 6 as buffer
+constexpr size_t kDSTOffsetMaxSerializedSize         = 34u + 6u; // adding 6 as buffer
 
 // user TZ feature #if 1
 // Multiply the serialized size by the maximum number of list size and add 2 bytes for the array start and end.
-constexpr size_t kTimeZoneListMaxSerializedSize = kTimeZoneMaxSerializedSize * CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE + 2;
+constexpr size_t kTimeZoneListMaxSerializedSize  = kTimeZoneMaxSerializedSize * CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE + 2;
 constexpr size_t kDSTOffsetListMaxSerializedSize = kDSTOffsetMaxSerializedSize * CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE + 2;
 
 CHIP_ERROR TimeSyncDataProvider::StoreTrustedTimeSource(const TrustedTimeSource & timeSource)
@@ -107,7 +107,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZone & timeZoneList, uint8_t &
 {
     uint8_t buffer[kTimeZoneListMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
-    size = 0;
+    size           = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::TSTimeZone().KeyName(), bufferSpan));
@@ -118,7 +118,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZone & timeZoneList, uint8_t &
     reader.Init(bufferSpan.data(), bufferSpan.size());
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
-    auto tz  = timeZoneList.begin();
+    auto tz   = timeZoneList.begin();
     uint8_t i = 0;
 
     while (reader.Next() != CHIP_ERROR_END_OF_TLV && i < timeZoneList.size())
@@ -195,7 +195,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffset & dstOffsetList, uint8_
     reader.Init(bufferSpan.data(), bufferSpan.size());
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
-    auto dst = dstOffsetList.begin();
+    auto dst  = dstOffsetList.begin();
     uint8_t i = 0;
 
     while (reader.Next() != CHIP_ERROR_END_OF_TLV && i < dstOffsetList.size())
