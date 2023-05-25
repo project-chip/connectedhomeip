@@ -7,21 +7,30 @@ orphan: true
 ## Overview
 
 This tool can generate an OTA image in the `|OTA standard header|TLV1|...|TLVn|`
-format. The payload contains data in standard TLV format (not Matter TLV format).
-During OTA transfer, these TLV can span across multiple BDX blocks, thus the
-`OTAImageProcessorImpl` instance should take this into account.
+format. The payload contains data in standard TLV format (not Matter TLV
+format). During OTA transfer, these TLV can span across multiple BDX blocks,
+thus the `OTAImageProcessorImpl` instance should take this into account.
 
 ## Supported platforms
--    K32W0 - [K32W OTA README](../../../../src/platform/nxp/k32w/common/K32W_OTA_README.md)
+
+-   K32W0 -
+    [K32W OTA README](../../../../src/platform/nxp/k32w/common/K32W_OTA_README.md)
 
 ## Usage
-This is a wrapper over standard `ota_image_tool.py`, so the options for `create` are also available here:
+
+This is a wrapper over standard `ota_image_tool.py`, so the options for `create`
+are also available here:
+
 ```
 python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256
 ```
-followed by **custom options*-    and a positional argument (should be last) that specifies the output file. Please see the `create_ota_images.sh` for some reference commands.
+
+followed by \*_custom options_- and a positional argument (should be last) that
+specifies the output file. Please see the `create_ota_images.sh` for some
+reference commands.
 
 The list of **custom options**:
+
 ```
 # Application options
 --app-input-file   --> Path to the application binary.
@@ -46,20 +55,35 @@ The list of **custom options**:
 # Custom TLVs options
 --json             --> Path to a JSON file following ota_payload.schema
 ```
-Please note that the options above are separated into four categories: application, bootloader, factory data and custom TLVs (`--json` option). If no descriptor options are specified for app/SSBL, the script will use the default values (`50000`, `"50000-default"`, `"2023-01-01"`). The descriptor feature is optional, TLV processors having the option to register a callback for descriptor processing.
+
+Please note that the options above are separated into four categories:
+application, bootloader, factory data and custom TLVs (`--json` option). If no
+descriptor options are specified for app/SSBL, the script will use the default
+values (`50000`, `"50000-default"`, `"2023-01-01"`). The descriptor feature is
+optional, TLV processors having the option to register a callback for descriptor
+processing.
 
 ## Custom payload
-When defining a custom processor, a user is able to also specify the custom format of the TLV by creating a JSON file based on the `ota_payload.schema`.
-The tool offers support for describing multiple TLVs in the same JSON file. Please see the `examples/ota_max_entries_example.json` for a multi-app + SSBL example.
+
+When defining a custom processor, a user is able to also specify the custom
+format of the TLV by creating a JSON file based on the `ota_payload.schema`. The
+tool offers support for describing multiple TLVs in the same JSON file. Please
+see the `examples/ota_max_entries_example.json` for a multi-app + SSBL example.
 Option `--json` must be used to specify the path to the JSON file.
 
 ## Examples
-A set of examples can be found in `./examples`. Please run `create_ota_image.sh` to generate the examples:
--    Application image with default descriptor
--    Application image with specified descriptor
--    Factory data image
--    SSBL image
--    Application + SSBL + factory data image
--    Maximum number of entries image, using `ota_max_entries_example.json`. The examples uses 8 SSBL binaries because they have a small size and fit in external flash.
 
-The binaries from `./examples/binaries` should only be used only as an example. The user should provide their own binaries when generating the OTA image.
+A set of examples can be found in `./examples`. Please run `create_ota_image.sh`
+to generate the examples:
+
+-   Application image with default descriptor
+-   Application image with specified descriptor
+-   Factory data image
+-   SSBL image
+-   Application + SSBL + factory data image
+-   Maximum number of entries image, using `ota_max_entries_example.json`. The
+    examples uses 8 SSBL binaries because they have a small size and fit in
+    external flash.
+
+The binaries from `./examples/binaries` should only be used only as an example.
+The user should provide their own binaries when generating the OTA image.

@@ -203,8 +203,8 @@ running oscillator as a clock source. In this case one must set the use_fro_32k
 argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
-(run automatically) install the recommanded packages
-(python version > 3, pip3, pycrypto, pycryptodome):
+(run automatically) install the recommanded packages (python version > 3, pip3,
+pycrypto, pycryptodome):
 
 ```
 user@ubuntu:~$ python3 --version
@@ -224,11 +224,17 @@ The resulting output file can be found in out/debug/chip-k32w0x-lock-example.
     the Plug&Trust middleware stack may not echo to the console.
 
 ## Rotating device id
-This is an optional feature and can be used in multiple ways (please see section 5.4.2.4.5 from Matter specification).
-One use case is Amazon FFS, which leverages the C3 Characteristic (Additional commissioning-related data) to offer an easier way to set up the device.
-The rotating device id will be encoded in this additional data and is programmed to rotate at pre-defined moments. The algorithm uses a unique per-device identifier that must be programmed during factory provisioning.
+
+This is an optional feature and can be used in multiple ways (please see section
+5.4.2.4.5 from Matter specification). One use case is Amazon FFS, which
+leverages the C3 Characteristic (Additional commissioning-related data) to offer
+an easier way to set up the device. The rotating device id will be encoded in
+this additional data and is programmed to rotate at pre-defined moments. The
+algorithm uses a unique per-device identifier that must be programmed during
+factory provisioning.
 
 Please use the following build args:
+
 -   `chip_enable_rotating_device_id=1` - to enable rotating device id.
 -   `chip_enable_additional_data_advertising=1` - to enable C3 characteristic.
 

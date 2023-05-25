@@ -230,8 +230,8 @@ running oscillator as a clock source. In this case one must set the use_fro_32k
 argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
-(run automatically) install the recommanded packages
-(python version > 3, pip3, pycrypto, pycryptodome):
+(run automatically) install the recommanded packages (python version > 3, pip3,
+pycrypto, pycryptodome):
 
 ```
 user@ubuntu:~$ python3 --version
@@ -251,11 +251,17 @@ The resulting output file can be found in out/debug/chip-k32w0x-light-example.
     the Plug&Trust middleware stack may not echo to the console.
 
 ## Rotating device id
-This is an optional feature and can be used in multiple ways (please see section 5.4.2.4.5 from Matter specification).
-One use case is Amazon FFS, which leverages the C3 Characteristic (Additional commissioning-related data) to offer an easier way to set up the device.
-The rotating device id will be encoded in this additional data and is programmed to rotate at pre-defined moments. The algorithm uses a unique per-device identifier that must be programmed during factory provisioning.
+
+This is an optional feature and can be used in multiple ways (please see section
+5.4.2.4.5 from Matter specification). One use case is Amazon FFS, which
+leverages the C3 Characteristic (Additional commissioning-related data) to offer
+an easier way to set up the device. The rotating device id will be encoded in
+this additional data and is programmed to rotate at pre-defined moments. The
+algorithm uses a unique per-device identifier that must be programmed during
+factory provisioning.
 
 Please use the following build args:
+
 -   `chip_enable_rotating_device_id=1` - to enable rotating device id.
 -   `chip_enable_additional_data_advertising=1` - to enable C3 characteristic.
 
@@ -395,24 +401,31 @@ related data (PSECT). The space between these two zones will be filled by the
 application.
 
 ### Writing the SSBL
-The SDK already provides an SSBL binary compiled with external
-flash support: `boards/k32w061dk6/wireless_examples/framework/ssbl/binary/ssbl_ext_flash_pdm_support.bin`, but it does not offer
-multi-image OTA support.
 
-Alternatively, the SSBL can ge generated from one of the SDK demo examples.
-The SSBL demo application can be imported from the `Quickstart panel`: `Import SDK example(s) -> select wireless -> framework -> ssbl` application.
+The SDK already provides an SSBL binary compiled with external flash support:
+`boards/k32w061dk6/wireless_examples/framework/ssbl/binary/ssbl_ext_flash_pdm_support.bin`,
+but it does not offer multi-image OTA support.
+
+Alternatively, the SSBL can ge generated from one of the SDK demo examples. The
+SSBL demo application can be imported from the `Quickstart panel`:
+`Import SDK example(s) -> select wireless -> framework -> ssbl` application.
 
 ![SSBL Application Select](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_select.JPG)
 
-To support multi-image OTA feature, the SSBL project must be compiled using the following defines:
-- `PDM_EXT_FLASH=1` - support PDM in external flash.
-- `gOTAUseCustomOtaEntry=1` - support custom OTA entry for multi-image.
-- `gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash` - K32W0 uses `OTACustomStorage_ExtFlash` (1) by default.
-- `SPIFI_DUAL_MODE_SUPPORT=1` - only for configurations that use dual SPIFI flash (e.g. K32W041AM variant).
+To support multi-image OTA feature, the SSBL project must be compiled using the
+following defines:
+
+-   `PDM_EXT_FLASH=1` - support PDM in external flash.
+-   `gOTAUseCustomOtaEntry=1` - support custom OTA entry for multi-image.
+-   `gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash` - K32W0 uses
+    `OTACustomStorage_ExtFlash` (1) by default.
+-   `SPIFI_DUAL_MODE_SUPPORT=1` - only for configurations that use dual SPIFI
+    flash (e.g. K32W041AM variant).
 
 Optionally, add the following defines:
-- `SPIFI_OPTIM_SIZE=1` - to optimize SSBL size.
-- `EXTERNAL_FLASH_DATA_OTA=1` - to support external RO data.
+
+-   `SPIFI_OPTIM_SIZE=1` - to optimize SSBL size.
+-   `EXTERNAL_FLASH_DATA_OTA=1` - to support external RO data.
 
 ![SSBL_MULTI_IMAGE](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_multi_image.JPG)
 
@@ -435,6 +448,7 @@ DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x00="k32w061dk6_ssbl
 ### Writing the PSECT
 
 This is the list of all supported partitions:
+
 ```
 0000000010000000 : SSBL partition
 
@@ -502,8 +516,8 @@ C904     -> 0x4C9 pages of 512-bytes (= 612.5kB)
 01       -> image type for the application
 ```
 
-Please note the user can write additional partitions by
-writing `image_dir_2/3/4` with the wanted configuration.
+Please note the user can write additional partitions by writing
+`image_dir_2/3/4` with the wanted configuration.
 
 ### Writing the application
 
@@ -568,39 +582,53 @@ user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examp
 
 Build OTA image:
 
-In order to build an OTA image, use NXP's wrapper over the standard tool `src/app/ota_image_tool.py`:
--    `scripts/tools/nxp/ota/ota_image_tool.py`
+In order to build an OTA image, use NXP's wrapper over the standard tool
+`src/app/ota_image_tool.py`:
+
+-   `scripts/tools/nxp/ota/ota_image_tool.py`
 
 The tool can be used to generate an OTA image with the following format:
+
 ```
     | OTA image header | TLV1 | TLV2 | ... | TLVn |
 ```
+
 where TLVx is in the form `|tag|length|value|`.
 
-Note that "standard" TLV format is used. Matter TLV format is only used for factory data TLV value.
+Note that "standard" TLV format is used. Matter TLV format is only used for
+factory data TLV value.
 
 A user can select which default processors to enable:
--    `chip_enable_ota_firmware_processor=1` to enable default firmware (app/SSBL) update processor (enabled by default).
--    `chip_enable_ota_factory_data_processor=1` to enable default factory data update processor (disabled by default).
+
+-   `chip_enable_ota_firmware_processor=1` to enable default firmware (app/SSBL)
+    update processor (enabled by default).
+-   `chip_enable_ota_factory_data_processor=1` to enable default factory data
+    update processor (disabled by default).
 
 The address for storing the custom OTA entry can also be specified:
-- `ota_custom_entry_address="0x000C1000"` is the default value, where `0x000C1000` is the end address of the PDM area.
-  PDM area ends at `0x00100000` (top of external flash) and has a size of `63 * 4096` bytes.
-  The user should be aware of the external flash configuration and use an address that does not overlap with anything else.
 
-Please see more in the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+-   `ota_custom_entry_address="0x000C1000"` is the default value, where
+    `0x000C1000` is the end address of the PDM area. PDM area ends at
+    `0x00100000` (top of external flash) and has a size of `63 * 4096` bytes.
+    The user should be aware of the external flash configuration and use an
+    address that does not overlap with anything else.
+
+Please see more in the
+[OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
 
 Here is an example that generates an OTA image with application update TLV:
+
 ```
 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 42021 -vs "1.0" -da sha256 --app-input-file chip-k32w0x-light-example.bin chip-k32w0x-light-example.ota
 ```
 
 A note regarding OTA image header version (`-vn` option). An application binary
 has its own software version, given by
-`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` (`42020` by default), which can be overwritten. For
-having a correct OTA process, the OTA header version should be the same as the
-binary embedded software version. A user can set a custom software version in
-the gn build args by setting `chip_software_version` to the wanted version.
+`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` (`42020` by default), which can be
+overwritten. For having a correct OTA process, the OTA header version should be
+the same as the binary embedded software version. A user can set a custom
+software version in the gn build args by setting `chip_software_version` to the
+wanted version.
 
 Start the OTA Provider Application:
 
