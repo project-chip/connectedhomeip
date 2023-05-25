@@ -212,7 +212,8 @@ tests:
                 value: 1000
 
     - label:
-          "TH confirm the DUT reached AC2 (on level control cluster) after 1s, which is different from AC1"
+          "TH confirm the DUT reached AC2 (on level control cluster) after 1s,
+          which is different from AC1"
       PICS: PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "readAttribute"
@@ -317,8 +318,8 @@ tests:
 
     - label:
           "TH sends a RecallScene command to DUT with the GroupID field set to
-          0x0001, the SceneID field set to 0x01 and the TransitionTime field
-          set to 0x0032 (5s)."
+          0x0001, the SceneID field set to 0x01 and the TransitionTime field set
+          to 0x0032 (5s)."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:
@@ -396,9 +397,9 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a RecallScene command to DUT with the GroupID field set to 0x0001,
-          the SceneID field set to 0x01 and the TransitionTime field set to null
-          (no transition time override)."
+          "TH sends a RecallScene command to DUT with the GroupID field set to
+          0x0001, the SceneID field set to 0x01 and the TransitionTime field set
+          to null (no transition time override)."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:

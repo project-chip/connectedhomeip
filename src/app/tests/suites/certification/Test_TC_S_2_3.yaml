@@ -78,8 +78,7 @@ tests:
               ]
 
     - label:
-          "TH sends a AddGroup command to DUT with the GroupID field set to
-          G1."
+          "TH sends a AddGroup command to DUT with the GroupID field set to G1."
       PICS: G.S.C00.Rsp
       cluster: "Groups"
       command: "AddGroup"
@@ -131,7 +130,6 @@ tests:
                 value: 0x0001
               - name: "SceneList"
                 value: [0x03]
-
 
     - label:
           "TH sends a EnhancedAddScene command to DUT with the GroupID field set
@@ -231,8 +229,8 @@ tests:
 
     - label:
           "TH sends a EnhancedAddScene command to DUT with the GroupID field set
-          to G1, the SceneID field set to 0x01, the TransitionTime field set
-          to 0x000a and a set of extension fields appropriate to AC1."
+          to G1, the SceneID field set to 0x01, the TransitionTime field set to
+          0x000a and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
@@ -292,9 +290,9 @@ tests:
                 value: "y"
 
     - label:
-          "TH sends a AddScene command to DUT with the GroupID field set to
-          G1, the SceneID field set to 0x01, the TransitionTime field set to
-          0x0001 and a set of extension fields appropriate to AC1."
+          "TH sends a AddScene command to DUT with the GroupID field set to G1,
+          the SceneID field set to 0x01, the TransitionTime field set to 0x0001
+          and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
@@ -465,9 +463,10 @@ tests:
           values:
               - name: "message"
                 value:
-                    "Please execute the ehanced-view-scene command and verify that the
-                    extensionfieldsets, status, groupID and SceneID are in accordance with AC1 on DUT and enter
-                    'y' if the command is successful"
+                    "Please execute the ehanced-view-scene command and verify
+                    that the extensionfieldsets, status, groupID and SceneID are
+                    in accordance with AC1 on DUT and enter 'y' if the command
+                    is successful"
               - name: "expectedValue"
                 value: "y"
     - label:
@@ -493,8 +492,9 @@ tests:
               - name: "message"
                 value:
                     "Please execute the view-scene command and verify that the
-                    extensionfieldsets, status, groupID and SceneID are in accordance with AC1 on DUT and enter
-                    'y' if the command is successful"
+                    extensionfieldsets, status, groupID and SceneID are in
+                    accordance with AC1 on DUT and enter 'y' if the command is
+                    successful"
               - name: "expectedValue"
                 value: "y"
 
@@ -583,8 +583,7 @@ tests:
       response:
           value: 100
 
-    - label:
-          "Verify DUT returns to AC1."
+    - label: "Verify DUT returns to AC1."
       verification: |
           Is DUT configured with AC1?
       cluster: "LogCommands"
@@ -593,8 +592,7 @@ tests:
       arguments:
           values:
               - name: "message"
-                value:
-                    "Please confirm AC1 on DUT and enter 'y'."
+                value: "Please confirm AC1 on DUT and enter 'y'."
               - name: "expectedValue"
                 value: "y"
 
