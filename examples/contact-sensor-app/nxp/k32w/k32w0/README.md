@@ -240,12 +240,12 @@ The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
 ## Rotating device id
 
 This is an optional feature and can be used in multiple ways (please see section
-5.4.2.4.5 from Matter specification). One use case is Amazon Frustration Free Setup,
-which leverages the C3 Characteristic (Additional commissioning-related data) to offer
-an easier way to set up the device. The rotating device id will be encoded in
-this additional data and is programmed to rotate at pre-defined moments. The
-algorithm uses a unique per-device identifier that must be programmed during
-factory provisioning.
+5.4.2.4.5 from Matter specification). One use case is Amazon Frustration Free
+Setup, which leverages the C3 Characteristic (Additional commissioning-related
+data) to offer an easier way to set up the device. The rotating device id will
+be encoded in this additional data and is programmed to rotate at pre-defined
+moments. The algorithm uses a unique per-device identifier that must be
+programmed during factory provisioning.
 
 Please use the following build args:
 
