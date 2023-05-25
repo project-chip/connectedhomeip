@@ -406,7 +406,7 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
             ChipLogProgress(Zcl, "Door Lock App: setting door lock state to \"%s\" [endpointId=%d]", lockStateToString(lockState),
                             mEndpointId);
 
-            DoorLockServer::Instance().SetLockState(mEndpointId, lockState);
+            DoorLockServer::Instance().SetLockState(mEndpointId, lockState, opSource, Nullable<uint16_t>(), Nullable<List<const LockOpCredentials>>());
 
             return true;
         }
