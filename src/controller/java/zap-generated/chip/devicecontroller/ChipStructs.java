@@ -142,12 +142,12 @@ public class ChipStructs {
     }
   }
 
-  public static class AccessControlClusterTarget {
+  public static class AccessControlClusterAccessControlTargetStruct {
     public @Nullable Long cluster;
     public @Nullable Integer endpoint;
     public @Nullable Long deviceType;
 
-    public AccessControlClusterTarget(
+    public AccessControlClusterAccessControlTargetStruct(
         @Nullable Long cluster, @Nullable Integer endpoint, @Nullable Long deviceType) {
       this.cluster = cluster;
       this.endpoint = endpoint;
@@ -157,7 +157,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("AccessControlClusterTarget {\n");
+      output.append("AccessControlClusterAccessControlTargetStruct {\n");
       output.append("\tcluster: ");
       output.append(cluster);
       output.append("\n");
@@ -176,14 +176,14 @@ public class ChipStructs {
     public Integer privilege;
     public Integer authMode;
     public @Nullable ArrayList<Object> subjects;
-    public @Nullable ArrayList<ChipStructs.AccessControlClusterTarget> targets;
+    public @Nullable ArrayList<ChipStructs.AccessControlClusterAccessControlTargetStruct> targets;
     public Integer fabricIndex;
 
     public AccessControlClusterAccessControlEntryStruct(
         Integer privilege,
         Integer authMode,
         @Nullable ArrayList<Object> subjects,
-        @Nullable ArrayList<ChipStructs.AccessControlClusterTarget> targets,
+        @Nullable ArrayList<ChipStructs.AccessControlClusterAccessControlTargetStruct> targets,
         Integer fabricIndex) {
       this.privilege = privilege;
       this.authMode = authMode;

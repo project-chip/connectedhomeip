@@ -19,8 +19,8 @@
 #include "MediaBase.h"
 #include "MediaCommandBase.h"
 
+#include <controller/CHIPCluster.h>
 #include <functional>
-#include <zap-generated/CHIPClusters.h>
 
 // COMMAND CLASSES
 class OnCommand : public MediaCommandBase<chip::app::Clusters::OnOff::Commands::On::Type, chip::app::DataModel::NullObjectType>

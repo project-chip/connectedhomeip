@@ -27,7 +27,7 @@ extern "C" int cc13xx_26xxLogInit(void)
     // Most params can be default because we only send data, we don't receive
     uartParams.baudRate = 115200;
 
-    sDebugUartHandle = UART2_open(CONFIG_UART_DEBUG, &uartParams);
+    sDebugUartHandle = UART2_open(CONFIG_UART2_DEBUG, &uartParams);
     return 0;
 }
 

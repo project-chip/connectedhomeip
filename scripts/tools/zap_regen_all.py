@@ -352,16 +352,6 @@ def getGlobalTemplatesTargets():
 
     targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/data_model/controller-clusters.zap', client_side=True))
 
-    # This generates app headers for darwin only, for easier/clearer include
-    # in .pbxproj files.
-    #
-    # TODO: These files can be code generated at compile time, we should figure
-    #       out a path for this codegen to not be required.
-    targets.append(ZAPGenerateTarget(
-        'src/controller/data_model/controller-clusters.zap',
-        template="src/app/zap-templates/app-templates.json",
-        output_dir='zzz_generated/darwin/controller-clusters/zap-generated'))
-
     return targets
 
 

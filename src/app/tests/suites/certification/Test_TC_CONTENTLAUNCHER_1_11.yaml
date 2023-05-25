@@ -42,7 +42,7 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: ( !CONTENTLAUNCHER.S.CS && !CONTENTLAUNCHER.S.UP )
+      PICS: ( !CONTENTLAUNCHER.S.F00 && !CONTENTLAUNCHER.S.F01 )
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -51,8 +51,9 @@ tests:
               type: bitmap32
 
     - label:
-          "Given CONTENTLAUNCHER.S.CS) ensure featuremap has the correct bit set"
-      PICS: CONTENTLAUNCHER.S.CS
+          "Given CONTENTLAUNCHER.S.F00 (CS) ensure featuremap has the correct
+          bit set"
+      PICS: CONTENTLAUNCHER.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -61,8 +62,9 @@ tests:
               hasMasksSet: [0x1]
 
     - label:
-          "Given CONTENTLAUNCHER.S.UP ensure featuremap has the correct bit set"
-      PICS: CONTENTLAUNCHER.S.UP
+          "Given CONTENTLAUNCHER.S.F01(UP) ensure featuremap has the correct bit
+          set"
+      PICS: CONTENTLAUNCHER.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
