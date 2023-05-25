@@ -21,8 +21,8 @@ kotlinc_runner = "${chip_root}/build/chip/java/kotlinc_runner.py"
 jar_runner = "${chip_root}/build/chip/java/jar_runner.py"
 write_build_config = "${chip_root}/build/chip/java/write_build_config.py"
 
-assert(android_sdk_root != "" || build_java_matter_controller,
-       "android_sdk_root or java_path must be specified")
+assert(android_sdk_root != "" || matter_enable_java_compilation,
+       "android_sdk_root must be specified or JAVA_PATH must be set.")
 
 # Declare a java library target
 #
