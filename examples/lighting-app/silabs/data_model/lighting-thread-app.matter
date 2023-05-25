@@ -128,12 +128,12 @@ server cluster Groups = 4 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 server cluster Scenes = 5 {
-  bitmap ScenesCopyMode : BITMAP8 {
-    kCopyAllScenes = 0x1;
+  bitmap Feature : BITMAP32 {
+    kSceneNames = 0x1;
   }
 
-  bitmap ScenesFeature : BITMAP32 {
-    kSceneNames = 0x1;
+  bitmap ScenesCopyMode : BITMAP8 {
+    kCopyAllScenes = 0x1;
   }
 
   struct AttributeValuePair {
@@ -256,6 +256,27 @@ server cluster Scenes = 5 {
     nullable INT8U capacity = 1;
     group_id groupID = 2;
     optional INT8U sceneList[] = 3;
+  }
+
+  response struct EnhancedAddSceneResponse = 64 {
+    status status = 0;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
+  }
+
+  response struct EnhancedViewSceneResponse = 65 {
+    status status = 0;
+    group_Id groupID = 1;
+    INT8U sceneID = 2;
+    optional INT16U transitionTime = 3;
+    optional CHAR_STRING sceneName = 4;
+    optional ExtensionFieldSet extensionFieldSets[] = 5;
+  }
+
+  response struct CopySceneResponse = 66 {
+    status status = 0;
+    group_Id groupIdentifierFrom = 1;
+    INT8U sceneIdentifierFrom = 2;
   }
 
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;

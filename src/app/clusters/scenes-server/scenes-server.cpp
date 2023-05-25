@@ -102,7 +102,7 @@ CHIP_ERROR ScenesServer::Init()
 
     for (auto endpoint : EnabledEndpointsWithServerCluster(Id))
     {
-        EmberAfStatus status = Attributes::FeatureMap::Set(endpoint, to_underlying(ScenesFeature::kSceneNames));
+        EmberAfStatus status = Attributes::FeatureMap::Set(endpoint, to_underlying(Feature::kSceneNames));
         if (EMBER_ZCL_STATUS_SUCCESS != status)
         {
             ChipLogDetail(Zcl, "ERR: setting feature map on Endpoint %hu Status: %x", endpoint, status);

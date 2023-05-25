@@ -5999,6 +5999,30 @@
               "source": "server",
               "incoming": 0,
               "outgoing": 1
+            },
+            {
+              "name": "EnhancedAddSceneResponse",
+              "code": 64,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "EnhancedViewSceneResponse",
+              "code": 65,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "CopySceneResponse",
+              "code": 66,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [

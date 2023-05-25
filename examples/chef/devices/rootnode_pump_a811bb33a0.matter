@@ -1163,21 +1163,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
   }
 
-  server cluster Scenes {
-    ram      attribute sceneCount default = 0x00;
-    ram      attribute currentScene default = 0x00;
-    ram      attribute currentGroup default = 0x0000;
-    ram      attribute sceneValid default = 0x00;
-    ram      attribute nameSupport default = 0x80;
-    ram      attribute lastConfiguredBy;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 4;
-  }
-
   server cluster OnOff {
     ram      attribute onOff default = 0;
     callback attribute generatedCommandList;
@@ -1217,3 +1202,5 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
   }
 }
+
+
