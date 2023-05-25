@@ -241,7 +241,7 @@ tests:
       command: "readAttribute"
       attribute: "SceneCount"
       response:
-          value: PIXIT.S.SceneTableEntriesOnFactoryNew.value + 1
+          value: 1
           constraints:
               type: int8u
 
