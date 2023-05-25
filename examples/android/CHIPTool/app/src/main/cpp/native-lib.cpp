@@ -29,8 +29,8 @@
 // is working.
 std::string base38Encode(void)
 {
-    const uint8_t buf[6] = { 0, 1, 2, 3, 4, 5 };
-    size_t size          = 6;
+    const uint8_t buf[] = { 0, 1, 2, 3, 4, 5 };
+    size_t size         = sizeof(buf);
     return chip::base38Encode(&buf[0], size);
 }
 
