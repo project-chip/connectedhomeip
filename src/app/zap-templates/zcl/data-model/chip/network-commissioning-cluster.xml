@@ -39,6 +39,7 @@ limitations under the License.
         <item name="5G" value="0x2"/>
         <item name="6G" value="0x3"/>
         <item name="60G" value="0x4"/>
+        <item name="1G" value="0x5"/>
     </enum>
     <bitmap name="WiFiSecurity" type="BITMAP8">
         <cluster code="0x0031"/>
