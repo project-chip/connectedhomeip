@@ -181,6 +181,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/src/controller/java",
         "${chip_root}/src/platform/android:java",
         "${chip_root}/src/setup_payload/java",
+        "${chip_root}/src/setup_payload/kotlin",
       ]
     }
 

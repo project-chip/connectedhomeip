@@ -212,6 +212,7 @@ class AndroidBuilder(Builder):
             "libSetupPayloadParser.so",
             "libCHIPController.so",
             "libc++_shared.so",
+            "libOnboardingPayload.so",
         ]:
             self._Execute(
                 [
@@ -227,6 +228,7 @@ class AndroidBuilder(Builder):
             "CHIPController.jar": "src/controller/java/CHIPController.jar",
             "SetupPayloadParser.jar": "src/setup_payload/java/SetupPayloadParser.jar",
             "AndroidPlatform.jar": "src/platform/android/AndroidPlatform.jar",
+            "OnboardingPayload.jar": "src/setup_payload/kotlin/OnboardingPayload.jar",
         }
 
         for jarName in jars.keys():
@@ -470,12 +472,13 @@ class AndroidBuilder(Builder):
                     self.root, "examples/", self.app.ExampleName(), "android/App/app/libs"
                 )
 
-                libs = ["libSetupPayloadParser.so", "libc++_shared.so", "libTvApp.so"]
+                libs = ["libSetupPayloadParser.so", "libOnboardingPayload.so", "libc++_shared.so", "libTvApp.so"]
 
                 jars = {
                     "SetupPayloadParser.jar": "third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar",
                     "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
                     "CHIPAppServer.jar": "third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar",
+                    "OnboardingPayload.jar": "src/setup_payload/kotlin/OnboardingPayload.jar",
                     "TvApp.jar": "TvApp.jar",
                 }
 
@@ -528,6 +531,11 @@ class AndroidBuilder(Builder):
                     "lib",
                     "src/setup_payload/java/SetupPayloadParser.jar",
                 ),
+                "OnboardingPayload.jar": os.path.join(
+                    self.output_dir,
+                    "lib",
+                    "src/setup_payload/kotlin/OnboardingPayload.jar",
+                ),
                 "jni/%s/libSetupPayloadParser.so"
                 % self.board.AbiName(): os.path.join(
                     self.output_dir,
@@ -535,6 +543,14 @@ class AndroidBuilder(Builder):
                     "jni",
                     self.board.AbiName(),
                     "libSetupPayloadParser.so",
+                ),
+                "jni/%s/libOnboardingPayload.so"
+                % self.board.AbiName(): os.path.join(
+                    self.output_dir,
+                    "lib",
+                    "jni",
+                    self.board.AbiName(),
+                    "libOnboardingPayload.so",
                 ),
                 "jni/%s/libCHIPController.so"
                 % self.board.AbiName(): os.path.join(
