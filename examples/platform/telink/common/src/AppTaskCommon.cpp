@@ -111,10 +111,10 @@ class AppCallbacks : public AppDelegate
 public:
     void OnCommissioningSessionStarted() override { isComissioningStarted = true;}
     void OnCommissioningSessionStopped() override { isComissioningStarted = false;}
-    void OnCommissioningWindowClosed() override 
+    void OnCommissioningWindowClosed() override
     {
         if (!isComissioningStarted)
-        chip::DeviceLayer::Internal::BLEMgr().Shutdown(); 
+        chip::DeviceLayer::Internal::BLEMgr().Shutdown();
     }
 };
 
