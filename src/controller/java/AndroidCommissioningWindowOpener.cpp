@@ -121,8 +121,8 @@ void AndroidCommissioningWindowOpener::OnOpenCommissioningWindowResponse(void * 
         std::string QRCode;
         std::string manualPairingCode;
 
-        SuccessOrExit(ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode));
-        SuccessOrExit(QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode));
+        SuccessOrExit(status = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode));
+        SuccessOrExit(status = QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode));
 
         if (self->mOnSuccessMethod != nullptr)
         {
