@@ -37,11 +37,11 @@
 // Use hard-coded test certificates already embedded in generic chip code => set it to 0
 // Use real/development certificates => set it to 1 + file the provisioning section from
 //                                      the internal flash
-#ifndef CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
-#define CONFIG_CHIP_K32W0_REAL_FACTORY_DATA 0
+#ifndef CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#define CONFIG_CHIP_LOAD_REAL_FACTORY_DATA 0
 #endif
 
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 
 // Enable usage of custom factory data provider
 #ifndef CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER

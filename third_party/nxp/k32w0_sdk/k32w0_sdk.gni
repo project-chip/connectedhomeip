@@ -461,7 +461,7 @@ template("k32w0_sdk") {
     }
 
     if (chip_with_factory_data == 1) {
-      defines += [ "CONFIG_CHIP_K32W0_REAL_FACTORY_DATA=1" ]
+      defines += [ "CONFIG_CHIP_LOAD_REAL_FACTORY_DATA=1" ]
     }
 
     if (defined(invoker.defines)) {

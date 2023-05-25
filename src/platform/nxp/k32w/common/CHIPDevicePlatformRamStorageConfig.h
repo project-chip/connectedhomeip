@@ -132,7 +132,7 @@
 #define kNvmId_ApplicationBase (uint16_t) 0xA000
 #endif
 
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
 /**
  * @def kNvmId_FactoryDataBackup
  *
@@ -141,4 +141,4 @@
 #ifndef kNvmId_FactoryDataBackup
 #define kNvmId_FactoryDataBackup (uint16_t) 0x7000
 #endif
-#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA

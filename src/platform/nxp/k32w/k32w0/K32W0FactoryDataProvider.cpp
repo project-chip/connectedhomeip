@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#if (!CONFIG_CHIP_K32W0_REAL_FACTORY_DATA || !(defined CONFIG_CHIP_K32W0_REAL_FACTORY_DATA))
+#if (!CONFIG_CHIP_LOAD_REAL_FACTORY_DATA || !(defined CONFIG_CHIP_LOAD_REAL_FACTORY_DATA))
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
@@ -129,8 +129,10 @@ CHIP_ERROR K32W0FactoryDataProvider::Init()
 
     if (sum > kFactoryDataSize)
     {
-        ChipLogError(DeviceLayer, "Max size of factory data: %" PRIu32 " is bigger than reserved factory data size: %" PRIu32, sum,
-                     kFactoryDataSize);
+        ChipLogError(DeviceLayer,
+            "Max size of factory data: %lu is bigger than reserved factory data size: %lu",
+            sum, kFactoryDataSize
+        );
     }
 
     VerifyOrReturnError(mRestoreMechanisms.size() > 0, CHIP_FACTORY_DATA_RESTORE_MECHANISM);
