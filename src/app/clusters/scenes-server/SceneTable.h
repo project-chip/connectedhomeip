@@ -28,13 +28,13 @@ namespace chip {
 namespace scenes {
 
 // Storage index for scenes in nvm
-typedef uint8_t SceneIndex;
+typedef uint16_t SceneIndex;
 
 typedef uint32_t TransitionTimeMs;
 typedef uint32_t SceneTransitionTime;
 
 constexpr GroupId kGlobalGroupSceneId     = 0x0000;
-constexpr SceneIndex kUndefinedSceneIndex = 0xff;
+constexpr SceneIndex kUndefinedSceneIndex = 0xffff;
 constexpr SceneId kUndefinedSceneId       = 0xff;
 
 static constexpr size_t kIteratorsMax                 = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;

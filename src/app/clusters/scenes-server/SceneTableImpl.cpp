@@ -228,7 +228,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     void Clear() override
     {
         scene_count = 0;
-        for (uint8_t i = 0; i < max_scenes_per_fabric; i++)
+        for (uint16_t i = 0; i < max_scenes_per_fabric; i++)
         {
             scene_map[i].Clear();
         }
@@ -244,7 +244,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             writer.StartContainer(TLV::ContextTag(TagScene::kStorageIDArray), TLV::kTLVType_Array, sceneMapContainer));
 
         // Storing the scene map
-        for (uint8_t i = 0; i < max_scenes_per_fabric; i++)
+        for (uint16_t i = 0; i < max_scenes_per_fabric; i++)
         {
             TLV::TLVType sceneIdContainer;
             ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, sceneIdContainer));
@@ -284,7 +284,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         TLV::TLVType sceneMapContainer;
         ReturnErrorOnFailure(reader.EnterContainer(sceneMapContainer));
 
-        uint8_t i = 0;
+        uint16_t i = 0;
         CHIP_ERROR err;
         deleted_scenes_count = 0;
 
@@ -330,7 +330,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     CHIP_ERROR Find(SceneStorageId target_scene, SceneIndex & idx)
     {
         SceneIndex firstFreeIdx = kUndefinedSceneIndex; // storage index if scene not found
-        uint8_t index           = 0;
+        uint16_t index          = 0;
 
         while (index < max_scenes_per_fabric)
         {

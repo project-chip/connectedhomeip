@@ -33,7 +33,7 @@ namespace chip {
 class StorageKeyName
 {
 public:
-    StorageKeyName(const StorageKeyName & other) = default;
+    StorageKeyName(const StorageKeyName & other)             = default;
     StorageKeyName & operator=(const StorageKeyName & other) = default;
 
     ~StorageKeyName() { memset(mKeyNameBuffer, 0, sizeof(mKeyNameBuffer)); }
@@ -203,9 +203,9 @@ public:
     {
         return StorageKeyName::Formatted("f/%x/e/%x/sc", fabric, endpoint);
     }
-    static StorageKeyName FabricSceneKey(FabricIndex fabric, EndpointId endpoint, uint8_t id)
+    static StorageKeyName FabricSceneKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
     {
-        return StorageKeyName::Formatted("f/%x/e/%x/sc/%x", fabric, endpoint, id);
+        return StorageKeyName::Formatted("f/%x/e/%x/sc/%x", fabric, endpoint, idx);
     }
 };
 
