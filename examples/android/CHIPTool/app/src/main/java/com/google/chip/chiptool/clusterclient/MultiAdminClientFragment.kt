@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
-import chip.devicecontroller.ClusterIDMapping.*
+import chip.devicecontroller.ClusterIDMapping.AdministratorCommissioning
 import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.OpenCommissioningCallback
 import chip.devicecontroller.ReportCallback

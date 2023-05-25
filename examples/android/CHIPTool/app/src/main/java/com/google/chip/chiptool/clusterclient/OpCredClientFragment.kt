@@ -15,7 +15,7 @@ import com.google.chip.chiptool.databinding.OpCredClientFragmentBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-import chip.devicecontroller.ClusterIDMapping.*
+import chip.devicecontroller.ClusterIDMapping.OperationalCredentials
 import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.model.ChipAttributePath
