@@ -110,7 +110,7 @@
         },
         {
             "path": "MTRCommandPayloadsObjc-src.zapt",
-            "name": "Objc reflections of MTR command payloads header",
+            "name": "Objc reflections of MTR command payloads",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandPayloadsObjc.mm"
         },
         {
@@ -132,6 +132,11 @@
             "path": "MTRClusterConstants.zapt",
             "name": "Constants for cluster IDs",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRClusterConstants.h"
+        },
+        {
+            "path": "MTRAttributeSpecifiedCheck-src.zapt",
+            "name": "Function to check if attribute is specified",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeSpecifiedCheck.mm"
         }
     ]
 }
