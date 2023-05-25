@@ -32,7 +32,7 @@ tests:
       command: "readAttribute"
       attribute: "TimeZone"
       response:
-          value: [{ Offset: 0, ValidAt: 0 }]
+          value: [{ Offset: 0, ValidAt: 0, Name: "" }]
 
     - label: "Set Time Zone list"
       command: "SetTimeZone"
@@ -105,7 +105,7 @@ tests:
       command: "readAttribute"
       attribute: "TimeZone"
       response:
-          value: [{ Offset: 0, ValidAt: 0 }]
+          value: [{ Offset: 0, ValidAt: 0, Name: "" }]
 
     - label: "Read DSTOffset"
       command: "readAttribute"
@@ -140,6 +140,19 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
+    - label: "Set unsorted DSTOffset entries"
+      command: "SetDSTOffset"
+      arguments:
+          values:
+              - name: "DSTOffset"
+                value:
+                    [
+                        { Offset: 1, ValidStarting: 2, ValidUntil: 3 },
+                        { Offset: 0, ValidStarting: 1, ValidUntil: null },
+                    ]
+      response:
+          error: CONSTRAINT_ERROR
+
     - label: "Set DSTOffset with multiple entries"
       command: "SetDSTOffset"
       arguments:
@@ -147,8 +160,8 @@ tests:
               - name: "DSTOffset"
                 value:
                     [
-                        { Offset: 1, ValidStarting: 3, ValidUntil: null },
-                        { Offset: 0, ValidStarting: 1, ValidUntil: 2 },
+                        { Offset: 1, ValidStarting: 1, ValidUntil: 2 },
+                        { Offset: 0, ValidStarting: 3, ValidUntil: null },
                     ]
 
     - label: "Read sorted DSTOffset"
@@ -157,8 +170,8 @@ tests:
       response:
           value:
               [
-                  { Offset: 0, ValidStarting: 1, ValidUntil: 2 },
-                  { Offset: 1, ValidStarting: 3, ValidUntil: null },
+                  { Offset: 1, ValidStarting: 1, ValidUntil: 2 },
+                  { Offset: 0, ValidStarting: 3, ValidUntil: null },
               ]
 
     - label: "Set DSTOffset with same validStarting and validUntil"

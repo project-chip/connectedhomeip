@@ -289,16 +289,20 @@ TimeSynchronizationServer::SetDSTOffset(DataModel::DecodableList<TimeSynchroniza
 
     mDstOffsetListSize = i;
 
-    // sorted by ValidStarting time
-    Sorting::BubbleSort(TimeSynchronizationServer::Instance().GetDSTOffset().begin(), mDstOffsetListSize,
-                        [](TimeSynchronization::Structs::DSTOffsetStruct::Type a,
-                           TimeSynchronization::Structs::DSTOffsetStruct::Type b) { return a.validStarting < b.validStarting; });
-
     // only 1 validuntil null value and shall be last in the list
     uint64_t lastValidUntil = 0;
     for (i = 0; i < mDstOffsetListSize; i++)
     {
         const auto & dstItem = TimeSynchronizationServer::Instance().GetDSTOffset()[i];
+        // list should be sorted by validStarting
+        for (uint8_t j = i + 1; j < mDstOffsetListSize; j++)
+        {
+            const auto & nextDstItem = TimeSynchronizationServer::Instance().GetDSTOffset()[j];
+            if (dstItem.validStarting > nextDstItem.validStarting)
+            {
+                return CHIP_ERROR_INVALID_TIME;
+            }
+        }
         // validUntil shall be larger than validStarting
         if (!dstItem.validUntil.IsNull() && dstItem.validStarting >= dstItem.validUntil.Value())
         {
