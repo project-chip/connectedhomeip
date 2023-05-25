@@ -4,7 +4,7 @@ import subprocess
 sign_images_path = os.environ["NXP_K32W0_SDK_ROOT"] + "/tools/imagetool/sign_images.sh"
 
 # Give execute permission if needed
-if (os.access(sign_images_path, os.X_OK) == False):
+if os.access(sign_images_path, os.X_OK) is False:
     os.chmod(sign_images_path, 0o766)
 
 # Convert script to unix format if needed
