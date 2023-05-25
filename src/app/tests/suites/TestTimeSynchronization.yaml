@@ -103,6 +103,26 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
+    - label: "Set Time Zone empty"
+      command: "SetTimeZone"
+      arguments:
+          values:
+              - name: "TimeZone"
+                value:
+                    []
+      response:
+          values:
+              - name: "DSTOffsetRequired"
+                value: true
+
+    - label: "Read Time Zone"
+      command: "readAttribute"
+      attribute: "TimeZone"
+      response:
+          value: [
+                      {Offset: 0, ValidAt: 0},
+                 ]
+
     - label: "Read DSTOffset"
       command: "readAttribute"
       attribute: "DSTOffset"
@@ -118,6 +138,14 @@ tests:
                 [
                     {Offset: 1, ValidStarting: 1, ValidUntil: 2},
                 ]
+
+    - label: "Set DSTOffset empty"
+      command: "SetDSTOffset"
+      arguments:
+          values:
+            - name: "DSTOffset"
+              value:
+                []
 
     - label: "Set DSTOffset with more than 1 null value"
       command: "SetDSTOffset"

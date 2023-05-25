@@ -72,6 +72,7 @@ public:
      * @param dst DstOffset list
      * @return CHIP_ERROR
      */
+    CHIP_ERROR ClearTimeZone(void);
     CHIP_ERROR SetDSTOffset(DataModel::DecodableList<TimeSynchronization::Structs::DSTOffsetStruct::Type> dst);
     CHIP_ERROR ClearDSTOffset(void);
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource(void);

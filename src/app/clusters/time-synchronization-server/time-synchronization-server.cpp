@@ -138,16 +138,10 @@ void TimeSynchronizationServer::Init()
     for (size_t i = 0; i < mTimeZoneList.size(); i++)
     {
         memset(mNames[i].name, 0, sizeof(mNames[i].name));
-        const char * buf = reinterpret_cast<const char *>(mNames[i].name);
-        tz[i].name.SetValue(chip::CharSpan(buf, sizeof(mNames[i].name)));
+        tz[i] = { 0, 0, Optional<chip::CharSpan>(chip::CharSpan(mNames[i].name, sizeof(mNames[i].name))) };
     }
     mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize);
-    if (mTimeZoneListSize == 0) // initialize default value
-    {
-        mTimeZoneList[0].offset  = 0;
-        mTimeZoneList[0].validAt = 0;
-        mTimeZoneListSize        = 1;
-    }
+    mTimeZoneListSize = (mTimeZoneListSize == 0) ? 1 : mTimeZoneListSize; // initialize default value
     mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetList, mDstOffsetListSize);
     // TODO if trusted time source is available schedule a time read
     if (!mTrustedTimeSource.IsNull())
@@ -247,7 +241,16 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(DataModel::DecodableList<TimeS
         }
         i++;
     }
-    ReturnErrorOnFailure(newTzL.GetStatus());
+    if (CHIP_NO_ERROR != newTzL.GetStatus())
+    {
+        mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize);
+        return newTzL.GetStatus();
+    }
+    if (i == 0)
+    {
+        return ClearTimeZone();
+    }
+
     mTimeZoneListSize = i;
 
     return mTimeSyncDataProvider.StoreTimeZone(TimeSynchronizationServer::Instance().GetTimeZone());
@@ -278,6 +281,10 @@ TimeSynchronizationServer::SetDSTOffset(DataModel::DecodableList<TimeSynchroniza
     {
         mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetList, mDstOffsetListSize);
         return newDstL.GetStatus();
+    }
+    if (i == 0)
+    {
+        return ClearDSTOffset();
     }
 
     mDstOffsetListSize = i;
@@ -314,6 +321,17 @@ TimeSynchronizationServer::SetDSTOffset(DataModel::DecodableList<TimeSynchroniza
     }
 
     return mTimeSyncDataProvider.StoreDSTOffset(TimeSynchronizationServer::Instance().GetDSTOffset());
+}
+
+CHIP_ERROR TimeSynchronizationServer::ClearTimeZone()
+{
+    mTimeZoneListSize = 1; // default time zone needed
+    for (uint8_t i = 0; i < CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE; i++)
+    {
+        memset(mNames[i].name, 0, sizeof(mNames[i].name));
+        mTz[i] = { 0, 0, Optional<chip::CharSpan>(chip::CharSpan(mNames[i].name, sizeof(mNames[i].name))) };
+    }
+    return mTimeSyncDataProvider.StoreTimeZone(TimeSynchronizationServer::Instance().GetTimeZone());
 }
 
 CHIP_ERROR TimeSynchronizationServer::ClearDSTOffset()
