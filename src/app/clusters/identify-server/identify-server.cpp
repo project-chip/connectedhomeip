@@ -210,7 +210,7 @@ bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, co
     auto & effectIdentifier = commandData.effectIdentifier;
     auto & effectVariant    = commandData.effectVariant;
 
-    chip::EndpointId endpoint = commandPath.mEndpointId;
+    EndpointId endpoint = commandPath.mEndpointId;
 
     // cmd TriggerEffect
     Identify * identify                      = inst(endpoint);
@@ -239,7 +239,7 @@ bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, co
     return true;
 }
 
-Identify::Identify(chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
+Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
                    IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier, EffectIdentifierEnum effectIdentifier,
                    EffectVariantEnum effectVariant) :
     mEndpoint(endpoint),
