@@ -1917,7 +1917,7 @@ endpoint 1 {
     ram      attribute colorTempPhysicalMinMireds default = 0x0000;
     ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
     ram      attribute coupleColorTempToLevelMinMireds;
-    ram      attribute startUpColorTemperatureMireds;
+    persist  attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0x1F;
     ram      attribute clusterRevision default = 5;
   }
