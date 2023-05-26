@@ -607,7 +607,8 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
             if (entry.hasCurrentLevelValue)
             {
-                logWriteError(LevelControl::Attributes::CurrentLevel::Set(endpoint, entry.currentLevelValue, false), "CurrentLevel");
+                logWriteError(LevelControl::Attributes::CurrentLevel::Set(endpoint, entry.currentLevelValue, false),
+                              "CurrentLevel");
             }
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER

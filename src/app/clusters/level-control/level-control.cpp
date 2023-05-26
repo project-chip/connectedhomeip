@@ -281,6 +281,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     // Are we at the requested level?
     if (currentLevel.Value() == state->moveToLevel)
     {
+        // we have finished transitioning, save the final value into storage
         status = Attributes::CurrentLevel::Set(endpoint, currentLevel, false);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
@@ -315,6 +316,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     }
     else
     {
+        // we haven't finish transitioning, don't save in storage as it might cause some time delay
         status = Attributes::CurrentLevel::Set(endpoint, currentLevel, true);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {

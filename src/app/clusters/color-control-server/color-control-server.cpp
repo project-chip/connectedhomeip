@@ -1634,6 +1634,8 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     if (isHueTansitionDone && isSaturationTransitionDone)
     {
         stopAllColorTransitions(endpoint);
+        // we have finished transitioning, save the final value into storage
+        // don't save to storage if we haven't finish transitioning as it might cause time delay
         isTemp = false;
     }
     else
@@ -2002,6 +2004,8 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     if (isXTransitionDone && isYTransitionDone)
     {
         stopAllColorTransitions(endpoint);
+        // we have finished transitioning, save the final value into storage
+        // don't save to storage if we haven't finish transitioning as it might cause time delay
         isTemp = false;
     }
     else
@@ -2206,6 +2210,8 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
     if (isColorTempTransitionDone)
     {
         stopAllColorTransitions(endpoint);
+        // we have finished transitioning, save the final value into storage
+        // don't save to storage if we haven't finish transitioning as it might cause time delay
         isTemp = false;
     }
     else

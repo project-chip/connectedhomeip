@@ -234,6 +234,10 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
 // the table or the data is too large, returns true and writes to dataPtr
 // if the attribute is supported and the readLength specified is less than
 // the length of the data.
+//
+// if true is passed in for isTemp, then the value is a temporary value, don't save it into storage.
+// a temporary value is an intermediate value during a transition to the final value.
+// we avoid storing such values so as to not delay the transitioning process
 EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
                                  EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest, bool isTemp)
 {
@@ -359,6 +363,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
 
         if (!isTemp)
         {
+            // only save to storage if data is not temporary (intermediate value during transition)
             // Save the attribute to persistent storage if needed
             // The callee will weed out attributes that do not need to be stored.
             emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
