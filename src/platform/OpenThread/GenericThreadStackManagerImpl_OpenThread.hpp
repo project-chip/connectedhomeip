@@ -1061,24 +1061,25 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id: {
-        ThreadNetworkDiagnostics::RoutingRole routingRole;
+        using ThreadNetworkDiagnostics::RoutingRoleEnum;
+        RoutingRoleEnum routingRole;
         otDeviceRole otRole = otThreadGetDeviceRole(mOTInst);
 
         if (otRole == OT_DEVICE_ROLE_DISABLED)
         {
-            routingRole = EMBER_ZCL_ROUTING_ROLE_UNSPECIFIED;
+            routingRole = RoutingRoleEnum::kUnspecified;
         }
         else if (otRole == OT_DEVICE_ROLE_DETACHED)
         {
-            routingRole = EMBER_ZCL_ROUTING_ROLE_UNASSIGNED;
+            routingRole = RoutingRoleEnum::kUnassigned;
         }
         else if (otRole == OT_DEVICE_ROLE_ROUTER)
         {
-            routingRole = EMBER_ZCL_ROUTING_ROLE_ROUTER;
+            routingRole = RoutingRoleEnum::kRouter;
         }
         else if (otRole == OT_DEVICE_ROLE_LEADER)
         {
-            routingRole = EMBER_ZCL_ROUTING_ROLE_LEADER;
+            routingRole = RoutingRoleEnum::kLeader;
         }
         else if (otRole == OT_DEVICE_ROLE_CHILD)
         {
@@ -1086,17 +1087,17 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 
             if (linkMode.mRxOnWhenIdle)
             {
-                routingRole = EMBER_ZCL_ROUTING_ROLE_END_DEVICE;
+                routingRole = RoutingRoleEnum::kEndDevice;
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
                 if (otThreadIsRouterEligible(mOTInst))
                 {
-                    routingRole = EMBER_ZCL_ROUTING_ROLE_REED;
+                    routingRole = RoutingRoleEnum::kReed;
                 }
 #endif
             }
             else
             {
-                routingRole = EMBER_ZCL_ROUTING_ROLE_SLEEPY_END_DEVICE;
+                routingRole = RoutingRoleEnum::kSleepyEndDevice;
             }
         }
 
@@ -1149,7 +1150,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 
             while (otThreadGetNextNeighborInfo(mOTInst, &iterator, &neighInfo) == OT_ERROR_NONE)
             {
-                ThreadNetworkDiagnostics::Structs::NeighborTable::Type neighborTable;
+                ThreadNetworkDiagnostics::Structs::NeighborTableStruct::Type neighborTable;
                 app::DataModel::Nullable<int8_t> averageRssi;
                 app::DataModel::Nullable<int8_t> lastRssi;
 
@@ -1209,7 +1210,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             {
                 if (otThreadGetRouterInfo(mOTInst, i, &routerInfo) == OT_ERROR_NONE)
                 {
-                    ThreadNetworkDiagnostics::Structs::RouteTable::Type routeTable;
+                    ThreadNetworkDiagnostics::Structs::RouteTableStruct::Type routeTable;
 
                     routeTable.extAddress      = Encoding::BigEndian::Get64(routerInfo.mExtAddress.m8);
                     routeTable.rloc16          = routerInfo.mRloc16;
@@ -1233,7 +1234,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             otError otErr = otThreadGetParentInfo(mOTInst, &routerInfo);
             ReturnErrorOnFailure(MapOpenThreadError(otErr));
 
-            ThreadNetworkDiagnostics::Structs::RouteTable::Type routeTable;
+            ThreadNetworkDiagnostics::Structs::RouteTableStruct::Type routeTable;
 
             routeTable.extAddress      = Encoding::BigEndian::Get64(routerInfo.mExtAddress.m8);
             routeTable.rloc16          = routerInfo.mRloc16;
@@ -1661,7 +1662,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
         err = encoder.EncodeList([](const auto & aEncoder) -> CHIP_ERROR {
             // TODO activeNetworkFaultsList isn't tracked. Encode the list of 4 entries at 0 none the less
-            ThreadNetworkDiagnostics::NetworkFault activeNetworkFaultsList[4] = { ThreadNetworkDiagnostics::NetworkFault(0) };
+            ThreadNetworkDiagnostics::NetworkFaultEnum activeNetworkFaultsList[4] = { ThreadNetworkDiagnostics::NetworkFaultEnum(
+                0) };
             for (auto fault : activeNetworkFaultsList)
             {
                 ReturnErrorOnFailure(aEncoder.Encode(fault));
