@@ -272,9 +272,15 @@
         "Test_TC_G_2_1"
     ],
     "Scenes": ["Test_TC_S_1_1"],
+    "AirQuality": [
+        "Test_TC_AIRQUAL_1_1",
+        "Test_TC_AIRQUAL_2_1",
+        "Test_TC_AIRQUAL_2_2"
+    ],
     "collection": [
         "AccessControl",
         "AccessControlEnforcement",
+        "AirQuality",
         "BooleanState",
         "BridgedDeviceBasicInformation",
         "Actions",
