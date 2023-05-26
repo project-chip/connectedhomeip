@@ -333,7 +333,6 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
             response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 100));
         }
     }
-    // Verify if name was saved in the scene
     response.sceneName.SetValue(CharSpan(scene.mStorageData.mName, scene.mStorageData.mNameLength));
     Span<Structs::ExtensionFieldSet::Type> responseEFSSpan(responseEFSBuffer, deserializedEFSCount);
     response.extensionFieldSets.SetValue(responseEFSSpan);

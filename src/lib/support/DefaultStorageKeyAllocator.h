@@ -201,14 +201,15 @@ public:
     // Number of scenes stored in a given endpoint's scene table, across all fabrics.
     static StorageKeyName EndpointSceneCountKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/scc/e/%x", endpoint); }
 
-    // Stores the scene count for a fabric and a map between scene storage ids <sceneId, groupId> and sceneIndex for a specific
-    // Fabric
+    // Stores the scene count for a fabric for the given endpoint and a map between scene storage ids (<sceneId, groupId>) and sceneIndex for a specific
+    // Fabric and endpoint.
     static StorageKeyName FabricSceneDataKey(FabricIndex fabric, EndpointId endpoint)
     {
         return StorageKeyName::Formatted("f/%x/e/%x/sc", fabric, endpoint);
     }
 
-    // Scene key, Fabric scoped, the value of the idx is held in FabricSceneData in a map between <scene_id, group_id> and
+    // Stores the actual scene data for a given scene on a given endpoint for a particular fabric. 
+    // idx corresponds to the indices read from FabricSceneDataKey.
     // SceneIndex
     static StorageKeyName FabricSceneKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
     {
