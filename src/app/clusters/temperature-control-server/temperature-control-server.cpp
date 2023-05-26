@@ -216,6 +216,10 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
         {
             status = Status::InvalidCommand;
         }
+        else
+        {
+            status = Status::InvalidCommand;
+        }
     }
 exit:
     commandObj->AddStatus(commandPath, status);
