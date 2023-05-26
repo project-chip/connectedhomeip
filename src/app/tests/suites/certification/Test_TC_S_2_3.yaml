@@ -74,10 +74,7 @@ tests:
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
-          value:
-              [
-                  { FabricIndex: 1, GroupId: G1, GroupKeySetID: 0x01a1 },
-              ]
+          value: [{ FabricIndex: 1, GroupId: G1, GroupKeySetID: 0x01a1 }]
 
     - label:
           "TH sends a AddGroup command to DUT with the GroupID field set to G1."
