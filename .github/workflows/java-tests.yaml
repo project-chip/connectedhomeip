@@ -93,8 +93,17 @@ jobs:
 
             - name: Run unit tests
               timeout-minutes: 10
-              run: scripts/run_in_build_env.sh 'echo FIXME'
-
+              # TODO: this direct path loading is not maintainable. Our build system should define and
+              #       support test classes.
+              run: scripts/run_in_build_env.sh "\
+                 java \
+                   -cp 'third_party/java_deps/artifacts/*:out/linux-x64-tests/lib/src/controller/java/*' \
+                   org.junit.runner.JUnitCore       \
+                   chip.tlv.TlvWriterTest           \
+                   chip.tlv.TlvReadWriteTest        \
+                   chip.tlv.TlvReaderTest           \
+                   chip.jsontlv.JsonToTlvToJsonTest \
+              "
             - name: Build Java Matter Controller and all clusters app
               timeout-minutes: 50
               run: |
