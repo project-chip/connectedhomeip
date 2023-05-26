@@ -5997,19 +5997,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster RefrigeratorAlarm {
-    emits event Notify;
-    ram      attribute mask default = 1;
-    ram      attribute latch default = 1;
-    ram      attribute state default = 1;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster RelativeHumidityMeasurement {
     ram      attribute measuredValue;
     ram      attribute minMeasuredValue default = 0;
