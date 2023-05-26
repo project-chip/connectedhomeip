@@ -402,6 +402,30 @@ CHIP_ERROR JniReferences::CharToStringUTF(const chip::CharSpan & charSpan, jobje
     jmethodID newDocoderMethod = env->GetMethodID(charSetClass, "newDecoder", "()Ljava/nio/charset/CharsetDecoder;");
     jobject decoderObject      = env->CallObjectMethod(charsetObject, newDocoderMethod);
 
+    // Even though spec requires UTF-8 strings, we have seen instances in the field of certified devices sending
+    // invalid strings like "startup?" (0x73 0x74 0x61 0x72 0x74 0x75 0x70 <0x91>) and we want to actually
+    // be lenient on those rather than failing an entire decode (which may fail an entire report for one invalid string,
+    // like in a very common 'subscribe *')
+    //
+    // As a result call:
+    //   onMalformedInput(CodingErrorAction.REPLACE) 
+    //   onUnmappableCharacter(CodingErrorAction.REPLACE)
+    jobject replaceAction = env->GetStaticObjectField(env->GetStaticFieldID(env->FindClass("java/nio/charset/CodingErrorAction"),
+                                                                            "REPLACE",
+                                                                            "Ljava/nio/charset/CodingErrorAction"));
+    {
+        jmethodID onMalformedInput = env->GetMethodID(charSetDocoderClass, "onMalformedInput", "(Ljava/nio/charset/CodingErrorAction;)Ljava/nio/charset/CharsetDecoder;");
+        decoderObject = env->CallObjectMethod(decoderObject, onMalformedInput, replaceAction);
+    }
+    {
+        jmethodID onUnmappableCharacter = env->GetMethodID(charSetDocoderClass, "onUnmappableCharacter", "(Ljava/nio/charset/CodingErrorAction;)Ljava/nio/charset/CharsetDecoder;");
+        decoderObject = env->CallObjectMethod(decoderObject, onUnmappableCharacter, replaceAction);
+    }
+
+
+    // TODO: onMalformedInput(CodingErrorAction.REPLACE)
+    // TODO: onUnmappableCharacter(CodingErrorAction.REPLACE)
+
     jmethodID charSetDecodeMethod = env->GetMethodID(charSetDocoderClass, "decode", "(Ljava/nio/ByteBuffer;)Ljava/nio/CharBuffer;");
     jobject decodeObject          = env->CallObjectMethod(decoderObject, charSetDecodeMethod, jbyteBuffer);
     env->DeleteLocalRef(jbyteBuffer);
