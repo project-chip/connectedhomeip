@@ -482,6 +482,16 @@ class TestStep:
                 self._test.run_if)
             self._test.event_number = self._config_variable_substitution(
                 self._test.event_number)
+            self._test.cluster = self._config_variable_substitution(
+                self._test.cluster)
+            self._test.command = self._config_variable_substitution(
+                self._test.command)
+            self._test.attribute = self._config_variable_substitution(
+                self._test.attribute)
+            self._test.event = self._config_variable_substitution(
+                self._test.event)
+            self._test.endpoint = self._config_variable_substitution(
+                self._test.endpoint)
             test.update_arguments(self.arguments)
             test.update_responses(self.responses)
 

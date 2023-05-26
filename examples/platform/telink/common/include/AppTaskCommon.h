@@ -62,7 +62,7 @@ public:
     CHIP_ERROR StartApp();
     void PostEvent(AppEvent * event);
 
-    static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
+    static void IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect);
 
 protected:
     CHIP_ERROR InitCommonParts(void);

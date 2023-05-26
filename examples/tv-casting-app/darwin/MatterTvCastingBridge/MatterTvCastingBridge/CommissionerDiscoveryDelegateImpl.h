@@ -26,7 +26,7 @@ class CommissionerDiscoveryDelegateImpl : public chip::Controller::DeviceDiscove
 public:
     void SetUp(dispatch_queue_t _Nonnull clientQueue,
         void (^_Nonnull objCDiscoveredCommissionerHandler)(DiscoveredNodeData * _Nonnull),
-        TargetVideoPlayerInfo * cachedTargetVideoPlayerInfos)
+        TargetVideoPlayerInfo * _Nullable cachedTargetVideoPlayerInfos)
     {
         mClientQueue = clientQueue;
         mObjCDiscoveredCommissionerHandler = objCDiscoveredCommissionerHandler;
@@ -59,7 +59,7 @@ public:
 private:
     void (^_Nonnull mObjCDiscoveredCommissionerHandler)(DiscoveredNodeData * _Nonnull);
     dispatch_queue_t _Nonnull mClientQueue;
-    TargetVideoPlayerInfo * mCachedTargetVideoPlayerInfos;
+    TargetVideoPlayerInfo * _Nullable mCachedTargetVideoPlayerInfos;
 };
 
 #endif /* CommissionerDiscoveryDelegateImpl_h */
