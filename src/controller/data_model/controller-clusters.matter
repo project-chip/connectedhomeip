@@ -13,7 +13,7 @@ struct LabelStruct {
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 client cluster Identify = 3 {
-  enum IdentifyEffectIdentifier : ENUM8 {
+  enum EffectIdentifierEnum : ENUM8 {
     kBlink = 0;
     kBreathe = 1;
     kOkay = 2;
@@ -22,21 +22,21 @@ client cluster Identify = 3 {
     kStopEffect = 255;
   }
 
-  enum IdentifyEffectVariant : ENUM8 {
+  enum EffectVariantEnum : ENUM8 {
     kDefault = 0;
   }
 
-  enum IdentifyIdentifyType : ENUM8 {
+  enum IdentifyTypeEnum : ENUM8 {
     kNone = 0;
-    kVisibleLight = 1;
-    kVisibleLED = 2;
+    kLightOutput = 1;
+    kVisibleIndicator = 2;
     kAudibleBeep = 3;
     kDisplay = 4;
     kActuator = 5;
   }
 
   attribute int16u identifyTime = 0;
-  readonly attribute enum8 identifyType = 1;
+  readonly attribute IdentifyTypeEnum identifyType = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -49,8 +49,8 @@ client cluster Identify = 3 {
   }
 
   request struct TriggerEffectRequest {
-    IdentifyEffectIdentifier effectIdentifier = 0;
-    IdentifyEffectVariant effectVariant = 1;
+    EffectIdentifierEnum effectIdentifier = 0;
+    EffectVariantEnum effectVariant = 1;
   }
 
   /** Command description for Identify */

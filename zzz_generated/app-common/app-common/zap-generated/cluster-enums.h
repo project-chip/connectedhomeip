@@ -29,11 +29,8 @@ namespace Clusters {
 
 namespace Identify {
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for IdentifyEffectIdentifier
-enum class IdentifyEffectIdentifier : uint8_t
+// Enum for EffectIdentifierEnum
+enum class EffectIdentifierEnum : uint8_t
 {
     kBlink         = 0x00,
     kBreathe       = 0x01,
@@ -47,17 +44,9 @@ enum class IdentifyEffectIdentifier : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyEffectIdentifier = EmberAfIdentifyEffectIdentifier;
-static IdentifyEffectIdentifier __attribute__((unused)) kIdentifyEffectIdentifierkUnknownEnumValue =
-    static_cast<IdentifyEffectIdentifier>(3);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for IdentifyEffectVariant
-enum class IdentifyEffectVariant : uint8_t
+// Enum for EffectVariantEnum
+enum class EffectVariantEnum : uint8_t
 {
     kDefault = 0x00,
     // All received enum values that are not listed above will be mapped
@@ -66,34 +55,22 @@ enum class IdentifyEffectVariant : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 1,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyEffectVariant = EmberAfIdentifyEffectVariant;
-static IdentifyEffectVariant __attribute__((unused)) kIdentifyEffectVariantkUnknownEnumValue =
-    static_cast<IdentifyEffectVariant>(1);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for IdentifyIdentifyType
-enum class IdentifyIdentifyType : uint8_t
+// Enum for IdentifyTypeEnum
+enum class IdentifyTypeEnum : uint8_t
 {
-    kNone         = 0x00,
-    kVisibleLight = 0x01,
-    kVisibleLED   = 0x02,
-    kAudibleBeep  = 0x03,
-    kDisplay      = 0x04,
-    kActuator     = 0x05,
+    kNone             = 0x00,
+    kLightOutput      = 0x01,
+    kVisibleIndicator = 0x02,
+    kAudibleBeep      = 0x03,
+    kDisplay          = 0x04,
+    kActuator         = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyIdentifyType                                                                 = EmberAfIdentifyIdentifyType;
-static IdentifyIdentifyType __attribute__((unused)) kIdentifyIdentifyTypekUnknownEnumValue = static_cast<IdentifyIdentifyType>(6);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace Identify
 
 namespace Groups {
@@ -209,8 +186,8 @@ enum class MoveMode : uint8_t
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MoveMode                                                                             = EmberAfMoveMode;
-static MoveMode __attribute__((unused)) kMoveModekUnknownEnumValue                         = static_cast<MoveMode>(2);
+using MoveMode                                                                       = EmberAfMoveMode;
+static MoveMode __attribute__((unused)) kMoveModekUnknownEnumValue                   = static_cast<MoveMode>(2);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
@@ -228,8 +205,8 @@ enum class StepMode : uint8_t
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StepMode                                                                             = EmberAfStepMode;
-static StepMode __attribute__((unused)) kStepModekUnknownEnumValue                         = static_cast<StepMode>(2);
+using StepMode                                                                       = EmberAfStepMode;
+static StepMode __attribute__((unused)) kStepModekUnknownEnumValue                   = static_cast<StepMode>(2);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for Feature
@@ -1035,8 +1012,8 @@ enum class InterfaceTypeEnum : uint8_t
     kUnknownEnumValue = 5,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using InterfaceTypeEnum                                                                    = EmberAfInterfaceTypeEnum;
-static InterfaceTypeEnum __attribute__((unused)) kInterfaceTypeEnumkUnknownEnumValue       = static_cast<InterfaceTypeEnum>(5);
+using InterfaceTypeEnum                                                              = EmberAfInterfaceTypeEnum;
+static InterfaceTypeEnum __attribute__((unused)) kInterfaceTypeEnumkUnknownEnumValue = static_cast<InterfaceTypeEnum>(5);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
@@ -1056,8 +1033,8 @@ enum class NetworkFaultEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NetworkFaultEnum                                                                     = EmberAfNetworkFaultEnum;
-static NetworkFaultEnum __attribute__((unused)) kNetworkFaultEnumkUnknownEnumValue         = static_cast<NetworkFaultEnum>(4);
+using NetworkFaultEnum                                                               = EmberAfNetworkFaultEnum;
+static NetworkFaultEnum __attribute__((unused)) kNetworkFaultEnumkUnknownEnumValue   = static_cast<NetworkFaultEnum>(4);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
@@ -1080,8 +1057,8 @@ enum class RadioFaultEnum : uint8_t
     kUnknownEnumValue = 7,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RadioFaultEnum                                                                       = EmberAfRadioFaultEnum;
-static RadioFaultEnum __attribute__((unused)) kRadioFaultEnumkUnknownEnumValue             = static_cast<RadioFaultEnum>(7);
+using RadioFaultEnum                                                                 = EmberAfRadioFaultEnum;
+static RadioFaultEnum __attribute__((unused)) kRadioFaultEnumkUnknownEnumValue       = static_cast<RadioFaultEnum>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace GeneralDiagnostics
 
@@ -1142,8 +1119,8 @@ enum class RoutingRole : uint8_t
     kUnknownEnumValue = 7,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RoutingRole                                                                          = EmberAfRoutingRole;
-static RoutingRole __attribute__((unused)) kRoutingRolekUnknownEnumValue                   = static_cast<RoutingRole>(7);
+using RoutingRole                                                                    = EmberAfRoutingRole;
+static RoutingRole __attribute__((unused)) kRoutingRolekUnknownEnumValue             = static_cast<RoutingRole>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for Feature
@@ -1250,8 +1227,8 @@ enum class PHYRateEnum : uint8_t
     kUnknownEnumValue = 10,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PHYRateEnum                                                                          = EmberAfPHYRateEnum;
-static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue                   = static_cast<PHYRateEnum>(10);
+using PHYRateEnum                                                                    = EmberAfPHYRateEnum;
+static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue             = static_cast<PHYRateEnum>(10);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for Feature
@@ -2965,8 +2942,8 @@ enum class ColorMode : uint8_t
     kUnknownEnumValue = 3,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorMode                                                                            = EmberAfColorMode;
-static ColorMode __attribute__((unused)) kColorModekUnknownEnumValue                       = static_cast<ColorMode>(3);
+using ColorMode                                                                      = EmberAfColorMode;
+static ColorMode __attribute__((unused)) kColorModekUnknownEnumValue                 = static_cast<ColorMode>(3);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Enum for HueDirection

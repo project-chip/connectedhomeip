@@ -233,8 +233,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TriggerEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
-    IdentifyEffectIdentifier effectIdentifier = static_cast<IdentifyEffectIdentifier>(0);
-    IdentifyEffectVariant effectVariant       = static_cast<IdentifyEffectVariant>(0);
+    EffectIdentifierEnum effectIdentifier = static_cast<EffectIdentifierEnum>(0);
+    EffectVariantEnum effectVariant       = static_cast<EffectVariantEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -249,8 +249,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TriggerEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
-    IdentifyEffectIdentifier effectIdentifier = static_cast<IdentifyEffectIdentifier>(0);
-    IdentifyEffectVariant effectVariant       = static_cast<IdentifyEffectVariant>(0);
+    EffectIdentifierEnum effectIdentifier = static_cast<EffectIdentifierEnum>(0);
+    EffectVariantEnum effectVariant       = static_cast<EffectVariantEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TriggerEffect
@@ -273,9 +273,9 @@ struct TypeInfo
 namespace IdentifyType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Identify::IdentifyTypeEnum;
+    using DecodableType    = chip::app::Clusters::Identify::IdentifyTypeEnum;
+    using DecodableArgType = chip::app::Clusters::Identify::IdentifyTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IdentifyType::Id; }
@@ -328,7 +328,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::IdentifyTime::TypeInfo::DecodableType identifyTime = static_cast<uint16_t>(0);
-        Attributes::IdentifyType::TypeInfo::DecodableType identifyType = static_cast<uint8_t>(0);
+        Attributes::IdentifyType::TypeInfo::DecodableType identifyType =
+            static_cast<chip::app::Clusters::Identify::IdentifyTypeEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

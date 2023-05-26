@@ -138,16 +138,15 @@ typedef void (*UnitTestingClusterTestEmitTestEventResponseCallbackType)(
 typedef void (*UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType)(
     void *, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &);
 
-typedef void (*IdentifyClusterIdentifyEffectIdentifierAttributeCallback)(void *,
-                                                                         chip::app::Clusters::Identify::IdentifyEffectIdentifier);
-typedef void (*NullableIdentifyClusterIdentifyEffectIdentifierAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectIdentifier> &);
-typedef void (*IdentifyClusterIdentifyEffectVariantAttributeCallback)(void *, chip::app::Clusters::Identify::IdentifyEffectVariant);
-typedef void (*NullableIdentifyClusterIdentifyEffectVariantAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectVariant> &);
-typedef void (*IdentifyClusterIdentifyIdentifyTypeAttributeCallback)(void *, chip::app::Clusters::Identify::IdentifyIdentifyType);
-typedef void (*NullableIdentifyClusterIdentifyIdentifyTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyIdentifyType> &);
+typedef void (*IdentifyClusterEffectIdentifierEnumAttributeCallback)(void *, chip::app::Clusters::Identify::EffectIdentifierEnum);
+typedef void (*NullableIdentifyClusterEffectIdentifierEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::EffectIdentifierEnum> &);
+typedef void (*IdentifyClusterEffectVariantEnumAttributeCallback)(void *, chip::app::Clusters::Identify::EffectVariantEnum);
+typedef void (*NullableIdentifyClusterEffectVariantEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::EffectVariantEnum> &);
+typedef void (*IdentifyClusterIdentifyTypeEnumAttributeCallback)(void *, chip::app::Clusters::Identify::IdentifyTypeEnum);
+typedef void (*NullableIdentifyClusterIdentifyTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyTypeEnum> &);
 typedef void (*OnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback)(
     void *, chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant);
 typedef void (*NullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallback)(
@@ -22582,202 +22581,202 @@ public:
                 const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data);
 };
 
-class MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge
-    : public MTRCallbackBridge<IdentifyClusterIdentifyEffectIdentifierAttributeCallback>
+class MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<IdentifyClusterEffectIdentifierEnumAttributeCallback>
 {
 public:
-    MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<IdentifyClusterIdentifyEffectIdentifierAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<IdentifyClusterEffectIdentifierEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRActionBlock action) :
-        MTRCallbackBridge<IdentifyClusterIdentifyEffectIdentifierAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::Identify::IdentifyEffectIdentifier value);
-};
-
-class MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge
-    : public MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge
-{
-public:
-    MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableIdentifyClusterIdentifyEffectIdentifierAttributeCallback>
-{
-public:
-    MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableIdentifyClusterIdentifyEffectIdentifierAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              MTRActionBlock action) :
-        MTRCallbackBridge<NullableIdentifyClusterIdentifyEffectIdentifierAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectIdentifier> & value);
-};
-
-class MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge
-    : public MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge
-{
-public:
-    MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge
-    : public MTRCallbackBridge<IdentifyClusterIdentifyEffectVariantAttributeCallback>
-{
-public:
-    MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<IdentifyClusterIdentifyEffectVariantAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<IdentifyClusterIdentifyEffectVariantAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::Identify::IdentifyEffectVariant value);
-};
-
-class MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge
-    : public MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge
-{
-public:
-    MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableIdentifyClusterIdentifyEffectVariantAttributeCallback>
-{
-public:
-    MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableIdentifyClusterIdentifyEffectVariantAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRActionBlock action) :
-        MTRCallbackBridge<NullableIdentifyClusterIdentifyEffectVariantAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectVariant> & value);
-};
-
-class MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge
-    : public MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge
-{
-public:
-    MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<IdentifyClusterIdentifyIdentifyTypeAttributeCallback>
-{
-public:
-    MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<IdentifyClusterIdentifyIdentifyTypeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<IdentifyClusterIdentifyIdentifyTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<IdentifyClusterEffectIdentifierEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Identify::IdentifyIdentifyType value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::Identify::EffectIdentifierEnum value);
 };
 
-class MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge
-    : public MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge
+class MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackSubscriptionBridge
+    : public MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge
 {
 public:
-    MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge(
+    MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(queue, handler, action),
+        MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnDone;
+    using MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableIdentifyClusterIdentifyIdentifyTypeAttributeCallback>
+class MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableIdentifyClusterEffectIdentifierEnumAttributeCallback>
 {
 public:
-    MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableIdentifyClusterIdentifyIdentifyTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableIdentifyClusterEffectIdentifierEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                           MTRActionBlock action) :
-        MTRCallbackBridge<NullableIdentifyClusterIdentifyIdentifyTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<NullableIdentifyClusterEffectIdentifierEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyIdentifyType> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::EffectIdentifierEnum> & value);
 };
 
-class MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge
+class MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge(
+    MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge(queue, handler, action),
+        MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnDone;
+    using MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRIdentifyClusterEffectVariantEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<IdentifyClusterEffectVariantEnumAttributeCallback>
+{
+public:
+    MTRIdentifyClusterEffectVariantEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<IdentifyClusterEffectVariantEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRIdentifyClusterEffectVariantEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                               MTRActionBlock action) :
+        MTRCallbackBridge<IdentifyClusterEffectVariantEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Identify::EffectVariantEnum value);
+};
+
+class MTRIdentifyClusterEffectVariantEnumAttributeCallbackSubscriptionBridge
+    : public MTRIdentifyClusterEffectVariantEnumAttributeCallbackBridge
+{
+public:
+    MTRIdentifyClusterEffectVariantEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action,
+                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRIdentifyClusterEffectVariantEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRIdentifyClusterEffectVariantEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIdentifyClusterEffectVariantEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableIdentifyClusterEffectVariantEnumAttributeCallback>
+{
+public:
+    MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableIdentifyClusterEffectVariantEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<NullableIdentifyClusterEffectVariantEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::EffectVariantEnum> & value);
+};
+
+class MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<IdentifyClusterIdentifyTypeEnumAttributeCallback>
+{
+public:
+    MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<IdentifyClusterIdentifyTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRActionBlock action) :
+        MTRCallbackBridge<IdentifyClusterIdentifyTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::Identify::IdentifyTypeEnum value);
+};
+
+class MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action,
+                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableIdentifyClusterIdentifyTypeEnumAttributeCallback>
+{
+public:
+    MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableIdentifyClusterIdentifyTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableIdentifyClusterIdentifyTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyTypeEnum> & value);
+};
+
+class MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

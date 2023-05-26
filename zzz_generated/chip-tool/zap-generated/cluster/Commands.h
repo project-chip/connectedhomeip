@@ -10464,8 +10464,8 @@ void registerClusterIdentify(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<uint16_t>>(Id, "identify-time", 0, UINT16_MAX, Attributes::IdentifyTime::Id,
                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "identify-type", 0, UINT8_MAX, Attributes::IdentifyType::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Identify::IdentifyTypeEnum>>(
+            Id, "identify-type", 0, UINT8_MAX, Attributes::IdentifyType::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //

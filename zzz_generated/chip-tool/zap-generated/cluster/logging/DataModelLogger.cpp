@@ -4724,7 +4724,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("IdentifyTime", 1, value);
         }
         case Identify::Attributes::IdentifyType::Id: {
-            uint8_t value;
+            chip::app::Clusters::Identify::IdentifyTypeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("IdentifyType", 1, value);
         }
