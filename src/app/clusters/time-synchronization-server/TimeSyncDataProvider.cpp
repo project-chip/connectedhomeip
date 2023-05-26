@@ -21,19 +21,17 @@
 #include <lib/core/TLV.h>
 namespace chip {
 
-// Calculated with Python code:
-//   w = TLVWriter()
-//   dict([(0 , 0xff),(1, bytearray([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])), (2, 0xffff), ])
-//   w.put(None, s)
-//   len(w.encoding)
-constexpr size_t kTrustedTimeSourceMaxSerializedSize = 23u + 9u; // adding 9 as buffer
-constexpr size_t kTimeZoneMaxSerializedSize          = 90u + 6u; // adding 6 as buffer
-constexpr size_t kDSTOffsetMaxSerializedSize         = 34u + 6u; // adding 6 as buffer
+constexpr size_t kTrustedTimeSourceMaxSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(chip::FabricIndex), sizeof(chip::NodeId), sizeof(chip::EndpointId));
+constexpr size_t kTimeZoneMaxSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(int32_t), sizeof(uint64_t)) + 64; // 64 for name field
+constexpr size_t kDSTOffsetMaxSerializedSize = TLV::EstimateStructOverhead(sizeof(int32_t), sizeof(uint64_t), sizeof(uint64_t));
 
-// user TZ feature #if 1
 // Multiply the serialized size by the maximum number of list size and add 2 bytes for the array start and end.
-constexpr size_t kTimeZoneListMaxSerializedSize  = kTimeZoneMaxSerializedSize * CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE + 2;
-constexpr size_t kDSTOffsetListMaxSerializedSize = kDSTOffsetMaxSerializedSize * CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE + 2;
+constexpr size_t kTimeZoneListMaxSerializedSize =
+    kTimeZoneMaxSerializedSize * CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE + TLV::EstimateStructOverhead();
+constexpr size_t kDSTOffsetListMaxSerializedSize =
+    kDSTOffsetMaxSerializedSize * CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE + TLV::EstimateStructOverhead();
 
 CHIP_ERROR TimeSyncDataProvider::StoreTrustedTimeSource(const TrustedTimeSource & timeSource)
 {
