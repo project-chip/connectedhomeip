@@ -208,7 +208,7 @@ public:
         return StorageKeyName::Formatted("f/%x/e/%x/sc", fabric, endpoint);
     }
 
-    // Stores the actual scene data for a given scene on a given endpoint for a particular fabric. 
+    // Stores the actual scene data for a given scene on a given endpoint for a particular fabric.
     // idx corresponds to the indices read from FabricSceneDataKey.
     // SceneIndex
     static StorageKeyName FabricSceneKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
