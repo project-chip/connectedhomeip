@@ -272,14 +272,16 @@ typedef void (^MTRFetchProxyHandleCompletion)(MTRDeviceControllerXPCProxyHandle 
                                            maxInterval:params.maxInterval
                                                 params:[MTRDeviceController encodeXPCSubscribeParams:params]
                                     establishedHandler:^{
-                                        dispatch_async(queue, ^{
-                                            MTR_LOG_DEBUG("Subscription established");
-                                            subscriptionEstablishedHandler();
-                                            // The following captures the proxy handle in the closure so that the handle
-                                            // won't be released prior to block call.
-                                            __auto_type handleRetainer = handle;
-                                            (void) handleRetainer;
-                                        });
+                                        [self.xpcConnection callSubscriptionEstablishedHandler:^{
+                                            dispatch_async(queue, ^{
+                                                MTR_LOG_DEBUG("Subscription established");
+                                                subscriptionEstablishedHandler();
+                                                // The following captures the proxy handle in the closure so that the handle
+                                                // won't be released prior to block call.
+                                                __auto_type handleRetainer = handle;
+                                                (void) handleRetainer;
+                                            });
+                                        }];
                                     }];
     };
 

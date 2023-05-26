@@ -190,7 +190,7 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length
     error = EcdsaAsn1SignatureToRaw(kP256_FE_Length, ByteSpan{ signature_se05x, signature_se05x_len }, out_raw_sig_span);
     SuccessOrExit(error);
 
-    SuccessOrExit(out_signature.SetLength(2 * kP256_FE_Length));
+    SuccessOrExit(error = out_signature.SetLength(2 * kP256_FE_Length));
 
     error = CHIP_NO_ERROR;
 exit:
