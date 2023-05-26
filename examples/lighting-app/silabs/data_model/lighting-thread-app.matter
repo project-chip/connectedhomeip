@@ -2225,14 +2225,14 @@ endpoint 1 {
   }
 
   server cluster Scenes {
-    ram      attribute sceneCount default = 0x00;
+    callback attribute sceneCount default = 0x00;
     ram      attribute currentScene default = 0x00;
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;
     ram      attribute nameSupport default = 0x80;
     ram      attribute lastConfiguredBy;
     ram      attribute sceneTableSize default = 16;
-    ram      attribute remainingCapacity default = 8;
+    callback attribute remainingCapacity default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

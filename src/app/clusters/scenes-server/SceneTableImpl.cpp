@@ -912,7 +912,9 @@ static DefaultSceneTableImpl gSceneTableImpl;
 } // namespace
 
 /// @brief Instance getter for the default global scene table implementation
-///        Should only be used in the scene cluster
+/// @note This API should always be called prior to using the scene Table and the return pointer should never be cached. As per
+/// issue: https://github.com/orgs/project-chip/projects/19/views/1?pane=issue&itemId=29250268, this API is currently not thread
+/// safe and calls to it should be made thread safe in the event of using multiple endpoints at once.
 /// @return Default global scene table implementation
 DefaultSceneTableImpl * GetSceneTableImpl(EndpointId endpoint, uint16_t endpointTableSize)
 {

@@ -69,8 +69,6 @@ private:
     void HandleEnhancedViewScene(HandlerContext & ctx, const Commands::EnhancedViewScene::DecodableType & req);
     void HandleCopyScene(HandlerContext & ctx, const Commands::CopyScene::DecodableType & req);
 
-    ConcreteCommandPath mPath = ConcreteCommandPath(0, 0, 0);
-
     // Group Data Provider
     Credentials::GroupDataProvider * mGroupProvider = nullptr;
 
