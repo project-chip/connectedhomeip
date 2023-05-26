@@ -36,6 +36,7 @@ tests:
       command: "readAttribute"
       attribute: "AirQuality"
       response:
+          saveAs: ValueBeforeChange
           constraints:
               type: enum8
               minValue: 0
