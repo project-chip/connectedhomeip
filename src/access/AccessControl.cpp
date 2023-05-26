@@ -613,7 +613,10 @@ exit:
     {
         ChipLogError(DataManagement, "AccessControl: %s %" CHIP_ERROR_FORMAT, log, err.Format());
     }
-    ChipLogError(DataManagement, "AccessControl: %s", log);
+    else
+    {
+        ChipLogError(DataManagement, "AccessControl: %s", log);
+    }
     return false;
 }
 
