@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -59,16 +59,6 @@
 // queue used to serialize all work performed by the CastingServerBridge
 @property (atomic) dispatch_queue_t chipWorkQueue;
 
-@property void (^_Nonnull commissioningCompleteCallback)(bool);
-
-@property void (^_Nonnull onConnectionSuccessCallback)(VideoPlayer *);
-
-@property void (^_Nonnull onConnectionFailureCallback)(MatterError *);
-
-@property void (^_Nonnull onNewOrUpdatedEndpointCallback)(ContentApp *);
-
-@property NSMutableDictionary * commandResponseCallbacks;
-
 @property NSMutableDictionary * subscriptionEstablishedCallbacks;
 
 @property NSMutableDictionary * subscriptionReadSuccessCallbacks;
@@ -102,6 +92,8 @@
             return nil;
         }
 
+        // TODO: Constructors should not perform heavy work like initializing the Matter SDK. This should
+        // be moved to initializeApp or another suitable location.
         err = chip::DeviceLayer::PlatformMgr().InitChipStack();
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "InitChipStack failed: %s", ErrorStr(err));
@@ -110,7 +102,6 @@
 
         _commissionerDiscoveryDelegate = new CommissionerDiscoveryDelegateImpl();
 
-        _commandResponseCallbacks = [NSMutableDictionary dictionary];
         _subscriptionEstablishedCallbacks = [NSMutableDictionary dictionary];
         _subscriptionReadSuccessCallbacks = [NSMutableDictionary dictionary];
         _subscriptionReadFailureCallbacks = [NSMutableDictionary dictionary];
@@ -120,10 +111,166 @@
     return self;
 }
 
+/**
+ Dispatches the block on the Matter SDK dispatch queue.
+
+ @param description Optional. A description of the callback to be dispatched for diagnostic purposes.
+ @param block The Block to be dispatched.
+ */
+- (void)dispatchOnMatterSDKQueue:(const NSString * _Nullable)description block:(dispatch_block_t)block
+{
+    if (nil != description) {
+        ChipLogProgress(AppServer, "[SYNC] CastingServerBridge %s", [description UTF8String]);
+    }
+    dispatch_async(_chipWorkQueue, ^{
+        // The Matter SDK is not, generally, internally thread-safe. It relies upon the client to lock
+        // the SDK prior to any interactions after chip::DeviceLayer::PlatformMgr().InitChipStack()
+        //
+        // Note that it is presently safe to do at this point because InitChipStack is called in the
+        // constructor for the CastingServerBridge.
+        chip::DeviceLayer::StackLock lock;
+
+        if (nil != description) {
+            ChipLogProgress(AppServer, "[ASYNC (CHIP)] CastingServerBridge BEGIN %s", [description UTF8String]);
+        }
+        block();
+        if (nil != description) {
+            ChipLogProgress(AppServer, "[ASYNC (CHIP)] CastingServerBridge END %s", [description UTF8String]);
+        }
+    });
+}
+
+/**
+ Dispatches a client callback via a `dispatch_block_t` to be run on the client's `dispatch_queue_t`.
+
+ @param queue The client's Dispatch Queue.
+ @param description Optional. A description of the callback to be dispatched for diagnostic purposes.
+ @param block The Block to be invoked to invoke the client callback.
+ */
+- (void)dispatchOnClientQueue:(dispatch_queue_t)queue
+                  description:(const NSString * _Nullable)description
+                        block:(dispatch_block_t)block
+{
+    // Within the CastingServerBridge, the usage pattern is typically to expose asynchronous public APIs that
+    // take a callback to indicate that the low-level SDK operation has been initiated (the "started"
+    // callback), and a separate set of result callbacks to be invoked when the low-level SDK operation
+    // has been completed (the "result" callbacks).
+    //
+    // All of the work is serialized on the _chipWorkQueue, with the started callback being invoked after the
+    // Matter SDK is called with the result callbacks. This poses a challenge because we don't have a strong
+    // guarantee that the Matter SDK will not complete its work and invoke the result callback before control
+    // is returning to the _chipWorkQueue thread; this can cause callbacks to be received in an unexpected
+    // order, where the result might arrive before the client knows that the call was started.
+    //
+    // To avoid this confusion, we perform a "double async" dispatch to ensure that events are delivered in a
+    // sensible order. First, we schedule the result callback to run on the _chipWorkQueue (so it *must* run
+    // after the end of the CastingServerBridge's wrapper logic that already started on the _chipWorkQueue)
+    // and then immediately, asynchronously dispatch the callback onto the provided client queue.
+    dispatch_async(_chipWorkQueue, ^{
+        if (nil != description) {
+            ChipLogProgress(AppServer, "[ASYNC (CHIP)] CastingServerBridge dispatching %s", [description UTF8String]);
+        }
+        dispatch_async(queue, ^{
+            if (nil != description) {
+                ChipLogProgress(AppServer, "[ASYNC (CLIENT)] CastingServerBridge BEGIN %s", [description UTF8String]);
+            }
+            block();
+            if (nil != description) {
+                ChipLogProgress(AppServer, "[ASYNC (CLIENT)] CastingServerBridge END %s", [description UTF8String]);
+            }
+        });
+    });
+}
+
+/**
+ A utility function that invokes an Objective C Block on the Matter Dispatch Queue in a thread-safe manner.
+
+ The result of the Objective C Block will be relayed to the `blockCompleteCallback`.
+
+ @param description  Optional. A description of the Objective C Block to be invoked for diagnostic purposes.
+ @param callbackQueue The Dispatch Queue on which the callback shall be invoked.
+ @param blockCompleteCallback The callback to be invoked with the result of the Objective C Block.
+ @param block The Objective C Block to dispatch.
+ */
+- (void)withCastingServerInvokeBlock:(const NSString * _Nullable)description
+                       callbackQueue:(dispatch_queue_t)callbackQueue
+                     onBlockComplete:(void (^_Nonnull)(bool))blockCompleteCallback
+                               block:(CHIP_ERROR (^_Nonnull)(CastingServer *))block
+{
+    [self dispatchOnMatterSDKQueue:description
+                             block:^{
+                                 CastingServer * castingServer = CastingServer::GetInstance();
+
+                                 // We invoke the block and capture the result on the Matter Dispatch Queue with the stack lock
+                                 // held, then use the result snapshot in the subsequent block to be asynchronously dispatched on
+                                 // the client's callback Dispatch Queue.
+                                 const CHIP_ERROR result = block(castingServer);
+                                 dispatch_async(callbackQueue, ^{
+                                     if (nil != description) {
+                                         ChipLogProgress(AppServer,
+                                             "[ASYNC (CLIENT)] CastingServerBridge invoking %s Started Callback",
+                                             [description UTF8String]);
+                                     }
+                                     blockCompleteCallback(
+                                         [[MatterError alloc] initWithCode:result.AsInteger()
+                                                                   message:[NSString stringWithUTF8String:result.AsString()]]);
+                                     if (nil != description) {
+                                         ChipLogProgress(AppServer,
+                                             "[ASYNC (CLIENT)] CastingServerBridge invoked %s Started Callback",
+                                             [description UTF8String]);
+                                     }
+                                 });
+                             }];
+}
+
+/**
+ A utility function that invokes an Objective C Block on the Matter Dispatch Queue in a thread-safe manner.
+
+ The result of the Objective C Block will be relayed to the `blockCompleteCallback`. The response callback is expected to be called
+ at a later time with the asynchronous result of the Casting Server operation (by the Casting Server).
+
+ @param description  Optional. A description of the Objective C Block to be invoked for diagnostic purposes.
+ @param blockCompleteCallback The callback to be invoked with the result of the Objective C Block.
+ @param responseCallback The callback that will eventually be invoked by the Casting Server when the operation has completed on the
+ remote end.
+ @param callbackQueue The Dispatch Queue on which the callbacks shall be invoked.
+ @param block The Objective C Block to dispatch.
+ */
+- (void)withCastingServerInvokeBlock:(const NSString * _Nullable)description
+                       callbackQueue:(dispatch_queue_t)callbackQueue
+                     onBlockComplete:(void (^_Nonnull)(bool))blockCompleteCallback
+                          onResponse:(void (^_Nonnull)(bool))responseCallback
+                               block:(CHIP_ERROR (^_Nonnull)(CastingServer *, std::function<void(CHIP_ERROR)>))block
+{
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:callbackQueue
+                       onBlockComplete:blockCompleteCallback
+                                 block:^(CastingServer * castingServer) {
+                                     return block(castingServer, [description, responseCallback, callbackQueue](CHIP_ERROR err) {
+                                         NSString * _description = description == nil
+                                             ? nil
+                                             : [NSString stringWithFormat:@"%@ Response Callback", description];
+
+                                         [[CastingServerBridge getSharedInstance]
+                                             dispatchOnClientQueue:callbackQueue
+                                                       description:_description
+                                                             block:^{
+                                                                 responseCallback(CHIP_NO_ERROR == err);
+                                                             }];
+                                     });
+                                 }];
+}
+
 - (MatterError *)initializeApp:(AppParameters * _Nullable)appParameters
                    clientQueue:(dispatch_queue_t _Nonnull)clientQueue
           initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler
 {
+    // The Matter SDK is not, generally, internally thread-safe. It relies upon the client to lock
+    // the SDK prior to any interactions after chip::DeviceLayer::PlatformMgr().InitChipStack()
+    //
+    // Note that it is presently safe to do at this point because InitChipStack is called in the
+    // constructor for the CastingServerBridge.
+    chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "CastingServerBridge().initApp() called");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -277,51 +424,54 @@
       discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler
     discoveredCommissionerHandler:(nullable void (^)(DiscoveredNodeData *))discoveredCommissionerHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().discoverCommissioners() called");
-    dispatch_async(_chipWorkQueue, ^{
-        bool discoveryRequestStatus = true;
+    [self dispatchOnMatterSDKQueue:@"discoverCommissioners(...)"
+                             block:^{
+                                 bool discoveryRequestStatus = true;
 
-        if (discoveredCommissionerHandler != nil) {
-            TargetVideoPlayerInfo * cachedTargetVideoPlayerInfos = CastingServer::GetInstance()->ReadCachedTargetVideoPlayerInfos();
-            self->_commissionerDiscoveryDelegate->SetUp(clientQueue, discoveredCommissionerHandler, cachedTargetVideoPlayerInfos);
-        }
-        CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners(
-            discoveredCommissionerHandler != nil ? self->_commissionerDiscoveryDelegate : nullptr);
-        if (err != CHIP_NO_ERROR) {
-            ChipLogError(AppServer, "CastingServerBridge().discoverCommissioners() failed: %" CHIP_ERROR_FORMAT, err.Format());
-            discoveryRequestStatus = false;
-        }
+                                 if (discoveredCommissionerHandler != nil) {
+                                     TargetVideoPlayerInfo * cachedTargetVideoPlayerInfos
+                                         = CastingServer::GetInstance()->ReadCachedTargetVideoPlayerInfos();
+                                     self->_commissionerDiscoveryDelegate->SetUp(
+                                         clientQueue, discoveredCommissionerHandler, cachedTargetVideoPlayerInfos);
+                                 }
+                                 CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners(
+                                     discoveredCommissionerHandler != nil ? self->_commissionerDiscoveryDelegate : nullptr);
+                                 if (err != CHIP_NO_ERROR) {
+                                     ChipLogError(AppServer,
+                                         "CastingServerBridge().discoverCommissioners() failed: %" CHIP_ERROR_FORMAT, err.Format());
+                                     discoveryRequestStatus = false;
+                                 }
 
-        dispatch_async(clientQueue, ^{
-            discoveryRequestSentHandler(discoveryRequestStatus);
-        });
-    });
+                                 dispatch_async(clientQueue, ^{
+                                     discoveryRequestSentHandler(discoveryRequestStatus);
+                                 });
+                             }];
 }
 
 - (void)getDiscoveredCommissioner:(int)index
                       clientQueue:(dispatch_queue_t _Nonnull)clientQueue
     discoveredCommissionerHandler:(nullable void (^)(DiscoveredNodeData * _Nullable))discoveredCommissionerHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().getDiscoveredCommissioner() called");
+    [self dispatchOnMatterSDKQueue:@"getDiscoveredCommissioner(...)"
+                             block:^{
+                                 chip::Optional<TargetVideoPlayerInfo *> associatedConnectableVideoPlayer;
+                                 DiscoveredNodeData * commissioner = nil;
+                                 const chip::Dnssd::DiscoveredNodeData * cppDiscoveredNodeData
+                                     = CastingServer::GetInstance()->GetDiscoveredCommissioner(
+                                         index, associatedConnectableVideoPlayer);
+                                 if (cppDiscoveredNodeData != nullptr) {
+                                     commissioner = [ConversionUtils convertToObjCDiscoveredNodeDataFrom:cppDiscoveredNodeData];
+                                     if (associatedConnectableVideoPlayer.HasValue()) {
+                                         VideoPlayer * connectableVideoPlayer = [ConversionUtils
+                                             convertToObjCVideoPlayerFrom:associatedConnectableVideoPlayer.Value()];
+                                         [commissioner setConnectableVideoPlayer:connectableVideoPlayer];
+                                     }
+                                 }
 
-    dispatch_sync(_chipWorkQueue, ^{
-        chip::Optional<TargetVideoPlayerInfo *> associatedConnectableVideoPlayer;
-        DiscoveredNodeData * commissioner = nil;
-        const chip::Dnssd::DiscoveredNodeData * cppDiscoveredNodeData
-            = CastingServer::GetInstance()->GetDiscoveredCommissioner(index, associatedConnectableVideoPlayer);
-        if (cppDiscoveredNodeData != nullptr) {
-            commissioner = [ConversionUtils convertToObjCDiscoveredNodeDataFrom:cppDiscoveredNodeData];
-            if (associatedConnectableVideoPlayer.HasValue()) {
-                VideoPlayer * connectableVideoPlayer =
-                    [ConversionUtils convertToObjCVideoPlayerFrom:associatedConnectableVideoPlayer.Value()];
-                [commissioner setConnectableVideoPlayer:connectableVideoPlayer];
-            }
-        }
-
-        dispatch_sync(clientQueue, ^{
-            discoveredCommissionerHandler(commissioner);
-        });
-    });
+                                 dispatch_async(clientQueue, ^{
+                                     discoveredCommissionerHandler(commissioner);
+                                 });
+                             }];
 }
 
 - (void)sendUserDirectedCommissioningRequest:(NSString * _Nonnull)commissionerIpAddress
@@ -330,76 +480,86 @@
                                  clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                        udcRequestSentHandler:(nullable void (^)(bool))udcRequestSentHandler
 {
-    ChipLogProgress(AppServer,
-        "CastingServerBridge().sendUserDirectedCommissioningRequest() called with IP %s port %d platformInterface %d",
-        [commissionerIpAddress UTF8String], commissionerPort, platformInterface);
+    const NSString * description =
+        [NSString stringWithFormat:@"sendUserDirectedCommissioningRequest() IP %s port %d platformInterface %d",
+                  [commissionerIpAddress UTF8String], commissionerPort, platformInterface];
+    [self dispatchOnMatterSDKQueue:description
+                             block:^{
+                                 bool udcRequestStatus;
+                                 chip::Inet::IPAddress commissionerAddrInet;
+                                 if (chip::Inet::IPAddress::FromString([commissionerIpAddress UTF8String], commissionerAddrInet)
+                                     == false) {
+                                     ChipLogError(AppServer,
+                                         "CastingServerBridge().sendUserDirectedCommissioningRequest() failed to parse IP address");
+                                     udcRequestStatus = false;
+                                 } else {
+                                     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId(platformInterface);
 
-    dispatch_async(_chipWorkQueue, ^{
-        bool udcRequestStatus;
-        chip::Inet::IPAddress commissionerAddrInet;
-        if (chip::Inet::IPAddress::FromString([commissionerIpAddress UTF8String], commissionerAddrInet) == false) {
-            ChipLogError(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() failed to parse IP address");
-            udcRequestStatus = false;
-        } else {
-            chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId(platformInterface);
+                                     chip::Transport::PeerAddress commissionerPeerAddress
+                                         = chip::Transport::PeerAddress::UDP(commissionerAddrInet, commissionerPort, interfaceId);
 
-            chip::Transport::PeerAddress commissionerPeerAddress
-                = chip::Transport::PeerAddress::UDP(commissionerAddrInet, commissionerPort, interfaceId);
+                                     CHIP_ERROR err = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(
+                                         commissionerPeerAddress);
+                                     if (err != CHIP_NO_ERROR) {
+                                         ChipLogError(AppServer,
+                                             "CastingServerBridge().sendUserDirectedCommissioningRequest() failed: "
+                                             "%" CHIP_ERROR_FORMAT,
+                                             err.Format());
+                                         udcRequestStatus = false;
+                                     } else {
+                                         udcRequestStatus = true;
+                                     }
+                                 }
 
-            CHIP_ERROR err = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(commissionerPeerAddress);
-            if (err != CHIP_NO_ERROR) {
-                ChipLogError(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() failed: %" CHIP_ERROR_FORMAT,
-                    err.Format());
-                udcRequestStatus = false;
-            } else {
-                udcRequestStatus = true;
-            }
-        }
-
-        dispatch_async(clientQueue, ^{
-            udcRequestSentHandler(udcRequestStatus);
-        });
-    });
+                                 dispatch_async(clientQueue, ^{
+                                     udcRequestSentHandler(udcRequestStatus);
+                                 });
+                             }];
 }
 
 - (void)sendUserDirectedCommissioningRequest:(DiscoveredNodeData * _Nonnull)commissioner
                                  clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                        udcRequestSentHandler:(nullable void (^)(bool))udcRequestSentHandler
 {
-    ChipLogProgress(AppServer,
-        "CastingServerBridge().sendUserDirectedCommissioningRequest() called with IP %s port %d platformInterface %d deviceName: "
-        "%s",
-        [commissioner.ipAddresses[0] UTF8String], commissioner.port, commissioner.platformInterface,
-        [commissioner.deviceName UTF8String]);
+    const NSString * description =
+        [NSString stringWithFormat:@"sendUserDirectedCommissioningRequest(...) IP %s port %d platformInterface %d deviceName %s",
+                  [commissioner.ipAddresses[0] UTF8String], commissioner.port, commissioner.platformInterface,
+                  [commissioner.deviceName UTF8String]];
 
-    dispatch_async(_chipWorkQueue, ^{
-        bool udcRequestStatus;
+    [self dispatchOnMatterSDKQueue:description
+                             block:^{
+                                 bool udcRequestStatus;
 
-        chip::Dnssd::DiscoveredNodeData cppCommissioner;
-        if ([ConversionUtils convertToCppDiscoveredNodeDataFrom:commissioner outDiscoveredNodeData:cppCommissioner]
-            != CHIP_NO_ERROR) {
-            ChipLogError(AppServer,
-                "CastingServerBridge().sendUserDirectedCommissioningRequest() failed to convert Commissioner(DiscoveredNodeData) "
-                "to Cpp type");
-            udcRequestStatus = false;
-        } else {
-            CHIP_ERROR err = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(&cppCommissioner);
-            if (err != CHIP_NO_ERROR) {
-                ChipLogError(AppServer, "CastingServerBridge().sendUserDirectedCommissioningRequest() failed: %" CHIP_ERROR_FORMAT,
-                    err.Format());
-                udcRequestStatus = false;
-            } else {
-                udcRequestStatus = true;
-            }
-        }
+                                 chip::Dnssd::DiscoveredNodeData cppCommissioner;
+                                 if ([ConversionUtils convertToCppDiscoveredNodeDataFrom:commissioner
+                                                                   outDiscoveredNodeData:cppCommissioner]
+                                     != CHIP_NO_ERROR) {
+                                     ChipLogError(AppServer,
+                                         "CastingServerBridge().sendUserDirectedCommissioningRequest() failed to convert "
+                                         "Commissioner(DiscoveredNodeData) "
+                                         "to Cpp type");
+                                     udcRequestStatus = false;
+                                 } else {
+                                     CHIP_ERROR err
+                                         = CastingServer::GetInstance()->SendUserDirectedCommissioningRequest(&cppCommissioner);
+                                     if (err != CHIP_NO_ERROR) {
+                                         ChipLogError(AppServer,
+                                             "CastingServerBridge().sendUserDirectedCommissioningRequest() failed: "
+                                             "%" CHIP_ERROR_FORMAT,
+                                             err.Format());
+                                         udcRequestStatus = false;
+                                     } else {
+                                         udcRequestStatus = true;
+                                     }
+                                 }
 
-        dispatch_async(clientQueue, ^{
-            udcRequestSentHandler(udcRequestStatus);
-        });
-    });
+                                 dispatch_async(clientQueue, ^{
+                                     udcRequestSentHandler(udcRequestStatus);
+                                 });
+                             }];
 }
 
-- (OnboardingPayload *)getOnboardingPaylod
+- (OnboardingPayload *)getOnboardingPayload
 {
     return _onboardingPayload;
 }
@@ -411,81 +571,101 @@
             onConnectionFailureCallback:(void (^_Nonnull)(MatterError * _Nonnull))onConnectionFailureCallback
          onNewOrUpdatedEndpointCallback:(void (^_Nonnull)(ContentApp * _Nonnull))onNewOrUpdatedEndpointCallback
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().openBasicCommissioningWindow() called");
+    [self
+        dispatchOnMatterSDKQueue:@"openBasicCommissioningWindow(...)"
+                           block:^{
+                               CHIP_ERROR err = CastingServer::GetInstance()->OpenBasicCommissioningWindow(
+                                   [clientQueue, commissioningCompleteCallback](CHIP_ERROR err) {
+                                       [[CastingServerBridge getSharedInstance]
+                                           dispatchOnClientQueue:clientQueue
+                                                     description:@"openBasicCommissioningWindow(...) commissioningCompleteCallback"
+                                                           block:^{
+                                                               commissioningCompleteCallback(CHIP_NO_ERROR == err);
+                                                           }];
+                                   },
+                                   [clientQueue, onConnectionSuccessCallback](TargetVideoPlayerInfo * cppTargetVideoPlayerInfo) {
+                                       VideoPlayer * videoPlayer =
+                                           [ConversionUtils convertToObjCVideoPlayerFrom:cppTargetVideoPlayerInfo];
+                                       [[CastingServerBridge getSharedInstance]
+                                           dispatchOnClientQueue:clientQueue
+                                                     description:@"openBasicCommissioningWindow(...) onConnectionSuccessCallback"
+                                                           block:^{
+                                                               onConnectionSuccessCallback(videoPlayer);
+                                                           }];
+                                   },
+                                   [clientQueue, onConnectionFailureCallback](CHIP_ERROR err) {
+                                       [[CastingServerBridge getSharedInstance]
+                                           dispatchOnClientQueue:clientQueue
+                                                     description:@"openBasicCommissioningWindow(...) onConnectionFailureCallback"
+                                                           block:^{
+                                                               onConnectionFailureCallback([[MatterError alloc]
+                                                                   initWithCode:err.AsInteger()
+                                                                        message:[NSString stringWithUTF8String:err.AsString()]]);
+                                                           }];
+                                   },
+                                   [clientQueue, onNewOrUpdatedEndpointCallback](TargetEndpointInfo * cppTargetEndpointInfo) {
+                                       ContentApp * contentApp =
+                                           [ConversionUtils convertToObjCContentAppFrom:cppTargetEndpointInfo];
+                                       [[CastingServerBridge getSharedInstance]
+                                           dispatchOnClientQueue:clientQueue
+                                                     description:@"openBasicCommissioningWindow(...) onNewOrUpdatedEndpointCallback"
+                                                           block:^{
+                                                               onNewOrUpdatedEndpointCallback(contentApp);
+                                                           }];
+                                   });
 
-    _commissioningCompleteCallback = commissioningCompleteCallback;
-    _onConnectionSuccessCallback = onConnectionSuccessCallback;
-    _onConnectionFailureCallback = onConnectionFailureCallback;
-    _onNewOrUpdatedEndpointCallback = onNewOrUpdatedEndpointCallback;
-
-    CHIP_ERROR OpenBasicCommissioningWindow(std::function<void(CHIP_ERROR)> commissioningCompleteCallback,
-        std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess, std::function<void(CHIP_ERROR)> onConnectionFailure,
-        std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
-
-    dispatch_async(_chipWorkQueue, ^{
-        CHIP_ERROR err = CastingServer::GetInstance()->OpenBasicCommissioningWindow(
-            [](CHIP_ERROR err) { [CastingServerBridge getSharedInstance].commissioningCompleteCallback(CHIP_NO_ERROR == err); },
-            [](TargetVideoPlayerInfo * cppTargetVideoPlayerInfo) {
-                VideoPlayer * videoPlayer = [ConversionUtils convertToObjCVideoPlayerFrom:cppTargetVideoPlayerInfo];
-                [CastingServerBridge getSharedInstance].onConnectionSuccessCallback(videoPlayer);
-            },
-            [](CHIP_ERROR err) {
-                [CastingServerBridge getSharedInstance].onConnectionFailureCallback(
-                    [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            [](TargetEndpointInfo * cppTargetEndpointInfo) {
-                ContentApp * contentApp = [ConversionUtils convertToObjCContentAppFrom:cppTargetEndpointInfo];
-                [CastingServerBridge getSharedInstance].onNewOrUpdatedEndpointCallback(contentApp);
-            });
-
-        dispatch_async(clientQueue, ^{
-            commissioningWindowRequestedHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                               dispatch_async(clientQueue, ^{
+                                   ChipLogProgress(AppServer, "[async] Dispatching commissioningWindowRequestedHandler");
+                                   commissioningWindowRequestedHandler(CHIP_NO_ERROR == err);
+                               });
+                           }];
 }
 
 - (void)getActiveTargetVideoPlayers:(dispatch_queue_t _Nonnull)clientQueue
     activeTargetVideoPlayersHandler:(nullable void (^)(NSMutableArray * _Nullable))activeTargetVideoPlayersHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().getActiveTargetVideoPlayers() called");
+    [self dispatchOnMatterSDKQueue:@"getActiveTargetVideoPlayers(...)"
+                             block:^{
+                                 NSMutableArray * videoPlayers = [NSMutableArray new];
+                                 TargetVideoPlayerInfo * cppTargetVideoPlayerInfo
+                                     = CastingServer::GetInstance()->GetActiveTargetVideoPlayer();
+                                 if (cppTargetVideoPlayerInfo != nullptr && cppTargetVideoPlayerInfo->IsInitialized()) {
+                                     videoPlayers[0] = [ConversionUtils convertToObjCVideoPlayerFrom:cppTargetVideoPlayerInfo];
+                                 }
 
-    dispatch_async(_chipWorkQueue, ^{
-        NSMutableArray * videoPlayers = [NSMutableArray new];
-        TargetVideoPlayerInfo * cppTargetVideoPlayerInfo = CastingServer::GetInstance()->GetActiveTargetVideoPlayer();
-        if (cppTargetVideoPlayerInfo != nullptr && cppTargetVideoPlayerInfo->IsInitialized()) {
-            videoPlayers[0] = [ConversionUtils convertToObjCVideoPlayerFrom:cppTargetVideoPlayerInfo];
-        }
-
-        dispatch_async(clientQueue, ^{
-            activeTargetVideoPlayersHandler(videoPlayers);
-        });
-    });
+                                 dispatch_async(clientQueue, ^{
+                                     activeTargetVideoPlayersHandler(videoPlayers);
+                                 });
+                             }];
 }
 
 - (void)readCachedVideoPlayers:(dispatch_queue_t _Nonnull)clientQueue
     readCachedVideoPlayersHandler:(nullable void (^)(NSMutableArray * _Nullable))readCachedVideoPlayersHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().readCachedVideoPlayers() called");
+    [self dispatchOnMatterSDKQueue:@"readCachedVideoPlayers(...)"
+                             block:^{
+                                 NSMutableArray * videoPlayers = nil;
+                                 TargetVideoPlayerInfo * cppTargetVideoPlayerInfos
+                                     = CastingServer::GetInstance()->ReadCachedTargetVideoPlayerInfos();
+                                 if (cppTargetVideoPlayerInfos != nullptr) {
+                                     videoPlayers = [NSMutableArray new];
+                                     for (size_t i = 0; cppTargetVideoPlayerInfos[i].IsInitialized(); i++) {
+                                         ChipLogProgress(AppServer,
+                                             "CastingServerBridge().readCachedVideoPlayers() with nodeId: 0x" ChipLogFormatX64
+                                             " fabricIndex: %d deviceName: %s vendorId: %d",
+                                             ChipLogValueX64(cppTargetVideoPlayerInfos[i].GetNodeId()),
+                                             cppTargetVideoPlayerInfos[i].GetFabricIndex(),
+                                             cppTargetVideoPlayerInfos[i].GetDeviceName(),
+                                             cppTargetVideoPlayerInfos[i].GetVendorId());
+                                         videoPlayers[i] =
+                                             [ConversionUtils convertToObjCVideoPlayerFrom:&cppTargetVideoPlayerInfos[i]];
+                                     }
+                                 }
 
-    dispatch_async(_chipWorkQueue, ^{
-        NSMutableArray * videoPlayers = nil;
-        TargetVideoPlayerInfo * cppTargetVideoPlayerInfos = CastingServer::GetInstance()->ReadCachedTargetVideoPlayerInfos();
-        if (cppTargetVideoPlayerInfos != nullptr) {
-            videoPlayers = [NSMutableArray new];
-            for (size_t i = 0; cppTargetVideoPlayerInfos[i].IsInitialized(); i++) {
-                ChipLogProgress(AppServer,
-                    "CastingServerBridge().readCachedVideoPlayers() with nodeId: 0x" ChipLogFormatX64
-                    " fabricIndex: %d deviceName: %s vendorId: %d",
-                    ChipLogValueX64(cppTargetVideoPlayerInfos[i].GetNodeId()), cppTargetVideoPlayerInfos[i].GetFabricIndex(),
-                    cppTargetVideoPlayerInfos[i].GetDeviceName(), cppTargetVideoPlayerInfos[i].GetVendorId());
-                videoPlayers[i] = [ConversionUtils convertToObjCVideoPlayerFrom:&cppTargetVideoPlayerInfos[i]];
-            }
-        }
-
-        dispatch_async(clientQueue, ^{
-            readCachedVideoPlayersHandler(videoPlayers);
-        });
-    });
+                                 dispatch_async(clientQueue, ^{
+                                     readCachedVideoPlayersHandler(videoPlayers);
+                                 });
+                             }];
 }
 
 - (void)verifyOrEstablishConnection:(VideoPlayer * _Nonnull)videoPlayer
@@ -495,167 +675,189 @@
         onConnectionFailureCallback:(void (^_Nonnull)(MatterError * _Nonnull))onConnectionFailureCallback
      onNewOrUpdatedEndpointCallback:(void (^_Nonnull)(ContentApp * _Nonnull))onNewOrUpdatedEndpointCallback
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().verifyOrEstablishConnection() called");
-    _onConnectionSuccessCallback = onConnectionSuccessCallback;
-    _onConnectionFailureCallback = onConnectionFailureCallback;
-    _onNewOrUpdatedEndpointCallback = onNewOrUpdatedEndpointCallback;
+    [self dispatchOnMatterSDKQueue:@"verifyOrEstablishConnection(...)"
+                             block:^{
+                                 TargetVideoPlayerInfo targetVideoPlayerInfo;
+                                 [ConversionUtils convertToCppTargetVideoPlayerInfoFrom:videoPlayer
+                                                               outTargetVideoPlayerInfo:targetVideoPlayerInfo];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetVideoPlayerInfo targetVideoPlayerInfo;
-        [ConversionUtils convertToCppTargetVideoPlayerInfoFrom:videoPlayer outTargetVideoPlayerInfo:targetVideoPlayerInfo];
+                                 CHIP_ERROR err = CastingServer::GetInstance()->VerifyOrEstablishConnection(
+                                     targetVideoPlayerInfo,
+                                     [clientQueue, onConnectionSuccessCallback](TargetVideoPlayerInfo * cppTargetVideoPlayerInfo) {
+                                         VideoPlayer * videoPlayer =
+                                             [ConversionUtils convertToObjCVideoPlayerFrom:cppTargetVideoPlayerInfo];
+                                         [[CastingServerBridge getSharedInstance]
+                                             dispatchOnClientQueue:clientQueue
+                                                       description:@"onConnectionSuccessCallback"
+                                                             block:^{
+                                                                 onConnectionSuccessCallback(videoPlayer);
+                                                             }];
+                                     },
+                                     [clientQueue, onConnectionFailureCallback](CHIP_ERROR err) {
+                                         [[CastingServerBridge getSharedInstance]
+                                             dispatchOnClientQueue:clientQueue
+                                                       description:@"onConnectionFailureCallback"
+                                                             block:^{
+                                                                 onConnectionFailureCallback([[MatterError alloc]
+                                                                     initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                                             }];
+                                     },
+                                     [clientQueue, onNewOrUpdatedEndpointCallback](TargetEndpointInfo * cppTargetEndpointInfo) {
+                                         ContentApp * contentApp =
+                                             [ConversionUtils convertToObjCContentAppFrom:cppTargetEndpointInfo];
+                                         [[CastingServerBridge getSharedInstance]
+                                             dispatchOnClientQueue:clientQueue
+                                                       description:@"onNewOrUpdatedEndpointCallback"
+                                                             block:^{
+                                                                 onNewOrUpdatedEndpointCallback(contentApp);
+                                                             }];
+                                     });
 
-        CHIP_ERROR err = CastingServer::GetInstance()->VerifyOrEstablishConnection(
-            targetVideoPlayerInfo,
-            [](TargetVideoPlayerInfo * cppTargetVideoPlayerInfo) {
-                VideoPlayer * videoPlayer = [ConversionUtils convertToObjCVideoPlayerFrom:cppTargetVideoPlayerInfo];
-                [CastingServerBridge getSharedInstance].onConnectionSuccessCallback(videoPlayer);
-            },
-            [](CHIP_ERROR err) {
-                [CastingServerBridge getSharedInstance].onConnectionFailureCallback(
-                    [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            [](TargetEndpointInfo * cppTargetEndpointInfo) {
-                ContentApp * contentApp = [ConversionUtils convertToObjCContentAppFrom:cppTargetEndpointInfo];
-                [CastingServerBridge getSharedInstance].onNewOrUpdatedEndpointCallback(contentApp);
-            });
-
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                                 dispatch_async(clientQueue, ^{
+                                     requestSentHandler(
+                                         [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                   message:[NSString stringWithUTF8String:err.AsString()]]);
+                                 });
+                             }];
 }
 
 - (void)shutdownAllSubscriptions:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().shutdownAllSubscriptions() called");
-    dispatch_async(_chipWorkQueue, ^{
-        CastingServer::GetInstance()->ShutdownAllSubscriptions();
-        dispatch_async(clientQueue, ^{
-            requestSentHandler();
-        });
-    });
+    [self dispatchOnMatterSDKQueue:@"shutdownAllSubscriptions(...)"
+                             block:^{
+                                 CastingServer::GetInstance()->ShutdownAllSubscriptions();
+                                 dispatch_async(clientQueue, ^{
+                                     requestSentHandler();
+                                 });
+                             }];
 }
 
 - (void)startMatterServer:(dispatch_queue_t _Nonnull)clientQueue
     startMatterServerCompletionCallback:(nullable void (^)(MatterError * _Nonnull))startMatterServerCompletionCallback
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().startMatterServer() called");
+    [self dispatchOnMatterSDKQueue:@"startMatterServer(...)"
+                             block:^{
+                                 // Initialize the Matter server
+                                 CHIP_ERROR err = chip::Server::GetInstance().Init(*self->_serverInitParams);
+                                 if (err != CHIP_NO_ERROR) {
+                                     ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
+                                     dispatch_async(clientQueue, ^{
+                                         startMatterServerCompletionCallback(
+                                             [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                       message:[NSString stringWithUTF8String:err.AsString()]]);
+                                     });
+                                     return;
+                                 }
 
-    dispatch_async(_chipWorkQueue, ^{
-        // Initialize the Matter server
-        CHIP_ERROR err = chip::Server::GetInstance().Init(*self->_serverInitParams);
-        if (err != CHIP_NO_ERROR) {
-            ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
-            dispatch_async(clientQueue, ^{
-                startMatterServerCompletionCallback(
-                    [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            });
-            return;
-        }
+                                 // Initialize binding handlers
+                                 err = CastingServer::GetInstance()->InitBindingHandlers();
+                                 if (err != CHIP_NO_ERROR) {
+                                     ChipLogError(AppServer, "Binding init failed: %s", ErrorStr(err));
+                                     dispatch_async(clientQueue, ^{
+                                         startMatterServerCompletionCallback(
+                                             [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                       message:[NSString stringWithUTF8String:err.AsString()]]);
+                                     });
+                                     return;
+                                 }
 
-        // Initialize binding handlers
-        err = CastingServer::GetInstance()->InitBindingHandlers();
-        if (err != CHIP_NO_ERROR) {
-            ChipLogError(AppServer, "Binding init failed: %s", ErrorStr(err));
-            dispatch_async(clientQueue, ^{
-                startMatterServerCompletionCallback(
-                    [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            });
-            return;
-        }
-
-        // Now reconnect to the VideoPlayer the casting app was previously connected to (if any)
-        if (self->_previouslyConnectedVideoPlayer != nil) {
-            ChipLogProgress(
-                AppServer, "CastingServerBridge().startMatterServer() reconnecting to previously connected VideoPlayer...");
-            err = CastingServer::GetInstance()->VerifyOrEstablishConnection(
-                *(self->_previouslyConnectedVideoPlayer),
-                [clientQueue, startMatterServerCompletionCallback](TargetVideoPlayerInfo * cppTargetVideoPlayerInfo) {
-                    dispatch_async(clientQueue, ^{
-                        startMatterServerCompletionCallback(
-                            [[MatterError alloc] initWithCode:CHIP_NO_ERROR.AsInteger()
-                                                      message:[NSString stringWithUTF8String:CHIP_NO_ERROR.AsString()]]);
-                    });
-                },
-                [clientQueue, startMatterServerCompletionCallback](CHIP_ERROR err) {
-                    dispatch_async(clientQueue, ^{
-                        startMatterServerCompletionCallback(
-                            [[MatterError alloc] initWithCode:err.AsInteger()
-                                                      message:[NSString stringWithUTF8String:err.AsString()]]);
-                    });
-                },
-                [](TargetEndpointInfo * cppTargetEndpointInfo) {});
-        } else {
-            dispatch_async(clientQueue, ^{
-                startMatterServerCompletionCallback(
-                    [[MatterError alloc] initWithCode:CHIP_NO_ERROR.AsInteger()
-                                              message:[NSString stringWithUTF8String:CHIP_NO_ERROR.AsString()]]);
-            });
-        }
-    });
+                                 // Now reconnect to the VideoPlayer the casting app was previously connected to (if any)
+                                 if (self->_previouslyConnectedVideoPlayer != nil) {
+                                     ChipLogProgress(AppServer,
+                                         "CastingServerBridge().startMatterServer() reconnecting to previously connected "
+                                         "VideoPlayer...");
+                                     err = CastingServer::GetInstance()->VerifyOrEstablishConnection(
+                                         *(self->_previouslyConnectedVideoPlayer),
+                                         [clientQueue, startMatterServerCompletionCallback](
+                                             TargetVideoPlayerInfo * cppTargetVideoPlayerInfo) {
+                                             dispatch_async(clientQueue, ^{
+                                                 startMatterServerCompletionCallback([[MatterError alloc]
+                                                     initWithCode:CHIP_NO_ERROR.AsInteger()
+                                                          message:[NSString stringWithUTF8String:CHIP_NO_ERROR.AsString()]]);
+                                             });
+                                         },
+                                         [clientQueue, startMatterServerCompletionCallback](CHIP_ERROR err) {
+                                             dispatch_async(clientQueue, ^{
+                                                 startMatterServerCompletionCallback([[MatterError alloc]
+                                                     initWithCode:err.AsInteger()
+                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                             });
+                                         },
+                                         [](TargetEndpointInfo * cppTargetEndpointInfo) {});
+                                 } else {
+                                     dispatch_async(clientQueue, ^{
+                                         startMatterServerCompletionCallback([[MatterError alloc]
+                                             initWithCode:CHIP_NO_ERROR.AsInteger()
+                                                  message:[NSString stringWithUTF8String:CHIP_NO_ERROR.AsString()]]);
+                                     });
+                                 }
+                             }];
 }
 
 - (void)stopMatterServer
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().stopMatterServer() called");
+    [self
+        dispatchOnMatterSDKQueue:@"stopMatterServer(...)"
+                           block:^{
+                               // capture pointer to previouslyConnectedVideoPlayer, to be deleted
+                               TargetVideoPlayerInfo * videoPlayerForDeletion
+                                   = self->_previouslyConnectedVideoPlayer == nil ? nil : self->_previouslyConnectedVideoPlayer;
 
-    dispatch_sync(_chipWorkQueue, ^{
-        // capture pointer to previouslyConnectedVideoPlayer, to be deleted
-        TargetVideoPlayerInfo * videoPlayerForDeletion
-            = self->_previouslyConnectedVideoPlayer == nil ? nil : self->_previouslyConnectedVideoPlayer;
+                               // On shutting down the Matter server, the casting app will be automatically disconnected from any
+                               // Video Players it was connected to. Save the VideoPlayer that the casting app was targetting and
+                               // connected to, so we can reconnect to it on re-starting the Matter server.
+                               TargetVideoPlayerInfo * currentTargetVideoPlayerInfo
+                                   = CastingServer::GetInstance()->GetActiveTargetVideoPlayer();
+                               if (currentTargetVideoPlayerInfo != nil && currentTargetVideoPlayerInfo->IsInitialized()
+                                   && currentTargetVideoPlayerInfo->GetOperationalDeviceProxy() != nil) {
+                                   self->_previouslyConnectedVideoPlayer = new TargetVideoPlayerInfo();
+                                   self->_previouslyConnectedVideoPlayer->Initialize(currentTargetVideoPlayerInfo->GetNodeId(),
+                                       currentTargetVideoPlayerInfo->GetFabricIndex(), nullptr, nullptr,
+                                       currentTargetVideoPlayerInfo->GetVendorId(), currentTargetVideoPlayerInfo->GetProductId(),
+                                       currentTargetVideoPlayerInfo->GetDeviceType(), currentTargetVideoPlayerInfo->GetDeviceName(),
+                                       currentTargetVideoPlayerInfo->GetHostName(), currentTargetVideoPlayerInfo->GetNumIPs(),
+                                       const_cast<chip::Inet::IPAddress *>(currentTargetVideoPlayerInfo->GetIpAddresses()));
 
-        // On shutting down the Matter server, the casting app will be automatically disconnected from any Video Players it was
-        // connected to. Save the VideoPlayer that the casting app was targetting and connected to, so we can reconnect to it on
-        // re-starting the Matter server.
-        TargetVideoPlayerInfo * currentTargetVideoPlayerInfo = CastingServer::GetInstance()->GetActiveTargetVideoPlayer();
-        if (currentTargetVideoPlayerInfo != nil && currentTargetVideoPlayerInfo->IsInitialized()
-            && currentTargetVideoPlayerInfo->GetOperationalDeviceProxy() != nil) {
-            self->_previouslyConnectedVideoPlayer = new TargetVideoPlayerInfo();
-            self->_previouslyConnectedVideoPlayer->Initialize(currentTargetVideoPlayerInfo->GetNodeId(),
-                currentTargetVideoPlayerInfo->GetFabricIndex(), nullptr, nullptr, currentTargetVideoPlayerInfo->GetVendorId(),
-                currentTargetVideoPlayerInfo->GetProductId(), currentTargetVideoPlayerInfo->GetDeviceType(),
-                currentTargetVideoPlayerInfo->GetDeviceName(), currentTargetVideoPlayerInfo->GetHostName(),
-                currentTargetVideoPlayerInfo->GetNumIPs(),
-                const_cast<chip::Inet::IPAddress *>(currentTargetVideoPlayerInfo->GetIpAddresses()));
+                                   TargetEndpointInfo * prevEndpoints = self->_previouslyConnectedVideoPlayer->GetEndpoints();
+                                   if (prevEndpoints != nullptr) {
+                                       for (size_t i = 0; i < kMaxNumberOfEndpoints; i++) {
+                                           prevEndpoints[i].Reset();
+                                       }
+                                   }
+                                   TargetEndpointInfo * currentEndpoints = currentTargetVideoPlayerInfo->GetEndpoints();
+                                   for (size_t i = 0; i < kMaxNumberOfEndpoints && currentEndpoints[i].IsInitialized(); i++) {
+                                       prevEndpoints[i].Initialize(currentEndpoints[i].GetEndpointId());
+                                       chip::ClusterId * currentClusters = currentEndpoints[i].GetClusters();
+                                       for (size_t j = 0;
+                                            j < kMaxNumberOfClustersPerEndpoint && currentClusters[j] != chip::kInvalidClusterId;
+                                            j++) {
+                                           prevEndpoints[i].AddCluster(currentClusters[j]);
+                                       }
+                                   }
+                               } else {
+                                   self->_previouslyConnectedVideoPlayer = nil;
+                               }
 
-            TargetEndpointInfo * prevEndpoints = self->_previouslyConnectedVideoPlayer->GetEndpoints();
-            if (prevEndpoints != nullptr) {
-                for (size_t i = 0; i < kMaxNumberOfEndpoints; i++) {
-                    prevEndpoints[i].Reset();
-                }
-            }
-            TargetEndpointInfo * currentEndpoints = currentTargetVideoPlayerInfo->GetEndpoints();
-            for (size_t i = 0; i < kMaxNumberOfEndpoints && currentEndpoints[i].IsInitialized(); i++) {
-                prevEndpoints[i].Initialize(currentEndpoints[i].GetEndpointId());
-                chip::ClusterId * currentClusters = currentEndpoints[i].GetClusters();
-                for (size_t j = 0; j < kMaxNumberOfClustersPerEndpoint && currentClusters[j] != chip::kInvalidClusterId; j++) {
-                    prevEndpoints[i].AddCluster(currentClusters[j]);
-                }
-            }
-        } else {
-            self->_previouslyConnectedVideoPlayer = nil;
-        }
+                               // Now shutdown the Matter server
+                               chip::Server::GetInstance().Shutdown();
 
-        // Now shutdown the Matter server
-        chip::Server::GetInstance().Shutdown();
-
-        // Delete the old previouslyConnectedVideoPlayer, if non-nil
-        if (videoPlayerForDeletion != nil) {
-            delete videoPlayerForDeletion;
-        }
-    });
+                               // Delete the old previouslyConnectedVideoPlayer, if non-nil
+                               if (videoPlayerForDeletion != nil) {
+                                   delete videoPlayerForDeletion;
+                               }
+                           }];
 }
 
 - (void)disconnect:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().disconnect() called");
-    dispatch_async(_chipWorkQueue, ^{
-        CastingServer::GetInstance()->Disconnect();
-        dispatch_async(clientQueue, ^{
-            requestSentHandler();
-        });
-    });
+    [self dispatchOnMatterSDKQueue:@"disconnect(...)"
+                             block:^{
+                                 CastingServer::GetInstance()->Disconnect();
+                                 dispatch_async(clientQueue, ^{
+                                     requestSentHandler();
+                                 });
+                             }];
 }
 
 - (void)purgeCache:(dispatch_queue_t _Nonnull)clientQueue responseHandler:(void (^)(MatterError * _Nonnull))responseHandler
@@ -676,24 +878,17 @@
                       clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().contentLauncher_launchUrl() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
-
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"contentLauncher_launchUrl"];
-
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-        CHIP_ERROR err = CastingServer::GetInstance()->ContentLauncherLaunchURL(
-            &endpoint, [contentUrl UTF8String], [contentDisplayStr UTF8String], [](CHIP_ERROR err) {
-                void (^responseCallback)(bool) =
-                    [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"contentLauncher_launchUrl"];
-                responseCallback(CHIP_NO_ERROR == err);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+                                     return castingServer->ContentLauncherLaunchURL(
+                                         &endpoint, [contentUrl UTF8String], [contentDisplayStr UTF8String], responseFunction);
+                                 }];
 }
 
 - (void)contentLauncher_launchContent:(ContentApp * _Nonnull)contentApp
@@ -704,72 +899,84 @@
                           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().contentLauncher_launchContent() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
-
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"contentLauncher_launchContent"];
+    const NSString * description =
+        [NSString stringWithFormat:@"contentLauncher_launchContent(...) with Content App endpoint ID %d", contentApp.endpointId];
 
     // Make a copy of params before we go async.
     contentSearch = [contentSearch copy];
     data = [data copy];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:description
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        ListFreer listFreer;
-        chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type cppSearch;
-        if (contentSearch.parameterList.count > 0) {
-            auto * parameterListHolder = new ListHolder<chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type>(
-                contentSearch.parameterList.count);
-            listFreer.add(parameterListHolder);
+                               ListFreer listFreer;
+                               chip::app::Clusters::ContentLauncher::Structs::ContentSearchStruct::Type cppSearch;
+                               if (contentSearch.parameterList.count > 0) {
+                                   auto * parameterListHolder
+                                       = new ListHolder<chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type>(
+                                           contentSearch.parameterList.count);
+                                   listFreer.add(parameterListHolder);
 
-            int parameterIndex = 0;
-            for (ContentLauncher_Parameter * parameter in contentSearch.parameterList) {
-                int externalIdListIndex = 0;
-                if (parameter.externalIDList != nil) {
-                    auto * externalIdListHolder
-                        = new ListHolder<chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type>(
-                            parameter.externalIDList.count);
-                    listFreer.add(externalIdListHolder);
+                                   int parameterIndex = 0;
+                                   for (ContentLauncher_Parameter * parameter in contentSearch.parameterList) {
+                                       int externalIdListIndex = 0;
+                                       if (parameter.externalIDList != nil) {
+                                           auto * externalIdListHolder = new ListHolder<
+                                               chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type>(
+                                               parameter.externalIDList.count);
+                                           listFreer.add(externalIdListHolder);
 
-                    for (ContentLauncher_AdditionalInfo * additionalInfo in parameter.externalIDList) {
-                        externalIdListHolder->mList[externalIdListIndex].value = chip::CharSpan([additionalInfo.value UTF8String],
-                            [additionalInfo.value lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
-                        externalIdListHolder->mList[externalIdListIndex].name = chip::CharSpan([additionalInfo.name UTF8String],
-                            [additionalInfo.name lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
-                        externalIdListIndex++;
-                    }
-                    parameterListHolder->mList[parameterIndex].externalIDList = MakeOptional(
-                        chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type>(
-                            externalIdListHolder->mList, parameter.externalIDList.count));
-                } else {
-                    parameterListHolder->mList[parameterIndex].externalIDList = chip::Optional<chip::app::DataModel::List<
-                        const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type>>::Missing();
-                }
+                                           for (ContentLauncher_AdditionalInfo * additionalInfo in parameter.externalIDList) {
+                                               externalIdListHolder->mList[externalIdListIndex].value
+                                                   = chip::CharSpan([additionalInfo.value UTF8String],
+                                                       [additionalInfo.value lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+                                               externalIdListHolder->mList[externalIdListIndex].name
+                                                   = chip::CharSpan([additionalInfo.name UTF8String],
+                                                       [additionalInfo.name lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+                                               externalIdListIndex++;
+                                           }
+                                           parameterListHolder->mList[parameterIndex].externalIDList
+                                               = MakeOptional(chip::app::DataModel::List<
+                                                   const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type>(
+                                                   externalIdListHolder->mList, parameter.externalIDList.count));
+                                       } else {
+                                           parameterListHolder->mList[parameterIndex].externalIDList
+                                               = chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::
+                                                       ContentLauncher::Structs::AdditionalInfoStruct::Type>>::Missing();
+                                       }
 
-                parameterListHolder->mList[parameterIndex].type
-                    = static_cast<chip::app::Clusters::ContentLauncher::ParameterEnum>(parameter.type);
-                parameterListHolder->mList[parameterIndex].value = chip::CharSpan(
-                    [parameter.value UTF8String], [parameter.value lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
-                parameterIndex++;
-                cppSearch.parameterList
-                    = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type>(
-                        parameterListHolder->mList, contentSearch.parameterList.count);
-            }
-        }
+                                       parameterListHolder->mList[parameterIndex].type
+                                           = static_cast<chip::app::Clusters::ContentLauncher::ParameterEnum>(parameter.type);
+                                       parameterListHolder->mList[parameterIndex].value
+                                           = chip::CharSpan([parameter.value UTF8String],
+                                               [parameter.value lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+                                       parameterIndex++;
+                                       cppSearch.parameterList = chip::app::DataModel::List<
+                                           chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::Type>(
+                                           parameterListHolder->mList, contentSearch.parameterList.count);
+                                   }
+                               }
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ContentLauncher_LaunchContent(&endpoint, cppSearch, autoPlay,
-            MakeOptional(chip::CharSpan([data UTF8String], [data lengthOfBytesUsingEncoding:NSUTF8StringEncoding])),
-            [](CHIP_ERROR err) {
-                void (^responseCallback)(bool) = [[CastingServerBridge getSharedInstance].commandResponseCallbacks
-                    objectForKey:@"contentLauncher_launchContent"];
-                responseCallback(CHIP_NO_ERROR == err);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->ContentLauncher_LaunchContent(&endpoint, cppSearch,
+                                   autoPlay,
+                                   MakeOptional(
+                                       chip::CharSpan([data UTF8String], [data lengthOfBytesUsingEncoding:NSUTF8StringEncoding])),
+                                   [clientQueue, responseCallback](CHIP_ERROR err) {
+                                       [[CastingServerBridge getSharedInstance]
+                                           dispatchOnClientQueue:clientQueue
+                                                     description:@"contentLauncher_launchContent(...) responseCallback"
+                                                           block:^{
+                                                               responseCallback(CHIP_NO_ERROR == err);
+                                                           }];
+                                   });
+
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(CHIP_NO_ERROR == err);
+                               });
+                           }];
 }
 
 - (void)contentLauncher_subscribeSupportedStreamingProtocols:(ContentApp * _Nonnull)contentApp
@@ -781,44 +988,46 @@
                                              failureCallback:(void (^_Nonnull)(MatterError * _Nonnull))failureCallback
                              subscriptionEstablishedCallback:(void (^_Nonnull)())subscriptionEstablishedCallback
 {
-    ChipLogProgress(AppServer,
-        "CastingServerBridge().contentLauncher_subscribeSupportedStreamingProtocols() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
+    const NSString * description =
+        [NSString stringWithFormat:@"contentLauncher_subscribeSupportedStreamingProtocols(...) with Content App endpoint ID %d",
+                  contentApp.endpointId];
+    [self dispatchOnMatterSDKQueue:description
+                             block:^{
+                                 TargetEndpointInfo endpoint;
+                                 [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_subscriptionReadSuccessCallbacks setObject:successCallback forKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
-    [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
-    [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback
-                                          forKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
-
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->ContentLauncher_SubscribeToSupportedStreamingProtocols(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType
-                    supportedStreamingProtocols) {
-                void (^callback)(uint32_t) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
-                callback(supportedStreamingProtocols);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                                 CHIP_ERROR err
+                                     = CastingServer::GetInstance()->ContentLauncher_SubscribeToSupportedStreamingProtocols(
+                                         &endpoint, nullptr,
+                                         [](void * context,
+                                             chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::
+                                                 TypeInfo::DecodableArgType supportedStreamingProtocols) {
+                                             void (^callback)(uint32_t) =
+                                                 [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                                     objectForKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
+                                             callback(supportedStreamingProtocols);
+                                         },
+                                         [](void * context, CHIP_ERROR err) {
+                                             void (^callback)(MatterError *) =
+                                                 [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                                     objectForKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
+                                             callback(
+                                                 [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                           message:[NSString stringWithUTF8String:err.AsString()]]);
+                                         },
+                                         minInterval, maxInterval,
+                                         [](void * context, chip::SubscriptionId subscriptionId) {
+                                             void (^callback)() =
+                                                 [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                                     objectForKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
+                                             callback();
+                                         });
+                                 dispatch_async(clientQueue, ^{
+                                     requestSentHandler(
+                                         [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                   message:[NSString stringWithUTF8String:err.AsString()]]);
+                                 });
+                             }];
 }
 
 - (void)levelControl_step:(ContentApp * _Nonnull)contentApp
@@ -831,25 +1040,19 @@
               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
        requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(
-        AppServer, "CastingServerBridge().levelControl_step() called on Content App with endpoint ID %d", contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"levelControl_step"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->LevelControl_Step(&endpoint,
-            static_cast<chip::app::Clusters::LevelControl::StepMode>(stepMode), stepSize, transitionTime, optionMask,
-            optionOverride, [](CHIP_ERROR err) {
-                void (^responseCallback)(bool) =
-                    [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"levelControl_step"];
-                responseCallback(CHIP_NO_ERROR == err);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->LevelControl_Step(&endpoint,
+                                         static_cast<chip::app::Clusters::LevelControl::StepMode>(stepMode), stepSize,
+                                         transitionTime, optionMask, optionOverride, responseFunction);
+                                 }];
 }
 
 - (void)levelControl_moveToLevel:(ContentApp * _Nonnull)contentApp
@@ -861,24 +1064,19 @@
                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
               requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().levelControl_moveToLevel() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
+    const NSString * description =
+        [NSString stringWithFormat:@"levelControl_moveToLevel(...) with Content App endpoint ID %d", contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"levelControl_moveToLevel"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->LevelControl_MoveToLevel(
-            &endpoint, level, transitionTime, optionMask, optionOverride, [](CHIP_ERROR err) {
-                void (^responseCallback)(bool) =
-                    [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"levelControl_moveToLevel"];
-                responseCallback(CHIP_NO_ERROR == err);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->LevelControl_MoveToLevel(
+                                         &endpoint, level, transitionTime, optionMask, optionOverride, responseFunction);
+                                 }];
 }
 
 - (void)levelControl_subscribeCurrentLevel:(ContentApp * _Nonnull)contentApp
@@ -898,34 +1096,42 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"levelControl_subscribeCurrentLevel"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"levelControl_subscribeCurrentLevel"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"levelControl_subscribeCurrentLevel(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->LevelControl_SubscribeToCurrentLevel(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableArgType currentLevel) {
-                void (^callback)(NSNumber * _Nullable) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"levelControl_subscribeCurrentLevel"];
-                callback(@(currentLevel.Value()));
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"levelControl_subscribeCurrentLevel"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"levelControl_subscribeCurrentLevel"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->LevelControl_SubscribeToCurrentLevel(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo::DecodableArgType
+                                           currentLevel) {
+                                       void (^callback)(NSNumber * _Nullable) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"levelControl_subscribeCurrentLevel"];
+                                       callback(@(currentLevel.Value()));
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"levelControl_subscribeCurrentLevel"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"levelControl_subscribeCurrentLevel"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)levelControl_subscribeMinLevel:(ContentApp * _Nonnull)contentApp
@@ -944,33 +1150,42 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"levelControl_subscribeMinLevel"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"levelControl_subscribeMinLevel"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"levelControl_subscribeMinLevel(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->LevelControl_SubscribeToMinLevel(
-            &endpoint, nullptr,
-            [](void * context, chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableArgType minLevel) {
-                void (^callback)(uint8_t) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"levelControl_subscribeMinLevel"];
-                callback(minLevel);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"levelControl_subscribeMinLevel"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"levelControl_subscribeMinLevel"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->LevelControl_SubscribeToMinLevel(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo::DecodableArgType
+                                           minLevel) {
+                                       void (^callback)(uint8_t) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"levelControl_subscribeMinLevel"];
+                                       callback(minLevel);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"levelControl_subscribeMinLevel"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"levelControl_subscribeMinLevel"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)levelControl_subscribeMaxLevel:(ContentApp * _Nonnull)contentApp
@@ -989,33 +1204,42 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"levelControl_subscribeMaxLevel"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"levelControl_subscribeMaxLevel"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"levelControl_subscribeMaxLevel(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->LevelControl_SubscribeToMaxLevel(
-            &endpoint, nullptr,
-            [](void * context, chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableArgType maxLevel) {
-                void (^callback)(uint8_t) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"levelControl_subscribeMaxLevel"];
-                callback(maxLevel);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"levelControl_subscribeMaxLevel"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"levelControl_subscribeMaxLevel"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->LevelControl_SubscribeToMaxLevel(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo::DecodableArgType
+                                           maxLevel) {
+                                       void (^callback)(uint8_t) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"levelControl_subscribeMaxLevel"];
+                                       callback(maxLevel);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"levelControl_subscribeMaxLevel"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"levelControl_subscribeMaxLevel"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)mediaPlayback_play:(ContentApp * _Nonnull)contentApp
@@ -1023,23 +1247,17 @@
                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(
-        AppServer, "CastingServerBridge().mediaPlayback_play() called on Content App with endpoint ID %d", contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_play"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Play(&endpoint, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_play"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->MediaPlayback_Play(&endpoint, responseFunction);
+                                 }];
 }
 
 - (void)mediaPlayback_pause:(ContentApp * _Nonnull)contentApp
@@ -1047,23 +1265,17 @@
                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
          requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(
-        AppServer, "CastingServerBridge().mediaPlayback_pause() called on Content App with endpoint ID %d", contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_pause"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Pause(&endpoint, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_pause"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->MediaPlayback_Pause(&endpoint, responseFunction);
+                                 }];
 }
 
 - (void)mediaPlayback_stopPlayback:(ContentApp * _Nonnull)contentApp
@@ -1071,23 +1283,17 @@
                        clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                 requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_stopPlayback() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_stopPlayback"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_StopPlayback(&endpoint, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_stopPlayback"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->MediaPlayback_StopPlayback(&endpoint, responseFunction);
+                                 }];
 }
 
 - (void)mediaPlayback_next:(ContentApp * _Nonnull)contentApp
@@ -1095,23 +1301,17 @@
                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(
-        AppServer, "CastingServerBridge().mediaPlayback_next() called on Content App with endpoint ID %d", contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_next"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Next(&endpoint, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_next"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->MediaPlayback_Next(&endpoint, responseFunction);
+                                 }];
 }
 
 - (void)mediaPlayback_seek:(ContentApp * _Nonnull)contentApp
@@ -1120,23 +1320,17 @@
                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(
-        AppServer, "CastingServerBridge().mediaPlayback_seek() called on Content App with endpoint ID %d", contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_seek"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Seek(&endpoint, position, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_seek"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->MediaPlayback_Seek(&endpoint, position, responseFunction);
+                                 }];
 }
 
 - (void)mediaPlayback_skipForward:(ContentApp * _Nonnull)contentApp
@@ -1145,24 +1339,18 @@
                       clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_skipForward() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_skipForward"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err
-            = CastingServer::GetInstance()->MediaPlayback_SkipForward(&endpoint, deltaPositionMilliseconds, [](CHIP_ERROR err) {
-                  void (^responseCallback)(bool) =
-                      [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_skipForward"];
-                  responseCallback(CHIP_NO_ERROR == err);
-              });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->MediaPlayback_SkipForward(
+                                         &endpoint, deltaPositionMilliseconds, responseFunction);
+                                 }];
 }
 
 - (void)mediaPlayback_skipBackward:(ContentApp * _Nonnull)contentApp
@@ -1171,24 +1359,18 @@
                        clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                 requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_skipBackward() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_skipBackward"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err
-            = CastingServer::GetInstance()->MediaPlayback_SkipBackward(&endpoint, deltaPositionMilliseconds, [](CHIP_ERROR err) {
-                  void (^responseCallback)(bool) =
-                      [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_skipBackward"];
-                  responseCallback(CHIP_NO_ERROR == err);
-              });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->MediaPlayback_SkipBackward(
+                                         &endpoint, deltaPositionMilliseconds, responseFunction);
+                                 }];
 }
 
 - (void)mediaPlayback_previous:(ContentApp * _Nonnull)contentApp
@@ -1196,23 +1378,17 @@
                    clientQueue:(dispatch_queue_t _Nonnull)clientQueue
             requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_previous() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_previous"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Previous(&endpoint, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_previous"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->MediaPlayback_Previous(&endpoint, responseFunction);
+                                 }];
 }
 
 - (void)mediaPlayback_rewind:(ContentApp * _Nonnull)contentApp
@@ -1220,23 +1396,17 @@
                  clientQueue:(dispatch_queue_t _Nonnull)clientQueue
           requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(
-        AppServer, "CastingServerBridge().mediaPlayback_rewind() called on Content App with endpoint ID %d", contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_rewind"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Rewind(&endpoint, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_rewind"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->MediaPlayback_Rewind(&endpoint, responseFunction);
+                                 }];
 }
 
 - (void)mediaPlayback_fastForward:(ContentApp * _Nonnull)contentApp
@@ -1244,23 +1414,17 @@
                       clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_fastForward() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_fastForward"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_FastForward(&endpoint, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_fastForward"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->MediaPlayback_FastForward(&endpoint, responseFunction);
+                                 }];
 }
 
 - (void)mediaPlayback_startOver:(ContentApp * _Nonnull)contentApp
@@ -1268,23 +1432,17 @@
                     clientQueue:(dispatch_queue_t _Nonnull)clientQueue
              requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_startOver() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"mediaPlayback_startOver"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_StartOver(&endpoint, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"mediaPlayback_startOver"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->MediaPlayback_StartOver(&endpoint, responseFunction);
+                                 }];
 }
 
 - (void)mediaPlayback_subscribeCurrentState:(ContentApp * _Nonnull)contentApp
@@ -1304,35 +1462,43 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"mediaPlayback_subscribeCurrentState"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"mediaPlayback_subscribeCurrentState"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"mediaPlayback_subscribeCurrentState(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToCurrentState(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType currentState) {
-                void (^callback)(MediaPlayback_PlaybackState) =
-                    [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                        objectForKey:@"mediaPlayback_subscribeCurrentState"];
-                callback(MediaPlayback_PlaybackState(currentState));
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"mediaPlayback_subscribeCurrentState"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"mediaPlayback_subscribeCurrentState"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToCurrentState(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType
+                                           currentState) {
+                                       void (^callback)(MediaPlayback_PlaybackState) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeCurrentState"];
+                                       callback(MediaPlayback_PlaybackState(currentState));
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeCurrentState"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeCurrentState"];
+                                       callback();
+                                   });
+
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)mediaPlayback_subscribeStartTime:(ContentApp * _Nonnull)contentApp
@@ -1351,33 +1517,42 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"mediaPlayback_subscribeStartTime"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"mediaPlayback_subscribeStartTime"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"mediaPlayback_subscribeStartTime(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToStartTime(
-            &endpoint, nullptr,
-            [](void * context, chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::DecodableArgType startTime) {
-                void (^callback)(NSNumber * _Nullable) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"mediaPlayback_subscribeStartTime"];
-                callback(@(startTime.Value()));
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"mediaPlayback_subscribeStartTime"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"mediaPlayback_subscribeStartTime"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToStartTime(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::DecodableArgType
+                                           startTime) {
+                                       void (^callback)(NSNumber * _Nullable) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeStartTime"];
+                                       callback(@(startTime.Value()));
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeStartTime"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeStartTime"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)mediaPlayback_subscribeDuration:(ContentApp * _Nonnull)contentApp
@@ -1396,33 +1571,42 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"mediaPlayback_subscribeDuration"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"mediaPlayback_subscribeDuration"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"mediaPlayback_subscribeDuration(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToDuration(
-            &endpoint, nullptr,
-            [](void * context, chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType startTime) {
-                void (^callback)(NSNumber * _Nullable) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"mediaPlayback_subscribeDuration"];
-                callback(@(startTime.Value()));
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"mediaPlayback_subscribeDuration"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"mediaPlayback_subscribeDuration"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToDuration(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType
+                                           startTime) {
+                                       void (^callback)(NSNumber * _Nullable) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeDuration"];
+                                       callback(@(startTime.Value()));
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeDuration"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeDuration"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)mediaPlayback_subscribeSampledPosition:(ContentApp * _Nonnull)contentApp
@@ -1442,47 +1626,54 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"mediaPlayback_subscribeSampledPosition"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"mediaPlayback_subscribeSampledPosition"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"mediaPlayback_subscribeSampledPosition(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToSampledPosition(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableArgType playbackPosition) {
-                void (^callback)(MediaPlayback_PlaybackPosition * _Nullable) =
-                    [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                        objectForKey:@"mediaPlayback_subscribeSampledPosition"];
-                MediaPlayback_PlaybackPosition * objCPlaybackPosition = nil;
-                if (!playbackPosition.IsNull()) {
-                    if (playbackPosition.Value().position.IsNull()) {
-                        objCPlaybackPosition =
-                            [[MediaPlayback_PlaybackPosition alloc] initWithUpdatedAt:@(playbackPosition.Value().updatedAt)
-                                                                             position:nil];
-                    } else {
-                        objCPlaybackPosition =
-                            [[MediaPlayback_PlaybackPosition alloc] initWithUpdatedAt:@(playbackPosition.Value().updatedAt)
-                                                                             position:@(playbackPosition.Value().position.Value())];
-                    }
-                    callback(objCPlaybackPosition);
-                }
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"mediaPlayback_subscribeSampledPosition"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"mediaPlayback_subscribeSampledPosition"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToSampledPosition(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo::DecodableArgType
+                                           playbackPosition) {
+                                       void (^callback)(MediaPlayback_PlaybackPosition * _Nullable) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeSampledPosition"];
+                                       MediaPlayback_PlaybackPosition * objCPlaybackPosition = nil;
+                                       if (!playbackPosition.IsNull()) {
+                                           if (playbackPosition.Value().position.IsNull()) {
+                                               objCPlaybackPosition = [[MediaPlayback_PlaybackPosition alloc]
+                                                   initWithUpdatedAt:@(playbackPosition.Value().updatedAt)
+                                                            position:nil];
+                                           } else {
+                                               objCPlaybackPosition = [[MediaPlayback_PlaybackPosition alloc]
+                                                   initWithUpdatedAt:@(playbackPosition.Value().updatedAt)
+                                                            position:@(playbackPosition.Value().position.Value())];
+                                           }
+                                           callback(objCPlaybackPosition);
+                                       }
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeSampledPosition"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeSampledPosition"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)mediaPlayback_subscribePlaybackSpeed:(ContentApp * _Nonnull)contentApp
@@ -1502,34 +1693,42 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"mediaPlayback_subscribePlaybackSpeed"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"mediaPlayback_subscribePlaybackSpeed"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"mediaPlayback_subscribePlaybackSpeed(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToPlaybackSpeed(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableArgType playbackSpeed) {
-                void (^callback)(float) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"mediaPlayback_subscribePlaybackSpeed"];
-                callback(playbackSpeed);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"mediaPlayback_subscribePlaybackSpeed"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"mediaPlayback_subscribePlaybackSpeed"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToPlaybackSpeed(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo::DecodableArgType
+                                           playbackSpeed) {
+                                       void (^callback)(float) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"mediaPlayback_subscribePlaybackSpeed"];
+                                       callback(playbackSpeed);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"mediaPlayback_subscribePlaybackSpeed"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"mediaPlayback_subscribePlaybackSpeed"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)mediaPlayback_subscribeSeekRangeEnd:(ContentApp * _Nonnull)contentApp
@@ -1549,34 +1748,43 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"mediaPlayback_subscribeSeekRangeEnd"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"mediaPlayback_subscribeSeekRangeEnd"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"mediaPlayback_subscribeSeekRangeEnd(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToDuration(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType seekRangeEnd) {
-                void (^callback)(NSNumber * _Nullable) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"mediaPlayback_subscribeSeekRangeEnd"];
-                callback(@(seekRangeEnd.Value()));
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"mediaPlayback_subscribeSeekRangeEnd"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"mediaPlayback_subscribeSeekRangeEnd"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToDuration(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType
+                                           seekRangeEnd) {
+                                       void (^callback)(NSNumber * _Nullable) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeSeekRangeEnd"];
+                                       callback(@(seekRangeEnd.Value()));
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeSeekRangeEnd"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeSeekRangeEnd"];
+                                       callback();
+                                   });
+
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)mediaPlayback_subscribeSeekRangeStart:(ContentApp * _Nonnull)contentApp
@@ -1596,34 +1804,42 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"mediaPlayback_subscribeSeekRangeStart"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"mediaPlayback_subscribeSeekRangeStart"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"mediaPlayback_subscribeSeekRangeStart(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToDuration(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType seekRangeStart) {
-                void (^callback)(NSNumber * _Nullable) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"mediaPlayback_subscribeSeekRangeStart"];
-                callback(@(seekRangeStart.Value()));
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"mediaPlayback_subscribeSeekRangeStart"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"mediaPlayback_subscribeSeekRangeStart"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SubscribeToDuration(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo::DecodableArgType
+                                           seekRangeStart) {
+                                       void (^callback)(NSNumber * _Nullable) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeSeekRangeStart"];
+                                       callback(@(seekRangeStart.Value()));
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeSeekRangeStart"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"mediaPlayback_subscribeSeekRangeStart"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)applicationLauncher_launchApp:(ContentApp * _Nonnull)contentApp
@@ -1634,29 +1850,24 @@
                           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().applicationLauncher_launchApp() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
-
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"applicationLauncher_launchApp"];
 
     chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
     application.catalogVendorID = catalogVendorId;
     application.applicationID = chip::CharSpan::fromCharString([applicationId UTF8String]);
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationLauncher_LaunchApp(&endpoint, application,
-            chip::MakeOptional(chip::ByteSpan(static_cast<const uint8_t *>(data.bytes), data.length)), [](CHIP_ERROR err) {
-                void (^responseCallback)(bool) = [[CastingServerBridge getSharedInstance].commandResponseCallbacks
-                    objectForKey:@"applicationLauncher_launchApp"];
-                responseCallback(CHIP_NO_ERROR == err);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->ApplicationLauncher_LaunchApp(&endpoint, application,
+                                         chip::MakeOptional(chip::ByteSpan(static_cast<const uint8_t *>(data.bytes), data.length)),
+                                         responseFunction);
+                                 }];
 }
 
 - (void)applicationLauncher_stopApp:(ContentApp * _Nonnull)contentApp
@@ -1666,28 +1877,21 @@
                         clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                  requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().applicationLauncher_stopApp() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
-
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"applicationLauncher_stopApp"];
-
     chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
     application.catalogVendorID = catalogVendorId;
     application.applicationID = chip::CharSpan::fromCharString([applicationId UTF8String]);
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationLauncher_StopApp(&endpoint, application, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"applicationLauncher_stopApp"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->ApplicationLauncher_StopApp(&endpoint, application, responseFunction);
+                                 }];
 }
 
 - (void)applicationLauncher_hideApp:(ContentApp * _Nonnull)contentApp
@@ -1697,28 +1901,22 @@
                         clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                  requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().applicationLauncher_hideApp() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
-
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"applicationLauncher_hideApp"];
 
     chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type application;
     application.catalogVendorID = catalogVendorId;
     application.applicationID = chip::CharSpan::fromCharString([applicationId UTF8String]);
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationLauncher_HideApp(&endpoint, application, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"applicationLauncher_hideApp"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->ApplicationLauncher_HideApp(&endpoint, application, responseFunction);
+                                 }];
 }
 
 - (void)targetNavigator_navigateTarget:(ContentApp * _Nonnull)contentApp
@@ -1728,25 +1926,18 @@
                            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                     requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().targetNavigator_navigateTarget() called on Content App with endpoint ID %d",
-        contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"targetNavigator_navigateTarget"];
-
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->TargetNavigator_NavigateTarget(
-            &endpoint, target, chip::MakeOptional(chip::CharSpan::fromCharString([data UTF8String])), [](CHIP_ERROR err) {
-                void (^responseCallback)(bool) = [[CastingServerBridge getSharedInstance].commandResponseCallbacks
-                    objectForKey:@"targetNavigator_navigateTarget"];
-                responseCallback(CHIP_NO_ERROR == err);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->TargetNavigator_NavigateTarget(&endpoint, target,
+                                         chip::MakeOptional(chip::CharSpan::fromCharString([data UTF8String])), responseFunction);
+                                 }];
 }
 
 - (void)targetNavigator_subscribeTargetList:(ContentApp * _Nonnull)contentApp
@@ -1766,49 +1957,59 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"targetNavigator_subscribeTargetList"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"targetNavigator_subscribeTargetList"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"targetNavigator_subscribeTargetList(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->TargetNavigator_SubscribeToTargetList(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType targetList) {
-                void (^callback)(NSMutableArray *) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"targetNavigator_subscribeTargetList"];
-                NSMutableArray * objCTargetList = nil;
-                size_t targetInfoCount;
-                targetList.ComputeSize(&targetInfoCount);
-                if (targetInfoCount > 0) {
-                    objCTargetList = [NSMutableArray arrayWithCapacity:targetInfoCount];
-                    auto iter = targetList.begin();
-                    while (iter.Next()) {
-                        const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType & targetInfo
-                            = iter.GetValue();
-                        TargetNavigator_TargetInfoStruct * objCTargetInfoStruct = [[TargetNavigator_TargetInfoStruct alloc]
-                            initWithIdentifier:@(targetInfo.identifier)
-                                          name:[NSString stringWithUTF8String:targetInfo.name.data()]];
-                        [objCTargetList addObject:objCTargetInfoStruct];
-                    }
-                }
-                callback(objCTargetList);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"targetNavigator_subscribeTargetList"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"targetNavigator_subscribeTargetList"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->TargetNavigator_SubscribeToTargetList(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::TargetNavigator::Attributes::TargetList::TypeInfo::DecodableArgType
+                                           targetList) {
+                                       void (^callback)(NSMutableArray *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"targetNavigator_subscribeTargetList"];
+                                       NSMutableArray * objCTargetList = nil;
+                                       size_t targetInfoCount;
+                                       targetList.ComputeSize(&targetInfoCount);
+                                       if (targetInfoCount > 0) {
+                                           objCTargetList = [NSMutableArray arrayWithCapacity:targetInfoCount];
+                                           auto iter = targetList.begin();
+                                           while (iter.Next()) {
+                                               const chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::
+                                                   DecodableType & targetInfo
+                                                   = iter.GetValue();
+                                               TargetNavigator_TargetInfoStruct * objCTargetInfoStruct =
+                                                   [[TargetNavigator_TargetInfoStruct alloc]
+                                                       initWithIdentifier:@(targetInfo.identifier)
+                                                                     name:[NSString stringWithUTF8String:targetInfo.name.data()]];
+                                               [objCTargetList addObject:objCTargetInfoStruct];
+                                           }
+                                       }
+                                       callback(objCTargetList);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"targetNavigator_subscribeTargetList"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"targetNavigator_subscribeTargetList"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)targetNavigator_subscribeCurrentTarget:(ContentApp * _Nonnull)contentApp
@@ -1828,34 +2029,42 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"targetNavigator_subscribeCurrentTarget"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"targetNavigator_subscribeCurrentTarget"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"targetNavigator_subscribeCurrentTarget(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->TargetNavigator_SubscribeToCurrentTarget(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableArgType currentTarget) {
-                void (^callback)(uint8_t) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"targetNavigator_subscribeCurrentTarget"];
-                callback(currentTarget);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"targetNavigator_subscribeCurrentTarget"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"targetNavigator_subscribeCurrentTarget"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->TargetNavigator_SubscribeToCurrentTarget(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::TargetNavigator::Attributes::CurrentTarget::TypeInfo::DecodableArgType
+                                           currentTarget) {
+                                       void (^callback)(uint8_t) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"targetNavigator_subscribeCurrentTarget"];
+                                       callback(currentTarget);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"targetNavigator_subscribeCurrentTarget"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"targetNavigator_subscribeCurrentTarget"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)keypadInput_sendKey:(ContentApp * _Nonnull)contentApp
@@ -1864,25 +2073,18 @@
                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
          requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(
-        AppServer, "CastingServerBridge().keypadInput_sendKey() called on Content App with endpoint ID %d", contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"keypadInput_sendKey"];
-
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->KeypadInput_SendKey(
-            &endpoint, static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(keyCode), [](CHIP_ERROR err) {
-                void (^responseCallback)(bool) =
-                    [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"keypadInput_sendKey"];
-                responseCallback(CHIP_NO_ERROR == err);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->KeypadInput_SendKey(&endpoint,
+                                         static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(keyCode), responseFunction);
+                                 }];
 }
 
 - (void)applicationBasic_subscribeVendorName:(ContentApp * _Nonnull)contentApp
@@ -1902,34 +2104,42 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_subscribeVendorName"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"applicationBasic_subscribeVendorName"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"applicationBasic_subscribeVendorName(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToVendorName(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType vendorName) {
-                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"applicationBasic_subscribeVendorName"];
-                callback(vendorName.data() != nil ? [NSString stringWithUTF8String:vendorName.data()] : nil);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"applicationBasic_subscribeVendorName"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"applicationBasic_subscribeVendorName"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToVendorName(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType
+                                           vendorName) {
+                                       void (^callback)(NSString * _Nonnull) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"applicationBasic_subscribeVendorName"];
+                                       callback(vendorName.data() != nil ? [NSString stringWithUTF8String:vendorName.data()] : nil);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"applicationBasic_subscribeVendorName"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"applicationBasic_subscribeVendorName"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)applicationBasic_subscribeVendorID:(ContentApp * _Nonnull)contentApp
@@ -1949,33 +2159,42 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_subscribeVendorID"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"applicationBasic_subscribeVendorID"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"applicationBasic_subscribeVendorID(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToVendorID(
-            &endpoint, nullptr,
-            [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType vendorID) {
-                void (^callback)(NSNumber * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"applicationBasic_subscribeVendorID"];
-                callback(@(vendorID));
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"applicationBasic_subscribeVendorID"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"applicationBasic_subscribeVendorID"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToVendorID(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType
+                                           vendorID) {
+                                       void (^callback)(NSNumber * _Nonnull) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"applicationBasic_subscribeVendorID"];
+                                       callback(@(vendorID));
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"applicationBasic_subscribeVendorID"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"applicationBasic_subscribeVendorID"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)applicationBasic_subscribeApplicationName:(ContentApp * _Nonnull)contentApp
@@ -1996,34 +2215,42 @@
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback
                                           forKey:@"applicationBasic_subscribeApplicationName"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"applicationBasic_subscribeApplicationName(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToApplicationName(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType applicationName) {
-                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"applicationBasic_subscribeApplicationName"];
-                callback([NSString stringWithUTF8String:applicationName.data()]);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"applicationBasic_subscribeApplicationName"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"applicationBasic_subscribeApplicationName"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToApplicationName(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::
+                                           DecodableArgType applicationName) {
+                                       void (^callback)(NSString * _Nonnull) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"applicationBasic_subscribeApplicationName"];
+                                       callback([NSString stringWithUTF8String:applicationName.data()]);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"applicationBasic_subscribeApplicationName"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"applicationBasic_subscribeApplicationName"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)applicationBasic_subscribeProductID:(ContentApp * _Nonnull)contentApp
@@ -2043,33 +2270,42 @@
     [_subscriptionReadFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_subscribeProductID"];
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback forKey:@"applicationBasic_subscribeProductID"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"applicationBasic_subscribeProductID(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToProductID(
-            &endpoint, nullptr,
-            [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType productID) {
-                void (^callback)(uint16_t) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"applicationBasic_subscribeProductID"];
-                callback(productID);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"applicationBasic_subscribeProductID"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"applicationBasic_subscribeProductID"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToProductID(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType
+                                           productID) {
+                                       void (^callback)(uint16_t) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"applicationBasic_subscribeProductID"];
+                                       callback(productID);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"applicationBasic_subscribeProductID"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"applicationBasic_subscribeProductID"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)applicationBasic_subscribeApplicationVersion:(ContentApp * _Nonnull)contentApp
@@ -2090,35 +2326,42 @@
     [_subscriptionEstablishedCallbacks setObject:subscriptionEstablishedCallback
                                           forKey:@"applicationBasic_subscribeApplicationVersion"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"applicationBasic_subscribeApplicationVersion(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToApplicationVersion(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType
-                    applicationVersion) {
-                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"applicationBasic_subscribeApplicationVersion"];
-                callback([NSString stringWithUTF8String:applicationVersion.data()]);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"applicationBasic_subscribeApplicationVersion"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            },
-            minInterval, maxInterval,
-            [](void * context, chip::SubscriptionId subscriptionId) {
-                void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
-                    objectForKey:@"applicationBasic_subscribeApplicationVersion"];
-                callback();
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_SubscribeToApplicationVersion(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::
+                                           DecodableArgType applicationVersion) {
+                                       void (^callback)(NSString * _Nonnull) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                                               objectForKey:@"applicationBasic_subscribeApplicationVersion"];
+                                       callback([NSString stringWithUTF8String:applicationVersion.data()]);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                                               objectForKey:@"applicationBasic_subscribeApplicationVersion"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   },
+                                   minInterval, maxInterval,
+                                   [](void * context, chip::SubscriptionId subscriptionId) {
+                                       void (^callback)() =
+                                           [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
+                                               objectForKey:@"applicationBasic_subscribeApplicationVersion"];
+                                       callback();
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)applicationBasic_readVendorName:(ContentApp * _Nonnull)contentApp
@@ -2133,28 +2376,35 @@
     [_readSuccessCallbacks setObject:successCallback forKey:@"applicationBasic_readVendorName"];
     [_readFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_readVendorName"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:[NSString stringWithFormat:@"%s(...)", __func__]
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadVendorName(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType vendorName) {
-                void (^callback)(NSString * _Nonnull) =
-                    [[CastingServerBridge getSharedInstance].readSuccessCallbacks objectForKey:@"applicationBasic_readVendorName"];
-                callback([NSString stringWithUTF8String:vendorName.data()]);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) =
-                    [[CastingServerBridge getSharedInstance].readFailureCallbacks objectForKey:@"applicationBasic_readVendorName"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadVendorName(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType
+                                           vendorName) {
+                                       void (^callback)(NSString * _Nonnull) =
+                                           [[CastingServerBridge getSharedInstance].readSuccessCallbacks
+                                               objectForKey:@"applicationBasic_readVendorName"];
+                                       callback([NSString stringWithUTF8String:vendorName.data()]);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].readFailureCallbacks
+                                               objectForKey:@"applicationBasic_readVendorName"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)applicationBasic_readVendorID:(ContentApp * _Nonnull)contentApp
@@ -2169,27 +2419,35 @@
     [_readSuccessCallbacks setObject:successCallback forKey:@"applicationBasic_readVendorID"];
     [_readFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_readVendorID"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"applicationBasic_readVendorID(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadVendorID(
-            &endpoint, nullptr,
-            [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType vendorID) {
-                void (^callback)(NSNumber * _Nonnull) =
-                    [[CastingServerBridge getSharedInstance].readSuccessCallbacks objectForKey:@"applicationBasic_readVendorID"];
-                callback(@(vendorID));
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) =
-                    [[CastingServerBridge getSharedInstance].readFailureCallbacks objectForKey:@"applicationBasic_readVendorID"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadVendorID(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType
+                                           vendorID) {
+                                       void (^callback)(NSNumber * _Nonnull) =
+                                           [[CastingServerBridge getSharedInstance].readSuccessCallbacks
+                                               objectForKey:@"applicationBasic_readVendorID"];
+                                       callback(@(vendorID));
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].readFailureCallbacks
+                                               objectForKey:@"applicationBasic_readVendorID"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)applicationBasic_readApplicationName:(ContentApp * _Nonnull)contentApp
@@ -2205,28 +2463,35 @@
     [_readSuccessCallbacks setObject:successCallback forKey:@"applicationBasic_readApplicationName"];
     [_readFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_readApplicationName"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"applicationBasic_readApplicationName(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadApplicationName(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType applicationName) {
-                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].readSuccessCallbacks
-                    objectForKey:@"applicationBasic_readApplicationName"];
-                callback([NSString stringWithUTF8String:applicationName.data()]);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].readFailureCallbacks
-                    objectForKey:@"applicationBasic_readApplicationName"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadApplicationName(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::
+                                           DecodableArgType applicationName) {
+                                       void (^callback)(NSString * _Nonnull) =
+                                           [[CastingServerBridge getSharedInstance].readSuccessCallbacks
+                                               objectForKey:@"applicationBasic_readApplicationName"];
+                                       callback([NSString stringWithUTF8String:applicationName.data()]);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].readFailureCallbacks
+                                               objectForKey:@"applicationBasic_readApplicationName"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)applicationBasic_readProductID:(ContentApp * _Nonnull)contentApp
@@ -2241,27 +2506,34 @@
     [_readSuccessCallbacks setObject:successCallback forKey:@"applicationBasic_readProductID"];
     [_readFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_readProductID"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"applicationBasic_readProductID(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadProductID(
-            &endpoint, nullptr,
-            [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType productID) {
-                void (^callback)(uint16_t) =
-                    [[CastingServerBridge getSharedInstance].readSuccessCallbacks objectForKey:@"applicationBasic_readProductID"];
-                callback(productID);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) =
-                    [[CastingServerBridge getSharedInstance].readFailureCallbacks objectForKey:@"applicationBasic_readProductID"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadProductID(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType
+                                           productID) {
+                                       void (^callback)(uint16_t) = [[CastingServerBridge getSharedInstance].readSuccessCallbacks
+                                           objectForKey:@"applicationBasic_readProductID"];
+                                       callback(productID);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].readFailureCallbacks
+                                               objectForKey:@"applicationBasic_readProductID"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)applicationBasic_readApplicationVersion:(ContentApp * _Nonnull)contentApp
@@ -2277,29 +2549,35 @@
     [_readSuccessCallbacks setObject:successCallback forKey:@"applicationBasic_readApplicationVersion"];
     [_readFailureCallbacks setObject:failureCallback forKey:@"applicationBasic_readApplicationVersion"];
 
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
+    [self
+        dispatchOnMatterSDKQueue:@"applicationBasic_readApplicationVersion(...)"
+                           block:^{
+                               TargetEndpointInfo endpoint;
+                               [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadApplicationVersion(
-            &endpoint, nullptr,
-            [](void * context,
-                chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType
-                    applicationVersion) {
-                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].readSuccessCallbacks
-                    objectForKey:@"applicationBasic_readApplicationVersion"];
-                callback([NSString stringWithUTF8String:applicationVersion.data()]);
-            },
-            [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].readFailureCallbacks
-                    objectForKey:@"applicationBasic_readApplicationVersion"];
-                callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
-            });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler([[MatterError alloc] initWithCode:err.AsInteger()
-                                                         message:[NSString stringWithUTF8String:err.AsString()]]);
-        });
-    });
+                               CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadApplicationVersion(
+                                   &endpoint, nullptr,
+                                   [](void * context,
+                                       chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::
+                                           DecodableArgType applicationVersion) {
+                                       void (^callback)(NSString * _Nonnull) =
+                                           [[CastingServerBridge getSharedInstance].readSuccessCallbacks
+                                               objectForKey:@"applicationBasic_readApplicationVersion"];
+                                       callback([NSString stringWithUTF8String:applicationVersion.data()]);
+                                   },
+                                   [](void * context, CHIP_ERROR err) {
+                                       void (^callback)(MatterError *) =
+                                           [[CastingServerBridge getSharedInstance].readFailureCallbacks
+                                               objectForKey:@"applicationBasic_readApplicationVersion"];
+                                       callback([[MatterError alloc] initWithCode:err.AsInteger()
+                                                                          message:[NSString stringWithUTF8String:err.AsString()]]);
+                                   });
+                               dispatch_async(clientQueue, ^{
+                                   requestSentHandler(
+                                       [[MatterError alloc] initWithCode:err.AsInteger()
+                                                                 message:[NSString stringWithUTF8String:err.AsString()]]);
+                               });
+                           }];
 }
 
 - (void)onOff_on:(ContentApp * _Nonnull)contentApp
@@ -2307,22 +2585,17 @@
            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
     requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().onOff_on() called on Content App with endpoint ID %d", contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"onOff_on"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->OnOff_On(&endpoint, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_on"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->OnOff_On(&endpoint, responseFunction);
+                                 }];
 }
 
 - (void)onOff_off:(ContentApp * _Nonnull)contentApp
@@ -2330,23 +2603,17 @@
            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
     requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(
-        AppServer, "CastingServerBridge().onOff_off() called on Content App with endpoint ID %d", contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"onOff_off"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->OnOff_Off(&endpoint, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_off"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->OnOff_Off(&endpoint, responseFunction);
+                                 }];
 }
 
 - (void)onOff_toggle:(ContentApp * _Nonnull)contentApp
@@ -2354,22 +2621,16 @@
            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
     requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(
-        AppServer, "CastingServerBridge().onOff_toggle() called on Content App with endpoint ID %d", contentApp.endpointId);
+    const NSString * description = [NSString stringWithFormat:@"%s(...) (Content App %d)", __func__, contentApp.endpointId];
+    [self withCastingServerInvokeBlock:description
+                         callbackQueue:clientQueue
+                       onBlockComplete:requestSentHandler
+                            onResponse:responseCallback
+                                 block:^(CastingServer * castingServer, std::function<void(CHIP_ERROR)> responseFunction) {
+                                     TargetEndpointInfo endpoint;
+                                     [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
 
-    [_commandResponseCallbacks setObject:responseCallback forKey:@"onOff_toggle"];
-    dispatch_async(_chipWorkQueue, ^{
-        TargetEndpointInfo endpoint;
-        [ConversionUtils convertToCppTargetEndpointInfoFrom:contentApp outTargetEndpointInfo:endpoint];
-
-        CHIP_ERROR err = CastingServer::GetInstance()->OnOff_Toggle(&endpoint, [](CHIP_ERROR err) {
-            void (^responseCallback)(bool) =
-                [[CastingServerBridge getSharedInstance].commandResponseCallbacks objectForKey:@"onOff_toggle"];
-            responseCallback(CHIP_NO_ERROR == err);
-        });
-        dispatch_async(clientQueue, ^{
-            requestSentHandler(CHIP_NO_ERROR == err);
-        });
-    });
+                                     return castingServer->OnOff_Toggle(&endpoint, responseFunction);
+                                 }];
 }
 @end
