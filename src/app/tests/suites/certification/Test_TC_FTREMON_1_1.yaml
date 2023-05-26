@@ -48,7 +48,9 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given FTREMON.S.F00(Condition) ensure featuremap has the correct bit set"
+    - label:
+          "Given FTREMON.S.F00(Condition) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FTREMON.S.F00
@@ -57,7 +59,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given FTREMON.S.F01(Warning) ensure featuremap has the correct bit set"
+    - label:
+          "Given FTREMON.S.F01(Warning) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: FTREMON.S.F01
@@ -74,7 +78,8 @@ tests:
               type: list
               contains: [2, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Read the feature dependent(FTREMON.S.F00) attribute in AttributeList"
+    - label:
+          "Read the feature dependent(FTREMON.S.F00) attribute in AttributeList"
       PICS: FTREMON.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
