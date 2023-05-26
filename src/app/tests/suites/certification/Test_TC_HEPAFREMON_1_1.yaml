@@ -12,15 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 164.1.1. [TC-HEPAFREMON-1.1] Global Attributes with DUT as Server
+name: 165.1.1. [TC-HEPAFREMON-1.1] Global Attributes with DUT as Server
 
 PICS:
     - HEPAFREMON.S
 
 config:
     nodeId: 0x12344321
-    cluster: "HepaFilterMonitoring"
-    # todo: is this correctly spelled?
+    cluster: "HEPA Filter Monitoring"
     endpoint: 1
 
 tests:

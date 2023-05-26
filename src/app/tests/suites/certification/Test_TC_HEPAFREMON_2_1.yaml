@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 3.2.1. [TC-HEPAFREMON-2.1] Attributes with server as DUT
+name: 165.2.1. [TC-HEPAFREMON-2.1] Attributes with server as DUT
 
 PICS:
     - HEPAFREMON.S
 
 config:
     nodeId: 0x12344321
-    cluster: "HepaFilterMonitoring"
+    cluster: "HEPA Filter Monitoring"
     # todo: is this correctly spelled?
     endpoint: 1
 
@@ -38,7 +38,7 @@ tests:
       attribute: "Condition"
       response:
           constraints:
-              type: uint8u
+              type: percent
               minValue: 0
               maxValue: 100
 
