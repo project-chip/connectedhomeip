@@ -2358,6 +2358,1700 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OccupancySensing::Occup
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = CarbonMonoxideConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = CarbonDioxideConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = EthyleneConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = EthyleneConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = EthyleneConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = EthyleneOxideConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = EthyleneOxideConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthyleneOxideConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = EthyleneOxideConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = HydrogenConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = HydrogenConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = HydrogenConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = HydrogenSulfideConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = HydrogenSulfideConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(HydrogenSulfideConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = HydrogenSulfideConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = NitricOxideConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = NitricOxideConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitricOxideConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = NitricOxideConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = NitrogenDioxideConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = OxygenConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = OxygenConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OxygenConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = OxygenConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = OzoneConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = OzoneConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = OzoneConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = SulfurDioxideConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = SulfurDioxideConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfurDioxideConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = SulfurDioxideConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = DissolvedOxygenConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = DissolvedOxygenConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DissolvedOxygenConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = DissolvedOxygenConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromateConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = BromateConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromateConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = BromateConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromateConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = BromateConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = ChloraminesConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = ChloraminesConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloraminesConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = ChloraminesConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = ChlorineConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = ChlorineConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorineConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = ChlorineConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = FecalColiformEColiConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = FecalColiformEColiConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FecalColiformEColiConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = FecalColiformEColiConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = FluorideConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = FluorideConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FluorideConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = FluorideConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = HaloaceticAcidsConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = HaloaceticAcidsConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(HaloaceticAcidsConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = HaloaceticAcidsConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = TotalTrihalomethanesConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = TotalTrihalomethanesConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalTrihalomethanesConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = TotalTrihalomethanesConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = TotalColiformBacteriaConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = TotalColiformBacteriaConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalColiformBacteriaConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = TotalColiformBacteriaConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = TurbidityConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = TurbidityConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(TurbidityConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = TurbidityConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(CopperConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = CopperConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CopperConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = CopperConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CopperConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = CopperConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(LeadConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = LeadConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(LeadConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = LeadConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(LeadConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = LeadConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = ManganeseConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = ManganeseConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ManganeseConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = ManganeseConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = SulfateConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = SulfateConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SulfateConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = SulfateConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = BromodichloromethaneConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = BromodichloromethaneConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromodichloromethaneConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = BromodichloromethaneConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = BromoformConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = BromoformConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(BromoformConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = BromoformConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = ChlorodibromomethaneConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = ChlorodibromomethaneConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChlorodibromomethaneConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = ChlorodibromomethaneConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = ChloroformConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = ChloroformConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ChloroformConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = ChloroformConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = SodiumConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = SodiumConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SodiumConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = SodiumConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25ConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = Pm25ConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25ConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = Pm25ConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25ConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = Pm25ConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = FormaldehydeConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = FormaldehydeConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = FormaldehydeConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1ConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = Pm1ConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1ConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = Pm1ConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1ConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = Pm1ConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10ConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = Pm10ConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10ConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = Pm10ConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10ConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = Pm10ConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused))
+EnsureKnownEnumValue(TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused))
+EnsureKnownEnumValue(TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = RadonConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = RadonConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kGas:
+    case EnumType::kLiquid:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = RadonConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelStatusEnum val)
 {
     using EnumType = Channel::ChannelStatusEnum;
