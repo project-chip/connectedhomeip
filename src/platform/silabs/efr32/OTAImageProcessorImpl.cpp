@@ -212,6 +212,9 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         ChipLogError(SoftwareUpdate, "%s: bootloader_verifyImage() error %ld", __func__, err);
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
+#if (defined(EFR32MG24) && defined(SL_WIFI))
+        sl_wfx_host_post_bootloader_spi_transfer();
+#endif
         return;
     }
 
@@ -221,14 +224,17 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         ChipLogError(SoftwareUpdate, "%s: bootloader_setImageToBootload() error %ld", __func__, err);
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
+#if (defined(EFR32MG24) && defined(SL_WIFI))
+        sl_wfx_host_post_bootloader_spi_transfer();
+#endif
         return;
     }
 
-    // This reboots the device
-    CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 #if (defined(EFR32MG24) && defined(SL_WIFI))
     sl_wfx_host_post_bootloader_spi_transfer();
 #endif
+    // This reboots the device
+    CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
