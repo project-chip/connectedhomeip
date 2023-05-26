@@ -56,6 +56,7 @@
 #define APP_EVENT_QUEUE_SIZE 10
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
