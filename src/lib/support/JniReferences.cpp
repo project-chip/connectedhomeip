@@ -422,10 +422,6 @@ CHIP_ERROR JniReferences::CharToStringUTF(const chip::CharSpan & charSpan, jobje
         decoderObject = env->CallObjectMethod(decoderObject, onUnmappableCharacter, replaceAction);
     }
 
-
-    // TODO: onMalformedInput(CodingErrorAction.REPLACE)
-    // TODO: onUnmappableCharacter(CodingErrorAction.REPLACE)
-
     jmethodID charSetDecodeMethod = env->GetMethodID(charSetDocoderClass, "decode", "(Ljava/nio/ByteBuffer;)Ljava/nio/CharBuffer;");
     jobject decodeObject          = env->CallObjectMethod(decoderObject, charSetDecodeMethod, jbyteBuffer);
     env->DeleteLocalRef(jbyteBuffer);
@@ -433,7 +429,14 @@ CHIP_ERROR JniReferences::CharToStringUTF(const chip::CharSpan & charSpan, jobje
     // If decode exception occur, outStr will be set null.
     outStr = nullptr;
 
-    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+    if (env->ExceptionCheck()) {
+        // If there is an exception, decode will not fail. Instead just
+        // an error will be reported.
+        ChipLogError(Support, "Exception encountered trying to decode a UTF string.");
+        env->ExceptionDescribe();
+        env->ClearException();
+        return CHIP_JNI_ERROR_EXCEPTION_THROWN;
+    }
 
     jclass charBufferClass       = env->FindClass("java/nio/CharBuffer");
     jmethodID charBufferToString = env->GetMethodID(charBufferClass, "toString", "()Ljava/lang/String;");
