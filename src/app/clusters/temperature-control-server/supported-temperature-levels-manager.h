@@ -33,45 +33,29 @@ namespace TemperatureControl {
 class SupportedTemperatureLevelsManager
 {
 
+public:
     using TemperatureLevelStructType = Structs::TemperatureLevelStruct::Type;
 
-public:
-    /**
-     * A class that can return the supported temperature levels for a specific endpoint.
-     */
-    struct TemperatureLevelOptionsProvider
+    class Iterator
     {
-        using pointer = const TemperatureLevelStructType *;
+    public:
+        virtual ~Iterator() = default;
 
-        /**
-         * Returns the TemperatureLevelStructIterator to the first option.
-         */
-        inline pointer begin() const { return mBegin; }
+        Iterator(EndpointId endpoint)
+        {
+            mEndpoint = endpoint;
+            mIndex    = 0;
+        }
 
-        /**
-         * Returns the TemperatureLevelStructIterator to an element after the last option.
-         */
-        inline pointer end() const { return mEnd; }
+        virtual bool Next(TemperatureLevelStructType & item);
 
-        TemperatureLevelOptionsProvider() : mBegin(nullptr), mEnd(nullptr) {}
-
-        TemperatureLevelOptionsProvider(const pointer aBegin, const pointer aEnd) : mBegin(aBegin), mEnd(aEnd) {}
-
-        pointer mBegin;
-        pointer mEnd;
+    private:
+        EndpointId mEndpoint;
+        uint8_t mIndex;
     };
-
-    /**
-     * Given the endpointId, returns all its temperature level options.
-     * @param endpointId
-     * @return The temperature level provider for the endpoint.
-     */
-    virtual TemperatureLevelOptionsProvider GetTemperatureLevelOptionsProvider(EndpointId endpointId) const = 0;
 
     virtual ~SupportedTemperatureLevelsManager() {}
 };
-
-const SupportedTemperatureLevelsManager * GetSupportedTemperatureLevelsManager();
 
 } // namespace TemperatureControl
 } // namespace Clusters

@@ -7039,7 +7039,7 @@
           "mfgCode": null,
           "define": "TEMPERATURE_CONTROL_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "TemperatureSetpoint",
