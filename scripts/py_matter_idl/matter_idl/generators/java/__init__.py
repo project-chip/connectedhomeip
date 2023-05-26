@@ -166,11 +166,17 @@ def _CppType(field: Field, context: TypeLookupContext) -> str:
 def DecodableJniType(field: Field, context: TypeLookupContext) -> str:
     actual = _CppType(field, context)
 
+    needsConstRef = False
     if field.is_list:
-        return f"const chip::app::DataModel::DecodableList<{actual}> &"
+        needsConstRef = True
+        actual = f"chip::app::DataModel::DecodableList<{actual}>"
 
     if field.is_nullable:
-        return f"const chip::app::DataModel::Nullable<{actual}> &"
+        needsConstRef = True
+        actual = f"chip::app::DataModel::Nullable<{actual}>"
+
+    if needsConstRef:
+        actual = f"const {actual} &"
 
     return actual
 
