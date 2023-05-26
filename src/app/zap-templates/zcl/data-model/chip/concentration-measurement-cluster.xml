@@ -805,7 +805,7 @@ limitations under the License.
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes for reporting total volatile organic compounds concentration measurements</description>
     <code>0x042e</code>
-    <define>VOC_CONCENTRATION_MEASUREMENT_CLUSTER</define>
+    <define>TVOC_CONCENTRATION_MEASUREMENT_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>

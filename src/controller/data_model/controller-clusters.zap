@@ -31168,7 +31168,7 @@
           "name": "Total Volatile Organic Compounds Measurement",
           "code": 1070,
           "mfgCode": null,
-          "define": "VOC_CONCENTRATION_MEASUREMENT_CLUSTER",
+          "define": "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -31210,7 +31210,7 @@
           "name": "Total Volatile Organic Compounds Measurement",
           "code": 1070,
           "mfgCode": null,
-          "define": "VOC_CONCENTRATION_MEASUREMENT_CLUSTER",
+          "define": "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [

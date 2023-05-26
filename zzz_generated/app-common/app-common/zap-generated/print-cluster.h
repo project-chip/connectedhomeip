@@ -769,13 +769,13 @@
 #define CHIP_PRINTCLUSTER_PM10_CONCENTRATION_MEASUREMENT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_VOC_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                             \
-    defined(ZCL_USING_VOC_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_VOC_CONCENTRATION_MEASUREMENT_CLUSTER                                                                    \
+#if defined(ZCL_USING_TVOC_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                            \
+    defined(ZCL_USING_TVOC_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TVOC_CONCENTRATION_MEASUREMENT_CLUSTER                                                                   \
     { chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,                                              \
       "Total Volatile Organic Compounds Concentration Measurement" },
 #else
-#define CHIP_PRINTCLUSTER_VOC_CONCENTRATION_MEASUREMENT_CLUSTER
+#define CHIP_PRINTCLUSTER_TVOC_CONCENTRATION_MEASUREMENT_CLUSTER
 #endif
 
 #if defined(ZCL_USING_RADON_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                           \
@@ -985,7 +985,7 @@
     CHIP_PRINTCLUSTER_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                               \
     CHIP_PRINTCLUSTER_PM1_CONCENTRATION_MEASUREMENT_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_PM10_CONCENTRATION_MEASUREMENT_CLUSTER                                                                       \
-    CHIP_PRINTCLUSTER_VOC_CONCENTRATION_MEASUREMENT_CLUSTER                                                                        \
+    CHIP_PRINTCLUSTER_TVOC_CONCENTRATION_MEASUREMENT_CLUSTER                                                                       \
     CHIP_PRINTCLUSTER_RADON_CONCENTRATION_MEASUREMENT_CLUSTER                                                                      \
     CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_CHANNEL_CLUSTER                                                                                              \
