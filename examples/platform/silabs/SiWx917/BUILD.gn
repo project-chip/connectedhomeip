@@ -95,13 +95,9 @@ if (enable_dic) {
       "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_tls_mbedtls.c",
       "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_tls_mbedtls_mem.c",
     ]
-    if (sl_enable_dic_nvm_embed_cert) {
-      sources += [ "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic_nvm_cert.cpp" ]
-    }
     public_deps = [
       "${chip_root}/src/inet",
       "${chip_root}/src/lwip",
-      "${chip_root}/src/platform/silabs/SiWx917",
     ]
     public_configs = [ ":efr32_dic_config" ]
   }

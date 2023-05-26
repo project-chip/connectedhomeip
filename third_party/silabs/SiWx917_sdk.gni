@@ -170,9 +170,6 @@ template("siwx917_sdk") {
     if (enable_dic) {
       defines += [ "DIC_ENABLE=1" ]
     }
-    if (sl_enable_dic_nvm_embed_cert) {
-      defines += [ "SL_DIC_NVM_EMBED_CERT" ]
-    }
 
     libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
 
