@@ -25,10 +25,10 @@ function download_jar() {
     _MAVEN_PATH=$2
     _JAR_NAME=$3
 
-    if [ ! -f "third_party/java_deps/artifacts/${_JAR_NAME}" ]; then
+    if [ ! -f "third_party/java_deps/artifacts/$_JAR_NAME" ]; then
         curl --fail --location --silent --show-error \
-             "https://${_HOST}/maven2/${_MAVEN_PATH}/${_JAR_NAME}" \
-             -o "third_party/java_deps/artifacts/${_JAR_NAME}"
+             "https://$_HOST/maven2/$_MAVEN_PATH/$_JAR_NAME" \
+             -o "third_party/java_deps/artifacts/$_JAR_NAME"
     fi
 }
 
