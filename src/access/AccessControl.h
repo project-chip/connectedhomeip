@@ -78,36 +78,28 @@ public:
             virtual void Release() {}
 
             // Simple getters
-            virtual CHIP_ERROR GetAuthMode(AuthMode & authMode) const { return CHIP_NO_ERROR; }
-            virtual CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const { return CHIP_NO_ERROR; }
-            virtual CHIP_ERROR GetPrivilege(Privilege & privilege) const { return CHIP_NO_ERROR; }
+            virtual CHIP_ERROR GetAuthMode(AuthMode & authMode) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR GetPrivilege(Privilege & privilege) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
             // Simple setters
-            virtual CHIP_ERROR SetAuthMode(AuthMode authMode) { return CHIP_NO_ERROR; }
-            virtual CHIP_ERROR SetFabricIndex(FabricIndex fabricIndex) { return CHIP_NO_ERROR; }
-            virtual CHIP_ERROR SetPrivilege(Privilege privilege) { return CHIP_NO_ERROR; }
+            virtual CHIP_ERROR SetAuthMode(AuthMode authMode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR SetFabricIndex(FabricIndex fabricIndex) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR SetPrivilege(Privilege privilege) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
             // Subjects
-            virtual CHIP_ERROR GetSubjectCount(size_t & count) const
-            {
-                count = 0;
-                return CHIP_NO_ERROR;
-            }
-            virtual CHIP_ERROR GetSubject(size_t index, NodeId & subject) const { return CHIP_NO_ERROR; }
-            virtual CHIP_ERROR SetSubject(size_t index, NodeId subject) { return CHIP_NO_ERROR; }
-            virtual CHIP_ERROR AddSubject(size_t * index, NodeId subject) { return CHIP_NO_ERROR; }
-            virtual CHIP_ERROR RemoveSubject(size_t index) { return CHIP_NO_ERROR; }
+            virtual CHIP_ERROR GetSubjectCount(size_t & count) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR GetSubject(size_t index, NodeId & subject) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR SetSubject(size_t index, NodeId subject) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR AddSubject(size_t * index, NodeId subject) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR RemoveSubject(size_t index) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
             // Targets
-            virtual CHIP_ERROR GetTargetCount(size_t & count) const
-            {
-                count = 0;
-                return CHIP_NO_ERROR;
-            }
-            virtual CHIP_ERROR GetTarget(size_t index, Target & target) const { return CHIP_NO_ERROR; }
-            virtual CHIP_ERROR SetTarget(size_t index, const Target & target) { return CHIP_NO_ERROR; }
-            virtual CHIP_ERROR AddTarget(size_t * index, const Target & target) { return CHIP_NO_ERROR; }
-            virtual CHIP_ERROR RemoveTarget(size_t index) { return CHIP_NO_ERROR; }
+            virtual CHIP_ERROR GetTargetCount(size_t & count) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR GetTarget(size_t index, Target & target) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR SetTarget(size_t index, const Target & target) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR AddTarget(size_t * index, const Target & target) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR RemoveTarget(size_t index) { return CHIP_ERROR_NOT_IMPLEMENTED; }
         };
 
         Entry() = default;
