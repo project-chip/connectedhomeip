@@ -28,6 +28,8 @@
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
 #import "MTRSetupPayload_Internal.h"
+#import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 
 #include "app/ConcreteAttributePath.h"
 #include "app/ConcreteCommandPath.h"
@@ -522,26 +524,27 @@ id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data
             dictionaryWithObjectsAndKeys:MTRDoubleValueType, MTRTypeKey, [NSNumber numberWithDouble:val], MTRValueKey, nil];
     }
     case chip::TLV::kTLVType_UTF8String: {
-        uint32_t len = data->GetLength();
-        const uint8_t * ptr;
-        CHIP_ERROR err = data->GetDataPtr(ptr);
+        CharSpan stringValue;
+        CHIP_ERROR err = data->Get(stringValue);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Error(%s): TLV UTF8String decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:MTRUTF8StringValueType, MTRTypeKey,
-                             [[NSString alloc] initWithBytes:ptr length:len encoding:NSUTF8StringEncoding], MTRValueKey, nil];
+        NSString * stringObj = AsString(stringValue);
+        if (stringObj == nil) {
+            MTR_LOG_ERROR("Error(%s): TLV UTF8String value is not actually UTF-8", err.AsString());
+            return nil;
+        }
+        return @ { MTRTypeKey : MTRUTF8StringValueType, MTRValueKey : stringObj };
     }
     case chip::TLV::kTLVType_ByteString: {
-        uint32_t len = data->GetLength();
-        const uint8_t * ptr;
-        CHIP_ERROR err = data->GetDataPtr(ptr);
+        ByteSpan bytesValue;
+        CHIP_ERROR err = data->Get(bytesValue);
         if (err != CHIP_NO_ERROR) {
             MTR_LOG_ERROR("Error(%s): TLV ByteString decoding failed", chip::ErrorStr(err));
             return nil;
         }
-        return [NSDictionary dictionaryWithObjectsAndKeys:MTROctetStringValueType, MTRTypeKey,
-                             [NSData dataWithBytes:ptr length:len], MTRValueKey, nil];
+        return @ { MTRTypeKey : MTROctetStringValueType, MTRValueKey : AsData(bytesValue) };
     }
     case chip::TLV::kTLVType_Null: {
         return [NSDictionary dictionaryWithObjectsAndKeys:MTRNullValueType, MTRTypeKey, nil];
@@ -653,7 +656,7 @@ static CHIP_ERROR MTREncodeTLVFromDataValueDictionary(id object, chip::TLV::TLVW
             MTR_LOG_ERROR("Error: Object to encode has corrupt UTF8 string type: %@", [value class]);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        return writer.PutString(tag, [value cStringUsingEncoding:NSUTF8StringEncoding]);
+        return writer.PutString(tag, [value UTF8String]);
     }
     if ([typeName isEqualToString:MTROctetStringValueType]) {
         if (![value isKindOfClass:[NSData class]]) {

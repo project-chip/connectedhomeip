@@ -23,6 +23,9 @@
 
 #import "MTRKeypair.h"
 #import "MTRLogging_Internal.h"
+#import "NSDataSpanConversion.h"
+
+#include <lib/support/Span.h>
 
 using namespace chip::Crypto;
 
@@ -82,7 +85,7 @@ CHIP_ERROR MTRP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_
         MTR_LOG_ERROR("ECDSA sign msg failure: no keypair to sign with.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    NSData * msgData = [NSData dataWithBytes:msg length:msg_length];
+    NSData * msgData = AsData(chip::ByteSpan(msg, msg_length));
     NSData * signature;
     if ([mKeypair respondsToSelector:@selector(signMessageECDSA_DER:)]) {
         signature = [mKeypair signMessageECDSA_DER:msgData];
