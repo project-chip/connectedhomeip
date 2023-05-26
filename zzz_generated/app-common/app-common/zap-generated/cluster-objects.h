@@ -14058,8 +14058,19 @@ namespace ModeTagStruct {
 
 using Fields = Clusters::detail::Structs::ModeTagStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeTagStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeTagStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -14070,12 +14081,30 @@ namespace ModeOptionStruct {
 
 using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::DecodableType;
+
+public:
+    DecodableType() = default;
+    DecodableType(const Super & arg) : Super(arg) {}
+    DecodableType(Super && arg) : Super(std::move(arg)) {}
 };
 
 } // namespace ModeOptionStruct
@@ -14348,8 +14377,19 @@ namespace ModeTagStruct {
 
 using Fields = Clusters::detail::Structs::ModeTagStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeTagStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeTagStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -14360,12 +14400,30 @@ namespace ModeOptionStruct {
 
 using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::DecodableType;
+
+public:
+    DecodableType() = default;
+    DecodableType(const Super & arg) : Super(arg) {}
+    DecodableType(Super && arg) : Super(std::move(arg)) {}
 };
 
 } // namespace ModeOptionStruct
@@ -14625,8 +14683,19 @@ namespace ModeTagStruct {
 
 using Fields = Clusters::detail::Structs::ModeTagStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeTagStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeTagStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -14637,12 +14706,30 @@ namespace ModeOptionStruct {
 
 using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::DecodableType;
+
+public:
+    DecodableType() = default;
+    DecodableType(const Super & arg) : Super(arg) {}
+    DecodableType(Super && arg) : Super(std::move(arg)) {}
 };
 
 } // namespace ModeOptionStruct
@@ -14904,8 +14991,19 @@ namespace ModeTagStruct {
 
 using Fields = Clusters::detail::Structs::ModeTagStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeTagStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeTagStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -14916,12 +15014,30 @@ namespace ModeOptionStruct {
 
 using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::DecodableType;
+
+public:
+    DecodableType() = default;
+    DecodableType(const Super & arg) : Super(arg) {}
+    DecodableType(Super && arg) : Super(std::move(arg)) {}
 };
 
 } // namespace ModeOptionStruct
@@ -15181,8 +15297,19 @@ namespace ModeTagStruct {
 
 using Fields = Clusters::detail::Structs::ModeTagStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeTagStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeTagStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -15193,12 +15320,30 @@ namespace ModeOptionStruct {
 
 using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::DecodableType;
+
+public:
+    DecodableType() = default;
+    DecodableType(const Super & arg) : Super(arg) {}
+    DecodableType(Super && arg) : Super(std::move(arg)) {}
 };
 
 } // namespace ModeOptionStruct
@@ -15863,8 +16008,19 @@ namespace ModeTagStruct {
 
 using Fields = Clusters::detail::Structs::ModeTagStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeTagStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeTagStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -15875,12 +16031,30 @@ namespace ModeOptionStruct {
 
 using Fields = Clusters::detail::Structs::ModeOptionStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ModeOptionStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 struct DecodableType : public Clusters::detail::Structs::ModeOptionStruct::DecodableType
 {
+private:
+    using Super = Clusters::detail::Structs::ModeOptionStruct::DecodableType;
+
+public:
+    DecodableType() = default;
+    DecodableType(const Super & arg) : Super(arg) {}
+    DecodableType(Super && arg) : Super(std::move(arg)) {}
 };
 
 } // namespace ModeOptionStruct

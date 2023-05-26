@@ -24,9 +24,9 @@ Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_
 }
 } // namespace
 
-constexpr ModeTagType modeTagsBlack[]     = { ModeTagType{ .value = 0 } };
-constexpr ModeTagType modeTagsCappucino[] = { ModeTagType{ .value = 0 } };
-constexpr ModeTagType modeTagsEspresso[]  = { ModeTagType{ .value = 0 } };
+ModeTagType modeTagsBlack[]     = { detail::Structs::ModeTagStruct::Type{ .value = 0 } };
+ModeTagType modeTagsCappucino[] = { detail::Structs::ModeTagStruct::Type{ .value = 0 } };
+ModeTagType modeTagsEspresso[]  = { detail::Structs::ModeTagStruct::Type{ .value = 0 } };
 
 // TODO: Configure your options for each endpoint
 storage_value_type StaticSupportedModesManager::coffeeOptions[] = {
