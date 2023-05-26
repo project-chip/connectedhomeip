@@ -410,9 +410,9 @@ CHIP_ERROR JniReferences::CharToStringUTF(const chip::CharSpan & charSpan, jobje
     // As a result call:
     //   onMalformedInput(CodingErrorAction.REPLACE)
     //   onUnmappableCharacter(CodingErrorAction.REPLACE)
-    jclass codingErrorActionClass =env->FindClass("java/nio/charset/CodingErrorAction");
-    jobject replaceAction = env->GetStaticObjectField(codingErrorActionClass, env->GetStaticFieldID(codingErrorActionClass,
-                                                                            "REPLACE", "Ljava/nio/charset/CodingErrorAction;"));
+    jclass codingErrorActionClass = env->FindClass("java/nio/charset/CodingErrorAction");
+    jobject replaceAction         = env->GetStaticObjectField(
+        codingErrorActionClass, env->GetStaticFieldID(codingErrorActionClass, "REPLACE", "Ljava/nio/charset/CodingErrorAction;"));
     {
         jmethodID onMalformedInput = env->GetMethodID(charSetDocoderClass, "onMalformedInput",
                                                       "(Ljava/nio/charset/CodingErrorAction;)Ljava/nio/charset/CharsetDecoder;");
