@@ -98,8 +98,12 @@ static_library("cc13x4_26x4") {
     ]
 
     if (chip_mdns == "platform") {
-      sources += [ "../../OpenThread/DnssdImpl.cpp" ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+      sources += [
+        "../../OpenThread/DnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.h",
+      ]
     }
   }
 }

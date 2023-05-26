@@ -11,3 +11,4 @@ RUN set -x \
     && : # last line
 
 ENV PATH $PATH:/usr/lib/kotlinc/bin
+ENV JAVA_PATH=/usr/lib/jvm/java-8-openjdk-amd64
