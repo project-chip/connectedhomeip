@@ -16,6 +16,10 @@
 
 set(CHIP_APP_BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+if (NOT CHIP_ROOT)
+    get_filename_component(CHIP_ROOT ${CHIP_APP_BASE_DIR}/../.. REALPATH)
+endif()
+
 include("${CHIP_ROOT}/build/chip/chip_codegen.cmake")
 
 # Configure ${APP_TARGET} with source files associated with ${CLUSTER} cluster

@@ -16,9 +16,9 @@
 #
 
 import argparse
-import fcntl
 import json
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -29,6 +29,13 @@ from pathlib import Path
 from typing import Optional
 
 from zap_execution import ZapTool
+
+def isWindows():
+    return platform.system() == "Windows"
+
+# fcntl is not supported on Windows platform due to lack of necessity of I/O control on file descriptor
+if not isWindows():
+    import fcntl
 
 
 @dataclass
@@ -326,7 +333,8 @@ def runClangPrettifier(templates_file, output_dir):
 
 class LockFileSerializer:
     def __init__(self, path):
-        self.lock_file_path = path
+        # fcntl is not supported on Windows platform due to lack of necessity of I/O control on file descriptor
+        self.lock_file_path = None if isWindows() else path
         self.lock_file = None
 
     def __enter__(self):
