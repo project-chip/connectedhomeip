@@ -347,7 +347,7 @@ CHIP_ERROR SendReadRequest()
         chip::Platform::MakeUnique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(), &gExchangeManager,
                                                           gMockDelegate, chip::app::ReadClient::InteractionType::Read);
 
-    SuccessOrExit(readClient->SendRequest(readPrepareParams));
+    SuccessOrExit(err = readClient->SendRequest(readPrepareParams));
 
     gMockDelegate.AdoptReadClient(std::move(readClient));
 

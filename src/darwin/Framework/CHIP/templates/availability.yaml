@@ -7580,6 +7580,9 @@
                   - Rugged
                   - Fabric
                   - Other
+          NetworkCommissioning:
+              WiFiBand:
+                  - 1G
           HEPAFilterMonitoring:
               ChangeIndicationEnum:
                   - OK
@@ -7713,11 +7716,15 @@
                   - High
                   - Standard
                   - Low
+          WiFiNetworkDiagnostics:
+              WiFiVersionEnum:
+                  - Ah
       bitmaps:
           AirQuality:
               - Feature
           Groups:
               - Feature
+              - NameSupportBitmap
           PressureMeasurement:
               - Feature
           PumpConfigurationAndControl:
@@ -7764,6 +7771,8 @@
           Groups:
               Feature:
                   - GroupNames
+              NameSupportBitmap:
+                  - GroupNames
           PressureMeasurement:
               Feature:
                   - Extended
@@ -7779,6 +7788,9 @@
           Scenes:
               Feature:
                   - SceneNames
+          Thermostat:
+              Feature:
+                  - LocalTemperatureNotExposed
           HEPAFilterMonitoring:
               Feature:
                   - Condition
