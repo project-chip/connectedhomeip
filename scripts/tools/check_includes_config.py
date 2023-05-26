@@ -26,6 +26,7 @@ from typing import Dict, Set
 IGNORE: Set[str] = {
 
     '/examples/',
+    '/kotlin/',
     '/java/',
     '/Jni',
     '/pybindings/',
