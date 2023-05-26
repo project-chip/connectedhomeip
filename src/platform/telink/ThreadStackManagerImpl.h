@@ -78,6 +78,7 @@ protected:
     void _ProcessThreadActivity() {}
     CHIP_ERROR _AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
                                       NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+    CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
 
     //} // namespace Internal
 
@@ -92,6 +93,8 @@ private:
     // ===== Private members for use by this class only.
     bool mRadioBlocked;
     bool mReadyToAttach;
+
+    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
 };
 
 /**

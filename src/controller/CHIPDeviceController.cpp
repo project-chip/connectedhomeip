@@ -868,7 +868,12 @@ DeviceCommissioner::ContinueCommissioningAfterDeviceAttestation(DeviceProxy * de
         return CHIP_ERROR_INCORRECT_STATE;
     }
     CommissioneeDeviceProxy * commissioneeDevice = FindCommissioneeDevice(device->GetDeviceId());
-    if (commissioneeDevice == nullptr || !commissioneeDevice->IsSecureConnected() || commissioneeDevice != mDeviceBeingCommissioned)
+    if (commissioneeDevice == nullptr)
+    {
+        ChipLogError(Controller, "Couldn't find commissionee device");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    if (!commissioneeDevice->IsSecureConnected() || commissioneeDevice != mDeviceBeingCommissioned)
     {
         ChipLogError(Controller, "Invalid device for commissioning after attestation failure: 0x" ChipLogFormatX64,
                      ChipLogValueX64(commissioneeDevice->GetDeviceId()));

@@ -32,7 +32,8 @@ limitations under the License.
     <item name="g" value="0x02"/>
     <item name="n" value="0x03"/>
     <item name="ac" value="0x04"/>
-    <item name="ax" value="0x05"/>    
+    <item name="ax" value="0x05"/>
+    <item name="ah" value="0x06"/>
   </enum>
   <enum name="AssociationFailureCauseEnum" type="ENUM8">
     <cluster code="0x0036"/>

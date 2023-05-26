@@ -1906,8 +1906,8 @@ void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
             {
                 NL_TEST_ASSERT(inSuite, accessControl.PrepareEntry(entry) == CHIP_NO_ERROR);
 
-                size_t subjectCount;
-                size_t targetCount;
+                size_t subjectCount = 0;
+                size_t targetCount  = 0;
 
                 NL_TEST_ASSERT(inSuite, entry.GetSubjectCount(subjectCount) == CHIP_NO_ERROR);
                 NL_TEST_ASSERT(inSuite, entry.GetTargetCount(targetCount) == CHIP_NO_ERROR);

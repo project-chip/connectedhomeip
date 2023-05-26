@@ -112,5 +112,29 @@ ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset 
     return result;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
+{
+    mpScanCallback = callback;
+
+    /* On Telink platform it's not possible to rise Thread network when its used by BLE,
+       so Thread networks scanning performed before start BLE and also available after switch into Thread */
+    if (mRadioBlocked)
+    {
+        if (mpScanCallback != nullptr)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+                mpScanCallback = nullptr;
+            });
+        }
+    }
+    else
+    {
+        return Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_StartThreadScan(mpScanCallback);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace DeviceLayer
 } // namespace chip

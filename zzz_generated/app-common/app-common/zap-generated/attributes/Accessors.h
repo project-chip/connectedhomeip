@@ -63,8 +63,9 @@ namespace Groups {
 namespace Attributes {
 
 namespace NameSupport {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> * value); // NameSupportBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> value);
 } // namespace NameSupport
 
 namespace FeatureMap {

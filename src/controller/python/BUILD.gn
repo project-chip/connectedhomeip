@@ -306,7 +306,6 @@ chip_python_wheel_action("chip-core") {
     "pyyaml",
     "ipdb",
     "deprecation",
-    "mobly",
     "cryptography",
     "ecdsa",
   ]
@@ -428,7 +427,6 @@ chip_python_wheel_action("chip-repl") {
     "ipython!=8.1.0",
     "rich",
     "ipykernel",
-    "mobly",
   ]
 
   if (current_os == "mac") {

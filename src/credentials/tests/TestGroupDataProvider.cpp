@@ -1174,6 +1174,12 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
             std::pair<FabricIndex, GroupId> found(session.fabric_index, session.group_id);
             NL_TEST_ASSERT(apSuite, expected.count(found) > 0);
             NL_TEST_ASSERT(apSuite, session.keyContext != nullptr);
+            // Assert aboves doesn't actually exit, we call continue so that we can call it->Release() outside of
+            // loop.
+            if (session.keyContext == nullptr)
+            {
+                continue;
+            }
 
             // Decrypt the ciphertext
             NL_TEST_ASSERT(apSuite,
