@@ -86,6 +86,11 @@ public:
         AddArgument("trace_decode", 0, 1, &mTraceDecode);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("ble-adapter", 0, UINT16_MAX, &mBleAdapterId);
+        AddArgument("storage-directory", &mStorageDirectory,
+                    "Directory to place chip-tool's storage files in.  Defaults to $TMPDIR, with fallback to /tmp");
+        AddArgument(
+            "commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
+            "The vendor id to use for chip-tool. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will be used.");
     }
 
     /////////// Command Interface /////////
@@ -201,6 +206,7 @@ private:
 
     chip::Optional<char *> mCommissionerName;
     chip::Optional<chip::NodeId> mCommissionerNodeId;
+    chip::Optional<chip::VendorId> mCommissionerVendorId;
     chip::Optional<uint16_t> mBleAdapterId;
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<char *> mCDTrustStorePath;

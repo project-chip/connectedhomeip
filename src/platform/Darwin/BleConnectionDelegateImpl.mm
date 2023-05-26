@@ -350,11 +350,6 @@ namespace DeviceLayer {
         advertisementData:(NSDictionary *)advertisementData
                      RSSI:(NSNumber *)RSSI
 {
-    NSNumber * isConnectable = [advertisementData objectForKey:CBAdvertisementDataIsConnectable];
-    if ([isConnectable boolValue] == NO) {
-        return;
-    }
-
     NSDictionary * servicesData = [advertisementData objectForKey:CBAdvertisementDataServiceDataKey];
     NSData * serviceData;
     for (CBUUID * serviceUUID in servicesData) {
@@ -364,26 +359,53 @@ namespace DeviceLayer {
         }
     }
 
-    if (!serviceData || [serviceData length] != 8) {
+    if (!serviceData) {
+        return;
+    }
+
+    NSNumber * isConnectable = [advertisementData objectForKey:CBAdvertisementDataIsConnectable];
+    if ([isConnectable boolValue] == NO) {
+        ChipLogError(Ble, "A device (%p) with a matching Matter UUID has been discovered but it is not connectable.", peripheral);
         return;
     }
 
     const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
+    if ([serviceData length] != 8) {
+        NSMutableString * hexString = [NSMutableString stringWithCapacity:([serviceData length] * 2)];
+        for (NSUInteger i = 0; i < [serviceData length]; i++) {
+            [hexString appendString:[NSString stringWithFormat:@"%02lx", (unsigned long) bytes[i]]];
+        }
+        ChipLogError(Ble,
+            "A device (%p) with a matching Matter UUID has been discovered but the service data len does not match our expectation "
+            "(serviceData = %s)",
+            peripheral, [hexString UTF8String]);
+        return;
+    }
+
     uint8_t opCode = bytes[0];
     if (opCode != 0 && opCode != 1) {
+        ChipLogError(Ble,
+            "A device (%p) with a matching Matter UUID has been discovered but the service data opCode not match our expectation "
+            "(opCode = %u).",
+            peripheral, opCode);
         return;
     }
 
     uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
 
-    if ([self isConnecting] and [self checkDiscriminator:discriminator]) {
+    if ([self isConnecting]) {
+        if (![self checkDiscriminator:discriminator]) {
+            ChipLogError(Ble,
+                "A device (%p) with a matching Matter UUID has been discovered but the service data discriminator not match our "
+                "expectation (discriminator = %u).",
+                peripheral, discriminator);
+            return;
+        }
+
         ChipLogProgress(Ble, "Connecting to device %p with discriminator: %d", peripheral, discriminator);
         [self connect:peripheral];
         [self stopScanning];
-        return;
-    }
-
-    if (![self isConnecting]) {
+    } else {
         [self addPeripheralToCache:peripheral data:serviceData];
     }
 }
@@ -651,9 +673,16 @@ namespace DeviceLayer {
 {
     dispatch_source_t timeoutTimer;
 
+    bool shouldLogData = true;
     if ([_cachedPeripherals objectForKey:peripheral]) {
+        shouldLogData = ![data isEqualToData:_cachedPeripherals[peripheral][@"data"]];
+        if (shouldLogData) {
+            ChipLogProgress(Ble, "Updating peripheral %p from the cache", peripheral);
+        }
+
         timeoutTimer = _cachedPeripherals[peripheral][@"timer"];
     } else {
+        ChipLogProgress(Ble, "Adding peripheral %p to the cache", peripheral);
         auto delegate = _scannerDelegate;
         if (delegate) {
             dispatch_async(_chipWorkQueue, ^{
@@ -678,12 +707,25 @@ namespace DeviceLayer {
         @"data" : data,
         @"timer" : timeoutTimer,
     };
+
+    if (shouldLogData) {
+        ChipBLEDeviceIdentificationInfo info;
+        auto bytes = (const uint8_t *) [data bytes];
+        memcpy(&info, bytes, sizeof(info));
+
+        ChipLogProgress(Ble, "  - Version: %u", info.GetAdvertisementVersion());
+        ChipLogProgress(Ble, "  - Discriminator: %u", info.GetDeviceDiscriminator());
+        ChipLogProgress(Ble, "  - VendorId: %u", info.GetVendorId());
+        ChipLogProgress(Ble, "  - ProductId: %u", info.GetVendorId());
+    }
 }
 
 - (void)removePeripheralFromCache:(CBPeripheral *)peripheral
 {
     auto entry = [_cachedPeripherals objectForKey:peripheral];
     if (entry) {
+        ChipLogProgress(Ble, "Removing peripheral %p from the cache", peripheral);
+
         dispatch_source_cancel(entry[@"timer"]);
         [_cachedPeripherals removeObjectForKey:peripheral];
 
@@ -698,7 +740,7 @@ namespace DeviceLayer {
 
 - (void)removePeripheralsFromCache
 {
-    for (CBPeripheral * peripheral in _cachedPeripherals) {
+    for (CBPeripheral * peripheral in [_cachedPeripherals allKeys]) {
         [self removePeripheralFromCache:peripheral];
     }
 }

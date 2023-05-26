@@ -16,7 +16,7 @@
 import asyncio
 import time
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .adapter import TestAdapter
 from .hooks import TestRunnerHooks
@@ -43,10 +43,14 @@ class TestRunnerOptions:
                     stop running the tests if a step index matches
                     the number. This is mostly useful when running
                     a single test file and for debugging purposes.
+
+    delay_in_ms:  If set to any value that is not zero the runner will
+                  wait for the given time between steps.
     """
     stop_on_error: bool = True
     stop_on_warning: bool = False
     stop_at_number: int = -1
+    delay_in_ms: int = 0
 
 
 @dataclass
@@ -68,7 +72,7 @@ class TestRunnerConfig:
     """
     adapter: TestAdapter = None
     pseudo_clusters: PseudoClusters = PseudoClusters([])
-    options: TestRunnerOptions = TestRunnerOptions()
+    options: TestRunnerOptions = field(default_factory=TestRunnerOptions)
     hooks: TestRunnerHooks = TestRunnerHooks()
 
 
@@ -139,7 +143,9 @@ class TestRunner(TestRunnerBase):
             if not parser or not runner_config:
                 continue
 
-            result = asyncio.run(self._run(parser, runner_config))
+            loop = asyncio.get_event_loop()
+            result = loop.run_until_complete(
+                self._run_with_timeout(parser, runner_config))
             if isinstance(result, Exception):
                 raise (result)
             elif not result:
@@ -149,13 +155,22 @@ class TestRunner(TestRunnerBase):
             duration = round((time.time() - start) * 1000)
             runner_config.hooks.stop(duration)
 
-        return True
+        return parser_builder.done
+
+    async def _run_with_timeout(self, parser: TestParser, config: TestRunnerConfig):
+        status = True
+        try:
+            await self.start()
+            status = await asyncio.wait_for(self._run(parser, config), parser.timeout)
+        except Exception as exception:
+            status = exception
+        finally:
+            await self.stop()
+            return status
 
     async def _run(self, parser: TestParser, config: TestRunnerConfig):
         status = True
         try:
-            await self.start()
-
             hooks = config.hooks
             hooks.test_start(parser.filename, parser.name, parser.tests.count)
 
@@ -200,10 +215,12 @@ class TestRunner(TestRunnerBase):
                 if (idx + 1) == config.options.stop_at_number:
                     break
 
+                if config.options.delay_in_ms:
+                    await asyncio.sleep(config.options.delay_in_ms / 1000)
+
             hooks.test_stop(round(test_duration))
 
         except Exception as exception:
             status = exception
         finally:
-            await self.stop()
             return status

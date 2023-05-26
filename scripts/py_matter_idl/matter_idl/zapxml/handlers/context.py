@@ -39,7 +39,7 @@ class ProcessingPath:
     and in general to report things like 'this path found but was not handled'.
     """
 
-    def __init__(self, paths: List[str] = None):
+    def __init__(self, paths: Optional[List[str]] = None):
         if paths is None:
             paths = []
         self.paths = paths
@@ -88,7 +88,7 @@ class Context:
         # Map of code -> attribute
         self._global_attributes = {}
 
-    def GetCurrentLocationMeta(self) -> ParseMetaData:
+    def GetCurrentLocationMeta(self) -> Optional[ParseMetaData]:
         if not self.locator:
             return None
 

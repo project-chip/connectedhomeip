@@ -53,11 +53,15 @@ server cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 server cluster Groups = 4 {
-  bitmap GroupsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kGroupNames = 0x1;
   }
 
-  readonly attribute bitmap8 nameSupport = 0;
+  bitmap NameSupportBitmap : BITMAP8 {
+    kGroupNames = 0x80;
+  }
+
+  readonly attribute NameSupportBitmap nameSupport = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -118,12 +122,12 @@ server cluster Groups = 4 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 server cluster Scenes = 5 {
-  bitmap ScenesCopyMode : BITMAP8 {
-    kCopyAllScenes = 0x1;
+  bitmap Feature : BITMAP32 {
+    kSceneNames = 0x1;
   }
 
-  bitmap ScenesFeature : BITMAP32 {
-    kSceneNames = 0x1;
+  bitmap ScenesCopyMode : BITMAP8 {
+    kCopyAllScenes = 0x1;
   }
 
   struct AttributeValuePair {
@@ -186,13 +190,13 @@ server cluster Scenes = 5 {
   }
 
   response struct AddSceneResponse = 0 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
 
   response struct ViewSceneResponse = 1 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
     optional INT16U transitionTime = 3;
@@ -201,24 +205,24 @@ server cluster Scenes = 5 {
   }
 
   response struct RemoveSceneResponse = 2 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
 
   response struct RemoveAllScenesResponse = 3 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
   }
 
   response struct StoreSceneResponse = 4 {
-    ENUM8 status = 0;
+    status status = 0;
     group_id groupID = 1;
     INT8U sceneID = 2;
   }
 
   response struct GetSceneMembershipResponse = 6 {
-    ENUM8 status = 0;
+    status status = 0;
     nullable INT8U capacity = 1;
     group_id groupID = 2;
     optional INT8U sceneList[] = 3;
@@ -256,12 +260,12 @@ server cluster OnOff = 6 {
     kTogglePreviousOnOff = 2;
   }
 
-  bitmap OnOffControl : BITMAP8 {
-    kAcceptOnlyWhenOn = 0x1;
+  bitmap Feature : BITMAP32 {
+    kLighting = 0x1;
   }
 
-  bitmap OnOffFeature : BITMAP32 {
-    kLighting = 0x1;
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
   }
 
   readonly attribute boolean onOff = 0;
@@ -289,7 +293,7 @@ server cluster LevelControl = 8 {
     kDown = 1;
   }
 
-  bitmap LevelControlFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kOnOff = 0x1;
     kLighting = 0x2;
     kFrequency = 0x4;
@@ -437,7 +441,7 @@ server cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
-  struct Target {
+  struct AccessControlTargetStruct {
     nullable cluster_id cluster = 0;
     nullable endpoint_no endpoint = 1;
     nullable devtype_id deviceType = 2;
@@ -447,7 +451,7 @@ server cluster AccessControl = 31 {
     fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
-    nullable fabric_sensitive Target targets[] = 4;
+    nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -859,7 +863,7 @@ server cluster UnitLocalization = 45 {
     kKelvin = 2;
   }
 
-  bitmap UnitLocalizationFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kTemperatureUnit = 0x1;
   }
 
@@ -1062,7 +1066,7 @@ server cluster PowerSource = 47 {
     kUnderVoltage = 2;
   }
 
-  bitmap PowerSourceFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWired = 0x1;
     kBattery = 0x2;
     kRechargeable = 0x4;
@@ -1112,7 +1116,7 @@ server cluster PowerSource = 47 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
-  enum CommissioningError : ENUM8 {
+  enum CommissioningErrorEnum : ENUM8 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -1120,7 +1124,7 @@ server cluster GeneralCommissioning = 48 {
     kBusyWithOtherAdmin = 4;
   }
 
-  enum RegulatoryLocationType : ENUM8 {
+  enum RegulatoryLocationTypeEnum : ENUM8 {
     kIndoor = 0;
     kOutdoor = 1;
     kIndoorOutdoor = 2;
@@ -1133,8 +1137,8 @@ server cluster GeneralCommissioning = 48 {
 
   attribute access(write: administer) int64u breadcrumb = 0;
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
-  readonly attribute RegulatoryLocationType regulatoryConfig = 2;
-  readonly attribute RegulatoryLocationType locationCapability = 3;
+  readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
+  readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1149,23 +1153,23 @@ server cluster GeneralCommissioning = 48 {
   }
 
   request struct SetRegulatoryConfigRequest {
-    RegulatoryLocationType newRegulatoryConfig = 0;
+    RegulatoryLocationTypeEnum newRegulatoryConfig = 0;
     CHAR_STRING countryCode = 1;
     INT64U breadcrumb = 2;
   }
 
   response struct ArmFailSafeResponse = 1 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse = 3 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct CommissioningCompleteResponse = 5 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
@@ -1198,9 +1202,10 @@ server cluster NetworkCommissioning = 49 {
     k5g = 2;
     k6g = 3;
     k60g = 4;
+    k1g = 5;
   }
 
-  bitmap NetworkCommissioningFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
@@ -1451,7 +1456,7 @@ server cluster GeneralDiagnostics = 51 {
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster SoftwareDiagnostics = 52 {
-  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWaterMarks = 0x1;
   }
 
@@ -1501,7 +1506,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kLeader = 6;
   }
 
-  bitmap ThreadNetworkDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
     kMLECounts = 0x4;
@@ -1622,9 +1627,10 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kN = 3;
     kAc = 4;
     kAx = 5;
+    kAh = 6;
   }
 
-  bitmap WiFiNetworkDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
   }
@@ -1670,7 +1676,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate400G = 9;
   }
 
-  bitmap EthernetNetworkDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
   }
@@ -1698,7 +1704,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 server cluster Switch = 59 {
-  bitmap SwitchFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kLatchingSwitch = 0x1;
     kMomentarySwitch = 0x2;
     kMomentarySwitchRelease = 0x4;
@@ -2020,7 +2026,7 @@ server cluster BooleanState = 69 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 server cluster ModeSelect = 80 {
-  bitmap ModeSelectFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kDeponoff = 0x1;
   }
 
@@ -2091,6 +2097,7 @@ server cluster DoorLock = 257 {
     kNotFullyLocked = 0;
     kLocked = 1;
     kUnlocked = 2;
+    kUnlatched = 3;
   }
 
   enum DlLockType : ENUM8 {
@@ -2105,6 +2112,7 @@ server cluster DoorLock = 257 {
     kInterconnectedLock = 8;
     kDeadLatch = 9;
     kDoorFurniture = 10;
+    kEurocylinder = 11;
   }
 
   enum DlStatus : ENUM8 {
@@ -2196,6 +2204,7 @@ server cluster DoorLock = 257 {
     kUnlock = 1;
     kNonAccessUserEvent = 2;
     kForcedUserEvent = 3;
+    kUnlatch = 4;
   }
 
   enum OperatingModeEnum : ENUM8 {
@@ -2371,7 +2380,7 @@ server cluster DoorLock = 257 {
     kSaturday = 0x40;
   }
 
-  bitmap DoorLockFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPinCredential = 0x1;
     kRfidCredential = 0x2;
     kFingerCredentials = 0x4;
@@ -2384,6 +2393,7 @@ server cluster DoorLock = 257 {
     kNotification = 0x200;
     kYearDayAccessSchedules = 0x400;
     kHolidaySchedules = 0x800;
+    kUnbolt = 0x1000;
   }
 
   struct CredentialStruct {
@@ -2507,6 +2517,14 @@ server cluster WindowCovering = 258 {
     kTiltEncoderControlled = 0x40;
   }
 
+  bitmap Feature : BITMAP32 {
+    kLift = 0x1;
+    kTilt = 0x2;
+    kPositionAwareLift = 0x4;
+    kAbsolutePosition = 0x8;
+    kPositionAwareTilt = 0x10;
+  }
+
   bitmap Mode : BITMAP8 {
     kMotorDirectionReversed = 0x1;
     kCalibrationMode = 0x2;
@@ -2533,14 +2551,6 @@ server cluster WindowCovering = 258 {
     kHardwareFailure = 0x200;
     kManualOperation = 0x400;
     kProtection = 0x800;
-  }
-
-  bitmap WindowCoveringFeature : BITMAP32 {
-    kLift = 0x1;
-    kTilt = 0x2;
-    kPositionAwareLift = 0x4;
-    kAbsolutePosition = 0x8;
-    kPositionAwareTilt = 0x10;
   }
 
   readonly attribute Type type = 0;
@@ -2578,7 +2588,7 @@ server cluster PumpConfigurationAndControl = 512 {
     kLocal = 3;
   }
 
-  bitmap PumpConfigurationAndControlFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kConstantPressure = 0x1;
     kCompensatedPressure = 0x2;
     kConstantFlow = 0x4;
@@ -2714,18 +2724,19 @@ server cluster Thermostat = 513 {
     kAway = 0x80;
   }
 
-  bitmap ModeForSequence : BITMAP8 {
-    kHeatSetpointPresent = 0x1;
-    kCoolSetpointPresent = 0x2;
-  }
-
-  bitmap ThermostatFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kHeating = 0x1;
     kCooling = 0x2;
     kOccupancy = 0x4;
     kScheduleConfiguration = 0x8;
     kSetback = 0x10;
     kAutoMode = 0x20;
+    kLocalTemperatureNotExposed = 0x40;
+  }
+
+  bitmap ModeForSequence : BITMAP8 {
+    kHeatSetpointPresent = 0x1;
+    kCoolSetpointPresent = 0x2;
   }
 
   struct ThermostatScheduleTransition {
@@ -2784,7 +2795,7 @@ server cluster FanControl = 514 {
     kSmart = 6;
   }
 
-  bitmap FanControlFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kMultiSpeed = 0x1;
     kAuto = 0x2;
     kRocking = 0x4;
@@ -2889,19 +2900,19 @@ server cluster ColorControl = 768 {
     kColorTemperatureSupported = 0x10;
   }
 
-  bitmap ColorControlFeature : BITMAP32 {
-    kHueAndSaturation = 0x1;
-    kEnhancedHue = 0x2;
-    kColorLoop = 0x4;
-    kXy = 0x8;
-    kColorTemperature = 0x10;
-  }
-
   bitmap ColorLoopUpdateFlags : BITMAP8 {
     kUpdateAction = 0x1;
     kUpdateDirection = 0x2;
     kUpdateTime = 0x4;
     kUpdateStartHue = 0x8;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kHueAndSaturation = 0x1;
+    kEnhancedHue = 0x2;
+    kColorLoop = 0x4;
+    kXy = 0x8;
+    kColorTemperature = 0x10;
   }
 
   readonly attribute enum8 colorMode = 8;
@@ -2965,7 +2976,7 @@ server cluster TemperatureMeasurement = 1026 {
 
 /** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
 server cluster PressureMeasurement = 1027 {
-  bitmap PressureMeasurementFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kExtended = 0x1;
   }
 
@@ -3058,7 +3069,7 @@ server cluster Channel = 1284 {
     kMso = 0;
   }
 
-  bitmap ChannelFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kChannelList = 0x1;
     kLineupInfo = 0x2;
   }
@@ -3091,7 +3102,7 @@ server cluster Channel = 1284 {
   }
 
   request struct SkipChannelRequest {
-    INT16U count = 0;
+    INT16S count = 0;
   }
 
   command ChangeChannelByNumber(ChangeChannelByNumberRequest): DefaultSuccess = 2;
@@ -3150,7 +3161,7 @@ server cluster MediaPlayback = 1286 {
     kBuffering = 3;
   }
 
-  bitmap MediaPlaybackFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kAdvancedSeek = 0x1;
     kVariableSpeed = 0x2;
   }
@@ -3195,7 +3206,7 @@ server cluster MediaInput = 1287 {
     kOther = 11;
   }
 
-  bitmap MediaInputFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNameUpdates = 0x1;
   }
 
@@ -3333,7 +3344,7 @@ server cluster KeypadInput = 1289 {
     kInvalidKeyInCurrentState = 2;
   }
 
-  bitmap KeypadInputFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNavigationKeyCodes = 0x1;
     kLocationKeys = 0x2;
     kNumberKeys = 0x4;
@@ -3387,7 +3398,7 @@ server cluster ContentLauncher = 1290 {
     kVideo = 13;
   }
 
-  bitmap ContentLauncherFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
   }
@@ -3452,7 +3463,7 @@ server cluster AudioOutput = 1291 {
     kOther = 5;
   }
 
-  bitmap AudioOutputFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kNameUpdates = 0x1;
   }
 
@@ -3486,7 +3497,7 @@ server cluster ApplicationLauncher = 1292 {
     kSystemBusy = 2;
   }
 
-  bitmap ApplicationLauncherFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kApplicationPlatform = 0x1;
   }
 

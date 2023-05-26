@@ -60,7 +60,7 @@ EmberAfStatus SetFanModeToOff(EndpointId endpointId)
     return status;
 }
 
-bool HasFeature(EndpointId endpoint, FanControlFeature feature)
+bool HasFeature(EndpointId endpoint, Feature feature)
 {
     bool success;
     uint32_t featureMap;
@@ -71,32 +71,32 @@ bool HasFeature(EndpointId endpoint, FanControlFeature feature)
 
 inline bool SupportsMultiSpeed(chip::EndpointId endpointId)
 {
-    return HasFeature(endpointId, FanControlFeature::kMultiSpeed);
+    return HasFeature(endpointId, Feature::kMultiSpeed);
 }
 
 inline bool SupportsAuto(chip::EndpointId endpointId)
 {
-    return HasFeature(endpointId, FanControlFeature::kAuto);
+    return HasFeature(endpointId, Feature::kAuto);
 }
 
 inline bool SupportsRocking(chip::EndpointId endpointId)
 {
-    return HasFeature(endpointId, FanControlFeature::kRocking);
+    return HasFeature(endpointId, Feature::kRocking);
 }
 
 inline bool SupportsWind(chip::EndpointId endpointId)
 {
-    return HasFeature(endpointId, FanControlFeature::kWind);
+    return HasFeature(endpointId, Feature::kWind);
 }
 
 inline bool SupportsStep(chip::EndpointId endpointId)
 {
-    return HasFeature(endpointId, FanControlFeature::kStep);
+    return HasFeature(endpointId, Feature::kStep);
 }
 
 inline bool SupportsAirflowDirection(chip::EndpointId endpointId)
 {
-    return HasFeature(endpointId, FanControlFeature::kAirflowDirection);
+    return HasFeature(endpointId, Feature::kAirflowDirection);
 }
 
 } // anonymous namespace
@@ -118,24 +118,26 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
     case FanMode::Id: {
         if (*value == to_underlying(FanModeType::kOn))
         {
-            *value = static_cast<uint8_t>(FanModeType::kHigh);
-            res    = Status::Success;
+            FanMode::Set(attributePath.mEndpointId, FanModeType::kHigh);
+            res = Status::WriteIgnored;
         }
         else if (*value == to_underlying(FanModeType::kSmart))
         {
             FanModeSequenceType fanModeSequence;
-            FanModeSequence::Get(attributePath.mEndpointId, &fanModeSequence);
+            EmberAfStatus status = FanModeSequence::Get(attributePath.mEndpointId, &fanModeSequence);
+            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::Failure);
+
             if (SupportsAuto(attributePath.mEndpointId) &&
                 ((fanModeSequence == FanModeSequenceType::kOffLowHighAuto) ||
                  (fanModeSequence == FanModeSequenceType::kOffLowMedHighAuto)))
             {
-                *value = static_cast<uint8_t>(FanModeType::kAuto);
+                FanMode::Set(attributePath.mEndpointId, FanModeType::kAuto);
             }
             else
             {
-                *value = static_cast<uint8_t>(FanModeType::kHigh);
+                FanMode::Set(attributePath.mEndpointId, FanModeType::kHigh);
             }
-            res = Status::Success;
+            res = Status::WriteIgnored;
         }
         else
         {
@@ -206,7 +208,8 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         if (SupportsRocking(attributePath.mEndpointId))
         {
             uint8_t rockSupport;
-            RockSupport::Get(attributePath.mEndpointId, &rockSupport);
+            EmberAfStatus status = RockSupport::Get(attributePath.mEndpointId, &rockSupport);
+            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::ConstraintError);
             if ((*value & rockSupport) == *value)
             {
                 res = Status::Success;
@@ -226,7 +229,8 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         if (SupportsWind(attributePath.mEndpointId))
         {
             uint8_t windSupport;
-            WindSupport::Get(attributePath.mEndpointId, &windSupport);
+            EmberAfStatus status = WindSupport::Get(attributePath.mEndpointId, &windSupport);
+            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::ConstraintError);
             if ((*value & windSupport) == *value)
             {
                 res = Status::Success;
@@ -243,7 +247,7 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
         break;
     }
     case AirflowDirection::Id: {
-        if (!SupportsAirflowDirection(attributePath.mEndpointId))
+        if (SupportsAirflowDirection(attributePath.mEndpointId))
         {
             res = Status::Success;
         }

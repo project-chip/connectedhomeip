@@ -128,7 +128,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mOperationalKeystore           = initParams.operationalKeystore;
     mOpCertStore                   = initParams.opCertStore;
 
-    mCertificateValidityPolicy = initParams.certificateValidityPolicy;
+    if (initParams.certificateValidityPolicy)
+    {
+        mCertificateValidityPolicy.Init(initParams.certificateValidityPolicy);
+    }
+    else
+    {
+        mCertificateValidityPolicy.Init(&sDefaultCertValidityPolicy);
+    }
 
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT)
     VerifyOrDie(chip::audit::ExecutePersistentStorageApiAudit(*mDeviceStorage));
@@ -140,7 +147,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
-    SuccessOrExit(mAttributePersister.Init(mDeviceStorage));
+    SuccessOrExit(err = mAttributePersister.Init(mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
 
     {
@@ -286,7 +293,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         .sessionInitParams =  {
             .sessionManager    = &mSessions,
             .sessionResumptionStorage = mSessionResumptionStorage,
-            .certificateValidityPolicy = mCertificateValidityPolicy,
+            .certificateValidityPolicy = &mCertificateValidityPolicy,
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .groupDataProvider = mGroupsProvider,
@@ -300,7 +307,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
-                                                    mCertificateValidityPolicy, mGroupsProvider);
+                                                    &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager,
@@ -531,11 +538,12 @@ void Server::ResumeSubscriptions()
 }
 #endif
 
+Credentials::IgnoreCertificateValidityPeriodPolicy Server::sDefaultCertValidityPolicy;
+
 KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
 PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
 Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
 Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
-IgnoreCertificateValidityPolicy CommonCaseDeviceServerInitParams::sDefaultCertValidityPolicy;
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
 SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
 #endif

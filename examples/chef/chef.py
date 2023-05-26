@@ -662,7 +662,7 @@ def main() -> int:
                 shell.run_cmd(f"rm -rf out/{options.sample_device_type_name}")
             efr32_cmd_args = []
             efr32_cmd_args.append(
-                f'{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh')
+                f'{_REPO_BASE_PATH}/scripts/examples/gn_silabs_example.sh')
             efr32_cmd_args.append('./')
             efr32_cmd_args.append(f'out/{options.sample_device_type_name}')
             efr32_cmd_args.append(f'{silabs_board}')
@@ -813,7 +813,7 @@ def main() -> int:
         elif (options.build_target == "silabs-thread") or (options.build_target == "silabs-wifi"):
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
             shell.run_cmd(
-                f"python3 out/{options.sample_device_type_name}/{silabs_board}/chip-efr32-chef-example.flash.py")
+                f"python3 out/{options.sample_device_type_name}/{silabs_board}/matter-silabs-chef-example.flash.py")
 
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
         elif (options.build_target == "ameba"):

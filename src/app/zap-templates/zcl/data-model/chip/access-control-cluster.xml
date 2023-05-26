@@ -40,7 +40,7 @@ limitations under the License.
     <item name="Removed" value="0x02"/>
   </enum>
 
-  <struct name="Target">
+  <struct name="AccessControlTargetStruct">
     <cluster code="0x001F"/>
     <item fieldId="0" name="Cluster" type="cluster_id" isNullable="true"/>
     <item fieldId="1" name="Endpoint" type="endpoint_no" isNullable="true"/>
@@ -52,7 +52,7 @@ limitations under the License.
     <item fieldId="1" name="Privilege" type="AccessControlEntryPrivilegeEnum" isFabricSensitive="true"/>
     <item fieldId="2" name="AuthMode" type="AccessControlEntryAuthModeEnum" isFabricSensitive="true"/>
     <item fieldId="3" name="Subjects" type="INT64U" isNullable="true" array="true" isFabricSensitive="true"/>
-    <item fieldId="4" name="Targets" type="Target" isNullable="true" array="true" isFabricSensitive="true"/>
+    <item fieldId="4" name="Targets" type="AccessControlTargetStruct" isNullable="true" array="true" isFabricSensitive="true"/>
   </struct>
 
   <struct name="AccessControlExtensionStruct" isFabricScoped="true">
@@ -76,14 +76,12 @@ limitations under the License.
       <description>ACL</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
-      <access modifier="fabric-scoped"/>
     </attribute>
 
     <attribute side="server" code="0x0001" define="EXTENSION" type="ARRAY" entryType="AccessControlExtensionStruct" writable="true" optional="true">
       <description>Extension</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
-      <access modifier="fabric-scoped"/>
     </attribute>
 
     <attribute side="server" code="0x0002" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" writable="false">

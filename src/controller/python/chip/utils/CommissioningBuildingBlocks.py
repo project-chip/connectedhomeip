@@ -142,7 +142,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
 
     '''
     resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(60))
-    if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
+    if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         return False
 
     csrForAddNOC = await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.CSRRequest(CSRNonce=os.urandom(32)))
@@ -161,7 +161,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
         return False
 
     resp = await newFabricDevCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
-    if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
+    if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
@@ -189,7 +189,7 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
 
     """
     resp = await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(600))
-    if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
+    if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         return False
     csrForUpdateNOC = await devCtrl.SendCommand(
         existingNodeId, 0, opCreds.Commands.CSRRequest(CSRNonce=os.urandom(32), isForUpdateNOC=True))
@@ -208,7 +208,7 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
     devCtrl.ExpireSessions(existingNodeId)
 
     resp = await devCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
-    if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
+    if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False

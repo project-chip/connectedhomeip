@@ -234,6 +234,83 @@ tests:
               isUpperCase: false
               isLowerCase: false
 
+    - label: "Write attribute CHAR_STRING Value with only digits"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "1234567890"
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: true
+              isLowerCase: true
+
+    - label: "Write attribute CHAR_STRING Value with only non-letters"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "12.4,76:"
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: true
+              isLowerCase: true
+
+    - label:
+          "Write attribute CHAR_STRING Value with uppercase letters and symbols"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "ABC;.* "
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: true
+              isLowerCase: false
+
+    - label:
+          "Write attribute CHAR_STRING Value with lowercase letters and symbols"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "abc;.* "
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: false
+              isLowerCase: true
+
+    - label: "Write attribute CHAR_STRING Value which is empty"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: ""
+
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          constraints:
+              isUpperCase: true
+              isLowerCase: true
+
     - label: "Write attribute CHAR_STRING Value"
       command: "writeAttribute"
       attribute: "char_string"

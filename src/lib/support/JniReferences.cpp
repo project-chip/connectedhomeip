@@ -290,7 +290,7 @@ CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback, long
                                                         &subscriptionEstablishedMethod);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    env->CallVoidMethod(javaCallback, subscriptionEstablishedMethod, subscriptionId);
+    env->CallVoidMethod(javaCallback, subscriptionEstablishedMethod, static_cast<jlong>(subscriptionId));
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
     return err;

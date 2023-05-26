@@ -12,8 +12,10 @@
 #import "MTRDevice_Internal.h"
 #import "MTRStructsObjc.h"
 
+#include <controller/CHIPCluster.h>
 #include <lib/support/CHIPListUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+
 #include <type_traits>
 
 using chip::Callback::Callback;
@@ -194,7 +196,7 @@ MTR{{cluster}}Cluster{{command}}Params
         TypeInfo::Type cppValue;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
 
-        chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
+        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self->_endpoint);
         return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout);
     });
     std::move(*bridge).DispatchAction(self.device);

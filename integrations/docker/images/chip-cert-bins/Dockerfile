@@ -7,7 +7,7 @@ ARG COMMITHASH=7b99e6399c6069037c613782d78132c69b9dcabb
 # ZAP Development install, so that it runs on both x64 and arm64
 # Generally this should match with the ZAP version that is used for codegen within the
 # specified SHA
-ARG ZAP_VERSION=v2023.04.27-nightly
+ARG ZAP_VERSION=v2023.05.22-nightly
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
@@ -201,7 +201,7 @@ RUN git clone https://github.com/project-chip/connectedhomeip.git /root/connecte
 WORKDIR /root/connectedhomeip/
 RUN git checkout ${COMMITHASH}
 RUN ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-RUN scripts/build/gn_bootstrap.sh
+RUN bash scripts/bootstrap.sh
 SHELL ["/bin/bash", "-c"]
 RUN set -x && \
     source scripts/activate.sh \
@@ -304,4 +304,5 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 chip-app1
 # Stage 3.1 Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing
+RUN pip install click websockets lark diskcache
 RUN pip install --no-cache-dir python_lib/controller/python/chip*.whl

@@ -33,7 +33,7 @@ namespace {
 
 /*
  * TODO: This is a stop-gap solution to allow the existing fan control cluster tests to run after changes to
- * the cluster objects for TE1. This should be removed once #6496 is resolved as it will likley result in a
+ * the cluster objects for TE1. This should be removed once #6496 is resolved as it will likely result in a
  * FanControl delegate added to the SDK.
  *
  * FYI... The previous implementation of the FanControl cluster set the speedCurrent/percentCurrent when it received
@@ -60,7 +60,7 @@ CHIP_ERROR FanAttrAccess::ReadPercentCurrent(EndpointId endpoint, AttributeValue
     DataModel::Nullable<uint8_t> percentSetting;
     PercentSetting::Get(endpoint, percentSetting);
     uint8_t ret = 0;
-    if (percentSetting.HasValidValue())
+    if (!percentSetting.IsNull())
     {
         ret = percentSetting.Value();
     }
@@ -74,7 +74,7 @@ CHIP_ERROR FanAttrAccess::ReadSpeedCurrent(EndpointId endpoint, AttributeValueEn
     DataModel::Nullable<uint8_t> speedSetting;
     SpeedSetting::Get(endpoint, speedSetting);
     uint8_t ret = 0;
-    if (speedSetting.HasValidValue())
+    if (!speedSetting.IsNull())
     {
         ret = speedSetting.Value();
     }
@@ -105,8 +105,9 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
     uint32_t featureMap = 0;
 
-    featureMap |= to_underlying(FanControl::FanControlFeature::kMultiSpeed);
-    featureMap |= to_underlying(FanControl::FanControlFeature::kAuto);
+    featureMap |= to_underlying(FanControl::Feature::kMultiSpeed);
+    featureMap |= to_underlying(FanControl::Feature::kMultiSpeed);
+    featureMap |= to_underlying(FanControl::Feature::kAuto);
 
     FeatureMap::Set(endpoint, featureMap);
 

@@ -189,9 +189,12 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 
 {{#zcl_attributes_server}}
 {{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
-{{#if (or (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
-          (and (isSupported (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
-               (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
+{{#if (and
+        (or clusterRef
+            (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true)))
+        (or (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
+            (and (isSupported (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
+                 (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name)))))}}
 {{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {

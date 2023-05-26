@@ -31,9 +31,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends a SendInit message to TH + TH sends a SendAccept message
-          back to DUT + DUT sends a Block message to TH + TH sends a BlockAck
-          message back to DUT"
+          "DUT sends the first Block message to TH + TH sends a BlockAck message
+          back to DUT."
       verification: |
           1. Verify that the OTA Reference Requester App logs show Block message from DUT
 
@@ -53,8 +52,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends a Block message to TH + TH sends a BlockAck message back to
-          DUT"
+          "DUT sends further Block messages to TH + TH sends BlockAck messages
+          back to DUT."
       verification: |
           1. Verify from the OTA Reference Requester App logs that the Blocks are sent in ascending and sequential block counter order.
 

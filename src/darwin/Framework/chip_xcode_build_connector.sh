@@ -133,6 +133,21 @@ declare -a args=(
     )
 }
 
+[[ $CHIP_IS_UBSAN == YES ]] && {
+    args+=(
+        'is_ubsan=true'
+    )
+}
+
+[[ $CHIP_IS_TSAN == YES ]] && {
+    args+=(
+        'is_tsan=true'
+        # The system stats stuff races on the stats in various ways,
+        # so just disable it when using TSan.
+        'chip_system_config_provide_statistics=false'
+    )
+}
+
 [[ $CHIP_IS_CLANG == YES ]] && {
     args+=(
         'is_clang=true'

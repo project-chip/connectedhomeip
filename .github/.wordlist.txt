@@ -88,6 +88,7 @@ armv
 ASAN
 asdk
 AssertionError
+ASR
 AST
 ASYNC
 atomics
@@ -563,6 +564,7 @@ FW
 gbl
 gcloud
 GDB
+gdbgui
 gdbserver
 GeneralCommissioning
 GeneralDiagnostics
@@ -606,6 +608,7 @@ GroupKeyManagement
 groupKeySecurityPolicy
 groupKeySetID
 groupsettings
+gsdk
 gtk
 GUA
 Gv
@@ -717,6 +720,7 @@ Jupyter
 jupyterlab
 KA
 kAdminister
+kbd
 kBusy
 kCase
 Kconfig
@@ -1239,6 +1243,7 @@ softwareVersionStr
 SoftwareVersionString
 softwareVersionValid
 sphinxcontrib
+SparkFun
 SPI
 spiflash
 spinel

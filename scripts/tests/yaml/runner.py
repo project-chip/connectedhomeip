@@ -16,6 +16,8 @@
 
 import relative_importer  # isort: split # noqa: F401
 
+import importlib
+import os
 import sys
 import traceback
 from dataclasses import dataclass
@@ -42,6 +44,21 @@ _DEFAULT_SPECIFICATIONS_DIR = 'src/app/zap-templates/zcl/data-model/chip/*.xml'
 _DEFAULT_PICS_FILE = 'src/app/tests/suites/certification/ci-pics-values'
 
 
+def get_custom_pseudo_clusters(additional_pseudo_clusters_directory: str):
+    clusters = get_default_pseudo_clusters()
+
+    if additional_pseudo_clusters_directory:
+        sys.path.insert(0, additional_pseudo_clusters_directory)
+        for filepath in os.listdir(additional_pseudo_clusters_directory):
+            if filepath != '__init__.py' and filepath[-3:] == '.py':
+                module = importlib.import_module(f'{filepath[:-3]}')
+                constructor = getattr(module, module.__name__)
+                if constructor:
+                    clusters.add(constructor())
+
+    return clusters
+
+
 def test_parser_options(f):
     f = click.option('--configuration_name', type=str, show_default=True, default=_DEFAULT_CONFIG_NAME,
                      help='Name of the collection configuration json file to use.')(f)
@@ -55,6 +72,8 @@ def test_parser_options(f):
                      help='Stop parsing on first error.')(f)
     f = click.option('--use_default_pseudo_clusters', type=bool, show_default=True, default=True,
                      help='If enable this option use the set of default clusters provided by the matter_yamltests package.')(f)
+    f = click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
+                     help='Path to a directory containing additional pseudo clusters.')(f)
     return f
 
 
@@ -73,6 +92,8 @@ def test_runner_options(f):
                      help='Show additional logs provided by the adapter on error.')(f)
     f = click.option('--use_test_harness_log_format', type=bool, default=False, show_default=True,
                      help='Use the test harness log format.')(f)
+    f = click.option('--delay-in-ms', type=int, default=0, show_default=True,
+                     help='Add a delay between test suite steps.')(f)
     return f
 
 
@@ -227,8 +248,9 @@ CONTEXT_SETTINGS = dict(
 @click.argument('test_name')
 @test_parser_options
 @click.pass_context
-def runner_base(ctx, configuration_directory: str, test_name: str, configuration_name: str, pics: str, specifications_paths: str, stop_on_error: bool, use_default_pseudo_clusters: bool, **kwargs):
-    pseudo_clusters = get_default_pseudo_clusters() if use_default_pseudo_clusters else PseudoClusters([])
+def runner_base(ctx, configuration_directory: str, test_name: str, configuration_name: str, pics: str, specifications_paths: str, stop_on_error: bool, use_default_pseudo_clusters: bool, additional_pseudo_clusters_directory: str, **kwargs):
+    pseudo_clusters = get_custom_pseudo_clusters(
+        additional_pseudo_clusters_directory) if use_default_pseudo_clusters else PseudoClusters([])
     specifications = SpecDefinitionsFromPaths(specifications_paths.split(','), pseudo_clusters)
     tests_finder = TestsFinder(configuration_directory, configuration_name)
 
@@ -263,10 +285,10 @@ def dry_run(parser_group: ParserGroup):
 @runner_base.command()
 @test_runner_options
 @pass_parser_group
-def run(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool):
+def run(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, delay_in_ms: int):
     """Run the test suite."""
     adapter = __import__(adapter, fromlist=[None]).Adapter(parser_group.builder_config.parser_config.definitions)
-    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number)
+    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number, delay_in_ms)
     runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error, use_test_harness_log_format)
     runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
 
@@ -278,10 +300,10 @@ def run(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_wa
 @test_runner_options
 @websocket_runner_options
 @pass_parser_group
-def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, server_address: str, server_port: int, server_path: str, server_name: str, server_arguments: str):
+def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, delay_in_ms: int, server_address: str, server_port: int, server_path: str, server_name: str, server_arguments: str):
     """Run the test suite using websockets."""
     adapter = __import__(adapter, fromlist=[None]).Adapter(parser_group.builder_config.parser_config.definitions)
-    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number)
+    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number, delay_in_ms)
     runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error, use_test_harness_log_format)
     runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
 
@@ -301,10 +323,10 @@ def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
 @test_runner_options
 @chip_repl_runner_options
 @pass_parser_group
-def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, runner: str, repl_storage_path: str, commission_on_network_dut: bool):
+def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, delay_in_ms: int, runner: str, repl_storage_path: str, commission_on_network_dut: bool):
     """Run the test suite using chip-repl."""
     adapter = __import__(adapter, fromlist=[None]).Adapter(parser_group.builder_config.parser_config.definitions)
-    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number)
+    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number, delay_in_ms)
     runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error, use_test_harness_log_format)
     runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
 

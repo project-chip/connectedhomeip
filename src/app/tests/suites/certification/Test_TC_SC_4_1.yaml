@@ -71,11 +71,11 @@ tests:
 
     - label: "Check DNS-SD subtypes used by DUT"
       PICS:
-          MCORE.COM.WIFI && MCORE.COM.ETH && MCORE.COM.THR &&
+          " MCORE.COM.WIFI && MCORE.COM.ETH && MCORE.COM.THR &&
           MCORE.SC.VENDOR_SUBTYPE && MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY
           && MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
-          MCORE.SC.DT_KEY&& MCORE.SC.DN_KEY && MCORE.SC.RI_KEY &&
-          MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
+          MCORE.SC.DT_KEY && MCORE.SC.DN_KEY && MCORE.SC.RI_KEY &&
+          MCORE.SC.PH_KEY && MCORE.SC.PI_KEY "
       verification: |
           Run the below commands within the mentioned time interval used in open-commissioning-window in step-1.
           Run the below avahi browse command in the TH terminal
@@ -85,7 +85,7 @@ tests:
 
           ubuntu@ubuntu:~$   avahi-browse -rt _matterc._udp
 
-          Verify the device is advertising _matterc._udp service like below output in TH terminal Log: (Verify for the DUT"s actual values (like vendor ID, PID ..etc) as mentioned in the expected outcome of the test plan, The below log contains the data from the reference raspi accessory)
+          Verify the device is advertising _matterc._udp service like below output in TH terminal Log: (Verify for the DUT's actual values (like vendor ID, PID ..etc) as mentioned in the expected outcome of the test plan, The below log contains the data from the reference raspi accessory)
 
 
           +  wlan0 IPv6 5A4E867284D08B13                              _matterc._udp        local
@@ -165,11 +165,11 @@ tests:
 
     - label: "Check DNS-SD subtypes used by DUT"
       PICS:
-          MCORE.COM.WIFI && MCORE.COM.ETH && MCORE.COM.THR &&
+          " MCORE.COM.WIFI && MCORE.COM.ETH && MCORE.COM.THR &&
           MCORE.SC.VENDOR_SUBTYPE && MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY
           && MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
           MCORE.SC.DT_KEY && MCORE.SC.DN_KEY && MCORE.SC.RI_KEY &&
-          MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
+          MCORE.SC.PH_KEY && MCORE.SC.PI_KEY "
       verification: |
           Run the below avahi browse command in  TH terminal
 
@@ -258,11 +258,11 @@ tests:
 
     - label: "Check DNS-SD subtypes used by DUT"
       PICS:
-          MCORE.COM.WIFI && MCORE.COM.ETH && MCORE.COM.THR &&
+          " MCORE.COM.WIFI && MCORE.COM.ETH && MCORE.COM.THR &&
           MCORE.SC.VENDOR_SUBTYPE && MCORE.SC.DEVTYPE_SUBTYPE && MCORE.SC.VP_KEY
           && MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
           MCORE.SC.DT_KEY && MCORE.SC.DN_KEY && MCORE.SC.RI_KEY &&
-          MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
+          MCORE.SC.PH_KEY && MCORE.SC.PI_KEY "
       verification: |
           Same verification steps as Step 3, Except Verify CM flag  value to be 2
 
@@ -304,26 +304,21 @@ tests:
     - label:
           "If (MCORE.SC.EXTENDED_DISCOVERY ) check DNS-SD subtypes used by DUT"
       PICS:
-          MCORE.SC.EXTENDED_DISCOVERY && MCORE.COM.WIFI && MCORE.COM.ETH &&
+          " MCORE.SC.EXTENDED_DISCOVERY && MCORE.COM.WIFI && MCORE.COM.ETH &&
           MCORE.COM.THR && MCORE.SC.VENDOR_SUBTYPE && MCORE.SC.DEVTYPE_SUBTYPE
           && MCORE.SC.VP_KEY && MCORE.SC.SII_OP_DISCOVERY_KEY &&
           MCORE.SC.SAI_OP_DISCOVERY_KEY && MCORE.SC.DT_KEY && MCORE.SC.DN_KEY &&
-          MCORE.SC.RI_KEY && MCORE.SC.PH_KEY && MCORE.SC.PI_KEY
+          MCORE.SC.RI_KEY && MCORE.SC.PH_KEY && MCORE.SC.PI_KEY "
       verification: |
-          Run and Verify on  the below output in TH terminal Log: (Below is the sample log , as RPI doesn"t support the extended discovery)
+          Run and Verify on  the below output in TH terminal Log: (Below is the sample log , as RPI doesn't support the extended discovery)
           Verify the CM flag value is 0
 
           avahi-browse -rt _matterc._udp
-          +   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local
-          +   eth0 IPv4 DD200C20D25AE5F7                              _matterc._udp        local
-          =   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local
-             hostname = [matter-te-7.local]
-             address = [fd00::e7]
-             port = [11111]
-             txt = ["CM=0" "D=840"]
-          =   eth0 IPv4 DD200C20D25AE5F7                              _matterc._udp        local
-             hostname = [matter-te-7.local]
-             address = [192.168.3.53]
-             port = [11111]
-             txt = ["CM=0" "D=840"]
+
+          + wlp0s20f3 IPv6 FD37FE5156C56632                              _matterc._udp        local
+          = wlp0s20f3 IPv6 FD37FE5156C56632                              _matterc._udp        local
+             hostname = [8C1D96786A130000.local]
+             address = [fe80::e9f6:2c08:2794:357d]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "DT=65535" "VP=65521+32769"]
       disabled: true

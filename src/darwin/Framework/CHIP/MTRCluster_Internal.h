@@ -21,7 +21,6 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCluster.h"
 
-#import "zap-generated/CHIPClusters.h"
 #import "zap-generated/MTRBaseClusters.h"
 
 #include <app/ReadPrepareParams.h>

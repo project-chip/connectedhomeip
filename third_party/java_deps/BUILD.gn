@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2022-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,4 +43,8 @@ java_prebuilt("truth") {
 
 java_prebuilt("junit-4") {
   jar_path = "artifacts/junit-4.13.2.jar"
+}
+
+java_prebuilt("gson") {
+  jar_path = "artifacts/gson-2.9.1.jar"
 }

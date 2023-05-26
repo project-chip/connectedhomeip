@@ -41,7 +41,7 @@ limitations under the License.
 
     <command source="client" code="0x03" name="SkipChannel" optional="false">
       <description>This command provides channel up and channel down functionality, but allows channel index jumps of size Count. When the value of the increase or decrease is larger than the number of channels remaining in the given direction, then the behavior SHALL be to return to the beginning (or end) of the channel list and continue. For example, if the current channel is at index 0 and count value of -1 is given, then the current channel should change to the last channel.</description>
-      <arg name="Count" type="INT16U"/>
+      <arg name="Count" type="INT16S"/>
     </command>
 
     <command source="server" code="0x01" name="ChangeChannelResponse" optional="true">
@@ -81,7 +81,7 @@ limitations under the License.
     <item name="NoMatches" value="0x02"/>
   </enum>
 
-  <bitmap name="ChannelFeature" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0504"/>
     <field name="ChannelList" mask="0x1"/>
     <field name="LineupInfo"  mask="0x2"/>

@@ -64,7 +64,7 @@ void TvAppJNI::InitializeWithObjects(jobject app)
     jclass managerClass = env->GetObjectClass(mTvAppObject);
     VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get TvAppJNI Java class"));
 
-    mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(II)V");
+    mPostClusterInitMethod = env->GetMethodID(managerClass, "postClusterInit", "(JI)V");
     if (mPostClusterInitMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ChannelManager 'postClusterInit' method");
@@ -79,7 +79,7 @@ void TvAppJNI::PostClusterInit(int clusterId, int endpoint)
     VerifyOrReturn(mTvAppObject != nullptr, ChipLogError(Zcl, "TvAppJNI::mTvAppObject null"));
     VerifyOrReturn(mPostClusterInitMethod != nullptr, ChipLogError(Zcl, "TvAppJNI::mPostClusterInitMethod null"));
 
-    env->CallVoidMethod(mTvAppObject, mPostClusterInitMethod, static_cast<jint>(clusterId), static_cast<jint>(endpoint));
+    env->CallVoidMethod(mTvAppObject, mPostClusterInitMethod, static_cast<jlong>(clusterId), static_cast<jint>(endpoint));
     if (env->ExceptionCheck())
     {
         ChipLogError(Zcl, "Failed to call TvAppJNI 'postClusterInit' method");

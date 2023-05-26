@@ -460,7 +460,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
         if (!mChunks.IsNull())
         {
             // Send the next chunk.
-            SuccessOrExit(SendWriteRequest());
+            SuccessOrExit(err = SendWriteRequest());
         }
     }
     else if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))

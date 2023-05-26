@@ -55,8 +55,6 @@
 
 #define REPORT_FAILED 0xFF
 
-using chip::app::Clusters::ColorControl::ColorControlFeature;
-
 /**
  * @brief color-control-server class
  */
@@ -69,6 +67,7 @@ public:
     using HueStepMode  = chip::app::Clusters::ColorControl::HueStepMode;
     using HueMoveMode  = chip::app::Clusters::ColorControl::HueMoveMode;
     using HueDirection = chip::app::Clusters::ColorControl::HueDirection;
+    using Feature      = chip::app::Clusters::ColorControl::Feature;
 
     enum ColorMode
     {
@@ -128,7 +127,7 @@ public:
      *********************************************************/
     static ColorControlServer & Instance();
 
-    bool HasFeature(chip::EndpointId endpoint, ColorControlFeature feature);
+    bool HasFeature(chip::EndpointId endpoint, Feature feature);
     chip::Protocols::InteractionModel::Status stopAllColorTransitions(chip::EndpointId endpoint);
     bool stopMoveStepCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                              uint8_t optionsMask, uint8_t optionsOverride);

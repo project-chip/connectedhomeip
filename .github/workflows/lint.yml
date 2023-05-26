@@ -23,6 +23,10 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    # XXX: Workaround for https://github.com/actions/cache/issues/1141
+    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
+
 jobs:
     code-lints:
         runs-on: ubuntu-latest
@@ -65,7 +69,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
 
             - name: Check for matter lint errors
               if: always()
@@ -79,22 +83,6 @@ jobs:
                       #       https://github.com/project-chip/connectedhomeip/issues/19169
                       #       https://github.com/project-chip/connectedhomeip/issues/22640
                       if [ "$idl_file" = './examples/all-clusters-app/all-clusters-common/all-clusters-app.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_contactsensor_lFAGG1bfRO.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_doorlock_aNKYAreMXE.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_extendedcolorlight_8lcaaYJVAa.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_flowsensor_1zVxHedlaV.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_heatingcoolingunit_ncdGai1E5a.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_humiditysensor_Xyj4gda6Hb.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_lightsensor_lZQycTFcJK.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_occupancysensor_iHyVgifZuo.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_onofflight_bbs1b7IaOV.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_onofflightswitch_FsPlMr090Q.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_onoffpluginunit_Wtf8ss5EBY.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_pressuresensor_s0qC9wLH4k.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_speaker_RpzeXdimqA.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_temperaturesensor_Qy1zkNW7c3.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_thermostat_bm3fb8dhYi.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_windowcovering_RLCxaGi9Yx.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/log-source-app/log-source-common/log-source-app.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/placeholder/linux/apps/app1/config.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
@@ -227,3 +215,15 @@ jobs:
               run: |
                   git grep -n 'SuccessOrExit(CHIP_ERROR' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of "SuccessOrExit(something-without-assignment(", which should probably be "SuccessOrExit(err = something("
+              if: always()
+              run: |
+                  git grep -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            - name: Check that our hardcoded SHA for clang-format on ARM mac matches the pigweed SHA.
+              if: always()
+              run: |
+                  ./scripts/lints/clang-format-version-matches.py

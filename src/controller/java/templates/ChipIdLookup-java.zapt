@@ -1,6 +1,4 @@
 {{> header}}
-{{#if_enabled_clusters side='client'}}
-
 package chip.devicecontroller;
 
 public final class ChipIdLookup {
@@ -9,11 +7,11 @@ public final class ChipIdLookup {
    * ID is found, returns an empty string.
    */
   public static String clusterIdToName(long clusterId) {
-    {{#all_user_clusters side='client'}}
+    {{#zcl_clusters}}
     if (clusterId == {{code}}L) {
       return "{{asUpperCamelCase name}}";
     }
-    {{/all_user_clusters}}
+    {{/zcl_clusters}}
     return "";
   }
 
@@ -22,7 +20,7 @@ public final class ChipIdLookup {
    * If no matching IDs are found, returns an empty string.
    */
   public static String attributeIdToName(long clusterId, long attributeId) {
-    {{#all_user_clusters side='client'}}
+    {{#zcl_clusters}}
     if (clusterId == {{code}}L) {
       {{#zcl_attributes_server}}
       if (attributeId == {{code}}L) {
@@ -31,7 +29,7 @@ public final class ChipIdLookup {
       {{/zcl_attributes_server}}
       return "";
     }
-    {{/all_user_clusters}}
+    {{/zcl_clusters}}
     return "";
   }
 
@@ -40,7 +38,7 @@ public final class ChipIdLookup {
    * If no matching IDs are found, returns an empty string.
    */
   public static String eventIdToName(long clusterId, long eventId) {
-    {{#all_user_clusters side='client'}}
+    {{#zcl_clusters}}
     if (clusterId == {{code}}L) {
       {{#zcl_events}}
       if (eventId == {{code}}L) {
@@ -49,8 +47,8 @@ public final class ChipIdLookup {
       {{/zcl_events}}
       return "";
     }
-    {{/all_user_clusters}}
+    {{/zcl_clusters}}
     return "";
   }
 }
-{{/if_enabled_clusters}}
+

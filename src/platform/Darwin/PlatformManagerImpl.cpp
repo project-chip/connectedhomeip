@@ -88,7 +88,7 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
     if (!mIsWorkQueueSuspended && !mIsWorkQueueSuspensionPending)
     {
         mIsWorkQueueSuspensionPending = true;
-        if (dispatch_get_current_queue() != mWorkQueue)
+        if (!IsWorkQueueCurrentQueue())
         {
             // dispatch_sync is used in order to guarantee serialization of the caller with
             // respect to any tasks that might already be on the queue, or running.
@@ -157,9 +157,14 @@ bool PlatformManagerImpl::_IsChipStackLockedByCurrentThread() const
 {
     // If we have no work queue, or it's suspended, then we assume our caller
     // knows what they are doing in terms of their own concurrency.
-    return !mWorkQueue || mIsWorkQueueSuspended || dispatch_get_current_queue() == mWorkQueue;
+    return !mWorkQueue || mIsWorkQueueSuspended || IsWorkQueueCurrentQueue();
 };
 #endif
+
+bool PlatformManagerImpl::IsWorkQueueCurrentQueue() const
+{
+    return dispatch_get_current_queue() == mWorkQueue;
+}
 
 CHIP_ERROR PlatformManagerImpl::StartBleScan(BleScannerDelegate * delegate)
 {
