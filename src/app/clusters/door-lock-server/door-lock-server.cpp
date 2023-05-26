@@ -3307,7 +3307,7 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
                                                const chip::app::ConcreteCommandPath & commandPath, LockOperationTypeEnum opType,
                                                RemoteLockOpHandler opHandler, const Optional<ByteSpan> & pinCode)
 {
-    VerifyOrDie(LockOperationTypeEnum::kLock == opType || LockOperationTypeEnum::kUnlock == opType);
+    VerifyOrDie(LockOperationTypeEnum::kLock == opType || LockOperationTypeEnum::kUnlock == opType || LockOperationTypeEnum::kUnlatch == opType);
     VerifyOrDie(nullptr != opHandler);
 
     EndpointId endpoint       = commandPath.mEndpointId;
@@ -3432,9 +3432,26 @@ exit:
         credentials.SetNonNull(foundCred);
     }
 
+    // Failed Unlatch requests SHALL generate only a LockOperationError event with LockOperationType set to Unlock
+    if (LockOperationTypeEnum::kUnlatch == opType && !success)
+    {
+        opType = LockOperationTypeEnum::kUnlock;
+    }
+
     SendLockOperationEvent(endpoint, opType, OperationSourceEnum::kRemote, reason, pinUserIdx,
                            Nullable<chip::FabricIndex>(getFabricIndex(commandObj)), Nullable<chip::NodeId>(getNodeId(commandObj)),
                            credentials, success);
+
+    // SHALL generate a LockOperation event with LockOperationType set to Unlatch when the unlatched state is reached and a LockOperation
+    // event with LockOperationType set to Unlock when the lock successfully completes the unlock.
+    // But as the current implementation here is sending LockOperation events immediately we're sending both events immediately.
+    if (LockOperationTypeEnum::kUnlatch == opType && success)
+    {
+        SendLockOperationEvent(endpoint, LockOperationTypeEnum::kUnlock, OperationSourceEnum::kRemote, reason, pinUserIdx,
+                               Nullable<chip::FabricIndex>(getFabricIndex(commandObj)), Nullable<chip::NodeId>(getNodeId(commandObj)),
+                               credentials, success);
+    }
+
     return success;
 }
 
@@ -3536,7 +3553,14 @@ bool emberAfDoorLockClusterUnlockDoorCallback(
 {
     emberAfDoorLockClusterPrintln("Received command: UnlockDoor");
 
-    if (DoorLockServer::Instance().HandleRemoteLockOperation(commandObj, commandPath, LockOperationTypeEnum::kUnlock,
+    LockOperationTypeEnum lockOp = LockOperationTypeEnum::kUnlock;
+
+    if (DoorLockServer::Instance().SupportsUnbolt(commandPath.mEndpointId))
+    {
+        lockOp = LockOperationTypeEnum::kUnlatch;
+    }
+
+    if (DoorLockServer::Instance().HandleRemoteLockOperation(commandObj, commandPath, lockOp,
                                                              emberAfPluginDoorLockOnDoorUnlockCommand, commandData.PINCode))
     {
         // appclusters.pdf 5.3.3.25:
@@ -3558,7 +3582,14 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
 {
     emberAfDoorLockClusterPrintln("Received command: UnlockWithTimeout");
 
-    if (DoorLockServer::Instance().HandleRemoteLockOperation(commandObj, commandPath, LockOperationTypeEnum::kUnlock,
+    LockOperationTypeEnum lockOp = LockOperationTypeEnum::kUnlock;
+
+    if (DoorLockServer::Instance().SupportsUnbolt(commandPath.mEndpointId))
+    {
+        lockOp = LockOperationTypeEnum::kUnlatch;
+    }
+
+    if (DoorLockServer::Instance().HandleRemoteLockOperation(commandObj, commandPath, lockOp,
                                                              emberAfPluginDoorLockOnDoorUnlockCommand, commandData.PINCode))
     {
         // appclusters.pdf 5.3.4.3:

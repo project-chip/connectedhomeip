@@ -168,15 +168,7 @@ tests:
           - values:
                 - value:
                       {
-                          "LockOperationType": 1,
-                          "OperationSource": 7,
-                          "UserIndex": null,
-                          "Credentials": null,
-                      }
-          - values:
-                - value:
-                      {
-                          "LockOperationType": 0,
+                          "LockOperationType": 4,
                           "OperationSource": 7,
                           "UserIndex": null,
                           "Credentials": null,
@@ -196,6 +188,31 @@ tests:
                           "OperationSource": 7,
                           "UserIndex": null,
                           "Credentials": null,
+                      }
+          - values:
+                - value:
+                      {
+                          "LockOperationType": 1,
+                          "OperationSource": 7,
+                          "UserIndex": null,
+                          "Credentials": null,
+                      }
+          - values:
+                - value:
+                      {
+                          "LockOperationType": 0,
+                          "OperationSource": 7,
+                          "UserIndex": null,
+                          "Credentials": null,
+                      }
+          - values:
+                - value:
+                      {
+                          "LockOperationType": 4,
+                          "OperationSource": 7,
+                          "UserIndex": 1,
+                          "Credentials":
+                              [{ "CredentialType": 1, "CredentialIndex": 2 }],
                       }
           - values:
                 - value:
