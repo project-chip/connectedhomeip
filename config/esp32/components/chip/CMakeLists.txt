@@ -184,6 +184,10 @@ else()
     chip_gn_arg_append("chip_enable_openthread"                 "false")
 endif()
 
+if (CONFIG_ENABLE_ETHERNET_TELEMETRY)
+    chip_gn_arg_append("chip_enable_ethernet"                   "true")
+endif()
+
 if (CONFIG_OPENTHREAD_FTD)
     chip_gn_arg_append("chip_openthread_ftd"                    "true")
 else()
