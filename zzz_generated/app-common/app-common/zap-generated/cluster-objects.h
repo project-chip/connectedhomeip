@@ -13180,8 +13180,19 @@ namespace LabelStruct {
 
 using Fields = Clusters::detail::Structs::LabelStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::LabelStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::LabelStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -13267,8 +13278,19 @@ namespace LabelStruct {
 
 using Fields = Clusters::detail::Structs::LabelStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::LabelStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::LabelStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -27013,8 +27035,19 @@ namespace ApplicationStruct {
 
 using Fields = Clusters::detail::Structs::ApplicationStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ApplicationStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ApplicationStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
@@ -27299,8 +27332,19 @@ namespace ApplicationStruct {
 
 using Fields = Clusters::detail::Structs::ApplicationStruct::Fields;
 
+// This is a struct type shared across multiple clusters.  Create a type-safe
+// declaration in this cluster namespace (so not just pulling in the shared
+// implementation via "using", but make sure we can initialize our
+// Type/DecodableType from the generic Type/DecodableType as needed.
 struct Type : public Clusters::detail::Structs::ApplicationStruct::Type
 {
+private:
+    using Super = Clusters::detail::Structs::ApplicationStruct::Type;
+
+public:
+    constexpr Type() = default;
+    constexpr Type(const Super & arg) : Super(arg) {}
+    constexpr Type(Super && arg) : Super(std::move(arg)) {}
 };
 
 using DecodableType = Type;
