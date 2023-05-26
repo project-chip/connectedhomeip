@@ -177,6 +177,7 @@
         "Test_TC_DGTHREAD_2_3",
         "Test_TC_DGTHREAD_2_4"
     ],
+    "TimeSynchronization": ["Test_TC_TIMESYNC_1_1"],
     "WiFiNetworkDiagnostics": [
         "Test_TC_DGWIFI_1_1",
         "Test_TC_DGWIFI_2_1",
@@ -311,6 +312,7 @@
         "Thermostat",
         "ThermostatUserConfiguration",
         "ThreadNetworkDiagnostics",
+        "TimeSynchronization",
         "UserLabel",
         "WiFiNetworkDiagnostics",
         "WindowCovering",

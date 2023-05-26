@@ -5353,6 +5353,31 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedTimeSynchronizationClusterSetTimeZoneResponseCallback
+      implements ChipClusters.TimeSynchronizationCluster.SetTimeZoneResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Boolean DSTOffsetRequired) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo DSTOffsetRequiredResponseValue =
+          new CommandResponseInfo("DSTOffsetRequired", "Boolean");
+      responseValues.put(DSTOffsetRequiredResponseValue, DSTOffsetRequired);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedTimeSynchronizationClusterUTCTimeAttributeCallback
       implements ChipClusters.TimeSynchronizationCluster.UTCTimeAttributeCallback,
           DelegatedClusterCallback {
@@ -17740,6 +17765,102 @@ public class ClusterInfoMapping {
         "ethernetNetworkDiagnostics", ethernetNetworkDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> timeSynchronizationClusterInteractionInfoMap =
         new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> timeSynchronizationsetUTCTimeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo timeSynchronizationsetUTCTimeUTCTimeCommandParameterInfo =
+        new CommandParameterInfo("UTCTime", Long.class, Long.class);
+    timeSynchronizationsetUTCTimeCommandParams.put(
+        "UTCTime", timeSynchronizationsetUTCTimeUTCTimeCommandParameterInfo);
+
+    CommandParameterInfo timeSynchronizationsetUTCTimegranularityCommandParameterInfo =
+        new CommandParameterInfo("granularity", Integer.class, Integer.class);
+    timeSynchronizationsetUTCTimeCommandParams.put(
+        "granularity", timeSynchronizationsetUTCTimegranularityCommandParameterInfo);
+
+    CommandParameterInfo timeSynchronizationsetUTCTimetimeSourceCommandParameterInfo =
+        new CommandParameterInfo("timeSource", Optional.class, Integer.class);
+    timeSynchronizationsetUTCTimeCommandParams.put(
+        "timeSource", timeSynchronizationsetUTCTimetimeSourceCommandParameterInfo);
+
+    InteractionInfo timeSynchronizationsetUTCTimeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeSynchronizationCluster) cluster)
+                  .setUTCTime(
+                      (DefaultClusterCallback) callback,
+                      (Long) commandArguments.get("UTCTime"),
+                      (Integer) commandArguments.get("granularity"),
+                      (Optional<Integer>) commandArguments.get("timeSource"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            timeSynchronizationsetUTCTimeCommandParams);
+    timeSynchronizationClusterInteractionInfoMap.put(
+        "setUTCTime", timeSynchronizationsetUTCTimeInteractionInfo);
+    Map<String, CommandParameterInfo> timeSynchronizationsetTrustedTimeSourceCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo timeSynchronizationsetTrustedTimeSourceInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeSynchronizationCluster) cluster)
+                  .setTrustedTimeSource(
+                      (DefaultClusterCallback) callback,
+                      (ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct)
+                          commandArguments.get("trustedTimeSource"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            timeSynchronizationsetTrustedTimeSourceCommandParams);
+    timeSynchronizationClusterInteractionInfoMap.put(
+        "setTrustedTimeSource", timeSynchronizationsetTrustedTimeSourceInteractionInfo);
+    Map<String, CommandParameterInfo> timeSynchronizationsetTimeZoneCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo timeSynchronizationsetTimeZoneInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeSynchronizationCluster) cluster)
+                  .setTimeZone(
+                      (ChipClusters.TimeSynchronizationCluster.SetTimeZoneResponseCallback)
+                          callback,
+                      (ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct>)
+                          commandArguments.get("timeZone"));
+            },
+            () -> new DelegatedTimeSynchronizationClusterSetTimeZoneResponseCallback(),
+            timeSynchronizationsetTimeZoneCommandParams);
+    timeSynchronizationClusterInteractionInfoMap.put(
+        "setTimeZone", timeSynchronizationsetTimeZoneInteractionInfo);
+    Map<String, CommandParameterInfo> timeSynchronizationsetDSTOffsetCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo timeSynchronizationsetDSTOffsetInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeSynchronizationCluster) cluster)
+                  .setDSTOffset(
+                      (DefaultClusterCallback) callback,
+                      (ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct>)
+                          commandArguments.get("DSTOffset"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            timeSynchronizationsetDSTOffsetCommandParams);
+    timeSynchronizationClusterInteractionInfoMap.put(
+        "setDSTOffset", timeSynchronizationsetDSTOffsetInteractionInfo);
+    Map<String, CommandParameterInfo> timeSynchronizationsetDefaultNTPCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo timeSynchronizationsetDefaultNTPdefaultNTPCommandParameterInfo =
+        new CommandParameterInfo("defaultNTP", String.class, String.class);
+    timeSynchronizationsetDefaultNTPCommandParams.put(
+        "defaultNTP", timeSynchronizationsetDefaultNTPdefaultNTPCommandParameterInfo);
+
+    InteractionInfo timeSynchronizationsetDefaultNTPInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TimeSynchronizationCluster) cluster)
+                  .setDefaultNTP(
+                      (DefaultClusterCallback) callback,
+                      (String) commandArguments.get("defaultNTP"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            timeSynchronizationsetDefaultNTPCommandParams);
+    timeSynchronizationClusterInteractionInfoMap.put(
+        "setDefaultNTP", timeSynchronizationsetDefaultNTPInteractionInfo);
     commandMap.put("timeSynchronization", timeSynchronizationClusterInteractionInfoMap);
     Map<String, InteractionInfo> bridgedDeviceBasicInformationClusterInteractionInfoMap =
         new LinkedHashMap<>();
