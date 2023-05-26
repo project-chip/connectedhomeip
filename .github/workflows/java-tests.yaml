@@ -38,7 +38,6 @@ jobs:
 
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
-            JAVA_PATH: /usr/lib/jvm/java-8-openjdk-amd64
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
@@ -95,8 +94,8 @@ jobs:
               timeout-minutes: 10
               # TODO: this direct path loading is not maintainable. Our build system should define and
               #       support test classes.
-              run: scripts/run_in_build_env.sh "\
-                 $JAVA_PATH/bin/java \
+              run: scripts/run_in_build_env.sh \
+                 "$JAVA_PATH/bin/java \
                    -cp 'third_party/java_deps/artifacts/*:out/linux-x64-tests/lib/src/controller/java/*' \
                    org.junit.runner.JUnitCore       \
                    chip.tlv.TlvWriterTest           \
