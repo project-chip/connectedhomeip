@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.2. [TC-DGGEN-2.2] Event functionality test with server as DUT
+name: 88.2.2. [TC-DGGEN-2.2] Event Functionality [DUT as Server]
 
 PICS:
     - DGGEN.S
@@ -50,9 +50,10 @@ tests:
           more time.)"
       PICS: DGGEN.S.E00
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Event so its not compulsory to get the expected outcome
 
           On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
+
           echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of all-clusters-app)
 
           ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
@@ -61,14 +62,22 @@ tests:
           detected by the Node. The current and previous field SHALL represent the set of faults as per Section 11.11.6.1,
           “HardwareFault enum”, On TH(chip-tool)
 
-          [1659530031.316459][4951:4956] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0000
-          [1659530031.316486][4951:4956] CHIP:TOO:   Event number: 6
-          [1659530031.316505][4951:4956] CHIP:TOO:   Priority: Critical
-          [1659530031.316524][4951:4956] CHIP:TOO:   Timestamp: 32093879
-          [1659530031.316629][4951:4956] CHIP:TOO:   HardwareFaultChange: {
-          [1659530031.316697][4951:4956] CHIP:TOO:     Current: 0 entries
-          [1659530031.316752][4951:4956] CHIP:TOO:     Previous: 0 entries
-          [1659530031.316778][4951:4956] CHIP:TOO:    }
+          [1684144494.712474][50333:50335] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0000
+          [1684144494.712481][50333:50335] CHIP:TOO:   Event number: 4
+          [1684144494.712487][50333:50335] CHIP:TOO:   Priority: Critical
+          [1684144494.712491][50333:50335] CHIP:TOO:   Timestamp: 1684144478245
+          [1684144494.712532][50333:50335] CHIP:TOO:   HardwareFaultChange: {
+          [1684144494.712549][50333:50335] CHIP:TOO:     Current: 4 entries
+          [1684144494.712578][50333:50335] CHIP:TOO:       [1]: 1
+          [1684144494.712588][50333:50335] CHIP:TOO:       [2]: 2
+          [1684144494.712595][50333:50335] CHIP:TOO:       [3]: 5
+          [1684144494.712602][50333:50335] CHIP:TOO:       [4]: 8
+          [1684144494.712610][50333:50335] CHIP:TOO:     Previous: 2 entries
+          [1684144494.712617][50333:50335] CHIP:TOO:       [1]: 1
+          [1684144494.712623][50333:50335] CHIP:TOO:       [2]: 5
+          [1684144494.712630][50333:50335] CHIP:TOO:    }
+          [1684144494.712706][50333:50335] CHIP:EM: <<< [E:38263i S:20357 M:150922929 (Ack:189840504)] (S) Msg TX to 1:0000000000000001 [EDC1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1684144494.712720][50333:50335] CHIP:IN: (S) Sending msg 150922929 on secure session with LSID: 20357
       disabled: true
 
     - label:
@@ -79,24 +88,32 @@ tests:
           previous TH fabric."
       PICS: DGGEN.S.E01
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
-
+          Optional Event so its not compulsory to get the expected outcome
           On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
-          echo '{"Name":"RadioFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app)
+
+           echo '{"Name":"RadioFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app)
 
           ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
 
           Verify that RadioFaultChange Event SHALL indicate a change in the set of radio faults currently detected
           by the Node.TH receives RadioFaultChange event with current and previous data specified by RadioFault ENUM table 11.11.6.2 according to two repeated failures On TH(chip-tool)
 
-          [1659530181.319598][4969:4975] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0001
-          [1659530181.319628][4969:4975] CHIP:TOO:   Event number: 7
-          [1659530181.319652][4969:4975] CHIP:TOO:   Priority: Critical
-          [1659530181.319675][4969:4975] CHIP:TOO:   Timestamp: 32245892
-          [1659530181.319768][4969:4975] CHIP:TOO:   RadioFaultChange: {
-          [1659530181.319814][4969:4975] CHIP:TOO:     Current: 0 entries
-          [1659530181.319848][4969:4975] CHIP:TOO:     Previous: 0 entries
-          [1659530181.319878][4969:4975] CHIP:TOO:    }
+          [1684144521.151145][50343:50345] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0001
+          [1684144521.151152][50343:50345] CHIP:TOO:   Event number: 5
+          [1684144521.151160][50343:50345] CHIP:TOO:   Priority: Critical
+          [1684144521.151167][50343:50345] CHIP:TOO:   Timestamp: 1684144512621
+          [1684144521.151208][50343:50345] CHIP:TOO:   RadioFaultChange: {
+          [1684144521.151223][50343:50345] CHIP:TOO:     Current: 4 entries
+          [1684144521.151236][50343:50345] CHIP:TOO:       [1]: 1
+          [1684144521.151248][50343:50345] CHIP:TOO:       [2]: 2
+          [1684144521.151260][50343:50345] CHIP:TOO:       [3]: 3
+          [1684144521.151270][50343:50345] CHIP:TOO:       [4]: 4
+          [1684144521.151283][50343:50345] CHIP:TOO:     Previous: 2 entries
+          [1684144521.151293][50343:50345] CHIP:TOO:       [1]: 1
+          [1684144521.151303][50343:50345] CHIP:TOO:       [2]: 3
+          [1684144521.151313][50343:50345] CHIP:TOO:    }
+          [1684144521.151392][50343:50345] CHIP:EM: <<< [E:9727i S:1308 M:147284449 (Ack:216976802)] (S) Msg TX to 1:0000000000000001 [EDC1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1684144521.151406][50343:50345] CHIP:IN: (S) Sending msg 147284449 on secure session with LSID: 1308
       disabled: true
 
     - label:
@@ -107,22 +124,33 @@ tests:
           rejoining DUT back to previous TH fabric.)"
       PICS: DGGEN.S.E02
       verification: |
+          Optional Event so its not compulsory to get the expected outcome
+
           On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
-          echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app)
+
+           echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_all_clusters_fifo_<PID>   (PID of all-clusters-app)
 
            ./chip-tool generaldiagnostics read-event network-fault-change 1 0
 
           Verify that NetworkFaultChange Event SHALL indicate a change in the set of network faults currently
           TH receives NetworkFaultChange event with current and previous data specified by NetworkFault ENUM table 11.11.2.3 according to two failure causes, On TH(chip-tool)
 
-          [1659530237.352498][4985:4990] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0002
-          [1659530237.352541][4985:4990] CHIP:TOO:   Event number: 8
-          [1659530237.352573][4985:4990] CHIP:TOO:   Priority: Critical
-          [1659530237.352604][4985:4990] CHIP:TOO:   Timestamp: 32301872
-          [1659530237.352728][4985:4990] CHIP:TOO:   NetworkFaultChange: {
-          [1659530237.352786][4985:4990] CHIP:TOO:     Current: 0 entries
-          [1659530237.352831][4985:4990] CHIP:TOO:     Previous: 0 entries
-          [1659530237.352874][4985:4990] CHIP:TOO:    }
+          [1684144729.918248][50378:50380] CHIP:DMG: }
+          [1684144729.918277][50378:50380] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0002
+          [1684144729.918279][50378:50380] CHIP:TOO:   Event number: 6
+          [1684144729.918281][50378:50380] CHIP:TOO:   Priority: Critical
+          [1684144729.918282][50378:50380] CHIP:TOO:   Timestamp: 1684144547365
+          [1684144729.918299][50378:50380] CHIP:TOO:   NetworkFaultChange: {
+          [1684144729.918306][50378:50380] CHIP:TOO:     Current: 3 entries
+          [1684144729.918310][50378:50380] CHIP:TOO:       [1]: 1
+          [1684144729.918312][50378:50380] CHIP:TOO:       [2]: 2
+          [1684144729.918314][50378:50380] CHIP:TOO:       [3]: 3
+          [1684144729.918317][50378:50380] CHIP:TOO:     Previous: 2 entries
+          [1684144729.918319][50378:50380] CHIP:TOO:       [1]: 1
+          [1684144729.918321][50378:50380] CHIP:TOO:       [2]: 2
+          [1684144729.918323][50378:50380] CHIP:TOO:    }
+          [1684144729.918348][50378:50380] CHIP:EM: <<< [E:3897i S:30865 M:110094271 (Ack:224914158)] (S) Msg TX to 1:0000000000000001 [EDC1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1684144729.918352][50378:50380] CHIP:IN: (S) Sending msg 110094271 on secure session with LSID: 30865
       disabled: true
 
     - label:
@@ -130,8 +158,6 @@ tests:
           TH fabric."
       PICS: DGGEN.S.E03
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
-
           On Raspi platform the event is triggered with below command, Pls use equivalent command on the respective DUT
           echo '{"Name":"<BootReason>"}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of all-clusters-app)
 
@@ -139,11 +165,13 @@ tests:
 
           Read the event data of BootReason specified by Table 103 BootReason ENUM table On TH(chip-tool)
 
-          [1659530352.583608][4993:4998] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
-          [1659530352.583636][4993:4998] CHIP:TOO:   Event number: 0
-          [1659530352.583656][4993:4998] CHIP:TOO:   Priority: Critical
-          [1659530352.583675][4993:4998] CHIP:TOO:   Timestamp: 29669541
-          [1659530352.583750][4993:4998] CHIP:TOO:   BootReason: {
-          [1659530352.583789][4993:4998] CHIP:TOO:     BootReason: 0
-          [1659530352.583813][4993:4998] CHIP:TOO:    }
+          [1684144762.620015][50386:50388] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
+          [1684144762.620021][50386:50388] CHIP:TOO:   Event number: 0
+          [1684144762.620026][50386:50388] CHIP:TOO:   Priority: Critical
+          [1684144762.620032][50386:50388] CHIP:TOO:   Timestamp: 1684144422477
+          [1684144762.620066][50386:50388] CHIP:TOO:   BootReason: {
+          [1684144762.620084][50386:50388] CHIP:TOO:     BootReason: 0
+          [1684144762.620090][50386:50388] CHIP:TOO:    }
+          [1684144762.620152][50386:50388] CHIP:EM: <<< [E:4771i S:40131 M:192514327 (Ack:118464853)] (S) Msg TX to 1:0000000000000001 [EDC1] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1684144762.620165][50386:50388] CHIP:IN: (S) Sending msg 192514327 on secure session with LSID: 40131
       disabled: true

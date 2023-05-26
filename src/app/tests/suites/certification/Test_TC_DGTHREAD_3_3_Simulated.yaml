@@ -1,0 +1,113 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.3.2. [TC-DGTHREAD-3.3] Command Generated {DUT_Client}]
+
+PICS:
+    - DGTHREAD.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Thread Network Diagnostics"
+    endpoint: 0
+
+tests:
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
+
+    - label: "DUT reads RxTotalCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxTotalCount"
+      PICS: DGTHREAD.C.A0027
+
+    - label: "DUT reads RxUnicastCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxUnicastCount"
+      PICS: DGTHREAD.C.A0028
+
+    - label: "DUT reads RxBroadcastCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxBroadcastCount"
+      PICS: DGTHREAD.C.A0029
+
+    - label: "DUT reads RxDataCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxDataCount"
+      PICS: DGTHREAD.C.A002a
+
+    - label: "DUT reads RxDataPollCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxDataPollCount"
+      PICS: DGTHREAD.C.A002b
+
+    - label: "DUT reads RxBeaconCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxBeaconCount"
+      PICS: DGTHREAD.C.A002c
+
+    - label: "DUT reads RxBeaconRequestCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxBeaconRequestCount"
+      PICS: DGTHREAD.C.A002d
+
+    - label: "DUT reads RxOtherCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxOtherCount"
+      PICS: DGTHREAD.C.A002e
+
+    - label: "DUT reads RxAddressFilteredCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxAddressFilteredCount"
+      PICS: DGTHREAD.C.A002f
+
+    - label: "DUT reads RxDestAddrFilteredCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxDestAddrFilteredCount"
+      PICS: DGTHREAD.C.A0030
+
+    - label: "DUT reads RxDuplicatedCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxDuplicatedCount"
+      PICS: DGTHREAD.C.A0031
+
+    - label: "DUT reads RxErrNoFrameCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxErrNoFrameCount"
+      PICS: DGTHREAD.C.A0032
+
+    - label: "DUT reads RxErrUnknownNeighborCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxErrUnknownNeighborCount"
+      PICS: DGTHREAD.C.A0033
+
+    - label: "DUT reads RxErrInvalidSrcAddrCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxErrInvalidSrcAddrCount"
+      PICS: DGTHREAD.C.A0034
+
+    - label: "DUT reads RxErrSecCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxErrSecCount"
+      PICS: DGTHREAD.C.A0035
+
+    - label: "DUT reads RxErrFcsCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxErrFcsCount"
+      PICS: DGTHREAD.C.A0036
+
+    - label: "DUT reads RxErrOtherCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RxErrOtherCount"
+      PICS: DGTHREAD.C.A0037

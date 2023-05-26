@@ -145,8 +145,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::AccessControl::Structs::Target::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -4764,7 +4765,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case Groups::Attributes::NameSupport::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NameSupport", 1, value);
         }
@@ -6029,12 +6030,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BasicCommissioningInfo", 1, value);
         }
         case GeneralCommissioning::Attributes::RegulatoryConfig::Id: {
-            chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value;
+            chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RegulatoryConfig", 1, value);
         }
         case GeneralCommissioning::Attributes::LocationCapability::Id: {
-            chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value;
+            chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LocationCapability", 1, value);
         }

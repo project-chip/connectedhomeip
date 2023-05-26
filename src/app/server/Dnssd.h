@@ -135,8 +135,6 @@ private:
     //
     bool HaveOperationalCredentials();
 
-    Time::TimeSource<Time::Source::kSystem> mTimeSource;
-
     FabricTable * mFabricTable                             = nullptr;
     CommissioningModeProvider * mCommissioningModeProvider = nullptr;
 
@@ -148,6 +146,8 @@ private:
     Optional<uint16_t> mEphemeralDiscriminator;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    Time::TimeSource<Time::Source::kSystem> mTimeSource;
+
     /// Get the current extended discovery timeout (set by
     /// SetExtendedDiscoveryTimeoutSecs, or the configuration default if not set).
     int32_t GetExtendedDiscoveryTimeoutSecs();

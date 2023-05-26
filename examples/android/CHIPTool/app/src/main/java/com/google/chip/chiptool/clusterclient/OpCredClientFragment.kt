@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
@@ -15,6 +14,17 @@ import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.OpCredClientFragmentBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
+import chip.devicecontroller.ClusterIDMapping.OperationalCredentials
+import chip.devicecontroller.InvokeCallback
+import chip.devicecontroller.ReportCallback
+import chip.devicecontroller.model.ChipAttributePath
+import chip.devicecontroller.model.ChipEventPath
+import chip.devicecontroller.model.InvokeElement
+import chip.devicecontroller.model.NodeState
+import chip.tlv.AnonymousTag
+import chip.tlv.ContextSpecificTag
+import chip.tlv.TlvWriter
 
 class OpCredClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -40,8 +50,10 @@ class OpCredClientFragment : Fragment() {
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
-    binding.readSupportedFabricBtn.setOnClickListener { scope.launch { sendReadOpCredSupportedFabricAttrClick() } }
-    binding.readCommissionedFabricBtn.setOnClickListener { scope.launch { sendReadOpCredCommissionedFabricAttrClick() } }
+    binding.readSupportedFabricBtn.setOnClickListener { scope.launch { readClusterAttribute(OperationalCredentials.Attribute.SupportedFabrics) } }
+    binding.readCommissionedFabricBtn.setOnClickListener { scope.launch { readClusterAttribute(OperationalCredentials.Attribute.CommissionedFabrics) } }
+    binding.readFabricsBtn.setOnClickListener { scope.launch { readClusterAttribute(OperationalCredentials.Attribute.Fabrics) } }
+    binding.removeFabricsBtn.setOnClickListener { scope.launch { sendRemoveFabricsBtnClick(binding.fabricIndexEd.text.toString().toUInt()) } }
 
     return binding.root
   }
@@ -71,30 +83,53 @@ class OpCredClientFragment : Fragment() {
     }
   }
 
-  private suspend fun sendReadOpCredSupportedFabricAttrClick() {
-    getOpCredClusterForDevice().readSupportedFabricsAttribute(object : ChipClusters.IntegerAttributeCallback {
-      override fun onSuccess(value: Int) {
-        Log.v(TAG, "OpCred supported Fabric attribute value: $value")
-        showMessage("OpCred supported Fabric attribute value: $value")
+  private suspend fun readClusterAttribute(attribute: OperationalCredentials.Attribute) {
+    val endpointId = addressUpdateFragment.endpointId
+    val clusterId = OperationalCredentials.ID
+    val attributeName = attribute.name
+    val attributeId = attribute.id
+
+    val devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+
+    ChipClient.getDeviceController(requireContext()).readPath(object: ReportCallback {
+      override fun onError(attributePath: ChipAttributePath?, eventPath: ChipEventPath?, ex: java.lang.Exception) {
+        showMessage("Read $attributeName failure $ex")
+        Log.e(TAG, "Read $attributeName failure", ex)
       }
 
-      override fun onError(ex: Exception) {
-        Log.e(TAG, "Error reading OpCred supported Fabric attribute", ex)
+      override fun onReport(nodeState: NodeState?) {
+        val value = nodeState?.getEndpointState(endpointId)?.getClusterState(clusterId)?.getAttributeState(attributeId)?.value ?: "null"
+        Log.i(TAG,"OpCred $attributeName value: $value")
+        showMessage("OpCred $attributeName value: $value")
       }
-    })
+
+    }, devicePtr, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), null, false, 0 /* imTimeoutMs */)
   }
 
-  private suspend fun sendReadOpCredCommissionedFabricAttrClick() {
-    getOpCredClusterForDevice().readCommissionedFabricsAttribute(object : ChipClusters.IntegerAttributeCallback {
-      override fun onSuccess(value: Int) {
-        Log.v(TAG, "OpCred Commissioned Fabric attribute value: $value")
-        showMessage("OpCred Commissioned Fabric attribute value: $value")
+  private suspend fun sendRemoveFabricsBtnClick(fabricIndex: UInt) {
+    val devicePtr = ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
+    // TODO : Need to be implement poj-to-tlv
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+    tlvWriter.put(ContextSpecificTag(OperationalCredentials.RemoveFabricCommandField.FabricIndex.id), fabricIndex)
+    tlvWriter.endStructure()
+    val invokeElement = InvokeElement.newInstance(addressUpdateFragment.endpointId
+            , OperationalCredentials.ID
+            , OperationalCredentials.Command.RemoveFabric.id
+            , tlvWriter.getEncoded(), null)
+
+    deviceController.invoke(object: InvokeCallback {
+      override fun onError(ex: Exception?) {
+        showMessage("RemoveFabric failure $ex")
+        Log.e(TAG, "RemoveFabric failure", ex)
       }
 
-      override fun onError(ex: Exception) {
-        Log.e(TAG, "Error reading OpCred Commissioned Fabric attribute", ex)
+      override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+        Log.e(TAG, "onResponse : $invokeElement, Code : $successCode")
+        showMessage("RemoveFabric success")
       }
-    })
+
+    }, devicePtr, invokeElement, 0, 0)
   }
 
   private fun showMessage(msg: String) {
@@ -103,14 +138,14 @@ class OpCredClientFragment : Fragment() {
     }
   }
 
-  private suspend fun getOpCredClusterForDevice(): ChipClusters.OperationalCredentialsCluster {
-    return ChipClusters.OperationalCredentialsCluster(
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId), 0
-    )
+  override fun onResume() {
+    super.onResume()
+    addressUpdateFragment.endpointId = OPERATIONAL_CREDENTIALS_ENDPOINT_ID
   }
 
   companion object {
     private const val TAG = "OpCredClientFragment"
+    private const val OPERATIONAL_CREDENTIALS_ENDPOINT_ID = 0
     fun newInstance(): OpCredClientFragment = OpCredClientFragment()
   }
 }

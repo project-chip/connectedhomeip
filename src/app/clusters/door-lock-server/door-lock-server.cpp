@@ -1367,18 +1367,29 @@ chip::FabricIndex DoorLockServer::getFabricIndex(const chip::app::CommandHandler
 
 chip::NodeId DoorLockServer::getNodeId(const chip::app::CommandHandler * commandObj)
 {
+    // TODO: Why are we doing all these checks?  At all the callsites we have
+    // just received a command, so we better have a handler, exchange, session,
+    // etc.  The only thing we should be checking is that it's a CASE session.
     if (nullptr == commandObj || nullptr == commandObj->GetExchangeContext())
     {
         ChipLogError(Zcl, "Cannot access ExchangeContext of Command Object for Node ID");
         return kUndefinedNodeId;
     }
 
-    auto secureSession = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession();
-    if (nullptr == secureSession)
+    if (!commandObj->GetExchangeContext()->HasSessionHandle())
     {
-        ChipLogError(Zcl, "Cannot access Secure session handle of Command Object for Node ID");
+        ChipLogError(Zcl, "Cannot access session of Command Object for Node ID");
+        return kUndefinedNodeId;
     }
-    return secureSession->GetPeerNodeId();
+
+    auto descriptor = commandObj->GetExchangeContext()->GetSessionHandle()->GetSubjectDescriptor();
+    if (descriptor.authMode != Access::AuthMode::kCase)
+    {
+        ChipLogError(Zcl, "Cannot get Node ID from non-CASE session of Command Object");
+        return kUndefinedNodeId;
+    }
+
+    return descriptor.subject;
 }
 
 bool DoorLockServer::userIndexValid(chip::EndpointId endpointId, uint16_t userIndex)

@@ -343,7 +343,7 @@ tests:
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.A0015
       arguments:
-          value: 600
+          value: 100
       response:
           error: CONSTRAINT_ERROR
 
@@ -527,7 +527,7 @@ tests:
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0017
       arguments:
-          value: 1002
+          value: 500
       response:
           error: CONSTRAINT_ERROR
 
@@ -704,7 +704,7 @@ tests:
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0015
       arguments:
-          value: 500
+          value: 100
       response:
           error: CONSTRAINT_ERROR
 
@@ -1087,7 +1087,7 @@ tests:
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.A0015
       arguments:
-          value: 500
+          value: 100
       response:
           error: CONSTRAINT_ERROR
 
@@ -1260,7 +1260,7 @@ tests:
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0005
       arguments:
-          value: 1000
+          value: 500
       response:
           error: CONSTRAINT_ERROR
 
@@ -1430,7 +1430,7 @@ tests:
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0017
       arguments:
-          value: 1000
+          value: 500
       response:
           error: CONSTRAINT_ERROR
 
@@ -1666,11 +1666,41 @@ tests:
       attribute: "ControlSequenceOfOperation"
       PICS: TSTAT.S.F00 || TSTAT.S.F01
       response:
-          value: 4
           constraints:
               type: enum8
               minValue: 0
               maxValue: 5
+
+    #Uncomment once anyOf is supported
+    #- label:
+    #      "Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F01 is
+    #      true"
+    #  command: "readAttribute"
+    #  attribute: "ControlSequenceOfOperation"
+    #  PICS: TSTAT.S.F01 && !TSTAT.S.F00
+    #  response:
+    #      constraints:
+    #          anyOf: [0, 1]
+
+    #- label:
+    #      "Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F00 is
+    #      true"
+    #  command: "readAttribute"
+    #  attribute: "ControlSequenceOfOperation"
+    #  PICS: TSTAT.S.F00 && !TSTAT.S.F01
+    #  response:
+    #      constraints:
+    #          anyOf: [2, 3]
+
+    #- label:
+    #      "Reads ControlSequenceOfOperation from Server DUT, if both TSTAT.S.F01
+    #      and TSTAT.S.F01 are true"
+    #  command: "readAttribute"
+    #  attribute: "ControlSequenceOfOperation"
+    #  PICS: TSTAT.S.F00 && TSTAT.S.F01
+    #  response:
+    #      constraints:
+    #          anyOf: [4, 5]
 
     - label:
           "Write Attribute command for ControlSequenceOfOperation with a new

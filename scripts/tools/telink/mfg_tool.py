@@ -49,7 +49,7 @@ SERIAL_NUMBER_LEN = 32
 SHORT_MANUALCODE_LEN = 11
 LONG_MANUALCODE_LEN = 21
 QRCODE_LEN = 22
-ROTATING_DEVICE_ID_UNIQUE_ID_LEN_BITS = 128
+ROTATING_DEVICE_ID_UNIQUE_ID_LEN = 16
 HEX_PREFIX = "hex:"
 DEV_SN_CSV_HDR = "Serial Number,\n"
 
@@ -464,8 +464,7 @@ def write_device_unique_data(args, out_dirs, pai_cert):
         nvs_memory_append('cert_dclrn', read_der_file(args.cert_dclrn))
 
         if (args.enable_rotating_device_id is True) and (args.rd_id_uid is None):
-            nvs_memory_update('rd_uid', binascii.b2a_hex(os.urandom(
-                int(ROTATING_DEVICE_ID_UNIQUE_ID_LEN_BITS / 8))).decode('utf-8'))
+            nvs_memory_update('rd_uid', os.urandom(ROTATING_DEVICE_ID_UNIQUE_ID_LEN))
 
         # Generate onboarding data
         generate_onboarding_data(args, out_dirs, int(row['Discriminator']), int(row['PIN Code']))
@@ -672,7 +671,7 @@ def get_and_validate_args():
     check_str_range(args.product_name, 1, 32, 'Product name')
     check_str_range(args.hw_ver_str, 1, 64, 'Hardware version string')
     check_str_range(args.mfg_date, 8, 16, 'Manufacturing date')
-    check_str_range(args.rd_id_uid, 32, 32, 'Rotating device Unique id')
+    check_str_range(args.rd_id_uid, 16, 32, 'Rotating device Unique id')
 
     # Validates the attestation related arguments
     # DAC key and DAC cert both should be present or none

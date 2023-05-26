@@ -86,6 +86,14 @@ tests:
               type: list
               contains: [5]
 
+    - label: "Read the global attribute: EventList"
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"

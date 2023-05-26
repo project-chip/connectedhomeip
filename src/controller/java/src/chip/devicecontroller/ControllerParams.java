@@ -288,15 +288,15 @@ public final class ControllerParams {
      * <p>Setting the regulatory location type will set the NewRegulatoryConfig when the
      * SetRegulatoryConfig command is sent by this ChipDeviceCommissioner.
      *
-     * @param regulatoryLocation an app::Clusters::GeneralCommissioning::RegulatoryLocationType enum
-     *     value
+     * @param regulatoryLocation an app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum
+     *     enum value
      * @return
      */
     public Builder setRegulatoryLocation(int regulatoryLocation) {
       if ((regulatoryLocation < 0) || (regulatoryLocation > 2)) {
         throw new IllegalArgumentException(
-            "regulatoryLocation value must be between RegulatoryLocationType::kIndoor and "
-                + "RegulatoryLocationType::kIndoorOutdoor");
+            "regulatoryLocation value must be between RegulatoryLocationTypeEnum::kIndoor and "
+                + "RegulatoryLocationTypeEnum::kIndoorOutdoor");
       }
       this.regulatoryLocationType = Optional.of(regulatoryLocation);
       return this;

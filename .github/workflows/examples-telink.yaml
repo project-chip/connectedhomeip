@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.7.3
+            image: connectedhomeip/chip-build-telink:0.7.14
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -139,6 +139,18 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d lighting-app-rpc \
                     out/telink-tlsr9518adk80d-light-rpc/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
+
+            - name: Build example Telink Lighting App with Shell
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-shell' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d lighting-app-shell \
+                    out/telink-tlsr9518adk80d-light-shell/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output

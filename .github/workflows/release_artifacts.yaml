@@ -124,7 +124,7 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Build example EFR32 Lock App
-              run: scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
+              run: scripts/examples/gn_silabs_example.sh examples/lock-app/efr32/
                   out/lock_app_debug $SILABS_BOARD
 
             - name: Upload artifact
