@@ -322,17 +322,15 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
 
     // Verifies how to convert transition time
-    if (scene.mStorageData.mSceneTransitionTimeMs)
+    if (Commands::ViewScene::Id == ctx.mRequestPath.mCommandId)
     {
-        if (Commands::ViewScene::Id == ctx.mRequestPath.mCommandId)
-        {
-            response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 1000));
-        }
-        else if (Commands::EnhancedViewScene::Id == ctx.mRequestPath.mCommandId)
-        {
-            response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 100));
-        }
+        response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 1000));
     }
+    else if (Commands::EnhancedViewScene::Id == ctx.mRequestPath.mCommandId)
+    {
+        response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 100));
+    }
+
     response.sceneName.SetValue(CharSpan(scene.mStorageData.mName, scene.mStorageData.mNameLength));
     Span<Structs::ExtensionFieldSet::Type> responseEFSSpan(responseEFSBuffer, deserializedEFSCount);
     response.extensionFieldSets.SetValue(responseEFSSpan);
