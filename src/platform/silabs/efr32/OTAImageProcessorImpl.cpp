@@ -46,34 +46,29 @@ uint8_t OTAImageProcessorImpl::writeBuffer[kAlignmentBytes] __attribute__((align
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
     DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
     DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
     DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
-    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
     if ((block.data() == nullptr) || block.empty())
     {
         ChipLogError(SoftwareUpdate, "%s: block is empty", __func__);
@@ -94,7 +89,6 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
-    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor == nullptr)
     {
@@ -107,7 +101,6 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
 
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 {
-    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor == nullptr)
     {
