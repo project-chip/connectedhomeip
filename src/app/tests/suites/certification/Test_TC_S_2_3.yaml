@@ -22,7 +22,10 @@ config:
     nodeId: 0x12344321
     cluster: "Scenes"
     endpoint: 1
-
+    G1:
+        type: int16u
+        defaultValue: 0x0001
+        
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -54,7 +57,7 @@ tests:
                 value:
                     {
                         GroupKeySetID: 0x01a1,
-                        GroupKeySecurityPolicy: 1,
+                        GroupKeySecurityPolicy: 0,
                         EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
                         EpochStartTime0: 0,
                         EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
@@ -73,8 +76,7 @@ tests:
       arguments:
           value:
               [
-                  { FabricIndex: 1, GroupId: 0x0001, GroupKeySetID: 0x01a1 },
-                  { FabricIndex: 1, GroupId: 0x0002, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: G1, GroupKeySetID: 0x01a1 },
               ]
 
     - label:
@@ -85,7 +87,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "GroupName"
                 value: "Group1"
       response:
@@ -93,7 +95,7 @@ tests:
               - name: "Status"
                 value: 0
               - name: "GroupID"
-                value: 0x0001
+                value: G1
 
     - label:
           "TH sends a RemoveAllScenes command to DUT with the GroupID field set
@@ -103,13 +105,13 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
                 value: 0
               - name: "GroupID"
-                value: 0x0001
+                value: G1
 
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
@@ -119,7 +121,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
@@ -127,9 +129,9 @@ tests:
               - name: "Capacity"
                 value: (maxScenes/2)
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneList"
-                value: [0x03]
+                value: []
 
     - label:
           "TH sends a EnhancedAddScene command to DUT with the GroupID field set
@@ -140,7 +142,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x0001
               - name: "TransitionTime"
@@ -175,7 +177,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
 
@@ -188,7 +190,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x0001
               - name: "TransitionTime"
@@ -223,7 +225,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
 
@@ -359,7 +361,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
       response:
@@ -367,7 +369,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
@@ -404,7 +406,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
       response:
@@ -412,7 +414,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
@@ -506,7 +508,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
@@ -514,7 +516,7 @@ tests:
               - name: "Capacity"
                 value: (maxScenes/2) - 1
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneList"
                 value: [0x01]
 
@@ -561,7 +563,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
 
@@ -610,11 +612,11 @@ tests:
               - name: "Mode"
                 value: 0x00
               - name: "GroupIdentifierFrom"
-                value: 0x0001
+                value: G1
               - name: "SceneIdentifierFrom"
                 value: 0x01
               - name: "GroupIdentifierTo"
-                value: 0x0001
+                value: G1
               - name: "SceneIdentifierTo"
                 value: 0x02
       response:
@@ -622,7 +624,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupIdentifierFrom"
-                value: 0x0001
+                value: G1
               - name: "SceneIdentifierFrom"
                 value: 0x01
 
@@ -634,7 +636,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
@@ -642,6 +644,6 @@ tests:
               - name: "Capacity"
                 value: (maxScenes/2) - 2
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneList"
                 value: [0x01, 0x02]
