@@ -282,7 +282,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
     Groups::Commands::RemoveGroupResponse::Type response;
 
 #ifdef EMBER_AF_PLUGIN_SCENES
-    // If a group is, removed the scenes associated with that group SHOULD be removed.
+    // If a group is removed the scenes associated with that group SHOULD be removed.
     Scenes::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, commandData.groupID);
 #endif
     response.groupID = commandData.groupID;
