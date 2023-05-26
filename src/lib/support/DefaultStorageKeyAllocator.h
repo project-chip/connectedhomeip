@@ -198,7 +198,7 @@ public:
     }
     static StorageKeyName SubscriptionResumptionMaxCount() { return StorageKeyName::Formatted("g/sum"); }
 
-    // Scene Count in an Endpoint's SceneTable
+    // Number of scenes stored in a given endpoint's scene table, across all fabrics.
     static StorageKeyName EndpointSceneCountKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/scc/e/%x", endpoint); }
 
     // General data of all scenes ID belonging to a Fabric on a specific endpoint
