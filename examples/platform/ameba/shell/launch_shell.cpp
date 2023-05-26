@@ -27,9 +27,7 @@ namespace {
 
 void MatterShellTask(void * args)
 {
-    const TickType_t xDelay = 1000 / portTICK_PERIOD_MS;
     chip::Shell::Engine::Root().RunMainLoop();
-    vTaskDelay(xDelay);
 }
 
 } // namespace

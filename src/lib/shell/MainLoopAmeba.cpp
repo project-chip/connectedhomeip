@@ -146,6 +146,7 @@ void Engine::RunMainLoop()
             ProcessShellLine(reinterpret_cast<intptr_t>(line));
 #endif
         }
+        vTaskDelay(pdMS_TO_TICKS(10)); // delay 10ms
     }
 }
 
