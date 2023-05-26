@@ -33,7 +33,7 @@ env:
 
 jobs:
     java_tests_linux:
-        name: Java Tests - Linux
+        name: Linux
         timeout-minutes: 130
 
         env:
