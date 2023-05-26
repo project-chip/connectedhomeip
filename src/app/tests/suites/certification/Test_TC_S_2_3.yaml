@@ -25,7 +25,7 @@ config:
     G1:
         type: int16u
         defaultValue: 0x0001
-        
+
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
