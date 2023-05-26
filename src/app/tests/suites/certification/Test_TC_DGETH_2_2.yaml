@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 45.2.2. [TC-DGETH-2.2] Command received functionality with server as DUT
+name: 47.2.2. [TC-DGETH-2.2] Command Received [DUT as Server]
 
 PICS:
     - DGETH.S
@@ -136,35 +136,35 @@ tests:
       command: "readAttribute"
       attribute: "PacketRxCount"
       response:
-          saveAs: PacketRxCount
+          saveAs: PacketRxCountValue
 
     - label: "TH reads PacketTxCount attribute value from DUT"
       PICS: DGETH.S.A0003
       command: "readAttribute"
       attribute: "PacketTxCount"
       response:
-          saveAs: PacketTxCount
+          saveAs: PacketTxCountValue
 
     - label: "TH reads TxErrCount attribute value from DUT"
       PICS: DGETH.S.A0004
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
-          saveAs: TxErrCount
+          saveAs: TxErrCountValue
 
     - label: "TH reads CollisionCount attribute value from DUT"
       PICS: DGETH.S.A0005
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
-          saveAs: CollisionCount
+          saveAs: CollisionCountValue
 
     - label: "TH reads OverrunCount attribute value from DUT"
       PICS: DGETH.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
-          saveAs: OverrunCount
+          saveAs: OverrunCountValue
 
     #issue #13648
     - label: "Sends ResetCounts command"
@@ -215,7 +215,7 @@ tests:
       attribute: "TxErrCount"
       response:
           constraints:
-              maxValue: TxErrCount
+              maxValue: TxErrCountValue
 
     - label: "TH reads CollisionCount attribute value from DUT"
       PICS: DGETH.S.A0005
@@ -223,7 +223,7 @@ tests:
       attribute: "CollisionCount"
       response:
           constraints:
-              maxValue: CollisionCount
+              maxValue: CollisionCountValue
 
     - label: "TH reads OverrunCount attribute value from DUT"
       PICS: DGETH.S.A0006
@@ -231,4 +231,4 @@ tests:
       attribute: "OverrunCount"
       response:
           constraints:
-              maxValue: OverrunCount
+              maxValue: OverrunCountValue

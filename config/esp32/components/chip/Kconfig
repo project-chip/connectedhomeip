@@ -700,6 +700,16 @@ menu "CHIP Device Layer"
                 Use ESP32 Secure Cert DAC Provider which is  ESP32 DeviceAttestationCredentialsProvider implementation which reads attestation
                 information from the esp_secure_cert partition
 
+        config USE_ESP32_ECDSA_PERIPHERAL
+            bool "Use ESP32 ECDSA Peripheral"
+            depends on SEC_CERT_DAC_PROVIDER && SOC_ECDSA_SUPPORTED
+            default y
+            select MBEDTLS_HARDWARE_ECDSA_SIGN
+            help
+                If DAC is being read from secure cert and SOC supports ECDSA signing using on-chip peripheral
+                then this option gets enabled.
+                Also, please disable ESP_SECURE_CERT_DS_PERIPHERAL from the menuconfig when this option is disabled
+
     endmenu
 
 

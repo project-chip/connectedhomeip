@@ -36,9 +36,17 @@ steps:
               --target android-x64-chip-tool
               --target bouffalolab-bl602-iot-matter-v1-light
               --target bouffalolab-xt-zb6-devkit-light-rpc
-              --target cc13x2x7_26x2x7-lock-ftd
+              --target cc13x2x7_26x2x7-lighting
               --target cc13x2x7_26x2x7-lock-mtd
-              --target cc13x2x7_26x2x7-shell
+              --target cc13x2x7_26x2x7-pump-mtd
+              --target cc13x2x7_26x2x7-pump-controller-mtd
+              --target cc13x4_26x4-lighting
+              --target cc13x4_26x4-lock-ftd
+              --target cc13x4_26x4-pump-ftd
+              --target cc13x4_26x4-pump-controller-ftd
+              --target cc13x4_26x4-lock-mtd
+              --target cc13x4_26x4-pump-mtd
+              --target cc13x4_26x4-pump-controller-mtd
               --target cyw30739-cyw930739m2evb_01-ota-requestor
               --target efr32-brd4161a-light-rpc
               --target efr32-brd4161a-lock

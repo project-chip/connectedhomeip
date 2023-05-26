@@ -178,6 +178,10 @@ if (CONFIG_ENABLE_ESP32_BLE_CONTROLLER)
     chip_gn_arg_append("chip_enable_ble_controller"             "true")
 endif()
 
+if (CONFIG_ENABLE_ETHERNET_TELEMETRY)
+    chip_gn_arg_append("chip_enable_ethernet"                   "true")
+endif()
+
 if (CONFIG_ENABLE_MATTER_OVER_THREAD)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
 else()
@@ -238,6 +242,9 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     chip_gn_arg_append("chip_use_secure_cert_dac_provider"                 "true")
 endif()
 
+if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
+    chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
+endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
@@ -356,6 +363,9 @@ endif()
 if(CONFIG_OPENTHREAD_ENABLED)
     idf_component_get_property(openthread_lib openthread COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${openthread_lib}>)
+
+    idf_component_get_property(ieee802154_lib ieee802154 COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${ieee802154_lib}>)
 endif()
 
 if((NOT CONFIG_USE_MINIMAL_MDNS) AND (CONFIG_ENABLE_WIFI_STATION OR CONFIG_ENABLE_WIFI_AP))
@@ -432,6 +442,12 @@ list(APPEND chip_libraries $<TARGET_FILE:${soc_lib}>)
 
 idf_component_get_property(efuse_lib efuse COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${efuse_lib}>)
+
+idf_component_get_property(vfs_lib vfs COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${vfs_lib}>)
+
+idf_component_get_property(driver_lib driver COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${driver_lib}>)
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}

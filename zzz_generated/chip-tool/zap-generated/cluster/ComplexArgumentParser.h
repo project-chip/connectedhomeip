@@ -42,10 +42,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Binding::Struct
 
 static void Finalize(chip::app::Clusters::Binding::Structs::TargetStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::Target::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::AccessControl::Structs::Target::Type & request);
+static void Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request,
                         Json::Value & value);

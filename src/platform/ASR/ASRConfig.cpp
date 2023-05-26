@@ -226,7 +226,7 @@ CHIP_ERROR ASRConfig::ReadFactoryConfigValue(asr_matter_partition_t matter_parti
     ret = asr_factory_config_read(matter_partition, buf, (uint32_t) bufSize, (uint32_t *) &outLen);
 
     if (ret != 0)
-        ChipLogProgress(DeviceLayer, "asr_factory_config_read: %d failed, ret = %d\n", matter_partition, ret);
+        ChipLogProgress(DeviceLayer, "asr_factory_config_read: %d failed, ret = %d\n", matter_partition, static_cast<int>(ret));
 
     if (ret == 0)
     {
@@ -251,7 +251,7 @@ CHIP_ERROR ASRConfig::ReadFactoryConfigValue(asr_matter_partition_t matter_parti
         ret = -1;
 
     if (ret != 0)
-        ChipLogProgress(DeviceLayer, "asr_factory_config_read: %d failed, ret = %d\n", matter_partition, ret);
+        ChipLogProgress(DeviceLayer, "asr_factory_config_read: %d failed, ret = %d\n", matter_partition, static_cast<int>(ret));
 
     if (ret == 0)
     {

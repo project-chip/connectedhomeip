@@ -252,7 +252,7 @@ Example:
 ##### Guides
 
 -   [Bouffalo Lab](/examples/lighting-app/bouffalolab/README.md)
--   [EFR32 Window Covering](/examples/window-app/silabs/efr32/README.md)
+-   [EFR32 Window Covering](/examples/window-app/silabs/README.md)
 -   [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
 -   [ESP32 Lighting](/examples/lighting-app/esp32/README.md)
 -   [ESP32 Temperature Sensor](/examples/temperature-measurement-app/esp32/README.md)
@@ -268,7 +268,7 @@ Example:
 -   [Simulated Linux](./simulated_device_linux.md)
 -   [Telink](/examples/lighting-app/telink/README.md)
 -   [TI Platform](./ti_platform_overview.md)
--   [TI All Clusters](/examples/all-clusters-app/cc13x2x7_26x2x7/README.md)
+-   [TI All Clusters](/examples/all-clusters-app/cc13x4_26x4/README.md)
 -   [Tizen](/examples/lighting-app/tizen/README.md)
 
 ## Providing Feedback to Apple
@@ -306,8 +306,17 @@ Example:
 -   Please refer to the iOS/iPadOS 16.1
     [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-16_1-release-notes)
     for currently known issues.
--   Please refer to the iOS/iPadOS 16.2 beta 3
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16-release-notes)
+-   Please refer to the iOS/iPadOS 16.2
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_2-release-notes)
+    for currently known issues
+-   Please refer to the iOS & iPadOS 16.3
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_3-release-notes)
+    for currently known issues
+-   Please refer to the iOS & iPadOS 16.4
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_4-release-notes)
+    for currently known issues
+-   Please refer to the iOS & iPadOS 16.5
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16_5-release-notes)
     for currently known issues
 -   An issues related to Apple Home integration should be reported
     [feedback](#providing-feedback-to-apple) as described in this section

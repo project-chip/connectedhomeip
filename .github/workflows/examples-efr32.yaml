@@ -87,7 +87,7 @@ jobs:
       - name: Test SLC gen
         timeout-minutes: 30
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32 ./out/light-app BRD4187C --slc_generate --docker
+          scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
           rm -rf ./out/
       - name: Build some BRD4187C variants
         timeout-minutes: 90
@@ -120,7 +120,7 @@ jobs:
       - name: Build example EFR32+WF200 WiFi Lock app for BRD4161A
         timeout-minutes: 15
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/lock_app_wifi_wf200 BRD4161A is_debug=false chip_logging=false --wifi wf200 --docker
+          scripts/examples/gn_silabs_example.sh examples/lock-app/silabs out/lock_app_wifi_wf200 BRD4161A is_debug=false chip_logging=false --wifi wf200 --docker
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+wf200 lock-app \
             out/lock_app_wifi_wf200/BRD4161A/matter-silabs-lock-example.out /tmp/bloat_reports/
       - name: Clean out build output
@@ -128,7 +128,7 @@ jobs:
       - name: Build example EFR32+RS9116 WiFi Lighting app for BRD4161A
         timeout-minutes: 15
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_wifi_rs9116 BRD4161A --wifi rs9116 --docker
+          scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs out/lighting_app_wifi_rs9116 BRD4161A --wifi rs9116 --docker
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rs9116 lighting-app \
             out/lighting_app_wifi_rs9116/BRD4161A/matter-silabs-lighting-example.out /tmp/bloat_reports/
       - name: Clean out build output

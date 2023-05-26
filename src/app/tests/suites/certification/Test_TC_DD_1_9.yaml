@@ -34,7 +34,7 @@ tests:
 
     - label: "Preconditions"
       verification: |
-          Manual Pairing Code is printed on the device or in additional provided materials (ex: manual)
+          Manual Pairing Code is printed on the Commissionee device or in additional provided materials (ex: manual, companion app, web service).
       disabled: true
 
     - label:
@@ -67,7 +67,7 @@ tests:
 
 
           2. Parse 11-digit Manual Pairing code
-           ./chip-tool payload parse-setup-payload 34970112332
+          ./chip-tool payload parse-setup-payload 34970112332
 
           Verify in DUT(CHIP-TOOL)
           [1667811737.160767][10335:10335] CHIP:SPL: Parsing decimalRepresentation: 34970112332
@@ -81,7 +81,7 @@ tests:
 
 
           3. Parse 21-digit Manual Pairing code
-           ./chip-tool payload parse-setup-payload 749701123365521327694
+          ./chip-tool payload parse-setup-payload 749701123365521327694
 
           Verify in DUT as commissoiner side:
           CHIP:SPL: Parsing decimalRepresentation: 749701123365521327694
@@ -99,10 +99,10 @@ tests:
           Verify in DUT(CHIP-TOOL)
           [1653556303.582797][4071:4076] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           [1653556303.582850][4071:4076] CHIP:CTL: Received CommissioningComplete response, errorCode=0
-          [1653556303.582891][4071:4076] CHIP:CTL: Successfully finished commissioning step "SendComplete"
-          [1653556303.582927][4071:4076] CHIP:CTL: Commissioning stage next step: "SendComplete" -> "Cleanup"
-          [1653556303.582964][4071:4076] CHIP:CTL: Performing next commissioning step "Cleanup"
-          [1653556303.583040][4071:4076] CHIP:CTL: Successfully finished commissioning step "Cleanup"
+          [1653556303.582891][4071:4076] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1653556303.582927][4071:4076] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1653556303.582964][4071:4076] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1653556303.583040][4071:4076] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
           [1653556303.583110][4071:4076] CHIP:TOO: Device commissioning completed with success
           [1653556303.583209][4071:4076] CHIP:DMG: ICR moving to [AwaitingDe]
           [1653556303.583255][4071:4076] CHIP:EM: Sending Standalone Ack for MessageCounter:9735725 on exchange 24476i

@@ -22977,6 +22977,10 @@ typedef NS_OPTIONS(uint32_t, MTRGroupsGroupClusterFeature) {
     = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRGroupsFeature");
 
+typedef NS_OPTIONS(uint8_t, MTRGroupsNameSupportBitmap) {
+    MTRGroupsNameSupportBitmapGroupNames MTR_NEWLY_AVAILABLE = 0x80,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_OPTIONS(uint32_t, MTRScenesFeature) {
     MTRScenesFeatureSceneNames MTR_NEWLY_AVAILABLE = 0x1,
 } MTR_NEWLY_AVAILABLE;
@@ -23639,6 +23643,7 @@ typedef NS_ENUM(uint8_t, MTRNetworkCommissioningWiFiBand) {
     MTRNetworkCommissioningWiFiBand5G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
     MTRNetworkCommissioningWiFiBand6G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
     MTRNetworkCommissioningWiFiBand60G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
+    MTRNetworkCommissioningWiFiBand1G MTR_NEWLY_AVAILABLE = 0x05,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRNetworkCommissioningFeature) {
@@ -23981,6 +23986,7 @@ typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersion) {
     MTRWiFiNetworkDiagnosticsWiFiVersionN API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x03,
     MTRWiFiNetworkDiagnosticsWiFiVersionAc API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x04,
     MTRWiFiNetworkDiagnosticsWiFiVersionAx API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x05,
+    MTRWiFiNetworkDiagnosticsWiFiVersionAh MTR_NEWLY_AVAILABLE = 0x06,
 } API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersionType) {
@@ -24370,24 +24376,21 @@ typedef NS_OPTIONS(uint32_t, MTRAirQualityFeature) {
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRSmokeCOAlarmAlarmState) {
-    MTRSmokeCOAlarmAlarmStateUnknown MTR_NEWLY_AVAILABLE = 0x00,
-    MTRSmokeCOAlarmAlarmStateNormal MTR_NEWLY_AVAILABLE = 0x01,
-    MTRSmokeCOAlarmAlarmStateWarning MTR_NEWLY_AVAILABLE = 0x02,
-    MTRSmokeCOAlarmAlarmStateCritical MTR_NEWLY_AVAILABLE = 0x03,
+    MTRSmokeCOAlarmAlarmStateNormal MTR_NEWLY_AVAILABLE = 0x00,
+    MTRSmokeCOAlarmAlarmStateWarning MTR_NEWLY_AVAILABLE = 0x01,
+    MTRSmokeCOAlarmAlarmStateCritical MTR_NEWLY_AVAILABLE = 0x02,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRSmokeCOAlarmContaminationState) {
-    MTRSmokeCOAlarmContaminationStateUnknown MTR_NEWLY_AVAILABLE = 0x00,
-    MTRSmokeCOAlarmContaminationStateNormal MTR_NEWLY_AVAILABLE = 0x01,
-    MTRSmokeCOAlarmContaminationStateLow MTR_NEWLY_AVAILABLE = 0x02,
-    MTRSmokeCOAlarmContaminationStateWarning MTR_NEWLY_AVAILABLE = 0x03,
-    MTRSmokeCOAlarmContaminationStateCritical MTR_NEWLY_AVAILABLE = 0x04,
+    MTRSmokeCOAlarmContaminationStateNormal MTR_NEWLY_AVAILABLE = 0x00,
+    MTRSmokeCOAlarmContaminationStateLow MTR_NEWLY_AVAILABLE = 0x01,
+    MTRSmokeCOAlarmContaminationStateWarning MTR_NEWLY_AVAILABLE = 0x02,
+    MTRSmokeCOAlarmContaminationStateCritical MTR_NEWLY_AVAILABLE = 0x03,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRSmokeCOAlarmEndOfService) {
-    MTRSmokeCOAlarmEndOfServiceUnknown MTR_NEWLY_AVAILABLE = 0x00,
-    MTRSmokeCOAlarmEndOfServiceExpired MTR_NEWLY_AVAILABLE = 0x01,
-    MTRSmokeCOAlarmEndOfServiceNormal MTR_NEWLY_AVAILABLE = 0x02,
+    MTRSmokeCOAlarmEndOfServiceExpired MTR_NEWLY_AVAILABLE = 0x00,
+    MTRSmokeCOAlarmEndOfServiceNormal MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRSmokeCOAlarmExpressedState) {
@@ -24403,9 +24406,8 @@ typedef NS_ENUM(uint8_t, MTRSmokeCOAlarmExpressedState) {
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRSmokeCOAlarmMuteState) {
-    MTRSmokeCOAlarmMuteStateUnknown MTR_NEWLY_AVAILABLE = 0x00,
-    MTRSmokeCOAlarmMuteStateNotMuted MTR_NEWLY_AVAILABLE = 0x01,
-    MTRSmokeCOAlarmMuteStateMuted MTR_NEWLY_AVAILABLE = 0x02,
+    MTRSmokeCOAlarmMuteStateNotMuted MTR_NEWLY_AVAILABLE = 0x00,
+    MTRSmokeCOAlarmMuteStateMuted MTR_NEWLY_AVAILABLE = 0x01,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRSmokeCOAlarmSensitivity) {
@@ -25634,6 +25636,7 @@ typedef NS_OPTIONS(uint32_t, MTRThermostatFeature) {
     MTRThermostatFeatureAutomode MTR_DEPRECATED(
         "Please use MTRThermostatFeatureAutoMode", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x20,
+    MTRThermostatFeatureLocalTemperatureNotExposed MTR_NEWLY_AVAILABLE = 0x40,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTRThermostatModeForSequence) {

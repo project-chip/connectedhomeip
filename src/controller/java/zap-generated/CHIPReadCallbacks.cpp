@@ -4618,24 +4618,25 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(
                         entry_3.deviceType.Value(), newElement_3_deviceType);
                 }
 
-                jclass targetStructClass_4;
+                jclass accessControlTargetStructStructClass_4;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$AccessControlClusterTarget", targetStructClass_4);
+                    env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlTargetStruct",
+                    accessControlTargetStructStructClass_4);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterTarget");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessControlTargetStruct");
                     return;
                 }
-                jmethodID targetStructCtor_4 =
-                    env->GetMethodID(targetStructClass_4, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;)V");
-                if (targetStructCtor_4 == nullptr)
+                jmethodID accessControlTargetStructStructCtor_4 = env->GetMethodID(
+                    accessControlTargetStructStructClass_4, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;)V");
+                if (accessControlTargetStructStructCtor_4 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterTarget constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessControlTargetStruct constructor");
                     return;
                 }
 
-                newElement_3 = env->NewObject(targetStructClass_4, targetStructCtor_4, newElement_3_cluster, newElement_3_endpoint,
-                                              newElement_3_deviceType);
+                newElement_3 = env->NewObject(accessControlTargetStructStructClass_4, accessControlTargetStructStructCtor_4,
+                                              newElement_3_cluster, newElement_3_endpoint, newElement_3_deviceType);
                 chip::JniReferences::GetInstance().AddToList(newElement_0_targets, newElement_3);
             }
         }

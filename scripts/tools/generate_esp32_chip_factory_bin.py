@@ -488,7 +488,7 @@ def generate_nvs_bin(encrypt, size, csv_filename, bin_filename):
     if encrypt:
         nvs_args.keygen = True
         nvs_args.keyfile = NVS_KEY_PARTITION_BIN
-        nvs_args.inputkey = None,
+        nvs_args.inputkey = None
         nvs_partition_gen.encrypt(nvs_args)
     else:
         nvs_partition_gen.generate(nvs_args)
