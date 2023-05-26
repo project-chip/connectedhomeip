@@ -30,6 +30,10 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#include <platform/nxp/k32w/k32w1/FactoryDataProviderImpl.h>
+#endif
+
 #include "FreeRTOS.h"
 #include "fsl_component_button.h"
 #include "timers.h"
@@ -45,6 +49,9 @@
 class AppTask
 {
 public:
+#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+    using FactoryDataProvider = chip::DeviceLayer::FactoryDataProviderImpl;
+#endif
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 

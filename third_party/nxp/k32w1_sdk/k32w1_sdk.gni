@@ -275,6 +275,10 @@ template("k32w1_sdk") {
       ]
     }
 
+    if (chip_with_factory_data == 1) {
+      defines += [ "CONFIG_CHIP_LOAD_REAL_FACTORY_DATA=1" ]
+    }
+
     if (chip_with_low_power == 1) {
       defines += [
         "chip_with_low_power=1",

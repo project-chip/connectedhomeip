@@ -59,7 +59,13 @@ static_library("nxp_platform") {
     "ram_storage.h",
   ]
 
-  public = [ "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h" ]
+  public = [
+    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
+    "${chip_root}/src/credentials/examples/ExampleDACs.h",
+    "${chip_root}/src/credentials/examples/ExamplePAI.h"
+  ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
@@ -88,7 +94,20 @@ static_library("nxp_platform") {
       "K32W1PersistentStorageOpKeystore.h",
     ]
 
-    public_deps += [ "${mbedtls_root}:mbedtls" ]
+  if (chip_with_factory_data == 1) {
+    sources += [
+      "../common/FactoryDataProvider.cpp",
+      "FactoryDataProviderImpl.cpp",
+    ]
+    public += [
+      "${chip_root}/src/credentials/CHIPCert.h",
+      "${chip_root}/src/credentials/CertificationDeclaration.h",
+    ]
+  }
+
+  public_deps += [
+      "${mbedtls_root}:mbedtls",
+    ]
   }
 
   deps = []

@@ -124,6 +124,7 @@ k32w1_executable("light_app") {
     "-Wl,--defsym=__heap_size__=0",
     "-Wl,--defsym=__stack_size__=0x480",
     "-Wl,--defsym=gNvmSectors=8",
+    "-Wl,--defsym=gUseFactoryData_d=1",
     "-Wl,-print-memory-usage",
     "-Wl,--no-warn-rwx-segments",
     "-T" + rebase_path(ldscript, root_build_dir),
