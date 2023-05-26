@@ -732,7 +732,6 @@ void DefaultSceneTableImpl::UnregisterAllHandlers()
 
 /// @brief Gets the field sets for the clusters implemented on a specific endpoint and store them in an EFS (extension field set).
 /// Does so by going through the SceneHandler list and calling the first handler the list find for each specific clusters.
-/// @param endpoint endpoint for which the scene is saved
 /// @param scene Scene in which the EFS gets populated
 CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
@@ -768,7 +767,6 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 /// @brief Retrieves the values of extension field sets on a scene and applies them to each cluster on the endpoint of the scene.
 /// Does so by iterating through mHandlerList for each cluster in the EFS and calling the FIRST handler found that supports the
 /// cluster. Does so by going through the SceneHandler list and calling the first handler the list find for each specific clusters.
-/// @param endpoint endpoint on which the scene is applied
 /// @param scene Scene providing the EFSs (extension field sets)
 CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
 {

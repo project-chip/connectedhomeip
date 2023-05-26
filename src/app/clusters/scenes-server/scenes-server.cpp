@@ -248,10 +248,6 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         AddResponseOnError(ctx, response, sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene)));
 
     // Update Attributes
-    uint8_t scene_count = 0;
-    ReturnOnFailure(AddResponseOnError(
-        ctx, response, sceneTable->GetFabricSceneCount(ctx.mCommandHandler.GetAccessingFabricIndex(), scene_count)));
-
     MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, Id, Attributes::SceneCount::Id);
     MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, Id, Attributes::RemainingCapacity::Id);
 
@@ -297,19 +293,6 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
                                        sceneTable->GetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(),
                                                                       SceneStorageId(req.sceneID, req.groupID), scene)));
 
-    // Verifies how to convert transition time
-    if (scene.mStorageData.mSceneTransitionTimeMs)
-    {
-        if (Commands::ViewScene::Id == ctx.mRequestPath.mCommandId)
-        {
-            response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 1000));
-        }
-        else if (Commands::EnhancedViewScene::Id == ctx.mRequestPath.mCommandId)
-        {
-            response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 100));
-        }
-    }
-
     // Response Extension Field Sets buffer
     Structs::ExtensionFieldSet::Type responseEFSBuffer[scenes::kMaxClustersPerScene];
     uint8_t deserializedEFSCount = 0;
@@ -338,11 +321,20 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
 
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
 
-    // Verify if name was saved in the scene
-    if (scene.mStorageData.mNameLength)
+    // Verifies how to convert transition time
+    if (scene.mStorageData.mSceneTransitionTimeMs)
     {
-        response.sceneName.SetValue(CharSpan(scene.mStorageData.mName, scene.mStorageData.mNameLength));
+        if (Commands::ViewScene::Id == ctx.mRequestPath.mCommandId)
+        {
+            response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 1000));
+        }
+        else if (Commands::EnhancedViewScene::Id == ctx.mRequestPath.mCommandId)
+        {
+            response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 100));
+        }
     }
+    // Verify if name was saved in the scene
+    response.sceneName.SetValue(CharSpan(scene.mStorageData.mName, scene.mStorageData.mNameLength));
     Span<Structs::ExtensionFieldSet::Type> responseEFSSpan(responseEFSBuffer, deserializedEFSCount);
     response.extensionFieldSets.SetValue(responseEFSSpan);
 
@@ -574,8 +566,8 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
     Commands::RemoveSceneResponse::Type response;
 
     uint16_t endpointTableSize = 0;
-    ReturnOnFailure(AddResponseOnError<Commands::RemoveSceneResponse::Type>(
-        ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
+    ReturnOnFailure(
+        AddResponseOnError(ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
 
     // Get Scene Table Instance
     scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable =
@@ -599,18 +591,18 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
     }
 
     //  Gets the scene from the table
-    ReturnOnFailure(AddResponseOnError<Commands::RemoveSceneResponse::Type>(
+    ReturnOnFailure(AddResponseOnError(
         ctx, response, sceneTable->GetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene.mStorageId, scene)));
 
     // Remove the scene from the scene table
-    ReturnOnFailure(AddResponseOnError<Commands::RemoveSceneResponse::Type>(
+    ReturnOnFailure(AddResponseOnError(
         ctx, response, sceneTable->RemoveSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene.mStorageId)));
 
     // Update Attributes
     MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, Id, Attributes::SceneCount::Id);
     MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, Id, Attributes::RemainingCapacity::Id);
 
-    ReturnOnFailure(UpdateLastConfiguredBy<Commands::RemoveSceneResponse::Type>(ctx, response));
+    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
 
     // Write response
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
@@ -622,8 +614,8 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
     Commands::RemoveAllScenesResponse::Type response;
 
     uint16_t endpointTableSize = 0;
-    ReturnOnFailure(AddResponseOnError<Commands::RemoveAllScenesResponse::Type>(
-        ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
+    ReturnOnFailure(
+        AddResponseOnError(ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
 
     // Get Scene Table Instance
     scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable =
@@ -642,14 +634,14 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
         return;
     }
 
-    ReturnOnFailure(AddResponseOnError<Commands::RemoveAllScenesResponse::Type>(
+    ReturnOnFailure(AddResponseOnError(
         ctx, response, sceneTable->DeleteAllScenesInGroup(ctx.mCommandHandler.GetAccessingFabricIndex(), req.groupID)));
 
     // Update Attributes
     MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, Id, Attributes::SceneCount::Id);
     MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, Id, Attributes::RemainingCapacity::Id);
 
-    ReturnOnFailure(UpdateLastConfiguredBy<Commands::RemoveAllScenesResponse::Type>(ctx, response));
+    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
 
     // Write response
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
@@ -661,8 +653,7 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
     Commands::StoreSceneResponse::Type response;
 
     // Scene Valid is false when this command begins
-    ReturnOnFailure(AddResponseOnError<Commands::StoreSceneResponse::Type>(
-        ctx, response, Attributes::SceneValid::Set(ctx.mRequestPath.mEndpointId, false)));
+    ReturnOnFailure(AddResponseOnError(ctx, response, Attributes::SceneValid::Set(ctx.mRequestPath.mEndpointId, false)));
 
     // Response data
     response.groupID = req.groupID;
@@ -673,10 +664,9 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
 
     if (CHIP_NO_ERROR == err)
     {
-        ReturnOnFailure(AddResponseOnError<Commands::StoreSceneResponse::Type>(
-            ctx, response, Attributes::SceneValid::Set(ctx.mRequestPath.mEndpointId, true)));
+        ReturnOnFailure(AddResponseOnError(ctx, response, Attributes::SceneValid::Set(ctx.mRequestPath.mEndpointId, true)));
 
-        ReturnOnFailure(UpdateLastConfiguredBy<Commands::StoreSceneResponse::Type>(ctx, response));
+        ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
     }
 
     response.status = to_underlying(StatusIB(err).mStatus);
@@ -714,8 +704,8 @@ void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands
     Commands::GetSceneMembershipResponse::Type response;
 
     uint16_t endpointTableSize = 0;
-    ReturnOnFailure(AddResponseOnError<Commands::GetSceneMembershipResponse::Type>(
-        ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
+    ReturnOnFailure(
+        AddResponseOnError(ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
 
     // Get Scene Table Instance
     scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable =
@@ -741,12 +731,12 @@ void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands
 
     uint8_t capacity = 0;
     // Get Capacity
-    ReturnOnFailure(AddResponseOnError<Commands::GetSceneMembershipResponse::Type>(
-        ctx, response, sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity)));
+    ReturnOnFailure(AddResponseOnError(ctx, response,
+                                       sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity)));
     response.capacity.SetNonNull(capacity);
 
     // populate scene list
-    ReturnOnFailure(AddResponseOnError<Commands::GetSceneMembershipResponse::Type>(
+    ReturnOnFailure(AddResponseOnError(
         ctx, response, sceneTable->GetAllSceneIdsInGroup(ctx.mCommandHandler.GetAccessingFabricIndex(), req.groupID, sceneList)));
 
     response.sceneList.SetValue(sceneList);
@@ -770,8 +760,8 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
     Commands::CopySceneResponse::Type response;
 
     uint16_t endpointTableSize = 0;
-    ReturnOnFailure(AddResponseOnError<Commands::CopySceneResponse::Type>(
-        ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
+    ReturnOnFailure(
+        AddResponseOnError(ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
 
     // Get Scene Table Instance
     scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable =
@@ -797,8 +787,8 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
 
     uint8_t capacity = 0;
     // Get Capacity
-    ReturnOnFailure(AddResponseOnError<Commands::CopySceneResponse::Type>(
-        ctx, response, sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity)));
+    ReturnOnFailure(AddResponseOnError(ctx, response,
+                                       sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity)));
 
     // Checks if we copy a single scene or all of them
     if (req.mode.GetField(app::Clusters::Scenes::ScenesCopyMode::kCopyAllScenes))
@@ -808,7 +798,7 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
         Span<SceneId> sceneList = Span<SceneId>(scenesInGroup);
 
         // populate scene list
-        ReturnOnFailure(AddResponseOnError<Commands::CopySceneResponse::Type>(
+        ReturnOnFailure(AddResponseOnError(
             ctx, response,
             sceneTable->GetAllSceneIdsInGroup(ctx.mCommandHandler.GetAccessingFabricIndex(), req.groupIdentifierFrom, sceneList)));
 
@@ -823,13 +813,13 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
         {
             SceneTableEntry scene(SceneStorageId(sceneId, req.groupIdentifierFrom));
             //  Insert in table
-            ReturnOnFailure(AddResponseOnError<Commands::CopySceneResponse::Type>(
+            ReturnOnFailure(AddResponseOnError(
                 ctx, response,
                 sceneTable->GetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene.mStorageId, scene)));
 
             scene.mStorageId = SceneStorageId(sceneId, req.groupIdentifierTo);
 
-            ReturnOnFailure(AddResponseOnError<Commands::CopySceneResponse::Type>(
+            ReturnOnFailure(AddResponseOnError(
                 ctx, response, sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene)));
         }
 
@@ -837,7 +827,7 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
         MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, Id, Attributes::SceneCount::Id);
         MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, Id, Attributes::RemainingCapacity::Id);
 
-        ReturnOnFailure(UpdateLastConfiguredBy<Commands::CopySceneResponse::Type>(ctx, response));
+        ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
 
         response.status = to_underlying(Protocols::InteractionModel::Status::Success);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -845,19 +835,19 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
     }
 
     SceneTableEntry scene(SceneStorageId(req.sceneIdentifierFrom, req.groupIdentifierFrom));
-    ReturnOnFailure(AddResponseOnError<Commands::CopySceneResponse::Type>(
+    ReturnOnFailure(AddResponseOnError(
         ctx, response, sceneTable->GetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene.mStorageId, scene)));
 
     scene.mStorageId = SceneStorageId(req.sceneIdentifierTo, req.groupIdentifierTo);
 
-    ReturnOnFailure(AddResponseOnError<Commands::CopySceneResponse::Type>(
-        ctx, response, sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene)));
+    ReturnOnFailure(
+        AddResponseOnError(ctx, response, sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene)));
 
     // Update Attributes
     MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, Id, Attributes::SceneCount::Id);
     MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, Id, Attributes::RemainingCapacity::Id);
 
-    ReturnOnFailure(UpdateLastConfiguredBy<Commands::CopySceneResponse::Type>(ctx, response));
+    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
 
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
