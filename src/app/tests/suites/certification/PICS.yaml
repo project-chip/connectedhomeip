@@ -7723,7 +7723,7 @@ PICS:
 
     - label: "Does the device support the Moderate feature?"
       id: AIRQUAL.S.F01
-    
+
     - label: "Does the device support the VeryPoor feature?"
       id: AIRQUAL.S.F02
 
