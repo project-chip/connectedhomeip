@@ -940,7 +940,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     out_buf_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
     result         = EVP_PKEY_derive(context, out_secret.Bytes(), &out_buf_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    SuccessOrExit(out_secret.SetLength(out_buf_length));
+    SuccessOrExit(error = out_secret.SetLength(out_buf_length));
 
 exit:
     if (ec_key != nullptr)
