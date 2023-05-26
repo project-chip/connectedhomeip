@@ -198,11 +198,16 @@ public:
     }
     static StorageKeyName SubscriptionResumptionMaxCount() { return StorageKeyName::Formatted("g/sum"); }
 
+    // Scene Count in an Endpoint's SceneTable
     static StorageKeyName EndpointSceneCountKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/scc/e/%x", endpoint); }
+
+    // General data of all scenes ID belonging to a Fabric on a specific endpoint
     static StorageKeyName FabricSceneDataKey(FabricIndex fabric, EndpointId endpoint)
     {
         return StorageKeyName::Formatted("f/%x/e/%x/sc", fabric, endpoint);
     }
+
+    // Scene key, Fabric scoped
     static StorageKeyName FabricSceneKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
     {
         return StorageKeyName::Formatted("f/%x/e/%x/sc/%x", fabric, endpoint, idx);

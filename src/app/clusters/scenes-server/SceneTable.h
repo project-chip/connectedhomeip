@@ -39,8 +39,8 @@ constexpr SceneId kUndefinedSceneId       = 0xff;
 
 static constexpr size_t kIteratorsMax                 = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
 static constexpr size_t kSceneNameMaxLength           = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
-static constexpr size_t kScenesMaxTransitionTimeS     = CHIP_CONFIG_SCENES_MAX_TRANSITION_TIME_SECONDS;
-static constexpr size_t kScenesMaxTransitionTime100ms = CHIP_CONFIG_SCENES_MAX_TRANSITION_TIME_SECONDS * 10;
+static constexpr size_t kScenesMaxTransitionTimeS     = 6000u;
+static constexpr size_t kScenesMaxTransitionTime100ms = kScenesMaxTransitionTimeS * 10;
 
 /// @brief SceneHandlers are meant as interface between various clusters and the Scene table.
 /// When a scene command involving extension field sets is received, the Scene Table will go through
