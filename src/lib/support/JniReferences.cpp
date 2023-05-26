@@ -408,17 +408,19 @@ CHIP_ERROR JniReferences::CharToStringUTF(const chip::CharSpan & charSpan, jobje
     // like in a very common 'subscribe *')
     //
     // As a result call:
-    //   onMalformedInput(CodingErrorAction.REPLACE) 
+    //   onMalformedInput(CodingErrorAction.REPLACE)
     //   onUnmappableCharacter(CodingErrorAction.REPLACE)
     jobject replaceAction = env->GetStaticObjectField(env->GetStaticFieldID(env->FindClass("java/nio/charset/CodingErrorAction"),
-                                                                            "REPLACE",
-                                                                            "Ljava/nio/charset/CodingErrorAction"));
+                                                                            "REPLACE", "Ljava/nio/charset/CodingErrorAction"));
     {
-        jmethodID onMalformedInput = env->GetMethodID(charSetDocoderClass, "onMalformedInput", "(Ljava/nio/charset/CodingErrorAction;)Ljava/nio/charset/CharsetDecoder;");
-        decoderObject = env->CallObjectMethod(decoderObject, onMalformedInput, replaceAction);
+        jmethodID onMalformedInput = env->GetMethodID(charSetDocoderClass, "onMalformedInput",
+                                                      "(Ljava/nio/charset/CodingErrorAction;)Ljava/nio/charset/CharsetDecoder;");
+        decoderObject              = env->CallObjectMethod(decoderObject, onMalformedInput, replaceAction);
     }
     {
-        jmethodID onUnmappableCharacter = env->GetMethodID(charSetDocoderClass, "onUnmappableCharacter", "(Ljava/nio/charset/CodingErrorAction;)Ljava/nio/charset/CharsetDecoder;");
+        jmethodID onUnmappableCharacter =
+            env->GetMethodID(charSetDocoderClass, "onUnmappableCharacter",
+                             "(Ljava/nio/charset/CodingErrorAction;)Ljava/nio/charset/CharsetDecoder;");
         decoderObject = env->CallObjectMethod(decoderObject, onUnmappableCharacter, replaceAction);
     }
 
@@ -429,7 +431,8 @@ CHIP_ERROR JniReferences::CharToStringUTF(const chip::CharSpan & charSpan, jobje
     // If decode exception occur, outStr will be set null.
     outStr = nullptr;
 
-    if (env->ExceptionCheck()) {
+    if (env->ExceptionCheck())
+    {
         // If there is an exception, decode will not fail. Instead just
         // an error will be reported.
         ChipLogError(Support, "Exception encountered trying to decode a UTF string.");
