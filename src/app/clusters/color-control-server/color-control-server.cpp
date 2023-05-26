@@ -1589,7 +1589,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
 
                 uint16_t storedEnhancedHue = 0;
                 Attributes::ColorLoopStoredEnhancedHue::Get(endpoint, &storedEnhancedHue);
-                Attributes::EnhancedCurrentHue::Set(endpoint, storedEnhancedHue);
+                Attributes::EnhancedCurrentHue::Set(endpoint, storedEnhancedHue, false);
             }
             else
             {
@@ -1627,12 +1627,14 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
 
     bool isHueTansitionDone         = computeNewHueValue(colorHueTransitionState);
     bool isSaturationTransitionDone = computeNewColor16uValue(colorSaturationTransitionState);
+    bool isTemp = true;
 
     SetHSVRemainingTime(endpoint);
 
     if (isHueTansitionDone && isSaturationTransitionDone)
     {
         stopAllColorTransitions(endpoint);
+        isTemp = false;
     }
     else
     {
@@ -1643,8 +1645,8 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     {
         if (previousEnhancedhue != colorHueTransitionState->currentEnhancedHue)
         {
-            Attributes::EnhancedCurrentHue::Set(endpoint, colorHueTransitionState->currentEnhancedHue);
-            Attributes::CurrentHue::Set(endpoint, static_cast<uint8_t>(colorHueTransitionState->currentEnhancedHue >> 8));
+            Attributes::EnhancedCurrentHue::Set(endpoint, colorHueTransitionState->currentEnhancedHue, isTemp);
+            Attributes::CurrentHue::Set(endpoint, static_cast<uint8_t>(colorHueTransitionState->currentEnhancedHue >> 8), isTemp);
 
             emberAfColorControlClusterPrintln("Enhanced Hue %d endpoint %d", colorHueTransitionState->currentEnhancedHue, endpoint);
         }
@@ -1653,7 +1655,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     {
         if (previousHue != colorHueTransitionState->currentHue)
         {
-            Attributes::CurrentHue::Set(colorHueTransitionState->endpoint, colorHueTransitionState->currentHue);
+            Attributes::CurrentHue::Set(colorHueTransitionState->endpoint, colorHueTransitionState->currentHue, isTemp);
             emberAfColorControlClusterPrintln("Hue %d endpoint %d", colorHueTransitionState->currentHue, endpoint);
         }
     }
@@ -1661,7 +1663,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     if (previousSaturation != colorSaturationTransitionState->currentValue)
     {
         Attributes::CurrentSaturation::Set(colorSaturationTransitionState->endpoint,
-                                           (uint8_t) colorSaturationTransitionState->currentValue);
+                                           (uint8_t) colorSaturationTransitionState->currentValue, isTemp);
         emberAfColorControlClusterPrintln("Saturation %d endpoint %d", colorSaturationTransitionState->currentValue, endpoint);
     }
 
@@ -1989,6 +1991,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
     Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
     bool isXTransitionDone, isYTransitionDone;
+    bool isTemp = true;
 
     // compute new values for X and Y.
     isXTransitionDone = computeNewColor16uValue(colorXTransitionState);
@@ -1999,6 +2002,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     if (isXTransitionDone && isYTransitionDone)
     {
         stopAllColorTransitions(endpoint);
+        isTemp = false;
     }
     else
     {
@@ -2006,8 +2010,8 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     }
 
     // update the attributes
-    Attributes::CurrentX::Set(endpoint, colorXTransitionState->currentValue);
-    Attributes::CurrentY::Set(endpoint, colorYTransitionState->currentValue);
+    Attributes::CurrentX::Set(endpoint, colorXTransitionState->currentValue, isTemp);
+    Attributes::CurrentY::Set(endpoint, colorYTransitionState->currentValue, isTemp);
 
     emberAfColorControlClusterPrintln("Color X %d Color Y %d", colorXTransitionState->currentValue,
                                       colorYTransitionState->currentValue);
@@ -2168,7 +2172,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
                 // existing setting of ColorTemp attribute will be left unchanged (i.e., treated as
                 // if startup color temp was set to null).
                 updatedColorTemp = startUpColorTemp.Value();
-                status           = Attributes::ColorTemperatureMireds::Set(endpoint, updatedColorTemp);
+                status           = Attributes::ColorTemperatureMireds::Set(endpoint, updatedColorTemp, false);
 
                 if (status == EMBER_ZCL_STATUS_SUCCESS)
                 {
@@ -2193,6 +2197,7 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
 {
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     bool isColorTempTransitionDone;
+    bool isTemp = true;
 
     isColorTempTransitionDone = computeNewColor16uValue(colorTempTransitionState);
 
@@ -2201,13 +2206,14 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
     if (isColorTempTransitionDone)
     {
         stopAllColorTransitions(endpoint);
+        isTemp = false;
     }
     else
     {
         scheduleTimerCallbackMs(configureTempEventControl(endpoint), UPDATE_TIME_MS);
     }
 
-    Attributes::ColorTemperatureMireds::Set(endpoint, colorTempTransitionState->currentValue);
+    Attributes::ColorTemperatureMireds::Set(endpoint, colorTempTransitionState->currentValue, isTemp);
 
     emberAfColorControlClusterPrintln("Color Temperature %d", colorTempTransitionState->currentValue);
 

@@ -104,7 +104,7 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * to perform the given operation.
  */
 EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                    uint8_t * dataPtr, EmberAfAttributeType dataType);
+                                    uint8_t * dataPtr, EmberAfAttributeType dataType, bool isTemp);
 
 /**
  * @brief Read the attribute value, performing all the checks.

@@ -28,7 +28,7 @@ EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::Clu
 void emberAfPrintAttributeTable(void);
 
 EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
-                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest);
+                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest, bool isTemp);
 
 EmberAfStatus emAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                 uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);

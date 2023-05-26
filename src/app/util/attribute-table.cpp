@@ -54,18 +54,19 @@ EmberAfStatus emberAfWriteAttributeExternal(EndpointId endpoint, ClusterId clust
     case EmberAfAttributeWritePermission::AllowWriteNormal:
     case EmberAfAttributeWritePermission::AllowWriteOfReadOnly:
         return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
-                                  (extWritePermission == EmberAfAttributeWritePermission::AllowWriteOfReadOnly), false);
+                                  (extWritePermission == EmberAfAttributeWritePermission::AllowWriteOfReadOnly), false, false);
     default:
         return (EmberAfStatus) extWritePermission;
     }
 }
 
 EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                    EmberAfAttributeType dataType)
+                                    EmberAfAttributeType dataType, bool isTemp)
 {
     return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
                               true,   // override read-only?
-                              false); // just test?
+                              false,    // just test?
+                              isTemp); // is temporary value (don't store in kvs)?
 }
 
 EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
@@ -234,7 +235,7 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
 // if the attribute is supported and the readLength specified is less than
 // the length of the data.
 EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
-                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest)
+                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest, bool isTemp)
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
@@ -356,9 +357,12 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
             return status;
         }
 
-        // Save the attribute to persistent storage if needed
-        // The callee will weed out attributes that do not need to be stored.
-        emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
+        if (!isTemp)
+        {
+            // Save the attribute to persistent storage if needed
+            // The callee will weed out attributes that do not need to be stored.
+            emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
+        }
 
         MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
 

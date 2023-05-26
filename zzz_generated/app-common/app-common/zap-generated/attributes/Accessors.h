@@ -204,9 +204,9 @@ namespace Attributes {
 
 namespace CurrentLevel {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value, bool isTemp);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value, bool isTemp);
 } // namespace CurrentLevel
 
 namespace RemainingTime {
@@ -2996,12 +2996,12 @@ namespace Attributes {
 
 namespace CurrentHue {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value, bool isTemp);
 } // namespace CurrentHue
 
 namespace CurrentSaturation {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value, bool isTemp);
 } // namespace CurrentSaturation
 
 namespace RemainingTime {
@@ -3011,12 +3011,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace CurrentX {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value, bool isTemp);
 } // namespace CurrentX
 
 namespace CurrentY {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value, bool isTemp);
 } // namespace CurrentY
 
 namespace DriftCompensation {
@@ -3031,7 +3031,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 
 namespace ColorTemperatureMireds {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value, bool isTemp);
 } // namespace ColorTemperatureMireds
 
 namespace ColorMode {
@@ -3216,7 +3216,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace EnhancedCurrentHue {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value, bool isTemp);
 } // namespace EnhancedCurrentHue
 
 namespace EnhancedColorMode {

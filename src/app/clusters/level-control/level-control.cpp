@@ -268,15 +268,6 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     emberAfLevelControlClusterPrint(" to %d ", currentLevel.Value());
     emberAfLevelControlClusterPrintln("(diff %c1)", state->increasing ? '+' : '-');
 
-    status = Attributes::CurrentLevel::Set(endpoint, currentLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfLevelControlClusterPrintln("ERR: writing current level %x", status);
-        state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
-        writeRemainingTime(endpoint, 0);
-        return;
-    }
-
     updateCoupledColorTemp(endpoint);
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -290,6 +281,15 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     // Are we at the requested level?
     if (currentLevel.Value() == state->moveToLevel)
     {
+        status = Attributes::CurrentLevel::Set(endpoint, currentLevel, false);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfLevelControlClusterPrintln("ERR: writing current level %x", status);
+            state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
+            writeRemainingTime(endpoint, 0);
+            return;
+        }
+
         if (state->commandId == Commands::MoveToLevelWithOnOff::Id || state->commandId == Commands::MoveWithOnOff::Id ||
             state->commandId == Commands::StepWithOnOff::Id)
         {
@@ -299,7 +299,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
         if (state->storedLevel != INVALID_STORED_LEVEL)
         {
             uint8_t storedLevel8u = (uint8_t) state->storedLevel;
-            status                = Attributes::CurrentLevel::Set(endpoint, storedLevel8u);
+            status                = Attributes::CurrentLevel::Set(endpoint, storedLevel8u, false);
             if (status != EMBER_ZCL_STATUS_SUCCESS)
             {
                 emberAfLevelControlClusterPrintln("ERR: writing current level %x", status);
@@ -315,6 +315,15 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     }
     else
     {
+        status = Attributes::CurrentLevel::Set(endpoint, currentLevel, true);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfLevelControlClusterPrintln("ERR: writing temp current level %x", status);
+            state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
+            writeRemainingTime(endpoint, 0);
+            return;
+        }
+
         state->callbackSchedule.runTime = System::SystemClock().GetMonotonicTimestamp() - callbackStartTimestamp;
         writeRemainingTime(endpoint, static_cast<uint16_t>(state->transitionTimeMs - state->elapsedTimeMs));
         scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
@@ -1172,7 +1181,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     {
         // If newValue is OnOff::Commands::On::Id...
         // "Set CurrentLevel to minimum level allowed for the device."
-        status = Attributes::CurrentLevel::Set(endpoint, minimumLevelAllowedForTheDevice);
+        status = Attributes::CurrentLevel::Set(endpoint, minimumLevelAllowedForTheDevice, false);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
@@ -1288,18 +1297,18 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
                 }
                 // Otherwise Set the CurrentLevel attribute to its previous value which was already fetch above
 
-                Attributes::CurrentLevel::Set(endpoint, currentLevel);
+                Attributes::CurrentLevel::Set(endpoint, currentLevel, false);
             }
         }
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
        // In any case, we make sure that the respects min/max
         if (currentLevel.IsNull() || currentLevel.Value() < state->minLevel)
         {
-            Attributes::CurrentLevel::Set(endpoint, state->minLevel);
+            Attributes::CurrentLevel::Set(endpoint, state->minLevel, false);
         }
         else if (currentLevel.Value() > state->maxLevel)
         {
-            Attributes::CurrentLevel::Set(endpoint, state->maxLevel);
+            Attributes::CurrentLevel::Set(endpoint, state->maxLevel, false);
         }
     }
 
