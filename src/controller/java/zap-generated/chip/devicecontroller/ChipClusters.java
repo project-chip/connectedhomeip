@@ -10322,6 +10322,115 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public void setUTCTime(
+        DefaultClusterCallback callback,
+        Long UTCTime,
+        Integer granularity,
+        Optional<Integer> timeSource) {
+      setUTCTime(chipClusterPtr, callback, UTCTime, granularity, timeSource, null);
+    }
+
+    public void setUTCTime(
+        DefaultClusterCallback callback,
+        Long UTCTime,
+        Integer granularity,
+        Optional<Integer> timeSource,
+        int timedInvokeTimeoutMs) {
+      setUTCTime(chipClusterPtr, callback, UTCTime, granularity, timeSource, timedInvokeTimeoutMs);
+    }
+
+    public void setTrustedTimeSource(
+        DefaultClusterCallback callback,
+        @Nullable
+            ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct
+                trustedTimeSource) {
+      setTrustedTimeSource(chipClusterPtr, callback, trustedTimeSource, null);
+    }
+
+    public void setTrustedTimeSource(
+        DefaultClusterCallback callback,
+        @Nullable
+            ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct
+                trustedTimeSource,
+        int timedInvokeTimeoutMs) {
+      setTrustedTimeSource(chipClusterPtr, callback, trustedTimeSource, timedInvokeTimeoutMs);
+    }
+
+    public void setTimeZone(
+        SetTimeZoneResponseCallback callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct> timeZone) {
+      setTimeZone(chipClusterPtr, callback, timeZone, null);
+    }
+
+    public void setTimeZone(
+        SetTimeZoneResponseCallback callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct> timeZone,
+        int timedInvokeTimeoutMs) {
+      setTimeZone(chipClusterPtr, callback, timeZone, timedInvokeTimeoutMs);
+    }
+
+    public void setDSTOffset(
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct> DSTOffset) {
+      setDSTOffset(chipClusterPtr, callback, DSTOffset, null);
+    }
+
+    public void setDSTOffset(
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct> DSTOffset,
+        int timedInvokeTimeoutMs) {
+      setDSTOffset(chipClusterPtr, callback, DSTOffset, timedInvokeTimeoutMs);
+    }
+
+    public void setDefaultNTP(DefaultClusterCallback callback, @Nullable String defaultNTP) {
+      setDefaultNTP(chipClusterPtr, callback, defaultNTP, null);
+    }
+
+    public void setDefaultNTP(
+        DefaultClusterCallback callback, @Nullable String defaultNTP, int timedInvokeTimeoutMs) {
+      setDefaultNTP(chipClusterPtr, callback, defaultNTP, timedInvokeTimeoutMs);
+    }
+
+    private native void setUTCTime(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Long UTCTime,
+        Integer granularity,
+        Optional<Integer> timeSource,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setTrustedTimeSource(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        @Nullable
+            ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct
+                trustedTimeSource,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setTimeZone(
+        long chipClusterPtr,
+        SetTimeZoneResponseCallback Callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct> timeZone,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setDSTOffset(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct> DSTOffset,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setDefaultNTP(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        @Nullable String defaultNTP,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    public interface SetTimeZoneResponseCallback {
+      void onSuccess(Boolean DSTOffsetRequired);
+
+      void onError(Exception error);
+    }
+
     public interface UTCTimeAttributeCallback {
       void onSuccess(@Nullable Long value);
 
