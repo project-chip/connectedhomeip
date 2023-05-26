@@ -105,7 +105,7 @@ CHIP_ERROR SilabsDeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
-    if (spake2Salt != 0)
+    if (spake2Salt != NULL)
     {
         err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_Spake2pSalt, spake2Salt);
         if (err != CHIP_NO_ERROR)
@@ -113,7 +113,7 @@ CHIP_ERROR SilabsDeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
-    if (spake2Verifier != 0)
+    if (spake2Verifier != NULL)
     {
         err = SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_Spake2pVerifier, spake2Verifier);
         if (err != CHIP_NO_ERROR)
