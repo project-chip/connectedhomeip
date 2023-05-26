@@ -260,7 +260,7 @@ CHIPProjectConfig.h.
 
 Regarding factory data provider, there are two options:
 
--   use the default factory data provider: `K32W0FactoryDataProvider` by setting
+-   use the default factory data provider: `FactoryDataProvider` by setting
     `chip_with_factory_data=1` in the gn build command.
 -   use a custom factory data provider: please see
     [Guide for implementing a custom factory data provider](../../../../platform/nxp/k32w/k32w0/common/README.md).

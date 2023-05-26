@@ -22,11 +22,11 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <platform/nxp/k32w/common/OTATlvProcessor.h>
-#include <platform/nxp/k32w/k32w0/K32W0FactoryDataProvider.h>
+#include <platform/nxp/k32w/k32w0/FactoryDataProvider.h>
 
 namespace chip {
 
-using FactoryProvider = DeviceLayer::K32W0FactoryDataProvider;
+using FactoryProvider = DeviceLayer::FactoryDataProvider;
 using Tags            = FactoryProvider::FactoryDataId;
 
 /**

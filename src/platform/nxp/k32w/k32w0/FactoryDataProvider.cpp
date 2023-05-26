@@ -30,7 +30,7 @@
 #include <lib/support/Span.h>
 #include <platform/ConfigurationManager.h>
 
-#include "K32W0FactoryDataProvider.h"
+#include "FactoryDataProvider.h"
 extern "C" {
 #include "Flash_Adapter.h"
 }
@@ -47,13 +47,13 @@ static constexpr size_t kSpake2pSalt_MaxBase64Len =
 
 OtaUtils_EEPROM_ReadData pFunctionEepromRead = (OtaUtils_EEPROM_ReadData) K32W0FactoryDataProvider::ReadDataMemcpy;
 
-uint32_t K32W0FactoryDataProvider::kFactoryDataStart        = (uint32_t)__FACTORY_DATA_START;
-uint32_t K32W0FactoryDataProvider::kFactoryDataSize         = (uint32_t)__FACTORY_DATA_SIZE;
-uint32_t K32W0FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(K32W0FactoryDataProvider::Header);
+uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t)__FACTORY_DATA_START;
+uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t)__FACTORY_DATA_SIZE;
+uint32_t FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(FactoryDataProvider::Header);
 
-K32W0FactoryDataProvider & K32W0FactoryDataProvider::GetDefaultInstance()
+FactoryDataProvider & FactoryDataProvider::GetDefaultInstance()
 {
-    static K32W0FactoryDataProvider sInstance;
+    static FactoryDataProvider sInstance;
     return sInstance;
 }
 
@@ -70,14 +70,14 @@ extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
     if (PDM_bDoesDataExist(kNvmId_FactoryDataBackup, &backupLength))
     {
         chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
-        buffer.Calloc(K32W0FactoryDataProvider::kFactoryDataSize);
+        buffer.Calloc(FactoryDataProvider::kFactoryDataSize);
         ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
 
-        auto status = PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) buffer.Get(),
-                                              K32W0FactoryDataProvider::kFactoryDataSize, &backupLength);
+        auto status = PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void*)buffer.Get(),
+                                              FactoryDataProvider::kFactoryDataSize, &backupLength);
         ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
 
-        error = K32W0FactoryDataProvider::GetDefaultInstance().UpdateData(buffer.Get());
+        error = FactoryDataProvider::GetDefaultInstance().UpdateData(buffer.Get());
         if (error == CHIP_NO_ERROR)
         {
             ChipLogProgress(DeviceLayer, "Factory data was restored successfully");
@@ -88,7 +88,7 @@ extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
     return error;
 }
 
-K32W0FactoryDataProvider::K32W0FactoryDataProvider()
+FactoryDataProvider::FactoryDataProvider()
 {
     maxLengths[FactoryDataId::kVerifierId]           = kSpake2pSerializedVerifier_MaxBase64Len;
     maxLengths[FactoryDataId::kSaltId]               = kSpake2pSalt_MaxBase64Len;
@@ -115,14 +115,14 @@ K32W0FactoryDataProvider::K32W0FactoryDataProvider()
     RegisterRestoreMechanism(FactoryDataDefaultRestoreMechanism);
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::Init()
+CHIP_ERROR FactoryDataProvider::Init()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint32_t sum     = 0;
 
     ReturnErrorOnFailure(SetCustomIds());
 
-    for (uint8_t i = 1; i < K32W0FactoryDataProvider::kNumberOfIds; i++)
+    for (uint8_t i = 1; i < FactoryDataProvider::kNumberOfIds; i++)
     {
         sum += maxLengths[i];
     }
@@ -168,7 +168,7 @@ CHIP_ERROR K32W0FactoryDataProvider::Init()
     return error;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::Validate()
+CHIP_ERROR FactoryDataProvider::Validate()
 {
     uint8_t output[Crypto::kSHA256_Hash_Length] = { 0 };
 
@@ -181,12 +181,12 @@ CHIP_ERROR K32W0FactoryDataProvider::Validate()
     return CHIP_NO_ERROR;
 }
 
-void K32W0FactoryDataProvider::RegisterRestoreMechanism(RestoreMechanism restore)
+void FactoryDataProvider::RegisterRestoreMechanism(RestoreMechanism restore)
 {
     mRestoreMechanisms.insert(mRestoreMechanisms.end(), restore);
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::UpdateData(uint8_t * pBuf)
+CHIP_ERROR FactoryDataProvider::UpdateData(uint8_t* pBuf)
 {
     NV_Init();
 
@@ -200,7 +200,7 @@ CHIP_ERROR K32W0FactoryDataProvider::UpdateData(uint8_t * pBuf)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
+CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                                                  uint32_t * offset)
 {
     uint32_t addr  = kFactoryDataPayloadStart;
@@ -213,7 +213,7 @@ CHIP_ERROR K32W0FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *
 
         if (searchedType == type)
         {
-            if ((type >= K32W0FactoryDataProvider::kNumberOfIds) || (length > maxLengths[type]))
+            if ((type >= FactoryDataProvider::kNumberOfIds) || (length > maxLengths[type]))
             {
                 ChipLogError(DeviceLayer, "Failed validity check for factory data with: id=%d, length=%d", type, length);
                 break;
@@ -237,13 +237,13 @@ CHIP_ERROR K32W0FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::SetCustomIds()
+CHIP_ERROR FactoryDataProvider::SetCustomIds()
 {
     ChipLogError(DeviceLayer, "SetCustomIds() is not implemented for default FactoryDataProvider");
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
+CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
     uint16_t declarationSize = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kCertDeclarationId, outBuffer.data(), outBuffer.size(), declarationSize));
@@ -252,12 +252,12 @@ CHIP_ERROR K32W0FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
+CHIP_ERROR FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & outBuffer)
+CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & outBuffer)
 {
     uint16_t certificateSize = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacCertificateId, outBuffer.data(), outBuffer.size(), certificateSize));
@@ -265,7 +265,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer)
+CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer)
 {
     uint16_t certificateSize = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kPaiCertificateId, outBuffer.data(), outBuffer.size(), certificateSize));
@@ -273,7 +273,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetProductAttestationIntermediateCert(Mutab
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
+CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
@@ -300,7 +300,7 @@ CHIP_ERROR K32W0FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
+CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
     uint32_t discriminator = 0;
     uint16_t temp          = 0;
@@ -311,12 +311,12 @@ CHIP_ERROR K32W0FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::SetSetupDiscriminator(uint16_t setupDiscriminator)
+CHIP_ERROR FactoryDataProvider::SetSetupDiscriminator(uint16_t setupDiscriminator)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
+CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
     uint16_t temp = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kIcId, (uint8_t *) &iterationCount, sizeof(iterationCount), temp));
@@ -324,7 +324,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterati
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
+CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
 {
     char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
     uint16_t saltB64Len                     = 0;
@@ -339,7 +339,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen)
+CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen)
 {
     char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };
     uint16_t verifierB64Len                                   = 0;
@@ -353,7 +353,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
+CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kSetupPasscodeId, (uint8_t *) &setupPasscode, sizeof(setupPasscode), length));
@@ -361,12 +361,12 @@ CHIP_ERROR K32W0FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode)
+CHIP_ERROR FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
+CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kVendorNameId, (uint8_t *) buf, bufSize, length));
@@ -375,7 +375,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetVendorId(uint16_t & vendorId)
+CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kVidId, (uint8_t *) &vendorId, sizeof(vendorId), length));
@@ -383,7 +383,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetVendorId(uint16_t & vendorId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
+CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductNameId, (uint8_t *) buf, bufSize, length));
@@ -392,7 +392,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetProductId(uint16_t & productId)
+CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kPidId, (uint8_t *) &productId, sizeof(productId), length));
@@ -400,7 +400,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetProductId(uint16_t & productId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
+CHIP_ERROR FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kPartNumber, (uint8_t *) buf, bufSize, length));
@@ -409,7 +409,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
+CHIP_ERROR FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductURL, (uint8_t *) buf, bufSize, length));
@@ -418,7 +418,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
+CHIP_ERROR FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductLabel, (uint8_t *) buf, bufSize, length));
@@ -427,7 +427,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
+CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kSerialNumberId, (uint8_t *) buf, bufSize, length));
@@ -436,7 +436,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
+CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
     uint16_t length = 0;
     uint8_t date[ConfigurationManager::kMaxManufacturingDateLength];
@@ -461,7 +461,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
+CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(
@@ -470,7 +470,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
+CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kHardwareVersionStrId, (uint8_t *) buf, bufSize, length));
@@ -479,7 +479,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetHardwareVersionString(char * buf, size_t
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
+CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID

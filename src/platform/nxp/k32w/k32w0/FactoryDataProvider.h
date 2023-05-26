@@ -19,12 +19,12 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
-
-#include "CHIPPlatformConfig.h"
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <src/lib/core/CHIPError.h>
 
 #include <vector>
+
+#include "CHIPPlatformConfig.h"
 
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START[];
@@ -53,9 +53,9 @@ namespace DeviceLayer {
  *        and Device Instance Info.
  */
 
-class K32W0FactoryDataProvider : public DeviceInstanceInfoProvider,
-                                 public CommissionableDataProvider,
-                                 public Credentials::DeviceAttestationCredentialsProvider
+class FactoryDataProvider : public DeviceInstanceInfoProvider,
+                            public CommissionableDataProvider,
+                            public Credentials::DeviceAttestationCredentialsProvider
 {
 public:
     struct Header
@@ -110,9 +110,9 @@ public:
 
     using RestoreMechanism = CHIP_ERROR (*)(void);
 
-    static K32W0FactoryDataProvider & GetDefaultInstance();
+    static FactoryDataProvider & GetDefaultInstance();
 
-    K32W0FactoryDataProvider();
+	FactoryDataProvider();
 
     CHIP_ERROR Init();
     CHIP_ERROR Validate();

@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include "K32W0FactoryDataProvider.h"
+#include "FactoryDataProvider.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -27,7 +27,7 @@ namespace DeviceLayer {
  *        provider based on this example.
  */
 
-class CustomFactoryDataProvider : public K32W0FactoryDataProvider
+class CustomFactoryDataProvider : public FactoryDataProvider
 {
 public:
     /* Custom IDs should start from FactoryDataId::kMaxId, which is
