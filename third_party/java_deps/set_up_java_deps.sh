@@ -21,14 +21,14 @@ set -e
 mkdir -p third_party/java_deps/artifacts
 
 function download_maven_jar() {
-  _MAVEN_PATH=$1
-  _JAR_NAME=$2
+    _MAVEN_PATH=$1
+    _JAR_NAME=$2
 
-  if [ ! -f "third_party/java_deps/artifacts/$_JAR_NAME" ]; then
-    curl --fail --location --silent --show-error \
-         "https://repo1.maven.org/maven2/$_MAVEN_PATH/$_JAR_NAME" \
-         -o "third_party/java_deps/artifacts/$_JAR_NAME"
-  fi
+    if [ ! -f "third_party/java_deps/artifacts/$_JAR_NAME" ]; then
+        curl --fail --location --silent --show-error \
+            "https://repo1.maven.org/maven2/$_MAVEN_PATH/$_JAR_NAME" \
+            -o "third_party/java_deps/artifacts/$_JAR_NAME"
+    fi
 }
 
 download_maven_jar "com/google/code/findbugs/jsr305/3.0.2" "jsr305-3.0.2.jar"
