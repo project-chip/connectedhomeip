@@ -155,7 +155,7 @@ jobs:
                   TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-incomplete-umbrella -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES > >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
                   # -enableThreadSanitizer instruments the code in Matter.framework,
                   # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_TSAN=YES
-                  #xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-incomplete-umbrella -Wno-unguarded-availability-new' CHIP_IS_TSAN=YES > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
+                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-incomplete-umbrella -Wno-unguarded-availability-new' CHIP_IS_TSAN=YES > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
               working-directory: src/darwin/Framework
             - name: Uploading log files
               uses: actions/upload-artifact@v3

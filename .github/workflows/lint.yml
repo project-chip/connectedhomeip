@@ -215,6 +215,14 @@ jobs:
               run: |
                   git grep -n 'SuccessOrExit(CHIP_ERROR' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of "SuccessOrExit(something-without-assignment(", which should probably be "SuccessOrExit(err = something("
+              if: always()
+              run: |
+                  git grep -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
             - name: Check that our hardcoded SHA for clang-format on ARM mac matches the pigweed SHA.
               if: always()
               run: |
