@@ -63,7 +63,11 @@ server cluster Groups = 4 {
     kGroupNames = 0x1;
   }
 
-  readonly attribute bitmap8 nameSupport = 0;
+  bitmap NameSupportBitmap : BITMAP8 {
+    kGroupNames = 0x80;
+  }
+
+  readonly attribute NameSupportBitmap nameSupport = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -761,6 +765,7 @@ server cluster NetworkCommissioning = 49 {
     k5g = 2;
     k6g = 3;
     k60g = 4;
+    k1g = 5;
   }
 
   bitmap Feature : BITMAP32 {
@@ -1245,6 +1250,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kN = 3;
     kAc = 4;
     kAx = 5;
+    kAh = 6;
   }
 
   bitmap Feature : BITMAP32 {
@@ -2285,27 +2291,27 @@ endpoint 1 {
   }
 
   server cluster ColorControl {
-    ram      attribute currentHue default = 0x00;
-    ram      attribute currentSaturation default = 0x00;
+    persist  attribute currentHue default = 0x00;
+    persist  attribute currentSaturation default = 0x00;
     ram      attribute remainingTime default = 0x0000;
-    ram      attribute currentX default = 0x616B;
-    ram      attribute currentY default = 0x607D;
-    ram      attribute colorTemperatureMireds default = 0x00FA;
-    ram      attribute colorMode default = 0x01;
+    persist  attribute currentX default = 0x616B;
+    persist  attribute currentY default = 0x607D;
+    persist  attribute colorTemperatureMireds default = 0x00FA;
+    persist  attribute colorMode default = 0x01;
     ram      attribute options default = 0x00;
     ram      attribute numberOfPrimaries;
-    ram      attribute enhancedCurrentHue default = 0x0000;
-    ram      attribute enhancedColorMode default = 0x01;
-    ram      attribute colorLoopActive default = 0x00;
-    ram      attribute colorLoopDirection default = 0x00;
-    ram      attribute colorLoopTime default = 0x0019;
+    persist  attribute enhancedCurrentHue default = 0x0000;
+    persist  attribute enhancedColorMode default = 0x01;
+    persist  attribute colorLoopActive default = 0x00;
+    persist  attribute colorLoopDirection default = 0x00;
+    persist  attribute colorLoopTime default = 0x0019;
     ram      attribute colorLoopStartEnhancedHue default = 0x2300;
     ram      attribute colorLoopStoredEnhancedHue default = 0x0000;
     ram      attribute colorCapabilities default = 0x1F;
     ram      attribute colorTempPhysicalMinMireds default = 0x0000;
     ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
     ram      attribute coupleColorTempToLevelMinMireds;
-    ram      attribute startUpColorTemperatureMireds;
+    persist  attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0x1F;
     ram      attribute clusterRevision default = 5;
   }

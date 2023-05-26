@@ -4880,7 +4880,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case Groups::Attributes::NameSupport::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NameSupport", 1, value);
         }

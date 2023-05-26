@@ -22261,6 +22261,10 @@ typedef NS_OPTIONS(uint32_t, MTRGroupsGroupClusterFeature) {
     = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRGroupsFeature");
 
+typedef NS_OPTIONS(uint8_t, MTRGroupsNameSupportBitmap) {
+    MTRGroupsNameSupportBitmapGroupNames MTR_NEWLY_AVAILABLE = 0x80,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_OPTIONS(uint32_t, MTRScenesFeature) {
     MTRScenesFeatureSceneNames MTR_NEWLY_AVAILABLE = 0x1,
 } MTR_NEWLY_AVAILABLE;
@@ -22923,6 +22927,7 @@ typedef NS_ENUM(uint8_t, MTRNetworkCommissioningWiFiBand) {
     MTRNetworkCommissioningWiFiBand5G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
     MTRNetworkCommissioningWiFiBand6G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
     MTRNetworkCommissioningWiFiBand60G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
+    MTRNetworkCommissioningWiFiBand1G MTR_NEWLY_AVAILABLE = 0x05,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRNetworkCommissioningFeature) {
@@ -23265,6 +23270,7 @@ typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersion) {
     MTRWiFiNetworkDiagnosticsWiFiVersionN API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x03,
     MTRWiFiNetworkDiagnosticsWiFiVersionAc API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x04,
     MTRWiFiNetworkDiagnosticsWiFiVersionAx API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x05,
+    MTRWiFiNetworkDiagnosticsWiFiVersionAh MTR_NEWLY_AVAILABLE = 0x06,
 } API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersionType) {
