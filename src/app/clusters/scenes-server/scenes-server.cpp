@@ -140,7 +140,7 @@ template <typename CommandData, typename ResponseType>
 void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandData & req, GroupDataProvider * groupProvider)
 {
     ResponseType response;
-    uint16_t endpoinTableSize = 0;
+    uint16_t endpointTableSize = 0;
 
     ReturnOnFailure(AddResponseOnError<ResponseType>(
         ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpoinTableSize)));
@@ -272,7 +272,7 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
 {
     ResponseType response;
 
-    uint16_t endpoinTableSize = 0;
+    uint16_t endpointTableSize = 0;
 
     ReturnOnFailure(AddResponseOnError<ResponseType>(
         ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpoinTableSize)));
@@ -297,7 +297,7 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
 
     SceneTableEntry scene;
 
-    //  Gets the scene form the table
+    //  Gets the scene from the table
     ReturnOnFailure(
         AddResponseOnError<ResponseType>(ctx, response,
                                          sceneTable->GetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(),
