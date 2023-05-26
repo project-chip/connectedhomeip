@@ -232,7 +232,7 @@ protected:
 }; // class DefaultSceneTableImpl
 
 /// @brief Gets a pointer to the instance of Scene Table Impl, providing EndpointId and Table Size for said endpoint
-/// @param endpoint Endpoint ID, optionnal only if getting the Table to initialize it, any storage action will require an endpoint
+/// @param endpoint Endpoint ID, optional only if getting the Table to initialize it, any storage action will require an endpoint
 /// different than kInvalidEndpoint ID and WILL fail if an endpoint wasn't provided here.
 /// @param endpointTableSize Size of the scene table for a specific endpoint. Must be lower than restriction set in CHIPConfig to
 /// match device restrictions, if it is higher than permitted by CHIPConfig, will be capped at kMaxScenesPerEndpoint
