@@ -33,7 +33,7 @@ env:
 
 jobs:
     java_tests_linux:
-        name: Linux
+        name: Java Tests - Linux
         timeout-minutes: 130
 
         env:
@@ -44,7 +44,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-java:0.7.3
+            image: connectedhomeip/chip-build-java:0.7.15
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -79,6 +79,21 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+            - name: Generate unit tests
+              timeout-minutes: 1
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/build/build_examples.py \
+                     --target linux-x64-tests \
+                     gen \
+                  '
+            - name: Build unit tests
+              timeout-minutes: 25
+              run: scripts/run_in_build_env.sh 'ninja -C out/linux-x64-tests src:java_controller_tests'
+
+            - name: Run unit tests
+              timeout-minutes: 10
+              run: scripts/run_in_build_env.sh 'echo FIXME'
 
             - name: Build Java Matter Controller and all clusters app
               timeout-minutes: 50
