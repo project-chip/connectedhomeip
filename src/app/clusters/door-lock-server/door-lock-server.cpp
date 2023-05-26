@@ -119,7 +119,16 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
                         success);
 
     // Send LockOperation event
-    auto opType = (DlLockState::kLocked == newLockState) ? LockOperationTypeEnum::kLock : LockOperationTypeEnum::kUnlock;
+    auto opType = LockOperationTypeEnum::kUnlock;
+
+    if (DlLockState::kLocked == newLockState)
+    {
+        opType = LockOperationTypeEnum::kLock;
+    }
+    else if (DlLockState::kUnlatched == newLockState)
+    {
+        opType = LockOperationTypeEnum::kUnlatch;
+    }
 
     SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex, Nullable<chip::FabricIndex>(),
                            Nullable<chip::NodeId>(), credentials, success);
