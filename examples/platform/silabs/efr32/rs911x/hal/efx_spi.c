@@ -185,9 +185,8 @@ void SPIDRV_ReInit(uint32_t baudrate)
     EUSART_BaudrateSet(MY_USART, 0, baudrate);
 }
 
-sl_status_t sl_wfx_host_spi_cs_assert()
+sl_status_t sl_wfx_host_spi_cs_assert(void)
 {
-    // SILABS_LOG("%s started.", __func__);
     configASSERT(spi_sem_sync_hdl);
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
@@ -201,43 +200,34 @@ sl_status_t sl_wfx_host_spi_cs_assert()
         spi_enabled = true;
     }
     GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
-    // SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 
-sl_status_t sl_wfx_host_spi_cs_deassert()
+sl_status_t sl_wfx_host_spi_cs_deassert(void)
 {
-    // SILABS_LOG("%s started.", __func__);
     if (spi_enabled)
     {
         SPIDRV_DeInit(SL_SPIDRV_HANDLE);
         spi_enabled = false;
     }
     GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
-    // TODO: should be done by deinit, check once.
     GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = 0;
     xSemaphoreGive(spi_sem_sync_hdl);
-    // SILABS_LOG("%s completed.", __func__);
     return SL_STATUS_OK;
 }
 
-void sl_wfx_host_spiflash_cs_assert()
+void sl_wfx_host_spiflash_cs_assert(void)
 {
-    SILABS_LOG("%s started.", __func__);
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
-    SILABS_LOG("%s completed.", __func__);
 }
 
-void sl_wfx_host_spiflash_cs_deassert()
+void sl_wfx_host_spiflash_cs_deassert(void)
 {
-    SILABS_LOG("%s started.", __func__);
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
-    SILABS_LOG("%s completed.", __func__);
 }
 
-void sl_wfx_host_pre_bootloader_spi_transfer()
+void sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
-    SILABS_LOG("%s started.", __func__);
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
         return;
@@ -255,12 +245,10 @@ void sl_wfx_host_pre_bootloader_spi_transfer()
         return;
     }
     sl_wfx_host_spiflash_cs_assert();
-    SILABS_LOG("%s completed.", __func__);
 }
 
-void sl_wfx_host_post_bootloader_spi_transfer()
+void sl_wfx_host_post_bootloader_spi_transfer(void)
 {
-    SILABS_LOG("%s started.", __func__);
     int32_t status = bootloader_deinit();
     // bootloader_deinit will do USART disable
     if (status != BOOTLOADER_OK)
@@ -271,12 +259,10 @@ void sl_wfx_host_post_bootloader_spi_transfer()
     GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = 0;
     sl_wfx_host_spiflash_cs_deassert();
     xSemaphoreGive(spi_sem_sync_hdl);
-    SILABS_LOG("%s completed.", __func__);
 }
 
-void sl_wfx_host_pre_lcd_spi_transfer()
+void sl_wfx_host_pre_lcd_spi_transfer(void)
 {
-    SILABS_LOG("%s started.", __func__);
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
         return;
@@ -288,17 +274,14 @@ void sl_wfx_host_pre_lcd_spi_transfer()
     }
     sl_memlcd_refresh(sl_memlcd_get());
     // sl_memlcd_refresh takes care of SPIDRV_Init()
-    SILABS_LOG("%s completed.", __func__);
 }
 
-void sl_wfx_host_post_lcd_spi_transfer()
+void sl_wfx_host_post_lcd_spi_transfer(void)
 {
-    SILABS_LOG("%s started.", __func__);
     USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
     CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
     GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = 0;
     xSemaphoreGive(spi_sem_sync_hdl);
-    SILABS_LOG("%s completed.", __func__);
 }
 
 #endif /* EFR32MG24 */
@@ -337,7 +320,6 @@ static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t tra
  **************************************************************************/
 int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint8_t mode)
 {
-    // SILABS_LOG("%s started.", __func__);
 #if defined(EFR32MG24)
     sl_wfx_host_spi_cs_assert();
 #endif /* EFR32MG24 */
@@ -404,6 +386,5 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
 #if defined(EFR32MG24)
     sl_wfx_host_spi_cs_deassert();
 #endif /* EFR32MG24 */
-    // SILABS_LOG("%s completed.", __func__);
     return rsiError;
 }
