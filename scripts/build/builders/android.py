@@ -227,6 +227,7 @@ class AndroidBuilder(Builder):
             "CHIPController.jar": "src/controller/java/CHIPController.jar",
             "SetupPayloadParser.jar": "src/setup_payload/java/SetupPayloadParser.jar",
             "AndroidPlatform.jar": "src/platform/android/AndroidPlatform.jar",
+            "libCHIPTlv.jar": "src/controller/java/libCHIPTlv.jar",
         }
 
         for jarName in jars.keys():
@@ -519,6 +520,9 @@ class AndroidBuilder(Builder):
                 ),
                 "CHIPController.jar": os.path.join(
                     self.output_dir, "lib", "src/controller/java/CHIPController.jar"
+                ),
+                "libChipTlv.jar": os.path.join(
+                    self.output_dir, "lib", "src/controller/java/libCHIPTlv.jar"
                 ),
                 "AndroidPlatform.jar": os.path.join(
                     self.output_dir, "lib", "src/platform/android/AndroidPlatform.jar"
