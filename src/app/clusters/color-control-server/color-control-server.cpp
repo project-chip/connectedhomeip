@@ -1627,7 +1627,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
 
     bool isHueTansitionDone         = computeNewHueValue(colorHueTransitionState);
     bool isSaturationTransitionDone = computeNewColor16uValue(colorSaturationTransitionState);
-    bool isTemp = true;
+    bool isTemp                     = true;
 
     SetHSVRemainingTime(endpoint);
 

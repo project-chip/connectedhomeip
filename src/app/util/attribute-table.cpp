@@ -64,8 +64,8 @@ EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attr
                                     EmberAfAttributeType dataType, bool isTemp)
 {
     return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
-                              true,   // override read-only?
-                              false,    // just test?
+                              true,    // override read-only?
+                              false,   // just test?
                               isTemp); // is temporary value (don't store in kvs)?
 }
 
