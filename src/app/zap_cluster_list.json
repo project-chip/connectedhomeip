@@ -146,6 +146,7 @@
         "ADMINISTRATOR_COMMISSIONING_CLUSTER": [
             "administrator-commissioning-server"
         ],
+        "AIR_QUALITY_CLUSTER": [],
         "ALARM_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],
