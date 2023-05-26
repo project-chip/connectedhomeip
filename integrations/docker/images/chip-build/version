@@ -1,1 +1,1 @@
-0.7.14 Version bump reason: [Telink] Update Docker image (drivers update)
+0.7.15 Version bump reason: [Java] Set JAVA_PATH in chip-build-java and vscode

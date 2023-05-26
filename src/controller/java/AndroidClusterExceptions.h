@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public:
     /**
      * Creates a Java ChipClusterException object in outEx.
      */
-    CHIP_ERROR CreateChipClusterException(JNIEnv * env, jint errorCode, jthrowable & outEx);
+    CHIP_ERROR CreateChipClusterException(JNIEnv * env, uint32_t errorCode, jthrowable & outEx);
 
     /**
      * Creates a Java IllegalStateException in outEx.

@@ -691,6 +691,7 @@ typedef void (*IdentifyEventListListAttributeCallback)(void * context,
                                                        const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*IdentifyAttributeListListAttributeCallback)(void * context,
                                                            const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*GroupsNameSupportAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>);
 typedef void (*GroupsGeneratedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*GroupsAcceptedCommandListListAttributeCallback)(void * context,
@@ -2508,6 +2509,35 @@ public:
     void OnSubscriptionEstablished();
     using MTRIdentifyAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRIdentifyAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRGroupsNameSupportAttributeCallbackBridge : public MTRCallbackBridge<GroupsNameSupportAttributeCallback>
+{
+public:
+    MTRGroupsNameSupportAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<GroupsNameSupportAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRGroupsNameSupportAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<GroupsNameSupportAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> value);
+};
+
+class MTRGroupsNameSupportAttributeCallbackSubscriptionBridge : public MTRGroupsNameSupportAttributeCallbackBridge
+{
+public:
+    MTRGroupsNameSupportAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRGroupsNameSupportAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRGroupsNameSupportAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRGroupsNameSupportAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
