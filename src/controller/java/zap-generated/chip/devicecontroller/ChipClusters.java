@@ -8345,7 +8345,8 @@ public class ChipClusters {
     }
 
     public interface NeighborTableAttributeCallback {
-      void onSuccess(List<ChipStructs.ThreadNetworkDiagnosticsClusterNeighborTable> valueList);
+      void onSuccess(
+          List<ChipStructs.ThreadNetworkDiagnosticsClusterNeighborTableStruct> valueList);
 
       void onError(Exception ex);
 
@@ -8353,7 +8354,7 @@ public class ChipClusters {
     }
 
     public interface RouteTableAttributeCallback {
-      void onSuccess(List<ChipStructs.ThreadNetworkDiagnosticsClusterRouteTable> valueList);
+      void onSuccess(List<ChipStructs.ThreadNetworkDiagnosticsClusterRouteTableStruct> valueList);
 
       void onError(Exception ex);
 

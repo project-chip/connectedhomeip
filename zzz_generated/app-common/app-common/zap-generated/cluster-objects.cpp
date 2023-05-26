@@ -7119,7 +7119,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace SoftwareDiagnostics
 namespace ThreadNetworkDiagnostics {
 namespace Structs {
-namespace NeighborTable {
+namespace NeighborTableStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -7210,7 +7210,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace NeighborTable
+} // namespace NeighborTableStruct
 namespace OperationalDatasetComponents {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -7295,7 +7295,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace OperationalDatasetComponents
-namespace RouteTable {
+namespace RouteTableStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -7370,7 +7370,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace RouteTable
+} // namespace RouteTableStruct
 namespace SecurityPolicy {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {

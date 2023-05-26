@@ -931,7 +931,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::SoftwareDiagnostics::S
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type & request,
+                                        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -940,29 +940,31 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("NeighborTable.extAddress", "extAddress", value.isMember("extAddress")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTable.age", "age", value.isMember("age")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTable.rloc16", "rloc16", value.isMember("rloc16")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTable.linkFrameCounter", "linkFrameCounter",
+        ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.extAddress", "extAddress", value.isMember("extAddress")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.age", "age", value.isMember("age")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.rloc16", "rloc16", value.isMember("rloc16")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.linkFrameCounter", "linkFrameCounter",
                                                                   value.isMember("linkFrameCounter")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTable.mleFrameCounter", "mleFrameCounter",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.mleFrameCounter", "mleFrameCounter",
                                                                   value.isMember("mleFrameCounter")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTable.lqi", "lqi", value.isMember("lqi")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.lqi", "lqi", value.isMember("lqi")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("NeighborTable.averageRssi", "averageRssi", value.isMember("averageRssi")));
+        ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.averageRssi", "averageRssi", value.isMember("averageRssi")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("NeighborTable.lastRssi", "lastRssi", value.isMember("lastRssi")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTable.frameErrorRate", "frameErrorRate",
+        ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.lastRssi", "lastRssi", value.isMember("lastRssi")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.frameErrorRate", "frameErrorRate",
                                                                   value.isMember("frameErrorRate")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTable.messageErrorRate", "messageErrorRate",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.messageErrorRate", "messageErrorRate",
                                                                   value.isMember("messageErrorRate")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("NeighborTable.rxOnWhenIdle", "rxOnWhenIdle", value.isMember("rxOnWhenIdle")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTable.fullThreadDevice", "fullThreadDevice",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.rxOnWhenIdle", "rxOnWhenIdle",
+                                                                  value.isMember("rxOnWhenIdle")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.fullThreadDevice", "fullThreadDevice",
                                                                   value.isMember("fullThreadDevice")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTable.fullNetworkData", "fullNetworkData",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.fullNetworkData", "fullNetworkData",
                                                                   value.isMember("fullNetworkData")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NeighborTable.isChild", "isChild", value.isMember("isChild")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("NeighborTableStruct.isChild", "isChild", value.isMember("isChild")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "extAddress");
@@ -1024,7 +1026,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.extAddress);
     ComplexArgumentParser::Finalize(request.age);
@@ -1153,7 +1155,7 @@ void ComplexArgumentParser::Finalize(
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & request,
+                                        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1162,17 +1164,20 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("RouteTable.extAddress", "extAddress", value.isMember("extAddress")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTable.rloc16", "rloc16", value.isMember("rloc16")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTable.routerId", "routerId", value.isMember("routerId")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTable.nextHop", "nextHop", value.isMember("nextHop")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTable.pathCost", "pathCost", value.isMember("pathCost")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTable.LQIIn", "LQIIn", value.isMember("LQIIn")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTable.LQIOut", "LQIOut", value.isMember("LQIOut")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTable.age", "age", value.isMember("age")));
+        ComplexArgumentParser::EnsureMemberExist("RouteTableStruct.extAddress", "extAddress", value.isMember("extAddress")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTableStruct.rloc16", "rloc16", value.isMember("rloc16")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("RouteTable.allocated", "allocated", value.isMember("allocated")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTable.linkEstablished", "linkEstablished",
+        ComplexArgumentParser::EnsureMemberExist("RouteTableStruct.routerId", "routerId", value.isMember("routerId")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("RouteTableStruct.nextHop", "nextHop", value.isMember("nextHop")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("RouteTableStruct.pathCost", "pathCost", value.isMember("pathCost")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTableStruct.LQIIn", "LQIIn", value.isMember("LQIIn")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTableStruct.LQIOut", "LQIOut", value.isMember("LQIOut")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTableStruct.age", "age", value.isMember("age")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("RouteTableStruct.allocated", "allocated", value.isMember("allocated")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RouteTableStruct.linkEstablished", "linkEstablished",
                                                                   value.isMember("linkEstablished")));
 
     char labelWithMember[kMaxLabelLength];
@@ -1219,7 +1224,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.extAddress);
     ComplexArgumentParser::Finalize(request.rloc16);

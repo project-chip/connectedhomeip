@@ -132,10 +132,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::SoftwareDiagnos
 
 static void Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type & request,
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type & request);
+static void Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type & request,
@@ -143,10 +144,11 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & request,
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & request);
+static void Finalize(chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type & request,
                         Json::Value & value);
