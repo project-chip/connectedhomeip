@@ -607,7 +607,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
             if (entry.hasCurrentLevelValue)
             {
-                logWriteError(LevelControl::Attributes::CurrentLevel::Set(endpoint, entry.currentLevelValue), "CurrentLevel");
+                logWriteError(LevelControl::Attributes::CurrentLevel::Set(endpoint, entry.currentLevelValue, false), "CurrentLevel");
             }
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
@@ -634,20 +634,20 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
                 using namespace ColorControl::Attributes;
                 if (entry.hasCurrentXValue)
                 {
-                    logWriteError(CurrentX::Set(endpoint, entry.currentXValue), "CurrentX");
+                    logWriteError(CurrentX::Set(endpoint, entry.currentXValue, false), "CurrentX");
                 }
                 if (entry.hasCurrentYValue)
                 {
-                    logWriteError(CurrentY::Set(endpoint, entry.currentXValue), "CurrentY");
+                    logWriteError(CurrentY::Set(endpoint, entry.currentXValue, false), "CurrentY");
                 }
 
                 if (entry.hasEnhancedCurrentHueValue)
                 {
-                    logWriteError(EnhancedCurrentHue::Set(endpoint, entry.enhancedCurrentHueValue), "EnhancedCurrentHue");
+                    logWriteError(EnhancedCurrentHue::Set(endpoint, entry.enhancedCurrentHueValue, false), "EnhancedCurrentHue");
                 }
                 if (entry.hasCurrentSaturationValue)
                 {
-                    logWriteError(CurrentSaturation::Set(endpoint, entry.currentSaturationValue), "CurrentSaturation");
+                    logWriteError(CurrentSaturation::Set(endpoint, entry.currentSaturationValue, false), "CurrentSaturation");
                 }
                 if (entry.hasColorLoopActiveValue)
                 {
@@ -663,7 +663,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
                 }
                 if (entry.hasColorTemperatureMiredsValue)
                 {
-                    logWriteError(ColorTemperatureMireds::Set(endpoint, entry.colorTemperatureMiredsValue),
+                    logWriteError(ColorTemperatureMireds::Set(endpoint, entry.colorTemperatureMiredsValue, false),
                                   "ColorTemperatureMireds");
                 }
             }

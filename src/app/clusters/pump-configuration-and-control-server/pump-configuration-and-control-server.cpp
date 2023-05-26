@@ -163,7 +163,7 @@ static void setEffectiveModes(EndpointId endpoint)
         Attributes::EffectiveControlMode::Set(endpoint, ControlModeEnum::kConstantSpeed);
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         LevelControl::Attributes::MaxLevel::Get(endpoint, &maxLevel);
-        LevelControl::Attributes::CurrentLevel::Set(endpoint, maxLevel);
+        LevelControl::Attributes::CurrentLevel::Set(endpoint, maxLevel, false);
 #endif
         if (isPumpStatusAvailable)
         {
@@ -187,7 +187,7 @@ static void setEffectiveModes(EndpointId endpoint)
             // Bump the minimum level to 1, since the value of 0 means stop
             minLevel = 1;
         }
-        LevelControl::Attributes::CurrentLevel::Set(endpoint, minLevel);
+        LevelControl::Attributes::CurrentLevel::Set(endpoint, minLevel, false);
 #endif
         if (isPumpStatusAvailable)
         {
