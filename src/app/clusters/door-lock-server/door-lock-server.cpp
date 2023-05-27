@@ -3307,7 +3307,8 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
                                                const chip::app::ConcreteCommandPath & commandPath, LockOperationTypeEnum opType,
                                                RemoteLockOpHandler opHandler, const Optional<ByteSpan> & pinCode)
 {
-    VerifyOrDie(LockOperationTypeEnum::kLock == opType || LockOperationTypeEnum::kUnlock == opType || LockOperationTypeEnum::kUnlatch == opType);
+    VerifyOrDie(LockOperationTypeEnum::kLock == opType || LockOperationTypeEnum::kUnlock == opType ||
+                LockOperationTypeEnum::kUnlatch == opType);
     VerifyOrDie(nullptr != opHandler);
 
     EndpointId endpoint       = commandPath.mEndpointId;
@@ -3442,14 +3443,14 @@ exit:
                            Nullable<chip::FabricIndex>(getFabricIndex(commandObj)), Nullable<chip::NodeId>(getNodeId(commandObj)),
                            credentials, success);
 
-    // SHALL generate a LockOperation event with LockOperationType set to Unlatch when the unlatched state is reached and a LockOperation
-    // event with LockOperationType set to Unlock when the lock successfully completes the unlock.
-    // But as the current implementation here is sending LockOperation events immediately we're sending both events immediately.
+    // SHALL generate a LockOperation event with LockOperationType set to Unlatch when the unlatched state is reached and a
+    // LockOperation event with LockOperationType set to Unlock when the lock successfully completes the unlock. But as the current
+    // implementation here is sending LockOperation events immediately we're sending both events immediately.
     if (LockOperationTypeEnum::kUnlatch == opType && success)
     {
         SendLockOperationEvent(endpoint, LockOperationTypeEnum::kUnlock, OperationSourceEnum::kRemote, reason, pinUserIdx,
-                               Nullable<chip::FabricIndex>(getFabricIndex(commandObj)), Nullable<chip::NodeId>(getNodeId(commandObj)),
-                               credentials, success);
+                               Nullable<chip::FabricIndex>(getFabricIndex(commandObj)),
+                               Nullable<chip::NodeId>(getNodeId(commandObj)), credentials, success);
     }
 
     return success;
