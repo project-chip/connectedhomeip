@@ -49,12 +49,6 @@ tests:
       response:
           value: 1
 
-    - label: "Verify that lock state attribute value is set to Locked"
-      command: "readAttribute"
-      attribute: "LockState"
-      response:
-          value: 1
-
     - label: "Try to unbolt the door without PIN"
       command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
@@ -68,12 +62,6 @@ tests:
     - label: "Try to lock the door without a PIN"
       command: "LockDoor"
       timedInteractionTimeoutMs: 10000
-
-    - label: "Verify that lock state attribute value is set to Locked"
-      command: "readAttribute"
-      attribute: "LockState"
-      response:
-          value: 1
 
     - label: "Verify that lock state attribute value is set to Locked"
       command: "readAttribute"
