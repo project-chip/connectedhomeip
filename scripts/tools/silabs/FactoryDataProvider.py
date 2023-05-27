@@ -51,6 +51,10 @@ class FactoryDataWriter:
     DIC_CA_CERT_OFFSET = "0x87213:"
     DIC_DEV_CERT_OFFSET = "0x87214:"
     DIC_DEV_KEY_OFFSET = "0x87215:"
+    DIC_HOSTNAME_KEY = "0x87216:"
+    DIC_CLIENTID_KEY = "0x87217:"
+    DIC_USERNAME_KEY = "0x87218:"
+    DIC_PASSWORD_KEY = "0x87219:"
 
     def generate_spake2p_verifier(self):
         """ Generate Spake2+ verifier using the external spake2p tool
@@ -140,6 +144,14 @@ class FactoryDataWriter:
         kMaxProductUrlLenght = 256
         kMaxPartNumberLength = 32
         kMaxProductLabelLength = 64
+        kMaxcacert = 2048
+        kMaxdevicecert = 2048
+        kMaxdevicekey = 2048
+        kMaxhostname = 64
+        kMaxclientid = 32
+        kMaxusernme = 32
+        kMaxpassword = 32
+
 
         INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444,
                              55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
@@ -177,6 +189,21 @@ class FactoryDataWriter:
             assert (len(self._args.product_url) <= kMaxProductUrlLenght), "Product URL exceeds the size limit"
         if self._args.part_number:
             assert (len(self._args.part_number) <= kMaxPartNumberLength), "Part number exceeds the size limit"
+        if self._args.ca_cert:
+            assert (len(self._args.ca_cert) <= kMaxcacert), "ca cert exceeds the size limit"
+        if self._args.device_cert:
+            assert (len(self._args.device_cert) <= kMaxdevicecert), "device cert exceeds the size limit"
+        if self._args.device_key:
+            assert (len(self._args.device_key) <= kMaxdevicekey), "device key exceeds the size limit"
+        if self._args.hostname:
+            assert (len(self._args.hostname) <= kMaxhostname), "hostname exceeds the size limit"
+        if self._args.clientid:
+            assert (len(self._args.clientid) <= kMaxclientid), "clientid exceeds the size limit"
+        if self._args.username:
+            assert (len(self._args.username) <= kMaxusernme), "username exceeds the size limit"
+        if self._args.password:
+            assert (len(self._args.password) <= kMaxpassword), "password exceeds the size limit"
+
 
     def add_SerialNo_To_CMD(self, cmdList):
         """ Add the jtag serial command to the commander command
@@ -300,6 +327,23 @@ class FactoryDataWriter:
             device_keyArray = bytes(self._args.device_key, 'utf-8').hex()
             cmd.extend(["--object", self.DIC_DEV_KEY_OFFSET + str(device_keyArray)])
 
+        if self._args.hostname:
+            hostname = bytes(self._args.hostname, 'utf-8').hex()
+            cmd.extend(["--object", self.DIC_HOSTNAME_KEY + str(hostname)])
+
+        if self._args.clientid:
+            clientid = bytes(self._args.clientid, 'utf-8').hex()
+            cmd.extend(["--object", self.DIC_CLIENTID_KEY + str(clientid)])
+
+        if self._args.username:
+            username = bytes(self._args.username, 'utf-8').hex()
+            cmd.extend(["--object", self.DIC_USERNAME_KEY + str(username)])
+
+        if self._args.password:
+            password = bytes(self._args.password, 'utf-8').hex()
+            cmd.extend(["--object", self.DIC_PASSWORD_KEY + str(password)])
+
+
         cmd.extend(["--outfile", self.OUT_FILE])
         results = subprocess.run(cmd)
 
@@ -371,6 +415,14 @@ def main():
                         help="[string] Provide device_cert.")
     parser.add_argument("--device_key", type=str,
                         help="[string] Provide device_key.")
+    parser.add_argument("--hostname", type=str,
+                        help="[string] Provide hostname.")
+    parser.add_argument("--clientid", type=str,
+                        help="[string] Provide clientid.")
+    parser.add_argument("--username", type=str,
+                        help="[string] Provide username.")
+    parser.add_argument("--password", type=str,
+                        help="[string] Provide pasword.")
 
     args = parser.parse_args()
     writer = FactoryDataWriter(args)

@@ -111,12 +111,14 @@ public:
     static constexpr Key KConfigKey_ProductLabel          = SilabsConfigKey(kMatterFactory_KeyBase, 0x10);
     static constexpr Key kConfigKey_ProductURL            = SilabsConfigKey(kMatterFactory_KeyBase, 0x11);
     static constexpr Key kConfigKey_PartNumber            = SilabsConfigKey(kMatterFactory_KeyBase, 0x12);
+    static constexpr Key kConfigKey_CACerts               = SilabsConfigKey(kMatterFactory_KeyBase, 0x13);
+    static constexpr Key kConfigKey_DeviceCerts           = SilabsConfigKey(kMatterFactory_KeyBase, 0x14);
+    static constexpr Key kConfigKey_DeviceKey             = SilabsConfigKey(kMatterFactory_KeyBase, 0x15);
+    static constexpr Key kConfigKey_hostname              = SilabsConfigKey(kMatterFactory_KeyBase, 0x16);
+    static constexpr Key kConfigKey_clientid              = SilabsConfigKey(kMatterFactory_KeyBase, 0x17);
+    static constexpr Key kConfigKey_username              = SilabsConfigKey(kMatterFactory_KeyBase, 0x18);
+    static constexpr Key kConfigKey_password              = SilabsConfigKey(kMatterFactory_KeyBase, 0x19);
     static constexpr Key kConfigKey_UniqueId              = SilabsConfigKey(kMatterFactory_KeyBase, 0x1F);
-#ifdef SL_DIC_NVM_EMBED_CERT
-    static constexpr Key kConfigKey_CACerts     = SilabsConfigKey(kMatterFactory_KeyBase, 0x13);
-    static constexpr Key kConfigKey_DeviceCerts = SilabsConfigKey(kMatterFactory_KeyBase, 0x14);
-    static constexpr Key kConfigKey_DeviceKey   = SilabsConfigKey(kMatterFactory_KeyBase, 0x15);
-#endif // SL_DIC_NVM_EMBED_CERT
     // Matter Config Keys
     static constexpr Key kConfigKey_ServiceConfig      = SilabsConfigKey(kMatterConfig_KeyBase, 0x01);
     static constexpr Key kConfigKey_PairedAccountId    = SilabsConfigKey(kMatterConfig_KeyBase, 0x02);
