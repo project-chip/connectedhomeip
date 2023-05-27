@@ -89,9 +89,13 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, log_queue)
 
     command = ['java',
-               '-Djava.library.path=' + tool_path + '/lib/jni',
+               f'-Djava.library.path={tool_path}/lib/jni',
                '-cp',
-               f'{tool_path}/lib/*:{tool_path}/bin/java-matter-controller',
+               ':'.join([
+                   f'{tool_path}/lib/*',
+                   f'{tool_path}/lib/third_party/connectedhomeip/src/controller/java/*',
+                   f'{tool_path}/bin/java-matter-controller',
+                   ]),
                'com.matter.controller.MainKt']
 
     if tool_cluster == 'pairing':
