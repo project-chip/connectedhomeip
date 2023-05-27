@@ -26,10 +26,9 @@ import javax.annotation.Nullable;
 public class ChipStructs {
   public static class ScenesClusterAttributeValuePair {
     public Optional<Long> attributeID;
-    public ArrayList<Object> attributeValue;
+    public Long attributeValue;
 
-    public ScenesClusterAttributeValuePair(
-        Optional<Long> attributeID, ArrayList<Object> attributeValue) {
+    public ScenesClusterAttributeValuePair(Optional<Long> attributeID, Long attributeValue) {
       this.attributeID = attributeID;
       this.attributeValue = attributeValue;
     }

@@ -315,6 +315,22 @@ typedef void (*EthernetNetworkDiagnosticsEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*EthernetNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*TimeSynchronizationTimeZoneListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::DecodableType> &
+        data);
+typedef void (*TimeSynchronizationDSTOffsetListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::DecodableType> &
+        data);
+typedef void (*TimeSynchronizationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TimeSynchronizationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*TimeSynchronizationEventListListAttributeCallback)(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*TimeSynchronizationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*BridgedDeviceBasicInformationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BridgedDeviceBasicInformationAcceptedCommandListListAttributeCallback)(
@@ -450,20 +466,6 @@ typedef void (*SmokeCoAlarmEventListListAttributeCallback)(void * context,
                                                            const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*SmokeCoAlarmAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OperationalStatePhaseListListAttributeCallback)(
-    void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & data);
-typedef void (*OperationalStateOperationalStateListListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType> & data);
-typedef void (*OperationalStateGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OperationalStateAcceptedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*OperationalStateEventListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*OperationalStateAttributeListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*HepaFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*HepaFilterMonitoringAcceptedCommandListListAttributeCallback)(

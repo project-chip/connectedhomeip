@@ -249,7 +249,6 @@ class TestYamlLoader(unittest.TestCase):
         keys = [
             'nodeId',
             'groupId',
-            'endpoint',
             'minInterval',
             'maxInterval',
             'timedInteractionTimeoutMs',
@@ -303,6 +302,23 @@ class TestYamlLoader(unittest.TestCase):
         self.assertEqual(tests, [{'response': [{'value': True}]}])
 
         wrong_values = self._get_wrong_values([dict, list], spaces=6)
+        for value in wrong_values:
+            x = content.format(value=value)
+            self.assertRaises(TestStepInvalidTypeError, load, x)
+
+    def test_key_tests_step_endpoint_number_key(self):
+        load = YamlLoader().load
+
+        content = ('tests:\n'
+                   '  - endpoint: {value}')
+
+        _, _, _, _, tests = load(content.format(value=1))
+        self.assertEqual(tests, [{'endpoint': 1}])
+
+        _, _, _, _, tests = load(content.format(value='TestKey'))
+        self.assertEqual(tests, [{'endpoint': 'TestKey'}])
+
+        wrong_values = self._get_wrong_values([str, int], spaces=6)
         for value in wrong_values:
             x = content.format(value=value)
             self.assertRaises(TestStepInvalidTypeError, load, x)

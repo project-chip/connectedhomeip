@@ -17,6 +17,7 @@
    <xi:include href="chip/chip-types.xml" />
    <xi:include href="chip/clusters-extensions.xml" />
    <xi:include href="chip/color-control-cluster.xml" />
+   <xi:include href="chip/concentration-measurement-cluster.xml" />
    <xi:include href="chip/content-launch-cluster.xml" />
    <xi:include href="chip/descriptor-cluster.xml" />
    <xi:include href="chip/diagnostic-logs-cluster.xml" />

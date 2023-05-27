@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _attributeID = nil;
 
-        _attributeValue = [NSArray array];
+        _attributeValue = @(0);
     }
     return self;
 }

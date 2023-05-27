@@ -1,0 +1,377 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 133.1.1. [TC-TIMESYNC-1.1] Global attributes with server as DUT
+
+PICS:
+    - TIMESYNC.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Time Synchronization"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    ##########################
+    # TS 2: Cluster revision
+    ##########################
+    - label: "TS2: read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 2
+
+    ##########################
+    # TS 3: Feature map
+    ##########################
+    # TZ
+    - label:
+          "TS3: Given TIMESYNC.S.F00(TZ) ensure featuremap has the correct bit
+          set"
+      PICS: TIMESYNC.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "TS3: Given !TIMESYNC.S.F00(TZ) ensure featuremap has the correct bit
+          clear"
+      PICS: "!TIMESYNC.S.F00"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
+    # NTPC
+    - label:
+          "TS3: Given TIMESYNC.S.F01(NTPC) ensure featuremap has the correct bit
+          set"
+      PICS: TIMESYNC.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label:
+          "TS3: Given !TIMESYNC.S.F01(NTPC) ensure featuremap has the correct
+          bit clear"
+      PICS: "!TIMESYNC.S.F01"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x2]
+
+    # NTPS
+    - label:
+          "TS3: Given TIMESYNC.S.F02(NTPS) ensure featuremap has the correct bit
+          set"
+      PICS: TIMESYNC.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label:
+          "TS3: Given !TIMESYNC.S.F02(NTPS) ensure featuremap has the correct
+          bit clear"
+      PICS: "!TIMESYNC.S.F02"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x4]
+
+    # TSC
+    - label:
+          "TS3: Given TIMESYNC.S.F03(TSC) ensure featuremap has the correct bit
+          set"
+      PICS: TIMESYNC.S.F03
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x8]
+
+    - label:
+          "TS3: Given !TIMESYNC.S.F03(TSC) ensure featuremap has the correct bit
+          clear"
+      PICS: "!TIMESYNC.S.F03"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x8]
+
+    ##########################
+    # TS 3: Feature map
+    ##########################
+    # Mandatory entries
+    - label: "TS4: Check for mandatory attributes in AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              contains:
+                  [
+                      0x0000,
+                      0x0001,
+                      0xFFF8,
+                      0xFFF9,
+                      0xFFFA,
+                      0xFFFB,
+                      0xFFFC,
+                      0xFFFD,
+                  ]
+
+    # Optional
+    - label: "TS4: Check for optional attribute TimeSource in AttributeList"
+      PICS: TIMESYNC.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              contains: [0x0002]
+
+    - label: "TS4: Check for optional attribute TimeSource not in AttributeList"
+      PICS: "!TIMESYNC.S.A0002"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              excludes: [0x0002]
+
+    # Feature TZ
+    - label: "TS4: Check for TZ feature-based attributes in AttributeList"
+      PICS: TIMESYNC.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              contains: [0x0005, 0x0006, 0x0007, 0x0008, 0x000A, 0x000B]
+
+    - label: "TS4: Check for TZ feature-based attributes not in AttributeList"
+      PICS: "!TIMESYNC.S.F00"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              excludes: [0x0005, 0x0006, 0x0007, 0x0008, 0x000A, 0x000B]
+
+    # Feature NTPC
+    - label: "TS4: Check for NTPC feature-based attributes in AttributeList"
+      PICS: TIMESYNC.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              contains: [0x0004, 0x000C]
+
+    - label: "TS4: Check for NTPC feature-based attributes not in AttributeList"
+      PICS: "!TIMESYNC.S.F01"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              excludes: [0x0004, 0x000C]
+
+    # Feature NTPS
+    - label: "TS4: Check for NTPS feature-based attributes in AttributeList"
+      PICS: TIMESYNC.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              contains: [0x0009]
+
+    - label: "TS4: Check for NTPS feature-based attributes not in AttributeList"
+      PICS: "!TIMESYNC.S.F02"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              excludes: [0x0009]
+
+    # Feature TSC
+    - label: "TS4: Check for TSC feature-based attributes in AttributeList"
+      PICS: TIMESYNC.S.F03
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              contains: [0x0003]
+
+    - label: "TS4: Check for TSC feature-based attributes not in AttributeList"
+      PICS: "!TIMESYNC.S.F03"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              excludes: [0x0003]
+
+    # Note - additional exclusions not handled here
+
+    ##########################
+    # TS 5: Event list - NOTE: disabled
+    ##########################
+    # mandatory
+    - label: "TS5: Check for mandatory events in EventList"
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              contains: [0x03]
+
+    # Feature TZ
+    - label: "TS5: Check for TZ feature-based events in EventList"
+      PICS: TIMESYNC.S.F00
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              contains: [0x00, 0x01, 0x02]
+
+    - label: "TS5: Check for TZ feature-based events not in EventList"
+      PICS: "!TIMESYNC.S.F00"
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              excludes: [0x00, 0x01, 0x02]
+
+    # Feature TSC
+    - label: "TS5: Check for TSC feature-based events in EventList"
+      PICS: TIMESYNC.S.F03
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              contains: [0x04]
+    - label: "TS5: Check for TSC feature-based events not in EventList"
+      PICS: "!TIMESYNC.S.F03"
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              excludes: [0x04]
+
+    # Note - additional exclusions not handled here
+
+    ##########################
+    # TS 6: AcceptedCommandList
+    ##########################
+    # mandatory
+    - label: "TS6: Check for mandatory commands in AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              contains: [0x00]
+
+    # Feature TZ
+    - label: "TS6: Check for TZ feature-based commands in AcceptedCommandList"
+      PICS: TIMESYNC.S.F00
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              contains: [0x02, 0x04]
+
+    - label:
+          "TS6: Check for TZ feature-based commands in not AcceptedCommandList"
+      PICS: "!TIMESYNC.S.F00"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              excludes: [0x02, 0x04]
+
+    # Feature NTPC
+    - label: "TS6: Check for NTPC feature-based commands in AcceptedCommandList"
+      PICS: TIMESYNC.S.F01
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              contains: [0x05]
+
+    - label:
+          "TS6: Check for NTPC feature-based commands in not AcceptedCommandList"
+      PICS: "!TIMESYNC.S.F01"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              excludes: [0x05]
+
+    # Feature TSC
+    - label: "TS6: Check for TSC feature-based commands in AcceptedCommandList"
+      PICS: TIMESYNC.S.F03
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              contains: [0x01]
+
+    - label:
+          "TS6: Check for TSC feature-based commands in not AcceptedCommandList"
+      PICS: "!TIMESYNC.S.F03"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              excludes: [0x01]
+
+    # NOTE: exclusions not checked
+
+    ##########################
+    # TS 7: GeneratedCommandList
+    ##########################
+    # Feature TZ
+    - label: "TS6: Check for TZ feature-based commands in AcceptedCommandList"
+      PICS: TIMESYNC.S.F00
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              contains: [0x03]
+
+    - label:
+          "TS6: Check for TZ feature-based commands in not AcceptedCommandList"
+      PICS: "!TIMESYNC.S.F00"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              excludes: [0x03]

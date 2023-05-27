@@ -414,6 +414,19 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 1, Cluster: Time Synchronization (client) */ \
+      .clusterId = 0x00000038, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
+      .attributeCount = 0, \
+      .clusterSize = 0, \
+      .mask = ZAP_CLUSTER_MASK(CLIENT), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 1, Cluster: Bridged Device Basic Information (client) */ \
       .clusterId = 0x00000039, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
@@ -572,19 +585,6 @@
   { \
       /* Endpoint: 1, Cluster: Smoke CO Alarm (client) */ \
       .clusterId = 0x0000005C, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .acceptedCommandList = nullptr, \
-      .generatedCommandList = nullptr, \
-      .eventList = nullptr, \
-      .eventCount = 0, \
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Operational State (client) */ \
-      .clusterId = 0x00000060, \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \
       .clusterSize = 0, \

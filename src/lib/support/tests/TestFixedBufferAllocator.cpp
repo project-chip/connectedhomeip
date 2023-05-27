@@ -17,6 +17,7 @@
  */
 
 #include <lib/support/FixedBufferAllocator.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <cstring>
@@ -34,7 +35,7 @@ void TestClone(nlTestSuite * inSuite, void * inContext)
     const char * kTestString     = "Test string";
     const char * allocatedString = alloc.Clone(kTestString);
 
-    NL_TEST_ASSERT(inSuite, allocatedString != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, allocatedString != nullptr);
     NL_TEST_ASSERT(inSuite, allocatedString != kTestString);
 
     // NOLINTNEXTLINE(clang-analyzer-unix.cstring.NullArg): null check for allocated string already done
@@ -43,7 +44,7 @@ void TestClone(nlTestSuite * inSuite, void * inContext)
     const uint8_t kTestData[]     = { 0xDE, 0xAD, 0xBE, 0xEF };
     const uint8_t * allocatedData = alloc.Clone(kTestData, sizeof(kTestData));
 
-    NL_TEST_ASSERT(inSuite, allocatedData != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, allocatedData != nullptr);
     NL_TEST_ASSERT(inSuite, allocatedData != kTestData);
 
     // NOLINTNEXTLINE(clang-analyzer-unix.cstring.NullArg): null check for allocated data already done

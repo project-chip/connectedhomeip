@@ -31,6 +31,7 @@
         "channel-cluster.xml",
         "clusters-extensions.xml",
         "color-control-cluster.xml",
+        "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
         "descriptor-cluster.xml",
         "diagnostic-logs-cluster.xml",

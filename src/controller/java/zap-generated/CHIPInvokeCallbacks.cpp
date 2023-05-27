@@ -521,19 +521,11 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
                                                                       newElement_3_attributeID);
                 }
                 jobject newElement_3_attributeValue;
-                chip::JniReferences::GetInstance().CreateArrayList(newElement_3_attributeValue);
-
-                auto iter_newElement_3_attributeValue_5 = entry_3.attributeValue.begin();
-                while (iter_newElement_3_attributeValue_5.Next())
-                {
-                    auto & entry_5 = iter_newElement_3_attributeValue_5.GetValue();
-                    jobject newElement_5;
-                    std::string newElement_5ClassName     = "java/lang/Integer";
-                    std::string newElement_5CtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                        newElement_5ClassName.c_str(), newElement_5CtorSignature.c_str(), entry_5, newElement_5);
-                    chip::JniReferences::GetInstance().AddToList(newElement_3_attributeValue, newElement_5);
-                }
+                std::string newElement_3_attributeValueClassName     = "java/lang/Long";
+                std::string newElement_3_attributeValueCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_3_attributeValueClassName.c_str(),
+                                                                               newElement_3_attributeValueCtorSignature.c_str(),
+                                                                               entry_3.attributeValue, newElement_3_attributeValue);
 
                 jclass attributeValuePairStructClass_4;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -544,7 +536,7 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
                     return;
                 }
                 jmethodID attributeValuePairStructCtor_4 =
-                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/util/Optional;Ljava/util/ArrayList;)V");
+                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/util/Optional;Ljava/lang/Long;)V");
                 if (attributeValuePairStructCtor_4 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterAttributeValuePair constructor");
@@ -1103,19 +1095,11 @@ void CHIPScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
                                                                       newElement_3_attributeID);
                 }
                 jobject newElement_3_attributeValue;
-                chip::JniReferences::GetInstance().CreateArrayList(newElement_3_attributeValue);
-
-                auto iter_newElement_3_attributeValue_5 = entry_3.attributeValue.begin();
-                while (iter_newElement_3_attributeValue_5.Next())
-                {
-                    auto & entry_5 = iter_newElement_3_attributeValue_5.GetValue();
-                    jobject newElement_5;
-                    std::string newElement_5ClassName     = "java/lang/Integer";
-                    std::string newElement_5CtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                        newElement_5ClassName.c_str(), newElement_5CtorSignature.c_str(), entry_5, newElement_5);
-                    chip::JniReferences::GetInstance().AddToList(newElement_3_attributeValue, newElement_5);
-                }
+                std::string newElement_3_attributeValueClassName     = "java/lang/Long";
+                std::string newElement_3_attributeValueCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_3_attributeValueClassName.c_str(),
+                                                                               newElement_3_attributeValueCtorSignature.c_str(),
+                                                                               entry_3.attributeValue, newElement_3_attributeValue);
 
                 jclass attributeValuePairStructClass_4;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -1126,7 +1110,7 @@ void CHIPScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
                     return;
                 }
                 jmethodID attributeValuePairStructCtor_4 =
-                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/util/Optional;Ljava/util/ArrayList;)V");
+                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/util/Optional;Ljava/lang/Long;)V");
                 if (attributeValuePairStructCtor_4 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterAttributeValuePair constructor");

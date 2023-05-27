@@ -136,6 +136,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml \
                       src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/concentration-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
@@ -488,7 +489,7 @@ jobs:
             - name: Build Python REPL and example apps
               timeout-minutes: 50
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env --extra_packages "mobly"'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
                       --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \

@@ -136,7 +136,7 @@ private:
     uint16_t mLastDisconnectedReason;
 };
 
-class ESPEthernetDriver final : public EthernetDriver
+class ESPEthernetDriver : public EthernetDriver
 {
 public:
     class EthernetNetworkIterator final : public NetworkIterator
@@ -170,11 +170,7 @@ public:
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new EthernetNetworkIterator(this); }
     uint8_t GetMaxNetworks() { return 1; }
-    CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
-    {
-        // TODO: This method can be implemented if Ethernet is used along with Wifi/Thread.
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
     void Shutdown()
     {
         // TODO: This method can be implemented if Ethernet is used along with Wifi/Thread.
