@@ -1755,6 +1755,93 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::OperationalState;
+    switch (aEventId) {
+    case Events::OperationalError::Id: {
+        Events::OperationalError::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTROperationalStateClusterOperationalErrorEvent new];
+
+        do {
+            MTROperationalStateClusterErrorStateStruct * _Nonnull memberValue;
+            memberValue = [MTROperationalStateClusterErrorStateStruct new];
+            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorState.errorStateID)];
+            if (cppValue.errorState.errorStateLabel.IsNull()) {
+                memberValue.errorStateLabel = nil;
+            } else {
+                memberValue.errorStateLabel = [[NSString alloc] initWithBytes:cppValue.errorState.errorStateLabel.Value().data()
+                                                                       length:cppValue.errorState.errorStateLabel.Value().size()
+                                                                     encoding:NSUTF8StringEncoding];
+            }
+            if (cppValue.errorState.errorStateDetails.HasValue()) {
+                memberValue.errorStateDetails = [[NSString alloc] initWithBytes:cppValue.errorState.errorStateDetails.Value().data()
+                                                                         length:cppValue.errorState.errorStateDetails.Value().size()
+                                                                       encoding:NSUTF8StringEncoding];
+            } else {
+                memberValue.errorStateDetails = nil;
+            }
+            value.errorState = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::OperationCompletion::Id: {
+        Events::OperationCompletion::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTROperationalStateClusterOperationCompletionEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.completionErrorCode)];
+            value.completionErrorCode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.totalOperationalTime.HasValue()) {
+                if (cppValue.totalOperationalTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.totalOperationalTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.totalOperationalTime = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.pausedTime.HasValue()) {
+                if (cppValue.pausedTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.pausedTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.pausedTime = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForHEPAFilterMonitoringCluster(
     EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -3418,6 +3505,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::SmokeCoAlarm::Id: {
         return DecodeEventPayloadForSmokeCOAlarmCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::OperationalState::Id: {
+        return DecodeEventPayloadForOperationalStateCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeEventPayloadForHEPAFilterMonitoringCluster(aPath.mEventId, aReader, aError);

@@ -1360,6 +1360,35 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::Sensitivi
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::ErrorStateEnum val)
+{
+    using EnumType = OperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kUnableToStartOrResume:
+    case EnumType::kUnableToCompleteOperation:
+    case EnumType::kCommandInvalidInState:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::OperationalStateEnum val)
+{
+    using EnumType = OperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kStopped:
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kError:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(HepaFilterMonitoring::ChangeIndicationEnum val)
 {
     using EnumType = HepaFilterMonitoring::ChangeIndicationEnum;

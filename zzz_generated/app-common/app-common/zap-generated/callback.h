@@ -401,6 +401,14 @@ void emberAfAirQualityClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Operational State Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief HEPA Filter Monitoring Cluster Init
  *
  * Cluster Init
@@ -4573,6 +4581,84 @@ void emberAfSmokeCoAlarmClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfSmokeCoAlarmClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Operational State Cluster
+//
+
+/** @brief Operational State Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOperationalStateClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Operational State Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOperationalStateClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Operational State Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfOperationalStateClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Operational State Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterOperationalStateClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Operational State Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterOperationalStateClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Operational State Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterOperationalStateClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Operational State Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOperationalStateClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Operational State Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfOperationalStateClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // HEPA Filter Monitoring Cluster
@@ -11107,6 +11193,30 @@ bool emberAfRefrigeratorAlarmClusterResetCallback(
 bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
+/**
+ * @brief Operational State Cluster Pause Command callback (from client)
+ */
+bool emberAfOperationalStateClusterPauseCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalState::Commands::Pause::DecodableType & commandData);
+/**
+ * @brief Operational State Cluster Stop Command callback (from client)
+ */
+bool emberAfOperationalStateClusterStopCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalState::Commands::Stop::DecodableType & commandData);
+/**
+ * @brief Operational State Cluster Start Command callback (from client)
+ */
+bool emberAfOperationalStateClusterStartCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalState::Commands::Start::DecodableType & commandData);
+/**
+ * @brief Operational State Cluster Resume Command callback (from client)
+ */
+bool emberAfOperationalStateClusterResumeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalState::Commands::Resume::DecodableType & commandData);
 /**
  * @brief HEPA Filter Monitoring Cluster ResetCondition Command callback (from client)
  */

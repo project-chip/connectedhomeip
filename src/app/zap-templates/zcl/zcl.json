@@ -62,6 +62,7 @@
         "onoff-cluster.xml",
         "onoff-switch-configuration-cluster.xml",
         "operational-credentials-cluster.xml",
+        "operational-state-cluster.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
         "power-source-configuration-cluster.xml",
@@ -288,7 +289,8 @@
             "UTCTime",
             "LocalTime"
         ],
-        "Temperature Control": ["SupportedTemperatureLevels"]
+        "Temperature Control": ["SupportedTemperatureLevels"],
+        "Operational State": ["OperationalState", "OperationalError"]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

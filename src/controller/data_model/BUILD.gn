@@ -156,6 +156,8 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/OtaSoftwareUpdateRequestorClient-ReadImpl.cpp",
       "jni/OzoneFilterMonitoringClient-InvokeSubscribeImpl.cpp",
       "jni/OzoneFilterMonitoringClient-ReadImpl.cpp",
+      "jni/OperationalStateClient-InvokeSubscribeImpl.cpp",
+      "jni/OperationalStateClient-ReadImpl.cpp",
       "jni/PowerSourceClient-InvokeSubscribeImpl.cpp",
       "jni/PowerSourceClient-ReadImpl.cpp",
       "jni/PowerSourceConfigurationClient-InvokeSubscribeImpl.cpp",
