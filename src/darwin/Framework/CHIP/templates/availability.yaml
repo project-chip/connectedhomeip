@@ -7040,6 +7040,8 @@
       attributes:
           Scenes:
               - EventList
+              - SceneTableSize
+              - RemainingCapacity
           OnOff:
               - EventList
           OnOffSwitchConfiguration:
