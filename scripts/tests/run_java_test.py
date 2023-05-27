@@ -95,7 +95,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
                    f'{tool_path}/lib/*',
                    f'{tool_path}/lib/third_party/connectedhomeip/src/controller/java/*',
                    f'{tool_path}/bin/java-matter-controller',
-                   ]),
+               ]),
                'com.matter.controller.MainKt']
 
     if tool_cluster == 'pairing':
