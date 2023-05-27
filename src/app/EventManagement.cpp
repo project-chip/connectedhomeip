@@ -301,11 +301,11 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     EventPathIB::Builder & eventPathBuilder = eventDataIBBuilder.CreatePath();
     ReturnErrorOnFailure(eventDataIBBuilder.GetError());
 
-    eventPathBuilder.Endpoint(apOptions->mPath.mEndpointId)
-        .Cluster(apOptions->mPath.mClusterId)
-        .Event(apOptions->mPath.mEventId)
-        .EndOfEventPathIB();
-    ReturnErrorOnFailure(eventPathBuilder.GetError());
+    CHIP_ERROR err = eventPathBuilder.Endpoint(apOptions->mPath.mEndpointId)
+                         .Cluster(apOptions->mPath.mClusterId)
+                         .Event(apOptions->mPath.mEventId)
+                         .EndOfEventPathIB();
+    ReturnErrorOnFailure(err);
     eventDataIBBuilder.EventNumber(apContext->mCurrentEventNumber).Priority(chip::to_underlying(apContext->mPriority));
     ReturnErrorOnFailure(eventDataIBBuilder.GetError());
 
@@ -330,10 +330,8 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     {
         apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag), apOptions->mFabricIndex);
     }
-    eventDataIBBuilder.EndOfEventDataIB();
-    ReturnErrorOnFailure(eventDataIBBuilder.GetError());
-    eventReportBuilder.EndOfEventReportIB();
-    ReturnErrorOnFailure(eventReportBuilder.GetError());
+    ReturnErrorOnFailure(eventDataIBBuilder.EndOfEventDataIB());
+    ReturnErrorOnFailure(eventReportBuilder.EndOfEventReportIB());
     ReturnErrorOnFailure(apContext->mWriter.Finalize());
     apContext->mFirst = false;
     return CHIP_NO_ERROR;
