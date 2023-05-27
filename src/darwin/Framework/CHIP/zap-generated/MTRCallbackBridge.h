@@ -22495,6 +22495,22 @@ public:
                 const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
 };
 
+class MTROperationalStateClusterOperationalCommandResponseCallbackBridge
+    : public MTRCallbackBridge<OperationalStateClusterOperationalCommandResponseCallbackType>
+{
+public:
+    MTROperationalStateClusterOperationalCommandResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OperationalStateClusterOperationalCommandResponseCallbackType>(queue, handler, OnSuccessFn){};
+
+    MTROperationalStateClusterOperationalCommandResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<OperationalStateClusterOperationalCommandResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & data);
+};
+
 class MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge
     : public MTRCallbackBridge<DoorLockClusterGetWeekDayScheduleResponseCallbackType>
 {
@@ -27929,6 +27945,142 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROperationalStateClusterErrorStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OperationalStateClusterErrorStateEnumAttributeCallback>
+{
+public:
+    MTROperationalStateClusterErrorStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OperationalStateClusterErrorStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROperationalStateClusterErrorStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<OperationalStateClusterErrorStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OperationalState::ErrorStateEnum value);
+};
+
+class MTROperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge
+    : public MTROperationalStateClusterErrorStateEnumAttributeCallbackBridge
+{
+public:
+    MTROperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROperationalStateClusterErrorStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROperationalStateClusterErrorStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOperationalStateClusterErrorStateEnumAttributeCallback>
+{
+public:
+    MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableOperationalStateClusterErrorStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableOperationalStateClusterErrorStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalState::ErrorStateEnum> & value);
+};
+
+class MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROperationalStateClusterOperationalStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OperationalStateClusterOperationalStateEnumAttributeCallback>
+{
+public:
+    MTROperationalStateClusterOperationalStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OperationalStateClusterOperationalStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROperationalStateClusterOperationalStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<OperationalStateClusterOperationalStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OperationalState::OperationalStateEnum value);
+};
+
+class MTROperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge
+    : public MTROperationalStateClusterOperationalStateEnumAttributeCallbackBridge
+{
+public:
+    MTROperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROperationalStateClusterOperationalStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROperationalStateClusterOperationalStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOperationalStateClusterOperationalStateEnumAttributeCallback>
+{
+public:
+    MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableOperationalStateClusterOperationalStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<NullableOperationalStateClusterOperationalStateEnumAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalState::OperationalStateEnum> & value);
+};
+
+class MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

@@ -3002,7 +3002,7 @@ client cluster OperationalState = 96 {
 
   struct OperationalStateStruct {
     OperationalStateEnum operationalStateID = 0;
-    char_string operationalStateLabel = 1;
+    char_string<64> operationalStateLabel = 1;
   }
 
   critical event OperationalError = 0 {

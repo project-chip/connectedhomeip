@@ -7801,31 +7801,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedOperationalStateClusterOperationalCommandResponseCallback
-      implements ChipClusters.OperationalStateCluster.OperationalCommandResponseCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(
-        ChipStructs.OperationalStateClusterErrorStateStruct CommandResponseState) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      // CommandResponseState: Struct ErrorStateStruct
-      // Conversion from this type to Java is not properly implemented yet
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-
   public static class DelegatedOperationalStateClusterPhaseListAttributeCallback
       implements ChipClusters.OperationalStateCluster.PhaseListAttributeCallback,
           DelegatedClusterCallback {
@@ -24334,6 +24309,11 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.SmokeCoAlarmCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("smokeCoAlarm", smokeCoAlarmClusterInfo);
+    ClusterInfo operationalStateClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.OperationalStateCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("operationalState", operationalStateClusterInfo);
     ClusterInfo hepaFilterMonitoringClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.HepaFilterMonitoringCluster(ptr, endpointId),
@@ -27278,58 +27258,6 @@ public class ClusterInfoMapping {
         "selfTestRequest", smokeCoAlarmselfTestRequestInteractionInfo);
     commandMap.put("smokeCoAlarm", smokeCoAlarmClusterInteractionInfoMap);
     Map<String, InteractionInfo> operationalStateClusterInteractionInfoMap = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> operationalStatepauseCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo operationalStatepauseInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.OperationalStateCluster) cluster)
-                  .pause(
-                      (ChipClusters.OperationalStateCluster.OperationalCommandResponseCallback)
-                          callback);
-            },
-            () -> new DelegatedOperationalStateClusterOperationalCommandResponseCallback(),
-            operationalStatepauseCommandParams);
-    operationalStateClusterInteractionInfoMap.put("pause", operationalStatepauseInteractionInfo);
-    Map<String, CommandParameterInfo> operationalStatestopCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo operationalStatestopInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.OperationalStateCluster) cluster)
-                  .stop(
-                      (ChipClusters.OperationalStateCluster.OperationalCommandResponseCallback)
-                          callback);
-            },
-            () -> new DelegatedOperationalStateClusterOperationalCommandResponseCallback(),
-            operationalStatestopCommandParams);
-    operationalStateClusterInteractionInfoMap.put("stop", operationalStatestopInteractionInfo);
-    Map<String, CommandParameterInfo> operationalStatestartCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo operationalStatestartInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.OperationalStateCluster) cluster)
-                  .start(
-                      (ChipClusters.OperationalStateCluster.OperationalCommandResponseCallback)
-                          callback);
-            },
-            () -> new DelegatedOperationalStateClusterOperationalCommandResponseCallback(),
-            operationalStatestartCommandParams);
-    operationalStateClusterInteractionInfoMap.put("start", operationalStatestartInteractionInfo);
-    Map<String, CommandParameterInfo> operationalStateresumeCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo operationalStateresumeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.OperationalStateCluster) cluster)
-                  .resume(
-                      (ChipClusters.OperationalStateCluster.OperationalCommandResponseCallback)
-                          callback);
-            },
-            () -> new DelegatedOperationalStateClusterOperationalCommandResponseCallback(),
-            operationalStateresumeCommandParams);
-    operationalStateClusterInteractionInfoMap.put("resume", operationalStateresumeInteractionInfo);
     commandMap.put("operationalState", operationalStateClusterInteractionInfoMap);
     Map<String, InteractionInfo> hepaFilterMonitoringClusterInteractionInfoMap =
         new LinkedHashMap<>();

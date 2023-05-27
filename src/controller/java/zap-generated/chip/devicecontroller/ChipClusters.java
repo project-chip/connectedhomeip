@@ -15002,68 +15002,6 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void pause(OperationalCommandResponseCallback callback) {
-      pause(chipClusterPtr, callback, null);
-    }
-
-    public void pause(OperationalCommandResponseCallback callback, int timedInvokeTimeoutMs) {
-
-      pause(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
-    public void stop(OperationalCommandResponseCallback callback) {
-      stop(chipClusterPtr, callback, null);
-    }
-
-    public void stop(OperationalCommandResponseCallback callback, int timedInvokeTimeoutMs) {
-
-      stop(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
-    public void start(OperationalCommandResponseCallback callback) {
-      start(chipClusterPtr, callback, null);
-    }
-
-    public void start(OperationalCommandResponseCallback callback, int timedInvokeTimeoutMs) {
-
-      start(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
-    public void resume(OperationalCommandResponseCallback callback) {
-      resume(chipClusterPtr, callback, null);
-    }
-
-    public void resume(OperationalCommandResponseCallback callback, int timedInvokeTimeoutMs) {
-
-      resume(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
-    private native void pause(
-        long chipClusterPtr,
-        OperationalCommandResponseCallback Callback,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void stop(
-        long chipClusterPtr,
-        OperationalCommandResponseCallback Callback,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void start(
-        long chipClusterPtr,
-        OperationalCommandResponseCallback Callback,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void resume(
-        long chipClusterPtr,
-        OperationalCommandResponseCallback Callback,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    public interface OperationalCommandResponseCallback {
-      void onSuccess(ChipStructs.OperationalStateClusterErrorStateStruct commandResponseState);
-
-      void onError(Exception error);
-    }
-
     public interface PhaseListAttributeCallback {
       void onSuccess(@Nullable List<String> valueList);
 
