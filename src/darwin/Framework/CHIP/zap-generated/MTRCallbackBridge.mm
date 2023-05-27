@@ -19,6 +19,8 @@
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRCommandPayloads_Internal.h"
 #import "MTRStructsObjc.h"
+#import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 
 #include <lib/support/TypeTraits.h>
 
@@ -32,7 +34,7 @@ void MTRCommandSuccessCallbackBridge::OnSuccessFn(void * context, const chip::ap
 void MTROctetStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::ByteSpan value)
 {
     NSData * _Nonnull objCValue;
-    objCValue = [NSData dataWithBytes:value.data() length:value.size()];
+    objCValue = AsData(value);
     DispatchSuccess(context, objCValue);
 };
 
@@ -58,7 +60,7 @@ void MTRNullableOctetStringAttributeCallbackBridge::OnSuccessFn(
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [NSData dataWithBytes:value.Value().data() length:value.Value().size()];
+        objCValue = AsData(value.Value());
     }
     DispatchSuccess(context, objCValue);
 };
@@ -81,7 +83,12 @@ void MTRNullableOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEs
 void MTRCharStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::CharSpan value)
 {
     NSString * _Nonnull objCValue;
-    objCValue = [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding];
+    objCValue = AsString(value);
+    if (objCValue == nil) {
+        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+        OnFailureFn(context, err);
+        return;
+    }
     DispatchSuccess(context, objCValue);
 };
 
@@ -107,7 +114,12 @@ void MTRNullableCharStringAttributeCallbackBridge::OnSuccessFn(
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [[NSString alloc] initWithBytes:value.Value().data() length:value.Value().size() encoding:NSUTF8StringEncoding];
+        objCValue = AsString(value.Value());
+        if (objCValue == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
     }
     DispatchSuccess(context, objCValue);
 };
@@ -2478,7 +2490,7 @@ void MTRAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * co
             auto & entry_0 = iter_0.GetValue();
             MTRAccessControlClusterAccessControlExtensionStruct * newElement_0;
             newElement_0 = [MTRAccessControlClusterAccessControlExtensionStruct new];
-            newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
+            newElement_0.data = AsData(entry_0.data);
             newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             [array_0 addObject:newElement_0];
         }
@@ -2671,9 +2683,12 @@ void MTRActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context
             MTRActionsClusterActionStruct * newElement_0;
             newElement_0 = [MTRActionsClusterActionStruct new];
             newElement_0.actionID = [NSNumber numberWithUnsignedShort:entry_0.actionID];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
             newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
             newElement_0.supportedCommands = [NSNumber numberWithUnsignedShort:entry_0.supportedCommands.Raw()];
@@ -2717,9 +2732,12 @@ void MTRActionsEndpointListsListAttributeCallbackBridge::OnSuccessFn(void * cont
             MTRActionsClusterEndpointListStruct * newElement_0;
             newElement_0 = [MTRActionsClusterEndpointListStruct new];
             newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
             { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
@@ -3478,7 +3496,12 @@ void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::On
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSString * newElement_0;
-            newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
+            newElement_0 = AsString(entry_0);
+            if (newElement_0 == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -4645,7 +4668,7 @@ void MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(voi
             auto & entry_0 = iter_0.GetValue();
             MTRNetworkCommissioningClusterNetworkInfo * newElement_0;
             newElement_0 = [MTRNetworkCommissioningClusterNetworkInfo new];
-            newElement_0.networkID = [NSData dataWithBytes:entry_0.networkID.data() length:entry_0.networkID.size()];
+            newElement_0.networkID = AsData(entry_0.networkID);
             newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
             [array_0 addObject:newElement_0];
         }
@@ -4990,9 +5013,12 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucces
             auto & entry_0 = iter_0.GetValue();
             MTRGeneralDiagnosticsClusterNetworkInterface * newElement_0;
             newElement_0 = [MTRGeneralDiagnosticsClusterNetworkInterface new];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.isOperational = [NSNumber numberWithBool:entry_0.isOperational];
             if (entry_0.offPremiseServicesReachableIPv4.IsNull()) {
                 newElement_0.offPremiseServicesReachableIPv4 = nil;
@@ -5006,15 +5032,14 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucces
                 newElement_0.offPremiseServicesReachableIPv6 =
                     [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6.Value()];
             }
-            newElement_0.hardwareAddress = [NSData dataWithBytes:entry_0.hardwareAddress.data()
-                                                          length:entry_0.hardwareAddress.size()];
+            newElement_0.hardwareAddress = AsData(entry_0.hardwareAddress);
             { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = entry_0.IPv4Addresses.begin();
                 while (iter_2.Next()) {
                     auto & entry_2 = iter_2.GetValue();
                     NSData * newElement_2;
-                    newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                    newElement_2 = AsData(entry_2);
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();
@@ -5030,7 +5055,7 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucces
                 while (iter_2.Next()) {
                     auto & entry_2 = iter_2.GetValue();
                     NSData * newElement_2;
-                    newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                    newElement_2 = AsData(entry_2);
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();
@@ -5348,9 +5373,12 @@ void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn
             newElement_0 = [MTRSoftwareDiagnosticsClusterThreadMetricsStruct new];
             newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
             if (entry_0.name.HasValue()) {
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
-                                                             length:entry_0.name.Value().size()
-                                                           encoding:NSUTF8StringEncoding];
+                newElement_0.name = AsString(entry_0.name.Value());
+                if (newElement_0.name == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.name = nil;
             }
@@ -6757,11 +6785,11 @@ void MTROperationalCredentialsNOCsListAttributeCallbackBridge::OnSuccessFn(void 
             auto & entry_0 = iter_0.GetValue();
             MTROperationalCredentialsClusterNOCStruct * newElement_0;
             newElement_0 = [MTROperationalCredentialsClusterNOCStruct new];
-            newElement_0.noc = [NSData dataWithBytes:entry_0.noc.data() length:entry_0.noc.size()];
+            newElement_0.noc = AsData(entry_0.noc);
             if (entry_0.icac.IsNull()) {
                 newElement_0.icac = nil;
             } else {
-                newElement_0.icac = [NSData dataWithBytes:entry_0.icac.Value().data() length:entry_0.icac.Value().size()];
+                newElement_0.icac = AsData(entry_0.icac.Value());
             }
             newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             [array_0 addObject:newElement_0];
@@ -6803,13 +6831,16 @@ void MTROperationalCredentialsFabricsListAttributeCallbackBridge::OnSuccessFn(vo
             auto & entry_0 = iter_0.GetValue();
             MTROperationalCredentialsClusterFabricDescriptorStruct * newElement_0;
             newElement_0 = [MTROperationalCredentialsClusterFabricDescriptorStruct new];
-            newElement_0.rootPublicKey = [NSData dataWithBytes:entry_0.rootPublicKey.data() length:entry_0.rootPublicKey.size()];
+            newElement_0.rootPublicKey = AsData(entry_0.rootPublicKey);
             newElement_0.vendorID = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorID)];
             newElement_0.fabricID = [NSNumber numberWithUnsignedLongLong:entry_0.fabricID];
             newElement_0.nodeID = [NSNumber numberWithUnsignedLongLong:entry_0.nodeID];
-            newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                          length:entry_0.label.size()
-                                                        encoding:NSUTF8StringEncoding];
+            newElement_0.label = AsString(entry_0.label);
+            if (newElement_0.label == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             [array_0 addObject:newElement_0];
         }
@@ -6848,7 +6879,7 @@ void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSData * newElement_0;
-            newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+            newElement_0 = AsData(entry_0);
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -7100,9 +7131,12 @@ void MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(voi
                 newElement_0.endpoints = array_2;
             }
             if (entry_0.groupName.HasValue()) {
-                newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.Value().data()
-                                                                  length:entry_0.groupName.Value().size()
-                                                                encoding:NSUTF8StringEncoding];
+                newElement_0.groupName = AsString(entry_0.groupName.Value());
+                if (newElement_0.groupName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.groupName = nil;
             }
@@ -7297,12 +7331,18 @@ void MTRFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * conte
             auto & entry_0 = iter_0.GetValue();
             MTRFixedLabelClusterLabelStruct * newElement_0;
             newElement_0 = [MTRFixedLabelClusterLabelStruct new];
-            newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                          length:entry_0.label.size()
-                                                        encoding:NSUTF8StringEncoding];
-            newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                          length:entry_0.value.size()
-                                                        encoding:NSUTF8StringEncoding];
+            newElement_0.label = AsString(entry_0.label);
+            if (newElement_0.label == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
+            newElement_0.value = AsString(entry_0.value);
+            if (newElement_0.value == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -7493,12 +7533,18 @@ void MTRUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * contex
             auto & entry_0 = iter_0.GetValue();
             MTRUserLabelClusterLabelStruct * newElement_0;
             newElement_0 = [MTRUserLabelClusterLabelStruct new];
-            newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                          length:entry_0.label.size()
-                                                        encoding:NSUTF8StringEncoding];
-            newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                          length:entry_0.value.size()
-                                                        encoding:NSUTF8StringEncoding];
+            newElement_0.label = AsString(entry_0.label);
+            if (newElement_0.label == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
+            newElement_0.value = AsString(entry_0.value);
+            if (newElement_0.value == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -7955,9 +8001,12 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
             auto & entry_0 = iter_0.GetValue();
             MTRModeSelectClusterModeOptionStruct * newElement_0;
             newElement_0 = [MTRModeSelectClusterModeOptionStruct new];
-            newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                          length:entry_0.label.size()
-                                                        encoding:NSUTF8StringEncoding];
+            newElement_0.label = AsString(entry_0.label);
+            if (newElement_0.label == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
             { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
@@ -8168,9 +8217,12 @@ void MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge:
             auto & entry_0 = iter_0.GetValue();
             MTRTemperatureControlClusterTemperatureLevelStruct * newElement_0;
             newElement_0 = [MTRTemperatureControlClusterTemperatureLevelStruct new];
-            newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                          length:entry_0.label.size()
-                                                        encoding:NSUTF8StringEncoding];
+            newElement_0.label = AsString(entry_0.label);
+            if (newElement_0.label == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.temperatureLevel = [NSNumber numberWithUnsignedChar:entry_0.temperatureLevel];
             [array_0 addObject:newElement_0];
         }
@@ -18902,23 +18954,32 @@ void MTRChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * contex
             newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
             newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
             if (entry_0.name.HasValue()) {
-                newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
-                                                             length:entry_0.name.Value().size()
-                                                           encoding:NSUTF8StringEncoding];
+                newElement_0.name = AsString(entry_0.name.Value());
+                if (newElement_0.name == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.name = nil;
             }
             if (entry_0.callSign.HasValue()) {
-                newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.Value().data()
-                                                                 length:entry_0.callSign.Value().size()
-                                                               encoding:NSUTF8StringEncoding];
+                newElement_0.callSign = AsString(entry_0.callSign.Value());
+                if (newElement_0.callSign == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.callSign = nil;
             }
             if (entry_0.affiliateCallSign.HasValue()) {
-                newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.Value().data()
-                                                                          length:entry_0.affiliateCallSign.Value().size()
-                                                                        encoding:NSUTF8StringEncoding];
+                newElement_0.affiliateCallSign = AsString(entry_0.affiliateCallSign.Value());
+                if (newElement_0.affiliateCallSign == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.affiliateCallSign = nil;
             }
@@ -18957,20 +19018,29 @@ void MTRChannelLineupStructAttributeCallbackBridge::OnSuccessFn(void * context,
         objCValue = nil;
     } else {
         objCValue = [MTRChannelClusterLineupInfoStruct new];
-        objCValue.operatorName = [[NSString alloc] initWithBytes:value.Value().operatorName.data()
-                                                          length:value.Value().operatorName.size()
-                                                        encoding:NSUTF8StringEncoding];
+        objCValue.operatorName = AsString(value.Value().operatorName);
+        if (objCValue.operatorName == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
         if (value.Value().lineupName.HasValue()) {
-            objCValue.lineupName = [[NSString alloc] initWithBytes:value.Value().lineupName.Value().data()
-                                                            length:value.Value().lineupName.Value().size()
-                                                          encoding:NSUTF8StringEncoding];
+            objCValue.lineupName = AsString(value.Value().lineupName.Value());
+            if (objCValue.lineupName == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
         } else {
             objCValue.lineupName = nil;
         }
         if (value.Value().postalCode.HasValue()) {
-            objCValue.postalCode = [[NSString alloc] initWithBytes:value.Value().postalCode.Value().data()
-                                                            length:value.Value().postalCode.Value().size()
-                                                          encoding:NSUTF8StringEncoding];
+            objCValue.postalCode = AsString(value.Value().postalCode.Value());
+            if (objCValue.postalCode == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
         } else {
             objCValue.postalCode = nil;
         }
@@ -19005,23 +19075,32 @@ void MTRChannelCurrentChannelStructAttributeCallbackBridge::OnSuccessFn(void * c
         objCValue.majorNumber = [NSNumber numberWithUnsignedShort:value.Value().majorNumber];
         objCValue.minorNumber = [NSNumber numberWithUnsignedShort:value.Value().minorNumber];
         if (value.Value().name.HasValue()) {
-            objCValue.name = [[NSString alloc] initWithBytes:value.Value().name.Value().data()
-                                                      length:value.Value().name.Value().size()
-                                                    encoding:NSUTF8StringEncoding];
+            objCValue.name = AsString(value.Value().name.Value());
+            if (objCValue.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
         } else {
             objCValue.name = nil;
         }
         if (value.Value().callSign.HasValue()) {
-            objCValue.callSign = [[NSString alloc] initWithBytes:value.Value().callSign.Value().data()
-                                                          length:value.Value().callSign.Value().size()
-                                                        encoding:NSUTF8StringEncoding];
+            objCValue.callSign = AsString(value.Value().callSign.Value());
+            if (objCValue.callSign == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
         } else {
             objCValue.callSign = nil;
         }
         if (value.Value().affiliateCallSign.HasValue()) {
-            objCValue.affiliateCallSign = [[NSString alloc] initWithBytes:value.Value().affiliateCallSign.Value().data()
-                                                                   length:value.Value().affiliateCallSign.Value().size()
-                                                                 encoding:NSUTF8StringEncoding];
+            objCValue.affiliateCallSign = AsString(value.Value().affiliateCallSign.Value());
+            if (objCValue.affiliateCallSign == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
         } else {
             objCValue.affiliateCallSign = nil;
         }
@@ -19209,9 +19288,12 @@ void MTRTargetNavigatorTargetListListAttributeCallbackBridge::OnSuccessFn(void *
             MTRTargetNavigatorClusterTargetInfoStruct * newElement_0;
             newElement_0 = [MTRTargetNavigatorClusterTargetInfoStruct new];
             newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -19590,12 +19672,18 @@ void MTRMediaInputInputListListAttributeCallbackBridge::OnSuccessFn(void * conte
             newElement_0 = [MTRMediaInputClusterInputInfoStruct new];
             newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
             newElement_0.inputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputType)];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
-            newElement_0.descriptionString = [[NSString alloc] initWithBytes:entry_0.description.data()
-                                                                      length:entry_0.description.size()
-                                                                    encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
+            newElement_0.descriptionString = AsString(entry_0.description);
+            if (newElement_0.descriptionString == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -20089,7 +20177,12 @@ void MTRContentLauncherAcceptHeaderListAttributeCallbackBridge::OnSuccessFn(
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSString * newElement_0;
-            newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
+            newElement_0 = AsString(entry_0);
+            if (newElement_0 == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -20282,9 +20375,12 @@ void MTRAudioOutputOutputListListAttributeCallbackBridge::OnSuccessFn(void * con
             newElement_0 = [MTRAudioOutputClusterOutputInfoStruct new];
             newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
             newElement_0.outputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputType)];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
+            newElement_0.name = AsString(entry_0.name);
+            if (newElement_0.name == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -20513,9 +20609,12 @@ void MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnSuccessFn(
         objCValue = [MTRApplicationLauncherClusterApplicationEPStruct new];
         objCValue.application = [MTRApplicationLauncherClusterApplicationStruct new];
         objCValue.application.catalogVendorID = [NSNumber numberWithUnsignedShort:value.Value().application.catalogVendorID];
-        objCValue.application.applicationID = [[NSString alloc] initWithBytes:value.Value().application.applicationID.data()
-                                                                       length:value.Value().application.applicationID.size()
-                                                                     encoding:NSUTF8StringEncoding];
+        objCValue.application.applicationID = AsString(value.Value().application.applicationID);
+        if (objCValue.application.applicationID == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
         if (value.Value().endpoint.HasValue()) {
             objCValue.endpoint = [NSNumber numberWithUnsignedShort:value.Value().endpoint.Value()];
         } else {
@@ -20698,9 +20797,12 @@ void MTRApplicationBasicApplicationStructAttributeCallbackBridge::OnSuccessFn(
     MTRApplicationBasicClusterApplicationStruct * _Nonnull objCValue;
     objCValue = [MTRApplicationBasicClusterApplicationStruct new];
     objCValue.catalogVendorID = [NSNumber numberWithUnsignedShort:value.catalogVendorID];
-    objCValue.applicationID = [[NSString alloc] initWithBytes:value.applicationID.data()
-                                                       length:value.applicationID.size()
-                                                     encoding:NSUTF8StringEncoding];
+    objCValue.applicationID = AsString(value.applicationID);
+    if (objCValue.applicationID == nil) {
+        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+        OnFailureFn(context, err);
+        return;
+    }
     DispatchSuccess(context, objCValue);
 };
 
@@ -21353,7 +21455,7 @@ void MTRUnitTestingListOctetStringListAttributeCallbackBridge::OnSuccessFn(
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSData * newElement_0;
-            newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+            newElement_0 = AsData(entry_0);
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -21394,7 +21496,7 @@ void MTRUnitTestingListStructOctetStringListAttributeCallbackBridge::OnSuccessFn
             MTRUnitTestingClusterTestListStructOctet * newElement_0;
             newElement_0 = [MTRUnitTestingClusterTestListStructOctet new];
             newElement_0.member1 = [NSNumber numberWithUnsignedLongLong:entry_0.member1];
-            newElement_0.member2 = [NSData dataWithBytes:entry_0.member2.data() length:entry_0.member2.size()];
+            newElement_0.member2 = AsData(entry_0.member2);
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -21457,14 +21559,20 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
             if (entry_0.nullableString.IsNull()) {
                 newElement_0.nullableString = nil;
             } else {
-                newElement_0.nullableString = [[NSString alloc] initWithBytes:entry_0.nullableString.Value().data()
-                                                                       length:entry_0.nullableString.Value().size()
-                                                                     encoding:NSUTF8StringEncoding];
+                newElement_0.nullableString = AsString(entry_0.nullableString.Value());
+                if (newElement_0.nullableString == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             }
             if (entry_0.optionalString.HasValue()) {
-                newElement_0.optionalString = [[NSString alloc] initWithBytes:entry_0.optionalString.Value().data()
-                                                                       length:entry_0.optionalString.Value().size()
-                                                                     encoding:NSUTF8StringEncoding];
+                newElement_0.optionalString = AsString(entry_0.optionalString.Value());
+                if (newElement_0.optionalString == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
             } else {
                 newElement_0.optionalString = nil;
             }
@@ -21472,10 +21580,12 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 if (entry_0.nullableOptionalString.Value().IsNull()) {
                     newElement_0.nullableOptionalString = nil;
                 } else {
-                    newElement_0.nullableOptionalString =
-                        [[NSString alloc] initWithBytes:entry_0.nullableOptionalString.Value().Value().data()
-                                                 length:entry_0.nullableOptionalString.Value().Value().size()
-                                               encoding:NSUTF8StringEncoding];
+                    newElement_0.nullableOptionalString = AsString(entry_0.nullableOptionalString.Value().Value());
+                    if (newElement_0.nullableOptionalString == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        OnFailureFn(context, err);
+                        return;
+                    }
                 }
             } else {
                 newElement_0.nullableOptionalString = nil;
@@ -21488,11 +21598,13 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 newElement_0.nullableStruct.b = [NSNumber numberWithBool:entry_0.nullableStruct.Value().b];
                 newElement_0.nullableStruct.c =
                     [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableStruct.Value().c)];
-                newElement_0.nullableStruct.d = [NSData dataWithBytes:entry_0.nullableStruct.Value().d.data()
-                                                               length:entry_0.nullableStruct.Value().d.size()];
-                newElement_0.nullableStruct.e = [[NSString alloc] initWithBytes:entry_0.nullableStruct.Value().e.data()
-                                                                         length:entry_0.nullableStruct.Value().e.size()
-                                                                       encoding:NSUTF8StringEncoding];
+                newElement_0.nullableStruct.d = AsData(entry_0.nullableStruct.Value().d);
+                newElement_0.nullableStruct.e = AsString(entry_0.nullableStruct.Value().e);
+                if (newElement_0.nullableStruct.e == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
                 newElement_0.nullableStruct.f = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().f.Raw()];
                 newElement_0.nullableStruct.g = [NSNumber numberWithFloat:entry_0.nullableStruct.Value().g];
                 newElement_0.nullableStruct.h = [NSNumber numberWithDouble:entry_0.nullableStruct.Value().h];
@@ -21503,11 +21615,13 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 newElement_0.optionalStruct.b = [NSNumber numberWithBool:entry_0.optionalStruct.Value().b];
                 newElement_0.optionalStruct.c =
                     [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.optionalStruct.Value().c)];
-                newElement_0.optionalStruct.d = [NSData dataWithBytes:entry_0.optionalStruct.Value().d.data()
-                                                               length:entry_0.optionalStruct.Value().d.size()];
-                newElement_0.optionalStruct.e = [[NSString alloc] initWithBytes:entry_0.optionalStruct.Value().e.data()
-                                                                         length:entry_0.optionalStruct.Value().e.size()
-                                                                       encoding:NSUTF8StringEncoding];
+                newElement_0.optionalStruct.d = AsData(entry_0.optionalStruct.Value().d);
+                newElement_0.optionalStruct.e = AsString(entry_0.optionalStruct.Value().e);
+                if (newElement_0.optionalStruct.e == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
                 newElement_0.optionalStruct.f = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().f.Raw()];
                 newElement_0.optionalStruct.g = [NSNumber numberWithFloat:entry_0.optionalStruct.Value().g];
                 newElement_0.optionalStruct.h = [NSNumber numberWithDouble:entry_0.optionalStruct.Value().h];
@@ -21525,13 +21639,13 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                         [NSNumber numberWithBool:entry_0.nullableOptionalStruct.Value().Value().b];
                     newElement_0.nullableOptionalStruct.c =
                         [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableOptionalStruct.Value().Value().c)];
-                    newElement_0.nullableOptionalStruct.d =
-                        [NSData dataWithBytes:entry_0.nullableOptionalStruct.Value().Value().d.data()
-                                       length:entry_0.nullableOptionalStruct.Value().Value().d.size()];
-                    newElement_0.nullableOptionalStruct.e =
-                        [[NSString alloc] initWithBytes:entry_0.nullableOptionalStruct.Value().Value().e.data()
-                                                 length:entry_0.nullableOptionalStruct.Value().Value().e.size()
-                                               encoding:NSUTF8StringEncoding];
+                    newElement_0.nullableOptionalStruct.d = AsData(entry_0.nullableOptionalStruct.Value().Value().d);
+                    newElement_0.nullableOptionalStruct.e = AsString(entry_0.nullableOptionalStruct.Value().Value().e);
+                    if (newElement_0.nullableOptionalStruct.e == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        OnFailureFn(context, err);
+                        return;
+                    }
                     newElement_0.nullableOptionalStruct.f =
                         [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
                     newElement_0.nullableOptionalStruct.g =
@@ -21641,8 +21755,13 @@ void MTRUnitTestingStructAttrStructAttributeCallbackBridge::OnSuccessFn(
     objCValue.a = [NSNumber numberWithUnsignedChar:value.a];
     objCValue.b = [NSNumber numberWithBool:value.b];
     objCValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.c)];
-    objCValue.d = [NSData dataWithBytes:value.d.data() length:value.d.size()];
-    objCValue.e = [[NSString alloc] initWithBytes:value.e.data() length:value.e.size() encoding:NSUTF8StringEncoding];
+    objCValue.d = AsData(value.d);
+    objCValue.e = AsString(value.e);
+    if (objCValue.e == nil) {
+        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+        OnFailureFn(context, err);
+        return;
+    }
     objCValue.f = [NSNumber numberWithUnsignedChar:value.f.Raw()];
     objCValue.g = [NSNumber numberWithFloat:value.g];
     objCValue.h = [NSNumber numberWithDouble:value.h];
@@ -21674,7 +21793,7 @@ void MTRUnitTestingListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSData * newElement_0;
-            newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+            newElement_0 = AsData(entry_0);
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -21736,19 +21855,24 @@ void MTRUnitTestingListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void
             } else {
                 newElement_0.nullableOptionalFabricSensitiveInt8u = nil;
             }
-            newElement_0.fabricSensitiveCharString = [[NSString alloc] initWithBytes:entry_0.fabricSensitiveCharString.data()
-                                                                              length:entry_0.fabricSensitiveCharString.size()
-                                                                            encoding:NSUTF8StringEncoding];
+            newElement_0.fabricSensitiveCharString = AsString(entry_0.fabricSensitiveCharString);
+            if (newElement_0.fabricSensitiveCharString == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.fabricSensitiveStruct = [MTRUnitTestingClusterSimpleStruct new];
             newElement_0.fabricSensitiveStruct.a = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.a];
             newElement_0.fabricSensitiveStruct.b = [NSNumber numberWithBool:entry_0.fabricSensitiveStruct.b];
             newElement_0.fabricSensitiveStruct.c =
                 [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.fabricSensitiveStruct.c)];
-            newElement_0.fabricSensitiveStruct.d = [NSData dataWithBytes:entry_0.fabricSensitiveStruct.d.data()
-                                                                  length:entry_0.fabricSensitiveStruct.d.size()];
-            newElement_0.fabricSensitiveStruct.e = [[NSString alloc] initWithBytes:entry_0.fabricSensitiveStruct.e.data()
-                                                                            length:entry_0.fabricSensitiveStruct.e.size()
-                                                                          encoding:NSUTF8StringEncoding];
+            newElement_0.fabricSensitiveStruct.d = AsData(entry_0.fabricSensitiveStruct.d);
+            newElement_0.fabricSensitiveStruct.e = AsString(entry_0.fabricSensitiveStruct.e);
+            if (newElement_0.fabricSensitiveStruct.e == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             newElement_0.fabricSensitiveStruct.f = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.f.Raw()];
             newElement_0.fabricSensitiveStruct.g = [NSNumber numberWithFloat:entry_0.fabricSensitiveStruct.g];
             newElement_0.fabricSensitiveStruct.h = [NSNumber numberWithDouble:entry_0.fabricSensitiveStruct.h];
@@ -21915,10 +22039,13 @@ void MTRUnitTestingNullableStructStructAttributeCallbackBridge::OnSuccessFn(void
         objCValue.a = [NSNumber numberWithUnsignedChar:value.Value().a];
         objCValue.b = [NSNumber numberWithBool:value.Value().b];
         objCValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value().c)];
-        objCValue.d = [NSData dataWithBytes:value.Value().d.data() length:value.Value().d.size()];
-        objCValue.e = [[NSString alloc] initWithBytes:value.Value().e.data()
-                                               length:value.Value().e.size()
-                                             encoding:NSUTF8StringEncoding];
+        objCValue.d = AsData(value.Value().d);
+        objCValue.e = AsString(value.Value().e);
+        if (objCValue.e == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
         objCValue.f = [NSNumber numberWithUnsignedChar:value.Value().f.Raw()];
         objCValue.g = [NSNumber numberWithFloat:value.Value().g];
         objCValue.h = [NSNumber numberWithDouble:value.Value().h];

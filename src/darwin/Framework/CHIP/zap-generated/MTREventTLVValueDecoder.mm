@@ -18,6 +18,8 @@
 #import "MTREventTLVValueDecoder_Internal.h"
 
 #import "MTRStructsObjc.h"
+#import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -291,8 +293,7 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
                 memberValue = nil;
             } else {
                 memberValue = [MTRAccessControlClusterAccessControlExtensionStruct new];
-                memberValue.data = [NSData dataWithBytes:cppValue.latestValue.Value().data.data()
-                                                  length:cppValue.latestValue.Value().data.size()];
+                memberValue.data = AsData(cppValue.latestValue.Value().data);
                 memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
             }
             value.latestValue = memberValue;
@@ -1045,9 +1046,12 @@ static id _Nullable DecodeEventPayloadForSoftwareDiagnosticsCluster(EventId aEve
         do {
             NSString * _Nullable memberValue;
             if (cppValue.name.HasValue()) {
-                memberValue = [[NSString alloc] initWithBytes:cppValue.name.Value().data()
-                                                       length:cppValue.name.Value().size()
-                                                     encoding:NSUTF8StringEncoding];
+                memberValue = AsString(cppValue.name.Value());
+                if (memberValue == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
             } else {
                 memberValue = nil;
             }
@@ -1056,8 +1060,7 @@ static id _Nullable DecodeEventPayloadForSoftwareDiagnosticsCluster(EventId aEve
         do {
             NSData * _Nullable memberValue;
             if (cppValue.faultRecording.HasValue()) {
-                memberValue = [NSData dataWithBytes:cppValue.faultRecording.Value().data()
-                                             length:cppValue.faultRecording.Value().size()];
+                memberValue = AsData(cppValue.faultRecording.Value());
             } else {
                 memberValue = nil;
             }
@@ -3199,10 +3202,13 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
             memberValue.a = [NSNumber numberWithUnsignedChar:cppValue.arg4.a];
             memberValue.b = [NSNumber numberWithBool:cppValue.arg4.b];
             memberValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.arg4.c)];
-            memberValue.d = [NSData dataWithBytes:cppValue.arg4.d.data() length:cppValue.arg4.d.size()];
-            memberValue.e = [[NSString alloc] initWithBytes:cppValue.arg4.e.data()
-                                                     length:cppValue.arg4.e.size()
-                                                   encoding:NSUTF8StringEncoding];
+            memberValue.d = AsData(cppValue.arg4.d);
+            memberValue.e = AsString(cppValue.arg4.e);
+            if (memberValue.e == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
             memberValue.f = [NSNumber numberWithUnsignedChar:cppValue.arg4.f.Raw()];
             memberValue.g = [NSNumber numberWithFloat:cppValue.arg4.g];
             memberValue.h = [NSNumber numberWithDouble:cppValue.arg4.h];
@@ -3220,10 +3226,13 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
                     newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
                     newElement_0.b = [NSNumber numberWithBool:entry_0.b];
                     newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
-                    newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
-                    newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data()
-                                                              length:entry_0.e.size()
-                                                            encoding:NSUTF8StringEncoding];
+                    newElement_0.d = AsData(entry_0.d);
+                    newElement_0.e = AsString(entry_0.e);
+                    if (newElement_0.e == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
                     newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
                     newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
                     newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
