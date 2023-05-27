@@ -15,6 +15,12 @@
  *    limitations under the License.
  */
 
+/**
+ * @file
+ *   APIs and defines for the Smoke CO Alarm Server plugin.
+ *
+ */
+
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -28,14 +34,6 @@
 #define SMOKE_CO_ALARM_SERVER_ENDPOINT 1
 #endif
 
-using chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
-using chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
-using chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
-using chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
-using chip::app::Clusters::SmokeCoAlarm::Feature;
-using chip::app::Clusters::SmokeCoAlarm::MuteStateEnum;
-using chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
-
 /**
  * @brief Smoke CO Alarm Server Plugin class
  */
@@ -44,6 +42,25 @@ class SmokeCoAlarmServer
 public:
     static SmokeCoAlarmServer & Instance();
 
+    using AlarmStateEnum         = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using ContaminationStateEnum = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
+    using EndOfServiceEnum       = chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
+    using ExpressedStateEnum     = chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
+    using Feature                = chip::app::Clusters::SmokeCoAlarm::Feature;
+    using MuteStateEnum          = chip::app::Clusters::SmokeCoAlarm::MuteStateEnum;
+    using SensitivityEnum        = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
+
+    typedef bool (*RemoteOpHandler)(chip::EndpointId endpointId);
+
+    /**
+     * @brief Updates the attribute with new value
+     *
+     * @note The application is responsible for changing the expression state
+     *
+     * @param endpointId ID of the endpoint
+     * @param newExpressedState new expressed state
+     * @return true on success, false on failure
+     */
     bool SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum newExpressedState);
     bool SetSmokeState(chip::EndpointId endpointId, AlarmStateEnum newSmokeState);
     bool SetCOState(chip::EndpointId endpointId, AlarmStateEnum newCOState);
@@ -58,9 +75,16 @@ public:
     bool SetSensitivityLevel(chip::EndpointId endpointId, SensitivityEnum newSensitivityLevel);
     // bool SetExpiryDate(chip::EndpointId endpointId, Date newExpiryDate); // TODO: Date type encoding not defined
 
+    /**
+     * @brief Get the value of the attribute
+     *
+     * @param endpointId ID of the endpoint
+     * @param expressedState Value of expressed state attribute
+     * @return true on success, false on failure
+     */
     bool GetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum & expressedState);
     bool GetSmokeState(chip::EndpointId endpointId, AlarmStateEnum & smokeState);
-    bool GetCOState(chip::EndpointId endpointId, AlarmStateEnum & COState);
+    bool GetCOState(chip::EndpointId endpointId, AlarmStateEnum & coState);
     bool GetBatteryAlert(chip::EndpointId endpointId, AlarmStateEnum & batteryAlert);
     bool GetDeviceMuted(chip::EndpointId endpointId, MuteStateEnum & deviceMuted);
     bool GetTestInProgress(chip::EndpointId endpointId, bool & testInProgress);
@@ -87,7 +111,8 @@ private:
      * @return true         if successful
      * @return false        if error happened
      */
-    bool HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
+    bool HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                     RemoteOpHandler opHandler);
 
     /**
      * @brief Send generic event
@@ -133,5 +158,21 @@ private:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
 
-    static SmokeCoAlarmServer instance;
+    static SmokeCoAlarmServer sInstance;
 };
+
+// =============================================================================
+// Plugin callbacks that are called by cluster server and should be implemented
+// by the server app
+// =============================================================================
+
+/**
+ * @brief User handler for SelfTestRequest command (server)
+ *
+ * @param   endpointId      endpoint for which SelfTestRequest command is called
+ * @param   err             error code if self-test request failed (set only if retval==false)
+ *
+ * @retval true on success
+ * @retval false if error happened (err should be set to appropriate error code)
+ */
+bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(chip::EndpointId endpointId);

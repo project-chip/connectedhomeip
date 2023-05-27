@@ -32,12 +32,15 @@ class SmokeCoAlarmManager
 {
 public:
     CHIP_ERROR Init();
+
+    /**
+     * @brief Execute the self-test process and attribute changes
+     *
+     */
     bool StartSelfTesting();
 
 private:
     friend SmokeCoAlarmManager & AlarmMgr(void);
-
-    bool mTestInProgress;
 
     static SmokeCoAlarmManager sAlarm;
 };

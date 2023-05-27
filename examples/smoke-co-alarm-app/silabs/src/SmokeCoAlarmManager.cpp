@@ -31,30 +31,28 @@ SmokeCoAlarmManager SmokeCoAlarmManager::sAlarm;
 
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
-    // Read current TestInProgress value on endpoint one.
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    SmokeCoAlarmServer::Instance().GetTestInProgress(1, mTestInProgress);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
     return CHIP_NO_ERROR;
 }
 
 bool SmokeCoAlarmManager::StartSelfTesting()
 {
-    if (mTestInProgress)
+    bool mTestInProgress = false;
+
+    // Read current TestInProgress value on endpoint one.
+    bool success = SmokeCoAlarmServer::Instance().GetTestInProgress(1, mTestInProgress);
+
+    if (!success || mTestInProgress)
     {
         return false;
     }
 
-    bool success    = true;
-    mTestInProgress = true;
+    success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, true);
 
     SILABS_LOG("Start self-testing!");
 
     SILABS_LOG("End self-testing!");
 
-    success         = SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
-    mTestInProgress = false;
+    success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
 
     return success;
 }

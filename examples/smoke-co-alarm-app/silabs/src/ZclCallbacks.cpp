@@ -38,14 +38,11 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     AttributeId attributeId = attributePath.mAttributeId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-    if (clusterId == SmokeCoAlarm::Id && attributeId == SmokeCoAlarm::Attributes::TestInProgress::Id)
+    if (clusterId == SmokeCoAlarm::Id && attributeId == SmokeCoAlarm::Attributes::ExpressedState::Id)
     {
-        AlarmMgr().StartSelfTesting();
-    }
-    else if (clusterId == Identify::Id)
-    {
-        ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
+        SmokeCoAlarm::ExpressedStateEnum expressedState = *(reinterpret_cast<SmokeCoAlarm::ExpressedStateEnum *>(value));
+        ChipLogProgress(Zcl, "Smoke CO Alarm cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
+                        to_underlying(expressedState));
     }
 }
 
@@ -61,4 +58,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 void emberAfSmokeCoAlarmClusterInitCallback(EndpointId endpoint)
 {
     // TODO: implement any additional Cluster Server init actions
+}
+
+bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(chip::EndpointId endpointId)
+{
+    return AlarmMgr().StartSelfTesting();
 }

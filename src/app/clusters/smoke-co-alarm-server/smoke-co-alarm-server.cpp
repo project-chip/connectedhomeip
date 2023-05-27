@@ -15,6 +15,12 @@
  *    limitations under the License.
  */
 
+/**
+ * @file
+ *   Routines for the Smoke CO Alarm Server plugin.
+ *
+ */
+
 #include "smoke-co-alarm-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
@@ -36,7 +42,7 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::SmokeCoAlarm;
 using chip::Protocols::InteractionModel::Status;
 
-SmokeCoAlarmServer SmokeCoAlarmServer::instance;
+SmokeCoAlarmServer SmokeCoAlarmServer::sInstance;
 
 /**********************************************************
  * SmokeCoAlarmServer public methods
@@ -44,17 +50,23 @@ SmokeCoAlarmServer SmokeCoAlarmServer::instance;
 
 SmokeCoAlarmServer & SmokeCoAlarmServer::Instance()
 {
-    return instance;
+    return sInstance;
 }
 
 bool SmokeCoAlarmServer::SetExpressedState(EndpointId endpointId, ExpressedStateEnum newExpressedState)
 {
-    bool success = SetAttribute(endpointId, Attributes::ExpressedState::Id, Attributes::ExpressedState::Set, newExpressedState);
+    ExpressedStateEnum expressedState;
+    bool success = GetAttribute(endpointId, Attributes::ExpressedState::Id, Attributes::ExpressedState::Get, expressedState);
 
-    if (success && (newExpressedState == ExpressedStateEnum::kNormal))
+    if (success && (expressedState != newExpressedState))
     {
-        Events::AllClear::Type event{};
-        SendEvent(endpointId, event);
+        success = SetAttribute(endpointId, Attributes::ExpressedState::Id, Attributes::ExpressedState::Set, newExpressedState);
+
+        if (success && (newExpressedState == ExpressedStateEnum::kNormal))
+        {
+            Events::AllClear::Type event{};
+            SendEvent(endpointId, event);
+        }
     }
 
     return success;
@@ -62,12 +74,18 @@ bool SmokeCoAlarmServer::SetExpressedState(EndpointId endpointId, ExpressedState
 
 bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum newSmokeState)
 {
-    bool success = SetAttribute(endpointId, Attributes::SmokeState::Id, Attributes::SmokeState::Set, newSmokeState);
+    AlarmStateEnum smokeState;
+    bool success = GetAttribute(endpointId, Attributes::SmokeState::Id, Attributes::SmokeState::Get, smokeState);
 
-    if (success && (newSmokeState == AlarmStateEnum::kWarning || newSmokeState == AlarmStateEnum::kCritical))
+    if (success && (smokeState != newSmokeState))
     {
-        Events::SmokeAlarm::Type event{};
-        SendEvent(endpointId, event);
+        success = SetAttribute(endpointId, Attributes::SmokeState::Id, Attributes::SmokeState::Set, newSmokeState);
+
+        if (success && (newSmokeState == AlarmStateEnum::kWarning || newSmokeState == AlarmStateEnum::kCritical))
+        {
+            Events::SmokeAlarm::Type event{};
+            SendEvent(endpointId, event);
+        }
     }
 
     return success;
@@ -75,12 +93,18 @@ bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum new
 
 bool SmokeCoAlarmServer::SetCOState(EndpointId endpointId, AlarmStateEnum newCOState)
 {
-    bool success = SetAttribute(endpointId, Attributes::COState::Id, Attributes::COState::Set, newCOState);
+    AlarmStateEnum coState;
+    bool success = GetAttribute(endpointId, Attributes::COState::Id, Attributes::COState::Get, coState);
 
-    if (success && (newCOState == AlarmStateEnum::kWarning || newCOState == AlarmStateEnum::kCritical))
+    if (success && (coState != newCOState))
     {
-        Events::COAlarm::Type event{};
-        SendEvent(endpointId, event);
+        success = SetAttribute(endpointId, Attributes::COState::Id, Attributes::COState::Set, newCOState);
+
+        if (success && (newCOState == AlarmStateEnum::kWarning || newCOState == AlarmStateEnum::kCritical))
+        {
+            Events::COAlarm::Type event{};
+            SendEvent(endpointId, event);
+        }
     }
 
     return success;
@@ -88,12 +112,18 @@ bool SmokeCoAlarmServer::SetCOState(EndpointId endpointId, AlarmStateEnum newCOS
 
 bool SmokeCoAlarmServer::SetBatteryAlert(EndpointId endpointId, AlarmStateEnum newBatteryAlert)
 {
-    bool success = SetAttribute(endpointId, Attributes::BatteryAlert::Id, Attributes::BatteryAlert::Set, newBatteryAlert);
+    AlarmStateEnum batteryAlert;
+    bool success = GetAttribute(endpointId, Attributes::BatteryAlert::Id, Attributes::BatteryAlert::Get, batteryAlert);
 
-    if (success && (newBatteryAlert == AlarmStateEnum::kWarning || newBatteryAlert == AlarmStateEnum::kCritical))
+    if (success && (batteryAlert != newBatteryAlert))
     {
-        Events::LowBattery::Type event{};
-        SendEvent(endpointId, event);
+        success = SetAttribute(endpointId, Attributes::BatteryAlert::Id, Attributes::BatteryAlert::Set, newBatteryAlert);
+
+        if (success && (newBatteryAlert == AlarmStateEnum::kWarning || newBatteryAlert == AlarmStateEnum::kCritical))
+        {
+            Events::LowBattery::Type event{};
+            SendEvent(endpointId, event);
+        }
     }
 
     return success;
@@ -101,19 +131,25 @@ bool SmokeCoAlarmServer::SetBatteryAlert(EndpointId endpointId, AlarmStateEnum n
 
 bool SmokeCoAlarmServer::SetDeviceMuted(EndpointId endpointId, MuteStateEnum newDeviceMuted)
 {
-    bool success = SetAttribute(endpointId, Attributes::DeviceMuted::Id, Attributes::DeviceMuted::Set, newDeviceMuted);
+    MuteStateEnum deviceMuted;
+    bool success = GetAttribute(endpointId, Attributes::DeviceMuted::Id, Attributes::DeviceMuted::Get, deviceMuted);
 
-    if (success)
+    if (success && (deviceMuted != newDeviceMuted))
     {
-        if (newDeviceMuted == MuteStateEnum::kMuted)
+        success = SetAttribute(endpointId, Attributes::DeviceMuted::Id, Attributes::DeviceMuted::Set, newDeviceMuted);
+
+        if (success)
         {
-            Events::AlarmMuted::Type event{};
-            SendEvent(endpointId, event);
-        }
-        else if (newDeviceMuted == MuteStateEnum::kNotMuted)
-        {
-            Events::MuteEnded::Type event{};
-            SendEvent(endpointId, event);
+            if (newDeviceMuted == MuteStateEnum::kMuted)
+            {
+                Events::AlarmMuted::Type event{};
+                SendEvent(endpointId, event);
+            }
+            else if (newDeviceMuted == MuteStateEnum::kNotMuted)
+            {
+                Events::MuteEnded::Type event{};
+                SendEvent(endpointId, event);
+            }
         }
     }
 
@@ -122,12 +158,18 @@ bool SmokeCoAlarmServer::SetDeviceMuted(EndpointId endpointId, MuteStateEnum new
 
 bool SmokeCoAlarmServer::SetTestInProgress(EndpointId endpointId, bool newTestInProgress)
 {
-    bool success = SetAttribute(endpointId, Attributes::TestInProgress::Id, Attributes::TestInProgress::Set, newTestInProgress);
+    bool testInProgress;
+    bool success = GetAttribute(endpointId, Attributes::TestInProgress::Id, Attributes::TestInProgress::Get, testInProgress);
 
-    if (success && !newTestInProgress)
+    if (success && (testInProgress != newTestInProgress))
     {
-        Events::SelfTestComplete::Type event{};
-        SendEvent(endpointId, event);
+        success = SetAttribute(endpointId, Attributes::TestInProgress::Id, Attributes::TestInProgress::Set, newTestInProgress);
+
+        if (success && !newTestInProgress)
+        {
+            Events::SelfTestComplete::Type event{};
+            SendEvent(endpointId, event);
+        }
     }
 
     return success;
@@ -135,13 +177,20 @@ bool SmokeCoAlarmServer::SetTestInProgress(EndpointId endpointId, bool newTestIn
 
 bool SmokeCoAlarmServer::SetHardwareFaultAlert(EndpointId endpointId, bool newHardwareFaultAlert)
 {
+    bool hardwareFaultAlert;
     bool success =
-        SetAttribute(endpointId, Attributes::HardwareFaultAlert::Id, Attributes::HardwareFaultAlert::Set, newHardwareFaultAlert);
+        GetAttribute(endpointId, Attributes::HardwareFaultAlert::Id, Attributes::HardwareFaultAlert::Get, hardwareFaultAlert);
 
-    if (success && newHardwareFaultAlert)
+    if (success && (hardwareFaultAlert != newHardwareFaultAlert))
     {
-        Events::HardwareFault::Type event{};
-        SendEvent(endpointId, event);
+        success = SetAttribute(endpointId, Attributes::HardwareFaultAlert::Id, Attributes::HardwareFaultAlert::Set,
+                               newHardwareFaultAlert);
+
+        if (success && newHardwareFaultAlert)
+        {
+            Events::HardwareFault::Type event{};
+            SendEvent(endpointId, event);
+        }
     }
 
     return success;
@@ -149,13 +198,20 @@ bool SmokeCoAlarmServer::SetHardwareFaultAlert(EndpointId endpointId, bool newHa
 
 bool SmokeCoAlarmServer::SetEndOfServiceAlert(EndpointId endpointId, EndOfServiceEnum newEndOfServiceAlert)
 {
+    EndOfServiceEnum endOfServiceAlert;
     bool success =
-        SetAttribute(endpointId, Attributes::EndOfServiceAlert::Id, Attributes::EndOfServiceAlert::Set, newEndOfServiceAlert);
+        GetAttribute(endpointId, Attributes::EndOfServiceAlert::Id, Attributes::EndOfServiceAlert::Get, endOfServiceAlert);
 
-    if (success && (newEndOfServiceAlert == EndOfServiceEnum::kExpired))
+    if (success && (endOfServiceAlert != newEndOfServiceAlert))
     {
-        Events::EndOfService::Type event{};
-        SendEvent(endpointId, event);
+        success =
+            SetAttribute(endpointId, Attributes::EndOfServiceAlert::Id, Attributes::EndOfServiceAlert::Set, newEndOfServiceAlert);
+
+        if (success && (newEndOfServiceAlert == EndOfServiceEnum::kExpired))
+        {
+            Events::EndOfService::Type event{};
+            SendEvent(endpointId, event);
+        }
     }
 
     return success;
@@ -163,13 +219,21 @@ bool SmokeCoAlarmServer::SetEndOfServiceAlert(EndpointId endpointId, EndOfServic
 
 bool SmokeCoAlarmServer::SetInterconnectSmokeAlarm(EndpointId endpointId, AlarmStateEnum newInterconnectSmokeAlarm)
 {
-    bool success = SetAttribute(endpointId, Attributes::InterconnectSmokeAlarm::Id, Attributes::InterconnectSmokeAlarm::Set,
-                                newInterconnectSmokeAlarm);
+    AlarmStateEnum interconnectSmokeAlarm;
+    bool success = GetAttribute(endpointId, Attributes::InterconnectSmokeAlarm::Id, Attributes::InterconnectSmokeAlarm::Get,
+                                interconnectSmokeAlarm);
 
-    if (success && (newInterconnectSmokeAlarm == AlarmStateEnum::kCritical))
+    if (success && (interconnectSmokeAlarm != newInterconnectSmokeAlarm))
     {
-        Events::InterconnectSmokeAlarm::Type event{};
-        SendEvent(endpointId, event);
+        success = SetAttribute(endpointId, Attributes::InterconnectSmokeAlarm::Id, Attributes::InterconnectSmokeAlarm::Set,
+                               newInterconnectSmokeAlarm);
+
+        if (success &&
+            (newInterconnectSmokeAlarm == AlarmStateEnum::kWarning || newInterconnectSmokeAlarm == AlarmStateEnum::kCritical))
+        {
+            Events::InterconnectSmokeAlarm::Type event{};
+            SendEvent(endpointId, event);
+        }
     }
 
     return success;
@@ -177,13 +241,20 @@ bool SmokeCoAlarmServer::SetInterconnectSmokeAlarm(EndpointId endpointId, AlarmS
 
 bool SmokeCoAlarmServer::SetInterconnectCOAlarm(EndpointId endpointId, AlarmStateEnum newInterconnectCOAlarm)
 {
+    AlarmStateEnum interconnectCOAlarm;
     bool success =
-        SetAttribute(endpointId, Attributes::InterconnectCOAlarm::Id, Attributes::InterconnectCOAlarm::Set, newInterconnectCOAlarm);
+        GetAttribute(endpointId, Attributes::InterconnectCOAlarm::Id, Attributes::InterconnectCOAlarm::Get, interconnectCOAlarm);
 
-    if (success && (newInterconnectCOAlarm == AlarmStateEnum::kCritical))
+    if (success && (interconnectCOAlarm != newInterconnectCOAlarm))
     {
-        Events::InterconnectCOAlarm::Type event{};
-        SendEvent(endpointId, event);
+        success = SetAttribute(endpointId, Attributes::InterconnectCOAlarm::Id, Attributes::InterconnectCOAlarm::Set,
+                               newInterconnectCOAlarm);
+
+        if (success && (newInterconnectCOAlarm == AlarmStateEnum::kWarning || newInterconnectCOAlarm == AlarmStateEnum::kCritical))
+        {
+            Events::InterconnectCOAlarm::Type event{};
+            SendEvent(endpointId, event);
+        }
     }
 
     return success;
@@ -191,12 +262,31 @@ bool SmokeCoAlarmServer::SetInterconnectCOAlarm(EndpointId endpointId, AlarmStat
 
 bool SmokeCoAlarmServer::SetContaminationState(EndpointId endpointId, ContaminationStateEnum newContaminationState)
 {
-    return SetAttribute(endpointId, Attributes::ContaminationState::Id, Attributes::ContaminationState::Set, newContaminationState);
+    ContaminationStateEnum contaminationState;
+    bool success =
+        GetAttribute(endpointId, Attributes::ContaminationState::Id, Attributes::ContaminationState::Get, contaminationState);
+
+    if (success && (contaminationState != newContaminationState))
+    {
+        success = SetAttribute(endpointId, Attributes::ContaminationState::Id, Attributes::ContaminationState::Set,
+                               newContaminationState);
+    }
+
+    return success;
 }
 
 bool SmokeCoAlarmServer::SetSensitivityLevel(EndpointId endpointId, SensitivityEnum newSensitivityLevel)
 {
-    return SetAttribute(endpointId, Attributes::SensitivityLevel::Id, Attributes::SensitivityLevel::Set, newSensitivityLevel);
+    SensitivityEnum sensitivityLevel;
+    bool success = GetAttribute(endpointId, Attributes::SensitivityLevel::Id, Attributes::SensitivityLevel::Get, sensitivityLevel);
+
+    if (success && (sensitivityLevel != newSensitivityLevel))
+    {
+        success =
+            SetAttribute(endpointId, Attributes::SensitivityLevel::Id, Attributes::SensitivityLevel::Set, newSensitivityLevel);
+    }
+
+    return success;
 }
 
 bool SmokeCoAlarmServer::GetExpressedState(chip ::EndpointId endpointId, ExpressedStateEnum & expressedState)
@@ -209,9 +299,9 @@ bool SmokeCoAlarmServer::GetSmokeState(EndpointId endpointId, AlarmStateEnum & s
     return GetAttribute(endpointId, Attributes::SmokeState::Id, Attributes::SmokeState::Get, smokeState);
 }
 
-bool SmokeCoAlarmServer::GetCOState(EndpointId endpointId, AlarmStateEnum & COState)
+bool SmokeCoAlarmServer::GetCOState(EndpointId endpointId, AlarmStateEnum & coState)
 {
-    return GetAttribute(endpointId, Attributes::COState::Id, Attributes::COState::Get, COState);
+    return GetAttribute(endpointId, Attributes::COState::Id, Attributes::COState::Get, coState);
 }
 
 bool SmokeCoAlarmServer::GetBatteryAlert(EndpointId endpointId, AlarmStateEnum & batteryAlert)
@@ -275,28 +365,42 @@ chip::BitFlags<Feature> SmokeCoAlarmServer::GetFeatures(EndpointId endpointId)
  * SmokeCoAlarmServer private methods
  *********************************************************/
 
-bool SmokeCoAlarmServer::HandleRemoteSelfTestRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath)
+bool SmokeCoAlarmServer::HandleRemoteSelfTestRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                     RemoteOpHandler opHandler)
 {
+    VerifyOrDie(nullptr != opHandler);
+
+    EndpointId endpointId = commandPath.mEndpointId;
+    Status status         = Status::Success;
+
     ExpressedStateEnum expressedState;
-    bool success = GetExpressedState(commandPath.mEndpointId, expressedState);
+    bool success = GetExpressedState(endpointId, expressedState);
 
     if (success)
     {
-        // If the value is busy then do nothing
+        // If the value is busy then return busy
         if (expressedState == ExpressedStateEnum::kSmokeAlarm || expressedState == ExpressedStateEnum::kCOAlarm ||
             expressedState == ExpressedStateEnum::kTesting || expressedState == ExpressedStateEnum::kInterconnectSmoke ||
             expressedState == ExpressedStateEnum::kInterconnectCO)
         {
-            success = false;
+            status = Status::Busy;
         }
         else
         {
-            success = SetTestInProgress(commandPath.mEndpointId, true);
+            success = opHandler(endpointId);
+            if (!success)
+            {
+                status = Status::Failure;
+            }
         }
     }
+    else
+    {
+        status = Status::Failure;
+    }
 
-    commandObj->AddStatus(commandPath, success ? Status::Success : Status::Failure);
-    return success;
+    commandObj->AddStatus(commandPath, status);
+    return true;
 }
 
 template <typename T>
@@ -307,7 +411,8 @@ void SmokeCoAlarmServer::SendEvent(EndpointId endpointId, T & event)
 
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "Failed to log event: err=0x%" PRIx32 ", event_id=0x%" PRIx32, err.AsInteger(), event.GetEventId());
+        ChipLogError(Zcl, "Failed to log event: err=%" CHIP_ERROR_FORMAT ", event_id=" ChipLogFormatMEI, err.Format(),
+                     ChipLogValueMEI(event.GetEventId()));
     }
 }
 
@@ -320,8 +425,8 @@ bool SmokeCoAlarmServer::GetAttribute(EndpointId endpointId, AttributeId attribu
 
     if (!success)
     {
-        ChipLogError(Zcl, "Failed to read SmokeCOAlarm attribute: attribute=0x%" PRIx32 ", status=0x%x", attributeId,
-                     to_underlying(status));
+        ChipLogError(Zcl, "Failed to read SmokeCOAlarm attribute: attribute=" ChipLogFormatMEI ", status=0x%x",
+                     ChipLogValueMEI(attributeId), to_underlying(status));
     }
     return success;
 }
@@ -335,8 +440,8 @@ bool SmokeCoAlarmServer::SetAttribute(EndpointId endpointId, AttributeId attribu
 
     if (!success)
     {
-        ChipLogError(Zcl, "Failed to write SmokeCOAlarm attribute: attribute=0x%" PRIx32 ", status=0x%x", attributeId,
-                     to_underlying(status));
+        ChipLogError(Zcl, "Failed to write SmokeCOAlarm attribute: attribute=" ChipLogFormatMEI ", status=0x%x",
+                     ChipLogValueMEI(attributeId), to_underlying(status));
     }
     return success;
 }
@@ -348,7 +453,8 @@ bool SmokeCoAlarmServer::SetAttribute(EndpointId endpointId, AttributeId attribu
 bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                        const Commands::SelfTestRequest::DecodableType & commandData)
 {
-    return SmokeCoAlarmServer::Instance().HandleRemoteSelfTestRequest(commandObj, commandPath);
+    return SmokeCoAlarmServer::Instance().HandleRemoteSelfTestRequest(commandObj, commandPath,
+                                                                      emberAfPluginSmokeCoAlarmSelfTestRequestCommand);
 }
 
 void MatterSmokeCoAlarmPluginServerInitCallback() {}
