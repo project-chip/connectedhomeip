@@ -108,6 +108,12 @@ static BOOL AttributeIsSpecifiedInScenesCluster(AttributeId aAttributeId)
     case Attributes::LastConfiguredBy::Id: {
         return YES;
     }
+    case Attributes::SceneTableSize::Id: {
+        return YES;
+    }
+    case Attributes::RemainingCapacity::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

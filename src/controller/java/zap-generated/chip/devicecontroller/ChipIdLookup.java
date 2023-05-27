@@ -474,6 +474,12 @@ public final class ChipIdLookup {
       if (attributeId == 5L) {
         return "LastConfiguredBy";
       }
+      if (attributeId == 6L) {
+        return "SceneTableSize";
+      }
+      if (attributeId == 7L) {
+        return "RemainingCapacity";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }

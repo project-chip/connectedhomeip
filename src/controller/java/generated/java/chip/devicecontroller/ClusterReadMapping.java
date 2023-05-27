@@ -265,6 +265,28 @@ public class ClusterReadMapping {
           readScenesLastConfiguredByCommandParams
         );
         result.put("readLastConfiguredByAttribute", readScenesLastConfiguredByAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readScenesSceneTableSizeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readScenesSceneTableSizeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ScenesCluster) cluster).readSceneTableSizeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readScenesSceneTableSizeCommandParams
+        );
+        result.put("readSceneTableSizeAttribute", readScenesSceneTableSizeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readScenesRemainingCapacityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readScenesRemainingCapacityAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ScenesCluster) cluster).readRemainingCapacityAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readScenesRemainingCapacityCommandParams
+        );
+        result.put("readRemainingCapacityAttribute", readScenesRemainingCapacityAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readScenesGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readScenesGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

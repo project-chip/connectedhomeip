@@ -1119,21 +1119,7 @@ NS_ASSUME_NONNULL_BEGIN
                             } else {
                                 newElement_3.attributeID = nil;
                             }
-                            { // Scope for our temporary variables
-                                auto * array_5 = [NSMutableArray new];
-                                auto iter_5 = entry_3.attributeValue.begin();
-                                while (iter_5.Next()) {
-                                    auto & entry_5 = iter_5.GetValue();
-                                    NSNumber * newElement_5;
-                                    newElement_5 = [NSNumber numberWithUnsignedChar:entry_5];
-                                    [array_5 addObject:newElement_5];
-                                }
-                                CHIP_ERROR err = iter_5.GetStatus();
-                                if (err != CHIP_NO_ERROR) {
-                                    return err;
-                                }
-                                newElement_3.attributeValue = array_5;
-                            }
+                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
                         CHIP_ERROR err = iter_3.GetStatus();
@@ -2284,21 +2270,7 @@ NS_ASSUME_NONNULL_BEGIN
                             } else {
                                 newElement_3.attributeID = nil;
                             }
-                            { // Scope for our temporary variables
-                                auto * array_5 = [NSMutableArray new];
-                                auto iter_5 = entry_3.attributeValue.begin();
-                                while (iter_5.Next()) {
-                                    auto & entry_5 = iter_5.GetValue();
-                                    NSNumber * newElement_5;
-                                    newElement_5 = [NSNumber numberWithUnsignedChar:entry_5];
-                                    [array_5 addObject:newElement_5];
-                                }
-                                CHIP_ERROR err = iter_5.GetStatus();
-                                if (err != CHIP_NO_ERROR) {
-                                    return err;
-                                }
-                                newElement_3.attributeValue = array_5;
-                            }
+                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
                         CHIP_ERROR err = iter_3.GetStatus();

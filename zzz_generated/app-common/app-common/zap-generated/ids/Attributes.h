@@ -154,6 +154,14 @@ namespace LastConfiguredBy {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace LastConfiguredBy
 
+namespace SceneTableSize {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace SceneTableSize
+
+namespace RemainingCapacity {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace RemainingCapacity
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

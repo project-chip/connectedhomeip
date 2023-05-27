@@ -744,6 +744,8 @@ public class ClusterIDMapping {
             SceneValid(3L),
             NameSupport(4L),
             LastConfiguredBy(5L),
+            SceneTableSize(6L),
+            RemainingCapacity(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

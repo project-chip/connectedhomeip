@@ -325,6 +325,18 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000006: {
+                "attributeName": "SceneTableSize",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "RemainingCapacity",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

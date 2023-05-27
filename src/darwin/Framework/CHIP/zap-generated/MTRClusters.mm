@@ -1043,31 +1043,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                             auto & definedValue_4 = listHolder_2->mList[i_2].attributeID.Emplace();
                                             definedValue_4 = element_2.attributeID.unsignedIntValue;
                                         }
-                                        {
-                                            using ListType_4
-                                                = std::remove_reference_t<decltype(listHolder_2->mList[i_2].attributeValue)>;
-                                            using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                                            if (element_2.attributeValue.count != 0) {
-                                                auto * listHolder_4
-                                                    = new ListHolder<ListMemberType_4>(element_2.attributeValue.count);
-                                                if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                                }
-                                                listFreer.add(listHolder_4);
-                                                for (size_t i_4 = 0; i_4 < element_2.attributeValue.count; ++i_4) {
-                                                    if (![element_2.attributeValue[i_4] isKindOfClass:[NSNumber class]]) {
-                                                        // Wrong kind of value.
-                                                        return CHIP_ERROR_INVALID_ARGUMENT;
-                                                    }
-                                                    auto element_4 = (NSNumber *) element_2.attributeValue[i_4];
-                                                    listHolder_4->mList[i_4] = element_4.unsignedCharValue;
-                                                }
-                                                listHolder_2->mList[i_2].attributeValue
-                                                    = ListType_4(listHolder_4->mList, element_2.attributeValue.count);
-                                            } else {
-                                                listHolder_2->mList[i_2].attributeValue = ListType_4();
-                                            }
-                                        }
+                                        listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
                                     }
                                     listHolder_0->mList[i_0].attributeValueList
                                         = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
@@ -1619,31 +1595,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                             auto & definedValue_4 = listHolder_2->mList[i_2].attributeID.Emplace();
                                             definedValue_4 = element_2.attributeID.unsignedIntValue;
                                         }
-                                        {
-                                            using ListType_4
-                                                = std::remove_reference_t<decltype(listHolder_2->mList[i_2].attributeValue)>;
-                                            using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
-                                            if (element_2.attributeValue.count != 0) {
-                                                auto * listHolder_4
-                                                    = new ListHolder<ListMemberType_4>(element_2.attributeValue.count);
-                                                if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                                }
-                                                listFreer.add(listHolder_4);
-                                                for (size_t i_4 = 0; i_4 < element_2.attributeValue.count; ++i_4) {
-                                                    if (![element_2.attributeValue[i_4] isKindOfClass:[NSNumber class]]) {
-                                                        // Wrong kind of value.
-                                                        return CHIP_ERROR_INVALID_ARGUMENT;
-                                                    }
-                                                    auto element_4 = (NSNumber *) element_2.attributeValue[i_4];
-                                                    listHolder_4->mList[i_4] = element_4.unsignedCharValue;
-                                                }
-                                                listHolder_2->mList[i_2].attributeValue
-                                                    = ListType_4(listHolder_4->mList, element_2.attributeValue.count);
-                                            } else {
-                                                listHolder_2->mList[i_2].attributeValue = ListType_4();
-                                            }
-                                        }
+                                        listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
                                     }
                                     listHolder_0->mList[i_0].attributeValueList
                                         = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
@@ -1866,6 +1818,22 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeScenesID)
                                         attributeID:@(MTRAttributeIDTypeClusterScenesAttributeLastConfiguredByID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeSceneTableSizeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeSceneTableSizeID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeRemainingCapacityWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeScenesID)
+                                        attributeID:@(MTRAttributeIDTypeClusterScenesAttributeRemainingCapacityID)
                                              params:params];
 }
 

@@ -1665,6 +1665,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::LastConfiguredBy::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, lastConfiguredBy));
         break;
+    case Attributes::SceneTableSize::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, sceneTableSize));
+        break;
+    case Attributes::RemainingCapacity::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, remainingCapacity));
+        break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;
