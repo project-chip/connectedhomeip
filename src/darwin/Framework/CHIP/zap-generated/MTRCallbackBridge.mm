@@ -8941,7 +8941,12 @@ void MTROperationalStatePhaseListListAttributeCallbackBridge::OnSuccessFn(
             while (iter_1.Next()) {
                 auto & entry_1 = iter_1.GetValue();
                 NSString * newElement_1;
-                newElement_1 = [[NSString alloc] initWithBytes:entry_1.data() length:entry_1.size() encoding:NSUTF8StringEncoding];
+                newElement_1 = AsString(entry_1);
+                if (newElement_1 == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
                 [array_1 addObject:newElement_1];
             }
             CHIP_ERROR err = iter_1.GetStatus();
@@ -8983,9 +8988,12 @@ void MTROperationalStateOperationalStateListListAttributeCallbackBridge::OnSucce
             MTROperationalStateClusterOperationalStateStruct * newElement_0;
             newElement_0 = [MTROperationalStateClusterOperationalStateStruct new];
             newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.operationalStateID)];
-            newElement_0.operationalStateLabel = [[NSString alloc] initWithBytes:entry_0.operationalStateLabel.data()
-                                                                          length:entry_0.operationalStateLabel.size()
-                                                                        encoding:NSUTF8StringEncoding];
+            newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel);
+            if (newElement_0.operationalStateLabel == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -9019,9 +9027,12 @@ void MTROperationalStateOperationalStateStructAttributeCallbackBridge::OnSuccess
     MTROperationalStateClusterOperationalStateStruct * _Nonnull objCValue;
     objCValue = [MTROperationalStateClusterOperationalStateStruct new];
     objCValue.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.operationalStateID)];
-    objCValue.operationalStateLabel = [[NSString alloc] initWithBytes:value.operationalStateLabel.data()
-                                                               length:value.operationalStateLabel.size()
-                                                             encoding:NSUTF8StringEncoding];
+    objCValue.operationalStateLabel = AsString(value.operationalStateLabel);
+    if (objCValue.operationalStateLabel == nil) {
+        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+        OnFailureFn(context, err);
+        return;
+    }
     DispatchSuccess(context, objCValue);
 };
 
@@ -9049,14 +9060,20 @@ void MTROperationalStateOperationalErrorStructAttributeCallbackBridge::OnSuccess
     if (value.errorStateLabel.IsNull()) {
         objCValue.errorStateLabel = nil;
     } else {
-        objCValue.errorStateLabel = [[NSString alloc] initWithBytes:value.errorStateLabel.Value().data()
-                                                             length:value.errorStateLabel.Value().size()
-                                                           encoding:NSUTF8StringEncoding];
+        objCValue.errorStateLabel = AsString(value.errorStateLabel.Value());
+        if (objCValue.errorStateLabel == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
     }
     if (value.errorStateDetails.HasValue()) {
-        objCValue.errorStateDetails = [[NSString alloc] initWithBytes:value.errorStateDetails.Value().data()
-                                                               length:value.errorStateDetails.Value().size()
-                                                             encoding:NSUTF8StringEncoding];
+        objCValue.errorStateDetails = AsString(value.errorStateDetails.Value());
+        if (objCValue.errorStateDetails == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
     } else {
         objCValue.errorStateDetails = nil;
     }

@@ -1775,14 +1775,20 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
             if (cppValue.errorState.errorStateLabel.IsNull()) {
                 memberValue.errorStateLabel = nil;
             } else {
-                memberValue.errorStateLabel = [[NSString alloc] initWithBytes:cppValue.errorState.errorStateLabel.Value().data()
-                                                                       length:cppValue.errorState.errorStateLabel.Value().size()
-                                                                     encoding:NSUTF8StringEncoding];
+                memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
+                if (memberValue.errorStateLabel == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
             }
             if (cppValue.errorState.errorStateDetails.HasValue()) {
-                memberValue.errorStateDetails = [[NSString alloc] initWithBytes:cppValue.errorState.errorStateDetails.Value().data()
-                                                                         length:cppValue.errorState.errorStateDetails.Value().size()
-                                                                       encoding:NSUTF8StringEncoding];
+                memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value());
+                if (memberValue.errorStateDetails == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
             } else {
                 memberValue.errorStateDetails = nil;
             }

@@ -6732,16 +6732,18 @@ NS_ASSUME_NONNULL_BEGIN
         if (decodableStruct.commandResponseState.errorStateLabel.IsNull()) {
             self.commandResponseState.errorStateLabel = nil;
         } else {
-            self.commandResponseState.errorStateLabel =
-                [[NSString alloc] initWithBytes:decodableStruct.commandResponseState.errorStateLabel.Value().data()
-                                         length:decodableStruct.commandResponseState.errorStateLabel.Value().size()
-                                       encoding:NSUTF8StringEncoding];
+            self.commandResponseState.errorStateLabel = AsString(decodableStruct.commandResponseState.errorStateLabel.Value());
+            if (self.commandResponseState.errorStateLabel == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         }
         if (decodableStruct.commandResponseState.errorStateDetails.HasValue()) {
-            self.commandResponseState.errorStateDetails =
-                [[NSString alloc] initWithBytes:decodableStruct.commandResponseState.errorStateDetails.Value().data()
-                                         length:decodableStruct.commandResponseState.errorStateDetails.Value().size()
-                                       encoding:NSUTF8StringEncoding];
+            self.commandResponseState.errorStateDetails = AsString(decodableStruct.commandResponseState.errorStateDetails.Value());
+            if (self.commandResponseState.errorStateDetails == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.commandResponseState.errorStateDetails = nil;
         }

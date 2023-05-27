@@ -10092,9 +10092,12 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(
                 while (iter_1.Next()) {
                     auto & entry_1 = iter_1.GetValue();
                     NSString * newElement_1;
-                    newElement_1 = [[NSString alloc] initWithBytes:entry_1.data()
-                                                            length:entry_1.size()
-                                                          encoding:NSUTF8StringEncoding];
+                    newElement_1 = AsString(entry_1);
+                    if (newElement_1 == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
                     [array_1 addObject:newElement_1];
                 }
                 CHIP_ERROR err = iter_1.GetStatus();
@@ -10153,9 +10156,12 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(
                 MTROperationalStateClusterOperationalStateStruct * newElement_0;
                 newElement_0 = [MTROperationalStateClusterOperationalStateStruct new];
                 newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.operationalStateID)];
-                newElement_0.operationalStateLabel = [[NSString alloc] initWithBytes:entry_0.operationalStateLabel.data()
-                                                                              length:entry_0.operationalStateLabel.size()
-                                                                            encoding:NSUTF8StringEncoding];
+                newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel);
+                if (newElement_0.operationalStateLabel == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -10177,9 +10183,12 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(
         MTROperationalStateClusterOperationalStateStruct * _Nonnull value;
         value = [MTROperationalStateClusterOperationalStateStruct new];
         value.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.operationalStateID)];
-        value.operationalStateLabel = [[NSString alloc] initWithBytes:cppValue.operationalStateLabel.data()
-                                                               length:cppValue.operationalStateLabel.size()
-                                                             encoding:NSUTF8StringEncoding];
+        value.operationalStateLabel = AsString(cppValue.operationalStateLabel);
+        if (value.operationalStateLabel == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
         return value;
     }
     case Attributes::OperationalError::Id: {
@@ -10195,14 +10204,20 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(
         if (cppValue.errorStateLabel.IsNull()) {
             value.errorStateLabel = nil;
         } else {
-            value.errorStateLabel = [[NSString alloc] initWithBytes:cppValue.errorStateLabel.Value().data()
-                                                             length:cppValue.errorStateLabel.Value().size()
-                                                           encoding:NSUTF8StringEncoding];
+            value.errorStateLabel = AsString(cppValue.errorStateLabel.Value());
+            if (value.errorStateLabel == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
         }
         if (cppValue.errorStateDetails.HasValue()) {
-            value.errorStateDetails = [[NSString alloc] initWithBytes:cppValue.errorStateDetails.Value().data()
-                                                               length:cppValue.errorStateDetails.Value().size()
-                                                             encoding:NSUTF8StringEncoding];
+            value.errorStateDetails = AsString(cppValue.errorStateDetails.Value());
+            if (value.errorStateDetails == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
         } else {
             value.errorStateDetails = nil;
         }
