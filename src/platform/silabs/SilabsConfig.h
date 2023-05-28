@@ -116,8 +116,6 @@ public:
     static constexpr Key kConfigKey_DeviceKey             = SilabsConfigKey(kMatterFactory_KeyBase, 0x15);
     static constexpr Key kConfigKey_hostname              = SilabsConfigKey(kMatterFactory_KeyBase, 0x16);
     static constexpr Key kConfigKey_clientid              = SilabsConfigKey(kMatterFactory_KeyBase, 0x17);
-    static constexpr Key kConfigKey_username              = SilabsConfigKey(kMatterFactory_KeyBase, 0x18);
-    static constexpr Key kConfigKey_password              = SilabsConfigKey(kMatterFactory_KeyBase, 0x19);
     static constexpr Key kConfigKey_UniqueId              = SilabsConfigKey(kMatterFactory_KeyBase, 0x1F);
     // Matter Config Keys
     static constexpr Key kConfigKey_ServiceConfig      = SilabsConfigKey(kMatterConfig_KeyBase, 0x01);

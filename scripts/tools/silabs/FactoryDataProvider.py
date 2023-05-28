@@ -53,8 +53,6 @@ class FactoryDataWriter:
     DIC_DEV_KEY_OFFSET = "0x87215:"
     DIC_HOSTNAME_KEY = "0x87216:"
     DIC_CLIENTID_KEY = "0x87217:"
-    DIC_USERNAME_KEY = "0x87218:"
-    DIC_PASSWORD_KEY = "0x87219:"
 
     def generate_spake2p_verifier(self):
         """ Generate Spake2+ verifier using the external spake2p tool
@@ -149,8 +147,6 @@ class FactoryDataWriter:
         kMaxdevicekey = 2048
         kMaxhostname = 64
         kMaxclientid = 32
-        kMaxusernme = 32
-        kMaxpassword = 32
 
 
         INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444,
@@ -199,10 +195,6 @@ class FactoryDataWriter:
             assert (len(self._args.hostname) <= kMaxhostname), "hostname exceeds the size limit"
         if self._args.clientid:
             assert (len(self._args.clientid) <= kMaxclientid), "clientid exceeds the size limit"
-        if self._args.username:
-            assert (len(self._args.username) <= kMaxusernme), "username exceeds the size limit"
-        if self._args.password:
-            assert (len(self._args.password) <= kMaxpassword), "password exceeds the size limit"
 
 
     def add_SerialNo_To_CMD(self, cmdList):
@@ -335,14 +327,6 @@ class FactoryDataWriter:
             clientid = bytes(self._args.clientid, 'utf-8').hex()
             cmd.extend(["--object", self.DIC_CLIENTID_KEY + str(clientid)])
 
-        if self._args.username:
-            username = bytes(self._args.username, 'utf-8').hex()
-            cmd.extend(["--object", self.DIC_USERNAME_KEY + str(username)])
-
-        if self._args.password:
-            password = bytes(self._args.password, 'utf-8').hex()
-            cmd.extend(["--object", self.DIC_PASSWORD_KEY + str(password)])
-
 
         cmd.extend(["--outfile", self.OUT_FILE])
         results = subprocess.run(cmd)
@@ -419,10 +403,6 @@ def main():
                         help="[string] Provide hostname.")
     parser.add_argument("--clientid", type=str,
                         help="[string] Provide clientid.")
-    parser.add_argument("--username", type=str,
-                        help="[string] Provide username.")
-    parser.add_argument("--password", type=str,
-                        help="[string] Provide pasword.")
 
     args = parser.parse_args()
     writer = FactoryDataWriter(args)
