@@ -219,7 +219,6 @@ class DeviceProxyWrapper():
         return bytes(buf)
 
 
-
 DiscoveryFilterType = discovery.FilterType
 
 
