@@ -70,7 +70,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogError(Zcl, "MediaPlayback NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, MediaPlayback::Id);
-    return ((ep == 0xFFFF || ep >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr : gDelegateTable[ep]);
+    return ((ep == 0xFFFF || ep >= kMediaPlaybackDelegateTableSize) ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -93,7 +93,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, MediaPlayback::Id);
     // if endpoint is found and is not a dynamic endpoint
-    if (ep != 0xFFFF && ep < EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (ep != 0xFFFF && ep < kMediaPlaybackDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }

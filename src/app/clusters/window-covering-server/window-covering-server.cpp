@@ -54,8 +54,7 @@ Delegate * gDelegateTable[kWindowCoveringDelegateTableSize] = { nullptr };
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, WindowCovering::Id);
-    return ((ep == kInvalidEndpointId || ep >= EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr
-                                                                                                       : gDelegateTable[ep]);
+    return ((ep == kInvalidEndpointId || ep >= kWindowCoveringDelegateTableSize) ? nullptr : gDelegateTable[ep]);
 }
 
 /*
@@ -598,7 +597,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, WindowCovering::Id);
 
     // if endpoint is found and is not a dynamic endpoint
-    if (ep != 0xFFFF && ep < EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (ep != 0xFFFF && ep < kWindowCoveringDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }
