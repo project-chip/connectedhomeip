@@ -23,9 +23,7 @@ limitations under the License.
   <struct name="AttributeValuePair">
     <cluster code="0x0005"/>
     <item name="AttributeID" type="attrib_id" optional="true"/>
-    <!-- TODO Need a new type that can support variable attribute types and size  -->
-    <!-- One suggestion from Boris is a Type that maps to a TLVReader place in the riight elements -->
-    <item name="AttributeValue" type="INT8U" array="true"/>
+    <item name="AttributeValue" type="INT32U" optional="false"/>
   </struct>
 
   <struct name="ExtensionFieldSet">
@@ -51,7 +49,9 @@ limitations under the License.
     <attribute side="server" code="0x0003" define="SCENE_VALID" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">SceneValid</attribute>
     <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" default="0x00" optional="false">NameSupport</attribute>
     <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
-   
+    <attribute side="server" code="0x0006" define="SCENE_TABLE_SIZE" type="INT16U" writable="false" optional="false">SceneTableSize</attribute>
+    <attribute side="server" code="0x0007" define="REMAINING_CAPACITY" type="INT8U" writable="false" optional="false">RemainingCapacity</attribute>
+
     <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes add">
       <description>
         Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}'

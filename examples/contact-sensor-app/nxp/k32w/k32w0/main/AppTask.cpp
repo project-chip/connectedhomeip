@@ -82,11 +82,12 @@ extern "C" void K32WUartProcess(void);
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip;
+using namespace chip::app;
 
 AppTask AppTask::sAppTask;
 
 static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
-                              EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED };
+                              Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator };
 
 /* OTA related variables */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -723,7 +724,7 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
 
 void AppTask::OnIdentifyStart(Identify * identify)
 {
-    if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK == identify->mCurrentEffectIdentifier)
+    if (Clusters::Identify::EffectIdentifierEnum::kBlink == identify->mCurrentEffectIdentifier)
     {
         if (Function::kNoneSelected != sAppTask.mFunction)
         {
@@ -741,7 +742,7 @@ void AppTask::OnIdentifyStart(Identify * identify)
 
 void AppTask::OnIdentifyStop(Identify * identify)
 {
-    if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK == identify->mCurrentEffectIdentifier)
+    if (Clusters::Identify::EffectIdentifierEnum::kBlink == identify->mCurrentEffectIdentifier)
     {
         K32W_LOG("Identify process has stopped.");
         sAppTask.mFunction = Function::kNoneSelected;
