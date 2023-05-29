@@ -3045,9 +3045,15 @@
                   - fabricIndex
       enums:
           Identify:
-              - IdentifyEffectIdentifier
-              - IdentifyEffectVariant
-              - IdentifyIdentifyType
+              # EffectIdentifierEnum, EffectVariantEnum, and IdentifyTypeEnum
+              # were originally named IdentifyEffectIdentifier,
+              # IdentifyEffectVariant, and IdentifyIdentifyType, but we generate
+              # the same API for the names with/without "Enum" at the end, and
+              # with/without the cluster name at the beginning, so the name can
+              # just change here.
+              - EffectIdentifierEnum
+              - EffectVariantEnum
+              - IdentifyTypeEnum
           OnOff:
               - OnOffDelayedAllOffEffectVariant
               - OnOffDyingLightEffectVariant
@@ -3237,16 +3243,22 @@
               - FaultType
       enum values:
           Identify:
-              IdentifyEffectIdentifier:
+              # EffectIdentifierEnum, EffectVariantEnum, and IdentifyTypeEnum
+              # were originally named IdentifyEffectIdentifier,
+              # IdentifyEffectVariant, and IdentifyIdentifyType, but we generate
+              # the same API for the names with/without "Enum" at the end, and
+              # with/without the cluster name at the beginning, so the name can
+              # just change here.
+              EffectIdentifierEnum:
                   - Blink
                   - Breathe
                   - Okay
                   - ChannelChange
                   - FinishEffect
                   - StopEffect
-              IdentifyEffectVariant:
+              EffectVariantEnum:
                   - Default
-              IdentifyIdentifyType:
+              IdentifyTypeEnum:
                   - None
                   - VisibleLight
                   - VisibleLED
@@ -7721,6 +7733,10 @@
           WiFiNetworkDiagnostics:
               WiFiVersionEnum:
                   - Ah
+          Identify:
+              IdentifyTypeEnum:
+                  - LightOutput
+                  - VisibleIndicator
       bitmaps:
           AirQuality:
               - Feature
@@ -7871,6 +7887,11 @@
           # We apparently forgot to deprecate BridgedDeviceBasic when we
           # introduced BridgedDeviceBasicInformation.
           - BridgedDeviceBasic
+      enum values:
+          Identify:
+              IdentifyTypeEnum:
+                  - VisibleLight
+                  - VisibleLED
       structs:
           AccessControl:
               - Target
@@ -7908,6 +7929,10 @@
                   MixedNTPNTS: MixedNtpNts
                   PTP: Ptp
                   GNSS: Gnss
+          Identify:
+              IdentifyTypeEnum:
+                  LightOutput: VisibleLight
+                  VisibleIndicator: VisibleLED
       bitmaps:
           Groups:
               Feature: GroupClusterFeature
