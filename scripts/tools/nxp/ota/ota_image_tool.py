@@ -32,10 +32,11 @@ but it could be modified to support all factory data fields.
 import argparse
 import glob
 import json
-import jsonschema
 import logging
 import os
 import sys
+
+import jsonschema
 
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../factory_data_generator'))
