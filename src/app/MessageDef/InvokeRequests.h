@@ -57,9 +57,9 @@ public:
     /**
      *  @brief Mark the end of this InvokeRequests
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    InvokeRequests::Builder & EndOfInvokeRequests();
+    CHIP_ERROR EndOfInvokeRequests();
 
 private:
     CommandDataIB::Builder mCommandData;
