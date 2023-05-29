@@ -466,23 +466,20 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     TLV::TLVType outer;
     TLV::TLVType outerRead;
 
-    static const uint8_t OO_av_payload[1]    = { 0x01 };
-    static const uint8_t LC_av_payload[2][2] = { { 0x40, 0x00 }, { 0x01, 0xF0 } };
-    static const uint8_t CC_av_payload[8][2] = { { 0x00, 0x00 }, { 0x00, 0x00 }, { 0x00, 0x00 }, { 0x00, 0x00 },
-                                                 { 0x00, 0x00 }, { 0x00, 0x00 }, { 0x00, 0x00 }, { 0x00, 0x00 } };
+    static const uint8_t OO_av_payload     = 0x01;
+    static const uint16_t LC_av_payload[2] = { 0x64, 0x01F0 };
+    static const uint16_t CC_av_payload[8] = { 0 };
 
     OOPairs[0].attributeID.SetValue(kOnOffAttId);
     OOPairs[0].attributeValue = OO_av_payload;
 
     LCPairs[0].attributeID.SetValue(kCurrentLevelId);
     LCPairs[0].attributeValue = LC_av_payload[0];
-    LCPairs[0].attributeValue.reduce_size(1);
     LCPairs[1].attributeID.SetValue(kCurrentFrequencyId);
     LCPairs[1].attributeValue = LC_av_payload[1];
 
     CCPairs[0].attributeID.SetValue(kCurrentSaturationId);
     CCPairs[0].attributeValue = CC_av_payload[0];
-    CCPairs[0].attributeValue.reduce_size(1);
     CCPairs[1].attributeID.SetValue(kCurrentXId);
     CCPairs[1].attributeValue = CC_av_payload[1];
     CCPairs[2].attributeID.SetValue(kCurrentYId);
@@ -493,10 +490,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     CCPairs[4].attributeValue = CC_av_payload[4];
     CCPairs[5].attributeID.SetValue(kColorLoopActiveId);
     CCPairs[5].attributeValue = CC_av_payload[5];
-    CCPairs[5].attributeValue.reduce_size(1);
     CCPairs[6].attributeID.SetValue(kColorLoopDirectionId);
     CCPairs[6].attributeValue = CC_av_payload[6];
-    CCPairs[6].attributeValue.reduce_size(1);
     CCPairs[7].attributeID.SetValue(kColorLoopTimeId);
     CCPairs[7].attributeValue = CC_av_payload[7];
 
@@ -658,59 +653,22 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     app::Clusters::Scenes::Structs::ExtensionFieldSet::Type extensionFieldFailTestOut;
     app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType extensionFieldFailTestIn;
     app::Clusters::Scenes::Structs::AttributeValuePair::Type TooManyPairs[16];
-    app::Clusters::Scenes::Structs::AttributeValuePair::Type TooManyBytesPairs[1];
 
     TLV::TLVType failWrite;
     TLV::TLVType failRead;
 
-    uint8_t payloadOk[1]     = { 0 };
-    uint8_t payloadTooBig[5] = { 0 };
+    uint8_t payloadOk = 0;
 
     for (uint8_t i = 0; i < 16; i++)
     {
         TooManyPairs[i].attributeValue = payloadOk;
     }
 
-    TooManyBytesPairs[0].attributeValue = payloadTooBig;
-
     extensionFieldFailTestOut.clusterID          = kColorControlClusterId;
     extensionFieldFailTestOut.attributeValueList = TooManyPairs;
 
     uint8_t failBuffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
     ByteSpan fail_list(failBuffer);
-
-    // Serialize Extension Field sets as if they were recovered from memory
-    writer.Init(failBuffer);
-    writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, failWrite);
-    NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR ==
-                       app::DataModel::Encode(writer,
-                                              TLV::ContextTag(to_underlying(
-                                                  app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
-                                              extensionFieldFailTestOut.attributeValueList));
-    writer.EndContainer(failWrite);
-
-    // Setup the On Off Extension field set in the expected state from a command
-    reader.Init(fail_list);
-    extensionFieldFailTestIn.clusterID = kColorControlClusterId;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(failRead));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldFailTestIn.attributeValueList.Decode(reader));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(failRead));
-
-    // Verify failure on both serialize and deserialize
-    NL_TEST_ASSERT(aSuite,
-                   CHIP_ERROR_BUFFER_TOO_SMALL == sHandler.SerializeAdd(kTestEndpoint1, extensionFieldFailTestIn, buff_span));
-    NL_TEST_ASSERT(aSuite,
-                   CHIP_ERROR_BUFFER_TOO_SMALL ==
-                       sHandler.Deserialize(kTestEndpoint1, kColorControlClusterId, fail_list, extensionFieldFailTestOut));
-
-    memset(failBuffer, 0, fail_list.size());
-    memset(buffer, 0, buff_span.size());
-
-    extensionFieldFailTestOut.clusterID          = kColorControlClusterId;
-    extensionFieldFailTestOut.attributeValueList = TooManyBytesPairs;
 
     // Serialize Extension Field sets as if they were recovered from memory
     writer.Init(failBuffer);

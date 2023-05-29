@@ -54,9 +54,9 @@ public:
     /**
      *  @brief Mark the end of this EventPathIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    EventPathIBs::Builder & EndOfEventPaths();
+    CHIP_ERROR EndOfEventPaths();
 
 private:
     EventPathIB::Builder mEventPath;

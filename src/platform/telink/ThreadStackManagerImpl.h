@@ -64,6 +64,7 @@ public:
     CHIP_ERROR _InitThreadStack();
     void SetRadioBlocked(bool state) { mRadioBlocked = state; }
     bool IsReadyToAttach(void) const { return mReadyToAttach; }
+    void Finalize(void);
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.

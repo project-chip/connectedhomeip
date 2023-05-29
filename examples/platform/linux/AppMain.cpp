@@ -413,8 +413,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     ApplicationInit();
 
 #if !defined(ENABLE_CHIP_SHELL)
+    // NOLINTBEGIN(bugprone-signal-handler)
     signal(SIGINT, StopSignalHandler);
     signal(SIGTERM, StopSignalHandler);
+    // NOLINTEND(bugprone-signal-handler)
 #endif // !defined(ENABLE_CHIP_SHELL)
 
     if (impl != nullptr)

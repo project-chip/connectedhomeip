@@ -118,12 +118,8 @@ static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId,
 
 void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
 {
-    // The most significant bit of the NameSupport attribute indicates whether or not group names are supported
-    //
-    // According to spec, highest bit (Group Names supported) MUST match feature bit 0 (Group Names supported)
-    static constexpr uint8_t kNameSuppportFlagGroupNamesSupported = 0x80;
-
-    EmberAfStatus status = Attributes::NameSupport::Set(endpointId, kNameSuppportFlagGroupNamesSupported);
+    // According to spec, highest bit (Group Names) MUST match feature bit 0 (Group Names)
+    EmberAfStatus status = Attributes::NameSupport::Set(endpointId, NameSupportBitmap::kGroupNames);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogDetail(Zcl, "ERR: writing NameSupport %x", status);

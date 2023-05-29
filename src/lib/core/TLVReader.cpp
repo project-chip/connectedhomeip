@@ -313,6 +313,11 @@ CHIP_ERROR TLVReader::Get(CharSpan & v)
 
     const uint8_t * bytes;
     ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
+    if (bytes == nullptr)
+    {
+        // Calling memchr further down with bytes == nullptr would have undefined behaviour, exiting early.
+        return CHIP_NO_ERROR;
+    }
 
     uint32_t len = GetLength();
 
@@ -335,6 +340,11 @@ CHIP_ERROR TLVReader::Get(Optional<LocalizedStringIdentifier> & lsid)
 
     const uint8_t * bytes;
     ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
+    if (bytes == nullptr)
+    {
+        // Calling memchr further down with bytes == nullptr would have undefined behaviour, exiting early.
+        return CHIP_NO_ERROR;
+    }
 
     uint32_t len = GetLength();
 

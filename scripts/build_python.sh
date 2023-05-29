@@ -63,6 +63,7 @@ Input Options:
                                                             no: Do not install
                                                             build-env: install to virtual env for build matter
                                                             separate: install to another virtual env (out/python_env)
+  --extra_packages PACKAGES                                 Install extra Python packages from PyPI
   --include_yamltests                                       Whether to install the matter_yamltests wheel.
   -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
 "
@@ -94,6 +95,10 @@ while (($#)); do
             ;;
         --install_wheel | -i)
             install_wheel=$2
+            shift
+            ;;
+        --extra_packages)
+            extra_packages=$2
             shift
             ;;
         --include_yamltests)
@@ -158,6 +163,10 @@ if [ -n "$include_yamltests" ]; then
     WHEEL+=(
         "$(ls -tr "$(wheel_output_dir "$YAMLTESTS_GN_LABEL")"/*.whl | head -n 1)"
     )
+fi
+
+if [ -n "$extra_packages" ]; then
+    WHEEL+=("$extra_packages")
 fi
 
 if [ "$install_wheel" = "no" ]; then

@@ -105,14 +105,14 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockAppDelegate;
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, ec1 != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
     NL_TEST_ASSERT(inSuite, ec1->GetSessionHandle() == ctx.GetSessionAliceToBob());
     NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
 
     ExchangeContext * ec2 = ctx.NewExchangeToAlice(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, ec2 != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
     NL_TEST_ASSERT(inSuite, ec2->GetSessionHandle() == ctx.GetSessionBobToAlice());
 

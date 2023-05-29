@@ -175,9 +175,9 @@ public:
     /**
      *  @brief Mark the end of this EventPath
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    EventPathIB::Builder & EndOfEventPathIB();
+    CHIP_ERROR EndOfEventPathIB();
 
     CHIP_ERROR Encode(const EventPathParams & aEventPathParams);
 };
