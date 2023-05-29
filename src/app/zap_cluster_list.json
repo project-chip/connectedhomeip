@@ -81,6 +81,7 @@
         "ON_OFF_CLUSTER": [],
         "ON_OFF_SWITCH_CONFIGURATION_CLUSTER": [],
         "OPERATIONAL_CREDENTIALS_CLUSTER": [],
+        "OPERATIONAL_STATE_CLUSTER": [],
         "OTA_BOOTLOAD_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER": [],
         "OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER": [],
@@ -146,6 +147,7 @@
         "ADMINISTRATOR_COMMISSIONING_CLUSTER": [
             "administrator-commissioning-server"
         ],
+        "AIR_QUALITY_CLUSTER": [],
         "ALARM_CLUSTER": [],
         "APPLICATION_BASIC_CLUSTER": ["application-basic-server"],
         "APPLICATION_LAUNCHER_CLUSTER": ["application-launcher-server"],

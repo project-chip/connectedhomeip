@@ -64,24 +64,9 @@ public:
         auto pair_iterator = extensionFieldSet.attributeValueList.begin();
         while (pair_iterator.Next())
         {
-            aVPair                          = pair_iterator.GetValue();
-            mAVPairs[pairCount].attributeID = aVPair.attributeID;
-            size_t valueBytesTotal          = 0;
-            uint8_t valueBytesCount         = 0;
-
-            ReturnErrorOnFailure(aVPair.attributeValue.ComputeSize(&valueBytesTotal));
-            VerifyOrReturnError(valueBytesTotal <= ArraySize(mValueBuffer[0]), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-            auto value_iterator = aVPair.attributeValue.begin();
-            while (value_iterator.Next())
-            {
-                mValueBuffer[pairCount][valueBytesCount] = value_iterator.GetValue();
-                valueBytesCount++;
-            }
-            ReturnErrorOnFailure(value_iterator.GetStatus());
-
-            mAVPairs[pairCount].attributeValue = mValueBuffer[pairCount];
-            mAVPairs[pairCount].attributeValue.reduce_size(valueBytesCount);
+            aVPair                             = pair_iterator.GetValue();
+            mAVPairs[pairCount].attributeID    = aVPair.attributeID;
+            mAVPairs[pairCount].attributeValue = aVPair.attributeValue;
             pairCount++;
         }
         ReturnErrorOnFailure(pair_iterator.GetStatus());
@@ -132,25 +117,9 @@ public:
         auto pair_iterator = attributeValueList.begin();
         while (pair_iterator.Next())
         {
-            decodePair                      = pair_iterator.GetValue();
-            mAVPairs[pairCount].attributeID = decodePair.attributeID;
-            size_t valueBytesTotal          = 0;
-            uint8_t valueBytesCount         = 0;
-
-            // Verify size of attribute value
-            ReturnErrorOnFailure(decodePair.attributeValue.ComputeSize(&valueBytesTotal));
-            VerifyOrReturnError(valueBytesTotal <= ArraySize(mValueBuffer[0]), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-            auto value_iterator = decodePair.attributeValue.begin();
-            while (value_iterator.Next())
-            {
-                mValueBuffer[pairCount][valueBytesCount] = value_iterator.GetValue();
-                valueBytesCount++;
-            }
-            ReturnErrorOnFailure(value_iterator.GetStatus());
-
-            mAVPairs[pairCount].attributeValue = mValueBuffer[pairCount];
-            mAVPairs[pairCount].attributeValue.reduce_size(valueBytesCount);
+            decodePair                         = pair_iterator.GetValue();
+            mAVPairs[pairCount].attributeID    = decodePair.attributeID;
+            mAVPairs[pairCount].attributeValue = decodePair.attributeValue;
             pairCount++;
         };
         ReturnErrorOnFailure(pair_iterator.GetStatus());
@@ -164,7 +133,6 @@ public:
 
 private:
     app::Clusters::Scenes::Structs::AttributeValuePair::Type mAVPairs[kMaxAvPair];
-    uint8_t mValueBuffer[kMaxAvPair][kMaxValueSize];
 };
 
 /**

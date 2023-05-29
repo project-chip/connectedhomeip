@@ -22,45 +22,88 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Scenes"
+    endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "TH reads from the DUT the (0x0000) SceneCount attribute"
+      PICS: S.S.A0000
+      command: "readAttribute"
+      attribute: "SceneCount"
+      response:
+          constraints:
+              type: int8u
 
-    - label: "TH reads all mandatory attributes from DUT one at a time."
-      verification: |
-          The data type in each command must match the value listed in the specification(s). The data value in each command for the attribute must fall within the valid range described in the specification(s).
-      disabled: true
+    - label: "TH reads from the DUT the (0x0001) CurrentScene attribute"
+      PICS: S.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentScene"
+      response:
+          constraints:
+              type: int8u
 
-    - label:
-          "TH writes the respective default value to all mandatory attributes to
-          DUT one at a time."
-      verification: |
-          If the access control of DUT is set to READ, the DUT response will indicate that the attribute write command was not a SUCCESS. If the access control of DUT is set to READ/WRITE, the DUT response will indicate that the write command was a SUCCESS.
-      disabled: true
+    - label: "TH reads from the DUT the (0x0002) CurrentGroup attribute"
+      PICS: S.S.A0002
+      command: "readAttribute"
+      attribute: "CurrentGroup"
+      response:
+          constraints:
+              type: groupid
 
-    - label: "TH reads back all attributes written in step 3a."
-      verification: |
-          If the Status field of the write attributes response command frame was equal to SUCCESS, the updated value is read back. If the Status field of the write attributes response command frame was not equal to SUCCESS the value is not updated when read back.
-      disabled: true
+    - label: "TH reads from the DUT the (0x0003) SceneValid attribute"
+      PICS: S.S.A0003
+      command: "readAttribute"
+      attribute: "SceneValid"
+      response:
+          constraints:
+              type: uint8
 
-    - label: "TH reads each optional attributes from DUT one at a time."
-      verification: |
-          If the DUT implements the attribute, the Status field will be equal to SUCCESS and the command will contain the requested attribute. If the DUT does not implement the attribute, the Status field will not be equal to SUCCESS. The data type in each command must match the value listed in the specification(s). The data value in each command for the attribute must fall within the valid range described in the specification(s).
-      disabled: true
+    - label: "TH reads from the DUT the (0x0004) NameSupport attribute"
+      PICS: S.S.A0003 && S.S.F00
+      command: "readAttribute"
+      attribute: "NameSupport"
+      response:
+          value: 0x80
+          constraints:
+              type: uint8
 
-    - label:
-          "TH writes the respective default value to each optional attributes to
-          DUT one at a time."
-      verification: |
-          If the attribute is not implemented or the access control of DUT is set to READ, the DUT response will indicate that the attribute write command was not a SUCCESS. If the attribute is implemented and the access control of DUT is set to READ/WRITE, the DUT response will indicate that the write command was a SUCCESS.
-      disabled: true
+    - label: "TH reads from the DUT the (0x0004) NameSupport attribute"
+      PICS: S.S.A0004 && (!S.S.F00)
+      command: "readAttribute"
+      attribute: "NameSupport"
+      response:
+          value: 0x00
+          constraints:
+              type: uint8
 
-    - label: "TH reads back all attributes written in step 5a."
-      verification: |
-          If the Status field of the write attributes response command frame was equal to SUCCESS, the updated value is read back. If the Status field of the write attributes response command frame was not equal to SUCCESS the value is not updated when read back.
-      disabled: true
+    - label: "TH reads from the DUT the (0x0005) LastConfiguredBy attribute"
+      PICS: S.S.A0005
+      command: "readAttribute"
+      attribute: "LastConfiguredBy"
+      response:
+          constraints:
+              type: nodeId
+
+    - label: "TH reads from the DUT the (0x0006) SceneTableSize attribute"
+      PICS: S.S.A0006
+      command: "readAttribute"
+      attribute: "SceneTableSize"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "TH reads from the DUT the (0x0007) RemainingCapacity attribute"
+      PICS: S.S.A0007
+      command: "readAttribute"
+      attribute: "RemainingCapacity"
+      response:
+          constraints:
+              type: uint8

@@ -108,6 +108,12 @@ static BOOL AttributeIsSpecifiedInScenesCluster(AttributeId aAttributeId)
     case Attributes::LastConfiguredBy::Id: {
         return YES;
     }
+    case Attributes::SceneTableSize::Id: {
+        return YES;
+    }
+    case Attributes::RemainingCapacity::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1945,6 +1951,51 @@ static BOOL AttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::SensitivityLevel::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInOperationalStateCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::OperationalState;
+    switch (aAttributeId) {
+    case Attributes::PhaseList::Id: {
+        return YES;
+    }
+    case Attributes::CurrentPhase::Id: {
+        return YES;
+    }
+    case Attributes::CountdownTime::Id: {
+        return YES;
+    }
+    case Attributes::OperationalStateList::Id: {
+        return YES;
+    }
+    case Attributes::OperationalState::Id: {
+        return YES;
+    }
+    case Attributes::OperationalError::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6995,6 +7046,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::SmokeCoAlarm::Id: {
         return AttributeIsSpecifiedInSmokeCOAlarmCluster(aAttributeId);
+    }
+    case Clusters::OperationalState::Id: {
+        return AttributeIsSpecifiedInOperationalStateCluster(aAttributeId);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return AttributeIsSpecifiedInHEPAFilterMonitoringCluster(aAttributeId);
