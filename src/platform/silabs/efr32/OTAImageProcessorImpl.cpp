@@ -162,8 +162,6 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
-
     // Pad the remainder of the write buffer with zeros and write it to bootloader storage
     if (writeBufOffset != 0)
     {
@@ -245,8 +243,6 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         ChipLogError(SoftwareUpdate, "%s: imageProcessor context is null", __func__);
         return;
     }
-    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
-
     // Not clearing the image storage area as it is done during each write
     imageProcessor->ReleaseBlock();
 }
@@ -333,7 +329,6 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
     if ((block.data() == nullptr) || block.empty())
     {
-        ChipLogError(SoftwareUpdate, "%s: block is empty", __func__);
         return CHIP_NO_ERROR;
     }
 

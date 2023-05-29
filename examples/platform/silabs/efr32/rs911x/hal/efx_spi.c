@@ -122,7 +122,6 @@ void sl_wfx_host_gpio_init(void)
     NVIC_SetPriority(GPIO_EVEN_IRQn, WFX_SPI_NVIC_PRIORITY);
     NVIC_SetPriority(GPIO_ODD_IRQn, WFX_SPI_NVIC_PRIORITY);
     spi_enabled = true;
-    SILABS_LOG("%s completed.", __func__);
 }
 
 /*****************************************************************
@@ -145,7 +144,6 @@ void sl_wfx_host_reset_chip(void)
 
     // Delay for 3ms
     vTaskDelay(pdMS_TO_TICKS(3));
-    SILABS_LOG("%s completed.", __func__);
 }
 
 /*****************************************************************
@@ -190,7 +188,6 @@ sl_status_t sl_wfx_host_spi_cs_assert(void)
     configASSERT(spi_sem_sync_hdl);
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
-        SILABS_LOG("%s errored.", __func__);
         return SL_STATUS_TIMEOUT;
     }
 
