@@ -144,7 +144,7 @@ sl_status_t sl_wfx_host_spi_cs_assert()
     {
         return SL_STATUS_TIMEOUT;
     }
-    SPIDRV_ReInit(SL_SPIDRV_EXP_BITRATE);
+    SPIDRV_ReInit(SL_SPIDRV_EXP_BITRATE_MULTIPLEXED);
 #endif /* EFR32MG24 */
     GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
     return SL_STATUS_OK;
