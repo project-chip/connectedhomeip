@@ -37,6 +37,8 @@ extern "C" {
 #include "spidrv.h"
 
 #ifdef WF200_WIFI
+// TODO: Investigate why using SL_SPIDRV_EXP_BITRATE is causing WF200 init failure
+// REF: sl_spidrv_exp_config.h
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED 10000000
 #else
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
