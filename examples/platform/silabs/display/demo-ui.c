@@ -92,13 +92,24 @@ static void demoUIDisplayLogo(void)
     GLIB_drawBitmap(&glibContext, SILICONLABS_X_POSITION, SILICONLABS_Y_POSITION, SILICONLABS_BITMAP_WIDTH,
                     SILICONLABS_BITMAP_HEIGHT, siliconlabsBitmap);
 }
-
 /*******************************************************************************
  **************************   GLOBAL FUNCTIONS   *******************************
  ******************************************************************************/
 void demoUIInit(GLIB_Context_t * context)
 {
     memcpy(&glibContext, context, sizeof(GLIB_Context_t));
+}
+
+EMSTATUS updateDisplay(void)
+{
+#if (defined(EFR32MG24) && defined(SL_WIFI))
+    sl_wfx_host_pre_lcd_spi_transfer();
+#endif
+    EMSTATUS status = DMD_updateDisplay();
+#if (defined(EFR32MG24) && defined(SL_WIFI))
+    sl_wfx_host_post_lcd_spi_transfer();
+#endif
+    return status;
 }
 
 void demoUIDisplayHeader(char * name)
@@ -108,26 +119,14 @@ void demoUIDisplayHeader(char * name)
     {
         GLIB_drawStringOnLine(&glibContext, name, 5, GLIB_ALIGN_CENTER, 0, 0, true);
     }
-#if (defined(EFR32MG24) && defined(SL_WIFI))
-    sl_wfx_host_pre_lcd_spi_transfer();
-#endif
-    DMD_updateDisplay();
-#if (defined(EFR32MG24) && defined(SL_WIFI))
-    sl_wfx_host_post_lcd_spi_transfer();
-#endif
+    updateDisplay();
 }
 
 void demoUIDisplayApp(bool on)
 {
     GLIB_drawBitmap(&glibContext, APP_X_POSITION, APP_Y_POSITION, APP_BITMAP_WIDTH, APP_BITMAP_HEIGHT,
                     (on ? OnStateBitMap : OffStateBitMap));
-#if (defined(EFR32MG24) && defined(SL_WIFI))
-    sl_wfx_host_pre_lcd_spi_transfer();
-#endif
-    DMD_updateDisplay();
-#if (defined(EFR32MG24) && defined(SL_WIFI))
-    sl_wfx_host_post_lcd_spi_transfer();
-#endif
+    updateDisplay();
 }
 
 void demoUIDisplayProtocol(demoUIProtocol protocol, bool isConnected)
@@ -138,13 +137,7 @@ void demoUIDisplayProtocol(demoUIProtocol protocol, bool isConnected)
                     (protocol == DEMO_UI_PROTOCOL1 ? PROT1_BITMAP_HEIGHT : PROT2_BITMAP_HEIGHT),
                     (protocol == DEMO_UI_PROTOCOL1 ? (isConnected ? PROT1_BITMAP_CONN : PROT1_BITMAP)
                                                    : (isConnected ? PROT2_BITMAP_CONN : PROT2_BITMAP)));
-#if (defined(EFR32MG24) && defined(SL_WIFI))
-    sl_wfx_host_pre_lcd_spi_transfer();
-#endif
-    DMD_updateDisplay();
-#if (defined(EFR32MG24) && defined(SL_WIFI))
-    sl_wfx_host_post_lcd_spi_transfer();
-#endif
+    updateDisplay();
 }
 
 void demoUIClearMainScreen(uint8_t * name)
