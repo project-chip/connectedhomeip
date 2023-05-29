@@ -111,7 +111,6 @@ enum class Instant {
     Log_NodeDiscovered,
     Log_NodeDiscoveryFailed,
 };
- 
 
 } // namespace Tracing
 } // namespace chip
