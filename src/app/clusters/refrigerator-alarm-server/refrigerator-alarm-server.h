@@ -29,7 +29,7 @@ class RefrigeratorAlarmServer
 public:
     static RefrigeratorAlarmServer & Instance();
 
-    bool ResetCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    void ResetCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                       const chip::app::Clusters::RefrigeratorAlarm::Commands::Reset::DecodableType & commandData);
 
     EmberAfStatus getMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);

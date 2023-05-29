@@ -40,12 +40,13 @@ RefrigeratorAlarmServer & RefrigeratorAlarmServer::Instance()
     return instance;
 }
 
-EmberAfStatus RefrigeratorAlarmServer::getMaskValue(chip::EndpointId endpoint, chip::BitMask<AlarmMap> * mask)
+EmberAfStatus RefrigeratorAlarmServer::getMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask)
 {
     EmberAfStatus status = Attributes::Mask::Get(endpoint, mask);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Refrigerator Alarm: ERR: reading  mask %x", status);
+        return status;
     }
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Refrigerator Alarm: Mask ep%d value: %" PRIu32 "", endpoint, mask->Raw());
@@ -53,12 +54,13 @@ EmberAfStatus RefrigeratorAlarmServer::getMaskValue(chip::EndpointId endpoint, c
     return status;
 }
 
-EmberAfStatus RefrigeratorAlarmServer::getLatchValue(chip::EndpointId endpoint, chip::BitMask<AlarmMap> * latch)
+EmberAfStatus RefrigeratorAlarmServer::getLatchValue(EndpointId endpoint, BitMask<AlarmMap> * latch)
 {
     EmberAfStatus status = Attributes::Latch::Get(endpoint, latch);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Refrigerator Alarm: ERR: reading latch %x", status);
+        return status;
     }
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Refrigerator Alarm: Latch ep%d value: %" PRIu32 "", endpoint, latch->Raw());
@@ -66,12 +68,13 @@ EmberAfStatus RefrigeratorAlarmServer::getLatchValue(chip::EndpointId endpoint, 
     return status;
 }
 
-EmberAfStatus RefrigeratorAlarmServer::getStateValue(chip::EndpointId endpoint, chip::BitMask<AlarmMap> * state)
+EmberAfStatus RefrigeratorAlarmServer::getStateValue(EndpointId endpoint, BitMask<AlarmMap> * state)
 {
     EmberAfStatus status = Attributes::State::Get(endpoint, state);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Refrigerator Alarm: ERR: reading state %x", status);
+        return status;
     }
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Refrigerator Alarm: State ep%d value: %" PRIu32 "", endpoint, state->Raw());
@@ -79,25 +82,14 @@ EmberAfStatus RefrigeratorAlarmServer::getStateValue(chip::EndpointId endpoint, 
     return status;
 }
 
-EmberAfStatus RefrigeratorAlarmServer::setMaskValue(chip::EndpointId endpoint, chip::BitMask<AlarmMap> mask)
+EmberAfStatus RefrigeratorAlarmServer::setMaskValue(EndpointId endpoint, BitMask<AlarmMap> mask)
 {
-    chip::BitMask<AlarmMap> * currentMask = nullptr;
-    EmberAfStatus status                  = Attributes::Mask::Get(endpoint, currentMask);
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    status               = Attributes::Mask::Set(endpoint, mask);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Refrigerator Alarm: ERR: reading  mask %x", status);
-    }
-    if (currentMask->Raw() == mask.Raw())
-    {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Refrigerator Alarm: Mask value already set to %" PRIu32 "", mask.Raw());
-    }
-    else
-    {
-        status = Attributes::Mask::Set(endpoint, mask);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Refrigerator Alarm: ERR: writing  mask %x", status);
-        }
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Refrigerator Alarm: ERR: writing  mask %x", status);
+        return status;
     }
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Refrigerator Alarm: Mask ep%d value: %" PRIu32 "", endpoint, mask.Raw());
@@ -105,13 +97,12 @@ EmberAfStatus RefrigeratorAlarmServer::setMaskValue(chip::EndpointId endpoint, c
     return status;
 }
 
-bool RefrigeratorAlarmServer::SendNotifyEvent(chip::EndpointId endpointId, chip::BitMask<AlarmMap> active,
-                                              chip::BitMask<AlarmMap> inActive, chip::BitMask<AlarmMap> state,
-                                              chip::BitMask<AlarmMap> mask)
+bool RefrigeratorAlarmServer::SendNotifyEvent(EndpointId endpointId, BitMask<AlarmMap> active, BitMask<AlarmMap> inActive,
+                                              BitMask<AlarmMap> state, BitMask<AlarmMap> mask)
 {
     Events::Notify::Type event{ active, inActive, state, mask };
     EventNumber eventNumber;
-    CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);
+    CHIP_ERROR error = LogEvent(event, endpointId, eventNumber);
     if (CHIP_NO_ERROR != error)
     {
         ChipLogError(Zcl, "[Notify] Unable to send notify event: %s [endpointId=%d]", error.AsString(), endpointId);
@@ -121,42 +112,50 @@ bool RefrigeratorAlarmServer::SendNotifyEvent(chip::EndpointId endpointId, chip:
     return true;
 }
 
-bool RefrigeratorAlarmServer::ResetCommand(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+void RefrigeratorAlarmServer::ResetCommand(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                            const Commands::Reset::DecodableType & commandData)
 {
-    auto & alarms = commandData.alarms;
-    auto & mask   = commandData.mask;
-
+    auto & alarms       = commandData.alarms;
+    auto & mask         = commandData.mask;
     EndpointId endpoint = commandPath.mEndpointId;
 
     EmberAfStatus status;
+    BitMask<AlarmMap> state = 0;
 
-    chip::BitMask<AlarmMap> eActive   = 0;
-    chip::BitMask<AlarmMap> eInActive = alarms;
-    chip::BitMask<AlarmMap> eMask     = 0;
-    chip::BitMask<AlarmMap> eState    = 0;
-
-    chip::BitMask<AlarmMap> state = 0;
-    status                        = State::Get(endpoint, &state);
-
-    eActive.Clear(alarms);
-    eInActive.Clear(state);
-    Mask::Get(endpoint, &eMask);
-    eActive = state;
-    eState  = state;
-
+    status = State::Get(endpoint, &state);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
-        return false;
+        commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
+        return;
     }
 
+    // This field SHALL indicate those alarms that have become active.
+    // Reset command will never active any alarm so eActive = 0.
+    BitMask<AlarmMap> eActive = 0;
+    // This field SHALL indicate those alarms that have become inactive.
+    BitMask<AlarmMap> eInActive = 0;
+    // This field SHALL be a copy of the Mask attribute when this event was generated.
+    BitMask<AlarmMap> eMask = 0;
+    // This field SHALL be a copy of the State attribute when this event was generated.
+    BitMask<AlarmMap> eState = 0;
+
+    // Set the parameters for the notify event.
+    eInActive = state & alarms;
+    status    = Mask::Get(endpoint, &eMask);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
+        return;
+    }
+    eState = state;
+
+    // Reset command handeling
     state.Clear(alarms);
     status = State::Set(endpoint, state);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
-        return false;
+        commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
+        return;
     }
 
     if (mask.HasValue())
@@ -164,14 +163,13 @@ bool RefrigeratorAlarmServer::ResetCommand(CommandHandler * commandObj, const Co
         status = Mask::Set(endpoint, mask.Value());
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
-            commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
-            return false;
+            commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
+            return;
         }
     }
 
     SendNotifyEvent(endpoint, eActive, eInActive, eMask, eState);
     commandObj->AddStatus(commandPath, Status::Success);
-    return true;
 }
 /**********************************************************
  * Callbacks Implementation
@@ -180,9 +178,10 @@ bool RefrigeratorAlarmServer::ResetCommand(CommandHandler * commandObj, const Co
 bool emberAfRefrigeratorAlarmClusterResetCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                   const Commands::Reset::DecodableType & commandData)
 {
-    return RefrigeratorAlarmServer::Instance().ResetCommand(commandObj, commandPath, commandData);
+    RefrigeratorAlarmServer::Instance().ResetCommand(commandObj, commandPath, commandData);
+    return true;
 }
 
-void emberAfRefrigeratorAlarmClusterServerInitCallback(chip::EndpointId endpoint) {}
+void emberAfRefrigeratorAlarmClusterServerInitCallback(EndpointId endpoint) {}
 
 void MatterRefrigeratorAlarmPluginServerInitCallback() {}
