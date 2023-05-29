@@ -857,5 +857,9 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
 
 void MatterScenesPluginServerInitCallback()
 {
-    // Nothing to do, the server init routine will be done in ScenesServer::Init()
+    CHIP_ERROR err = chip::app::Clusters::Scenes::ScenesServer::Instance().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ScenesServer::Instance().Init() error: %s", err.AsString());
+    }
 }
