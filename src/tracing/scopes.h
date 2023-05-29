@@ -105,8 +105,8 @@ enum class Instant {
 
     // Used if and only if default "Log*" requests
     // are not implemented in the backend.
-    Log_SentMessage,
-    Log_ReceivedMessage,
+    Log_MessageSend,
+    Log_MessageReceived,
     Log_NodeLookup,
     Log_NodeDiscovered,
     Log_NodeDiscoveryFailed,

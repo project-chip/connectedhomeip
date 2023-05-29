@@ -23,11 +23,11 @@ namespace Tracing {
 // These structures are forward-declared so that tracing itself has no direct dependencies
 // on actual types. This allows tracing to be used anywhere lib/support could be used.
 
-struct SentMessageInfo;
-struct ReceivedMessageInfo;
+struct MessageSendInfo;
+struct MessageReceiveInfo;
 struct NodeLookupInfo;
 struct NodeDiscoveredInfo;
-struct NodeDiscovereyFailed;
+struct NodeDiscovereyFailedInfo;
 
 } // namespace Tracing
 } // namespace chip
