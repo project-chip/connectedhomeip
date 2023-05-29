@@ -134,8 +134,6 @@ static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
 static Fifo_t sReceiveFifo;
 
 static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount);
-static void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus, uint8_t * data,
-                             UARTDRV_Count_t transferCount);
 static void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes);
 
 static bool InitFifo(Fifo_t * fifo, uint8_t * pDataBuffer, uint16_t bufferSize)
@@ -474,14 +472,15 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 #endif
 
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
+    // Blocking transmit for the MG24 + WF200 since UART TX is multiplexed with
+    // WF200 SPI IRQ
     pre_uart_transfer();
-#endif /* EFR32MG24 && WF200_WIFI */
-
+    UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) buffer, nbOfBytes);
+    post_uart_transfer();
+#else
+    // Non Blocking Transmit
     UARTDRV_Transmit(vcom_handle, (uint8_t *) buffer, nbOfBytes, UART_tx_callback);
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    post_uart_transfer();
 #endif /* EFR32MG24 && WF200_WIFI */
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)

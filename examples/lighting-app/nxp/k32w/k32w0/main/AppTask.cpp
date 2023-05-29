@@ -84,6 +84,7 @@ extern "C" void K32WUartProcess(void);
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip;
+using namespace chip::app;
 
 AppTask AppTask::sAppTask;
 
@@ -93,11 +94,11 @@ uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] =
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
-                              EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, AppTask::OnTriggerEffect,
+                              Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, AppTask::OnTriggerEffect,
                               // Use invalid value for identifiers to enable TriggerEffect command
                               // to stop Identify command for each effect
-                              (EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10),
-                              EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT };
+                              Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue,
+                              Clusters::Identify::EffectVariantEnum::kDefault };
 
 /* OTA related variables */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -770,11 +771,9 @@ void AppTask::OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * 
         // TriggerEffect finished - reset identifiers
         // Use invalid value for identifiers to enable TriggerEffect command
         // to stop Identify command for each effect
-        gIdentify.mCurrentEffectIdentifier =
-            (EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10);
-        gIdentify.mTargetEffectIdentifier =
-            (EmberAfIdentifyEffectIdentifier)(EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT - 0x10);
-        gIdentify.mEffectVariant = EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT;
+        gIdentify.mCurrentEffectIdentifier = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
+        gIdentify.mTargetEffectIdentifier  = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
+        gIdentify.mEffectVariant           = Clusters::Identify::EffectVariantEnum::kDefault;
 
         RestoreLightingState();
     }
@@ -796,29 +795,30 @@ void AppTask::OnTriggerEffect(Identify * identify)
 
     switch (identify->mCurrentEffectIdentifier)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
         timerDelay = 2;
         break;
 
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
         timerDelay = 15;
         break;
 
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
         timerDelay = 4;
         break;
 
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl, "Channel Change effect not supported, using effect %d", EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK);
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Channel Change effect not supported, using effect %d",
+                        to_underlying(Clusters::Identify::EffectIdentifierEnum::kBlink));
         timerDelay = 2;
         break;
 
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
         chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerEffectComplete, identify);
         timerDelay = 1;
         break;
 
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
         chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerEffectComplete, identify);
         OnTriggerEffectComplete(&chip::DeviceLayer::SystemLayer(), identify);
         break;

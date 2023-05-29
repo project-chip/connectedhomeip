@@ -4,6 +4,8 @@
 #import "MTRStructsObjc.h"
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRCommandPayloads_Internal.h"
+#import "NSStringSpanConversion.h"
+#import "NSDataSpanConversion.h"
 
 #include <lib/support/TypeTraits.h>
 

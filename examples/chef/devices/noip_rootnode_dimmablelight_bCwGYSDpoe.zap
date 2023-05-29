@@ -5503,7 +5503,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "IdentifyTypeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,

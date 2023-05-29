@@ -644,7 +644,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     ReturnErrorOnFailure(errorStatus.GetError());
     attributeStatus.EndOfAttributeStatusIB();
     ReturnErrorOnFailure(attributeStatus.GetError());
-    return attributeReport.EndOfAttributeReportIB().GetError();
+    return attributeReport.EndOfAttributeReportIB();
 }
 
 const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)

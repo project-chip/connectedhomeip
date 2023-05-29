@@ -39,6 +39,13 @@
 #include <app/InteractionModelEngine.h>
 #endif
 
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
+#include <zephyr/fs/nvs.h>
+#include <zephyr/settings/settings.h>
+#endif
+
+using namespace chip::app;
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
@@ -99,7 +106,7 @@ Identify sIdentify = {
     kExampleEndpointId,
     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnIdentifyTriggerEffect,
 };
 #endif
@@ -133,7 +140,47 @@ class AppFabricTableDelegate : public FabricTable::Delegate
     {
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            chip::Server::GetInstance().ScheduleFactoryReset();
+            ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
+
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
+            void * storage = nullptr;
+            int status     = settings_storage_get(&storage);
+
+            if (status == 0)
+            {
+                status = nvs_clear(static_cast<nvs_fs *>(storage));
+            }
+
+            if (!status)
+            {
+                status = nvs_mount(static_cast<nvs_fs *>(storage));
+            }
+
+            if (status)
+            {
+                ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
+            }
+#else
+            const CHIP_ERROR err = PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Factory reset failed: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+
+            ConnectivityMgr().ErasePersistentInfo();
+#endif
+        }
+    }
+};
+
+class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
+{
+    void OnShutDown() override
+    {
+        if (ThreadStackManagerImpl().IsThreadEnabled())
+        {
+            ThreadStackManagerImpl().Finalize();
         }
     }
 };
@@ -256,6 +303,15 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
 #endif
 
+    // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs
+    // The OpenThread thread is running during factory reset. The nvs_clear function is called during
+    // factory reset, which makes the NVS storage innaccessible, but the OpenThread knows nothing
+    // about this and tries to store the parameters to NVS. Because of this the OpenThread need to be
+    // shut down before NVS. This delegate fixes the issue "Failed to store setting , ret -13",
+    // which means that the NVS is already disabled.
+    // For this the OnShutdown function is used
+    PlatformMgr().SetDelegate(new PlatformMgrDelegate);
+
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
@@ -364,45 +420,45 @@ void AppTaskCommon::UpdateIdentifyStateEventHandler(AppEvent * aEvent)
     GetAppTask().mPwmIdentifyLed.UpdateAction();
 }
 
-void AppTaskCommon::IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect)
+void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect)
 {
     AppEvent event;
     event.Type = AppEvent::kEventType_IdentifyStart;
 
     switch (aEffect)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBreatheAction(PWMDevice::kBreatheType_Both, kIdentifyBreatheRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyOkayOnRateMs, kIdentifyOkayOffRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyChannelChangeRateMs, kIdentifyChannelChangeRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT");
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kFinishEffect");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyFinishOnRateMs, kIdentifyFinishOffRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT");
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kStopEffect");
         event.Handler = [](AppEvent *) { GetAppTask().mPwmIdentifyLed.StopAction(); };
         event.Type    = AppEvent::kEventType_IdentifyStop;
         break;

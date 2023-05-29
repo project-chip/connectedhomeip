@@ -29,11 +29,8 @@ namespace Clusters {
 
 namespace Identify {
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for IdentifyEffectIdentifier
-enum class IdentifyEffectIdentifier : uint8_t
+// Enum for EffectIdentifierEnum
+enum class EffectIdentifierEnum : uint8_t
 {
     kBlink         = 0x00,
     kBreathe       = 0x01,
@@ -47,17 +44,9 @@ enum class IdentifyEffectIdentifier : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyEffectIdentifier = EmberAfIdentifyEffectIdentifier;
-static IdentifyEffectIdentifier __attribute__((unused)) kIdentifyEffectIdentifierkUnknownEnumValue =
-    static_cast<IdentifyEffectIdentifier>(3);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for IdentifyEffectVariant
-enum class IdentifyEffectVariant : uint8_t
+// Enum for EffectVariantEnum
+enum class EffectVariantEnum : uint8_t
 {
     kDefault = 0x00,
     // All received enum values that are not listed above will be mapped
@@ -66,34 +55,22 @@ enum class IdentifyEffectVariant : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 1,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyEffectVariant = EmberAfIdentifyEffectVariant;
-static IdentifyEffectVariant __attribute__((unused)) kIdentifyEffectVariantkUnknownEnumValue =
-    static_cast<IdentifyEffectVariant>(1);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for IdentifyIdentifyType
-enum class IdentifyIdentifyType : uint8_t
+// Enum for IdentifyTypeEnum
+enum class IdentifyTypeEnum : uint8_t
 {
-    kNone         = 0x00,
-    kVisibleLight = 0x01,
-    kVisibleLED   = 0x02,
-    kAudibleBeep  = 0x03,
-    kDisplay      = 0x04,
-    kActuator     = 0x05,
+    kNone             = 0x00,
+    kLightOutput      = 0x01,
+    kVisibleIndicator = 0x02,
+    kAudibleBeep      = 0x03,
+    kDisplay          = 0x04,
+    kActuator         = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyIdentifyType                                                                 = EmberAfIdentifyIdentifyType;
-static IdentifyIdentifyType __attribute__((unused)) kIdentifyIdentifyTypekUnknownEnumValue = static_cast<IdentifyIdentifyType>(6);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace Identify
 
 namespace Groups {
@@ -209,8 +186,8 @@ enum class MoveMode : uint8_t
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MoveMode                                                                             = EmberAfMoveMode;
-static MoveMode __attribute__((unused)) kMoveModekUnknownEnumValue                         = static_cast<MoveMode>(2);
+using MoveMode                                                                       = EmberAfMoveMode;
+static MoveMode __attribute__((unused)) kMoveModekUnknownEnumValue                   = static_cast<MoveMode>(2);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
@@ -228,8 +205,8 @@ enum class StepMode : uint8_t
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StepMode                                                                             = EmberAfStepMode;
-static StepMode __attribute__((unused)) kStepModekUnknownEnumValue                         = static_cast<StepMode>(2);
+using StepMode                                                                       = EmberAfStepMode;
+static StepMode __attribute__((unused)) kStepModekUnknownEnumValue                   = static_cast<StepMode>(2);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for Feature
@@ -1035,8 +1012,8 @@ enum class InterfaceTypeEnum : uint8_t
     kUnknownEnumValue = 5,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using InterfaceTypeEnum                                                                    = EmberAfInterfaceTypeEnum;
-static InterfaceTypeEnum __attribute__((unused)) kInterfaceTypeEnumkUnknownEnumValue       = static_cast<InterfaceTypeEnum>(5);
+using InterfaceTypeEnum                                                              = EmberAfInterfaceTypeEnum;
+static InterfaceTypeEnum __attribute__((unused)) kInterfaceTypeEnumkUnknownEnumValue = static_cast<InterfaceTypeEnum>(5);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
@@ -1056,8 +1033,8 @@ enum class NetworkFaultEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NetworkFaultEnum                                                                     = EmberAfNetworkFaultEnum;
-static NetworkFaultEnum __attribute__((unused)) kNetworkFaultEnumkUnknownEnumValue         = static_cast<NetworkFaultEnum>(4);
+using NetworkFaultEnum                                                               = EmberAfNetworkFaultEnum;
+static NetworkFaultEnum __attribute__((unused)) kNetworkFaultEnumkUnknownEnumValue   = static_cast<NetworkFaultEnum>(4);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
@@ -1080,8 +1057,8 @@ enum class RadioFaultEnum : uint8_t
     kUnknownEnumValue = 7,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RadioFaultEnum                                                                       = EmberAfRadioFaultEnum;
-static RadioFaultEnum __attribute__((unused)) kRadioFaultEnumkUnknownEnumValue             = static_cast<RadioFaultEnum>(7);
+using RadioFaultEnum                                                                 = EmberAfRadioFaultEnum;
+static RadioFaultEnum __attribute__((unused)) kRadioFaultEnumkUnknownEnumValue       = static_cast<RadioFaultEnum>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace GeneralDiagnostics
 
@@ -1142,8 +1119,8 @@ enum class RoutingRole : uint8_t
     kUnknownEnumValue = 7,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RoutingRole                                                                          = EmberAfRoutingRole;
-static RoutingRole __attribute__((unused)) kRoutingRolekUnknownEnumValue                   = static_cast<RoutingRole>(7);
+using RoutingRole                                                                    = EmberAfRoutingRole;
+static RoutingRole __attribute__((unused)) kRoutingRolekUnknownEnumValue             = static_cast<RoutingRole>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for Feature
@@ -1250,8 +1227,8 @@ enum class PHYRateEnum : uint8_t
     kUnknownEnumValue = 10,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PHYRateEnum                                                                          = EmberAfPHYRateEnum;
-static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue                   = static_cast<PHYRateEnum>(10);
+using PHYRateEnum                                                                    = EmberAfPHYRateEnum;
+static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue             = static_cast<PHYRateEnum>(10);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for Feature
@@ -1652,6 +1629,37 @@ enum class Feature : uint32_t
     kCoAlarm    = 0x2,
 };
 } // namespace SmokeCoAlarm
+
+namespace OperationalState {
+
+// Enum for ErrorStateEnum
+enum class ErrorStateEnum : uint8_t
+{
+    kNoError                   = 0x00,
+    kUnableToStartOrResume     = 0x01,
+    kUnableToCompleteOperation = 0x02,
+    kCommandInvalidInState     = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for OperationalStateEnum
+enum class OperationalStateEnum : uint8_t
+{
+    kStopped = 0x00,
+    kRunning = 0x01,
+    kPaused  = 0x02,
+    kError   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+} // namespace OperationalState
 
 namespace HepaFilterMonitoring {
 
@@ -2965,8 +2973,8 @@ enum class ColorMode : uint8_t
     kUnknownEnumValue = 3,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorMode                                                                            = EmberAfColorMode;
-static ColorMode __attribute__((unused)) kColorModekUnknownEnumValue                       = static_cast<ColorMode>(3);
+using ColorMode                                                                      = EmberAfColorMode;
+static ColorMode __attribute__((unused)) kColorModekUnknownEnumValue                 = static_cast<ColorMode>(3);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Enum for HueDirection
@@ -3125,6 +3133,2166 @@ enum class OccupancySensorTypeBitmap : uint8_t
     kPhysicalContact = 0x4,
 };
 } // namespace OccupancySensing
+
+namespace CarbonMonoxideConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace CarbonMonoxideConcentrationMeasurement
+
+namespace CarbonDioxideConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace CarbonDioxideConcentrationMeasurement
+
+namespace EthyleneConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace EthyleneConcentrationMeasurement
+
+namespace EthyleneOxideConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace EthyleneOxideConcentrationMeasurement
+
+namespace HydrogenConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace HydrogenConcentrationMeasurement
+
+namespace HydrogenSulfideConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace HydrogenSulfideConcentrationMeasurement
+
+namespace NitricOxideConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace NitricOxideConcentrationMeasurement
+
+namespace NitrogenDioxideConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace NitrogenDioxideConcentrationMeasurement
+
+namespace OxygenConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace OxygenConcentrationMeasurement
+
+namespace OzoneConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace OzoneConcentrationMeasurement
+
+namespace SulfurDioxideConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace SulfurDioxideConcentrationMeasurement
+
+namespace DissolvedOxygenConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace DissolvedOxygenConcentrationMeasurement
+
+namespace BromateConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace BromateConcentrationMeasurement
+
+namespace ChloraminesConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace ChloraminesConcentrationMeasurement
+
+namespace ChlorineConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace ChlorineConcentrationMeasurement
+
+namespace FecalColiformEColiConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace FecalColiformEColiConcentrationMeasurement
+
+namespace FluorideConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace FluorideConcentrationMeasurement
+
+namespace HaloaceticAcidsConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace HaloaceticAcidsConcentrationMeasurement
+
+namespace TotalTrihalomethanesConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace TotalTrihalomethanesConcentrationMeasurement
+
+namespace TotalColiformBacteriaConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace TotalColiformBacteriaConcentrationMeasurement
+
+namespace TurbidityConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace TurbidityConcentrationMeasurement
+
+namespace CopperConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace CopperConcentrationMeasurement
+
+namespace LeadConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace LeadConcentrationMeasurement
+
+namespace ManganeseConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace ManganeseConcentrationMeasurement
+
+namespace SulfateConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace SulfateConcentrationMeasurement
+
+namespace BromodichloromethaneConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace BromodichloromethaneConcentrationMeasurement
+
+namespace BromoformConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace BromoformConcentrationMeasurement
+
+namespace ChlorodibromomethaneConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace ChlorodibromomethaneConcentrationMeasurement
+
+namespace ChloroformConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace ChloroformConcentrationMeasurement
+
+namespace SodiumConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace SodiumConcentrationMeasurement
+
+namespace Pm25ConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace Pm25ConcentrationMeasurement
+
+namespace FormaldehydeConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace FormaldehydeConcentrationMeasurement
+
+namespace Pm1ConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace Pm1ConcentrationMeasurement
+
+namespace Pm10ConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace Pm10ConcentrationMeasurement
+
+namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
+
+namespace RadonConcentrationMeasurement {
+
+// Enum for LevelValueEnum
+enum class LevelValueEnum : uint8_t
+{
+    kUnknown  = 0x00,
+    kLow      = 0x01,
+    kMedium   = 0x02,
+    kHigh     = 0x03,
+    kCritical = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MeasurementMediumEnum
+enum class MeasurementMediumEnum : uint8_t
+{
+    kGas    = 0x00,
+    kLiquid = 0x01,
+    kSoil   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for MeasurementUnitEnum
+enum class MeasurementUnitEnum : uint8_t
+{
+    kPpm  = 0x00,
+    kPpb  = 0x01,
+    kPpt  = 0x02,
+    kMgm3 = 0x03,
+    kUgm3 = 0x04,
+    kNgm3 = 0x05,
+    kPm3  = 0x06,
+    kBqm3 = 0x07,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 8,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNumericMeasurement = 0x1,
+    kLevelIndication    = 0x2,
+    kMediumLevel        = 0x4,
+    kCriticalLevel      = 0x8,
+    kPeakMeasurement    = 0x10,
+    kAverageMeasurement = 0x20,
+};
+} // namespace RadonConcentrationMeasurement
 
 namespace WakeOnLan {} // namespace WakeOnLan
 

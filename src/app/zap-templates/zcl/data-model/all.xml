@@ -17,6 +17,7 @@
    <xi:include href="chip/chip-types.xml" />
    <xi:include href="chip/clusters-extensions.xml" />
    <xi:include href="chip/color-control-cluster.xml" />
+   <xi:include href="chip/concentration-measurement-cluster.xml" />
    <xi:include href="chip/content-launch-cluster.xml" />
    <xi:include href="chip/descriptor-cluster.xml" />
    <xi:include href="chip/diagnostic-logs-cluster.xml" />
@@ -45,6 +46,7 @@
    <xi:include href="chip/occupancy-sensing-cluster.xml" />
    <xi:include href="chip/onoff-cluster.xml" />
    <xi:include href="chip/operational-credentials-cluster.xml" />
+   <xi:include href="chip/operational-state-cluster.xml" />
    <xi:include href="chip/pressure-measurement-cluster.xml" />
    <xi:include href="chip/power-source-cluster.xml" />
    <xi:include href="chip/power-source-configuration-cluster.xml" />
