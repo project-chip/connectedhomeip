@@ -3446,6 +3446,7 @@ exit:
     // SHALL generate a LockOperation event with LockOperationType set to Unlatch when the unlatched state is reached and a
     // LockOperation event with LockOperationType set to Unlock when the lock successfully completes the unlock. But as the current
     // implementation here is sending LockOperation events immediately we're sending both events immediately.
+    // https://github.com/project-chip/connectedhomeip/issues/26925
     if (LockOperationTypeEnum::kUnlatch == opType && success)
     {
         SendLockOperationEvent(endpoint, LockOperationTypeEnum::kUnlock, OperationSourceEnum::kRemote, reason, pinUserIdx,
