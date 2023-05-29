@@ -18,7 +18,7 @@ import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tests.gni")
 
-if (!build_java_matter_controller) {
+if (!matter_enable_java_compilation) {
   import("${build_root}/config/android_abi.gni")
 }
 
@@ -76,7 +76,7 @@ shared_library("jni") {
     "${chip_root}/src/platform",
   ]
 
-  if (build_java_matter_controller) {
+  if (matter_enable_java_compilation) {
     defines = [ "JAVA_MATTER_CONTROLLER_TEST" ]
 
     sources += [
@@ -123,7 +123,7 @@ if (chip_link_tests) {
       "${chip_root}/src/messaging/tests:helpers",
     ]
 
-    if (build_java_matter_controller) {
+    if (matter_enable_java_compilation) {
       defines = [ "JAVA_MATTER_CONTROLLER_TEST" ]
       include_dirs = java_matter_controller_dependent_paths
       if (current_os == "mac") {
@@ -240,7 +240,7 @@ kotlin_library("json_to_tlv_to_json_test") {
 
 shared_library("jni_for_onboarding_payload") {
   output_name = "libOnboardingPayload"
-  if (build_java_matter_controller) {
+  if (matter_enable_java_compilation) {
     include_dirs = java_matter_controller_dependent_paths
     output_dir = "${root_out_dir}/lib/jni"
   } else {
@@ -260,7 +260,7 @@ kotlin_library("onboarding_payload") {
 
   data_deps = [ ":jni_for_onboarding_payload" ]
 
-  if (!build_java_matter_controller) {
+  if (!matter_enable_java_compilation) {
     data_deps += [ "${chip_root}/build/chip/java:shared_cpplib" ]
   }
 
@@ -269,6 +269,15 @@ kotlin_library("onboarding_payload") {
     "src/chip/onboardingpayload/OnboardingPayload.kt",
     "src/chip/onboardingpayload/OnboardingPayloadParser.kt",
     "src/chip/onboardingpayload/OptionalQRCodeInfo.kt",
+  ]
+}
+
+group("unit_tests") {
+  deps = [
+    ":json_to_tlv_to_json_test",
+    ":tlv_read_write_test",
+    ":tlv_reader_test",
+    ":tlv_writer_test",
   ]
 }
 
@@ -337,7 +346,7 @@ android_library("java") {
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
   ]
 
-  if (build_java_matter_controller) {
+  if (matter_enable_java_compilation) {
     deps += [
       "${chip_root}/third_party/java_deps:json",
       "${chip_root}/third_party/java_deps/stub_src",
@@ -372,7 +381,7 @@ if (chip_link_tests) {
       "src/chip/devicecontroller/GetConnectedDeviceCallbackForTestJni.java",
     ]
 
-    if (build_java_matter_controller) {
+    if (matter_enable_java_compilation) {
       deps += [
         "${chip_root}/third_party/java_deps:json",
         "${chip_root}/third_party/java_deps/stub_src",
@@ -407,7 +416,7 @@ if (chip_link_tests) {
     sources =
         [ "tests/chip/devicecontroller/GetConnectedDeviceCallbackJniTest.java" ]
 
-    if (build_java_matter_controller) {
+    if (matter_enable_java_compilation) {
       deps += [
         "${chip_root}/third_party/java_deps:json",
         "${chip_root}/third_party/java_deps/stub_src",
@@ -425,7 +434,7 @@ if (chip_link_tests) {
   }
 }
 
-if (!build_java_matter_controller) {
+if (!matter_enable_java_compilation) {
   java_prebuilt("android") {
     jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
   }
