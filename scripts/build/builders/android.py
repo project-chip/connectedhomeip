@@ -153,7 +153,8 @@ class AndroidBuilder(Builder):
         if not (
             os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)
         ) and not (
-            os.path.isfile(new_sdk_manager) and os.access(new_sdk_manager, os.X_OK)
+            os.path.isfile(new_sdk_manager) and os.access(
+                new_sdk_manager, os.X_OK)
         ):
             raise Exception(
                 "'%s' and '%s' is not executable by the current user"
@@ -268,7 +269,8 @@ class AndroidBuilder(Builder):
         # App compilation
         self._Execute(
             [
-                "%s/examples/android/%s/gradlew" % (self.root, self.app.AppName()),
+                "%s/examples/android/%s/gradlew" % (
+                    self.root, self.app.AppName()),
                 "-p",
                 "%s/examples/android/%s" % (self.root, self.app.AppName()),
                 "-PmatterBuildSrcDir=%s" % self.output_dir,
@@ -296,7 +298,8 @@ class AndroidBuilder(Builder):
                         "-PbuildDir=%s/%s" % (self.output_dir, module),
                         ":%s:assembleDebug" % module,
                     ],
-                    title="Building Example %s, module %s" % (self.identifier, module),
+                    title="Building Example %s, module %s" % (
+                        self.identifier, module),
                 )
         else:
             self._Execute(
@@ -304,7 +307,8 @@ class AndroidBuilder(Builder):
                     "%s/examples/%s/android/App/gradlew"
                     % (self.root, self.app.ExampleName()),
                     "-p",
-                    "%s/examples/%s/android/App/" % (self.root, self.app.ExampleName()),
+                    "%s/examples/%s/android/App/" % (self.root,
+                                                     self.app.ExampleName()),
                     "-PmatterBuildSrcDir=%s" % self.output_dir,
                     "-PmatterSdkSourceBuild=false",
                     "-PbuildDir=%s" % self.output_dir,
@@ -360,7 +364,8 @@ class AndroidBuilder(Builder):
 
             exampleName = self.app.ExampleName()
             if exampleName is not None:
-                gn_gen += ["--root=%s/examples/%s/android/" % (self.root, exampleName)]
+                gn_gen += ["--root=%s/examples/%s/android/" %
+                           (self.root, exampleName)]
 
             if self.board.IsIde():
                 gn_gen += [
@@ -379,7 +384,8 @@ class AndroidBuilder(Builder):
             )
             if os.path.isfile(new_sdk_manager) and os.access(new_sdk_manager, os.X_OK):
                 self._Execute(
-                    ["bash", "-c", "yes | %s --licenses >/dev/null" % new_sdk_manager],
+                    ["bash", "-c", "yes | %s --licenses >/dev/null" %
+                        new_sdk_manager],
                     title="Accepting NDK licenses @ cmdline-tools",
                 )
             else:
@@ -415,7 +421,8 @@ class AndroidBuilder(Builder):
             # TODO: Android Gradle with module and -PbuildDir= will caused issue, remove -PbuildDir=
             self._Execute(
                 [
-                    "%s/examples/android/%s/gradlew" % (self.root, self.app.AppName()),
+                    "%s/examples/android/%s/gradlew" % (
+                        self.root, self.app.AppName()),
                     "-p",
                     "%s/examples/android/%s" % (self.root, self.app.AppName()),
                     "-PmatterBuildSrcDir=%s" % self.output_dir,
@@ -471,7 +478,8 @@ class AndroidBuilder(Builder):
                     self.root, "examples/", self.app.ExampleName(), "android/App/app/libs"
                 )
 
-                libs = ["libSetupPayloadParser.so", "libc++_shared.so", "libTvApp.so"]
+                libs = ["libSetupPayloadParser.so",
+                        "libc++_shared.so", "libTvApp.so"]
 
                 jars = {
                     "SetupPayloadParser.jar": "third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar",
@@ -521,7 +529,7 @@ class AndroidBuilder(Builder):
                 "CHIPController.jar": os.path.join(
                     self.output_dir, "lib", "src/controller/java/CHIPController.jar"
                 ),
-                "libChipTlv.jar": os.path.join(
+                "libCHIPTlv.jar": os.path.join(
                     self.output_dir, "lib", "src/controller/java/libCHIPTlv.jar"
                 ),
                 "AndroidPlatform.jar": os.path.join(

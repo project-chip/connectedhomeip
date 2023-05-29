@@ -47,6 +47,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/network-commissioning-cluster
 load "../src/app/zap-templates/zcl/data-model/chip/occupancy-sensing-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/operational-credentials-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/operational-state-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/power-source-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/power-source-configuration-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/pressure-measurement-cluster.xml";

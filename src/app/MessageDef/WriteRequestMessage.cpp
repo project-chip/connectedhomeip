@@ -172,7 +172,7 @@ WriteRequestMessage::Builder & WriteRequestMessage::Builder::MoreChunkedMessages
     return *this;
 }
 
-WriteRequestMessage::Builder & WriteRequestMessage::Builder::EndOfWriteRequestMessage()
+CHIP_ERROR WriteRequestMessage::Builder::EndOfWriteRequestMessage()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -182,7 +182,7 @@ WriteRequestMessage::Builder & WriteRequestMessage::Builder::EndOfWriteRequestMe
     {
         EndOfContainer();
     }
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

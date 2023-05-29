@@ -673,8 +673,10 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
     NSDate * timestampDate API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 /**
- * An instance of one of the event payload interfaces, or nil if error is not
- * nil (in which case there is no payload available).
+ * An instance of the event payload interface that corresponds to the report's
+ * path (e.g. MTRBasicInformationClusterStartUpEvent if the path's cluster
+ * 0x0028 "Basic Information" and the path's event is 0x00 "StartUp"), or nil if
+ * error is not nil (in which case there is no payload available).
  */
 @property (nonatomic, readonly, copy, nullable) id value;
 

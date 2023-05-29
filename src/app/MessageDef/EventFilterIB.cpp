@@ -119,10 +119,10 @@ EventFilterIB::Builder & EventFilterIB::Builder::EventMin(const uint64_t aEventM
     return *this;
 }
 
-EventFilterIB::Builder & EventFilterIB::Builder::EndOfEventFilterIB()
+CHIP_ERROR EventFilterIB::Builder::EndOfEventFilterIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 }; // namespace app
 }; // namespace chip
