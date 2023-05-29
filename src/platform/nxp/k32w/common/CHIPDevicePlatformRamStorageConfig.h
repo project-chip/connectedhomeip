@@ -129,7 +129,7 @@
  * PDM IDs by using an offset.
  */
 #ifndef kNvmId_ApplicationBase
-#define kNvmId_ApplicationBase (uint16_t)0xA000
+#define kNvmId_ApplicationBase (uint16_t) 0xA000
 #endif
 
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
