@@ -392,7 +392,7 @@ idf_component_get_property(lwip_lib lwip COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${lwip_lib}>)
 
 
-if (CONFIG_ESP_WIFI_ENABLED)
+if (CONFIG_ESP32_WIFI_ENABLED)
     idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
     idf_component_get_property(esp_wifi_dir esp_wifi COMPONENT_DIR)
     list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)
