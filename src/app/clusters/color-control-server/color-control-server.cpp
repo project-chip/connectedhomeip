@@ -956,8 +956,10 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    Status status       = Status::Success;
-    uint16_t currentHue = 0;
+    Status status             = Status::Success;
+    uint16_t currentHue       = 0;
+    uint16_t numberOfSteps    = transitionTime == 0 ? 1 : transitionTime;
+    uint16_t firstStepDelayMs = transitionTime == 0 ? 0 : UPDATE_TIME_MS;
     HueDirection direction;
 
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
@@ -982,11 +984,6 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
         Attributes::CurrentHue::Get(endpoint, &current8bitHue);
 
         currentHue = static_cast<uint16_t>(current8bitHue);
-    }
-
-    if (transitionTime == 0)
-    {
-        transitionTime++;
     }
 
     // Convert the ShortestDistance/LongestDistance moveDirection values into Up/Down.
@@ -1056,8 +1053,8 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
         colorHueTransitionState->finalHue = static_cast<uint8_t>(hue);
     }
 
-    colorHueTransitionState->stepsRemaining = transitionTime;
-    colorHueTransitionState->stepsTotal     = transitionTime;
+    colorHueTransitionState->stepsRemaining = numberOfSteps;
+    colorHueTransitionState->stepsTotal     = numberOfSteps;
     colorHueTransitionState->endpoint       = endpoint;
     colorHueTransitionState->up             = (direction == HueDirection::kUp);
     colorHueTransitionState->repeat         = false;
@@ -1065,7 +1062,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), firstStepDelayMs);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1093,9 +1090,11 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    Status status       = Status::Success;
-    uint16_t currentHue = 0;
-    uint16_t halfWay    = isEnhanced ? HALF_MAX_UINT16T : HALF_MAX_UINT8T;
+    Status status             = Status::Success;
+    uint16_t currentHue       = 0;
+    uint16_t halfWay          = isEnhanced ? HALF_MAX_UINT16T : HALF_MAX_UINT8T;
+    uint16_t numberOfSteps    = transitionTime == 0 ? 1 : transitionTime;
+    uint16_t firstStepDelayMs = transitionTime == 0 ? 0 : UPDATE_TIME_MS;
     bool moveUp;
 
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
@@ -1116,11 +1115,6 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
     {
         commandObj->AddStatus(commandPath, Status::Success);
         return true;
-    }
-
-    if (transitionTime == 0)
-    {
-        transitionTime++;
     }
 
     // New command.  Need to stop any active transitions.
@@ -1161,15 +1155,15 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
     }
 
     colorHueTransitionState->up             = moveUp;
-    colorHueTransitionState->stepsRemaining = transitionTime;
-    colorHueTransitionState->stepsTotal     = transitionTime;
+    colorHueTransitionState->stepsRemaining = numberOfSteps;
+    colorHueTransitionState->stepsTotal     = numberOfSteps;
     colorHueTransitionState->endpoint       = endpoint;
     colorHueTransitionState->repeat         = false;
 
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
     colorSaturationTransitionState->finalValue     = saturation;
-    colorSaturationTransitionState->stepsRemaining = transitionTime;
-    colorSaturationTransitionState->stepsTotal     = transitionTime;
+    colorSaturationTransitionState->stepsRemaining = numberOfSteps;
+    colorSaturationTransitionState->stepsTotal     = numberOfSteps;
     colorSaturationTransitionState->endpoint       = endpoint;
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
@@ -1177,7 +1171,7 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), firstStepDelayMs);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1202,9 +1196,10 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
                                         HueStepMode stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
                                         uint8_t optionsOverride, bool isEnhanced)
 {
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    Status status = Status::Success;
+    EndpointId endpoint       = commandPath.mEndpointId;
+    uint16_t numberOfSteps    = transitionTime == 0 ? 1 : transitionTime;
+    uint16_t firstStepDelayMs = transitionTime == 0 ? 0 : UPDATE_TIME_MS;
+    Status status             = Status::Success;
 
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
     VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
@@ -1220,11 +1215,6 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     {
         commandObj->AddStatus(commandPath, Status::Success);
         return true;
-    }
-
-    if (transitionTime == 0)
-    {
-        transitionTime++;
     }
 
     // New command.  Need to stop any active transitions.
@@ -1271,15 +1261,15 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
         }
     }
 
-    colorHueTransitionState->stepsRemaining = transitionTime;
-    colorHueTransitionState->stepsTotal     = transitionTime;
+    colorHueTransitionState->stepsRemaining = numberOfSteps;
+    colorHueTransitionState->stepsTotal     = numberOfSteps;
     colorHueTransitionState->endpoint       = endpoint;
     colorHueTransitionState->repeat         = false;
 
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), firstStepDelayMs);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1372,12 +1362,14 @@ exit:
 bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::MoveToSaturation::DecodableType & commandData)
 {
-    uint8_t saturation      = commandData.saturation;
-    uint16_t transitionTime = commandData.transitionTime;
-    uint8_t optionsMask     = commandData.optionsMask;
-    uint8_t optionsOverride = commandData.optionsOverride;
-    EndpointId endpoint     = commandPath.mEndpointId;
-    Status status           = Status::Success;
+    uint8_t saturation        = commandData.saturation;
+    uint16_t transitionTime   = commandData.transitionTime;
+    uint16_t numberOfSteps    = transitionTime == 0 ? 1 : transitionTime;
+    uint16_t firstStepDelayMs = transitionTime == 0 ? 0 : UPDATE_TIME_MS;
+    uint8_t optionsMask       = commandData.optionsMask;
+    uint8_t optionsOverride   = commandData.optionsOverride;
+    EndpointId endpoint       = commandPath.mEndpointId;
+    Status status             = Status::Success;
 
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
     VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
@@ -1396,11 +1388,6 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
         return true;
     }
 
-    if (transitionTime == 0)
-    {
-        transitionTime++;
-    }
-
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
 
@@ -1410,8 +1397,8 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
     // now, kick off the state machine.
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
     colorSaturationTransitionState->finalValue     = saturation;
-    colorSaturationTransitionState->stepsRemaining = transitionTime;
-    colorSaturationTransitionState->stepsTotal     = transitionTime;
+    colorSaturationTransitionState->stepsRemaining = numberOfSteps;
+    colorSaturationTransitionState->stepsTotal     = numberOfSteps;
     colorSaturationTransitionState->endpoint       = endpoint;
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
@@ -1419,7 +1406,7 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), firstStepDelayMs);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1431,7 +1418,9 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
 {
     auto stepMode             = commandData.stepMode;
     uint8_t stepSize          = commandData.stepSize;
-    uint8_t transitionTime    = commandData.transitionTime;
+    uint16_t transitionTime   = commandData.transitionTime;
+    uint16_t numberOfSteps    = transitionTime == 0 ? 1 : transitionTime;
+    uint16_t firstStepDelayMs = transitionTime == 0 ? 0 : UPDATE_TIME_MS;
     uint8_t optionsMask       = commandData.optionsMask;
     uint8_t optionsOverride   = commandData.optionsOverride;
     EndpointId endpoint       = commandPath.mEndpointId;
@@ -1454,11 +1443,6 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
         return true;
     }
 
-    if (transitionTime == 0)
-    {
-        transitionTime++;
-    }
-
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
 
@@ -1477,8 +1461,8 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     {
         colorSaturationTransitionState->finalValue = subtractSaturation(currentSaturation, stepSize);
     }
-    colorSaturationTransitionState->stepsRemaining = transitionTime;
-    colorSaturationTransitionState->stepsTotal     = transitionTime;
+    colorSaturationTransitionState->stepsRemaining = numberOfSteps;
+    colorSaturationTransitionState->stepsTotal     = numberOfSteps;
     colorSaturationTransitionState->endpoint       = endpoint;
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
@@ -1486,7 +1470,7 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureHSVEventControl(endpoint), firstStepDelayMs);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1752,13 +1736,15 @@ EmberEventControl * ColorControlServer::configureXYEventControl(EndpointId endpo
 bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                             const Commands::MoveToColor::DecodableType & commandData)
 {
-    uint16_t colorX         = commandData.colorX;
-    uint16_t colorY         = commandData.colorY;
-    uint16_t transitionTime = commandData.transitionTime;
-    uint8_t optionsMask     = commandData.optionsMask;
-    uint8_t optionsOverride = commandData.optionsOverride;
-    EndpointId endpoint     = commandPath.mEndpointId;
-    Status status           = Status::Success;
+    uint16_t colorX           = commandData.colorX;
+    uint16_t colorY           = commandData.colorY;
+    uint16_t transitionTime   = commandData.transitionTime;
+    uint16_t numberOfSteps    = transitionTime == 0 ? 1 : transitionTime;
+    uint16_t firstStepDelayMs = transitionTime == 0 ? 0 : UPDATE_TIME_MS;
+    uint8_t optionsMask       = commandData.optionsMask;
+    uint8_t optionsOverride   = commandData.optionsOverride;
+    EndpointId endpoint       = commandPath.mEndpointId;
+    Status status             = Status::Success;
 
     Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
     Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
@@ -1772,11 +1758,6 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
         return true;
     }
 
-    if (transitionTime == 0)
-    {
-        transitionTime++;
-    }
-
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
 
@@ -1787,8 +1768,8 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
     Attributes::CurrentX::Get(endpoint, &(colorXTransitionState->initialValue));
     Attributes::CurrentX::Get(endpoint, &(colorXTransitionState->currentValue));
     colorXTransitionState->finalValue     = colorX;
-    colorXTransitionState->stepsRemaining = transitionTime;
-    colorXTransitionState->stepsTotal     = transitionTime;
+    colorXTransitionState->stepsRemaining = numberOfSteps;
+    colorXTransitionState->stepsTotal     = numberOfSteps;
     colorXTransitionState->endpoint       = endpoint;
     colorXTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
     colorXTransitionState->highLimit      = MAX_CIE_XY_VALUE;
@@ -1796,8 +1777,8 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
     Attributes::CurrentY::Get(endpoint, &(colorYTransitionState->initialValue));
     Attributes::CurrentY::Get(endpoint, &(colorYTransitionState->currentValue));
     colorYTransitionState->finalValue     = colorY;
-    colorYTransitionState->stepsRemaining = transitionTime;
-    colorYTransitionState->stepsTotal     = transitionTime;
+    colorYTransitionState->stepsRemaining = numberOfSteps;
+    colorYTransitionState->stepsTotal     = numberOfSteps;
     colorYTransitionState->endpoint       = endpoint;
     colorYTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
     colorYTransitionState->highLimit      = MAX_CIE_XY_VALUE;
@@ -1805,7 +1786,7 @@ bool ColorControlServer::moveToColorCommand(app::CommandHandler * commandObj, co
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureXYEventControl(endpoint), firstStepDelayMs);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -1908,16 +1889,18 @@ exit:
 bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const Commands::StepColor::DecodableType & commandData)
 {
-    int16_t stepX           = commandData.stepX;
-    int16_t stepY           = commandData.stepY;
-    uint16_t transitionTime = commandData.transitionTime;
-    uint8_t optionsMask     = commandData.optionsMask;
-    uint8_t optionsOverride = commandData.optionsOverride;
-    EndpointId endpoint     = commandPath.mEndpointId;
-    uint16_t currentColorX  = 0;
-    uint16_t currentColorY  = 0;
-    uint16_t colorX         = 0;
-    uint16_t colorY         = 0;
+    int16_t stepX             = commandData.stepX;
+    int16_t stepY             = commandData.stepY;
+    uint16_t transitionTime   = commandData.transitionTime;
+    uint16_t numberOfSteps    = transitionTime == 0 ? 1 : transitionTime;
+    uint16_t firstStepDelayMs = transitionTime == 0 ? 0 : UPDATE_TIME_MS;
+    uint8_t optionsMask       = commandData.optionsMask;
+    uint8_t optionsOverride   = commandData.optionsOverride;
+    EndpointId endpoint       = commandPath.mEndpointId;
+    uint16_t currentColorX    = 0;
+    uint16_t currentColorY    = 0;
+    uint16_t colorX           = 0;
+    uint16_t colorY           = 0;
 
     Status status = Status::Success;
 
@@ -1939,11 +1922,6 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     colorX = findNewColorValueFromStep(currentColorX, stepX);
     colorY = findNewColorValueFromStep(currentColorY, stepY);
 
-    if (transitionTime == 0)
-    {
-        transitionTime++;
-    }
-
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
 
@@ -1954,8 +1932,8 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     colorXTransitionState->initialValue   = currentColorX;
     colorXTransitionState->currentValue   = currentColorX;
     colorXTransitionState->finalValue     = colorX;
-    colorXTransitionState->stepsRemaining = transitionTime;
-    colorXTransitionState->stepsTotal     = transitionTime;
+    colorXTransitionState->stepsRemaining = numberOfSteps;
+    colorXTransitionState->stepsTotal     = numberOfSteps;
     colorXTransitionState->endpoint       = endpoint;
     colorXTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
     colorXTransitionState->highLimit      = MAX_CIE_XY_VALUE;
@@ -1963,8 +1941,8 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     colorYTransitionState->initialValue   = currentColorY;
     colorYTransitionState->currentValue   = currentColorY;
     colorYTransitionState->finalValue     = colorY;
-    colorYTransitionState->stepsRemaining = transitionTime;
-    colorYTransitionState->stepsTotal     = transitionTime;
+    colorYTransitionState->stepsRemaining = numberOfSteps;
+    colorYTransitionState->stepsTotal     = numberOfSteps;
     colorYTransitionState->endpoint       = endpoint;
     colorYTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
     colorYTransitionState->highLimit      = MAX_CIE_XY_VALUE;
@@ -1972,7 +1950,7 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureXYEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureXYEventControl(endpoint), firstStepDelayMs);
 
 exit:
     commandObj->AddStatus(commandPath, status);
@@ -2046,7 +2024,9 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransit
  */
 Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime)
 {
-    EndpointId endpoint = aEndpoint;
+    EndpointId endpoint       = aEndpoint;
+    uint16_t numberOfSteps    = transitionTime == 0 ? 1 : transitionTime;
+    uint16_t firstStepDelayMs = transitionTime == 0 ? 0 : UPDATE_TIME_MS;
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     VerifyOrReturnError(colorTempTransitionState != nullptr, Status::UnsupportedEndpoint);
@@ -2056,11 +2036,6 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
 
     uint16_t temperatureMax = MAX_TEMPERATURE_VALUE;
     Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &temperatureMax);
-
-    if (transitionTime == 0)
-    {
-        transitionTime++;
-    }
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
@@ -2083,14 +2058,14 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
     Attributes::ColorTemperatureMireds::Get(endpoint, &(colorTempTransitionState->currentValue));
 
     colorTempTransitionState->finalValue     = colorTemperature;
-    colorTempTransitionState->stepsRemaining = transitionTime;
-    colorTempTransitionState->stepsTotal     = transitionTime;
+    colorTempTransitionState->stepsRemaining = numberOfSteps;
+    colorTempTransitionState->stepsTotal     = numberOfSteps;
     colorTempTransitionState->endpoint       = endpoint;
     colorTempTransitionState->lowLimit       = temperatureMin;
     colorTempTransitionState->highLimit      = temperatureMax;
 
     // kick off the state machine
-    scheduleTimerCallbackMs(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureTempEventControl(endpoint), firstStepDelayMs);
     return Status::Success;
 }
 
@@ -2352,6 +2327,8 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     auto stepMode                    = commandData.stepMode;
     uint16_t stepSize                = commandData.stepSize;
     uint16_t transitionTime          = commandData.transitionTime;
+    uint16_t numberOfSteps           = transitionTime == 0 ? 1 : transitionTime;
+    uint16_t firstStepDelayMs        = transitionTime == 0 ? 0 : UPDATE_TIME_MS;
     uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
     uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
     uint8_t optionsMask              = commandData.optionsMask;
@@ -2382,11 +2359,6 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
 
     Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
     Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
-
-    if (transitionTime == 0)
-    {
-        transitionTime++;
-    }
 
     if (colorTemperatureMinimum < tempPhysicalMin)
     {
@@ -2429,8 +2401,8 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
             colorTempTransitionState->finalValue = static_cast<uint16_t>(finalValue32u);
         }
     }
-    colorTempTransitionState->stepsRemaining = transitionTime;
-    colorTempTransitionState->stepsTotal     = transitionTime;
+    colorTempTransitionState->stepsRemaining = numberOfSteps;
+    colorTempTransitionState->stepsTotal     = numberOfSteps;
     colorTempTransitionState->endpoint       = endpoint;
     colorTempTransitionState->lowLimit       = colorTemperatureMinimum;
     colorTempTransitionState->highLimit      = colorTemperatureMaximum;
@@ -2438,7 +2410,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::RemainingTime::Set(endpoint, transitionTime);
 
     // kick off the state machine:
-    scheduleTimerCallbackMs(configureTempEventControl(endpoint), UPDATE_TIME_MS);
+    scheduleTimerCallbackMs(configureTempEventControl(endpoint), firstStepDelayMs);
 
 exit:
     commandObj->AddStatus(commandPath, status);
