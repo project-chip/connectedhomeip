@@ -87,7 +87,7 @@ def decode_serial(serialport, outfile, database):
                 print(line, file=sys.stdout)
                 if output:
                     print(line, file=output)
-        except:
+        except Exception:
             print("Serial error or program closed", file=sys.stderr)
 
         if output:

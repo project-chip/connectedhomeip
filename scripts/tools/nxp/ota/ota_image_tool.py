@@ -32,16 +32,10 @@ but it could be modified to support all factory data fields.
 import argparse
 import glob
 import json
+import jsonschema
 import logging
 import os
 import sys
-
-import ota_image_tool
-from chip.tlv import TLVWriter
-from custom import CertDeclaration, DacCert, DacPKey, PaiCert
-from default import InputArgument
-from generate import set_logger
-from jsonschema import validate
 
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../factory_data_generator'))
@@ -50,6 +44,11 @@ sys.path.insert(0, os.path.join(
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../../../../src/app/'))
 
+import ota_image_tool # noqa: E402 isort:skip
+from chip.tlv import TLVWriter # noqa: E402 isort:skip
+from custom import CertDeclaration, DacCert, DacPKey, PaiCert # noqa: E402 isort:skip
+from default import InputArgument # noqa: E402 isort:skip
+from generate import set_logger # noqa: E402 isort:skip
 
 OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_app_tlv.bin")
 OTA_BOOTLOADER_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_ssbl_tlv.bin")
@@ -154,7 +153,7 @@ def validate_json(data: str):
         payload_schema = json.load(fd)
 
     try:
-        validate(instance=data, schema=payload_schema)
+        jsonschema.validate(instance=data, schema=payload_schema)
         logging.info("JSON data is valid")
     except jsonschema.exceptions.ValidationError as err:
         logging.error(f"JSON data is invalid: {err}")
