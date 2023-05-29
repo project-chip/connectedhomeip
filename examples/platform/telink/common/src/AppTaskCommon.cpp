@@ -52,6 +52,22 @@ constexpr int kFactoryResetCalcTimeout = 3000;
 constexpr int kFactoryResetTriggerCntr = 3;
 constexpr int kAppEventQueueSize       = 10;
 
+#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+const struct gpio_dt_spec sFactoryResetButtonDt = BUTTON_FACTORY_RESET;
+const struct gpio_dt_spec sBleStartButtonDt     = BUTTON_BLE_START;
+#if APP_USE_THREAD_START_BUTTON
+const struct gpio_dt_spec sThreadStartButtonDt = BUTTON_THREAD_START;
+#endif
+#if APP_USE_EXAMPLE_START_BUTTON
+const struct gpio_dt_spec sExampleActionButtonDt = BUTTON_EXAMPLE_ACTION;
+#endif
+#else
+const struct gpio_dt_spec sButtonCol1Dt = BUTTON_COL_1;
+const struct gpio_dt_spec sButtonCol2Dt = BUTTON_COL_2;
+const struct gpio_dt_spec sButtonRow1Dt = BUTTON_ROW_1;
+const struct gpio_dt_spec sButtonRow2Dt = BUTTON_ROW_2;
+#endif
+
 #if APP_USE_IDENTIFY_PWM
 constexpr uint32_t kIdentifyBlinkRateMs         = 200;
 constexpr uint32_t kIdentifyOkayOnRateMs        = 50;
@@ -312,28 +328,28 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 void AppTaskCommon::InitButtons(void)
 {
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, StartBleAdvButtonEventHandler);
+    sFactoryResetButton.Configure(&sFactoryResetButtonDt, FactoryResetButtonEventHandler);
+    sBleAdvStartButton.Configure(&sBleStartButtonDt, StartBleAdvButtonEventHandler);
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
-        sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_2, ExampleActionButtonEventHandler);
+        sExampleActionButton.Configure(&sExampleActionButtonDt, ExampleActionButtonEventHandler);
     }
 #endif
 #if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, StartThreadButtonEventHandler);
+    sThreadStartButton.Configure(&sThreadStartButtonDt, StartThreadButtonEventHandler);
 #endif
 #else
-    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
+    sFactoryResetButton.Configure(&sButtonRow1Dt, &sButtonCol1Dt, FactoryResetButtonEventHandler);
+    sBleAdvStartButton.Configure(&sButtonRow2Dt, &sButtonCol2Dt, StartBleAdvButtonEventHandler);
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
-        sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, ExampleActionButtonEventHandler);
+        sExampleActionButton.Configure(&sButtonRow1Dt, &sButtonCol2Dt, ExampleActionButtonEventHandler);
     }
 #endif
 #if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    sThreadStartButton.Configure(&sButtonRow2Dt, &sButtonCol1Dt, StartThreadButtonEventHandler);
 #endif
 #endif
 
