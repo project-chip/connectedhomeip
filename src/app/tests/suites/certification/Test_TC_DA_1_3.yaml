@@ -40,7 +40,7 @@ tests:
 
     - label: "Start the commissioning process of TH1 on DUT"
       verification: |
-          ./chip-all-clusters-app --wifi  --trace_decode 1
+          sudo ./chip-all-clusters-app --wifi  --trace_decode 1
 
           DUT as commissioner side:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3840  --trace_decode 1
@@ -213,7 +213,7 @@ tests:
 
     - label: "Start the commissioning process of TH1 on DUT again"
       verification: |
-          ./chip-all-clusters-app --wifi   --trace_decode 1 --discriminator 3841
+          sudo ./chip-all-clusters-app --wifi   --trace_decode 1 --discriminator 3841
 
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
       disabled: true

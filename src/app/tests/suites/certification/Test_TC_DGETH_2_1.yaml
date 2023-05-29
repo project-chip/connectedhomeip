@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 45.2.1. [TC-DGETH-2.1] Attributes with server as DUT
+name: 47.2.1. [TC-DGETH-2.1] Attributes [DUT as Server]
 
 PICS:
     - DGETH.S

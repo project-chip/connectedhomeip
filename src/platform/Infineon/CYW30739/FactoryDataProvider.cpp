@@ -111,8 +111,8 @@ CHIP_ERROR FactoryDataProvider::LoadKeypairFromDer(const ByteSpan & der_buffer, 
     mbedtls_result = mbedtls_ecp_write_key(ecp, private_key.data(), private_key.size());
     VerifyOrExit(mbedtls_result == 0, error = CHIP_ERROR_INTERNAL);
 
-    SuccessOrExit(serializedKeypair.SetLength(public_key.size() + private_key.size()));
-    SuccessOrExit(keypair.Deserialize(serializedKeypair));
+    SuccessOrExit(error = serializedKeypair.SetLength(public_key.size() + private_key.size()));
+    SuccessOrExit(error = keypair.Deserialize(serializedKeypair));
 
 exit:
     if (mbedtls_result != 0)

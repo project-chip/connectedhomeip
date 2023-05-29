@@ -41,7 +41,7 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: ( !CHANNEL.S.CL && !CHANNEL.S.LI )
+      PICS: ( !CHANNEL.S.F00 && !CHANNEL.S.F01 )
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -49,8 +49,9 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given CHANNEL.S.CL ensure featuremap has the correct bit set"
-      PICS: CHANNEL.S.CL
+    - label:
+          "Given CCHANNEL.S.F00(CL) ensure featuremap has the correct bit set"
+      PICS: CHANNEL.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -58,8 +59,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given CHANNEL.S.LI ensure featuremap has the correct bit set"
-      PICS: CHANNEL.S.LI
+    - label: "Given CHANNEL.S.F01(LI) ensure featuremap has the correct bit set"
+      PICS: CHANNEL.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -132,7 +133,7 @@ tests:
               contains: [3]
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: ( !CHANNEL.S.CL && !CHANNEL.S.LI )
+      PICS: ( !CHANNEL.S.F00 && !CHANNEL.S.F01 )
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -141,7 +142,7 @@ tests:
               type: list
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: CHANNEL.S.CL || CHANNEL.S.LI
+      PICS: CHANNEL.S.F00 || CHANNEL.S.F01
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

@@ -327,6 +327,20 @@ static constexpr EventId Id = 0x0000000A;
 } // namespace Events
 } // namespace SmokeCoAlarm
 
+namespace OperationalState {
+namespace Events {
+
+namespace OperationalError {
+static constexpr EventId Id = 0x00000000;
+} // namespace OperationalError
+
+namespace OperationCompletion {
+static constexpr EventId Id = 0x00000001;
+} // namespace OperationCompletion
+
+} // namespace Events
+} // namespace OperationalState
+
 namespace DoorLock {
 namespace Events {
 

@@ -24,7 +24,7 @@ public abstract class SuccessCallback<R> {
 
   public abstract void handle(R response);
 
-  public void handleInternal(R response) {
+  protected final void handleInternal(R response) {
     try {
       handle(response);
     } catch (Throwable t) {

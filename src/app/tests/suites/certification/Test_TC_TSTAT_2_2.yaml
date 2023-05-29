@@ -36,14 +36,14 @@ tests:
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
       response:
-          saveAs: MinCoolSetpointLimit
+          saveAs: MinCoolSetpointLimitValue
 
     - label: "Saving value for comparision in step 2a read MaxCoolSetpointLimit"
       PICS: TSTAT.S.A0018
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
       response:
-          saveAs: MaxCoolSetpointLimit
+          saveAs: MaxCoolSetpointLimitValue
 
     - label:
           "Saving value for comparision in step 2c read attribute
@@ -52,14 +52,14 @@ tests:
       command: "readAttribute"
       attribute: "MinSetpointDeadBand"
       response:
-          saveAs: MinSetpointDeadBand
+          saveAs: MinSetpointDeadBandValue
 
     - label: "Saving value for comparision in step 3a read MinHeatSetpointLimit"
       PICS: TSTAT.S.A0015
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
       response:
-          saveAs: MinHeatSetpointLimit
+          saveAs: MinHeatSetpointLimitValue
 
     - label:
           "Saving value for comparision in step 3 reads
@@ -68,14 +68,14 @@ tests:
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.A0013
       response:
-          saveAs: UnoccupiedCoolingSetpoint
+          saveAs: UnoccupiedCoolingSetpointValue
 
     - label: "Saving value for comparision in step 3a read MaxHeatSetpointLimit"
       PICS: TSTAT.S.A0016
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
       response:
-          saveAs: MaxHeatSetpointLimit
+          saveAs: MaxHeatSetpointLimitValue
 
     - label:
           "Saving value for comparision in step3c read attribute
@@ -84,7 +84,7 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       response:
-          saveAs: OccupiedHeatingSetpoint
+          saveAs: OccupiedHeatingSetpointValue
 
     - label:
           "Saving value for comparision in step3c read attribute
@@ -93,7 +93,7 @@ tests:
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       response:
-          saveAs: OccupiedCoolingSetpoint
+          saveAs: OccupiedCoolingSetpointValue
 
     - label:
           "Saving value for comparision in step 6a read attribute
@@ -120,7 +120,7 @@ tests:
       attribute: "AbsMinCoolSetpointLimit"
       PICS: TSTAT.S.A0005
       response:
-          saveAs: AbsMinCoolSetpointLimit
+          saveAs: AbsMinCoolSetpointLimitValue
 
     - label:
           "Saving value for comparision in step9a read attribute
@@ -129,7 +129,7 @@ tests:
       attribute: "AbsMaxCoolSetpointLimit"
       PICS: TSTAT.S.A0006
       response:
-          saveAs: AbsMaxCoolSetpointLimit
+          saveAs: AbsMaxCoolSetpointLimitValue
 
     #Using saved values when optional attributes are available
     - label: "Read attribute OccupiedCoolingSetpoint from the DUT"
@@ -139,8 +139,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: MinCoolSetpointLimit
-              maxValue: MaxCoolSetpointLimit
+              minValue: MinCoolSetpointLimitValue
+              maxValue: MaxCoolSetpointLimitValue
 
     #Using hard coded values when optional attributes are not available
     - label:
@@ -194,7 +194,7 @@ tests:
 
           #2 Test Harness Client  attempts to write OccupiedCoolingSetpoint below the MinCoolSetpointLimit and confirms that the device does not accept the value.
           ./chip-tool thermostat write occupied-cooling-setpoint 1000 1 1
-          On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87) for the value which is below of the  MinCoolSetpointLimit
+          On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87) for the value which is below of the  MinCoolSetpointLimitValue
 
           [1676028984.901635][19375:19377] CHIP:DMG: WriteClient moving to [AwaitingDe]
           [1676028984.901706][19375:19377] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
@@ -227,7 +227,7 @@ tests:
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017
       arguments:
-          value: MaxCoolSetpointLimit + 1000
+          value: MaxCoolSetpointLimitValue + 1000
       response:
           error: CONSTRAINT_ERROR
 
@@ -247,7 +247,7 @@ tests:
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017
       arguments:
-          value: MaxCoolSetpointLimit
+          value: MaxCoolSetpointLimitValue
 
     - label:
           "Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint
@@ -265,7 +265,7 @@ tests:
       attribute: "OccupiedCoolingSetpoint"
       PICS: TSTAT.S.F01 && !TSTAT.S.F05 && TSTAT.S.A0017
       arguments:
-          value: MinCoolSetpointLimit
+          value: MinCoolSetpointLimitValue
 
     #LowerLimit = Max(MinCoolSetpointLimit,(OccupiedHeatingSetpoint + MinSetpointDeadBand)) not possible in YAML
     - label:
@@ -302,8 +302,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: MinHeatSetpointLimit
-              maxValue: MaxHeatSetpointLimit
+              minValue: MinHeatSetpointLimitValue
+              maxValue: MaxHeatSetpointLimitValue
 
     #Using hard coded values when optional attributes are not available
     - label:
@@ -343,7 +343,7 @@ tests:
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.A0015
       arguments:
-          value: 600
+          value: 100
       response:
           error: CONSTRAINT_ERROR
 
@@ -389,7 +389,7 @@ tests:
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && TSTAT.S.A0016
       arguments:
-          value: MaxHeatSetpointLimit + 1000
+          value: MaxHeatSetpointLimitValue + 1000
       response:
           error: CONSTRAINT_ERROR
 
@@ -409,7 +409,7 @@ tests:
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && !TSTAT.S.F05 && TSTAT.S.A0016
       arguments:
-          value: MaxHeatSetpointLimit
+          value: MaxHeatSetpointLimitValue
 
     - label:
           "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint
@@ -476,7 +476,7 @@ tests:
       attribute: "OccupiedHeatingSetpoint"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015
       arguments:
-          value: MinHeatSetpointLimit
+          value: MinHeatSetpointLimitValue
 
     - label:
           "Reads UnoccupiedCoolingSetpoint attribute from Server DUT and
@@ -487,8 +487,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: MinCoolSetpointLimit
-              maxValue: MaxCoolSetpointLimit
+              minValue: MinCoolSetpointLimitValue
+              maxValue: MaxCoolSetpointLimitValue
 
     - label:
           "Reads UnoccupiedCoolingSetpoint attribute from Server DUT and
@@ -527,7 +527,7 @@ tests:
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && !TSTAT.S.A0017
       arguments:
-          value: 1002
+          value: 500
       response:
           error: CONSTRAINT_ERROR
 
@@ -573,7 +573,7 @@ tests:
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0018
       arguments:
-          value: MaxCoolSetpointLimit + 1000
+          value: MaxCoolSetpointLimitValue + 1000
       response:
           error: CONSTRAINT_ERROR
 
@@ -593,7 +593,7 @@ tests:
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.F05
       arguments:
-          value: MaxCoolSetpointLimit
+          value: MaxCoolSetpointLimitValue
 
     #LowerLimit = Max(MinCoolSetpointLimit,(UnoccupiedCoolingSetpoint + MinSetpointDeadBand)) not possible in YAML
     - label:
@@ -651,7 +651,7 @@ tests:
       attribute: "UnoccupiedCoolingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.F05
       arguments:
-          value: MinCoolSetpointLimit
+          value: MinCoolSetpointLimitValue
 
     #Using saved values when optional attributes are available
     - label:
@@ -663,8 +663,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: MinHeatSetpointLimit
-              maxValue: MaxHeatSetpointLimit
+              minValue: MinHeatSetpointLimitValue
+              maxValue: MaxHeatSetpointLimitValue
 
     #Using hardcoded values when optional attributes are not available
     - label:
@@ -704,7 +704,7 @@ tests:
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && !TSTAT.S.A0015
       arguments:
-          value: 500
+          value: 100
       response:
           error: CONSTRAINT_ERROR
 
@@ -752,7 +752,7 @@ tests:
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0016
       arguments:
-          value: MaxHeatSetpointLimit + 1000
+          value: MaxHeatSetpointLimitValue + 1000
       response:
           error: CONSTRAINT_ERROR
 
@@ -772,7 +772,7 @@ tests:
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05
       arguments:
-          value: MaxHeatSetpointLimit
+          value: MaxHeatSetpointLimitValue
 
     - label:
           "Writes the limit of MaxHeatSetpointLimit to UnoccupiedHeatingSetpoint
@@ -832,7 +832,7 @@ tests:
       attribute: "UnoccupiedHeatingSetpoint"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0015
       arguments:
-          value: MinHeatSetpointLimit
+          value: MinHeatSetpointLimitValue
 
     #Using saved values when optional attributes are available
     - label:
@@ -845,7 +845,7 @@ tests:
           constraints:
               type: int16s
               minValue: AbsMinHeatSetpointLimitValue
-              maxValue: MaxHeatSetpointLimit
+              maxValue: MaxHeatSetpointLimitValue
 
     #Using hard coded values when optional attributes are not available
     - label:
@@ -940,7 +940,7 @@ tests:
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && TSTAT.S.A0016
       arguments:
-          value: MaxHeatSetpointLimit + 1000
+          value: MaxHeatSetpointLimitValue + 1000
       response:
           error: CONSTRAINT_ERROR
 
@@ -960,7 +960,7 @@ tests:
       attribute: "MinHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0015 && !TSTAT.S.F05 && TSTAT.S.A0016
       arguments:
-          value: MaxHeatSetpointLimit
+          value: MaxHeatSetpointLimitValue
 
     #UpperLimit = Min(MaxHeatSetpointLimit,(MinCoolSetpointLimit - MinSetpointDeadBand)) not possible in YAML
     - label:
@@ -1024,7 +1024,7 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: MinHeatSetpointLimit
+              minValue: MinHeatSetpointLimitValue
               maxValue: AbsMaxHeatSetpointLimitValue
 
     #Using hard coded values when optional attributes are not available
@@ -1087,7 +1087,7 @@ tests:
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.A0015
       arguments:
-          value: 500
+          value: 100
       response:
           error: CONSTRAINT_ERROR
 
@@ -1207,7 +1207,7 @@ tests:
       attribute: "MaxHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0016 && TSTAT.S.A0015
       arguments:
-          value: MinHeatSetpointLimit
+          value: MinHeatSetpointLimitValue
 
     #Using saved values when optional attributes are available
     - label:
@@ -1219,8 +1219,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: AbsMinCoolSetpointLimit
-              maxValue: MaxCoolSetpointLimit
+              minValue: AbsMinCoolSetpointLimitValue
+              maxValue: MaxCoolSetpointLimitValue
 
     #Using hard coded values when optional attributes are not available
     - label:
@@ -1260,7 +1260,7 @@ tests:
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0005
       arguments:
-          value: 1000
+          value: 500
       response:
           error: CONSTRAINT_ERROR
 
@@ -1306,7 +1306,7 @@ tests:
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018
       arguments:
-          value: MaxCoolSetpointLimit + 1000
+          value: MaxCoolSetpointLimitValue + 1000
       response:
           error: CONSTRAINT_ERROR
 
@@ -1326,7 +1326,7 @@ tests:
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0018
       arguments:
-          value: MaxCoolSetpointLimit
+          value: MaxCoolSetpointLimitValue
 
     - label:
           "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit
@@ -1344,7 +1344,7 @@ tests:
       attribute: "MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0005 && !TSTAT.S.F05
       arguments:
-          value: AbsMinCoolSetpointLimit
+          value: AbsMinCoolSetpointLimitValue
 
     #LowerLimit = Max(AbsMinCoolSetpointLimit,(MinHeatSetpointLimit + MinSetpointDeadBand)) not possible in YAML
     - label:
@@ -1389,8 +1389,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: MinCoolSetpointLimit
-              maxValue: AbsMaxCoolSetpointLimit
+              minValue: MinCoolSetpointLimitValue
+              maxValue: AbsMaxCoolSetpointLimitValue
 
     #Using hard coded values when optional attributes are not available
     - label:
@@ -1430,7 +1430,7 @@ tests:
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0017
       arguments:
-          value: 1000
+          value: 500
       response:
           error: CONSTRAINT_ERROR
 
@@ -1477,7 +1477,7 @@ tests:
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0006
       arguments:
-          value: AbsMaxCoolSetpointLimit + 1000
+          value: AbsMaxCoolSetpointLimitValue + 1000
       response:
           error: CONSTRAINT_ERROR
 
@@ -1497,7 +1497,7 @@ tests:
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0006
       arguments:
-          value: AbsMaxCoolSetpointLimit
+          value: AbsMaxCoolSetpointLimitValue
 
     - label:
           "Writes the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit
@@ -1526,7 +1526,7 @@ tests:
       attribute: "MaxCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0017 && !TSTAT.S.F05
       arguments:
-          value: MinCoolSetpointLimit
+          value: MinCoolSetpointLimitValue
 
     #LowerLimit = Max(MinCoolSetpointLimit,(MaxHeatSetpointLimit + MinSetpointDeadBand)) not possible in YAML
     - label:
@@ -1666,11 +1666,41 @@ tests:
       attribute: "ControlSequenceOfOperation"
       PICS: TSTAT.S.F00 || TSTAT.S.F01
       response:
-          value: 4
           constraints:
               type: enum8
               minValue: 0
               maxValue: 5
+
+    #Uncomment once anyOf is supported
+    #- label:
+    #      "Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F01 is
+    #      true"
+    #  command: "readAttribute"
+    #  attribute: "ControlSequenceOfOperation"
+    #  PICS: TSTAT.S.F01 && !TSTAT.S.F00
+    #  response:
+    #      constraints:
+    #          anyOf: [0, 1]
+
+    #- label:
+    #      "Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F00 is
+    #      true"
+    #  command: "readAttribute"
+    #  attribute: "ControlSequenceOfOperation"
+    #  PICS: TSTAT.S.F00 && !TSTAT.S.F01
+    #  response:
+    #      constraints:
+    #          anyOf: [2, 3]
+
+    #- label:
+    #      "Reads ControlSequenceOfOperation from Server DUT, if both TSTAT.S.F01
+    #      and TSTAT.S.F01 are true"
+    #  command: "readAttribute"
+    #  attribute: "ControlSequenceOfOperation"
+    #  PICS: TSTAT.S.F00 && TSTAT.S.F01
+    #  response:
+    #      constraints:
+    #          anyOf: [4, 5]
 
     - label:
           "Write Attribute command for ControlSequenceOfOperation with a new

@@ -540,6 +540,7 @@ template("efr32_sdk") {
       "${chip_root}/src/platform/silabs/efr32/psa_crypto_config.h",
     ]
 
+    public_configs = [ "${chip_root}/src:includes" ]
     public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
   }
 

@@ -7410,6 +7410,8 @@
                   - targetTemperature
                   - targetTemperatureLevel
       structs:
+          AccessControl:
+              - AccessControlTargetStruct
           BasicInformation:
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
@@ -7417,6 +7419,11 @@
           TemperatureControl:
               - TemperatureLevelStruct
       struct fields:
+          AccessControl:
+              AccessControlTargetStruct:
+                  - cluster
+                  - endpoint
+                  - deviceType
           BasicInformation:
               ProductAppearanceStruct:
                   - finish
@@ -7573,6 +7580,9 @@
                   - Rugged
                   - Fabric
                   - Other
+          NetworkCommissioning:
+              WiFiBand:
+                  - 1G
           HEPAFilterMonitoring:
               ChangeIndicationEnum:
                   - OK
@@ -7706,11 +7716,15 @@
                   - High
                   - Standard
                   - Low
+          WiFiNetworkDiagnostics:
+              WiFiVersionEnum:
+                  - Ah
       bitmaps:
           AirQuality:
               - Feature
           Groups:
               - Feature
+              - NameSupportBitmap
           PressureMeasurement:
               - Feature
           PumpConfigurationAndControl:
@@ -7757,6 +7771,8 @@
           Groups:
               Feature:
                   - GroupNames
+              NameSupportBitmap:
+                  - GroupNames
           PressureMeasurement:
               Feature:
                   - Extended
@@ -7772,6 +7788,9 @@
           Scenes:
               Feature:
                   - SceneNames
+          Thermostat:
+              Feature:
+                  - LocalTemperatureNotExposed
           HEPAFilterMonitoring:
               Feature:
                   - Condition
@@ -7850,6 +7869,9 @@
           # We apparently forgot to deprecate BridgedDeviceBasic when we
           # introduced BridgedDeviceBasicInformation.
           - BridgedDeviceBasic
+      structs:
+          AccessControl:
+              - Target
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -7866,6 +7888,9 @@
       commands:
           TimeSynchronization:
               SetUTCTime: SetUtcTime
+      structs:
+          AccessControl:
+              AccessControlTargetStruct: Target
       enum values:
           TimeSynchronization:
               TimeSourceEnum:

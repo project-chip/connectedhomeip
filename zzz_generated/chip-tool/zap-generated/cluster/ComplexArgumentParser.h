@@ -42,10 +42,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Binding::Struct
 
 static void Finalize(chip::app::Clusters::Binding::Structs::TargetStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::Target::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::AccessControl::Structs::Target::Type & request);
+static void Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlTargetStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request,
                         Json::Value & value);
@@ -238,6 +238,16 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request,
                         Json::Value & value);

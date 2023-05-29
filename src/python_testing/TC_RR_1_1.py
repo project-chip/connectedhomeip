@@ -759,14 +759,14 @@ class TC_RR_1_1(MatterBaseTest):
         # Administer ACL entry
         admin_subjects = [0xFFFF_FFFD_0001_0001, 0x2000_0000_0000_0001, 0x2000_0000_0000_0002, 0x2000_0000_0000_0003]
 
-        admin_target_field_2 = Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC00, deviceType=0xFFF1_BC30)
+        admin_target_field_2 = Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0xFFF1_FC00, deviceType=0xFFF1_BC30)
         if enable_access_to_group_cluster:
-            admin_target_field_2 = Clusters.AccessControl.Structs.Target(cluster=0x0000_0004)
+            admin_target_field_2 = Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0x0000_0004)
 
         admin_targets = [
-            Clusters.AccessControl.Structs.Target(endpoint=0),
+            Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0),
             admin_target_field_2,
-            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC01, deviceType=0xFFF1_BC31)
+            Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0xFFF1_FC01, deviceType=0xFFF1_BC31)
         ]
         admin_acl_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
@@ -779,9 +779,9 @@ class TC_RR_1_1(MatterBaseTest):
         # Manage ACL entry
         manage_subjects = [0x1000_0000_0000_0001, 0x1000_0000_0000_0002, 0x1000_0000_0000_0003, 0x1000_0000_0000_0004]
         manage_targets = [
-            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC00, deviceType=0xFFF1_BC20),
-            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC01, deviceType=0xFFF1_BC21),
-            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC02, deviceType=0xFFF1_BC22)
+            Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0xFFF1_FC00, deviceType=0xFFF1_BC20),
+            Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0xFFF1_FC01, deviceType=0xFFF1_BC21),
+            Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0xFFF1_FC02, deviceType=0xFFF1_BC22)
         ]
 
         manage_acl_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -795,9 +795,9 @@ class TC_RR_1_1(MatterBaseTest):
         # Operate ACL entry
         operate_subjects = [0x3000_0000_0000_0001, 0x3000_0000_0000_0002, 0x3000_0000_0000_0003, 0x3000_0000_0000_0004]
         operate_targets = [
-            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC40, deviceType=0xFFF1_BC20),
-            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC41, deviceType=0xFFF1_BC21),
-            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC42, deviceType=0xFFF1_BC42)
+            Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0xFFF1_FC40, deviceType=0xFFF1_BC20),
+            Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0xFFF1_FC41, deviceType=0xFFF1_BC21),
+            Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0xFFF1_FC42, deviceType=0xFFF1_BC42)
         ]
 
         operate_acl_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -811,9 +811,9 @@ class TC_RR_1_1(MatterBaseTest):
         # View ACL entry
         view_subjects = [0x4000_0000_0000_0001, 0x4000_0000_0000_0002, 0x4000_0000_0000_0003, 0x4000_0000_0000_0004]
         view_targets = [
-            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC80, deviceType=0xFFF1_BC20),
-            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC81, deviceType=0xFFF1_BC21),
-            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC82, deviceType=0xFFF1_BC22)
+            Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0xFFF1_FC80, deviceType=0xFFF1_BC20),
+            Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0xFFF1_FC81, deviceType=0xFFF1_BC21),
+            Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=0xFFF1_FC82, deviceType=0xFFF1_BC22)
         ]
 
         view_acl_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(

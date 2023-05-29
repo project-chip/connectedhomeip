@@ -1,7 +1,7 @@
 
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import SwiftUI
 struct CertTestView: View {
     @StateObject var viewModel = CertTestViewModel()
     @State private var targetContentAppId: String = ""
+    @State private var parallelizeTests = true
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -46,9 +47,17 @@ struct CertTestView: View {
                     }
                     .border(.secondary)
                 }
+                HStack() {
+                    Toggle(isOn: $parallelizeTests) {
+                        Text("Parallelize Tests")
+                    }
+                }
 
                 Button("Launch Test") {
-                    viewModel.launchTest(targetContentAppId: targetContentAppId)
+                    viewModel.launchTests(
+                        targetContentAppId: targetContentAppId,
+                        inParallel: parallelizeTests
+                    )
                 }
                 .background(Color.blue)
                 .foregroundColor(Color.white)

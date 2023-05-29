@@ -315,16 +315,10 @@ tests:
 
           avahi-browse -rt _matterc._udp
 
-          +   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local
-          +   eth0 IPv4 DD200C20D25AE5F7                              _matterc._udp        local
-          =   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local
-             hostname = [matter-te-7.local]
-             address = [fd00::e7]
-             port = [11111]
-             txt = ["CM=0" "D=840"]
-          =   eth0 IPv4 DD200C20D25AE5F7                              _matterc._udp        local
-             hostname = [matter-te-7.local]
-             address = [192.168.3.53]
-             port = [11111]
-             txt = ["CM=0" "D=840"]
+          + wlp0s20f3 IPv6 FD37FE5156C56632                              _matterc._udp        local
+          = wlp0s20f3 IPv6 FD37FE5156C56632                              _matterc._udp        local
+             hostname = [8C1D96786A130000.local]
+             address = [fe80::e9f6:2c08:2794:357d]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "DT=65535" "VP=65521+32769"]
       disabled: true
