@@ -56,5 +56,4 @@ private:
 ///      // ... add code here
 ///
 ///   } // TRACE_END called here
-#define MATTER_TRACE_SCOPE(scope) \
-    ::chip::Tracing::Scoped _trace_scope ## __COUNTER__ (scope)
+#define MATTER_TRACE_SCOPE(scope) ::chip::Tracing::Scoped _trace_scope##__COUNTER__(scope)

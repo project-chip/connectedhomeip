@@ -95,9 +95,9 @@ enum class Scope
     PASESession_SetupSpake2p,
 };
 
-
 /// An event that happened instant (like a zero sized scope)
-enum class Instant {
+enum class Instant
+{
     // General instant notifications
     Resolve_TxtNotApplicable,
     Resolve_Ipv4NotApplicable,

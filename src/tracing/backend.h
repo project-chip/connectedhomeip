@@ -17,8 +17,8 @@
 #pragma once
 
 #include <lib/support/IntrusiveList.h>
-#include <tracing/scopes.h>
 #include <tracing/log_declares.h>
+#include <tracing/scopes.h>
 
 namespace chip {
 namespace Tracing {
