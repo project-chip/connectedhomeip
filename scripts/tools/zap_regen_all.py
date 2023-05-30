@@ -32,10 +32,9 @@ from typing import List, Optional
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
-# Type of targets that can be re-generated
-
 
 class TargetType(Flag):
+    """Type of targets that can be re-generated"""
 
     # Tests for golden images
     TESTS = auto()
