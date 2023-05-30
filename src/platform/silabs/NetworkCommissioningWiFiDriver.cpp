@@ -179,6 +179,7 @@ void SlWiFiDriver::UpdateNetworkingStatus()
     ByteSpan networkId = ByteSpan((const unsigned char *) mStagingNetwork.ssid, mStagingNetwork.ssidLen);
     if (!wfx_is_sta_connected())
     {
+        // TODO: https://github.com/project-chip/connectedhomeip/issues/26861
         mpStatusChangeCallback->OnNetworkingStatusChange(Status::kUnknownError, MakeOptional(networkId),
                                                          MakeOptional(static_cast<int32_t>(SL_STATUS_FAIL)));
         return;
