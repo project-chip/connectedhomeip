@@ -24,7 +24,8 @@ using namespace chip;
 #define SETUP_PAYLOAD_PARSER_JNI_ERROR_METHOD_NOT_FOUND _SETUP_PAYLOAD_PARSER_JNI_ERROR(2)
 #define SETUP_PAYLOAD_PARSER_JNI_ERROR_FIELD_NOT_FOUND _SETUP_PAYLOAD_PARSER_JNI_ERROR(3)
 
-#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_onboardingpayload_OnboardingPayloadParser_##METHOD_NAME
+#define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
+    extern "C" JNIEXPORT RETURN JNICALL Java_chip_onboardingpayload_OnboardingPayloadParser_##METHOD_NAME
 
 static jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload);
 static jobject CreateCapabilitiesHashSet(JNIEnv * env, RendezvousInformationFlags flags);
@@ -151,8 +152,9 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
         jclass optionalInfoClass = env->FindClass("chip/onboardingpayload/OptionalQRCodeInfo");
         jobject optionalInfo     = env->AllocObject(optionalInfoClass);
         jfieldID tag             = env->GetFieldID(optionalInfoClass, "tag", "I");
-        jfieldID type = env->GetFieldID(optionalInfoClass, "type", "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
-        jfieldID data = env->GetFieldID(optionalInfoClass, "data", "Ljava/lang/String;");
+        jfieldID type =
+            env->GetFieldID(optionalInfoClass, "type", "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+        jfieldID data  = env->GetFieldID(optionalInfoClass, "data", "Ljava/lang/String;");
         jfieldID int32 = env->GetFieldID(optionalInfoClass, "int32", "I");
 
         env->SetIntField(optionalInfo, tag, info.tag);
@@ -163,29 +165,29 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
         switch (info.type)
         {
         case optionalQRCodeInfoTypeString:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_STRING", "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_STRING",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeInt32:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_INT32", "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_INT32",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeInt64:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_INT64", "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_INT64",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeUInt32:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_UINT32", "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_UINT32",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeUInt64:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_UINT64", "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_UINT64",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeUnknown:
         default: // Optional Type variable has to set any value.
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_UNKNOWN", "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_UNKNOWN",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         }
 
@@ -221,8 +223,9 @@ jobject CreateCapabilitiesHashSet(JNIEnv * env, RendezvousInformationFlags flags
     }
     if (flags.Has(chip::RendezvousInformationFlag::kSoftAP))
     {
-        jfieldID softApCapability = env->GetStaticFieldID(capabilityEnum, "SOFT_AP", "Lchip/onboardingpayload/DiscoveryCapability;");
-        jobject enumObj           = env->GetStaticObjectField(capabilityEnum, softApCapability);
+        jfieldID softApCapability =
+            env->GetStaticFieldID(capabilityEnum, "SOFT_AP", "Lchip/onboardingpayload/DiscoveryCapability;");
+        jobject enumObj = env->GetStaticObjectField(capabilityEnum, softApCapability);
         env->CallBooleanMethod(capabilitiesHashSet, hashSetAddMethod, enumObj);
     }
     if (flags.Has(chip::RendezvousInformationFlag::kOnNetwork))
@@ -330,9 +333,10 @@ void CreateCapabilitiesFromHashSet(JNIEnv * env, jobject discoveryCapabilitiesOb
         flags.Set(chip::RendezvousInformationFlag::kSoftAP);
     }
 
-    jfieldID onNetworkCapability = env->GetStaticFieldID(capabilityEnum, "ON_NETWORK", "Lchip/onboardingpayload/DiscoveryCapability;");
-    jobject onNetworkObj         = env->GetStaticObjectField(capabilityEnum, onNetworkCapability);
-    contains                     = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, onNetworkObj);
+    jfieldID onNetworkCapability =
+        env->GetStaticFieldID(capabilityEnum, "ON_NETWORK", "Lchip/onboardingpayload/DiscoveryCapability;");
+    jobject onNetworkObj = env->GetStaticObjectField(capabilityEnum, onNetworkCapability);
+    contains             = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, onNetworkObj);
     if (contains)
     {
         flags.Set(chip::RendezvousInformationFlag::kOnNetwork);
