@@ -19,6 +19,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
+-   [Manufacturing data](#manufacturing-data)
 -   [Flashing](#flashing)
     -   [Flashing the NBU image](#flashing-the-nbu-image)
     -   [Flashing the host image](#flashing-the-host-image)
@@ -135,6 +136,30 @@ set to 1.
 
 After a successful build, the `elf` and `srec` files are found in `out/debug/` -
 `see the files prefixed with chip-k32w1-contact-example`.
+After a successful build, the `elf` and `srec` files are found in `out/debug/` - `see the files prefixed with chip-k32w1-contact-example`.
+
+## Manufacturing data
+
+Use `chip_with_factory_data=1` in the gn build command to enable factory data.
+
+The following is a two-step example of writing factory data in internal flash.
+
+Create a `factory_data_jlink` commander script:
+```
+loadfile factory_data.bin, 0x00000000000ec000
+reset
+go
+quit
+```
+where `0x00000000000ec000` is the `__MATTER_FACTORY_DATA_START` address retrieved from the corresponding application `.map` file.
+
+Run
+```
+jlink -device K32W1480 -if SWD -speed 4000 -autoconnect 1 -CommanderScript factory_data_jlink
+```
+
+See
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
 
 ## Flashing
 
