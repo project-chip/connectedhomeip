@@ -8807,14 +8807,14 @@ class ThreadNetworkDiagnostics(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="channel", Tag=0x00000000, Type=typing.Union[Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="routingRole", Tag=0x00000001, Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRole]),
+                ClusterObjectFieldDescriptor(Label="routingRole", Tag=0x00000001, Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRoleEnum]),
                 ClusterObjectFieldDescriptor(Label="networkName", Tag=0x00000002, Type=typing.Union[Nullable, str]),
                 ClusterObjectFieldDescriptor(Label="panId", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="extendedPanId", Tag=0x00000004, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="meshLocalPrefix", Tag=0x00000005, Type=typing.Union[Nullable, bytes]),
                 ClusterObjectFieldDescriptor(Label="overrunCount", Tag=0x00000006, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="neighborTable", Tag=0x00000007, Type=typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]),
-                ClusterObjectFieldDescriptor(Label="routeTable", Tag=0x00000008, Type=typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]),
+                ClusterObjectFieldDescriptor(Label="neighborTable", Tag=0x00000007, Type=typing.List[ThreadNetworkDiagnostics.Structs.NeighborTableStruct]),
+                ClusterObjectFieldDescriptor(Label="routeTable", Tag=0x00000008, Type=typing.List[ThreadNetworkDiagnostics.Structs.RouteTableStruct]),
                 ClusterObjectFieldDescriptor(Label="partitionId", Tag=0x00000009, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="weighting", Tag=0x0000000A, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="dataVersion", Tag=0x0000000B, Type=typing.Union[Nullable, uint]),
@@ -8868,7 +8868,7 @@ class ThreadNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="securityPolicy", Tag=0x0000003B, Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.SecurityPolicy]),
                 ClusterObjectFieldDescriptor(Label="channelPage0Mask", Tag=0x0000003C, Type=typing.Union[Nullable, bytes]),
                 ClusterObjectFieldDescriptor(Label="operationalDatasetComponents", Tag=0x0000003D, Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]),
-                ClusterObjectFieldDescriptor(Label="activeNetworkFaultsList", Tag=0x0000003E, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]),
+                ClusterObjectFieldDescriptor(Label="activeNetworkFaultsList", Tag=0x0000003E, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -8878,14 +8878,14 @@ class ThreadNetworkDiagnostics(Cluster):
             ])
 
     channel: 'typing.Union[Nullable, uint]' = None
-    routingRole: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRole]' = None
+    routingRole: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRoleEnum]' = None
     networkName: 'typing.Union[Nullable, str]' = None
     panId: 'typing.Union[Nullable, uint]' = None
     extendedPanId: 'typing.Union[Nullable, uint]' = None
     meshLocalPrefix: 'typing.Union[Nullable, bytes]' = None
     overrunCount: 'typing.Optional[uint]' = None
-    neighborTable: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]' = None
-    routeTable: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]' = None
+    neighborTable: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTableStruct]' = None
+    routeTable: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTableStruct]' = None
     partitionId: 'typing.Union[Nullable, uint]' = None
     weighting: 'typing.Union[Nullable, uint]' = None
     dataVersion: 'typing.Union[Nullable, uint]' = None
@@ -8939,7 +8939,7 @@ class ThreadNetworkDiagnostics(Cluster):
     securityPolicy: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.SecurityPolicy]' = None
     channelPage0Mask: 'typing.Union[Nullable, bytes]' = None
     operationalDatasetComponents: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]' = None
-    activeNetworkFaultsList: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]' = None
+    activeNetworkFaultsList: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -8957,7 +8957,7 @@ class ThreadNetworkDiagnostics(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
-        class NetworkFault(MatterIntEnum):
+        class NetworkFaultEnum(MatterIntEnum):
             kUnspecified = 0x00
             kLinkDown = 0x01
             kHardwareFailure = 0x02
@@ -8968,7 +8968,7 @@ class ThreadNetworkDiagnostics(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 4,
 
-        class RoutingRole(MatterIntEnum):
+        class RoutingRoleEnum(MatterIntEnum):
             kUnspecified = 0x00
             kUnassigned = 0x01
             kSleepyEndDevice = 0x02
@@ -8991,7 +8991,7 @@ class ThreadNetworkDiagnostics(Cluster):
 
     class Structs:
         @dataclass
-        class NeighborTable(ClusterObject):
+        class NeighborTableStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -9061,7 +9061,7 @@ class ThreadNetworkDiagnostics(Cluster):
             channelMaskPresent: 'bool' = False
 
         @dataclass
-        class RouteTable(ClusterObject):
+        class RouteTableStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -9145,9 +9145,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRole])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRoleEnum])
 
-            value: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRole]' = NullValue
+            value: 'typing.Union[Nullable, ThreadNetworkDiagnostics.Enums.RoutingRoleEnum]' = NullValue
 
         @dataclass
         class NetworkName(ClusterAttributeDescriptor):
@@ -9241,9 +9241,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable])
+                return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Structs.NeighborTableStruct])
 
-            value: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]' = field(default_factory=lambda: [])
+            value: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTableStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class RouteTable(ClusterAttributeDescriptor):
@@ -9257,9 +9257,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Structs.RouteTable])
+                return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Structs.RouteTableStruct])
 
-            value: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]' = field(default_factory=lambda: [])
+            value: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTableStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class PartitionId(ClusterAttributeDescriptor):
@@ -10121,9 +10121,9 @@ class ThreadNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault])
+                return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum])
 
-            value: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]' = field(default_factory=lambda: [])
+            value: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum]' = field(default_factory=lambda: [])
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -10255,12 +10255,12 @@ class ThreadNetworkDiagnostics(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]),
-                        ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]),
+                        ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum]),
+                        ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum]),
                     ])
 
-            current: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]' = field(default_factory=lambda: [])
-            previous: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]' = field(default_factory=lambda: [])
+            current: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum]' = field(default_factory=lambda: [])
+            previous: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFaultEnum]' = field(default_factory=lambda: [])
 
 
 @dataclass

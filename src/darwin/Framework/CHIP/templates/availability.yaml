@@ -3131,8 +3131,11 @@
               - NetworkFaultType
               - RadioFaultType
           ThreadNetworkDiagnostics:
-              - NetworkFault
-              - RoutingRole
+              # NetworkFaultEnum and RoutingRoleEnum were originally just named
+              # NetworkFault and RoutingRole, but we generate the same API for
+              # both of those names, so the name can just change here.
+              - NetworkFaultEnum
+              - RoutingRoleEnum
               - ThreadConnectionStatus
           WiFiNetworkDiagnostics:
               # AssociationFailureCauseEnum was originally just named
@@ -3531,12 +3534,15 @@
                   - BLEFault
                   - EthernetFault
           ThreadNetworkDiagnostics:
-              NetworkFault:
+              # NetworkFaultEnum and RoutingRoleEnum were originally just named
+              # NetworkFault and RoutingRole, but we generate the same API for
+              # both of those names, so the name can just change here.
+              NetworkFaultEnum:
                   - Unspecified
                   - LinkDown
                   - HardwareFailure
                   - NetworkJammed
-              RoutingRole:
+              RoutingRoleEnum:
                   - Unspecified
                   - Unassigned
                   - SleepyEndDevice
@@ -8118,6 +8124,9 @@
               - ProductAppearanceStruct
           TemperatureControl:
               - TemperatureLevelStruct
+          ThreadNetworkDiagnostics:
+              - NeighborTableStruct
+              - RouteTableStruct
       struct fields:
           AccessControl:
               AccessControlTargetStruct:
@@ -8136,6 +8145,33 @@
               TemperatureLevelStruct:
                   - label
                   - temperatureLevel
+          ThreadNetworkDiagnostics:
+              NeighborTableStruct:
+                  - extAddress
+                  - age
+                  - rloc16
+                  - linkFrameCounter
+                  - mleFrameCounter
+                  - lqi
+                  - averageRssi
+                  - lastRssi
+                  - frameErrorRate
+                  - messageErrorRate
+                  - rxOnWhenIdle
+                  - fullThreadDevice
+                  - fullNetworkData
+                  - isChild
+              RouteTableStruct:
+                  - extAddress
+                  - rloc16
+                  - routerId
+                  - nextHop
+                  - pathCost
+                  - lqiIn
+                  - lqiOut
+                  - age
+                  - allocated
+                  - linkEstablished
       events:
           RefrigeratorAlarm:
               - Notify
@@ -9805,6 +9841,9 @@
       structs:
           AccessControl:
               - Target
+          ThreadNetworkDiagnostics:
+              - NeighborTable
+              - RouteTable
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -9824,6 +9863,9 @@
       structs:
           AccessControl:
               AccessControlTargetStruct: Target
+          ThreadNetworkDiagnostics:
+              NeighborTableStruct: NeighborTable
+              RouteTableStruct: RouteTable
       enum values:
           TimeSynchronization:
               TimeSourceEnum:

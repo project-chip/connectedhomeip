@@ -12700,7 +12700,7 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                     //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "channel", 0, UINT16_MAX, Attributes::Channel::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole>>>(
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum>>>(
             Id, "routing-role", 0, UINT8_MAX, Attributes::RoutingRole::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::CharSpan>>>(
             Id, "network-name", Attributes::NetworkName::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -12714,10 +12714,10 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<uint64_t>>(Id, "overrun-count", 0, UINT64_MAX, Attributes::OverrunCount::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::Type>>>(
             Id, "neighbor-table", Attributes::NeighborTable::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::Type>>>(
             Id, "route-table", Attributes::RouteTable::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
             Id, "partition-id", 0, UINT32_MAX, Attributes::PartitionId::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -12840,8 +12840,8 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
             chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type>>>(
             Id, "operational-dataset-components", Attributes::OperationalDatasetComponents::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<
-            WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault>>>(
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum>>>(
             Id, "active-network-faults-list", Attributes::ActiveNetworkFaultsList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(

@@ -746,7 +746,7 @@ public class ChipStructs {
     }
   }
 
-  public static class ThreadNetworkDiagnosticsClusterNeighborTable {
+  public static class ThreadNetworkDiagnosticsClusterNeighborTableStruct {
     public Long extAddress;
     public Long age;
     public Integer rloc16;
@@ -762,7 +762,7 @@ public class ChipStructs {
     public Boolean fullNetworkData;
     public Boolean isChild;
 
-    public ThreadNetworkDiagnosticsClusterNeighborTable(
+    public ThreadNetworkDiagnosticsClusterNeighborTableStruct(
         Long extAddress,
         Long age,
         Integer rloc16,
@@ -796,7 +796,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ThreadNetworkDiagnosticsClusterNeighborTable {\n");
+      output.append("ThreadNetworkDiagnosticsClusterNeighborTableStruct {\n");
       output.append("\textAddress: ");
       output.append(extAddress);
       output.append("\n");
@@ -930,7 +930,7 @@ public class ChipStructs {
     }
   }
 
-  public static class ThreadNetworkDiagnosticsClusterRouteTable {
+  public static class ThreadNetworkDiagnosticsClusterRouteTableStruct {
     public Long extAddress;
     public Integer rloc16;
     public Integer routerId;
@@ -942,7 +942,7 @@ public class ChipStructs {
     public Boolean allocated;
     public Boolean linkEstablished;
 
-    public ThreadNetworkDiagnosticsClusterRouteTable(
+    public ThreadNetworkDiagnosticsClusterRouteTableStruct(
         Long extAddress,
         Integer rloc16,
         Integer routerId,
@@ -968,7 +968,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ThreadNetworkDiagnosticsClusterRouteTable {\n");
+      output.append("ThreadNetworkDiagnosticsClusterRouteTableStruct {\n");
       output.append("\textAddress: ");
       output.append(extAddress);
       output.append("\n");

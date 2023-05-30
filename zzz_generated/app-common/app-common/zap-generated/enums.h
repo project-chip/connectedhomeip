@@ -80,15 +80,6 @@ enum EmberAfMoveMode : uint8_t
     EMBER_ZCL_MOVE_MODE_DOWN = 1,
 };
 
-// Enum for NetworkFaultEnum
-enum EmberAfNetworkFaultEnum : uint8_t
-{
-    EMBER_ZCL_NETWORK_FAULT_ENUM_UNSPECIFIED       = 0,
-    EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE  = 1,
-    EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED    = 2,
-    EMBER_ZCL_NETWORK_FAULT_ENUM_CONNECTION_FAILED = 3,
-};
-
 // Enum for PHYRateEnum
 enum EmberAfPHYRateEnum : uint8_t
 {
@@ -114,18 +105,6 @@ enum EmberAfRadioFaultEnum : uint8_t
     EMBER_ZCL_RADIO_FAULT_ENUM_NFC_FAULT      = 4,
     EMBER_ZCL_RADIO_FAULT_ENUM_BLE_FAULT      = 5,
     EMBER_ZCL_RADIO_FAULT_ENUM_ETHERNET_FAULT = 6,
-};
-
-// Enum for RoutingRole
-enum EmberAfRoutingRole : uint8_t
-{
-    EMBER_ZCL_ROUTING_ROLE_UNSPECIFIED       = 0,
-    EMBER_ZCL_ROUTING_ROLE_UNASSIGNED        = 1,
-    EMBER_ZCL_ROUTING_ROLE_SLEEPY_END_DEVICE = 2,
-    EMBER_ZCL_ROUTING_ROLE_END_DEVICE        = 3,
-    EMBER_ZCL_ROUTING_ROLE_REED              = 4,
-    EMBER_ZCL_ROUTING_ROLE_ROUTER            = 5,
-    EMBER_ZCL_ROUTING_ROLE_LEADER            = 6,
 };
 
 // Enum for StepMode

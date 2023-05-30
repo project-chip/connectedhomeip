@@ -5578,7 +5578,7 @@ void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge:
 
 void MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value)
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5586,8 +5586,8 @@ void MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge::OnSucc
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRThreadNetworkDiagnosticsClusterNeighborTable * newElement_0;
-            newElement_0 = [MTRThreadNetworkDiagnosticsClusterNeighborTable new];
+            MTRThreadNetworkDiagnosticsClusterNeighborTableStruct * newElement_0;
+            newElement_0 = [MTRThreadNetworkDiagnosticsClusterNeighborTableStruct new];
             newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
             newElement_0.age = [NSNumber numberWithUnsignedInt:entry_0.age];
             newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
@@ -5638,8 +5638,8 @@ void MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackSubscriptionBr
 }
 
 void MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
-        value)
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5647,8 +5647,8 @@ void MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge::OnSuccess
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRThreadNetworkDiagnosticsClusterRouteTable * newElement_0;
-            newElement_0 = [MTRThreadNetworkDiagnosticsClusterRouteTable new];
+            MTRThreadNetworkDiagnosticsClusterRouteTableStruct * newElement_0;
+            newElement_0 = [MTRThreadNetworkDiagnosticsClusterRouteTableStruct new];
             newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
             newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
             newElement_0.routerId = [NSNumber numberWithUnsignedChar:entry_0.routerId];
@@ -5756,8 +5756,8 @@ void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallb
     }
 }
 
-void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
+void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -25740,15 +25740,15 @@ void MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCall
     }
 }
 
-void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault value)
+void MTRThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25763,8 +25763,8 @@ void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscription
     }
 }
 
-void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
+void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25775,7 +25775,7 @@ void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25790,15 +25790,15 @@ void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubs
     }
 }
 
-void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole value)
+void MTRThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25813,8 +25813,8 @@ void MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> & value)
+void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25825,7 +25825,7 @@ void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
