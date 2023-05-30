@@ -143,7 +143,7 @@ class TestRunnerHooks():
         """
         pass
 
-    def step_start(self, name: str):
+    def step_start(self, request):
         """
         This method is called when the runner starts running a step from the test.
 

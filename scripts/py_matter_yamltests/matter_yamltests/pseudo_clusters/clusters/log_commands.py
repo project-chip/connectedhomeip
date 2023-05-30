@@ -39,7 +39,12 @@ class LogCommands(PseudoCluster):
     definition = _DEFINITION
 
     async def UserPrompt(self, request):
-        pass
+        input_result = input("")
+        for value in request.arguments.get("values", []):
+            if value.get('name') and 'expectedValue' in value['name']:
+                request.responses = [{"values": [{"name": "expectedValue", "value": value['value']}]}]
+                return {"value": {"expectedValue": input_result}}
+        return {}
 
     async def Log(self, request):
         pass
