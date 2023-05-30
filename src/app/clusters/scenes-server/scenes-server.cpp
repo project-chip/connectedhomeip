@@ -40,6 +40,7 @@ using ExtensionFieldSet = chip::scenes::ExtensionFieldSet;
 using GroupDataProvider = chip::Credentials::GroupDataProvider;
 using SceneTable        = chip::scenes::SceneTable<chip::scenes::ExtensionFieldSetsImpl>;
 using AuthMode          = chip::Access::AuthMode;
+using ScenesServer      = chip::app::Clusters::Scenes::ScenesServer;
 
 namespace chip {
 namespace app {
