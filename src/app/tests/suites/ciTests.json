@@ -103,7 +103,6 @@
         "Test_TC_MEDIAPLAYBACK_1_7",
         "Test_TC_AUDIOOUTPUT_1_8",
         "Test_TC_TGTNAV_1_9",
-        "Test_TC_TGTNAV_8_2",
         "Test_TC_APBSC_1_10",
         "Test_TC_CONTENTLAUNCHER_1_11",
         "Test_TC_ALOGIN_1_12",
@@ -178,6 +177,7 @@
         "Test_TC_DGTHREAD_2_3",
         "Test_TC_DGTHREAD_2_4"
     ],
+    "TimeSynchronization": ["Test_TC_TIMESYNC_1_1"],
     "WiFiNetworkDiagnostics": [
         "Test_TC_DGWIFI_1_1",
         "Test_TC_DGWIFI_2_1",
@@ -312,6 +312,7 @@
         "Thermostat",
         "ThermostatUserConfiguration",
         "ThreadNetworkDiagnostics",
+        "TimeSynchronization",
         "UserLabel",
         "WiFiNetworkDiagnostics",
         "WindowCovering",

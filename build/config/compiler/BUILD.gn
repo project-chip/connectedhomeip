@@ -253,7 +253,7 @@ config("strict_warnings") {
     cflags += [ "-Wconversion" ]
   }
 
-  if (build_java_matter_controller) {
+  if (matter_enable_java_compilation) {
     cflags -= [ "-Wshadow" ]
   }
 

@@ -3045,9 +3045,15 @@
                   - fabricIndex
       enums:
           Identify:
-              - IdentifyEffectIdentifier
-              - IdentifyEffectVariant
-              - IdentifyIdentifyType
+              # EffectIdentifierEnum, EffectVariantEnum, and IdentifyTypeEnum
+              # were originally named IdentifyEffectIdentifier,
+              # IdentifyEffectVariant, and IdentifyIdentifyType, but we generate
+              # the same API for the names with/without "Enum" at the end, and
+              # with/without the cluster name at the beginning, so the name can
+              # just change here.
+              - EffectIdentifierEnum
+              - EffectVariantEnum
+              - IdentifyTypeEnum
           OnOff:
               - OnOffDelayedAllOffEffectVariant
               - OnOffDyingLightEffectVariant
@@ -3098,8 +3104,16 @@
               - WiredCurrentTypeEnum
               - WiredFaultEnum
           GeneralCommissioning:
-              - CommissioningError
-              - RegulatoryLocationType
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              - CommissioningErrorEnum
+              # RegulatoryLocationTypeEnum was originally just named
+              # RegulatoryLocationType, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              - RegulatoryLocationTypeEnum
           NetworkCommissioning:
               - NetworkCommissioningStatus
               - WiFiBand
@@ -3117,8 +3131,11 @@
               - NetworkFaultType
               - RadioFaultType
           ThreadNetworkDiagnostics:
-              - NetworkFault
-              - RoutingRole
+              # NetworkFaultEnum and RoutingRoleEnum were originally just named
+              # NetworkFault and RoutingRole, but we generate the same API for
+              # both of those names, so the name can just change here.
+              - NetworkFaultEnum
+              - RoutingRoleEnum
               - ThreadConnectionStatus
           WiFiNetworkDiagnostics:
               # AssociationFailureCauseEnum was originally just named
@@ -3229,16 +3246,22 @@
               - FaultType
       enum values:
           Identify:
-              IdentifyEffectIdentifier:
+              # EffectIdentifierEnum, EffectVariantEnum, and IdentifyTypeEnum
+              # were originally named IdentifyEffectIdentifier,
+              # IdentifyEffectVariant, and IdentifyIdentifyType, but we generate
+              # the same API for the names with/without "Enum" at the end, and
+              # with/without the cluster name at the beginning, so the name can
+              # just change here.
+              EffectIdentifierEnum:
                   - Blink
                   - Breathe
                   - Okay
                   - ChannelChange
                   - FinishEffect
                   - StopEffect
-              IdentifyEffectVariant:
+              EffectVariantEnum:
                   - Default
-              IdentifyIdentifyType:
+              IdentifyTypeEnum:
                   - None
                   - VisibleLight
                   - VisibleLED
@@ -3414,13 +3437,21 @@
                   - OverVoltage
                   - UnderVoltage
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   - Ok
                   - ValueOutsideRange
                   - InvalidAuthentication
                   - NoFailSafe
                   - BusyWithOtherAdmin
-              RegulatoryLocationType:
+              # RegulatoryLocationTypeEnum was originally just named
+              # RegulatoryLocationType, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              RegulatoryLocationTypeEnum:
                   - Indoor
                   - Outdoor
                   - IndoorOutdoor
@@ -3503,12 +3534,15 @@
                   - BLEFault
                   - EthernetFault
           ThreadNetworkDiagnostics:
-              NetworkFault:
+              # NetworkFaultEnum and RoutingRoleEnum were originally just named
+              # NetworkFault and RoutingRole, but we generate the same API for
+              # both of those names, so the name can just change here.
+              NetworkFaultEnum:
                   - Unspecified
                   - LinkDown
                   - HardwareFailure
                   - NetworkJammed
-              RoutingRole:
+              RoutingRoleEnum:
                   - Unspecified
                   - Unassigned
                   - SleepyEndDevice
@@ -5646,7 +5680,11 @@
                   - ValueB
                   - ValueC
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   - OK
           AccessControl:
               AccessControlEntryPrivilegeEnum:
@@ -6211,7 +6249,11 @@
               - DoorLockProgrammingEventCode
       enum values:
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   - Ok
           PowerSource:
               BatChargeLevelEnum:
@@ -6569,7 +6611,11 @@
               UserTypeEnum: DlUserType
       enum values:
           GeneralCommissioning:
-              CommissioningError:
+              # CommissioningErrorEnum was originally just named
+              # CommissioningError, but we generate the same API
+              # for both of those names, so the name can just change
+              # here.
+              CommissioningErrorEnum:
                   OK: Ok
           PowerSource:
               BatChargeLevelEnum:
@@ -6994,6 +7040,7 @@
   introduced:
       clusters:
           - AirQuality
+          # Replaceable Monitoring clusters
           - HEPAFilterMonitoring
           - ActivatedCarbonFilterMonitoring
           - CeramicFilterMonitoring
@@ -7006,11 +7053,51 @@
           - FuelTankMonitoring
           - InkCartridgeMonitoring
           - TonerCartridgeMonitoring
+          # Concentration Measurement clusters
+          - BromateConcentrationMeasurement
+          - BromodichloromethaneConcentrationMeasurement
+          - BromoformConcentrationMeasurement
+          - CarbonDioxideConcentrationMeasurement
+          - CarbonMonoxideConcentrationMeasurement
+          - ChloraminesConcentrationMeasurement
+          - ChlorineConcentrationMeasurement
+          - ChlorodibromomethaneConcentrationMeasurement
+          - ChloroformConcentrationMeasurement
+          - CopperConcentrationMeasurement
+          - DissolvedOxygenConcentrationMeasurement
+          - EthyleneConcentrationMeasurement
+          - EthyleneOxideConcentrationMeasurement
+          - FecalColiformEColiConcentrationMeasurement
+          - FluorideConcentrationMeasurement
+          - FormaldehydeConcentrationMeasurement
+          - HaloaceticAcidsConcentrationMeasurement
+          - HydrogenConcentrationMeasurement
+          - HydrogenSulfideConcentrationMeasurement
+          - LeadConcentrationMeasurement
+          - ManganeseConcentrationMeasurement
+          - NitricOxideConcentrationMeasurement
+          - NitrogenDioxideConcentrationMeasurement
+          - OxygenConcentrationMeasurement
+          - OzoneConcentrationMeasurement
+          - PM10ConcentrationMeasurement
+          - PM1ConcentrationMeasurement
+          - PM25ConcentrationMeasurement
+          - RadonConcentrationMeasurement
+          - SodiumConcentrationMeasurement
+          - SulfateConcentrationMeasurement
+          - SulfurDioxideConcentrationMeasurement
+          - TotalColiformBacteriaConcentrationMeasurement
+          - TotalTrihalomethanesConcentrationMeasurement
+          - TotalVolatileOrganicCompoundsConcentrationMeasurement
+          - TurbidityConcentrationMeasurement
+          - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
       attributes:
           Scenes:
               - EventList
+              - SceneTableSize
+              - RemainingCapacity
           OnOff:
               - EventList
           OnOffSwitchConfiguration:
@@ -7293,6 +7380,664 @@
               - EventList
               - FeatureMap
               - ClusterRevision
+          BromateConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          BromodichloromethaneConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          BromoformConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          CarbonDioxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          CarbonMonoxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          ChloraminesConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          ChlorineConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          ChlorodibromomethaneConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          ChloroformConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          CopperConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          DissolvedOxygenConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          EthyleneConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          EthyleneOxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          FecalColiformEColiConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          FluorideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          FormaldehydeConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          HaloaceticAcidsConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          HydrogenConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          HydrogenSulfideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          LeadConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          ManganeseConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          NitricOxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          NitrogenDioxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          OxygenConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          OzoneConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          PM10ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          PM1ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          PM25ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          RadonConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          SodiumConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          SulfateConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          SulfurDioxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          TotalColiformBacteriaConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          TotalTrihalomethanesConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          TurbidityConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          RefrigeratorAlarm:
+              - Mask
+              - Latch
+              - State
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
           TemperatureControl:
               - TemperatureSetpoint
               - MinTemperature
@@ -7350,6 +8095,8 @@
               - ResetCondition
           TonerCartridgeMonitoring:
               - ResetCondition
+          RefrigeratorAlarm:
+              - Reset
           TemperatureControl:
               - SetTemperature
           DoorLock:
@@ -7360,18 +8107,32 @@
           DoorLock:
               UnboltDoor:
                   - pinCode
+          RefrigeratorAlarm:
+              Reset:
+                  - alarms
+                  - mask
           TemperatureControl:
               SetTemperature:
                   - targetTemperature
                   - targetTemperatureLevel
       structs:
+          AccessControl:
+              - AccessControlTargetStruct
           BasicInformation:
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
               - ProductAppearanceStruct
           TemperatureControl:
               - TemperatureLevelStruct
+          ThreadNetworkDiagnostics:
+              - NeighborTableStruct
+              - RouteTableStruct
       struct fields:
+          AccessControl:
+              AccessControlTargetStruct:
+                  - cluster
+                  - endpoint
+                  - deviceType
           BasicInformation:
               ProductAppearanceStruct:
                   - finish
@@ -7384,7 +8145,36 @@
               TemperatureLevelStruct:
                   - label
                   - temperatureLevel
+          ThreadNetworkDiagnostics:
+              NeighborTableStruct:
+                  - extAddress
+                  - age
+                  - rloc16
+                  - linkFrameCounter
+                  - mleFrameCounter
+                  - lqi
+                  - averageRssi
+                  - lastRssi
+                  - frameErrorRate
+                  - messageErrorRate
+                  - rxOnWhenIdle
+                  - fullThreadDevice
+                  - fullNetworkData
+                  - isChild
+              RouteTableStruct:
+                  - extAddress
+                  - rloc16
+                  - routerId
+                  - nextHop
+                  - pathCost
+                  - lqiIn
+                  - lqiOut
+                  - age
+                  - allocated
+                  - linkEstablished
       events:
+          RefrigeratorAlarm:
+              - Notify
           SmokeCOAlarm:
               - SmokeAlarm
               - COAlarm
@@ -7397,6 +8187,13 @@
               - InterconnectSmokeAlarm
               - InterconnectCOAlarm
               - AllClear
+      event fields:
+          RefrigeratorAlarm:
+              Notify:
+                  - active
+                  - inactive
+                  - state
+                  - mask
       enums:
           AirQuality:
               - AirQualityEnum
@@ -7442,6 +8239,150 @@
           TonerCartridgeMonitoring:
               - ChangeIndicationEnum
               - DegradationDirectionEnum
+          BromateConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          BromodichloromethaneConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          BromoformConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          CarbonDioxideConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          CarbonMonoxideConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          ChloraminesConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          ChlorineConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          ChlorodibromomethaneConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          ChloroformConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          CopperConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          DissolvedOxygenConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          EthyleneConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          EthyleneOxideConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          FecalColiformEColiConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          FluorideConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          FormaldehydeConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          HaloaceticAcidsConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          HydrogenConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          HydrogenSulfideConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          LeadConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          ManganeseConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          NitricOxideConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          NitrogenDioxideConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          OxygenConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          OzoneConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          PM10ConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          PM1ConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          PM25ConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          RadonConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          SodiumConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          SulfateConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          SulfurDioxideConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          TotalColiformBacteriaConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          TotalTrihalomethanesConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          TurbidityConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
           SmokeCOAlarm:
               - AlarmStateEnum
               - ContaminationStateEnum
@@ -7519,6 +8460,9 @@
                   - Rugged
                   - Fabric
                   - Other
+          NetworkCommissioning:
+              WiFiBand:
+                  - 1G
           HEPAFilterMonitoring:
               ChangeIndicationEnum:
                   - OK
@@ -7615,6 +8559,726 @@
               DegradationDirectionEnum:
                   - Up
                   - Down
+          BromateConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          BromodichloromethaneConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          BromoformConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          CarbonDioxideConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          CarbonMonoxideConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          ChloraminesConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          ChlorineConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          ChlorodibromomethaneConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          ChloroformConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          CopperConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          DissolvedOxygenConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          EthyleneConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          EthyleneOxideConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          FecalColiformEColiConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          FluorideConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          FormaldehydeConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          HaloaceticAcidsConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          HydrogenConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          HydrogenSulfideConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          LeadConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          ManganeseConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          NitricOxideConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          NitrogenDioxideConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          OxygenConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          OzoneConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          PM10ConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          PM1ConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          PM25ConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          RadonConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          SodiumConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          SulfateConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          SulfurDioxideConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          TotalColiformBacteriaConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          TotalTrihalomethanesConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          TurbidityConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
+                  - Critical
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
           DoorLock:
               DlLockState:
                   - Unlatched
@@ -7624,18 +9288,15 @@
                   - Unlatch
           SmokeCOAlarm:
               AlarmStateEnum:
-                  - Unknown
                   - Normal
                   - Warning
                   - Critical
               ContaminationStateEnum:
-                  - Unknown
                   - Normal
                   - Low
                   - Warning
                   - Critical
               EndOfServiceEnum:
-                  - Unknown
                   - Expired
                   - Normal
               ExpressedStateEnum:
@@ -7649,18 +9310,25 @@
                   - InterconnectSmoke
                   - InterconnectCO
               MuteStateEnum:
-                  - Unknown
                   - NotMuted
                   - Muted
               SensitivityEnum:
                   - High
                   - Standard
                   - Low
+          WiFiNetworkDiagnostics:
+              WiFiVersionEnum:
+                  - Ah
+          Identify:
+              IdentifyTypeEnum:
+                  - LightOutput
+                  - VisibleIndicator
       bitmaps:
           AirQuality:
               - Feature
           Groups:
               - Feature
+              - NameSupportBitmap
           PressureMeasurement:
               - Feature
           PumpConfigurationAndControl:
@@ -7691,6 +9359,80 @@
               - Feature
           TonerCartridgeMonitoring:
               - Feature
+          BromateConcentrationMeasurement:
+              - Feature
+          BromodichloromethaneConcentrationMeasurement:
+              - Feature
+          BromoformConcentrationMeasurement:
+              - Feature
+          CarbonDioxideConcentrationMeasurement:
+              - Feature
+          CarbonMonoxideConcentrationMeasurement:
+              - Feature
+          ChloraminesConcentrationMeasurement:
+              - Feature
+          ChlorineConcentrationMeasurement:
+              - Feature
+          ChlorodibromomethaneConcentrationMeasurement:
+              - Feature
+          ChloroformConcentrationMeasurement:
+              - Feature
+          CopperConcentrationMeasurement:
+              - Feature
+          DissolvedOxygenConcentrationMeasurement:
+              - Feature
+          EthyleneConcentrationMeasurement:
+              - Feature
+          EthyleneOxideConcentrationMeasurement:
+              - Feature
+          FecalColiformEColiConcentrationMeasurement:
+              - Feature
+          FluorideConcentrationMeasurement:
+              - Feature
+          FormaldehydeConcentrationMeasurement:
+              - Feature
+          HaloaceticAcidsConcentrationMeasurement:
+              - Feature
+          HydrogenConcentrationMeasurement:
+              - Feature
+          HydrogenSulfideConcentrationMeasurement:
+              - Feature
+          LeadConcentrationMeasurement:
+              - Feature
+          ManganeseConcentrationMeasurement:
+              - Feature
+          NitricOxideConcentrationMeasurement:
+              - Feature
+          NitrogenDioxideConcentrationMeasurement:
+              - Feature
+          OxygenConcentrationMeasurement:
+              - Feature
+          OzoneConcentrationMeasurement:
+              - Feature
+          PM10ConcentrationMeasurement:
+              - Feature
+          PM1ConcentrationMeasurement:
+              - Feature
+          PM25ConcentrationMeasurement:
+              - Feature
+          RadonConcentrationMeasurement:
+              - Feature
+          SodiumConcentrationMeasurement:
+              - Feature
+          SulfateConcentrationMeasurement:
+              - Feature
+          SulfurDioxideConcentrationMeasurement:
+              - Feature
+          TotalColiformBacteriaConcentrationMeasurement:
+              - Feature
+          TotalTrihalomethanesConcentrationMeasurement:
+              - Feature
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              - Feature
+          TurbidityConcentrationMeasurement:
+              - Feature
+          RefrigeratorAlarm:
+              - AlarmMap
           TemperatureControl:
               - Feature
           SmokeCOAlarm:
@@ -7704,6 +9446,8 @@
                   - ExtremelyPoor
           Groups:
               Feature:
+                  - GroupNames
+              NameSupportBitmap:
                   - GroupNames
           PressureMeasurement:
               Feature:
@@ -7720,6 +9464,9 @@
           Scenes:
               Feature:
                   - SceneNames
+          Thermostat:
+              Feature:
+                  - LocalTemperatureNotExposed
           HEPAFilterMonitoring:
               Feature:
                   - Condition
@@ -7768,12 +9515,303 @@
               Feature:
                   - Condition
                   - Warning
+          BromateConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          BromodichloromethaneConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          BromoformConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          CarbonDioxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          CarbonMonoxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          ChloraminesConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          ChlorineConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          ChlorodibromomethaneConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          ChloroformConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          CopperConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          DissolvedOxygenConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          EthyleneConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          EthyleneOxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          FecalColiformEColiConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          FluorideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          FormaldehydeConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          HaloaceticAcidsConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          HydrogenConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          HydrogenSulfideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          LeadConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          ManganeseConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          NitricOxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          NitrogenDioxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          OxygenConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          OzoneConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM10ConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM1ConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM25ConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          RadonConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          SodiumConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          SulfateConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          SulfurDioxideConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          TotalColiformBacteriaConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          TotalTrihalomethanesConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          TurbidityConcentrationMeasurement:
+              Feature:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
           DoorLock:
               # Feature was originally named DoorLockFeature, but we generate the
               # same API for both of those names, so the name can just change
               # here.
               Feature:
                   - Unbolt
+          RefrigeratorAlarm:
+              AlarmMap:
+                  - DoorOpen
           TemperatureControl:
               Feature:
                   - TemperatureNumber
@@ -7795,6 +9833,17 @@
           # We apparently forgot to deprecate BridgedDeviceBasic when we
           # introduced BridgedDeviceBasicInformation.
           - BridgedDeviceBasic
+      enum values:
+          Identify:
+              IdentifyTypeEnum:
+                  - VisibleLight
+                  - VisibleLED
+      structs:
+          AccessControl:
+              - Target
+          ThreadNetworkDiagnostics:
+              - NeighborTable
+              - RouteTable
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -7811,6 +9860,12 @@
       commands:
           TimeSynchronization:
               SetUTCTime: SetUtcTime
+      structs:
+          AccessControl:
+              AccessControlTargetStruct: Target
+          ThreadNetworkDiagnostics:
+              NeighborTableStruct: NeighborTable
+              RouteTableStruct: RouteTable
       enum values:
           TimeSynchronization:
               TimeSourceEnum:
@@ -7826,6 +9881,10 @@
                   MixedNTPNTS: MixedNtpNts
                   PTP: Ptp
                   GNSS: Gnss
+          Identify:
+              IdentifyTypeEnum:
+                  LightOutput: VisibleLight
+                  VisibleIndicator: VisibleLED
       bitmaps:
           Groups:
               Feature: GroupClusterFeature

@@ -107,7 +107,7 @@
         "Test_TC_DGGEN_3_1"
     ],
     "Identify": ["Test_TC_I_3_2"],
-    "IlluminanceMeasurement": ["Test_TC_ILL_3_1"],
+    "IlluminanceMeasurement": [],
     "InteractionDataModel": [
         "Test_TC_IDM_1_1",
         "Test_TC_IDM_1_2",
@@ -151,7 +151,8 @@
         "Test_TC_CONTENTLAUNCHER_10_7",
         "Test_TC_MC_11_1",
         "Test_TC_MC_11_2",
-        "Test_TC_ALOGIN_12_2"
+        "Test_TC_ALOGIN_12_2",
+        "Test_TC_TGTNAV_8_2"
     ],
     "MultipleFabrics": [
         "Test_TC_CADMIN_1_1",
@@ -237,24 +238,17 @@
     "SoftwareDiagnostics": [
         "Test_TC_DGSW_2_1",
         "Test_TC_DGSW_2_2",
-        "Test_TC_DGSW_2_3",
-        "Test_TC_DGSW_3_2"
+        "Test_TC_DGSW_2_3"
     ],
-    "EthernetNetworkDiagnostics": ["Test_TC_DGETH_3_2"],
-    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2", "Test_TC_DGWIFI_3_2"],
-    "WindowCovering": ["Test_TC_WNCV_6_1", "Test_TC_WNCV_7_1"],
+    "EthernetNetworkDiagnostics": [],
+    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2"],
+    "WindowCovering": [],
     "FlowMeasurement": ["Test_TC_FLW_2_2"],
     "OccupancySensing": ["Test_TC_OCC_3_1"],
     "PowerSource": ["Test_TC_PS_2_2"],
     "BooleanState": ["Test_TC_BOOL_2_2"],
     "ColorControl": [
         "Test_TC_CC_2_2",
-        "Test_TC_CC_3_4",
-        "Test_TC_CC_4_5",
-        "Test_TC_CC_5_4",
-        "Test_TC_CC_6_4",
-        "Test_TC_CC_7_5",
-        "Test_TC_CC_9_4",
         "Test_TC_CC_3_1",
         "Test_TC_CC_7_1",
         "Test_TC_CC_9_1",
@@ -270,19 +264,16 @@
         "Test_TC_DRLK_3_3"
     ],
     "LocalizationConfiguration": ["Test_TC_LCFG_2_1"],
-    "LevelControl": ["Test_TC_LVL_2_3", "Test_TC_LVL_7_1", "Test_TC_LVL_8_1"],
-    "OnOff": ["Test_TC_OO_2_3", "Test_TC_OO_3_1", "Test_TC_OO_3_2"],
+    "LevelControl": ["Test_TC_LVL_7_1", "Test_TC_LVL_8_1"],
+    "OnOff": ["Test_TC_OO_2_3"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
     "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],
-    "TemperatureMeasurement": ["Test_TC_TMP_2_2", "Test_TC_TMP_3_1"],
+    "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_1", "Test_TC_TSTAT_3_2"],
-    "ThermostatUserConfiguration": ["Test_TC_TSUIC_3_1"],
+    "ThermostatUserConfiguration": [],
     "ThreadNetworkDiagnostics": [
         "Test_TC_DGTHREAD_2_5",
-        "Test_TC_DGTHREAD_3_1",
-        "Test_TC_DGTHREAD_3_2",
-        "Test_TC_DGTHREAD_3_3",
-        "Test_TC_DGTHREAD_3_4"
+        "Test_TC_DGTHREAD_3_1"
     ],
     "Actions": ["Test_TC_ACT_2_1", "Test_TC_ACT_2_2", "Test_TC_ACT_3_2"],
     "TimeFormatLocalization": ["Test_TC_LTIME_2_1", "Test_TC_LTIME_3_1"],
@@ -293,16 +284,17 @@
         "Test_TC_S_2_1",
         "Test_TC_S_2_2",
         "Test_TC_S_2_3",
+        "Test_TC_S_2_4",
         "Test_TC_S_3_1"
     ],
-    "PumpConfigurationControl": ["Test_TC_PCC_3_1"],
+    "PumpConfigurationControl": [],
     "AccessControl": ["Test_TC_ACL_2_5", "Test_TC_ACL_2_6"],
     "UserLabel": [],
     "BridgedDeviceBasicInformation": [
         "Test_TC_BRBINFO_2_2",
         "Test_TC_BRBINFO_2_3"
     ],
-    "AccessControlEnforcement": ["Test_TC_ACE_1_2"],
+    "AccessControlEnforcement": ["Test_TC_ACE_1_2", "Test_TC_ACE_1_6"],
     "collection": [
         "DeviceDiscovery",
         "Groups",

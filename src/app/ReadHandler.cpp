@@ -629,8 +629,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
 
     SubscribeResponseMessage::Builder response;
     ReturnErrorOnFailure(response.Init(&writer));
-    response.SubscriptionId(mSubscriptionId).MaxInterval(mMaxInterval).EndOfSubscribeResponseMessage();
-    ReturnErrorOnFailure(response.GetError());
+    ReturnErrorOnFailure(response.SubscriptionId(mSubscriptionId).MaxInterval(mMaxInterval).EndOfSubscribeResponseMessage());
 
     ReturnErrorOnFailure(writer.Finalize(&packet));
     VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);

@@ -21,8 +21,20 @@
 
 #include "lib/dnssd/platform/Dnssd.h"
 #include "platform/CHIPDeviceLayer.h"
+#include "platform/ConnectivityManager.h"
 #include "platform/PlatformManager.h"
+#include <lib/dnssd/minimal_mdns/AddressPolicy.h>
+#include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
+#include <lib/dnssd/minimal_mdns/Parser.h>
+#include <lib/dnssd/minimal_mdns/RecordData.h>
+#include <lib/dnssd/minimal_mdns/ResponseSender.h>
+#include <lib/dnssd/minimal_mdns/Server.h>
+#include <lib/dnssd/minimal_mdns/responders/IP.h>
+#include <lib/dnssd/minimal_mdns/responders/Ptr.h>
+#include <lib/dnssd/minimal_mdns/responders/Srv.h>
+#include <lib/dnssd/minimal_mdns/responders/Txt.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 
 using chip::Dnssd::DnssdService;
@@ -44,6 +56,35 @@ struct DnssdContext
     bool mEndOfInput                    = false;
 };
 
+class TestDnssdResolveServerDelegate : public mdns::Minimal::ServerDelegate, public mdns::Minimal::ParserDelegate
+{
+public:
+    TestDnssdResolveServerDelegate(mdns::Minimal::ResponseSender * responder) : mResponder(responder) {}
+    virtual ~TestDnssdResolveServerDelegate() = default;
+
+    // Implementation of mdns::Minimal::ServerDelegate
+
+    void OnResponse(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override {}
+    void OnQuery(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
+    {
+        mCurSrc = info;
+        mdns::Minimal::ParsePacket(data, this);
+        mCurSrc = nullptr;
+    }
+
+    // Implementation of mdns::Minimal::ParserDelegate
+
+    void OnHeader(mdns::Minimal::ConstHeaderRef & header) override { mMsgId = header.GetMessageId(); }
+    void OnQuery(const mdns::Minimal::QueryData & data) override { mResponder->Respond(mMsgId, data, mCurSrc, mRespConfig); }
+    void OnResource(mdns::Minimal::ResourceType type, const mdns::Minimal::ResourceData & data) override {}
+
+private:
+    mdns::Minimal::ResponseSender * mResponder;
+    mdns::Minimal::ResponseConfiguration mRespConfig;
+    const chip::Inet::IPPacketInfo * mCurSrc = nullptr;
+    uint16_t mMsgId                          = 0;
+};
+
 } // namespace
 
 static void Timeout(chip::System::Layer * systemLayer, void * context)
@@ -61,8 +102,12 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     auto * suite = ctx->mTestSuite;
     char addrBuf[100];
 
-    NL_TEST_ASSERT(suite, result != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(suite, result != nullptr);
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
+
+    // The NL_TEST_ASSERT above will not abort the test, so we need to
+    // explicitly abort it here to avoid dereferencing a null pointer.
+    VerifyOrReturn(result != nullptr, );
 
     if (!addresses.empty())
     {
@@ -122,13 +167,96 @@ static void DnssdErrorCallback(void * context, CHIP_ERROR error)
     NL_TEST_ASSERT(ctx->mTestSuite, error == CHIP_NO_ERROR);
 }
 
+void TestDnssdBrowse_DnssdInitCallback(void * context, CHIP_ERROR error)
+{
+    auto * ctx = static_cast<DnssdContext *>(context);
+    NL_TEST_ASSERT(ctx->mTestSuite, error == CHIP_NO_ERROR);
+    auto * suite = ctx->mTestSuite;
+
+    NL_TEST_ASSERT(suite,
+                   ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolUdp, chip::Inet::IPAddressType::kAny,
+                                   chip::Inet::InterfaceId::Null(), HandleBrowse, context,
+                                   &ctx->mBrowseIdentifier) == CHIP_NO_ERROR);
+}
+
+// Verify that platform DNS-SD implementation can browse and resolve services.
+//
+// This test case uses platform-independent mDNS server implementation based on
+// minimal mdns library. The server is configured to respond to PTR, SRV, TXT,
+// A and AAAA queries without additional records. In order to pass this test,
+// the platform DNS-SD client implementation must be able to browse and resolve
+// services by querying for all of these records separately.
+void TestDnssdBrowse(nlTestSuite * inSuite, void * inContext)
+{
+    DnssdContext context;
+    context.mTestSuite = inSuite;
+
+    mdns::Minimal::SetDefaultAddressPolicy();
+
+    mdns::Minimal::Server<10> server;
+    mdns::Minimal::QNamePart serverName[] = { "resolve-tester", "_mock", chip::Dnssd::kCommissionProtocol,
+                                              chip::Dnssd::kLocalDomain };
+    mdns::Minimal::ResponseSender responseSender(&server);
+
+    mdns::Minimal::QueryResponder<16> queryResponder;
+    responseSender.AddQueryResponder(&queryResponder);
+
+    // Respond to PTR queries for _mock._udp.local
+    mdns::Minimal::QNamePart serviceName[]       = { "_mock", chip::Dnssd::kCommissionProtocol, chip::Dnssd::kLocalDomain };
+    mdns::Minimal::QNamePart serverServiceName[] = { "INSTANCE", chip::Dnssd::kCommissionableServiceName,
+                                                     chip::Dnssd::kCommissionProtocol, chip::Dnssd::kLocalDomain };
+    mdns::Minimal::PtrResponder ptrUdpResponder(serviceName, serverServiceName);
+    queryResponder.AddResponder(&ptrUdpResponder);
+
+    // Respond to SRV queries for INSTANCE._matterc._udp.local
+    mdns::Minimal::SrvResponder srvResponder(mdns::Minimal::SrvResourceRecord(serverServiceName, serverName, CHIP_PORT));
+    queryResponder.AddResponder(&srvResponder);
+
+    // Respond to TXT queries for INSTANCE._matterc._udp.local
+    const char * txtEntries[] = { "key=val" };
+    mdns::Minimal::TxtResponder txtResponder(mdns::Minimal::TxtResourceRecord(serverServiceName, txtEntries));
+    queryResponder.AddResponder(&txtResponder);
+
+    // Respond to A queries
+    mdns::Minimal::IPv4Responder ipv4Responder(serverName);
+    queryResponder.AddResponder(&ipv4Responder);
+
+    // Respond to AAAA queries
+    mdns::Minimal::IPv6Responder ipv6Responder(serverName);
+    queryResponder.AddResponder(&ipv6Responder);
+
+    TestDnssdResolveServerDelegate delegate(&responseSender);
+    server.SetDelegate(&delegate);
+
+    auto endpoints = mdns::Minimal::GetAddressPolicy()->GetListenEndpoints();
+    NL_TEST_ASSERT(inSuite, server.Listen(chip::DeviceLayer::UDPEndPointManager(), endpoints.get(), 5353) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite,
+                   chip::Dnssd::ChipDnssdInit(TestDnssdBrowse_DnssdInitCallback, DnssdErrorCallback, &context) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(5), Timeout, &context) ==
+                       CHIP_NO_ERROR);
+
+    ChipLogProgress(DeviceLayer, "Start EventLoop");
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    ChipLogProgress(DeviceLayer, "End EventLoop");
+
+    NL_TEST_ASSERT(inSuite, context.mResolvedServicesCount > 0);
+    NL_TEST_ASSERT(inSuite, !context.mTimeoutExpired);
+
+    // Stop browsing so we can safely shutdown DNS-SD
+    chip::Dnssd::ChipDnssdStopBrowse(context.mBrowseIdentifier);
+
+    chip::Dnssd::ChipDnssdShutdown();
+}
+
 static void HandlePublish(void * context, const char * type, const char * instanceName, CHIP_ERROR error)
 {
     auto * ctx = static_cast<DnssdContext *>(context);
     NL_TEST_ASSERT(ctx->mTestSuite, error == CHIP_NO_ERROR);
 }
 
-static void TestDnssdPubSub_DnssdInitCallback(void * context, CHIP_ERROR error)
+static void TestDnssdPublishService_DnssdInitCallback(void * context, CHIP_ERROR error)
 {
     auto * ctx = static_cast<DnssdContext *>(context);
     NL_TEST_ASSERT(ctx->mTestSuite, error == CHIP_NO_ERROR);
@@ -157,13 +285,19 @@ static void TestDnssdPubSub_DnssdInitCallback(void * context, CHIP_ERROR error)
                                    &ctx->mBrowseIdentifier) == CHIP_NO_ERROR);
 }
 
-void TestDnssdPubSub(nlTestSuite * inSuite, void * inContext)
+// Verify that the platform DNS-SD implementation can publish services.
+//
+// This test uses platform implementation of DNS-SD server and client. Since
+// client implementation should be verified by the TestDnssdBrowse test case,
+// here we only verify that the server implementation can publish services.
+void TestDnssdPublishService(nlTestSuite * inSuite, void * inContext)
 {
     DnssdContext context;
     context.mTestSuite = inSuite;
 
     NL_TEST_ASSERT(inSuite,
-                   chip::Dnssd::ChipDnssdInit(TestDnssdPubSub_DnssdInitCallback, DnssdErrorCallback, &context) == CHIP_NO_ERROR);
+                   chip::Dnssd::ChipDnssdInit(TestDnssdPublishService_DnssdInitCallback, DnssdErrorCallback, &context) ==
+                       CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(5), Timeout, &context) ==
                        CHIP_NO_ERROR);
@@ -172,6 +306,7 @@ void TestDnssdPubSub(nlTestSuite * inSuite, void * inContext)
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     ChipLogProgress(DeviceLayer, "End EventLoop");
 
+    NL_TEST_ASSERT(inSuite, context.mResolvedServicesCount > 0);
     NL_TEST_ASSERT(inSuite, !context.mTimeoutExpired);
 
     // Stop browsing so we can safely shutdown DNS-SD
@@ -180,7 +315,11 @@ void TestDnssdPubSub(nlTestSuite * inSuite, void * inContext)
     chip::Dnssd::ChipDnssdShutdown();
 }
 
-static const nlTest sTests[] = { NL_TEST_DEF("Test Dnssd::PubSub", TestDnssdPubSub), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = {
+    NL_TEST_DEF("Test ChipDnssdBrowse", TestDnssdBrowse),
+    NL_TEST_DEF("Test ChipDnssdPublishService", TestDnssdPublishService),
+    NL_TEST_SENTINEL(),
+};
 
 int TestDnssd_Setup(void * inContext)
 {

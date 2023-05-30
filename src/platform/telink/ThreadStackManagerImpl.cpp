@@ -47,13 +47,6 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     otInstance * const instance = openthread_get_default_instance();
 
     ReturnErrorOnFailure(GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(instance));
-#ifdef CONFIG_CHIP_OPENTHREAD_TX_POWER
-    /* On Zephyr platform otPlatRadioSetTransmitPower does not touch radio HW */
-    if (otPlatRadioSetTransmitPower(OTInstance(), CONFIG_CHIP_OPENTHREAD_TX_POWER) != OT_ERROR_NONE)
-    {
-        ChipLogError(DeviceLayer, "Can't set OpenThread TX power");
-    }
-#endif /* CONFIG_CHIP_OPENTHREAD_TX_POWER */
 
     UDPEndPointImplSockets::SetJoinMulticastGroupHandler([](InterfaceId, const IPAddress & address) {
         const otIp6Address otAddress = ToOpenThreadIP6Address(address);
@@ -117,6 +110,35 @@ ThreadStackManagerImpl::_AttachToThreadNetwork(const Thread::OperationalDataset 
             Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_AttachToThreadNetwork(dataset, callback);
     }
     return result;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
+{
+    mpScanCallback = callback;
+
+    /* On Telink platform it's not possible to rise Thread network when its used by BLE,
+       so Thread networks scanning performed before start BLE and also available after switch into Thread */
+    if (mRadioBlocked)
+    {
+        if (mpScanCallback != nullptr)
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+                mpScanCallback = nullptr;
+            });
+        }
+    }
+    else
+    {
+        return Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_StartThreadScan(mpScanCallback);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ThreadStackManagerImpl::Finalize(void)
+{
+    otInstanceFinalize(openthread_get_default_instance());
 }
 
 } // namespace DeviceLayer

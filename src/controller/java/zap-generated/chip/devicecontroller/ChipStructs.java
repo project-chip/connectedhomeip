@@ -26,10 +26,9 @@ import javax.annotation.Nullable;
 public class ChipStructs {
   public static class ScenesClusterAttributeValuePair {
     public Optional<Long> attributeID;
-    public ArrayList<Object> attributeValue;
+    public Long attributeValue;
 
-    public ScenesClusterAttributeValuePair(
-        Optional<Long> attributeID, ArrayList<Object> attributeValue) {
+    public ScenesClusterAttributeValuePair(Optional<Long> attributeID, Long attributeValue) {
       this.attributeID = attributeID;
       this.attributeValue = attributeValue;
     }
@@ -142,12 +141,12 @@ public class ChipStructs {
     }
   }
 
-  public static class AccessControlClusterTarget {
+  public static class AccessControlClusterAccessControlTargetStruct {
     public @Nullable Long cluster;
     public @Nullable Integer endpoint;
     public @Nullable Long deviceType;
 
-    public AccessControlClusterTarget(
+    public AccessControlClusterAccessControlTargetStruct(
         @Nullable Long cluster, @Nullable Integer endpoint, @Nullable Long deviceType) {
       this.cluster = cluster;
       this.endpoint = endpoint;
@@ -157,7 +156,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("AccessControlClusterTarget {\n");
+      output.append("AccessControlClusterAccessControlTargetStruct {\n");
       output.append("\tcluster: ");
       output.append(cluster);
       output.append("\n");
@@ -176,14 +175,14 @@ public class ChipStructs {
     public Integer privilege;
     public Integer authMode;
     public @Nullable ArrayList<Object> subjects;
-    public @Nullable ArrayList<ChipStructs.AccessControlClusterTarget> targets;
+    public @Nullable ArrayList<ChipStructs.AccessControlClusterAccessControlTargetStruct> targets;
     public Integer fabricIndex;
 
     public AccessControlClusterAccessControlEntryStruct(
         Integer privilege,
         Integer authMode,
         @Nullable ArrayList<Object> subjects,
-        @Nullable ArrayList<ChipStructs.AccessControlClusterTarget> targets,
+        @Nullable ArrayList<ChipStructs.AccessControlClusterAccessControlTargetStruct> targets,
         Integer fabricIndex) {
       this.privilege = privilege;
       this.authMode = authMode;
@@ -747,7 +746,7 @@ public class ChipStructs {
     }
   }
 
-  public static class ThreadNetworkDiagnosticsClusterNeighborTable {
+  public static class ThreadNetworkDiagnosticsClusterNeighborTableStruct {
     public Long extAddress;
     public Long age;
     public Integer rloc16;
@@ -763,7 +762,7 @@ public class ChipStructs {
     public Boolean fullNetworkData;
     public Boolean isChild;
 
-    public ThreadNetworkDiagnosticsClusterNeighborTable(
+    public ThreadNetworkDiagnosticsClusterNeighborTableStruct(
         Long extAddress,
         Long age,
         Integer rloc16,
@@ -797,7 +796,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ThreadNetworkDiagnosticsClusterNeighborTable {\n");
+      output.append("ThreadNetworkDiagnosticsClusterNeighborTableStruct {\n");
       output.append("\textAddress: ");
       output.append(extAddress);
       output.append("\n");
@@ -931,7 +930,7 @@ public class ChipStructs {
     }
   }
 
-  public static class ThreadNetworkDiagnosticsClusterRouteTable {
+  public static class ThreadNetworkDiagnosticsClusterRouteTableStruct {
     public Long extAddress;
     public Integer rloc16;
     public Integer routerId;
@@ -943,7 +942,7 @@ public class ChipStructs {
     public Boolean allocated;
     public Boolean linkEstablished;
 
-    public ThreadNetworkDiagnosticsClusterRouteTable(
+    public ThreadNetworkDiagnosticsClusterRouteTableStruct(
         Long extAddress,
         Integer rloc16,
         Integer routerId,
@@ -969,7 +968,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ThreadNetworkDiagnosticsClusterRouteTable {\n");
+      output.append("ThreadNetworkDiagnosticsClusterRouteTableStruct {\n");
       output.append("\textAddress: ");
       output.append(extAddress);
       output.append("\n");
@@ -1536,6 +1535,63 @@ public class ChipStructs {
       output.append("\n");
       output.append("\ttemperatureLevel: ");
       output.append(temperatureLevel);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class OperationalStateClusterErrorStateStruct {
+    public Integer errorStateID;
+    public @Nullable String errorStateLabel;
+    public Optional<String> errorStateDetails;
+
+    public OperationalStateClusterErrorStateStruct(
+        Integer errorStateID,
+        @Nullable String errorStateLabel,
+        Optional<String> errorStateDetails) {
+      this.errorStateID = errorStateID;
+      this.errorStateLabel = errorStateLabel;
+      this.errorStateDetails = errorStateDetails;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("OperationalStateClusterErrorStateStruct {\n");
+      output.append("\terrorStateID: ");
+      output.append(errorStateID);
+      output.append("\n");
+      output.append("\terrorStateLabel: ");
+      output.append(errorStateLabel);
+      output.append("\n");
+      output.append("\terrorStateDetails: ");
+      output.append(errorStateDetails);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class OperationalStateClusterOperationalStateStruct {
+    public Integer operationalStateID;
+    public String operationalStateLabel;
+
+    public OperationalStateClusterOperationalStateStruct(
+        Integer operationalStateID, String operationalStateLabel) {
+      this.operationalStateID = operationalStateID;
+      this.operationalStateLabel = operationalStateLabel;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("OperationalStateClusterOperationalStateStruct {\n");
+      output.append("\toperationalStateID: ");
+      output.append(operationalStateID);
+      output.append("\n");
+      output.append("\toperationalStateLabel: ");
+      output.append(operationalStateLabel);
       output.append("\n");
       output.append("}\n");
       return output.toString();

@@ -178,6 +178,10 @@ if (CONFIG_ENABLE_ESP32_BLE_CONTROLLER)
     chip_gn_arg_append("chip_enable_ble_controller"             "true")
 endif()
 
+if (CONFIG_ENABLE_ETHERNET_TELEMETRY)
+    chip_gn_arg_append("chip_enable_ethernet"                   "true")
+endif()
+
 if (CONFIG_ENABLE_MATTER_OVER_THREAD)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
 else()
@@ -238,6 +242,9 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     chip_gn_arg_append("chip_use_secure_cert_dac_provider"                 "true")
 endif()
 
+if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
+    chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
+endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
@@ -332,22 +339,17 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}/../../"
 )
 
-idf_component_get_property(esp32_mbedtls_lib esp32_mbedtls COMPONENT_LIB)
+idf_component_get_property(mbedtls_lib mbedtls COMPONENT_LIB)
+
+idf_build_get_property(idf_target IDF_TARGET)
+set(target_name "${idf_target}")
 
 if(CONFIG_BT_ENABLED)
     idf_component_get_property(bt_lib bt COMPONENT_LIB)
-    if("${CONFIG_IDF_TARGET}" STREQUAL "esp32h2")
+    if((target_name STREQUAL "esp32h2") OR (target_name STREQUAL "esp32c2") OR (target_name STREQUAL "esp32c6"))
         idf_component_get_property(bt_dir bt COMPONENT_DIR)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32h2/esp32h2-bt-lib/libble_app.a)
-    elseif("${CONFIG_IDF_TARGET}" STREQUAL "esp32c2")
-        idf_component_get_property(bt_dir bt COMPONENT_DIR)
-        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32c2/esp32c2-bt-lib/libble_app.a)
-    elseif("${CONFIG_IDF_TARGET}" STREQUAL "esp32c6")
-        idf_component_get_property(bt_dir bt COMPONENT_DIR)
-        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32c6/esp32c6-bt-lib/libble_app.a)
+        list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a")
     else()
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
     endif()
@@ -361,6 +363,9 @@ endif()
 if(CONFIG_OPENTHREAD_ENABLED)
     idf_component_get_property(openthread_lib openthread COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${openthread_lib}>)
+
+    idf_component_get_property(ieee802154_lib ieee802154 COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${ieee802154_lib}>)
 endif()
 
 if((NOT CONFIG_USE_MINIMAL_MDNS) AND (CONFIG_ENABLE_WIFI_STATION OR CONFIG_ENABLE_WIFI_AP))
@@ -383,9 +388,71 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     list(APPEND chip_libraries $<TARGET_FILE:${esp32_secure_cert_mgr_lib}>)
 endif()
 
+idf_component_get_property(lwip_lib lwip COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${lwip_lib}>)
+
+
+if (CONFIG_ESP32_WIFI_ENABLED)
+    idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
+    idf_component_get_property(esp_wifi_dir esp_wifi COMPONENT_DIR)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)
+    if (CONFIG_IDF_TARGET_ESP32C2)
+        set(blobs core net80211 pp)
+    else()
+        set(blobs core mesh net80211 pp)
+    endif()
+
+    foreach(blob ${blobs})
+    list(APPEND chip_libraries "${esp_wifi_dir}/lib/${target_name}/lib${blob}.a")
+    endforeach()
+endif()
+
+idf_component_get_property(esp_netif_lib esp_netif COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${esp_netif_lib}>)
+
+idf_component_get_property(esp_hw_support_lib esp_hw_support COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${esp_hw_support_lib}>)
+
+idf_component_get_property(esp_phy_lib esp_phy COMPONENT_LIB)
+idf_component_get_property(esp_phy_dir esp_phy COMPONENT_DIR)
+list(APPEND chip_libraries $<TARGET_FILE:${esp_phy_lib}>)
+
+if (CONFIG_IDF_TARGET_ESP32)
+    set(phy_blobs phy rtc)
+elseif (CONFIG_IDF_TARGET_ESP32S2)
+    set(phy_blobs phy)
+else()
+    set(phy_blobs phy btbb)
+endif()
+foreach(phy_blob ${phy_blobs})
+    list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
+endforeach()
+
+idf_component_get_property(esp_event_lib esp_event COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${esp_event_lib}>)
+
+idf_component_get_property(hal_lib hal COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${hal_lib}>)
+
+idf_component_get_property(esp_system_lib esp_system COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${esp_system_lib}>)
+
+idf_component_get_property(soc_lib soc COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${soc_lib}>)
+
+idf_component_get_property(efuse_lib efuse COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${efuse_lib}>)
+
+idf_component_get_property(vfs_lib vfs COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${vfs_lib}>)
+
+idf_component_get_property(driver_lib driver COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${driver_lib}>)
+
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
-                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}>
+                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:mbedx509>
+                                                $<TARGET_FILE:${mbedtls_lib}>
                                                 -Wl,--end-group)
 
 # Make the component dependent on our CHIP build

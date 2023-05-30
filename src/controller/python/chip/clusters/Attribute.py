@@ -27,7 +27,7 @@ from asyncio.futures import Future
 from ctypes import CFUNCTYPE, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import chip.exceptions
 import chip.interaction_model
@@ -47,9 +47,9 @@ class EventTimestampType(Enum):
 
 @unique
 class EventPriority(Enum):
-    DEBUG = 1
-    INFO = 2
-    CRITICAL = 3
+    DEBUG = 0
+    INFO = 1
+    CRITICAL = 2
 
 
 @dataclass
@@ -503,6 +503,26 @@ class SubscriptionTransaction:
             lambda: handle.pychip_ReadClient_OverrideLivenessTimeout(self._readTransaction._pReadClient, timeoutMs)
         )
 
+    def GetReportingIntervalsSeconds(self) -> Tuple[int, int]:
+        '''
+        Retrieve the reporting intervals associated with an active subscription. 
+        This should only be called if we're of subscription interaction type and after a subscription has been established.
+        '''
+        handle = chip.native.GetLibraryHandle()
+        handle.pychip_ReadClient_GetReportingIntervals.argtypes = [
+            ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint16), ctypes.POINTER(ctypes.c_uint16)]
+        handle.pychip_ReadClient_GetReportingIntervals.restype = PyChipError
+
+        minIntervalSec = ctypes.c_uint16(0)
+        maxIntervalSec = ctypes.c_uint16(0)
+
+        builtins.chipStack.Call(
+            lambda: handle.pychip_ReadClient_GetReportingIntervals(
+                self._readTransaction._pReadClient, ctypes.pointer(minIntervalSec), ctypes.pointer(maxIntervalSec))
+        ).raise_on_error()
+
+        return minIntervalSec.value, maxIntervalSec.value
+
     def SetResubscriptionAttemptedCallback(self, callback: Callable[[SubscriptionTransaction, int, int], None], isAsync=False):
         '''
         Sets the callback function that gets invoked anytime a re-subscription is attempted. The callback is expected
@@ -515,7 +535,7 @@ class SubscriptionTransaction:
             self._onResubscriptionAttemptedCb = callback
             self._onResubscriptionAttemptedCb_isAsync = isAsync
 
-    def SetResubscriptionSucceededCallback(self, callback: Callback[[SubscriptionTransaction], None], isAsync=False):
+    def SetResubscriptionSucceededCallback(self, callback: Callable[[SubscriptionTransaction], None], isAsync=False):
         '''
         Sets the callback function that gets invoked when a re-subscription attempt succeeds. The callback
         is expected to have the following signature:
@@ -556,6 +576,10 @@ class SubscriptionTransaction:
     @property
     def OnErrorCb(self) -> Callable[[int, SubscriptionTransaction], None]:
         return self._onErrorCb
+
+    @property
+    def subscriptionId(self) -> int:
+        return self._subscriptionId
 
     def Shutdown(self):
         if (self._isDone):
@@ -862,8 +886,13 @@ def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, clust
 def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: c_uint64, number: int, priority: int, timestamp: int, timestampType: int, data, len, status):
     dataBytes = ctypes.string_at(data, len)
     path = EventPath(ClusterId=cluster, EventId=event)
-    closure.handleEventData(EventHeader(
-        EndpointId=endpoint, ClusterId=cluster, EventId=event, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), path, dataBytes[:], status)
+
+    # EventHeader is valid only when successful
+    eventHeader = None
+    if status == chip.interaction_model.Status.Success.value:
+        eventHeader = EventHeader(
+            EndpointId=endpoint, ClusterId=cluster, EventId=event, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType))
+    closure.handleEventData(eventHeader, path, dataBytes[:], status)
 
 
 @_OnSubscriptionEstablishedCallbackFunct
@@ -1054,10 +1083,6 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
                 path.Urgent = 0
             path = chip.interaction_model.EventPathIBstruct.build(path)
             readargs.append(ctypes.c_char_p(path))
-
-    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    minInterval = 0
-    maxInterval = 0
 
     readClientObj = ctypes.POINTER(c_void_p)()
     readCallbackObj = ctypes.POINTER(c_void_p)()

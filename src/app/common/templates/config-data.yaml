@@ -6,15 +6,10 @@ WeakEnums:
     - ColorControlOptions
     - ColorMode
     - EnhancedColorMode
-    - IdentifyEffectIdentifier
-    - IdentifyEffectVariant
-    - IdentifyIdentifyType
     - InterfaceTypeEnum
     - MoveMode
-    - NetworkFaultEnum
     - PHYRateEnum
     - RadioFaultEnum
-    - RoutingRole
     - StepMode
 
 DefineBitmaps:

@@ -33,12 +33,40 @@
 #include "OTAUtil.h"
 #endif
 
+#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
+#include "ICDUtil.h"
+#include <app/InteractionModelEngine.h>
+#endif
+
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
+#include <zephyr/fs/nvs.h>
+#include <zephyr/settings/settings.h>
+#endif
+
+using namespace chip::app;
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
 constexpr int kFactoryResetCalcTimeout = 3000;
 constexpr int kFactoryResetTriggerCntr = 3;
 constexpr int kAppEventQueueSize       = 10;
+
+#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+const struct gpio_dt_spec sFactoryResetButtonDt = BUTTON_FACTORY_RESET;
+const struct gpio_dt_spec sBleStartButtonDt     = BUTTON_BLE_START;
+#if APP_USE_THREAD_START_BUTTON
+const struct gpio_dt_spec sThreadStartButtonDt = BUTTON_THREAD_START;
+#endif
+#if APP_USE_EXAMPLE_START_BUTTON
+const struct gpio_dt_spec sExampleActionButtonDt = BUTTON_EXAMPLE_ACTION;
+#endif
+#else
+const struct gpio_dt_spec sButtonCol1Dt = BUTTON_COL_1;
+const struct gpio_dt_spec sButtonCol2Dt = BUTTON_COL_2;
+const struct gpio_dt_spec sButtonRow1Dt = BUTTON_ROW_1;
+const struct gpio_dt_spec sButtonRow2Dt = BUTTON_ROW_2;
+#endif
 
 #if APP_USE_IDENTIFY_PWM
 constexpr uint32_t kIdentifyBlinkRateMs         = 200;
@@ -93,7 +121,7 @@ Identify sIdentify = {
     kExampleEndpointId,
     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnIdentifyTriggerEffect,
 };
 #endif
@@ -111,7 +139,47 @@ class AppFabricTableDelegate : public FabricTable::Delegate
     {
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            chip::Server::GetInstance().ScheduleFactoryReset();
+            ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
+
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
+            void * storage = nullptr;
+            int status     = settings_storage_get(&storage);
+
+            if (status == 0)
+            {
+                status = nvs_clear(static_cast<nvs_fs *>(storage));
+            }
+
+            if (!status)
+            {
+                status = nvs_mount(static_cast<nvs_fs *>(storage));
+            }
+
+            if (status)
+            {
+                ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
+            }
+#else
+            const CHIP_ERROR err = PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Factory reset failed: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+
+            ConnectivityMgr().ErasePersistentInfo();
+#endif
+        }
+    }
+};
+
+class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
+{
+    void OnShutDown() override
+    {
+        if (ThreadStackManagerImpl().IsThreadEnabled())
+        {
+            ThreadStackManagerImpl().Finalize();
         }
     }
 };
@@ -127,6 +195,8 @@ static int cmd_telink_reboot(const struct shell * shell, size_t argc, char ** ar
 
     shell_print(shell, "Performing board reboot...");
     sys_reboot();
+
+    return 0;
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_telink, SHELL_CMD(reboot, NULL, "Reboot board command", cmd_telink_reboot),
@@ -227,6 +297,19 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif
 
+#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
+    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
+#endif
+
+    // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs
+    // The OpenThread thread is running during factory reset. The nvs_clear function is called during
+    // factory reset, which makes the NVS storage innaccessible, but the OpenThread knows nothing
+    // about this and tries to store the parameters to NVS. Because of this the OpenThread need to be
+    // shut down before NVS. This delegate fixes the issue "Failed to store setting , ret -13",
+    // which means that the NVS is already disabled.
+    // For this the OnShutdown function is used
+    PlatformMgr().SetDelegate(new PlatformMgrDelegate);
+
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
@@ -245,28 +328,28 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 void AppTaskCommon::InitButtons(void)
 {
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, StartBleAdvButtonEventHandler);
+    sFactoryResetButton.Configure(&sFactoryResetButtonDt, FactoryResetButtonEventHandler);
+    sBleAdvStartButton.Configure(&sBleStartButtonDt, StartBleAdvButtonEventHandler);
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
-        sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_2, ExampleActionButtonEventHandler);
+        sExampleActionButton.Configure(&sExampleActionButtonDt, ExampleActionButtonEventHandler);
     }
 #endif
 #if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, StartThreadButtonEventHandler);
+    sThreadStartButton.Configure(&sThreadStartButtonDt, StartThreadButtonEventHandler);
 #endif
 #else
-    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
+    sFactoryResetButton.Configure(&sButtonRow1Dt, &sButtonCol1Dt, FactoryResetButtonEventHandler);
+    sBleAdvStartButton.Configure(&sButtonRow2Dt, &sButtonCol2Dt, StartBleAdvButtonEventHandler);
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
-        sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, ExampleActionButtonEventHandler);
+        sExampleActionButton.Configure(&sButtonRow1Dt, &sButtonCol2Dt, ExampleActionButtonEventHandler);
     }
 #endif
 #if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    sThreadStartButton.Configure(&sButtonRow2Dt, &sButtonCol1Dt, StartThreadButtonEventHandler);
 #endif
 #endif
 
@@ -335,45 +418,45 @@ void AppTaskCommon::UpdateIdentifyStateEventHandler(AppEvent * aEvent)
     GetAppTask().mPwmIdentifyLed.UpdateAction();
 }
 
-void AppTaskCommon::IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect)
+void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect)
 {
     AppEvent event;
     event.Type = AppEvent::kEventType_IdentifyStart;
 
     switch (aEffect)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBreatheAction(PWMDevice::kBreatheType_Both, kIdentifyBreatheRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyOkayOnRateMs, kIdentifyOkayOffRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyChannelChangeRateMs, kIdentifyChannelChangeRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT");
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kFinishEffect");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyFinishOnRateMs, kIdentifyFinishOffRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT");
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kStopEffect");
         event.Handler = [](AppEvent *) { GetAppTask().mPwmIdentifyLed.StopAction(); };
         event.Type    = AppEvent::kEventType_IdentifyStop;
         break;

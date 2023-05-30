@@ -25,6 +25,7 @@ limitations under the License.
     <field name="ScheduleConfiguration" mask="0x8"/>
     <field name="Setback" mask="0x10"/>
     <field name="AutoMode" mask="0x20"/>
+    <field name="LocalTemperatureNotExposed" mask="0x40"/>
   </bitmap>
 
   <bitmap name="DayOfWeek" type="BITMAP8">

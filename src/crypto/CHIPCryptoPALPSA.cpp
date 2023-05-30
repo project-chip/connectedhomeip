@@ -589,7 +589,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     status = psa_raw_key_agreement(PSA_ALG_ECDH, context.key_id, remote_public_key.ConstBytes(), remote_public_key.Length(),
                                    out_secret.Bytes(), outputSize, &outputLength);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-    SuccessOrExit(out_secret.SetLength(outputLength));
+    SuccessOrExit(error = out_secret.SetLength(outputLength));
 
 exit:
     logPsaError(status);
@@ -1420,7 +1420,9 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
         error  = CHIP_ERROR_CERT_NOT_TRUSTED;
         break;
     default:
-        SuccessOrExit((result = CertificateChainValidationResult::kInternalFrameworkError, error = CHIP_ERROR_INTERNAL));
+        result = CertificateChainValidationResult::kInternalFrameworkError;
+        error  = CHIP_ERROR_INTERNAL;
+        break;
     }
 
 exit:
@@ -1773,7 +1775,7 @@ CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certif
     dn.reduce_size(len);
 
 exit:
-    _log_mbedTLS_error(result);
+    logMbedTLSError(result);
     mbedtls_x509_crt_free(&mbedCertificate);
 
 #else

@@ -137,7 +137,7 @@ class BasicClientFragment : Fragment() {
         showMessage("[Read Success] $attributeName: $value")
       }
 
-    }, devicePtr, listOf(ChipAttributePath.newInstance(endpointId.toLong(), clusterId, attributeId)), null, false, 0 /* imTimeoutMs */)
+    }, devicePtr, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), null, false, 0 /* imTimeoutMs */)
   }
 
   private fun makeAttributeList() {
@@ -160,7 +160,7 @@ class BasicClientFragment : Fragment() {
         showMessage("Write ${attribute.name} success")
       }
 
-    }, devicePtr, listOf(AttributeWriteRequest.newInstance(addressUpdateFragment.endpointId.toLong(), clusterId, attribute.id, tlv, Optional.empty())), 0, 0)
+    }, devicePtr, listOf(AttributeWriteRequest.newInstance(addressUpdateFragment.endpointId, clusterId, attribute.id, tlv, Optional.empty())), 0, 0)
   }
 
   private fun showMessage(msg: String) {

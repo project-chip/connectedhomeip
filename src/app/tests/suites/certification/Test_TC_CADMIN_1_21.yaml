@@ -25,9 +25,6 @@ config:
     nodeId: 0x12344321
     timeout: 950
     endpoint: 0
-    discriminator:
-        type: int16u
-        defaultValue: 3840
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"

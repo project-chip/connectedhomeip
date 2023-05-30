@@ -81,9 +81,9 @@ public:
     /**
      *  @brief Mark the end of this CommandDataIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    CommandDataIB::Builder & EndOfCommandDataIB();
+    CHIP_ERROR EndOfCommandDataIB();
 
 private:
     CommandPathIB::Builder mPath;

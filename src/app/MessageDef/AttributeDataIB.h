@@ -101,9 +101,9 @@ public:
     /**
      *  @brief Mark the end of this AttributeDataIB
      *
-     *  @return A reference to *this
+     *  @return Our The builder's final status.
      */
-    AttributeDataIB::Builder & EndOfAttributeDataIB();
+    CHIP_ERROR EndOfAttributeDataIB();
 
 private:
     AttributePathIB::Builder mPath;

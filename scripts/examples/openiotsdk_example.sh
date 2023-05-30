@@ -41,13 +41,16 @@ TELNET_CONNECTION_PORT=""
 FAILED_TESTS=0
 IS_UNIT_TEST=0
 FVP_NETWORK="user"
+KVS_STORAGE_TYPE="tdb"
+KVS_STORAGE_FILE=""
 
-readarray -t TEST_NAMES <"$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/testnames.txt
+declare -A tdb_storage_param=([instance]=sram [memspace]=0 [address]=0x0 [size]=0x100000)
+declare -A ps_storage_param=([instance]=qspi_sram [memspace]=0 [address]=0x660000 [size]=0x12000)
 
-declare -a SUPPORTED_APP_NAMES
-SUPPORTED_APP_NAMES+=("shell")
-SUPPORTED_APP_NAMES+=("lock-app")
+readarray -t SUPPORTED_APP_NAMES <"$CHIP_ROOT"/examples/platform/openiotsdk/supported_examples.txt
 SUPPORTED_APP_NAMES+=("unit-tests")
+
+readarray -t TEST_NAMES <"$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/test_components.txt
 
 function show_usage() {
     cat <<EOF
@@ -62,7 +65,9 @@ Options:
     -C,--command    <command>           Action to execute <build-run | run | test | build - default>
     -d,--debug      <debug_enable>      Build in debug mode <true | false - default>
     -l,--lwipdebug  <lwip_debug_enable> Build with LwIP debug logs support <true | false - default>
+    -k,--kvsstore   <kvs_storage_type>  Select KVS storage type <ps | tdb - default>
     -p,--path       <build_path>        Build path <build_path - default is example_dir/build>
+    -K,--kvsfile    <kvs_storage_file>  Path to KVS storage file which will be used to ensure persistence <kvs_storage_file - default is empty which means disable persistence>
     -n,--network    <network_name>      FVP network interface name <network_name - default is "user" which means user network mode>
 
 Examples:
@@ -77,8 +82,13 @@ EOF
 You run or test individual test suites of unit tests by using their names [test_name] with the specified command:
 
 EOF
-    cat "$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/testnames.txt
+
+    for test in "${TEST_NAMES[@]}"; do
+        echo "    $test"
+    done
+
     cat <<EOF
+
 Use "test" command without a specific test name, runs all supported unit tests.
 
 EOF
@@ -109,12 +119,19 @@ function build_with_cmake() {
     fi
 
     BUILD_OPTIONS=(-DCMAKE_SYSTEM_PROCESSOR=cortex-m55)
+
     if "$DEBUG"; then
         BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Debug)
+    else
+        BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Release)
     fi
 
     if "$LWIP_DEBUG"; then
         BUILD_OPTIONS+=(-DCONFIG_CHIP_OPEN_IOT_SDK_LWIP_DEBUG=YES)
+    fi
+
+    if [[ $KVS_STORAGE_TYPE == "ps" ]]; then
+        BUILD_OPTIONS+=(-DCONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS=YES)
     fi
 
     cmake -G Ninja -S "$EXAMPLE_PATH" -B "$BUILD_PATH" --toolchain="$TOOLCHAIN_PATH" "${BUILD_OPTIONS[@]}"
@@ -139,7 +156,7 @@ function run_fvp() {
 
     # Check if FVP GDB plugin file exists
     if "$DEBUG" && ! [ -f "$GDB_PLUGIN" ]; then
-        echo "Error: $GDB_PLUGIN does not exist. Ensure Fast Model extensions are mounted." >&2
+        echo "Error: $GDB_PLUGIN does not exist." >&2
         exit 1
     fi
 
@@ -154,6 +171,18 @@ function run_fvp() {
         RUN_OPTIONS+=(-C mps3_board.hostbridge.userNetworking=1)
     else
         RUN_OPTIONS+=(-C mps3_board.hostbridge.interfaceName="$FVP_NETWORK")
+    fi
+
+    if [ -n "$KVS_STORAGE_FILE" ]; then
+        if [[ $KVS_STORAGE_TYPE == "ps" ]]; then
+            declare -n storage_param=ps_storage_param
+        else
+            declare -n storage_param=tdb_storage_param
+        fi
+        if [ -f "$KVS_STORAGE_FILE" ]; then
+            RUN_OPTIONS+=(--data "mps3_board.${storage_param[instance]}=$KVS_STORAGE_FILE@${storage_param[memspace]}:${storage_param[address]}")
+        fi
+        RUN_OPTIONS+=(--dump "mps3_board.${storage_param[instance]}=$KVS_STORAGE_FILE@${storage_param[memspace]}:${storage_param[address]},${storage_param[size]}")
     fi
 
     echo "Running $EXAMPLE_EXE_PATH with options: ${RUN_OPTIONS[@]}"
@@ -239,8 +268,8 @@ function run_test() {
     fi
 }
 
-SHORT=C:,p:,d:,l:,n:,c,s,h
-LONG=command:,path:,debug:,lwipdebug:,network:,clean,scratch,help
+SHORT=C:,p:,d:,l:,n:,k:,K:,c,s,h
+LONG=command:,path:,debug:,lwipdebug:,network:,kvsstore:,kvsfile:,clean,scratch,help
 OPTS=$(getopt -n build --options "$SHORT" --longoptions "$LONG" -- "$@")
 
 eval set -- "$OPTS"
@@ -269,6 +298,14 @@ while :; do
             ;;
         -l | --lwipdebug)
             LWIP_DEBUG=$2
+            shift 2
+            ;;
+        -k | --kvsstore)
+            KVS_STORAGE_TYPE=$2
+            shift 2
+            ;;
+        -K | --kvsfile)
+            KVS_STORAGE_FILE=$2
             shift 2
             ;;
         -p | --path)
@@ -333,6 +370,15 @@ if [[ "$EXAMPLE" == "unit-tests" ]]; then
 else
     EXAMPLE_PATH="$CHIP_ROOT/examples/$EXAMPLE/openiotsdk"
 fi
+
+case "$KVS_STORAGE_TYPE" in
+    ps | tdb) ;;
+    *)
+        echo "Wrong KVS storage type definition"
+        show_usage
+        exit 2
+        ;;
+esac
 
 TOOLCHAIN_PATH="toolchains/toolchain-$TOOLCHAIN.cmake"
 

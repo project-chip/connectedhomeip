@@ -56,8 +56,7 @@ object TlvParseUtil {
 
   fun encode(input: ByteArray): ByteArray {
     val tlvWriter = TlvWriter()
-    val inputByteStringValue = ByteString.copyFrom(input);
-    tlvWriter.put(AnonymousTag, inputByteStringValue)
+    tlvWriter.put(AnonymousTag, input)
     return tlvWriter.getEncoded();
   }
 
