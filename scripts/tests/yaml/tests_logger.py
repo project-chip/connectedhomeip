@@ -193,11 +193,14 @@ class TestRunnerLogger(TestRunnerHooks):
         self.__index += 1
         self.__skipped += 1
 
-    def step_start(self, name: str):
+    def step_start(self, request):
         if self.__use_test_harness_log_format:
-            print(self.__strings.test_harness_step_start.format(index=self.__index, name=name))
+            print(self.__strings.test_harness_step_start.format(index=self.__index, name=request.label))
 
-        print(self.__strings.step_start.format(index=self.__index, name=click.style(name, bold=True)), end='')
+        print(self.__strings.step_start.format(index=self.__index, name=click.style(request.label, bold=True)), end='')
+        if request.command == 'UserPrompt':
+            message = request.arguments['values'][0]['value']
+            print("\n" + self.__strings.user_prompt.format(message=f'{message}'))
         # flushing stdout such that the previous print statement is visible on the screen for long running tasks.
         sys.stdout.flush()
 
@@ -218,9 +221,6 @@ class TestRunnerLogger(TestRunnerHooks):
             elif request.command == 'Log':
                 message = request.arguments['values'][0]['value']
                 print(self.__strings.log.format(message=f'{message}'))
-            elif request.command == 'UserPrompt':
-                message = request.arguments['values'][0]['value']
-                print(self.__strings.user_prompt.format(message=f'{message}'))
 
         if self.__show_adapter_logs:
             self.__log_printer.print(logs)
