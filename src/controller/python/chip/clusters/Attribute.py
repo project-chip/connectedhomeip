@@ -229,7 +229,6 @@ class EventHeader:
 class AttributeStatus:
     Path: AttributePath
     Status: Union[chip.interaction_model.Status, int]
-    DataVersion: int
 
 
 @dataclass
@@ -267,6 +266,7 @@ EventReadRequest = EventDescriptorWithEndpoint
 @dataclass
 class AttributeReadResult(AttributeStatus):
     Data: Any = None
+    DataVersion: int = 0
 
 
 @dataclass
