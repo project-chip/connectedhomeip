@@ -18,6 +18,21 @@
 
 #include <platform/nxp/k32w/common/FactoryDataProvider.h>
 
+/* This flag should be defined when the factory data contains
+ * the DAC private key in plain text. It usually occurs in
+ * manufacturing.
+ *
+ * The init phase will use S200 to export an encrypted blob,
+ * then overwrite the private key section from internal flash.
+ *
+ * Should be used one time only for securing the private key.
+ * The manufacturer will then flash the real image, which shall
+ * not define this flag.
+ */
+#ifndef CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY
+#define CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY 0
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -31,6 +46,11 @@ class FactoryDataProviderImpl : public FactoryDataProvider
 public:
     CHIP_ERROR Init() override;
     CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
+
+#if CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY
+private:
+    void ConvertDacKey();
+#endif
 };
 
 } // namespace DeviceLayer

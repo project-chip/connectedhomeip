@@ -26,6 +26,10 @@ CHIP_ERROR FactoryDataProviderImpl::Init()
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint32_t sum     = 0;
 
+#if CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY
+    ConvertDacKey();
+#endif
+
     for (uint8_t i = 1; i < FactoryDataProvider::kNumberOfIds; i++)
     {
         sum += maxLengths[i];
@@ -76,6 +80,17 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & messageToSig
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
 }
+
+#if CHIP_DEVICE_CONFIG_SECURE_DAC_PRIVATE_KEY
+void FactoryDataProviderImpl::ConvertDacKey()
+{
+    // Get private key from internal flash
+    // Send it to S200 and export blob
+    // Compute factory data hash
+    // Overwrite old hash
+    // Overwrite old private key with the blob
+}
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip
