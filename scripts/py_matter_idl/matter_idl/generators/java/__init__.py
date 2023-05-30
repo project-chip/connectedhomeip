@@ -441,7 +441,6 @@ class EncodableValue:
 
         raise Exception("Unknown jni fundamental type.")
 
-
     @property
     def boxed_java_type(self):
         t = ParseDataType(self.data_type, self.context)
