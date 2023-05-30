@@ -2857,6 +2857,10 @@ server cluster DoorLock = 257 {
     nullable CredentialStruct credential = 0;
   }
 
+  request struct UnboltDoorRequest {
+    optional OCTET_STRING PINCode = 0;
+  }
+
   response struct GetUserResponse = 28 {
     INT16U userIndex = 0;
     nullable CHAR_STRING userName = 1;
@@ -2898,6 +2902,7 @@ server cluster DoorLock = 257 {
   timed command access(invoke: administer) SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
   command access(invoke: administer) GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
   timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
+  timed command UnboltDoor(UnboltDoorRequest): DefaultSuccess = 39;
 }
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
@@ -5246,7 +5251,7 @@ endpoint 1 {
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute requirePINforRemoteOperation default = 0;
-    ram      attribute featureMap default = 0xD13;
+    ram      attribute featureMap default = 0x1D13;
     ram      attribute clusterRevision default = 6;
   }
 
