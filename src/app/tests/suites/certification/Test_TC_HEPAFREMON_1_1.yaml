@@ -89,7 +89,9 @@ tests:
               type: list
               contains: [0, 1]
 
-    - label: "Read the optional attribute InPlaceIndicator (HEPAFREMON.S.A0002) in AttributeList"
+    - label:
+          "Read the optional attribute InPlaceIndicator (HEPAFREMON.S.A0002) in
+          AttributeList"
       PICS: HEPAFREMON.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"

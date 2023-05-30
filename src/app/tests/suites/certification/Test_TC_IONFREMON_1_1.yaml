@@ -89,7 +89,9 @@ tests:
               type: list
               contains: [0, 1]
 
-    - label: "Read the optional attribute InPlaceIndicator (IONFREMON.S.A0002) in AttributeList"
+    - label:
+          "Read the optional attribute InPlaceIndicator (IONFREMON.S.A0002) in
+          AttributeList"
       PICS: IONFREMON.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"

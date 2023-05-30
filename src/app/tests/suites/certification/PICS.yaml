@@ -3752,10 +3752,14 @@ PICS:
       id: G.C.C05.Tx
 
     # HEPA Filter Monitoring Cluster Test Plan
-    - label: "Does the device implement the HEPA Filter Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the HEPA Filter Monitoring cluster as a
+          server?"
       id: HEPAFREMON.S
 
-    - label: "Does the device implement the HEPA Filter Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the HEPA Filter Monitoring cluster as a
+          client?"
       id: HEPAFREMON.C
 
     #
@@ -3789,10 +3793,14 @@ PICS:
       id: HEPAFREMON.S.C00.Rsp
 
     # Activated Carbon Filter Monitoring Cluster Test Plan
-    - label: "Does the device implement the Activated Carbon Filter Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the Activated Carbon Filter Monitoring
+          cluster as a server?"
       id: ACFREMON.S
 
-    - label: "Does the device implement the Activated Carbon Filter Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the Activated Carbon Filter Monitoring
+          cluster as a client?"
       id: ACFREMON.C
 
     #
@@ -3826,10 +3834,14 @@ PICS:
       id: ACFREMON.S.C00.Rsp
 
     # Ceramic Filter Monitoring Cluster Test Plan
-    - label: "Does the device implement the Ceramic Filter Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the Ceramic Filter Monitoring cluster as a
+          server?"
       id: CFREMON.S
 
-    - label: "Does the device implement the Ceramic Filter Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the Ceramic Filter Monitoring cluster as a
+          client?"
       id: CFREMON.C
 
     #
@@ -3863,10 +3875,14 @@ PICS:
       id: CFREMON.S.C00.Rsp
 
     # Electrostatic Filter Monitoring Cluster Test Plan
-    - label: "Does the device implement the Electrostatic Filter Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the Electrostatic Filter Monitoring cluster
+          as a server?"
       id: ESFREMON.S
 
-    - label: "Does the device implement the Electrostatic Filter Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the Electrostatic Filter Monitoring cluster
+          as a client?"
       id: ESFREMON.C
 
     #
@@ -3900,10 +3916,14 @@ PICS:
       id: ESFREMON.S.C00.Rsp
 
     # Fuel Tank Monitoring Cluster Test Plan
-    - label: "Does the device implement the Fuel Tank Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the Fuel Tank Monitoring cluster as a
+          server?"
       id: FTREMON.S
 
-    - label: "Does the device implement the Fuel Tank Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the Fuel Tank Monitoring cluster as a
+          client?"
       id: FTREMON.C
 
     #
@@ -3937,10 +3957,14 @@ PICS:
       id: FTREMON.S.C00.Rsp
 
     # Ink Cartridge Monitoring Cluster Test Plan
-    - label: "Does the device implement the Ink Cartridge Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the Ink Cartridge Monitoring cluster as a
+          server?"
       id: INKCREMON.S
 
-    - label: "Does the device implement the Ink Cartridge Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the Ink Cartridge Monitoring cluster as a
+          client?"
       id: INKCREMON.C
 
     #
@@ -3974,10 +3998,14 @@ PICS:
       id: INKCREMON.S.C00.Rsp
 
     # Ionizing Filter Monitoring Cluster Test Plan
-    - label: "Does the device implement the Ionizing Filter Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the Ionizing Filter Monitoring cluster as a
+          server?"
       id: IONFREMON.S
 
-    - label: "Does the device implement the Ionizing Filter Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the Ionizing Filter Monitoring cluster as a
+          client?"
       id: IONFREMON.C
 
     #
@@ -4011,10 +4039,14 @@ PICS:
       id: IONFREMON.S.C00.Rsp
 
     # Ozone Filter Monitoring Cluster Test Plan
-    - label: "Does the device implement the Ozone Filter Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the Ozone Filter Monitoring cluster as a
+          server?"
       id: OZFREMON.S
 
-    - label: "Does the device implement the Ozone Filter Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the Ozone Filter Monitoring cluster as a
+          client?"
       id: OZFREMON.C
 
     #
@@ -4048,10 +4080,14 @@ PICS:
       id: OZFREMON.S.C00.Rsp
 
     # Toner Cartridge Monitoring Cluster Test Plan
-    - label: "Does the device implement the Toner Cartridge Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the Toner Cartridge Monitoring cluster as a
+          server?"
       id: TCREMON.S
 
-    - label: "Does the device implement the Toner Cartridge Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the Toner Cartridge Monitoring cluster as a
+          client?"
       id: TCREMON.C
 
     #
@@ -4085,10 +4121,14 @@ PICS:
       id: TCREMON.S.C00.Rsp
 
     # UV Filter Monitoring Cluster Test Plan
-    - label: "Does the device implement the UV Filter Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the UV Filter Monitoring cluster as a
+          server?"
       id: UVFREMON.S
 
-    - label: "Does the device implement the UV Filter Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the UV Filter Monitoring cluster as a
+          client?"
       id: UVFREMON.C
 
     #
@@ -4122,10 +4162,14 @@ PICS:
       id: UVFREMON.S.C00.Rsp
 
     # Water Tank Monitoring Cluster Test Plan
-    - label: "Does the device implement the Water Tank Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the Water Tank Monitoring cluster as a
+          server?"
       id: WTREMON.S
 
-    - label: "Does the device implement the Water Tank Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the Water Tank Monitoring cluster as a
+          client?"
       id: WTREMON.C
 
     #
@@ -4159,10 +4203,14 @@ PICS:
       id: WTREMON.S.C00.Rsp
 
     # Zeolite Filter Monitoring Cluster Test Plan
-    - label: "Does the device implement the Zeolite Filter Monitoring cluster as a server?"
+    - label:
+          "Does the device implement the Zeolite Filter Monitoring cluster as a
+          server?"
       id: ZEOFREMON.S
 
-    - label: "Does the device implement the Zeolite Filter Monitoring cluster as a client?"
+    - label:
+          "Does the device implement the Zeolite Filter Monitoring cluster as a
+          client?"
       id: ZEOFREMON.C
 
     #

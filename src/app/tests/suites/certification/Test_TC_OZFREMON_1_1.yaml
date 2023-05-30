@@ -49,8 +49,8 @@ tests:
               type: bitmap32
 
     - label:
-          "Given OZFREMON.S.F00(Condition) ensure featuremap has the correct
-          bit set"
+          "Given OZFREMON.S.F00(Condition) ensure featuremap has the correct bit
+          set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: OZFREMON.S.F00
@@ -79,8 +79,7 @@ tests:
               contains: [2, 65528, 65529, 65530, 65531, 65532, 65533]
 
     - label:
-          "Read the feature dependent(OZFREMON.S.F00) attribute in
-          AttributeList"
+          "Read the feature dependent(OZFREMON.S.F00) attribute in AttributeList"
       PICS: OZFREMON.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
@@ -89,7 +88,9 @@ tests:
               type: list
               contains: [0, 1]
 
-    - label: "Read the optional attribute InPlaceIndicator (OZFREMON.S.A0002) in AttributeList"
+    - label:
+          "Read the optional attribute InPlaceIndicator (OZFREMON.S.A0002) in
+          AttributeList"
       PICS: OZFREMON.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
