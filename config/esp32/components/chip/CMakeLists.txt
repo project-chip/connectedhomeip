@@ -178,6 +178,10 @@ if (CONFIG_ENABLE_ESP32_BLE_CONTROLLER)
     chip_gn_arg_append("chip_enable_ble_controller"             "true")
 endif()
 
+if (CONFIG_ENABLE_ETHERNET_TELEMETRY)
+    chip_gn_arg_append("chip_enable_ethernet"                   "true")
+endif()
+
 if (CONFIG_ENABLE_MATTER_OVER_THREAD)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
 else()
