@@ -8,10 +8,8 @@ WeakEnums:
     - EnhancedColorMode
     - InterfaceTypeEnum
     - MoveMode
-    - NetworkFaultEnum
     - PHYRateEnum
     - RadioFaultEnum
-    - RoutingRole
     - StepMode
 
 DefineBitmaps:

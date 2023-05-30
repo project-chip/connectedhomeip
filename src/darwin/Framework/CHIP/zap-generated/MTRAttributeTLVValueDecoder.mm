@@ -5790,8 +5790,8 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRThreadNetworkDiagnosticsClusterNeighborTable * newElement_0;
-                newElement_0 = [MTRThreadNetworkDiagnosticsClusterNeighborTable new];
+                MTRThreadNetworkDiagnosticsClusterNeighborTableStruct * newElement_0;
+                newElement_0 = [MTRThreadNetworkDiagnosticsClusterNeighborTableStruct new];
                 newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
                 newElement_0.age = [NSNumber numberWithUnsignedInt:entry_0.age];
                 newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
@@ -5838,8 +5838,8 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRThreadNetworkDiagnosticsClusterRouteTable * newElement_0;
-                newElement_0 = [MTRThreadNetworkDiagnosticsClusterRouteTable new];
+                MTRThreadNetworkDiagnosticsClusterRouteTableStruct * newElement_0;
+                newElement_0 = [MTRThreadNetworkDiagnosticsClusterRouteTableStruct new];
                 newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
                 newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
                 newElement_0.routerId = [NSNumber numberWithUnsignedChar:entry_0.routerId];

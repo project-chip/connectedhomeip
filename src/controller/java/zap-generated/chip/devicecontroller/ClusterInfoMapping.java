@@ -4394,11 +4394,11 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        List<ChipStructs.ThreadNetworkDiagnosticsClusterNeighborTable> valueList) {
+        List<ChipStructs.ThreadNetworkDiagnosticsClusterNeighborTableStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.ThreadNetworkDiagnosticsClusterNeighborTable>");
+              "valueList", "List<ChipStructs.ThreadNetworkDiagnosticsClusterNeighborTableStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -4420,11 +4420,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.ThreadNetworkDiagnosticsClusterRouteTable> valueList) {
+    public void onSuccess(
+        List<ChipStructs.ThreadNetworkDiagnosticsClusterRouteTableStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.ThreadNetworkDiagnosticsClusterRouteTable>");
+              "valueList", "List<ChipStructs.ThreadNetworkDiagnosticsClusterRouteTableStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }

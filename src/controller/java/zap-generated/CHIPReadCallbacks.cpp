@@ -11330,7 +11330,7 @@ CHIPThreadNetworkDiagnosticsRoutingRoleAttributeCallback::~CHIPThreadNetworkDiag
 }
 
 void CHIPThreadNetworkDiagnosticsRoutingRoleAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11664,7 +11664,7 @@ CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback::~CHIPThreadNetworkDi
 void CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & list)
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11789,30 +11789,31 @@ void CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback::CallbackFn(
                                                                    newElement_0_isChildCtorSignature.c_str(), entry_0.isChild,
                                                                    newElement_0_isChild);
 
-        jclass neighborTableStructClass_1;
+        jclass neighborTableStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable", neighborTableStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTableStruct",
+            neighborTableStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable");
+            ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTableStruct");
             return;
         }
-        jmethodID neighborTableStructCtor_1 =
-            env->GetMethodID(neighborTableStructClass_1, "<init>",
+        jmethodID neighborTableStructStructCtor_1 =
+            env->GetMethodID(neighborTableStructStructClass_1, "<init>",
                              "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/"
                              "Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
                              "Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
-        if (neighborTableStructCtor_1 == nullptr)
+        if (neighborTableStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTableStruct constructor");
             return;
         }
 
         newElement_0 = env->NewObject(
-            neighborTableStructClass_1, neighborTableStructCtor_1, newElement_0_extAddress, newElement_0_age, newElement_0_rloc16,
-            newElement_0_linkFrameCounter, newElement_0_mleFrameCounter, newElement_0_lqi, newElement_0_averageRssi,
-            newElement_0_lastRssi, newElement_0_frameErrorRate, newElement_0_messageErrorRate, newElement_0_rxOnWhenIdle,
-            newElement_0_fullThreadDevice, newElement_0_fullNetworkData, newElement_0_isChild);
+            neighborTableStructStructClass_1, neighborTableStructStructCtor_1, newElement_0_extAddress, newElement_0_age,
+            newElement_0_rloc16, newElement_0_linkFrameCounter, newElement_0_mleFrameCounter, newElement_0_lqi,
+            newElement_0_averageRssi, newElement_0_lastRssi, newElement_0_frameErrorRate, newElement_0_messageErrorRate,
+            newElement_0_rxOnWhenIdle, newElement_0_fullThreadDevice, newElement_0_fullNetworkData, newElement_0_isChild);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 
@@ -11852,8 +11853,8 @@ CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback::~CHIPThreadNetworkDiagn
 
 void CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
-        list)
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11939,27 +11940,29 @@ void CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback::CallbackFn(
                                                                    newElement_0_linkEstablishedCtorSignature.c_str(),
                                                                    entry_0.linkEstablished, newElement_0_linkEstablished);
 
-        jclass routeTableStructClass_1;
+        jclass routeTableStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable", routeTableStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterRouteTableStruct",
+            routeTableStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable");
+            ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterRouteTableStruct");
             return;
         }
-        jmethodID routeTableStructCtor_1 =
-            env->GetMethodID(routeTableStructClass_1, "<init>",
+        jmethodID routeTableStructStructCtor_1 =
+            env->GetMethodID(routeTableStructStructClass_1, "<init>",
                              "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/"
                              "lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
-        if (routeTableStructCtor_1 == nullptr)
+        if (routeTableStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterRouteTableStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(routeTableStructClass_1, routeTableStructCtor_1, newElement_0_extAddress, newElement_0_rloc16,
-                                      newElement_0_routerId, newElement_0_nextHop, newElement_0_pathCost, newElement_0_LQIIn,
-                                      newElement_0_LQIOut, newElement_0_age, newElement_0_allocated, newElement_0_linkEstablished);
+        newElement_0 = env->NewObject(routeTableStructStructClass_1, routeTableStructStructCtor_1, newElement_0_extAddress,
+                                      newElement_0_rloc16, newElement_0_routerId, newElement_0_nextHop, newElement_0_pathCost,
+                                      newElement_0_LQIIn, newElement_0_LQIOut, newElement_0_age, newElement_0_allocated,
+                                      newElement_0_linkEstablished);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 
@@ -12602,7 +12605,8 @@ CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::
 }
 
 void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list)
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
