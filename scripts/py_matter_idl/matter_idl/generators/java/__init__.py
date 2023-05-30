@@ -509,7 +509,7 @@ def GlobalEncodableValueFrom(typeName: str, context: TypeLookupContext) -> Encod
     """
     Filter to convert a global type name to an encodable value
     """
-    return EncodableValue(context, typeName, {})
+    return EncodableValue(context, DataType(name=typeName), {})
 
 
 def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableValue:

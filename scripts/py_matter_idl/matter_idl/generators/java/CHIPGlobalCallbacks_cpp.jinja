@@ -9,11 +9,9 @@
 #include <lib/support/SafeInt.h>
 #include <platform/PlatformManager.h>
 
-
 {% for type in globalTypes -%}
-{% set typeLookup = idl | createLookupContext(None) %}
-{% set encodable = type.idl_type | globalAsEncodable(typeLookup) %}
-
+{%- set typeLookup = idl | createLookupContext(None) -%}
+{%- set encodable = type.idl_type | globalAsEncodable(typeLookup) -%}
 CHIP{{type.name}}AttributeCallback::CHIP{{type.name}}AttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<{{type.name}}AttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
 {
@@ -53,8 +51,7 @@ void CHIP{{type.name}}AttributeCallback::CallbackFn(void * context, {{type.cpp_t
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  {% if encodable.is_octet_string %}
+  {%- if encodable.is_octet_string %}
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
 
@@ -64,18 +61,17 @@ void CHIP{{type.name}}AttributeCallback::CallbackFn(void * context, {{type.cpp_t
     env->SetByteArrayRegion(valueArr, 0, static_cast<uint32_t>(value.size()), reinterpret_cast<const jbyte *>(value.data()));
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, valueArr);
-  {% elif encodable.is_char_string %}
+  {%- elif encodable.is_char_string %}
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
 
     chip::UtfString valueStr(env, value);
     env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
-  {% else %}
+  {%- else %}
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{encodable.boxed_jaav_signature}})V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<{{type.cpp_type}}>(value));
-  {% endif %}
-
+  {%- endif %}
 }
 
 {% endfor %}

@@ -9,10 +9,6 @@
 #include <lib/support/SafeInt.h>
 #include <platform/PlatformManager.h>
 
-
-
-
-
 CHIPBooleanAttributeCallback::CHIPBooleanAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<BooleanAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
 {
@@ -52,17 +48,10 @@ void CHIPBooleanAttributeCallback::CallbackFn(void * context, bool value)
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<bool>(value));
-  
-
 }
-
-
-
 
 CHIPCharStringAttributeCallback::CHIPCharStringAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CharStringAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -103,17 +92,12 @@ void CHIPCharStringAttributeCallback::CallbackFn(void * context, const chip::Cha
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<const chip::CharSpan>(value));
-  
 
+    chip::UtfString valueStr(env, value);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
 }
-
-
-
 
 CHIPDoubleAttributeCallback::CHIPDoubleAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<DoubleAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -154,17 +138,10 @@ void CHIPDoubleAttributeCallback::CallbackFn(void * context, double value)
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<double>(value));
-  
-
 }
-
-
-
 
 CHIPFloatAttributeCallback::CHIPFloatAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<FloatAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -205,17 +182,10 @@ void CHIPFloatAttributeCallback::CallbackFn(void * context, float value)
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<float>(value));
-  
-
 }
-
-
-
 
 CHIPInt8sAttributeCallback::CHIPInt8sAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<Int8sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -256,17 +226,10 @@ void CHIPInt8sAttributeCallback::CallbackFn(void * context, int8_t value)
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<int8_t>(value));
-  
-
 }
-
-
-
 
 CHIPInt8uAttributeCallback::CHIPInt8uAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<Int8uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -307,17 +270,10 @@ void CHIPInt8uAttributeCallback::CallbackFn(void * context, uint8_t value)
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<uint8_t>(value));
-  
-
 }
-
-
-
 
 CHIPInt16sAttributeCallback::CHIPInt16sAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<Int16sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -358,17 +314,10 @@ void CHIPInt16sAttributeCallback::CallbackFn(void * context, int16_t value)
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<int16_t>(value));
-  
-
 }
-
-
-
 
 CHIPInt16uAttributeCallback::CHIPInt16uAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<Int16uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -409,17 +358,10 @@ void CHIPInt16uAttributeCallback::CallbackFn(void * context, uint16_t value)
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<uint16_t>(value));
-  
-
 }
-
-
-
 
 CHIPInt32sAttributeCallback::CHIPInt32sAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<Int32sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -460,17 +402,10 @@ void CHIPInt32sAttributeCallback::CallbackFn(void * context, int32_t value)
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<int32_t>(value));
-  
-
 }
-
-
-
 
 CHIPInt32uAttributeCallback::CHIPInt32uAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<Int32uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -511,17 +446,10 @@ void CHIPInt32uAttributeCallback::CallbackFn(void * context, uint32_t value)
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<uint32_t>(value));
-  
-
 }
-
-
-
 
 CHIPInt64sAttributeCallback::CHIPInt64sAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<Int64sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -562,17 +490,10 @@ void CHIPInt64sAttributeCallback::CallbackFn(void * context, int64_t value)
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<int64_t>(value));
-  
-
 }
-
-
-
 
 CHIPInt64uAttributeCallback::CHIPInt64uAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<Int64uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -613,17 +534,10 @@ void CHIPInt64uAttributeCallback::CallbackFn(void * context, uint64_t value)
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
     env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<uint64_t>(value));
-  
-
 }
-
-
-
 
 CHIPOctetStringAttributeCallback::CHIPOctetStringAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<OctetStringAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -664,13 +578,15 @@ void CHIPOctetStringAttributeCallback::CallbackFn(void * context, const chip::By
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-
-  
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<const chip::ByteSpan>(value));
-  
 
+    VerifyOrReturn(chip::CanCastTo<uint32_t>(value.size()), ChipLogError(Zcl, "Value too long"));
+    jbyteArray valueArr = env->NewByteArray(static_cast<uint32_t>(value.size()));
+    env->ExceptionClear();
+    env->SetByteArrayRegion(valueArr, 0, static_cast<uint32_t>(value.size()), reinterpret_cast<const jbyte *>(value.data()));
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, valueArr);
 }
 
 
