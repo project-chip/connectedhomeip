@@ -33,6 +33,8 @@ CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
 # Type of targets that can be re-generated
+
+
 class TargetType(Flag):
 
     # Tests for golden images
@@ -64,6 +66,7 @@ __TARGET_TYPES__ = {
     'all': TargetType.ALL,
 }
 
+
 class ZapInput:
     """ZAP may be run from a .zap configuration or from zcl properties.
 
@@ -82,7 +85,7 @@ class ZapInput:
     def FromZcl(f):
         return ZapInput(zcl_file=str(f))
 
-    def __init__(self, zap_file = None,  zcl_file = None):
+    def __init__(self, zap_file=None,  zcl_file=None):
         if zap_file and zcl_file:
             raise Exception("only one of zap/zcl should be specified")
         self.zap_file = zap_file
