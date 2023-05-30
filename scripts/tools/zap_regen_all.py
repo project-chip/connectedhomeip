@@ -27,7 +27,7 @@ import time
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
