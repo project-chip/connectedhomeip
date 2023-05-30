@@ -327,7 +327,6 @@ class FactoryDataWriter:
             clientid = bytes(self._args.clientid, 'utf-8').hex()
             cmd.extend(["--object", self.DIC_CLIENTID_KEY + str(clientid)])
 
-
         cmd.extend(["--outfile", self.OUT_FILE])
         results = subprocess.run(cmd)
 

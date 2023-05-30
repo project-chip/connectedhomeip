@@ -120,7 +120,7 @@ if (enable_dic) {
     public_deps = [
       "${chip_root}/src/inet",
       "${chip_root}/src/lwip",
-      "${chip_root}/src/platform/silabs/efr32",
+      "${chip_root}/src/platform:platform_base",
     ]
     public_configs = [ ":efr32_dic_config" ]
   }
