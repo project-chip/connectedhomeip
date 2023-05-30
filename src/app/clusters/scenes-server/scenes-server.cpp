@@ -860,6 +860,6 @@ void MatterScenesPluginServerInitCallback()
     CHIP_ERROR err = ScenesServer::Instance().Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "ScenesServer::Instance().Init() error: %s", err.AsString());
+        ChipLogError(Zcl, "ScenesServer::Instance().Init() error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
