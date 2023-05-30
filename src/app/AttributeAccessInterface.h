@@ -201,6 +201,35 @@ public:
     }
 
     /**
+     * @brief Conditionaly uses the provided aCallback to encode the attribute data.
+     *        When the condition evaluates to false, it will encode null instead by using EncodeNull
+     *
+     *        aCallback is expected to take a const auto argument (which will convert to a AttributeValueEncoder pointer)
+     *        and encode, with the available method of this class, an attribute data.
+     *        Any error during its process needs to be directly returned to the user as a CHIP_ERROR
+     *
+     *        This method should only be used to encode nullable attributes
+     *        aCallback is not called when the condition evaluates to false
+     *
+     * @tparam AttributeEncoder
+     * @param condition When true, use aCallback to encode the attribute data. When false, encode null
+     * @param aCallback Provide your lamda function encoding the data.
+     * @return CHIP_ERROR Encoding succeed or failed with error code
+     */
+    template <typename AttributeEncoder>
+    CHIP_ERROR EncodeNullableOnCondition(bool condition, AttributeEncoder aCallback)
+    {
+        if (condition)
+        {
+            return aCallback(this);
+        }
+        else
+        {
+            return EncodeNull();
+        }
+    }
+
+    /**
      * aCallback is expected to take a const auto & argument and Encode() on it as many times as needed to encode all the list
      * elements one by one.  If any of those Encode() calls returns failure, aCallback must stop encoding and return failure.  When
      * all items are encoded aCallback is expected to return success.
