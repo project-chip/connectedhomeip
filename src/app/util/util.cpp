@@ -138,6 +138,7 @@ void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}
 void MatterFanControlPluginServerInitCallback() {}
 void MatterAirQualityPluginServerInitCallback() {}
+void MatterSmokeCoAlarmPluginServerInitCallback() {}
 
 // ****************************************
 // Print out information about each cluster

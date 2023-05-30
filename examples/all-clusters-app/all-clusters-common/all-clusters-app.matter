@@ -2452,8 +2452,6 @@ server cluster SmokeCoAlarm = 92 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  command SelfTestRequest(): DefaultSuccess = 0;
 }
 
 /** An interface to a generic way to secure a door */
