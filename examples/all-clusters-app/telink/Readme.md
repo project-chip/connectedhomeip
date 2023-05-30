@@ -32,7 +32,7 @@ creating your own application.
 1. In the example dir run:
 
     ```bash
-    $ west build
+    $ west build -b tlsr9518adk80d
     ```
 
 1. Flash binary:
