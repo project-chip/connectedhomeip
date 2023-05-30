@@ -1,13 +1,11 @@
-#include <jni/CHIPReadCallbacks.h>
-
-#include <zap-generated/CHIPClientCallbacks.h>
-
 #include <jni.h>
+#include <jni/CHIPReadCallbacks.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/PlatformManager.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 
 {% for type in globalTypes -%}
 {%- set typeLookup = idl | createLookupContext(None) -%}
@@ -46,7 +44,8 @@ void CHIP{{type.name}}AttributeCallback::CallbackFn(void * context, {{type.cpp_t
 
     std::unique_ptr<CHIP{{type.name}}AttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIP{{type.name}}AttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -68,9 +67,9 @@ void CHIP{{type.name}}AttributeCallback::CallbackFn(void * context, {{type.cpp_t
     chip::UtfString valueStr(env, value);
     env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
   {%- else %}
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{encodable.boxed_jaav_signature}})V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{encodable.unboxed_java_signature}})V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<{{type.cpp_type}}>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<{{encodable.jni_fundamental_type}}>(value));
   {%- endif %}
 }
 

@@ -1,13 +1,11 @@
-#include <jni/CHIPReadCallbacks.h>
-
-#include <zap-generated/CHIPClientCallbacks.h>
-
 #include <jni.h>
+#include <jni/CHIPReadCallbacks.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/PlatformManager.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 
 CHIPBooleanAttributeCallback::CHIPBooleanAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<BooleanAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -43,14 +41,15 @@ void CHIPBooleanAttributeCallback::CallbackFn(void * context, bool value)
 
     std::unique_ptr<CHIPBooleanAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPBooleanAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Z)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<bool>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jboolean>(value));
 }
 
 CHIPCharStringAttributeCallback::CHIPCharStringAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -87,7 +86,8 @@ void CHIPCharStringAttributeCallback::CallbackFn(void * context, const chip::Cha
 
     std::unique_ptr<CHIPCharStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPCharStringAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -133,14 +133,15 @@ void CHIPDoubleAttributeCallback::CallbackFn(void * context, double value)
 
     std::unique_ptr<CHIPDoubleAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPDoubleAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(D)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<double>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jdouble>(value));
 }
 
 CHIPFloatAttributeCallback::CHIPFloatAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -177,14 +178,15 @@ void CHIPFloatAttributeCallback::CallbackFn(void * context, float value)
 
     std::unique_ptr<CHIPFloatAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPFloatAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(F)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<float>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jfloat>(value));
 }
 
 CHIPInt8sAttributeCallback::CHIPInt8sAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -221,14 +223,15 @@ void CHIPInt8sAttributeCallback::CallbackFn(void * context, int8_t value)
 
     std::unique_ptr<CHIPInt8sAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPInt8sAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<int8_t>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
 }
 
 CHIPInt8uAttributeCallback::CHIPInt8uAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -265,14 +268,15 @@ void CHIPInt8uAttributeCallback::CallbackFn(void * context, uint8_t value)
 
     std::unique_ptr<CHIPInt8uAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPInt8uAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<uint8_t>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
 }
 
 CHIPInt16sAttributeCallback::CHIPInt16sAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -309,14 +313,15 @@ void CHIPInt16sAttributeCallback::CallbackFn(void * context, int16_t value)
 
     std::unique_ptr<CHIPInt16sAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPInt16sAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<int16_t>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
 }
 
 CHIPInt16uAttributeCallback::CHIPInt16uAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -353,14 +358,15 @@ void CHIPInt16uAttributeCallback::CallbackFn(void * context, uint16_t value)
 
     std::unique_ptr<CHIPInt16uAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPInt16uAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<uint16_t>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
 }
 
 CHIPInt32sAttributeCallback::CHIPInt32sAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -397,14 +403,15 @@ void CHIPInt32sAttributeCallback::CallbackFn(void * context, int32_t value)
 
     std::unique_ptr<CHIPInt32sAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPInt32sAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<int32_t>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
 }
 
 CHIPInt32uAttributeCallback::CHIPInt32uAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -441,14 +448,15 @@ void CHIPInt32uAttributeCallback::CallbackFn(void * context, uint32_t value)
 
     std::unique_ptr<CHIPInt32uAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPInt32uAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<uint32_t>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
 }
 
 CHIPInt64sAttributeCallback::CHIPInt64sAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -485,14 +493,15 @@ void CHIPInt64sAttributeCallback::CallbackFn(void * context, int64_t value)
 
     std::unique_ptr<CHIPInt64sAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPInt64sAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<int64_t>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
 }
 
 CHIPInt64uAttributeCallback::CHIPInt64uAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -529,14 +538,15 @@ void CHIPInt64uAttributeCallback::CallbackFn(void * context, uint64_t value)
 
     std::unique_ptr<CHIPInt64uAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPInt64uAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<uint64_t>(value));
+    env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
 }
 
 CHIPOctetStringAttributeCallback::CHIPOctetStringAttributeCallback(jobject javaCallback, bool keepAlive) :
@@ -573,7 +583,8 @@ void CHIPOctetStringAttributeCallback::CallbackFn(void * context, const chip::By
 
     std::unique_ptr<CHIPOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIPOctetStringAttributeCallback *>(context), maybeDestroy);
 
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a
+    // null callback.
     jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 

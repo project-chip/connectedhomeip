@@ -425,6 +425,24 @@ class EncodableValue:
         return e
 
     @property
+    def jni_fundamental_type(self):
+        java_type = self.boxed_java_type
+
+        if java_type == 'Boolean':
+            return 'jboolean'
+        elif java_type == 'Float':
+            return 'jfloat'
+        elif java_type == 'Double':
+            return 'jdouble'
+        elif java_type == 'Long':
+            return 'jlong'
+        elif java_type == 'Integer':
+            return 'jint'
+
+        raise Exception("Unknown jni fundamental type.")
+
+
+    @property
     def boxed_java_type(self):
         t = ParseDataType(self.data_type, self.context)
 
@@ -460,6 +478,30 @@ class EncodableValue:
                 return "Integer"
         else:
             return "Object"
+
+    @property
+    def unboxed_java_signature(self):
+        if self.is_optional or self.is_list:
+            raise Exception("Not a basic type: %r" % self)
+
+        t = ParseDataType(self.data_type, self.context)
+
+        if isinstance(t, FundamentalType):
+            if t == FundamentalType.BOOL:
+                return "Z"
+            elif t == FundamentalType.FLOAT:
+                return "F"
+            elif t == FundamentalType.DOUBLE:
+                return "D"
+            else:
+                raise Exception("Unknown fundamental type")
+        elif isinstance(t, BasicInteger):
+            if t.byte_count >= 3:
+                return "J"
+            else:
+                return "I"
+        else:
+            raise Exception("Not a basic type: %r" % self)
 
     @property
     def boxed_java_signature(self):
