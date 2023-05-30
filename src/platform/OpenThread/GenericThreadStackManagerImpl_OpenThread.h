@@ -65,6 +65,8 @@ template <class ImplClass>
 class GenericThreadStackManagerImpl_OpenThread
 {
 public:
+    static constexpr uint16_t kAttachNetworkTimeoutSeconds = 20;
+
     // ===== Platform-specific methods directly callable by the application.
 
     otInstance * OTInstance() const;
@@ -229,7 +231,7 @@ private:
     static constexpr size_t kTotalDnsServiceTxtValueSize = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalValueSize,
                                                                     Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
     static constexpr size_t kTotalDnsServiceTxtKeySize   = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalKeySize,
-                                                                  Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize);
+                                                                    Dnssd::OperationalAdvertisingParameters::kTxtTotalKeySize);
 #else
     // Thread only supports operational discovery.
     static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
@@ -273,6 +275,10 @@ private:
                                                   otError error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+    static void OnConnectNetworkTimeout(System::Layer * systemLayer, void * appState);
+    void OnConnectNetworkTimeout(void);
+    void OnAttachEnd(NetworkCommissioning::Status status);
 
     static void OnJoinerComplete(otError aError, void * aContext);
     void OnJoinerComplete(otError aError);

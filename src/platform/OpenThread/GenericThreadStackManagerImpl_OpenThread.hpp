@@ -360,6 +360,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
 
     if (dataset.IsCommissioned())
     {
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(kAttachNetworkTimeoutSeconds), OnConnectNetworkTimeout,
+                                              this);
         ReturnErrorOnFailure(Impl()->SetThreadEnabled(true));
         mpConnectCallback = callback;
     }
@@ -370,14 +372,26 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinished()
 {
-    if (mpConnectCallback != nullptr)
-    {
-        DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-            VerifyOrReturn(mpConnectCallback != nullptr);
-            mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
-            mpConnectCallback = nullptr;
-        });
-    }
+    this_->OnAttachEnd(NetworkCommissioning::Status::kSuccess);
+}
+
+static template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnConnectNetworkTimeout(System::Layer * systemLayer, void * appState)
+{
+    GenericThreadStackManagerImpl_OpenThread<ImplClass> * this_ =
+        static_cast<GenericThreadStackManagerImpl_OpenThread<ImplClass> *>(appState);
+
+    this_->OnAttachEnd(NetworkCommissioning::Status::kNetworkNotFound);
+}
+
+static template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnAttachEnd(NetworkCommissioning::Status status)
+{
+    VerifyOrReturn(mpConnectCallback != nullptr);
+
+    auto callback     = mpConnectCallback;
+    mpConnectCallback = nullptr;
+    DeviceLayer::SystemLayer().ScheduleLambda([callback, status]() { callback->OnResult(status, CharSpan(), 0); });
 }
 
 template <class ImplClass>
