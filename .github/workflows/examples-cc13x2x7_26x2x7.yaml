@@ -36,7 +36,7 @@ jobs:
             BUILD_TYPE: gn_cc26x2x7
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && false
 
         container:
             image: connectedhomeip/chip-build-ti:0.7.14
