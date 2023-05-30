@@ -705,12 +705,9 @@ menu "CHIP Device Layer"
             depends on SEC_CERT_DAC_PROVIDER && SOC_ECDSA_SUPPORTED
             default y
             select MBEDTLS_HARDWARE_ECDSA_SIGN
-            select ENABLE_ESP32_FACTORY_DATA_PROVIDER
-            select ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER
             help
                 If DAC is being read from secure cert and SOC supports ECDSA signing using on-chip peripheral
-                then this option gets enabled. This option also selects few more that are required for commissioning
-                the device.
+                then this option gets enabled.
                 Also, please disable ESP_SECURE_CERT_DS_PERIPHERAL from the menuconfig when this option is disabled
 
     endmenu

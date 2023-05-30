@@ -88,9 +88,9 @@ public:
     /**
      *  @brief Mark the end of this AttributeStatusIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    AttributeStatusIB::Builder & EndOfAttributeStatusIB();
+    CHIP_ERROR EndOfAttributeStatusIB();
 
 private:
     AttributePathIB::Builder mPath;

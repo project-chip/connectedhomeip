@@ -147,8 +147,9 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init(void)
 {
-    mBLERadioInitialized = false;
-    mconId               = NULL;
+    mBLERadioInitialized  = false;
+    mconId                = NULL;
+    mInternalScanCallback = new InternalScanCallback(this);
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
@@ -278,14 +279,27 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest(void)
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    int err;
-
     if (ConnectivityMgr().IsThreadProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Thread provisioned, can't StartAdvertising");
 
         return CHIP_ERROR_INCORRECT_STATE;
     }
+    else if (!mBLERadioInitialized)
+    {
+        ThreadStackMgrImpl().StartThreadScan(mInternalScanCallback);
+    }
+    else
+    {
+        return StartAdvertisingProcess();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
+{
+    int err;
 
     if (!mBLERadioInitialized)
     {

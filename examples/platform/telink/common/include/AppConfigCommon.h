@@ -19,12 +19,17 @@
 #pragma once
 
 // Buttons config
-#define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
-
-#define BUTTON_PIN_1 2
-#define BUTTON_PIN_3 3
-#define BUTTON_PIN_4 1
-#define BUTTON_PIN_2 0
+#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+#define BUTTON_FACTORY_RESET GPIO_DT_SPEC_GET(DT_NODELABEL(key_1), gpios)
+#define BUTTON_BLE_START GPIO_DT_SPEC_GET(DT_NODELABEL(key_2), gpios)
+#define BUTTON_THREAD_START GPIO_DT_SPEC_GET(DT_NODELABEL(key_3), gpios)
+#define BUTTON_EXAMPLE_ACTION GPIO_DT_SPEC_GET(DT_NODELABEL(key_4), gpios)
+#else
+#define BUTTON_COL_1 GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_col1), gpios)
+#define BUTTON_COL_2 GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_col2), gpios)
+#define BUTTON_ROW_1 GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_row1), gpios)
+#define BUTTON_ROW_2 GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_row2), gpios)
+#endif
 
 // LEDs config
 #define LEDS_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))

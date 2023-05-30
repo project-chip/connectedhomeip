@@ -284,6 +284,7 @@
         "Test_TC_S_2_1",
         "Test_TC_S_2_2",
         "Test_TC_S_2_3",
+        "Test_TC_S_2_4",
         "Test_TC_S_3_1"
     ],
     "PumpConfigurationControl": [],
@@ -293,7 +294,7 @@
         "Test_TC_BRBINFO_2_2",
         "Test_TC_BRBINFO_2_3"
     ],
-    "AccessControlEnforcement": ["Test_TC_ACE_1_2"],
+    "AccessControlEnforcement": ["Test_TC_ACE_1_2", "Test_TC_ACE_1_6"],
     "collection": [
         "DeviceDiscovery",
         "Groups",

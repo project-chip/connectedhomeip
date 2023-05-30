@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lwip/lwip.gni")
@@ -146,5 +147,11 @@ if (chip_build_tests) {
       "${chip_root}/src/credentials/tests",
       "${chip_root}/src/crypto/tests",
     ]
+  }
+
+  if (matter_enable_java_compilation) {
+    group("java_controller_tests") {
+      deps = [ "${chip_root}/src/controller/java:unit_tests" ]
+    }
   }
 }

@@ -82,10 +82,10 @@ AttributePathIB::Builder & AttributePathIBs::Builder::CreatePath()
 }
 
 // Mark the end of this array and recover the type for outer container
-AttributePathIBs::Builder & AttributePathIBs::Builder::EndOfAttributePathIBs()
+CHIP_ERROR AttributePathIBs::Builder::EndOfAttributePathIBs()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

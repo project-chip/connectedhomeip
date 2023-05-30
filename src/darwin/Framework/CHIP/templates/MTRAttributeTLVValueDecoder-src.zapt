@@ -3,6 +3,8 @@
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 
 #import "MTRStructsObjc.h"
+#import "NSStringSpanConversion.h"
+#import "NSDataSpanConversion.h"
 
 #include <app/data-model/Decode.h>
 #include <app/data-model/DecodableList.h>

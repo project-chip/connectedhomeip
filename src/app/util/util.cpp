@@ -149,6 +149,7 @@ void MatterTonerCartridgeMonitoringPluginServerInitCallback() {}
 void MatterUvFilterMonitoringPluginServerInitCallback() {}
 void MatterWaterTankMonitoringPluginServerInitCallback() {}
 void MatterZeoliteFilterMonitoringPluginServerInitCallback() {}
+void MatterAirQualityPluginServerInitCallback() {}
 
 // ****************************************
 // Print out information about each cluster

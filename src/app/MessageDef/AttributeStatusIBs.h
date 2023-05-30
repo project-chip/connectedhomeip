@@ -45,9 +45,9 @@ public:
     /**
      *  @brief Mark the end of this AttributeStatusIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    AttributeStatusIBs::Builder & EndOfAttributeStatuses();
+    CHIP_ERROR EndOfAttributeStatuses();
 
 private:
     AttributeStatusIB::Builder mAttributeStatus;

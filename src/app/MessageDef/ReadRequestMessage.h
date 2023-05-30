@@ -135,9 +135,9 @@ public:
     /**
      *  @brief Mark the end of this ReadRequestMessage
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    ReadRequestMessage::Builder & EndOfReadRequestMessage();
+    CHIP_ERROR EndOfReadRequestMessage();
 
 private:
     AttributePathIBs::Builder mAttributeRequests;

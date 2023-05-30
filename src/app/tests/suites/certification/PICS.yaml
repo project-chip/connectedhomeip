@@ -5585,6 +5585,12 @@ PICS:
     - label: "Does the device implement the LastConfiguredBy attribute?"
       id: S.S.A0005
 
+    - label: "Does the device implement the SceneTableSize attribute?"
+      id: S.S.A0006
+
+    - label: "Does the device implement the RemainingCapacity attribute?"
+      id: S.S.A0007
+
     #
     # server / commandsReceived
     #
