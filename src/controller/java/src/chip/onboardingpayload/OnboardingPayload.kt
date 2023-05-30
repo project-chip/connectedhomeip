@@ -17,6 +17,53 @@
  
 package chip.onboardingpayload
 
+// See section 5.1.2. QR Code in the Matter specification
+const val kDiscriminatorLongBits = 12
+const val kDiscriminatorShortBits = 4
+const val kDiscriminatorLongMask = (1 shl kDiscriminatorLongBits) - 1
+const val kDiscriminatorShortMask = (1 shl kDiscriminatorShortBits) - 1
+
+const val kVersionFieldLengthInBits              = 3
+const val kVendorIDFieldLengthInBits             = 16
+const val kProductIDFieldLengthInBits            = 16
+const val kCommissioningFlowFieldLengthInBits    = 2
+const val kRendezvousInfoFieldLengthInBits       = 8
+const val kPayloadDiscriminatorFieldLengthInBits = kDiscriminatorLongBits
+const val kSetupPINCodeFieldLengthInBits         = 27
+const val kPaddingFieldLengthInBits              = 4
+const val kRawVendorTagLengthInBits              = 7
+
+// See section 5.1.3. Manual Pairing Code in the Matter specification
+const val kManualSetupDiscriminatorFieldLengthInBits  = kDiscriminatorShortBits
+const val kManualSetupChunk1DiscriminatorMsbitsPos    = 0
+const val kManualSetupChunk1DiscriminatorMsbitsLength = 2
+const val kManualSetupChunk1VidPidPresentBitPos =
+    (kManualSetupChunk1DiscriminatorMsbitsPos + kManualSetupChunk1DiscriminatorMsbitsLength)
+const val kManualSetupChunk2PINCodeLsbitsPos       = 0
+const val kManualSetupChunk2PINCodeLsbitsLength    = 14
+const val kManualSetupChunk2DiscriminatorLsbitsPos = (kManualSetupChunk2PINCodeLsbitsPos + kManualSetupChunk2PINCodeLsbitsLength)
+const val kManualSetupChunk2DiscriminatorLsbitsLength = 2
+const val kManualSetupChunk3PINCodeMsbitsPos          = 0
+const val kManualSetupChunk3PINCodeMsbitsLength       = 13
+
+const val kManualSetupShortCodeCharLength  = 10
+const val kManualSetupLongCodeCharLength   = 20
+const val kManualSetupCodeChunk1CharLength = 1
+const val kManualSetupCodeChunk2CharLength = 5
+const val kManualSetupCodeChunk3CharLength = 4
+const val kManualSetupVendorIdCharLength   = 5
+const val kManualSetupProductIdCharLength  = 5
+
+// Spec 5.1.4.2 CHIP-Common Reserved Tags
+const val kSerialNumberTag         = 0x00
+const val kPBKDFIterationsTag      = 0x01
+const val kBPKFSaltTag             = 0x02
+const val kNumberOFDevicesTag      = 0x03
+const val kCommissioningTimeoutTag = 0x04
+
+const val kSetupPINCodeMaximumValue   = 99999998
+const val kSetupPINCodeUndefinedValue = 0
+
 /** Class to hold the data from the scanned QR code or Manual Pairing Code.  */
 class OnboardingPayload(
   /** Version info of the OnboardingPayload: version SHALL be 0 */
@@ -55,6 +102,18 @@ class OnboardingPayload(
 ) {
   var optionalQRCodeInfo: HashMap<Int, OptionalQRCodeInfo>
 
+  enum class VendorId(val value: Int) {
+    COMMON(0x0000),
+    UNSPECIFIED(0x0000),
+    APPLE(0x1349),
+    GOOGLE(0x6006),
+    TESTVENDOR1(0xFFF1),
+    TESTVENDOR2(0xFFF2),
+    TESTVENDOR3(0xFFF3),
+    TESTVENDOR4(0xFFF4),
+    NOTSPECIFIED(0xFFFF)
+  }
+
   init {
     optionalQRCodeInfo = HashMap()
   }
@@ -80,5 +139,79 @@ class OnboardingPayload(
 
   fun addOptionalQRCodeInfo(info: OptionalQRCodeInfo) {
     optionalQRCodeInfo[info.tag] = info
+  }
+
+  fun isValidManualCode(): Boolean {
+    if (setupPinCode >= (1 shl kSetupPINCodeFieldLengthInBits)) {
+      return false
+    }
+
+    return checkPayloadCommonConstraints()
+  }
+
+  fun getShortDiscriminatorValue(): Int {
+    if (hasShortDiscriminator) {
+      return discriminator
+    }
+    return longToShortValue(discriminator)
+  }  
+
+  private fun checkPayloadCommonConstraints(): Boolean {
+    if (version != 0.toInt()) {
+      return false
+    }
+
+    if (!isValidSetupPIN(setupPinCode.toInt())) {
+      return false
+    }
+
+    if (!isVendorIdValidOperationally(vendorId) && vendorId != VendorId.UNSPECIFIED.value) {
+      return false
+    }
+
+    if (productId == 0.toInt() && vendorId != VendorId.UNSPECIFIED.value) {
+      return false
+    }
+
+    return true
+  }
+
+  private fun isVendorIdValidOperationally(vendorId: Int): Boolean {
+    return vendorId != VendorId.COMMON.value && vendorId <= VendorId.TESTVENDOR4.value
+  }     
+
+  companion object {
+    private fun isValidSetupPIN(setupPIN: Int): Boolean {
+      return (setupPIN != kSetupPINCodeUndefinedValue && setupPIN <= kSetupPINCodeMaximumValue &&
+              setupPIN != 11111111 && setupPIN != 22222222 && setupPIN != 33333333 &&
+              setupPIN != 44444444 && setupPIN != 55555555 && setupPIN != 66666666 &&
+              setupPIN != 77777777 && setupPIN != 88888888 && setupPIN != 12345678 &&
+              setupPIN != 87654321)
+    }
+
+    private fun longToShortValue(longValue: Int): Int {
+      return (longValue shr (kDiscriminatorLongBits - kDiscriminatorShortBits))
+    }
+  }  
+}
+
+class UnrecognizedQrCodeException(qrCode: String) :
+  Exception(String.format("Invalid QR code string: %s", qrCode), null) {
+  companion object {
+    private const val serialVersionUID = 1L
+  }
+}
+
+class InvalidManualPairingCodeFormatException(entryCode: String) :
+  Exception(String.format("Invalid format for entry code string: %s", entryCode), null) {
+  companion object {
+    private const val serialVersionUID = 1L
+  }
+}
+
+class OnboardingPayloadException(message: String) :
+  Exception(String.format("Failed to encode Onboarding payload to buffer: %s", message)) {
+  companion object {
+    private const val serialVersionUID = 1L
   }
 }
