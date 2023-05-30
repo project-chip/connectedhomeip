@@ -148,7 +148,6 @@ class FactoryDataWriter:
         kMaxhostname = 64
         kMaxclientid = 32
 
-
         INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444,
                              55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
 
@@ -195,7 +194,6 @@ class FactoryDataWriter:
             assert (len(self._args.hostname) <= kMaxhostname), "hostname exceeds the size limit"
         if self._args.clientid:
             assert (len(self._args.clientid) <= kMaxclientid), "clientid exceeds the size limit"
-
 
     def add_SerialNo_To_CMD(self, cmdList):
         """ Add the jtag serial command to the commander command
