@@ -243,6 +243,15 @@ public:
         ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
         ctxt.SetCommandHandled();
     };
+    ///
+    /// The command UnboltDoor is not defined in UCL and must be manually handled
+    ///
+    virtual void Invoke_UnboltDoor(CommandHandlerInterface::HandlerContext& ctxt,
+        chip::app::Clusters::DoorLock::Commands::UnboltDoor::DecodableType data)
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+        ctxt.SetCommandHandled();
+    };
 
     virtual CHIP_ERROR EnumerateAcceptedCommands(const chip::app::ConcreteClusterPath& cluster, CommandIdCallback callback,
         void* context) override
@@ -266,6 +275,7 @@ public:
             34,
             36,
             38,
+            39,
         };
         for (const auto& cmd : all_commands) {
             if (callback(cmd, context) != chip::Loop::Continue) {
@@ -340,10 +350,22 @@ public:
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
 
+    ///
+    /// The command Step is not defined in UCL and must be manually handled
+    ///
+    virtual void Invoke_Step(CommandHandlerInterface::HandlerContext& ctxt,
+        chip::app::Clusters::FanControl::Commands::Step::DecodableType data)
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+        ctxt.SetCommandHandled();
+    };
+
     virtual CHIP_ERROR EnumerateAcceptedCommands(const chip::app::ConcreteClusterPath& cluster, CommandIdCallback callback,
         void* context) override
     {
-        const chip::CommandId all_commands[] = {};
+        const chip::CommandId all_commands[] = {
+            0,
+        };
         for (const auto& cmd : all_commands) {
             if (callback(cmd, context) != chip::Loop::Continue) {
                 break;

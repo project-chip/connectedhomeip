@@ -42,15 +42,15 @@ std::optional<chip::Span<const char>> inline from_json(const nlohmann::json& val
 /***************************** Bitmap Converters **************/
 
 template <>
-inline std::optional<Identify::IdentifyEffectIdentifier> from_json(const nlohmann::json& value)
+inline std::optional<Identify::EffectIdentifierEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, Identify::IdentifyEffectIdentifier> table = {
-        { "Blink", Identify::IdentifyEffectIdentifier::kBlink },
-        { "Breathe", Identify::IdentifyEffectIdentifier::kBreathe },
-        { "Okay", Identify::IdentifyEffectIdentifier::kOkay },
-        { "ChannelChange", Identify::IdentifyEffectIdentifier::kChannelChange },
-        { "FinishEffect", Identify::IdentifyEffectIdentifier::kFinishEffect },
-        { "StopEffect", Identify::IdentifyEffectIdentifier::kStopEffect },
+    const std::map<std::string, Identify::EffectIdentifierEnum> table = {
+        { "Blink", Identify::EffectIdentifierEnum::kBlink },
+        { "Breathe", Identify::EffectIdentifierEnum::kBreathe },
+        { "Okay", Identify::EffectIdentifierEnum::kOkay },
+        { "ChannelChange", Identify::EffectIdentifierEnum::kChannelChange },
+        { "FinishEffect", Identify::EffectIdentifierEnum::kFinishEffect },
+        { "StopEffect", Identify::EffectIdentifierEnum::kStopEffect },
     };
 
     auto i = table.find(value);
@@ -61,10 +61,10 @@ inline std::optional<Identify::IdentifyEffectIdentifier> from_json(const nlohman
     }
 }
 template <>
-inline std::optional<Identify::IdentifyEffectVariant> from_json(const nlohmann::json& value)
+inline std::optional<Identify::EffectVariantEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, Identify::IdentifyEffectVariant> table = {
-        { "Default", Identify::IdentifyEffectVariant::kDefault },
+    const std::map<std::string, Identify::EffectVariantEnum> table = {
+        { "Default", Identify::EffectVariantEnum::kDefault },
     };
 
     auto i = table.find(value);
@@ -75,15 +75,15 @@ inline std::optional<Identify::IdentifyEffectVariant> from_json(const nlohmann::
     }
 }
 template <>
-inline std::optional<Identify::IdentifyIdentifyType> from_json(const nlohmann::json& value)
+inline std::optional<Identify::IdentifyTypeEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, Identify::IdentifyIdentifyType> table = {
-        { "None", Identify::IdentifyIdentifyType::kNone },
-        { "VisibleLight", Identify::IdentifyIdentifyType::kVisibleLight },
-        { "VisibleLED", Identify::IdentifyIdentifyType::kVisibleLED },
-        { "AudibleBeep", Identify::IdentifyIdentifyType::kAudibleBeep },
-        { "Display", Identify::IdentifyIdentifyType::kDisplay },
-        { "Actuator", Identify::IdentifyIdentifyType::kActuator },
+    const std::map<std::string, Identify::IdentifyTypeEnum> table = {
+        { "None", Identify::IdentifyTypeEnum::kNone },
+        { "LightOutput", Identify::IdentifyTypeEnum::kLightOutput },
+        { "VisibleIndicator", Identify::IdentifyTypeEnum::kVisibleIndicator },
+        { "AudibleBeep", Identify::IdentifyTypeEnum::kAudibleBeep },
+        { "Display", Identify::IdentifyTypeEnum::kDisplay },
+        { "Actuator", Identify::IdentifyTypeEnum::kActuator },
     };
 
     auto i = table.find(value);
@@ -95,14 +95,28 @@ inline std::optional<Identify::IdentifyIdentifyType> from_json(const nlohmann::j
 }
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<Groups::GroupsFeature>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<Groups::Feature>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<Groups::GroupsFeature> r;
-    r.SetField(Groups::GroupsFeature::kGroupNames, obj.value("GroupNames", false));
+    chip::BitMask<Groups::Feature> r;
+    r.SetField(Groups::Feature::kGroupNames, obj.value("GroupNames", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<Groups::NameSupportBitmap>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Groups::NameSupportBitmap> r;
+    r.SetField(Groups::NameSupportBitmap::kGroupNames, obj.value("GroupNames", false));
     return r;
 }
 
 /***************************** Bitmap Converters **************/
+template <>
+inline std::optional<chip::BitMask<Scenes::Feature>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Scenes::Feature> r;
+    r.SetField(Scenes::Feature::kSceneNames, obj.value("SceneNames", false));
+    return r;
+}
 template <>
 inline std::optional<chip::BitMask<Scenes::ScenesCopyMode>> from_json(const nlohmann::json& obj)
 {
@@ -110,27 +124,20 @@ inline std::optional<chip::BitMask<Scenes::ScenesCopyMode>> from_json(const nloh
     r.SetField(Scenes::ScenesCopyMode::kCopyAllScenes, obj.value("CopyAllScenes", false));
     return r;
 }
-template <>
-inline std::optional<chip::BitMask<Scenes::ScenesFeature>> from_json(const nlohmann::json& obj)
-{
-    chip::BitMask<Scenes::ScenesFeature> r;
-    r.SetField(Scenes::ScenesFeature::kSceneNames, obj.value("SceneNames", false));
-    return r;
-}
 
 /***************************** Bitmap Converters **************/
+template <>
+inline std::optional<chip::BitMask<OnOff::Feature>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<OnOff::Feature> r;
+    r.SetField(OnOff::Feature::kLighting, obj.value("Lighting", false));
+    return r;
+}
 template <>
 inline std::optional<chip::BitMask<OnOff::OnOffControl>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<OnOff::OnOffControl> r;
     r.SetField(OnOff::OnOffControl::kAcceptOnlyWhenOn, obj.value("AcceptOnlyWhenOn", false));
-    return r;
-}
-template <>
-inline std::optional<chip::BitMask<OnOff::OnOffFeature>> from_json(const nlohmann::json& obj)
-{
-    chip::BitMask<OnOff::OnOffFeature> r;
-    r.SetField(OnOff::OnOffFeature::kLighting, obj.value("Lighting", false));
     return r;
 }
 
@@ -199,12 +206,12 @@ inline std::optional<OnOff::OnOffStartUpOnOff> from_json(const nlohmann::json& v
 }
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<LevelControl::LevelControlFeature>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<LevelControl::Feature>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<LevelControl::LevelControlFeature> r;
-    r.SetField(LevelControl::LevelControlFeature::kOnOff, obj.value("OnOff", false));
-    r.SetField(LevelControl::LevelControlFeature::kLighting, obj.value("Lighting", false));
-    r.SetField(LevelControl::LevelControlFeature::kFrequency, obj.value("Frequency", false));
+    chip::BitMask<LevelControl::Feature> r;
+    r.SetField(LevelControl::Feature::kOnOff, obj.value("OnOff", false));
+    r.SetField(LevelControl::Feature::kLighting, obj.value("Lighting", false));
+    r.SetField(LevelControl::Feature::kFrequency, obj.value("Frequency", false));
     return r;
 }
 template <>
@@ -421,21 +428,22 @@ inline std::optional<chip::BitMask<DoorLock::DoorLockDayOfWeek>> from_json(const
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DoorLockFeature>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<DoorLock::Feature>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<DoorLock::DoorLockFeature> r;
-    r.SetField(DoorLock::DoorLockFeature::kPinCredential, obj.value("PIN Credential", false));
-    r.SetField(DoorLock::DoorLockFeature::kRfidCredential, obj.value("RFID Credential", false));
-    r.SetField(DoorLock::DoorLockFeature::kFingerCredentials, obj.value("Finger Credentials", false));
-    r.SetField(DoorLock::DoorLockFeature::kLogging, obj.value("Logging", false));
-    r.SetField(DoorLock::DoorLockFeature::kWeekDayAccessSchedules, obj.value("Week Day Access Schedules", false));
-    r.SetField(DoorLock::DoorLockFeature::kDoorPositionSensor, obj.value("Door Position Sensor", false));
-    r.SetField(DoorLock::DoorLockFeature::kFaceCredentials, obj.value("Face Credentials", false));
-    r.SetField(DoorLock::DoorLockFeature::kCredentialsOverTheAirAccess, obj.value("Credentials Over-the-Air Access", false));
-    r.SetField(DoorLock::DoorLockFeature::kUser, obj.value("User", false));
-    r.SetField(DoorLock::DoorLockFeature::kNotification, obj.value("Notification", false));
-    r.SetField(DoorLock::DoorLockFeature::kYearDayAccessSchedules, obj.value("Year Day Access Schedules", false));
-    r.SetField(DoorLock::DoorLockFeature::kHolidaySchedules, obj.value("Holiday Schedules", false));
+    chip::BitMask<DoorLock::Feature> r;
+    r.SetField(DoorLock::Feature::kPinCredential, obj.value("PIN Credential", false));
+    r.SetField(DoorLock::Feature::kRfidCredential, obj.value("RFID Credential", false));
+    r.SetField(DoorLock::Feature::kFingerCredentials, obj.value("Finger Credentials", false));
+    r.SetField(DoorLock::Feature::kLogging, obj.value("Logging", false));
+    r.SetField(DoorLock::Feature::kWeekDayAccessSchedules, obj.value("Week Day Access Schedules", false));
+    r.SetField(DoorLock::Feature::kDoorPositionSensor, obj.value("Door Position Sensor", false));
+    r.SetField(DoorLock::Feature::kFaceCredentials, obj.value("Face Credentials", false));
+    r.SetField(DoorLock::Feature::kCredentialsOverTheAirAccess, obj.value("Credentials Over-the-Air Access", false));
+    r.SetField(DoorLock::Feature::kUser, obj.value("User", false));
+    r.SetField(DoorLock::Feature::kNotification, obj.value("Notification", false));
+    r.SetField(DoorLock::Feature::kYearDayAccessSchedules, obj.value("Year Day Access Schedules", false));
+    r.SetField(DoorLock::Feature::kHolidaySchedules, obj.value("Holiday Schedules", false));
+    r.SetField(DoorLock::Feature::kUnbolt, obj.value("Unbolt", false));
     return r;
 }
 
@@ -518,6 +526,7 @@ inline std::optional<DoorLock::DlLockState> from_json(const nlohmann::json& valu
         { "NotFullyLocked", DoorLock::DlLockState::kNotFullyLocked },
         { "Locked", DoorLock::DlLockState::kLocked },
         { "Unlocked", DoorLock::DlLockState::kUnlocked },
+        { "Undefined", DoorLock::DlLockState::kUnlatched },
     };
 
     auto i = table.find(value);
@@ -542,6 +551,7 @@ inline std::optional<DoorLock::DlLockType> from_json(const nlohmann::json& value
         { "InterconnectedLock", DoorLock::DlLockType::kInterconnectedLock },
         { "DeadLatch", DoorLock::DlLockType::kDeadLatch },
         { "DoorFurniture", DoorLock::DlLockType::kDoorFurniture },
+        { "", DoorLock::DlLockType::kEurocylinder },
     };
 
     auto i = table.find(value);
@@ -723,6 +733,7 @@ inline std::optional<DoorLock::LockOperationTypeEnum> from_json(const nlohmann::
         { "Unlock", DoorLock::LockOperationTypeEnum::kUnlock },
         { "NonAccessUserEvent", DoorLock::LockOperationTypeEnum::kNonAccessUserEvent },
         { "ForcedUserEvent", DoorLock::LockOperationTypeEnum::kForcedUserEvent },
+        { "Unlatch", DoorLock::LockOperationTypeEnum::kUnlatch },
     };
 
     auto i = table.find(value);
@@ -848,23 +859,24 @@ inline std::optional<chip::BitMask<Thermostat::DayOfWeek>> from_json(const nlohm
     return r;
 }
 template <>
+inline std::optional<chip::BitMask<Thermostat::Feature>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Thermostat::Feature> r;
+    r.SetField(Thermostat::Feature::kHeating, obj.value("Heating", false));
+    r.SetField(Thermostat::Feature::kCooling, obj.value("Cooling", false));
+    r.SetField(Thermostat::Feature::kOccupancy, obj.value("Occupancy", false));
+    r.SetField(Thermostat::Feature::kScheduleConfiguration, obj.value("ScheduleConfiguration", false));
+    r.SetField(Thermostat::Feature::kSetback, obj.value("Setback", false));
+    r.SetField(Thermostat::Feature::kAutoMode, obj.value("AutoMode", false));
+    r.SetField(Thermostat::Feature::kLocalTemperatureNotExposed, obj.value("LocalTemperatureNotExposed", false));
+    return r;
+}
+template <>
 inline std::optional<chip::BitMask<Thermostat::ModeForSequence>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<Thermostat::ModeForSequence> r;
     r.SetField(Thermostat::ModeForSequence::kHeatSetpointPresent, obj.value("Heat", false));
     r.SetField(Thermostat::ModeForSequence::kCoolSetpointPresent, obj.value("Cool", false));
-    return r;
-}
-template <>
-inline std::optional<chip::BitMask<Thermostat::ThermostatFeature>> from_json(const nlohmann::json& obj)
-{
-    chip::BitMask<Thermostat::ThermostatFeature> r;
-    r.SetField(Thermostat::ThermostatFeature::kHeating, obj.value("Heating", false));
-    r.SetField(Thermostat::ThermostatFeature::kCooling, obj.value("Cooling", false));
-    r.SetField(Thermostat::ThermostatFeature::kOccupancy, obj.value("Occupancy", false));
-    r.SetField(Thermostat::ThermostatFeature::kScheduleConfiguration, obj.value("ScheduleConfiguration", false));
-    r.SetField(Thermostat::ThermostatFeature::kSetback, obj.value("Setback", false));
-    r.SetField(Thermostat::ThermostatFeature::kAutoMode, obj.value("AutoMode", false));
     return r;
 }
 
@@ -943,13 +955,15 @@ inline std::optional<Thermostat::ThermostatSystemMode> from_json(const nlohmann:
 }
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<FanControl::FanControlFeature>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<FanControl::Feature>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<FanControl::FanControlFeature> r;
-    r.SetField(FanControl::FanControlFeature::kMultiSpeed, obj.value("Multi-Speed", false));
-    r.SetField(FanControl::FanControlFeature::kAuto, obj.value("Auto", false));
-    r.SetField(FanControl::FanControlFeature::kRocking, obj.value("Rocking", false));
-    r.SetField(FanControl::FanControlFeature::kWind, obj.value("Wind", false));
+    chip::BitMask<FanControl::Feature> r;
+    r.SetField(FanControl::Feature::kMultiSpeed, obj.value("Multi-Speed", false));
+    r.SetField(FanControl::Feature::kAuto, obj.value("Auto", false));
+    r.SetField(FanControl::Feature::kRocking, obj.value("Rocking", false));
+    r.SetField(FanControl::Feature::kWind, obj.value("Wind", false));
+    r.SetField(FanControl::Feature::kStep, obj.value("Step", false));
+    r.SetField(FanControl::Feature::kAirflowDirection, obj.value("Airflow Direction", false));
     return r;
 }
 template <>
@@ -978,6 +992,36 @@ inline std::optional<chip::BitMask<FanControl::WindSupportMask>> from_json(const
     return r;
 }
 
+template <>
+inline std::optional<FanControl::AirflowDirectionEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, FanControl::AirflowDirectionEnum> table = {
+        { "Forward", FanControl::AirflowDirectionEnum::kForward },
+        { "Reverse", FanControl::AirflowDirectionEnum::kReverse },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<FanControl::DirectionEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, FanControl::DirectionEnum> table = {
+        { "Increase", FanControl::DirectionEnum::kIncrease },
+        { "Decrease", FanControl::DirectionEnum::kDecrease },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
 template <>
 inline std::optional<FanControl::FanModeSequenceType> from_json(const nlohmann::json& value)
 {
@@ -1032,17 +1076,6 @@ inline std::optional<chip::BitMask<ColorControl::ColorCapabilities>> from_json(c
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<ColorControl::ColorControlFeature>> from_json(const nlohmann::json& obj)
-{
-    chip::BitMask<ColorControl::ColorControlFeature> r;
-    r.SetField(ColorControl::ColorControlFeature::kHueAndSaturation, obj.value("HueAndSaturation", false));
-    r.SetField(ColorControl::ColorControlFeature::kEnhancedHue, obj.value("EnhancedHue", false));
-    r.SetField(ColorControl::ColorControlFeature::kColorLoop, obj.value("ColorLoop", false));
-    r.SetField(ColorControl::ColorControlFeature::kXy, obj.value("XY", false));
-    r.SetField(ColorControl::ColorControlFeature::kColorTemperature, obj.value("ColorTemperature", false));
-    return r;
-}
-template <>
 inline std::optional<chip::BitMask<ColorControl::ColorLoopUpdateFlags>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<ColorControl::ColorLoopUpdateFlags> r;
@@ -1050,6 +1083,17 @@ inline std::optional<chip::BitMask<ColorControl::ColorLoopUpdateFlags>> from_jso
     r.SetField(ColorControl::ColorLoopUpdateFlags::kUpdateDirection, obj.value("UpdateDirection", false));
     r.SetField(ColorControl::ColorLoopUpdateFlags::kUpdateTime, obj.value("UpdateTime", false));
     r.SetField(ColorControl::ColorLoopUpdateFlags::kUpdateStartHue, obj.value("UpdateStartHue", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<ColorControl::Feature>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<ColorControl::Feature> r;
+    r.SetField(ColorControl::Feature::kHueAndSaturation, obj.value("HueAndSaturation", false));
+    r.SetField(ColorControl::Feature::kEnhancedHue, obj.value("EnhancedHue", false));
+    r.SetField(ColorControl::Feature::kColorLoop, obj.value("ColorLoop", false));
+    r.SetField(ColorControl::Feature::kXy, obj.value("XY", false));
+    r.SetField(ColorControl::Feature::kColorTemperature, obj.value("ColorTemperature", false));
     return r;
 }
 
@@ -1182,11 +1226,11 @@ inline std::optional<ColorControl::SaturationStepMode> from_json(const nlohmann:
 /***************************** Bitmap Converters **************/
 
 template <>
-inline std::optional<IlluminanceMeasurement::LightSensorType> from_json(const nlohmann::json& value)
+inline std::optional<IlluminanceMeasurement::LightSensorTypeEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, IlluminanceMeasurement::LightSensorType> table = {
-        { "Photodiode", IlluminanceMeasurement::LightSensorType::kPhotodiode },
-        { "CMOS", IlluminanceMeasurement::LightSensorType::kCmos },
+    const std::map<std::string, IlluminanceMeasurement::LightSensorTypeEnum> table = {
+        { "Photodiode", IlluminanceMeasurement::LightSensorTypeEnum::kPhotodiode },
+        { "CMOS", IlluminanceMeasurement::LightSensorTypeEnum::kCmos },
     };
 
     auto i = table.find(value);
@@ -1200,10 +1244,10 @@ inline std::optional<IlluminanceMeasurement::LightSensorType> from_json(const nl
 
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<PressureMeasurement::PressureMeasurementFeature>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<PressureMeasurement::Feature>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<PressureMeasurement::PressureMeasurementFeature> r;
-    r.SetField(PressureMeasurement::PressureMeasurementFeature::kExtended, obj.value("Extended", false));
+    chip::BitMask<PressureMeasurement::Feature> r;
+    r.SetField(PressureMeasurement::Feature::kExtended, obj.value("Extended", false));
     return r;
 }
 

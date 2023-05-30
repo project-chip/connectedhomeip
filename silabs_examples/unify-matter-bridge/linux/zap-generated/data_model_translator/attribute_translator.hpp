@@ -97,6 +97,8 @@ private:
 /// Attribute Handler for the Scenes cluster
 /// Please note that the following attributes are not defined in UCL, and they must be handled
 /// by separate code
+/// - SceneTableSize
+/// - RemainingCapacity
 /// - GeneratedCommandList
 /// - AcceptedCommandList
 /// - EventList
@@ -229,7 +231,25 @@ private:
 // Skipping Proxy Discovery
 // Skipping Proxy Valid
 // Skipping Boolean State
+// Skipping ICD Management
 // Skipping Mode Select
+// Skipping Temperature Control
+// Skipping Refrigerator Alarm
+// Skipping Air Quality
+// Skipping Smoke CO Alarm
+// Skipping Operational State
+// Skipping HEPA Filter Monitoring
+// Skipping Activated Carbon Filter Monitoring
+// Skipping Ceramic Filter Monitoring
+// Skipping Electrostatic Filter Monitoring
+// Skipping UV Filter Monitoring
+// Skipping Ionizing Filter Monitoring
+// Skipping Zeolite Filter Monitoring
+// Skipping Ozone Filter Monitoring
+// Skipping Water Tank Monitoring
+// Skipping Fuel Tank Monitoring
+// Skipping Ink Cartridge Monitoring
+// Skipping Toner Cartridge Monitoring
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attribute Handler for the Door Lock cluster
@@ -352,6 +372,7 @@ private:
 /// - RockSetting (optional)
 /// - WindSupport (optional)
 /// - WindSetting (optional)
+/// - AirflowDirection (optional)
 /// - GeneratedCommandList
 /// - AcceptedCommandList
 /// - EventList
@@ -665,6 +686,42 @@ private:
     UnifyMqtt& m_unify_mqtt;
     device_translator& m_dev_translator;
 };
+// Skipping Carbon Monoxide Concentration Measurement
+// Skipping Carbon Dioxide Concentration Measurement
+// Skipping Ethylene Concentration Measurement
+// Skipping Ethylene Oxide Concentration Measurement
+// Skipping Hydrogen Concentration Measurement
+// Skipping Hydrogen Sulfide Concentration Measurement
+// Skipping Nitric Oxide Concentration Measurement
+// Skipping Nitrogen Dioxide Concentration Measurement
+// Skipping Oxygen Concentration Measurement
+// Skipping Ozone Concentration Measurement
+// Skipping Sulfur Dioxide Concentration Measurement
+// Skipping Dissolved Oxygen Concentration Measurement
+// Skipping Bromate Concentration Measurement
+// Skipping Chloramines Concentration Measurement
+// Skipping Chlorine Concentration Measurement
+// Skipping Fecal coliform & E. Coli Concentration Measurement
+// Skipping Fluoride Concentration Measurement
+// Skipping Haloacetic Acids Concentration Measurement
+// Skipping Total Trihalomethanes Concentration Measurement
+// Skipping Total Coliform Bacteria Concentration Measurement
+// Skipping Turbidity Concentration Measurement
+// Skipping Copper Concentration Measurement
+// Skipping Lead Concentration Measurement
+// Skipping Manganese Concentration Measurement
+// Skipping Sulfate Concentration Measurement
+// Skipping Bromodichloromethane Concentration Measurement
+// Skipping Bromoform Concentration Measurement
+// Skipping Chlorodibromomethane Concentration Measurement
+// Skipping Chloroform Concentration Measurement
+// Skipping Sodium Concentration Measurement
+// Skipping PM2.5 Concentration Measurement
+// Skipping Formaldehyde Concentration Measurement
+// Skipping PM1 Concentration Measurement
+// Skipping PM10 Concentration Measurement
+// Skipping Total Volatile Organic Compounds Concentration Measurement
+// Skipping Radon Concentration Measurement
 // Skipping Wake on LAN
 // Skipping Channel
 // Skipping Target Navigator
@@ -716,7 +773,6 @@ private:
     UnifyMqtt& m_unify_mqtt;
     device_translator& m_dev_translator;
 };
-// Skipping Client Monitoring
 // Skipping Unit Testing
 // Skipping Fault Injection
 } // namespace unify::matter_bridge

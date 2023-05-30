@@ -13,7 +13,7 @@ struct LabelStruct {
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
-  enum IdentifyEffectIdentifier : ENUM8 {
+  enum EffectIdentifierEnum : ENUM8 {
     kBlink = 0;
     kBreathe = 1;
     kOkay = 2;
@@ -22,21 +22,21 @@ server cluster Identify = 3 {
     kStopEffect = 255;
   }
 
-  enum IdentifyEffectVariant : ENUM8 {
+  enum EffectVariantEnum : ENUM8 {
     kDefault = 0;
   }
 
-  enum IdentifyIdentifyType : ENUM8 {
+  enum IdentifyTypeEnum : ENUM8 {
     kNone = 0;
-    kVisibleLight = 1;
-    kVisibleLED = 2;
+    kLightOutput = 1;
+    kVisibleIndicator = 2;
     kAudibleBeep = 3;
     kDisplay = 4;
     kActuator = 5;
   }
 
   attribute int16u identifyTime = 0;
-  readonly attribute enum8 identifyType = 1;
+  readonly attribute IdentifyTypeEnum identifyType = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -49,8 +49,8 @@ server cluster Identify = 3 {
   }
 
   request struct TriggerEffectRequest {
-    IdentifyEffectIdentifier effectIdentifier = 0;
-    IdentifyEffectVariant effectVariant = 1;
+    EffectIdentifierEnum effectIdentifier = 0;
+    EffectVariantEnum effectVariant = 1;
   }
 
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
@@ -59,11 +59,15 @@ server cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 server cluster Groups = 4 {
-  bitmap GroupsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kGroupNames = 0x1;
   }
 
-  readonly attribute bitmap8 nameSupport = 0;
+  bitmap NameSupportBitmap : BITMAP8 {
+    kGroupNames = 0x80;
+  }
+
+  readonly attribute NameSupportBitmap nameSupport = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -185,7 +189,7 @@ client cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
-  struct Target {
+  struct AccessControlTargetStruct {
     nullable cluster_id cluster = 0;
     nullable endpoint_no endpoint = 1;
     nullable devtype_id deviceType = 2;
@@ -195,7 +199,7 @@ client cluster AccessControl = 31 {
     fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
-    nullable fabric_sensitive Target targets[] = 4;
+    nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -258,7 +262,7 @@ server cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
-  struct Target {
+  struct AccessControlTargetStruct {
     nullable cluster_id cluster = 0;
     nullable endpoint_no endpoint = 1;
     nullable devtype_id deviceType = 2;
@@ -268,7 +272,7 @@ server cluster AccessControl = 31 {
     fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
-    nullable fabric_sensitive Target targets[] = 4;
+    nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -458,7 +462,7 @@ server cluster UnitLocalization = 45 {
     kKelvin = 2;
   }
 
-  bitmap UnitLocalizationFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kTemperatureUnit = 0x1;
   }
 
@@ -473,7 +477,7 @@ server cluster UnitLocalization = 45 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
-  enum CommissioningError : ENUM8 {
+  enum CommissioningErrorEnum : ENUM8 {
     kOk = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -481,7 +485,7 @@ server cluster GeneralCommissioning = 48 {
     kBusyWithOtherAdmin = 4;
   }
 
-  enum RegulatoryLocationType : ENUM8 {
+  enum RegulatoryLocationTypeEnum : ENUM8 {
     kIndoor = 0;
     kOutdoor = 1;
     kIndoorOutdoor = 2;
@@ -494,8 +498,8 @@ server cluster GeneralCommissioning = 48 {
 
   attribute access(write: administer) int64u breadcrumb = 0;
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
-  readonly attribute RegulatoryLocationType regulatoryConfig = 2;
-  readonly attribute RegulatoryLocationType locationCapability = 3;
+  readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
+  readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -510,23 +514,23 @@ server cluster GeneralCommissioning = 48 {
   }
 
   request struct SetRegulatoryConfigRequest {
-    RegulatoryLocationType newRegulatoryConfig = 0;
+    RegulatoryLocationTypeEnum newRegulatoryConfig = 0;
     CHAR_STRING countryCode = 1;
     INT64U breadcrumb = 2;
   }
 
   response struct ArmFailSafeResponse = 1 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse = 3 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
   response struct CommissioningCompleteResponse = 5 {
-    CommissioningError errorCode = 0;
+    CommissioningErrorEnum errorCode = 0;
     CHAR_STRING debugText = 1;
   }
 
@@ -559,9 +563,10 @@ server cluster NetworkCommissioning = 49 {
     k5g = 2;
     k6g = 3;
     k60g = 4;
+    k1g = 5;
   }
 
-  bitmap NetworkCommissioningFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
@@ -805,7 +810,7 @@ server cluster GeneralDiagnostics = 51 {
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster SoftwareDiagnostics = 52 {
-  bitmap SoftwareDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kWaterMarks = 0x1;
   }
 
@@ -850,7 +855,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate400G = 9;
   }
 
-  bitmap EthernetNetworkDiagnosticsFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
   }

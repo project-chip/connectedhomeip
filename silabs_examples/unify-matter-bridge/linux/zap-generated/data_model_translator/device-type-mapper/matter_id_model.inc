@@ -73,7 +73,25 @@ namespace app {
             { "ProxyDiscovery", ProxyDiscovery::Id },
             { "ProxyValid", ProxyValid::Id },
             { "BooleanState", BooleanState::Id },
+            { "IcdManagement", IcdManagement::Id },
             { "ModeSelect", ModeSelect::Id },
+            { "TemperatureControl", TemperatureControl::Id },
+            { "RefrigeratorAlarm", RefrigeratorAlarm::Id },
+            { "AirQuality", AirQuality::Id },
+            { "SmokeCoAlarm", SmokeCoAlarm::Id },
+            { "OperationalState", OperationalState::Id },
+            { "HepaFilterMonitoring", HepaFilterMonitoring::Id },
+            { "ActivatedCarbonFilterMonitoring", ActivatedCarbonFilterMonitoring::Id },
+            { "CeramicFilterMonitoring", CeramicFilterMonitoring::Id },
+            { "ElectrostaticFilterMonitoring", ElectrostaticFilterMonitoring::Id },
+            { "UvFilterMonitoring", UvFilterMonitoring::Id },
+            { "IonizingFilterMonitoring", IonizingFilterMonitoring::Id },
+            { "ZeoliteFilterMonitoring", ZeoliteFilterMonitoring::Id },
+            { "OzoneFilterMonitoring", OzoneFilterMonitoring::Id },
+            { "WaterTankMonitoring", WaterTankMonitoring::Id },
+            { "FuelTankMonitoring", FuelTankMonitoring::Id },
+            { "InkCartridgeMonitoring", InkCartridgeMonitoring::Id },
+            { "TonerCartridgeMonitoring", TonerCartridgeMonitoring::Id },
             { "DoorLock", DoorLock::Id },
             { "WindowCovering", WindowCovering::Id },
             { "BarrierControl", BarrierControl::Id },
@@ -89,6 +107,42 @@ namespace app {
             { "FlowMeasurement", FlowMeasurement::Id },
             { "RelativeHumidityMeasurement", RelativeHumidityMeasurement::Id },
             { "OccupancySensing", OccupancySensing::Id },
+            { "CarbonMonoxideConcentrationMeasurement", CarbonMonoxideConcentrationMeasurement::Id },
+            { "CarbonDioxideConcentrationMeasurement", CarbonDioxideConcentrationMeasurement::Id },
+            { "EthyleneConcentrationMeasurement", EthyleneConcentrationMeasurement::Id },
+            { "EthyleneOxideConcentrationMeasurement", EthyleneOxideConcentrationMeasurement::Id },
+            { "HydrogenConcentrationMeasurement", HydrogenConcentrationMeasurement::Id },
+            { "HydrogenSulfideConcentrationMeasurement", HydrogenSulfideConcentrationMeasurement::Id },
+            { "NitricOxideConcentrationMeasurement", NitricOxideConcentrationMeasurement::Id },
+            { "NitrogenDioxideConcentrationMeasurement", NitrogenDioxideConcentrationMeasurement::Id },
+            { "OxygenConcentrationMeasurement", OxygenConcentrationMeasurement::Id },
+            { "OzoneConcentrationMeasurement", OzoneConcentrationMeasurement::Id },
+            { "SulfurDioxideConcentrationMeasurement", SulfurDioxideConcentrationMeasurement::Id },
+            { "DissolvedOxygenConcentrationMeasurement", DissolvedOxygenConcentrationMeasurement::Id },
+            { "BromateConcentrationMeasurement", BromateConcentrationMeasurement::Id },
+            { "ChloraminesConcentrationMeasurement", ChloraminesConcentrationMeasurement::Id },
+            { "ChlorineConcentrationMeasurement", ChlorineConcentrationMeasurement::Id },
+            { "FecalColiformEColiConcentrationMeasurement", FecalColiformEColiConcentrationMeasurement::Id },
+            { "FluorideConcentrationMeasurement", FluorideConcentrationMeasurement::Id },
+            { "HaloaceticAcidsConcentrationMeasurement", HaloaceticAcidsConcentrationMeasurement::Id },
+            { "TotalTrihalomethanesConcentrationMeasurement", TotalTrihalomethanesConcentrationMeasurement::Id },
+            { "TotalColiformBacteriaConcentrationMeasurement", TotalColiformBacteriaConcentrationMeasurement::Id },
+            { "TurbidityConcentrationMeasurement", TurbidityConcentrationMeasurement::Id },
+            { "CopperConcentrationMeasurement", CopperConcentrationMeasurement::Id },
+            { "LeadConcentrationMeasurement", LeadConcentrationMeasurement::Id },
+            { "ManganeseConcentrationMeasurement", ManganeseConcentrationMeasurement::Id },
+            { "SulfateConcentrationMeasurement", SulfateConcentrationMeasurement::Id },
+            { "BromodichloromethaneConcentrationMeasurement", BromodichloromethaneConcentrationMeasurement::Id },
+            { "BromoformConcentrationMeasurement", BromoformConcentrationMeasurement::Id },
+            { "ChlorodibromomethaneConcentrationMeasurement", ChlorodibromomethaneConcentrationMeasurement::Id },
+            { "ChloroformConcentrationMeasurement", ChloroformConcentrationMeasurement::Id },
+            { "SodiumConcentrationMeasurement", SodiumConcentrationMeasurement::Id },
+            { "Pm25ConcentrationMeasurement", Pm25ConcentrationMeasurement::Id },
+            { "FormaldehydeConcentrationMeasurement", FormaldehydeConcentrationMeasurement::Id },
+            { "Pm1ConcentrationMeasurement", Pm1ConcentrationMeasurement::Id },
+            { "Pm10ConcentrationMeasurement", Pm10ConcentrationMeasurement::Id },
+            { "TotalVolatileOrganicCompoundsConcentrationMeasurement", TotalVolatileOrganicCompoundsConcentrationMeasurement::Id },
+            { "RadonConcentrationMeasurement", RadonConcentrationMeasurement::Id },
             { "WakeOnLan", WakeOnLan::Id },
             { "Channel", Channel::Id },
             { "TargetNavigator", TargetNavigator::Id },
@@ -102,7 +156,6 @@ namespace app {
             { "ApplicationBasic", ApplicationBasic::Id },
             { "AccountLogin", AccountLogin::Id },
             { "ElectricalMeasurement", ElectricalMeasurement::Id },
-            { "ClientMonitoring", ClientMonitoring::Id },
             { "UnitTesting", UnitTesting::Id },
             { "FaultInjection", FaultInjection::Id }
         };
@@ -676,13 +729,13 @@ namespace app {
                     { "UTCTime", UTCTime::Id },
                     { "Granularity", Granularity::Id },
                     { "TimeSource", TimeSource::Id },
-                    { "TrustedTimeNodeId", TrustedTimeNodeId::Id },
-                    { "DefaultNtp", DefaultNtp::Id },
+                    { "TrustedTimeSource", TrustedTimeSource::Id },
+                    { "DefaultNTP", DefaultNTP::Id },
                     { "TimeZone", TimeZone::Id },
                     { "DSTOffset", DSTOffset::Id },
                     { "LocalTime", LocalTime::Id },
                     { "TimeZoneDatabase", TimeZoneDatabase::Id },
-                    { "NtpServerPort", NtpServerPort::Id },
+                    { "NTPServerAvailable", NTPServerAvailable::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -858,6 +911,11 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace BooleanState
+        namespace IcdManagement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace IcdManagement
         namespace ModeSelect {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -876,6 +934,91 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace ModeSelect
+        namespace TemperatureControl {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace TemperatureControl
+        namespace RefrigeratorAlarm {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace RefrigeratorAlarm
+        namespace AirQuality {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace AirQuality
+        namespace SmokeCoAlarm {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace SmokeCoAlarm
+        namespace OperationalState {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace OperationalState
+        namespace HepaFilterMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace HepaFilterMonitoring
+        namespace ActivatedCarbonFilterMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ActivatedCarbonFilterMonitoring
+        namespace CeramicFilterMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace CeramicFilterMonitoring
+        namespace ElectrostaticFilterMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ElectrostaticFilterMonitoring
+        namespace UvFilterMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace UvFilterMonitoring
+        namespace IonizingFilterMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace IonizingFilterMonitoring
+        namespace ZeoliteFilterMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ZeoliteFilterMonitoring
+        namespace OzoneFilterMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace OzoneFilterMonitoring
+        namespace WaterTankMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace WaterTankMonitoring
+        namespace FuelTankMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace FuelTankMonitoring
+        namespace InkCartridgeMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace InkCartridgeMonitoring
+        namespace TonerCartridgeMonitoring {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace TonerCartridgeMonitoring
         namespace DoorLock {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -1314,6 +1457,186 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace OccupancySensing
+        namespace CarbonMonoxideConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace CarbonMonoxideConcentrationMeasurement
+        namespace CarbonDioxideConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace CarbonDioxideConcentrationMeasurement
+        namespace EthyleneConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace EthyleneConcentrationMeasurement
+        namespace EthyleneOxideConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace EthyleneOxideConcentrationMeasurement
+        namespace HydrogenConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace HydrogenConcentrationMeasurement
+        namespace HydrogenSulfideConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace HydrogenSulfideConcentrationMeasurement
+        namespace NitricOxideConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace NitricOxideConcentrationMeasurement
+        namespace NitrogenDioxideConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace NitrogenDioxideConcentrationMeasurement
+        namespace OxygenConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace OxygenConcentrationMeasurement
+        namespace OzoneConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace OzoneConcentrationMeasurement
+        namespace SulfurDioxideConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace SulfurDioxideConcentrationMeasurement
+        namespace DissolvedOxygenConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace DissolvedOxygenConcentrationMeasurement
+        namespace BromateConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace BromateConcentrationMeasurement
+        namespace ChloraminesConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ChloraminesConcentrationMeasurement
+        namespace ChlorineConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ChlorineConcentrationMeasurement
+        namespace FecalColiformEColiConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace FecalColiformEColiConcentrationMeasurement
+        namespace FluorideConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace FluorideConcentrationMeasurement
+        namespace HaloaceticAcidsConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace HaloaceticAcidsConcentrationMeasurement
+        namespace TotalTrihalomethanesConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace TotalTrihalomethanesConcentrationMeasurement
+        namespace TotalColiformBacteriaConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace TotalColiformBacteriaConcentrationMeasurement
+        namespace TurbidityConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace TurbidityConcentrationMeasurement
+        namespace CopperConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace CopperConcentrationMeasurement
+        namespace LeadConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace LeadConcentrationMeasurement
+        namespace ManganeseConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ManganeseConcentrationMeasurement
+        namespace SulfateConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace SulfateConcentrationMeasurement
+        namespace BromodichloromethaneConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace BromodichloromethaneConcentrationMeasurement
+        namespace BromoformConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace BromoformConcentrationMeasurement
+        namespace ChlorodibromomethaneConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ChlorodibromomethaneConcentrationMeasurement
+        namespace ChloroformConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ChloroformConcentrationMeasurement
+        namespace SodiumConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace SodiumConcentrationMeasurement
+        namespace Pm25ConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace Pm25ConcentrationMeasurement
+        namespace FormaldehydeConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace FormaldehydeConcentrationMeasurement
+        namespace Pm1ConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace Pm1ConcentrationMeasurement
+        namespace Pm10ConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace Pm10ConcentrationMeasurement
+        namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
+        namespace RadonConcentrationMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace RadonConcentrationMeasurement
         namespace WakeOnLan {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -1627,22 +1950,6 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace ElectricalMeasurement
-        namespace ClientMonitoring {
-            namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
-                    { "IdleModeInterval", IdleModeInterval::Id },
-                    { "ActiveModeInterval", ActiveModeInterval::Id },
-                    { "ActiveModeThreshold", ActiveModeThreshold::Id },
-                    { "ExpectedClients", ExpectedClients::Id },
-                    { "GeneratedCommandList", GeneratedCommandList::Id },
-                    { "AcceptedCommandList", AcceptedCommandList::Id },
-                    { "EventList", EventList::Id },
-                    { "AttributeList", AttributeList::Id },
-                    { "FeatureMap", FeatureMap::Id },
-                    { "ClusterRevision", ClusterRevision::Id }
-                };
-            } // namespace Attributes
-        } // namespace ClientMonitoring
         namespace UnitTesting {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -1792,7 +2099,25 @@ namespace app {
             { "ProxyDiscovery", ProxyDiscovery::Attributes::matter_attribute_id_cluster_map },
             { "ProxyValid", ProxyValid::Attributes::matter_attribute_id_cluster_map },
             { "BooleanState", BooleanState::Attributes::matter_attribute_id_cluster_map },
+            { "IcdManagement", IcdManagement::Attributes::matter_attribute_id_cluster_map },
             { "ModeSelect", ModeSelect::Attributes::matter_attribute_id_cluster_map },
+            { "TemperatureControl", TemperatureControl::Attributes::matter_attribute_id_cluster_map },
+            { "RefrigeratorAlarm", RefrigeratorAlarm::Attributes::matter_attribute_id_cluster_map },
+            { "AirQuality", AirQuality::Attributes::matter_attribute_id_cluster_map },
+            { "SmokeCoAlarm", SmokeCoAlarm::Attributes::matter_attribute_id_cluster_map },
+            { "OperationalState", OperationalState::Attributes::matter_attribute_id_cluster_map },
+            { "HepaFilterMonitoring", HepaFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "ActivatedCarbonFilterMonitoring", ActivatedCarbonFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "CeramicFilterMonitoring", CeramicFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "ElectrostaticFilterMonitoring", ElectrostaticFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "UvFilterMonitoring", UvFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "IonizingFilterMonitoring", IonizingFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "ZeoliteFilterMonitoring", ZeoliteFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "OzoneFilterMonitoring", OzoneFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "WaterTankMonitoring", WaterTankMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "FuelTankMonitoring", FuelTankMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "InkCartridgeMonitoring", InkCartridgeMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "TonerCartridgeMonitoring", TonerCartridgeMonitoring::Attributes::matter_attribute_id_cluster_map },
             { "DoorLock", DoorLock::Attributes::matter_attribute_id_cluster_map },
             { "WindowCovering", WindowCovering::Attributes::matter_attribute_id_cluster_map },
             { "BarrierControl", BarrierControl::Attributes::matter_attribute_id_cluster_map },
@@ -1808,6 +2133,42 @@ namespace app {
             { "FlowMeasurement", FlowMeasurement::Attributes::matter_attribute_id_cluster_map },
             { "RelativeHumidityMeasurement", RelativeHumidityMeasurement::Attributes::matter_attribute_id_cluster_map },
             { "OccupancySensing", OccupancySensing::Attributes::matter_attribute_id_cluster_map },
+            { "CarbonMonoxideConcentrationMeasurement", CarbonMonoxideConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "CarbonDioxideConcentrationMeasurement", CarbonDioxideConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "EthyleneConcentrationMeasurement", EthyleneConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "EthyleneOxideConcentrationMeasurement", EthyleneOxideConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "HydrogenConcentrationMeasurement", HydrogenConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "HydrogenSulfideConcentrationMeasurement", HydrogenSulfideConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "NitricOxideConcentrationMeasurement", NitricOxideConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "NitrogenDioxideConcentrationMeasurement", NitrogenDioxideConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "OxygenConcentrationMeasurement", OxygenConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "OzoneConcentrationMeasurement", OzoneConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "SulfurDioxideConcentrationMeasurement", SulfurDioxideConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "DissolvedOxygenConcentrationMeasurement", DissolvedOxygenConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "BromateConcentrationMeasurement", BromateConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "ChloraminesConcentrationMeasurement", ChloraminesConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "ChlorineConcentrationMeasurement", ChlorineConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "FecalColiformEColiConcentrationMeasurement", FecalColiformEColiConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "FluorideConcentrationMeasurement", FluorideConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "HaloaceticAcidsConcentrationMeasurement", HaloaceticAcidsConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "TotalTrihalomethanesConcentrationMeasurement", TotalTrihalomethanesConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "TotalColiformBacteriaConcentrationMeasurement", TotalColiformBacteriaConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "TurbidityConcentrationMeasurement", TurbidityConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "CopperConcentrationMeasurement", CopperConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "LeadConcentrationMeasurement", LeadConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "ManganeseConcentrationMeasurement", ManganeseConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "SulfateConcentrationMeasurement", SulfateConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "BromodichloromethaneConcentrationMeasurement", BromodichloromethaneConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "BromoformConcentrationMeasurement", BromoformConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "ChlorodibromomethaneConcentrationMeasurement", ChlorodibromomethaneConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "ChloroformConcentrationMeasurement", ChloroformConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "SodiumConcentrationMeasurement", SodiumConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "Pm25ConcentrationMeasurement", Pm25ConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "FormaldehydeConcentrationMeasurement", FormaldehydeConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "Pm1ConcentrationMeasurement", Pm1ConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "Pm10ConcentrationMeasurement", Pm10ConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "TotalVolatileOrganicCompoundsConcentrationMeasurement", TotalVolatileOrganicCompoundsConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
+            { "RadonConcentrationMeasurement", RadonConcentrationMeasurement::Attributes::matter_attribute_id_cluster_map },
             { "WakeOnLan", WakeOnLan::Attributes::matter_attribute_id_cluster_map },
             { "Channel", Channel::Attributes::matter_attribute_id_cluster_map },
             { "TargetNavigator", TargetNavigator::Attributes::matter_attribute_id_cluster_map },
@@ -1821,7 +2182,6 @@ namespace app {
             { "ApplicationBasic", ApplicationBasic::Attributes::matter_attribute_id_cluster_map },
             { "AccountLogin", AccountLogin::Attributes::matter_attribute_id_cluster_map },
             { "ElectricalMeasurement", ElectricalMeasurement::Attributes::matter_attribute_id_cluster_map },
-            { "ClientMonitoring", ClientMonitoring::Attributes::matter_attribute_id_cluster_map },
             { "UnitTesting", UnitTesting::Attributes::matter_attribute_id_cluster_map },
             { "FaultInjection", FaultInjection::Attributes::matter_attribute_id_cluster_map }
         };
@@ -2075,7 +2435,7 @@ namespace app {
         namespace TimeSynchronization {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "SetUtcTime", SetUtcTime::Id }
+                    { "SetUTCTime", SetUTCTime::Id },
                 };
             } // namespace Commands
         } // namespace TimeSynchronization
@@ -2158,6 +2518,11 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace BooleanState
+        namespace IcdManagement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace IcdManagement
         namespace ModeSelect {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
@@ -2165,6 +2530,91 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace ModeSelect
+        namespace TemperatureControl {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace TemperatureControl
+        namespace RefrigeratorAlarm {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace RefrigeratorAlarm
+        namespace AirQuality {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace AirQuality
+        namespace SmokeCoAlarm {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace SmokeCoAlarm
+        namespace OperationalState {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace OperationalState
+        namespace HepaFilterMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace HepaFilterMonitoring
+        namespace ActivatedCarbonFilterMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ActivatedCarbonFilterMonitoring
+        namespace CeramicFilterMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace CeramicFilterMonitoring
+        namespace ElectrostaticFilterMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ElectrostaticFilterMonitoring
+        namespace UvFilterMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace UvFilterMonitoring
+        namespace IonizingFilterMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace IonizingFilterMonitoring
+        namespace ZeoliteFilterMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ZeoliteFilterMonitoring
+        namespace OzoneFilterMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace OzoneFilterMonitoring
+        namespace WaterTankMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace WaterTankMonitoring
+        namespace FuelTankMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace FuelTankMonitoring
+        namespace InkCartridgeMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace InkCartridgeMonitoring
+        namespace TonerCartridgeMonitoring {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace TonerCartridgeMonitoring
         namespace DoorLock {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
@@ -2191,7 +2641,7 @@ namespace app {
                     { "SetCredentialResponse", SetCredentialResponse::Id },
                     { "GetCredentialStatus", GetCredentialStatus::Id },
                     { "GetCredentialStatusResponse", GetCredentialStatusResponse::Id },
-                    { "ClearCredential", ClearCredential::Id }
+                    { "ClearCredential", ClearCredential::Id },
                 };
             } // namespace Commands
         } // namespace DoorLock
@@ -2302,6 +2752,186 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace OccupancySensing
+        namespace CarbonMonoxideConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace CarbonMonoxideConcentrationMeasurement
+        namespace CarbonDioxideConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace CarbonDioxideConcentrationMeasurement
+        namespace EthyleneConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace EthyleneConcentrationMeasurement
+        namespace EthyleneOxideConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace EthyleneOxideConcentrationMeasurement
+        namespace HydrogenConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace HydrogenConcentrationMeasurement
+        namespace HydrogenSulfideConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace HydrogenSulfideConcentrationMeasurement
+        namespace NitricOxideConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace NitricOxideConcentrationMeasurement
+        namespace NitrogenDioxideConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace NitrogenDioxideConcentrationMeasurement
+        namespace OxygenConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace OxygenConcentrationMeasurement
+        namespace OzoneConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace OzoneConcentrationMeasurement
+        namespace SulfurDioxideConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace SulfurDioxideConcentrationMeasurement
+        namespace DissolvedOxygenConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace DissolvedOxygenConcentrationMeasurement
+        namespace BromateConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace BromateConcentrationMeasurement
+        namespace ChloraminesConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ChloraminesConcentrationMeasurement
+        namespace ChlorineConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ChlorineConcentrationMeasurement
+        namespace FecalColiformEColiConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace FecalColiformEColiConcentrationMeasurement
+        namespace FluorideConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace FluorideConcentrationMeasurement
+        namespace HaloaceticAcidsConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace HaloaceticAcidsConcentrationMeasurement
+        namespace TotalTrihalomethanesConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace TotalTrihalomethanesConcentrationMeasurement
+        namespace TotalColiformBacteriaConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace TotalColiformBacteriaConcentrationMeasurement
+        namespace TurbidityConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace TurbidityConcentrationMeasurement
+        namespace CopperConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace CopperConcentrationMeasurement
+        namespace LeadConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace LeadConcentrationMeasurement
+        namespace ManganeseConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ManganeseConcentrationMeasurement
+        namespace SulfateConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace SulfateConcentrationMeasurement
+        namespace BromodichloromethaneConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace BromodichloromethaneConcentrationMeasurement
+        namespace BromoformConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace BromoformConcentrationMeasurement
+        namespace ChlorodibromomethaneConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ChlorodibromomethaneConcentrationMeasurement
+        namespace ChloroformConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ChloroformConcentrationMeasurement
+        namespace SodiumConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace SodiumConcentrationMeasurement
+        namespace Pm25ConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace Pm25ConcentrationMeasurement
+        namespace FormaldehydeConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace FormaldehydeConcentrationMeasurement
+        namespace Pm1ConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace Pm1ConcentrationMeasurement
+        namespace Pm10ConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace Pm10ConcentrationMeasurement
+        namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
+        namespace RadonConcentrationMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace RadonConcentrationMeasurement
         namespace WakeOnLan {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
@@ -2420,15 +3050,6 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace ElectricalMeasurement
-        namespace ClientMonitoring {
-            namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "RegisterClientMonitoring", RegisterClientMonitoring::Id },
-                    { "UnregisterClientMonitoring", UnregisterClientMonitoring::Id },
-                    { "StayAwakeRequest", StayAwakeRequest::Id }
-                };
-            } // namespace Commands
-        } // namespace ClientMonitoring
         namespace UnitTesting {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
@@ -2520,7 +3141,25 @@ namespace app {
             { "ProxyDiscovery", ProxyDiscovery::Commands::matter_command_id_cluster_map },
             { "ProxyValid", ProxyValid::Commands::matter_command_id_cluster_map },
             { "BooleanState", BooleanState::Commands::matter_command_id_cluster_map },
+            { "IcdManagement", IcdManagement::Commands::matter_command_id_cluster_map },
             { "ModeSelect", ModeSelect::Commands::matter_command_id_cluster_map },
+            { "TemperatureControl", TemperatureControl::Commands::matter_command_id_cluster_map },
+            { "RefrigeratorAlarm", RefrigeratorAlarm::Commands::matter_command_id_cluster_map },
+            { "AirQuality", AirQuality::Commands::matter_command_id_cluster_map },
+            { "SmokeCoAlarm", SmokeCoAlarm::Commands::matter_command_id_cluster_map },
+            { "OperationalState", OperationalState::Commands::matter_command_id_cluster_map },
+            { "HepaFilterMonitoring", HepaFilterMonitoring::Commands::matter_command_id_cluster_map },
+            { "ActivatedCarbonFilterMonitoring", ActivatedCarbonFilterMonitoring::Commands::matter_command_id_cluster_map },
+            { "CeramicFilterMonitoring", CeramicFilterMonitoring::Commands::matter_command_id_cluster_map },
+            { "ElectrostaticFilterMonitoring", ElectrostaticFilterMonitoring::Commands::matter_command_id_cluster_map },
+            { "UvFilterMonitoring", UvFilterMonitoring::Commands::matter_command_id_cluster_map },
+            { "IonizingFilterMonitoring", IonizingFilterMonitoring::Commands::matter_command_id_cluster_map },
+            { "ZeoliteFilterMonitoring", ZeoliteFilterMonitoring::Commands::matter_command_id_cluster_map },
+            { "OzoneFilterMonitoring", OzoneFilterMonitoring::Commands::matter_command_id_cluster_map },
+            { "WaterTankMonitoring", WaterTankMonitoring::Commands::matter_command_id_cluster_map },
+            { "FuelTankMonitoring", FuelTankMonitoring::Commands::matter_command_id_cluster_map },
+            { "InkCartridgeMonitoring", InkCartridgeMonitoring::Commands::matter_command_id_cluster_map },
+            { "TonerCartridgeMonitoring", TonerCartridgeMonitoring::Commands::matter_command_id_cluster_map },
             { "DoorLock", DoorLock::Commands::matter_command_id_cluster_map },
             { "WindowCovering", WindowCovering::Commands::matter_command_id_cluster_map },
             { "BarrierControl", BarrierControl::Commands::matter_command_id_cluster_map },
@@ -2536,6 +3175,42 @@ namespace app {
             { "FlowMeasurement", FlowMeasurement::Commands::matter_command_id_cluster_map },
             { "RelativeHumidityMeasurement", RelativeHumidityMeasurement::Commands::matter_command_id_cluster_map },
             { "OccupancySensing", OccupancySensing::Commands::matter_command_id_cluster_map },
+            { "CarbonMonoxideConcentrationMeasurement", CarbonMonoxideConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "CarbonDioxideConcentrationMeasurement", CarbonDioxideConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "EthyleneConcentrationMeasurement", EthyleneConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "EthyleneOxideConcentrationMeasurement", EthyleneOxideConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "HydrogenConcentrationMeasurement", HydrogenConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "HydrogenSulfideConcentrationMeasurement", HydrogenSulfideConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "NitricOxideConcentrationMeasurement", NitricOxideConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "NitrogenDioxideConcentrationMeasurement", NitrogenDioxideConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "OxygenConcentrationMeasurement", OxygenConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "OzoneConcentrationMeasurement", OzoneConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "SulfurDioxideConcentrationMeasurement", SulfurDioxideConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "DissolvedOxygenConcentrationMeasurement", DissolvedOxygenConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "BromateConcentrationMeasurement", BromateConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "ChloraminesConcentrationMeasurement", ChloraminesConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "ChlorineConcentrationMeasurement", ChlorineConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "FecalColiformEColiConcentrationMeasurement", FecalColiformEColiConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "FluorideConcentrationMeasurement", FluorideConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "HaloaceticAcidsConcentrationMeasurement", HaloaceticAcidsConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "TotalTrihalomethanesConcentrationMeasurement", TotalTrihalomethanesConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "TotalColiformBacteriaConcentrationMeasurement", TotalColiformBacteriaConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "TurbidityConcentrationMeasurement", TurbidityConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "CopperConcentrationMeasurement", CopperConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "LeadConcentrationMeasurement", LeadConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "ManganeseConcentrationMeasurement", ManganeseConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "SulfateConcentrationMeasurement", SulfateConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "BromodichloromethaneConcentrationMeasurement", BromodichloromethaneConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "BromoformConcentrationMeasurement", BromoformConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "ChlorodibromomethaneConcentrationMeasurement", ChlorodibromomethaneConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "ChloroformConcentrationMeasurement", ChloroformConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "SodiumConcentrationMeasurement", SodiumConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "Pm25ConcentrationMeasurement", Pm25ConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "FormaldehydeConcentrationMeasurement", FormaldehydeConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "Pm1ConcentrationMeasurement", Pm1ConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "Pm10ConcentrationMeasurement", Pm10ConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "TotalVolatileOrganicCompoundsConcentrationMeasurement", TotalVolatileOrganicCompoundsConcentrationMeasurement::Commands::matter_command_id_cluster_map },
+            { "RadonConcentrationMeasurement", RadonConcentrationMeasurement::Commands::matter_command_id_cluster_map },
             { "WakeOnLan", WakeOnLan::Commands::matter_command_id_cluster_map },
             { "Channel", Channel::Commands::matter_command_id_cluster_map },
             { "TargetNavigator", TargetNavigator::Commands::matter_command_id_cluster_map },
@@ -2549,7 +3224,6 @@ namespace app {
             { "ApplicationBasic", ApplicationBasic::Commands::matter_command_id_cluster_map },
             { "AccountLogin", AccountLogin::Commands::matter_command_id_cluster_map },
             { "ElectricalMeasurement", ElectricalMeasurement::Commands::matter_command_id_cluster_map },
-            { "ClientMonitoring", ClientMonitoring::Commands::matter_command_id_cluster_map },
             { "UnitTesting", UnitTesting::Commands::matter_command_id_cluster_map },
             { "FaultInjection", FaultInjection::Commands::matter_command_id_cluster_map }
         };

@@ -67,7 +67,7 @@ IdentifyAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
             }
             break;
         }
-        case MN::IdentifyType::Id: { // type is enum8
+        case MN::IdentifyType::Id: { // type is IdentifyTypeEnum
             MN::IdentifyType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -204,7 +204,7 @@ GroupsAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
 
     try {
         switch (aPath.mAttributeId) {
-        case MN::NameSupport::Id: { // type is bitmap8
+        case MN::NameSupport::Id: { // type is NameSupportBitmap
             MN::NameSupport::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -296,7 +296,7 @@ void GroupsAttributeAccess::reported_updated(const bridged_endpoint* ep, const s
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::Groups::Id, attribute_id.value());
     switch (attribute_id.value()) {
-    // type is bitmap8
+    // type is NameSupportBitmap
     case MN::NameSupport::Id: {
         using T = MN::NameSupport::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -376,6 +376,20 @@ ScenesAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
             }
             break;
         }
+        case MN::SceneTableSize::Id: { // type is int16u
+            MN::SceneTableSize::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::RemainingCapacity::Id: { // type is int8u
+            MN::RemainingCapacity::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
@@ -426,6 +440,8 @@ CHIP_ERROR ScenesAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
         // SceneValid is not supported by UCL
         // NameSupport is not supported by UCL
         // LastConfiguredBy is not supported by UCL
+        // SceneTableSize is not supported by UCL
+        // RemainingCapacity is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
         // EventList is not supported by UCL
@@ -3795,6 +3811,13 @@ FanControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             }
             break;
         }
+        case MN::AirflowDirection::Id: { // type is AirflowDirectionEnum
+            MN::AirflowDirection::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
@@ -5404,7 +5427,7 @@ IlluminanceMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPa
             }
             break;
         }
-        case MN::LightSensorType::Id: { // type is enum8
+        case MN::LightSensorType::Id: { // type is LightSensorTypeEnum
             MN::LightSensorType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -5551,7 +5574,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
         }
         break;
     }
-        // type is enum8
+        // type is LightSensorTypeEnum
     case MN::LightSensorType::Id: {
         using T = MN::LightSensorType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
