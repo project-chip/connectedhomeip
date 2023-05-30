@@ -774,6 +774,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 exit:
     return error;
 }
+
 void P256Keypair::Clear()
 {
     if (mInitialized)
