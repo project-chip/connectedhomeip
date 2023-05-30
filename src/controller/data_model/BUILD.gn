@@ -79,6 +79,7 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/ChannelClient-InvokeSubscribeImpl.cpp",
       "jni/ChannelClient-ReadImpl.cpp",
       "jni/CHIPCallbackTypes.h",
+      "jni/CHIPGlobalCallbacks.cpp",
       "jni/CHIPReadCallbacks.h",
       "jni/ColorControlClient-InvokeSubscribeImpl.cpp",
       "jni/ColorControlClient-ReadImpl.cpp",
