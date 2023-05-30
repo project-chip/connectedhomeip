@@ -42,9 +42,9 @@ public:
     }
 
     virtual void HandleTimeZoneChanged(TimeZoneList timeZoneList) = 0;
-    virtual CHIP_ERROR HandleDstoffsetlookup()                    = 0;
-    virtual bool HandleDstoffsetavailable(chip::CharSpan name)    = 0;
-    virtual CHIP_ERROR HandleGetdstoffset()                       = 0;
+    virtual CHIP_ERROR HandleDSTOffsetLookup()                    = 0;
+    virtual bool HandleDSTOffsetAvailable(chip::CharSpan name)    = 0;
+    virtual CHIP_ERROR HandleGetDSTOffset()                       = 0;
     virtual bool isNTPAddressValid(chip::CharSpan ntp)            = 0;
     virtual bool isNTPAddressDomain(chip::CharSpan ntp)           = 0;
 

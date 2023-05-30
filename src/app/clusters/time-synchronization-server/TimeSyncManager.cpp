@@ -26,19 +26,19 @@ void TimeSyncManager::HandleTimeZoneChanged(TimeZoneList timeZoneList)
     ChipLogProgress(Zcl, "%s", __FUNCTION__);
 }
 
-CHIP_ERROR TimeSyncManager::HandleDstoffsetlookup()
+CHIP_ERROR TimeSyncManager::HandleDSTOffsetLookup()
 {
     ChipLogProgress(Zcl, "%s", __FUNCTION__);
     return CHIP_NO_ERROR;
 }
 
-bool TimeSyncManager::HandleDstoffsetavailable(chip::CharSpan name)
+bool TimeSyncManager::HandleDSTOffsetAvailable(chip::CharSpan name)
 {
     ChipLogProgress(Zcl, "%s", __FUNCTION__);
     return false;
 }
 
-CHIP_ERROR TimeSyncManager::HandleGetdstoffset()
+CHIP_ERROR TimeSyncManager::HandleGetDSTOffset()
 {
     ChipLogProgress(Zcl, "%s", __FUNCTION__);
     return CHIP_NO_ERROR;

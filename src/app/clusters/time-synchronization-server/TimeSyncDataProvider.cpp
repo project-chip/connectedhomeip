@@ -129,7 +129,6 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZone & timeZoneList, uint8_t &
         {
             if (timeZone.name.Value().size() <= tz[i].name.Value().size())
             {
-                ChipLogProgress(Zcl, "name len: %d", (int) tz[i].name.Value().size());
                 char * dest = const_cast<char *>(tz[i].name.Value().data());
                 size_t len  = timeZone.name.Value().size();
                 memcpy(dest, timeZone.name.Value().data(), len);
@@ -220,7 +219,7 @@ CHIP_ERROR TimeSyncDataProvider::Load(const char * key, MutableByteSpan & buffer
     uint16_t size = static_cast<uint16_t>(buffer.size());
     ReturnErrorOnFailure(mPersistentStorage->SyncGetKeyValue(key, buffer.data(), size));
 
-    buffer = MutableByteSpan(buffer.data(), size);
+    buffer.reduce_size(size);
     return CHIP_NO_ERROR;
 }
 

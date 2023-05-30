@@ -37,8 +37,8 @@
 #include <system/SystemClock.h>
 
 using namespace chip;
-using namespace chip::DeviceLayer;
 using namespace chip::app;
+using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TimeSynchronization;
 using namespace chip::app::Clusters::TimeSynchronization::Attributes;
@@ -85,39 +85,132 @@ Delegate * GetDefaultDelegate()
 } // namespace app
 } // namespace chip
 
-static bool ChipEpochToUnixEpochTime(uint32_t chipEpochTime, uint32_t & unixEpochTime)
+constexpr uint64_t kChipEpochUsSinceUnixEpoch = (uint64_t) kChipEpochSecondsSinceUnixEpoch * chip::kMicrosecondsPerSecond;
+
+static bool ChipEpochToUnixEpochMicro(uint64_t chipEpochTime, uint64_t & unixEpochTime)
 {
-    // VerifyOrReturnError(chipEpochTime <= kChipEpochSecondsSinceUnixEpoch, false);
-
-    unixEpochTime = chipEpochTime + kChipEpochSecondsSinceUnixEpoch;
-
+    unixEpochTime = chipEpochTime + kChipEpochUsSinceUnixEpoch;
     return true;
 }
 
 static bool UnixEpochToChipEpochMicro(uint64_t unixEpochTime, uint64_t & chipEpochTime)
 {
-    uint32_t chipEpochSec;
-    chip::UnixEpochToChipEpochTime((uint32_t)(unixEpochTime / chip::kMicrosecondsPerSecond), chipEpochSec);
-    chipEpochTime = (uint64_t) chipEpochSec * chip::kMicrosecondsPerSecond;
+    VerifyOrReturnValue(unixEpochTime >= kChipEpochUsSinceUnixEpoch, false);
+    chipEpochTime = unixEpochTime - kChipEpochUsSinceUnixEpoch;
 
     return true;
 }
 
-static CHIP_ERROR utcTimeChanged(uint64_t utcTime)
+static CHIP_ERROR UpdateUTCTime(uint64_t UTCTimeInChipEpochUs)
 {
     System::Clock::Seconds32 lastKnownGoodChipEpoch;
-    uint32_t chipEpochInUtcTime;
+    uint64_t UTCTimeInUnixEpochUs;
 
     ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().GetLastKnownGoodChipEpochTime(lastKnownGoodChipEpoch));
-    ChipEpochToUnixEpochTime((uint32_t)(utcTime / chip::kMicrosecondsPerSecond), chipEpochInUtcTime);
+    VerifyOrReturnError(ChipEpochToUnixEpochMicro(UTCTimeInChipEpochUs, UTCTimeInUnixEpochUs), CHIP_ERROR_INVALID_TIME);
 
-    // if ( (utcTime / chip::kMicrosecondsPerSecond) < lastKnownGoodChipEpoch) return CHIP_ERROR_INVALID_TIME;
-    ReturnErrorOnFailure(
-        Server::GetInstance().GetFabricTable().SetLastKnownGoodChipEpochTime(System::Clock::Seconds32(chipEpochInUtcTime)));
-    ReturnErrorOnFailure(System::SystemClock().SetClock_RealTime(
-        System::Clock::Microseconds64((uint64_t) chipEpochInUtcTime * chip::kMicrosecondsPerSecond)));
+    // if ( (UTCTimeInUnixEpochUs / chip::kMicrosecondsPerSecond) < lastKnownGoodChipEpoch) return CHIP_ERROR_INVALID_TIME;
+    ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().SetLastKnownGoodChipEpochTime(
+        System::Clock::Seconds32((uint32_t) (UTCTimeInChipEpochUs / chip::kMicrosecondsPerSecond))));
+    ReturnErrorOnFailure(System::SystemClock().SetClock_RealTime(System::Clock::Microseconds64(UTCTimeInUnixEpochUs)));
 
     return CHIP_NO_ERROR;
+}
+
+static bool sendDSTTableEmptyEvent(EndpointId endpointId)
+{
+    Events::DSTTableEmpty::Type event;
+    EventNumber eventNumber;
+
+    CHIP_ERROR error = LogEvent(event, endpointId, eventNumber);
+
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Zcl, "Unable to send DSTTableEmpty event [endpointId=%d]", endpointId);
+        return false;
+    }
+    ChipLogProgress(Zcl, "Emit DSTTableEmpty event [endpointId=%d]", endpointId);
+
+    // TODO re-schedule event for after min 1hr
+    // delegate->scheduleDSTTableEmptyEvent()
+    return true;
+}
+
+static bool sendDSTStatusEvent(EndpointId endpointId, bool dstOffsetActive)
+{
+    Events::DSTStatus::Type event;
+    event.DSTOffsetActive = dstOffsetActive;
+    EventNumber eventNumber;
+
+    CHIP_ERROR error = LogEvent(event, endpointId, eventNumber);
+
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Zcl, "Unable to send sendDSTStatus event [endpointId=%d]", endpointId);
+        return false;
+    }
+
+    ChipLogProgress(Zcl, "Emit sendDSTStatus event [endpointId=%d]", endpointId);
+    return true;
+}
+
+static bool sendTimeZoneStatusEvent(EndpointId endpointId)
+{
+    Events::TimeZoneStatus::Type event;
+    const auto & tz = TimeSynchronizationServer::Instance().GetTimeZone()[0];
+    event.offset    = tz.offset;
+    if (tz.name.HasValue())
+    {
+        event.name.SetValue(tz.name.Value());
+    }
+    EventNumber eventNumber;
+
+    CHIP_ERROR error = LogEvent(event, endpointId, eventNumber);
+
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Zcl, "Unable to send sendTimeZoneStatus event [endpointId=%d]", endpointId);
+        return false;
+    }
+
+    ChipLogProgress(Zcl, "Emit sendTimeZoneStatus event [endpointId=%d]", endpointId);
+    return true;
+}
+
+static bool sendTimeFailureEvent(EndpointId endpointId)
+{
+    Events::TimeFailure::Type event;
+    EventNumber eventNumber;
+
+    CHIP_ERROR error = LogEvent(event, endpointId, eventNumber);
+
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Zcl, "Unable to send sendTimeFailure event [endpointId=%d]", endpointId);
+        return false;
+    }
+
+    // TODO re-schedule event for after min 1hr if no time is still available
+    ChipLogProgress(Zcl, "Emit sendTimeFailure event [endpointId=%d]", endpointId);
+    return true;
+}
+
+static bool sendMissingTrustedTimeSourceEvent(EndpointId endpointId)
+{
+    Events::MissingTrustedTimeSource::Type event;
+    EventNumber eventNumber;
+
+    CHIP_ERROR error = LogEvent(event, endpointId, eventNumber);
+
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Zcl, "Unable to send sendMissingTrustedTimeSource event [endpointId=%d]", endpointId);
+        return false;
+    }
+
+    // TODO re-schedule event for after min 1hr if TTS is null or cannot be reached
+    ChipLogProgress(Zcl, "Emit sendMissingTrustedTimeSource event [endpointId=%d]", endpointId);
+    return true;
 }
 
 TimeSynchronizationServer TimeSynchronizationServer::mTimeSyncInstance;
@@ -134,11 +227,10 @@ void TimeSynchronizationServer::Init()
     TimeSynchronization::Structs::TrustedTimeSourceStruct::Type tts;
     (CHIP_NO_ERROR == mTimeSyncDataProvider.LoadTrustedTimeSource(tts)) ? (void) mTrustedTimeSource.SetNonNull(tts)
                                                                         : mTrustedTimeSource.SetNull();
-    auto tz = mTimeZoneList.begin();
     for (size_t i = 0; i < mTimeZoneList.size(); i++)
     {
         memset(mNames[i].name, 0, sizeof(mNames[i].name));
-        tz[i] = { 0, 0, Optional<chip::CharSpan>(chip::CharSpan(mNames[i].name, sizeof(mNames[i].name))) };
+        mTimeZoneList[i] = { 0, 0, Optional<chip::CharSpan>(chip::CharSpan(mNames[i].name, sizeof(mNames[i].name))) };
     }
     mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize);
     mTimeZoneListSize = (mTimeZoneListSize == 0) ? 1 : mTimeZoneListSize; // initialize default value
@@ -174,7 +266,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTrustedTimeSource(
     return err;
 }
 
-CHIP_ERROR TimeSynchronizationServer::SetDefaultNtp(DataModel::Nullable<chip::CharSpan> & dntp)
+CHIP_ERROR TimeSynchronizationServer::SetDefaultNTP(DataModel::Nullable<chip::CharSpan> & dntp)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (!dntp.IsNull())
@@ -188,22 +280,22 @@ CHIP_ERROR TimeSynchronizationServer::SetDefaultNtp(DataModel::Nullable<chip::Ch
     return err;
 }
 
-CHIP_ERROR TimeSynchronizationServer::SetTimeZone(DataModel::DecodableList<TimeSynchronization::Structs::TimeZoneStruct::Type> tz)
+CHIP_ERROR TimeSynchronizationServer::SetTimeZone(DataModel::DecodableList<TimeSynchronization::Structs::TimeZoneStruct::Type> tzL)
 {
     size_t items;
-    ReturnErrorOnFailure(tz.ComputeSize(&items));
+    ReturnErrorOnFailure(tzL.ComputeSize(&items));
 
     if (items > CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE)
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    auto tzL    = mTimeZoneList.begin();
-    auto newTzL = tz.begin();
+    auto newTzL = tzL.begin();
     uint8_t i   = 0;
 
     while (newTzL.Next() && i < CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE)
     {
+        auto & tz = mTimeZoneList[i];
         if (newTzL.GetValue().offset < -43200 || newTzL.GetValue().offset > 50400)
         {
             mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize);
@@ -220,8 +312,8 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(DataModel::DecodableList<TimeS
             mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize);
             return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
         }
-        tzL[i].offset  = newTzL.GetValue().offset;
-        tzL[i].validAt = newTzL.GetValue().validAt;
+        tz.offset  = newTzL.GetValue().offset;
+        tz.validAt = newTzL.GetValue().validAt;
         if (newTzL.GetValue().name.HasValue())
         {
             if (newTzL.GetValue().name.Value().size() > sizeof(mNames[i].name))
@@ -233,11 +325,11 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(DataModel::DecodableList<TimeS
             size_t len       = newTzL.GetValue().name.Value().size();
             memset(mNames[i].name, 0, sizeof(mNames[i].name));
             memcpy(mNames[i].name, buf, len);
-            tzL[i].name.SetValue(chip::CharSpan(mNames[i].name, strnlen(mNames[i].name, sizeof(mNames[i].name))));
+            tz.name.SetValue(chip::CharSpan(mNames[i].name, strnlen(mNames[i].name, sizeof(mNames[i].name))));
         }
         else
         {
-            tzL[i].name.ClearValue();
+            tz.name.ClearValue();
         }
         i++;
     }
@@ -257,23 +349,22 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(DataModel::DecodableList<TimeS
 }
 
 CHIP_ERROR
-TimeSynchronizationServer::SetDSTOffset(DataModel::DecodableList<TimeSynchronization::Structs::DSTOffsetStruct::Type> dst)
+TimeSynchronizationServer::SetDSTOffset(DataModel::DecodableList<TimeSynchronization::Structs::DSTOffsetStruct::Type> dstL)
 {
     size_t items;
-    ReturnErrorOnFailure(dst.ComputeSize(&items));
+    ReturnErrorOnFailure(dstL.ComputeSize(&items));
 
     if (items > CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE)
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    auto dstL    = mDstOffsetList.begin();
-    auto newDstL = dst.begin();
+    auto newDstL = dstL.begin();
     uint8_t i    = 0;
 
     while (newDstL.Next() && i < CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE)
     {
-        dstL[i] = newDstL.GetValue();
+        mDstOffsetList[i] = newDstL.GetValue();
         i++;
     }
 
@@ -377,38 +468,37 @@ void TimeSynchronizationServer::ScheduleDelayedAction(System::Clock::Seconds32 d
                 CHIP_NO_ERROR);
 }
 
-CHIP_ERROR TimeSynchronizationServer::SetUTCTime(chip::EndpointId ep, uint64_t utcTime,
-                                                 TimeSynchronization::GranularityEnum granularity,
+CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime, TimeSynchronization::GranularityEnum granularity,
                                                  TimeSynchronization::TimeSourceEnum source)
 {
-    ReturnErrorOnFailure(utcTimeChanged(utcTime));
+    ReturnErrorOnFailure(UpdateUTCTime(utcTime));
     mGranularity = granularity;
     TimeSource::Set(ep, source);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TimeSynchronizationServer::GetLocalTime(chip::EndpointId ep, uint64_t & localTime)
+CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, uint64_t & localTime)
 {
     uint64_t timeZoneOffset = 0, dstOffset = 0;
     System::Clock::Microseconds64 utcTime;
     uint64_t chipEpochTime;
     ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
-    UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime);
-
-    if (isTimeZoneAvailable())
+    VerifyOrReturnError(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
+    if (GetUpdatedTimeZoneState())
     {
-        auto tz        = TimeSynchronizationServer::Instance().GetTimeZone().begin();
-        timeZoneOffset = chip::kMicrosecondsPerSecond * static_cast<uint64_t>(tz->offset);
+        sendTimeZoneStatusEvent(ep);
     }
-    VerifyOrReturnError(isDSTOffsetAvailable() == true, CHIP_ERROR_INVALID_TIME);
-    auto dst  = TimeSynchronizationServer::Instance().GetDSTOffset().begin();
-    dstOffset = chip::kMicrosecondsPerSecond * static_cast<uint64_t>(dst->offset);
+    VerifyOrReturnError(DSTState::kInvalid != GetUpdatedDSTOffsetState(), CHIP_ERROR_INVALID_TIME);
+    const auto & tz  = TimeSynchronizationServer::Instance().GetTimeZone()[0];
+    timeZoneOffset   = chip::kMicrosecondsPerSecond * static_cast<uint64_t>(tz.offset);
+    const auto & dst = TimeSynchronizationServer::Instance().GetDSTOffset()[0];
+    dstOffset        = chip::kMicrosecondsPerSecond * static_cast<uint64_t>(dst.offset);
 
     localTime = chipEpochTime + timeZoneOffset + dstOffset;
     return CHIP_NO_ERROR;
 }
 
-bool TimeSynchronizationServer::isTimeZoneAvailable()
+bool TimeSynchronizationServer::GetUpdatedTimeZoneState()
 {
     System::Clock::Microseconds64 utcTime;
     auto tzList           = TimeSynchronizationServer::Instance().GetTimeZone();
@@ -417,7 +507,7 @@ bool TimeSynchronizationServer::isTimeZoneAvailable()
 
     VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, false);
     VerifyOrReturnValue(tzList.size() != 0, false);
-    UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime);
+    VerifyOrReturnValue(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), false);
 
     for (uint8_t i = 0; i < tzList.size(); i++)
     {
@@ -439,16 +529,16 @@ bool TimeSynchronizationServer::isTimeZoneAvailable()
     return true;
 }
 
-bool TimeSynchronizationServer::isDSTOffsetAvailable()
+DSTState TimeSynchronizationServer::GetUpdatedDSTOffsetState()
 {
     System::Clock::Microseconds64 utcTime;
     uint8_t activeDstIndex = 0;
     auto dstList           = TimeSynchronizationServer::Instance().GetDSTOffset();
     uint64_t chipEpochTime;
 
-    VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, false);
-    VerifyOrReturnValue(dstList.size() != 0, false);
-    UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime);
+    VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, DSTState::kInvalid);
+    VerifyOrReturnValue(dstList.size() != 0, DSTState::kInvalid);
+    VerifyOrReturnValue(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), DSTState::kInvalid);
 
     for (uint8_t i = 0; i < dstList.size(); i++)
     {
@@ -460,18 +550,19 @@ bool TimeSynchronizationServer::isDSTOffsetAvailable()
     // if offset is zero and validUntil is null then no DST is used
     if (dstList[activeDstIndex].offset == 0 && dstList[activeDstIndex].validUntil.IsNull())
     {
-        return false;
+        return DSTState::kStopped;
     }
     if (activeDstIndex != 0)
     {
         mDstOffsetListSize    = static_cast<uint8_t>(dstList.size() - activeDstIndex);
         auto newDstOffsetList = dstList.SubSpan(activeDstIndex);
-        VerifyOrReturnValue(mTimeSyncDataProvider.StoreDSTOffset(newDstOffsetList) == CHIP_NO_ERROR, false);
+        VerifyOrReturnValue(mTimeSyncDataProvider.StoreDSTOffset(newDstOffsetList) == CHIP_NO_ERROR, DSTState::kInvalid);
         VerifyOrReturnValue(mTimeSyncDataProvider.LoadDSTOffset(TimeSynchronizationServer::Instance().GetDSTOffset(),
                                                                 mDstOffsetListSize) == CHIP_NO_ERROR,
-                            false);
+                            DSTState::kInvalid);
+        return DSTState::kChanged;
     }
-    return true;
+    return DSTState::kActive;
 }
 
 namespace {
@@ -578,7 +669,7 @@ CHIP_ERROR TimeSynchronizationAttrAccess::Read(const ConcreteReadAttributePath &
         uint64_t chipEpochTime;
 
         VerifyOrReturnError(System::SystemClock().GetClock_RealTime(utcTimeUnix) == CHIP_NO_ERROR, aEncoder.EncodeNull());
-        UnixEpochToChipEpochMicro(utcTimeUnix.count(), chipEpochTime);
+        VerifyOrReturnError(UnixEpochToChipEpochMicro(utcTimeUnix.count(), chipEpochTime), aEncoder.EncodeNull());
         return aEncoder.Encode(chipEpochTime);
     }
     case Granularity::Id: {
@@ -615,102 +706,6 @@ CHIP_ERROR TimeSynchronizationAttrAccess::Read(const ConcreteReadAttributePath &
     return err;
 }
 } // anonymous namespace
-
-static bool sendDSTTableEmptyEvent(chip::EndpointId endpointId)
-{
-    Events::DSTTableEmpty::Type event;
-    EventNumber eventNumber;
-
-    CHIP_ERROR error = LogEvent(event, endpointId, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(Zcl, "Unable to send DSTTableEmpty event [endpointId=%d]", endpointId);
-        return false;
-    }
-    ChipLogProgress(Zcl, "Emit DSTTableEmpty event [endpointId=%d]", endpointId);
-
-    // re-schedule event for after min 1hr
-    // delegate->scheduleDSTTableEmptyEvent()
-    return true;
-}
-
-static bool sendDSTStatusEvent(chip::EndpointId endpointId, bool dstOffsetActive)
-{
-    Events::DSTStatus::Type event;
-    event.DSTOffsetActive = dstOffsetActive;
-    EventNumber eventNumber;
-
-    CHIP_ERROR error = LogEvent(event, endpointId, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(Zcl, "Unable to send sendDSTStatus event [endpointId=%d]", endpointId);
-        return false;
-    }
-
-    ChipLogProgress(Zcl, "Emit sendDSTStatus event [endpointId=%d]", endpointId);
-    return true;
-}
-
-static bool sendTimeZoneStatusEvent(chip::EndpointId endpointId, uint8_t listIndex)
-{
-    Events::TimeZoneStatus::Type event;
-    auto tz      = TimeSynchronizationServer::Instance().GetTimeZone().begin();
-    event.offset = tz[listIndex].offset;
-    if (tz[listIndex].name.HasValue())
-    {
-        event.name.SetValue(tz[listIndex].name.Value());
-    }
-    EventNumber eventNumber;
-
-    CHIP_ERROR error = LogEvent(event, endpointId, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(Zcl, "Unable to send sendTimeZoneStatus event [endpointId=%d]", endpointId);
-        return false;
-    }
-
-    ChipLogProgress(Zcl, "Emit sendTimeZoneStatus event [endpointId=%d]", endpointId);
-    return true;
-}
-
-static bool sendTimeFailureEvent(chip::EndpointId endpointId)
-{
-    Events::TimeFailure::Type event;
-    EventNumber eventNumber;
-
-    CHIP_ERROR error = LogEvent(event, endpointId, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(Zcl, "Unable to send sendTimeFailure event [endpointId=%d]", endpointId);
-        return false;
-    }
-
-    // re-schedule event for after min 1hr if no time is still available
-    ChipLogProgress(Zcl, "Emit sendTimeFailure event [endpointId=%d]", endpointId);
-    return true;
-}
-
-static bool sendMissingTrustedTimeSourceEvent(chip::EndpointId endpointId)
-{
-    Events::MissingTrustedTimeSource::Type event;
-    EventNumber eventNumber;
-
-    CHIP_ERROR error = LogEvent(event, endpointId, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(Zcl, "Unable to send sendMissingTrustedTimeSource event [endpointId=%d]", endpointId);
-        return false;
-    }
-
-    // re-schedule event for after min 1hr if TTS is null or cannot be reached
-    ChipLogProgress(Zcl, "Emit sendMissingTrustedTimeSource event [endpointId=%d]", endpointId);
-    return true;
-}
 
 bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -781,10 +776,10 @@ bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
         }
         return true;
     }
-    sendTimeZoneStatusEvent(commandPath.mEndpointId, 0);
+    sendTimeZoneStatusEvent(commandPath.mEndpointId);
     sendTimeFailureEvent(commandPath.mEndpointId); // TODO remove
     GetDelegate()->HandleTimeZoneChanged(TimeSynchronizationServer::Instance().GetTimeZone());
-    GetDelegate()->HandleDstoffsetlookup();
+    GetDelegate()->HandleDSTOffsetLookup();
 
     TimeSynchronization::TimeZoneDatabaseEnum tzDb;
     TimeZoneDatabase::Get(commandPath.mEndpointId, &tzDb);
@@ -792,19 +787,22 @@ bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
     if (GetDelegate()->HasFeature(commandPath.mEndpointId, TimeSynchronization::Feature::kTimeZone) &&
         tzDb != TimeSynchronization::TimeZoneDatabaseEnum::kNone)
     {
-        auto tzL = TimeSynchronizationServer::Instance().GetTimeZone();
-        auto tz  = tzL.begin();
-        if (tz != tzL.end() && tz->name.HasValue() && GetDelegate()->HandleDstoffsetavailable(tz->name.Value()))
+        const auto & tz = TimeSynchronizationServer::Instance().GetTimeZone()[0];
+        if (tz.name.HasValue() && GetDelegate()->HandleDSTOffsetAvailable(tz.name.Value()))
         {
-            GetDelegate()->HandleGetdstoffset();
+            GetDelegate()->HandleGetDSTOffset();
             response.DSTOffsetRequired = false;
             sendDSTStatusEvent(commandPath.mEndpointId, true);
         }
         else
         {
+            DSTState dstState = TimeSynchronizationServer::Instance().GetUpdatedDSTOffsetState();
             TimeSynchronizationServer::Instance().ClearDSTOffset();
             sendDSTTableEmptyEvent(commandPath.mEndpointId);
-            sendDSTStatusEvent(commandPath.mEndpointId, false);
+            if (dstState == DSTState::kActive || dstState == DSTState::kChanged)
+            {
+                sendDSTStatusEvent(commandPath.mEndpointId, false);
+            }
             response.DSTOffsetRequired = true;
         }
     }
@@ -823,6 +821,8 @@ bool emberAfTimeSynchronizationClusterSetDSTOffsetCallback(
 {
     const auto & dstOffset = commandData.DSTOffset;
 
+    DSTState dstState = TimeSynchronizationServer::Instance().GetUpdatedDSTOffsetState();
+
     CHIP_ERROR err = TimeSynchronizationServer::Instance().SetDSTOffset(dstOffset);
     if (err != CHIP_NO_ERROR)
     {
@@ -837,7 +837,11 @@ bool emberAfTimeSynchronizationClusterSetDSTOffsetCallback(
         return true;
     }
     // if DST state changes, generate DSTStatus event
-    sendDSTStatusEvent(commandPath.mEndpointId, true);
+    if (dstState != TimeSynchronizationServer::Instance().GetUpdatedDSTOffsetState())
+    {
+        sendDSTStatusEvent(commandPath.mEndpointId,
+                           DSTState::kActive == TimeSynchronizationServer::Instance().GetUpdatedDSTOffsetState());
+    }
     // if list is empty, generate DSTTableEmpty event
     sendDSTTableEmptyEvent(commandPath.mEndpointId);
 
@@ -854,6 +858,12 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
 
     if (!dNtpChar.IsNull())
     {
+        size_t len = dNtpChar.Value().size();
+        if (len > DefaultNTP::TypeInfo::MaxLength())
+        {
+            commandObj->AddStatus(commandPath, Status::ConstraintError);
+            return true;
+        }
         if (!GetDelegate()->isNTPAddressValid(dNtpChar.Value()))
         {
             commandObj->AddStatus(commandPath, Status::InvalidCommand);
@@ -869,18 +879,10 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
                 return true;
             }
         }
-
-        size_t len = dNtpChar.Value().size();
-
-        if (len > DefaultNTP::TypeInfo::MaxLength())
-        {
-            commandObj->AddStatus(commandPath, Status::ConstraintError);
-            return true;
-        }
     }
 
     status =
-        (CHIP_NO_ERROR == TimeSynchronizationServer::Instance().SetDefaultNtp(dNtpChar)) ? Status::Success : Status::InvalidCommand;
+        (CHIP_NO_ERROR == TimeSynchronizationServer::Instance().SetDefaultNTP(dNtpChar)) ? Status::Success : Status::InvalidCommand;
 
     commandObj->AddStatus(commandPath, status);
     return true;
@@ -894,8 +896,5 @@ void MatterTimeSynchronizationPluginServerInitCallback()
     {
         attrAccessRegistered = true;
         registerAttributeAccessOverride(&gAttrAccess);
-#if 0
-        // System::SystemClock().SetClock_RealTime(System::Clock::Microseconds64(1679668000000000));
-#endif
     }
 }

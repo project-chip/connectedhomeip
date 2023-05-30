@@ -44,13 +44,20 @@ using namespace chip::app::Clusters::TimeSynchronization::Attributes;
 using chip::TimeSyncDataProvider;
 using chip::Protocols::InteractionModel::Status;
 
+struct timeZoneName
+{
+    char name[64];
+};
+enum class DSTState : uint8_t
+{
+    kInvalid = 0,
+    kActive  = 1,
+    kChanged = 2,
+    kStopped = 2,
+};
+
 class TimeSynchronizationServer
 {
-    struct timeZoneName
-    {
-        char name[64];
-    };
-
 public:
     void Init();
 
@@ -58,14 +65,14 @@ public:
     TimeSyncDataProvider GetDataProvider(void) { return mTimeSyncDataProvider; }
 
     CHIP_ERROR SetTrustedTimeSource(DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> tts);
-    CHIP_ERROR SetDefaultNtp(DataModel::Nullable<chip::CharSpan> & dntp);
+    CHIP_ERROR SetDefaultNTP(DataModel::Nullable<chip::CharSpan> & dntp);
     /**
      * @brief Sets TimeZone Attribute. Assumes the size of the list is already validated.
      *
      * @param tz TimeZone list
      * @return CHIP_ERROR
      */
-    CHIP_ERROR SetTimeZone(DataModel::DecodableList<TimeSynchronization::Structs::TimeZoneStruct::Type> tz);
+    CHIP_ERROR SetTimeZone(DataModel::DecodableList<TimeSynchronization::Structs::TimeZoneStruct::Type> tzL);
     /**
      * @brief Sets DstOffset Attribute. Assumes the size of the list is already validated.
      *
@@ -73,7 +80,7 @@ public:
      * @return CHIP_ERROR
      */
     CHIP_ERROR ClearTimeZone(void);
-    CHIP_ERROR SetDSTOffset(DataModel::DecodableList<TimeSynchronization::Structs::DSTOffsetStruct::Type> dst);
+    CHIP_ERROR SetDSTOffset(DataModel::DecodableList<TimeSynchronization::Structs::DSTOffsetStruct::Type> dstL);
     CHIP_ERROR ClearDSTOffset(void);
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource(void);
     CHIP_ERROR GetDefaultNtp(MutableByteSpan & dntp);
@@ -87,10 +94,10 @@ public:
 
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 
-private:
-    bool isTimeZoneAvailable(void);
-    bool isDSTOffsetAvailable(void);
+    bool GetUpdatedTimeZoneState();
+    DSTState GetUpdatedDSTOffsetState();
 
+private:
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
     DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList =
         DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type>(mTz);

@@ -36,9 +36,9 @@ public:
 
     TimeSyncManager() : Delegate(){};
     void HandleTimeZoneChanged(TimeZoneList timeZoneList) override;
-    CHIP_ERROR HandleDstoffsetlookup() override;
-    bool HandleDstoffsetavailable(chip::CharSpan name) override;
-    CHIP_ERROR HandleGetdstoffset() override;
+    CHIP_ERROR HandleDSTOffsetLookup() override;
+    bool HandleDSTOffsetAvailable(chip::CharSpan name) override;
+    CHIP_ERROR HandleGetDSTOffset() override;
     bool isNTPAddressValid(chip::CharSpan ntp) override;
     bool isNTPAddressDomain(chip::CharSpan ntp) override;
 };
