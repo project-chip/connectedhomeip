@@ -6517,6 +6517,213 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRDishwasherOperationalStateClusterPauseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDishwasherOperationalStateClusterPauseParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRDishwasherOperationalStateClusterStopParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDishwasherOperationalStateClusterStopParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRDishwasherOperationalStateClusterStartParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDishwasherOperationalStateClusterStartParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRDishwasherOperationalStateClusterResumeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDishwasherOperationalStateClusterResumeParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRDishwasherOperationalStateClusterOperationalCommandResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _commandResponseState = [MTRDishwasherOperationalStateClusterErrorStateStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDishwasherOperationalStateClusterOperationalCommandResponseParams alloc] init];
+
+    other.commandResponseState = self.commandResponseState;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: commandResponseState:%@; >", NSStringFromClass([self class]), _commandResponseState];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::DishwasherOperationalState::Commands::OperationalCommandResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRDishwasherOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::DishwasherOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
+{
+    {
+        self.commandResponseState = [MTRDishwasherOperationalStateClusterErrorStateStruct new];
+        self.commandResponseState.errorStateID =
+            [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.commandResponseState.errorStateID)];
+        if (decodableStruct.commandResponseState.errorStateLabel.IsNull()) {
+            self.commandResponseState.errorStateLabel = nil;
+        } else {
+            self.commandResponseState.errorStateLabel = AsString(decodableStruct.commandResponseState.errorStateLabel.Value());
+            if (self.commandResponseState.errorStateLabel == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        }
+        if (decodableStruct.commandResponseState.errorStateDetails.HasValue()) {
+            self.commandResponseState.errorStateDetails = AsString(decodableStruct.commandResponseState.errorStateDetails.Value());
+            if (self.commandResponseState.errorStateDetails == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.commandResponseState.errorStateDetails = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+@end
 @implementation MTRSmokeCOAlarmClusterSelfTestRequestParams
 - (instancetype)init
 {

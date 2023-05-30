@@ -6295,6 +6295,120 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readDishwasherOperationalStateInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readDishwasherOperationalStatePhaseListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDishwasherOperationalStatePhaseListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DishwasherOperationalStateCluster) cluster).readPhaseListAttribute(
+              (ChipClusters.DishwasherOperationalStateCluster.PhaseListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDishwasherOperationalStateClusterPhaseListAttributeCallback(),
+          readDishwasherOperationalStatePhaseListCommandParams
+        );
+        result.put("readPhaseListAttribute", readDishwasherOperationalStatePhaseListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDishwasherOperationalStateCurrentPhaseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDishwasherOperationalStateCurrentPhaseAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DishwasherOperationalStateCluster) cluster).readCurrentPhaseAttribute(
+              (ChipClusters.DishwasherOperationalStateCluster.CurrentPhaseAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDishwasherOperationalStateClusterCurrentPhaseAttributeCallback(),
+          readDishwasherOperationalStateCurrentPhaseCommandParams
+        );
+        result.put("readCurrentPhaseAttribute", readDishwasherOperationalStateCurrentPhaseAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDishwasherOperationalStateCountdownTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDishwasherOperationalStateCountdownTimeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DishwasherOperationalStateCluster) cluster).readCountdownTimeAttribute(
+              (ChipClusters.DishwasherOperationalStateCluster.CountdownTimeAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDishwasherOperationalStateClusterCountdownTimeAttributeCallback(),
+          readDishwasherOperationalStateCountdownTimeCommandParams
+        );
+        result.put("readCountdownTimeAttribute", readDishwasherOperationalStateCountdownTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDishwasherOperationalStateOperationalStateListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDishwasherOperationalStateOperationalStateListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DishwasherOperationalStateCluster) cluster).readOperationalStateListAttribute(
+              (ChipClusters.DishwasherOperationalStateCluster.OperationalStateListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDishwasherOperationalStateClusterOperationalStateListAttributeCallback(),
+          readDishwasherOperationalStateOperationalStateListCommandParams
+        );
+        result.put("readOperationalStateListAttribute", readDishwasherOperationalStateOperationalStateListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDishwasherOperationalStateGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDishwasherOperationalStateGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DishwasherOperationalStateCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.DishwasherOperationalStateCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDishwasherOperationalStateClusterGeneratedCommandListAttributeCallback(),
+          readDishwasherOperationalStateGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readDishwasherOperationalStateGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDishwasherOperationalStateAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDishwasherOperationalStateAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DishwasherOperationalStateCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.DishwasherOperationalStateCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDishwasherOperationalStateClusterAcceptedCommandListAttributeCallback(),
+          readDishwasherOperationalStateAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readDishwasherOperationalStateAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDishwasherOperationalStateEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDishwasherOperationalStateEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DishwasherOperationalStateCluster) cluster).readEventListAttribute(
+              (ChipClusters.DishwasherOperationalStateCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDishwasherOperationalStateClusterEventListAttributeCallback(),
+          readDishwasherOperationalStateEventListCommandParams
+        );
+        result.put("readEventListAttribute", readDishwasherOperationalStateEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDishwasherOperationalStateAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDishwasherOperationalStateAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DishwasherOperationalStateCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.DishwasherOperationalStateCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedDishwasherOperationalStateClusterAttributeListAttributeCallback(),
+          readDishwasherOperationalStateAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readDishwasherOperationalStateAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDishwasherOperationalStateFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDishwasherOperationalStateFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DishwasherOperationalStateCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readDishwasherOperationalStateFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readDishwasherOperationalStateFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDishwasherOperationalStateClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDishwasherOperationalStateClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DishwasherOperationalStateCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readDishwasherOperationalStateClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readDishwasherOperationalStateClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readAirQualityInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readAirQualityAirQualityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readAirQualityAirQualityAttributeInteractionInfo = new InteractionInfo(
@@ -22485,6 +22599,7 @@ public class ClusterReadMapping {
             put("modeSelect", readModeSelectInteractionInfo());
             put("temperatureControl", readTemperatureControlInteractionInfo());
             put("refrigeratorAlarm", readRefrigeratorAlarmInteractionInfo());
+            put("dishwasherOperationalState", readDishwasherOperationalStateInteractionInfo());
             put("airQuality", readAirQualityInteractionInfo());
             put("smokeCoAlarm", readSmokeCoAlarmInteractionInfo());
             put("operationalState", readOperationalStateInteractionInfo());

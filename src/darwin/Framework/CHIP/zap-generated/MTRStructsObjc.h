@@ -706,6 +706,31 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
+@interface MTRDishwasherOperationalStateClusterErrorStateStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRDishwasherOperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull operationalStateLabel MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRDishwasherOperationalStateClusterOperationalErrorEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRDishwasherOperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRDishwasherOperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRSmokeCOAlarmClusterSmokeAlarmEvent : NSObject <NSCopying>
 @end
 

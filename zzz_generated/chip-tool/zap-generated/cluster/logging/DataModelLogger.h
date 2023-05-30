@@ -151,6 +151,13 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DishwasherOperationalState::Structs::ErrorStateStruct::DecodableType & value);
+
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -314,6 +321,11 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::RefrigeratorAlarm::Events::Notify::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::DishwasherOperationalState::Events::OperationalError::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::DishwasherOperationalState::Events::OperationCompletion::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::SmokeCoAlarm::Events::SmokeAlarm::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::SmokeCoAlarm::Events::COAlarm::DecodableType & value);
@@ -464,6 +476,9 @@ LogValue(const char * label, size_t indent,
          const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::DishwasherOperationalState::Commands::OperationalCommandResponse::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & value);

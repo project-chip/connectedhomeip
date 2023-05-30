@@ -4517,6 +4517,110 @@ class ChipClusters:
             },
         },
     }
+    _DISHWASHER_OPERATIONAL_STATE_CLUSTER_INFO = {
+        "clusterName": "DishwasherOperationalState",
+        "clusterId": 0x0000005A,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Pause",
+                "args": {
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "Stop",
+                "args": {
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "Start",
+                "args": {
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "Resume",
+                "args": {
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "PhaseList",
+                "attributeId": 0x00000000,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CurrentPhase",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "CountdownTime",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "OperationalStateList",
+                "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "OperationalState",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "OperationalError",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _AIR_QUALITY_CLUSTER_INFO = {
         "clusterName": "AirQuality",
         "clusterId": 0x0000005B,
@@ -15071,6 +15175,7 @@ class ChipClusters:
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
         0x00000056: _TEMPERATURE_CONTROL_CLUSTER_INFO,
         0x00000057: _REFRIGERATOR_ALARM_CLUSTER_INFO,
+        0x0000005A: _DISHWASHER_OPERATIONAL_STATE_CLUSTER_INFO,
         0x0000005B: _AIR_QUALITY_CLUSTER_INFO,
         0x0000005C: _SMOKE_CO_ALARM_CLUSTER_INFO,
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
@@ -15199,6 +15304,7 @@ class ChipClusters:
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
         "TemperatureControl": _TEMPERATURE_CONTROL_CLUSTER_INFO,
         "RefrigeratorAlarm": _REFRIGERATOR_ALARM_CLUSTER_INFO,
+        "DishwasherOperationalState": _DISHWASHER_OPERATIONAL_STATE_CLUSTER_INFO,
         "AirQuality": _AIR_QUALITY_CLUSTER_INFO,
         "SmokeCoAlarm": _SMOKE_CO_ALARM_CLUSTER_INFO,
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,

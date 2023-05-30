@@ -278,6 +278,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeModeSelectID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
     MTRClusterIDTypeTemperatureControlID MTR_NEWLY_AVAILABLE = 0x00000056,
     MTRClusterIDTypeRefrigeratorAlarmID MTR_NEWLY_AVAILABLE = 0x00000057,
+    MTRClusterIDTypeDishwasherOperationalStateID MTR_NEWLY_AVAILABLE = 0x0000005A,
     MTRClusterIDTypeAirQualityID MTR_NEWLY_AVAILABLE = 0x0000005B,
     MTRClusterIDTypeSmokeCOAlarmID MTR_NEWLY_AVAILABLE = 0x0000005C,
     MTRClusterIDTypeOperationalStateID MTR_NEWLY_AVAILABLE = 0x00000060,
@@ -3803,6 +3804,26 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeFeatureMapID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster DishwasherOperationalState attributes
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributePhaseListID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeCurrentPhaseID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeCountdownTimeID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeOperationalStateListID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeOperationalStateID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeOperationalErrorID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeEventListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterDishwasherOperationalStateAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster AirQuality attributes
@@ -10192,6 +10213,13 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster RefrigeratorAlarm commands
     MTRCommandIDTypeClusterRefrigeratorAlarmCommandResetID MTR_NEWLY_AVAILABLE = 0x00000000,
 
+    // Cluster DishwasherOperationalState commands
+    MTRCommandIDTypeClusterDishwasherOperationalStateCommandPauseID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterDishwasherOperationalStateCommandStopID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterDishwasherOperationalStateCommandStartID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterDishwasherOperationalStateCommandResumeID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterDishwasherOperationalStateCommandOperationalCommandResponseID MTR_NEWLY_AVAILABLE = 0x00000004,
+
     // Cluster SmokeCOAlarm commands
     MTRCommandIDTypeClusterSmokeCOAlarmCommandSelfTestRequestID MTR_NEWLY_AVAILABLE = 0x00000000,
 
@@ -11363,6 +11391,10 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
 
     // Cluster RefrigeratorAlarm events
     MTREventIDTypeClusterRefrigeratorAlarmEventNotifyID MTR_NEWLY_AVAILABLE = 0x00000000,
+
+    // Cluster DishwasherOperationalState events
+    MTREventIDTypeClusterDishwasherOperationalStateEventOperationalErrorID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterDishwasherOperationalStateEventOperationCompletionID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster SmokeCOAlarm events
     MTREventIDTypeClusterSmokeCOAlarmEventSmokeAlarmID MTR_NEWLY_AVAILABLE = 0x00000000,

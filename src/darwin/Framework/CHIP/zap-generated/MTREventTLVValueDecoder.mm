@@ -1610,6 +1610,100 @@ static id _Nullable DecodeEventPayloadForRefrigeratorAlarmCluster(EventId aEvent
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForDishwasherOperationalStateCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::DishwasherOperationalState;
+    switch (aEventId) {
+    case Events::OperationalError::Id: {
+        Events::OperationalError::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDishwasherOperationalStateClusterOperationalErrorEvent new];
+
+        do {
+            MTRDishwasherOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
+            memberValue = [MTRDishwasherOperationalStateClusterErrorStateStruct new];
+            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorState.errorStateID)];
+            if (cppValue.errorState.errorStateLabel.IsNull()) {
+                memberValue.errorStateLabel = nil;
+            } else {
+                memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
+                if (memberValue.errorStateLabel == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            }
+            if (cppValue.errorState.errorStateDetails.HasValue()) {
+                memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value());
+                if (memberValue.errorStateDetails == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            } else {
+                memberValue.errorStateDetails = nil;
+            }
+            value.errorState = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::OperationCompletion::Id: {
+        Events::OperationCompletion::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDishwasherOperationalStateClusterOperationCompletionEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.completionErrorCode)];
+            value.completionErrorCode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.totalOperationalTime.HasValue()) {
+                if (cppValue.totalOperationalTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.totalOperationalTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.totalOperationalTime = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.pausedTime.HasValue()) {
+                if (cppValue.pausedTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.pausedTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.pausedTime = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForAirQualityCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::AirQuality;
@@ -3505,6 +3599,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::RefrigeratorAlarm::Id: {
         return DecodeEventPayloadForRefrigeratorAlarmCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::DishwasherOperationalState::Id: {
+        return DecodeEventPayloadForDishwasherOperationalStateCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::AirQuality::Id: {
         return DecodeEventPayloadForAirQualityCluster(aPath.mEventId, aReader, aError);

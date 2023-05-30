@@ -304,6 +304,13 @@
 #define CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM
 #endif
 
+#if defined(ZCL_USING_OPERATIONAL_STATE_DISHWASHER_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_DISHWASHER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_DISHWASHER_CLUSTER                                                                     \
+    { chip::app::Clusters::DishwasherOperationalState::Id, "Dishwasher Operational State" },
+#else
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_DISHWASHER_CLUSTER
+#endif
+
 #if defined(ZCL_USING_AIR_QUALITY_CLUSTER_SERVER) || defined(ZCL_USING_AIR_QUALITY_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER { chip::app::Clusters::AirQuality::Id, "Air Quality" },
 #else
@@ -928,6 +935,7 @@
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM                                                                                           \
+    CHIP_PRINTCLUSTER_OPERATIONAL_STATE_DISHWASHER_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER                                                                                    \

@@ -241,6 +241,18 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DishwasherOperationalState::Structs::ErrorStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DishwasherOperationalState::Structs::ErrorStateStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request,
                         Json::Value & value);
 

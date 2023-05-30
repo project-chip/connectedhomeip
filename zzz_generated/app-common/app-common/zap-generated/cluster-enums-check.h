@@ -1237,6 +1237,41 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(DishwasherOperationalState::ErrorStateEnum val)
+{
+    using EnumType = DishwasherOperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kUnableToStartOrResume:
+    case EnumType::kUnableToCompleteOperation:
+    case EnumType::kCommandInvalidInState:
+    case EnumType::kInflowError:
+    case EnumType::kDrainError:
+    case EnumType::kDoorError:
+    case EnumType::kTempTooLow:
+    case EnumType::kTempTooHigh:
+    case EnumType::kWaterLevelError:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DishwasherOperationalState::OperationalStateEnum val)
+{
+    using EnumType = DishwasherOperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kStopped:
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kError:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(AirQuality::AirQualityEnum val)
 {
     using EnumType = AirQuality::AirQualityEnum;

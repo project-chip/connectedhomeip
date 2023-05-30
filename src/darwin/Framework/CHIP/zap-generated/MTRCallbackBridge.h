@@ -85,6 +85,8 @@ typedef void (*GroupKeyManagementClusterKeySetReadResponseCallbackType)(
     void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &);
 typedef void (*GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
     void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
+typedef void (*DishwasherOperationalStateClusterOperationalCommandResponseCallbackType)(
+    void *, const chip::app::Clusters::DishwasherOperationalState::Commands::OperationalCommandResponse::DecodableType &);
 typedef void (*OperationalStateClusterOperationalCommandResponseCallbackType)(
     void *, const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType &);
 typedef void (*DoorLockClusterGetWeekDayScheduleResponseCallbackType)(
@@ -382,6 +384,14 @@ typedef void (*GroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallb
     void *, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum);
 typedef void (*NullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum> &);
+typedef void (*DishwasherOperationalStateClusterErrorStateEnumAttributeCallback)(
+    void *, chip::app::Clusters::DishwasherOperationalState::ErrorStateEnum);
+typedef void (*NullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DishwasherOperationalState::ErrorStateEnum> &);
+typedef void (*DishwasherOperationalStateClusterOperationalStateEnumAttributeCallback)(
+    void *, chip::app::Clusters::DishwasherOperationalState::OperationalStateEnum);
+typedef void (*NullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DishwasherOperationalState::OperationalStateEnum> &);
 typedef void (*AirQualityClusterAirQualityEnumAttributeCallback)(void *, chip::app::Clusters::AirQuality::AirQualityEnum);
 typedef void (*NullableAirQualityClusterAirQualityEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AirQuality::AirQualityEnum> &);
@@ -1612,6 +1622,24 @@ typedef void (*RefrigeratorAlarmAcceptedCommandListListAttributeCallback)(
 typedef void (*RefrigeratorAlarmEventListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*RefrigeratorAlarmAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*DishwasherOperationalStatePhaseListListAttributeCallback)(
+    void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & data);
+typedef void (*DishwasherOperationalStateOperationalStateListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::DecodableType> & data);
+typedef void (*DishwasherOperationalStateOperationalStateStructAttributeCallback)(
+    void *, const chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::DecodableType &);
+typedef void (*DishwasherOperationalStateOperationalErrorStructAttributeCallback)(
+    void *, const chip::app::Clusters::DishwasherOperationalState::Structs::ErrorStateStruct::DecodableType &);
+typedef void (*DishwasherOperationalStateGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DishwasherOperationalStateAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DishwasherOperationalStateEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*DishwasherOperationalStateAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*AirQualityGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -9808,6 +9836,281 @@ public:
     void OnSubscriptionEstablished();
     using MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherOperationalStatePhaseListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherOperationalStatePhaseListListAttributeCallback>
+{
+public:
+    MTRDishwasherOperationalStatePhaseListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherOperationalStatePhaseListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherOperationalStatePhaseListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherOperationalStatePhaseListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & value);
+};
+
+class MTRDishwasherOperationalStatePhaseListListAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherOperationalStatePhaseListListAttributeCallbackBridge
+{
+public:
+    MTRDishwasherOperationalStatePhaseListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherOperationalStatePhaseListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherOperationalStatePhaseListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherOperationalStatePhaseListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherOperationalStateOperationalStateListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherOperationalStateOperationalStateListListAttributeCallback>
+{
+public:
+    MTRDishwasherOperationalStateOperationalStateListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherOperationalStateOperationalStateListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherOperationalStateOperationalStateListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherOperationalStateOperationalStateListListAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::DecodableList<
+                    chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::DecodableType> & value);
+};
+
+class MTRDishwasherOperationalStateOperationalStateListListAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherOperationalStateOperationalStateListListAttributeCallbackBridge
+{
+public:
+    MTRDishwasherOperationalStateOperationalStateListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherOperationalStateOperationalStateListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherOperationalStateOperationalStateListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherOperationalStateOperationalStateListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherOperationalStateOperationalStateStructAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherOperationalStateOperationalStateStructAttributeCallback>
+{
+public:
+    MTRDishwasherOperationalStateOperationalStateStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherOperationalStateOperationalStateStructAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherOperationalStateOperationalStateStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherOperationalStateOperationalStateStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::DecodableType & value);
+};
+
+class MTRDishwasherOperationalStateOperationalStateStructAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherOperationalStateOperationalStateStructAttributeCallbackBridge
+{
+public:
+    MTRDishwasherOperationalStateOperationalStateStructAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherOperationalStateOperationalStateStructAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherOperationalStateOperationalStateStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherOperationalStateOperationalStateStructAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherOperationalStateOperationalErrorStructAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherOperationalStateOperationalErrorStructAttributeCallback>
+{
+public:
+    MTRDishwasherOperationalStateOperationalErrorStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherOperationalStateOperationalErrorStructAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherOperationalStateOperationalErrorStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherOperationalStateOperationalErrorStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::DishwasherOperationalState::Structs::ErrorStateStruct::DecodableType & value);
+};
+
+class MTRDishwasherOperationalStateOperationalErrorStructAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherOperationalStateOperationalErrorStructAttributeCallbackBridge
+{
+public:
+    MTRDishwasherOperationalStateOperationalErrorStructAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherOperationalStateOperationalErrorStructAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherOperationalStateOperationalErrorStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherOperationalStateOperationalErrorStructAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherOperationalStateGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherOperationalStateGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRDishwasherOperationalStateGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherOperationalStateGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherOperationalStateGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherOperationalStateGeneratedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRDishwasherOperationalStateGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherOperationalStateGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRDishwasherOperationalStateGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherOperationalStateGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherOperationalStateGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherOperationalStateGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherOperationalStateAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherOperationalStateAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRDishwasherOperationalStateAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherOperationalStateAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherOperationalStateAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherOperationalStateAcceptedCommandListListAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRDishwasherOperationalStateAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherOperationalStateAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRDishwasherOperationalStateAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherOperationalStateAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherOperationalStateAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherOperationalStateAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherOperationalStateEventListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherOperationalStateEventListListAttributeCallback>
+{
+public:
+    MTRDishwasherOperationalStateEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherOperationalStateEventListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherOperationalStateEventListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherOperationalStateEventListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value);
+};
+
+class MTRDishwasherOperationalStateEventListListAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherOperationalStateEventListListAttributeCallbackBridge
+{
+public:
+    MTRDishwasherOperationalStateEventListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherOperationalStateEventListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherOperationalStateEventListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherOperationalStateEventListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherOperationalStateAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherOperationalStateAttributeListListAttributeCallback>
+{
+public:
+    MTRDishwasherOperationalStateAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherOperationalStateAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherOperationalStateAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherOperationalStateAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRDishwasherOperationalStateAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherOperationalStateAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRDishwasherOperationalStateAttributeListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherOperationalStateAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherOperationalStateAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherOperationalStateAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -22504,6 +22807,23 @@ public:
                 const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
 };
 
+class MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge
+    : public MTRCallbackBridge<DishwasherOperationalStateClusterOperationalCommandResponseCallbackType>
+{
+public:
+    MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherOperationalStateClusterOperationalCommandResponseCallbackType>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherOperationalStateClusterOperationalCommandResponseCallbackType>(queue, handler, action,
+                                                                                                   OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::DishwasherOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
+};
+
 class MTROperationalStateClusterOperationalCommandResponseCallbackBridge
     : public MTRCallbackBridge<OperationalStateClusterOperationalCommandResponseCallbackType>
 {
@@ -27487,6 +27807,151 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherOperationalStateClusterErrorStateEnumAttributeCallback>
+{
+public:
+    MTRDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherOperationalStateClusterErrorStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherOperationalStateClusterErrorStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DishwasherOperationalState::ErrorStateEnum value);
+};
+
+class MTRDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge
+{
+public:
+    MTRDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallback>
+{
+public:
+    MTRNullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<NullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::DishwasherOperationalState::ErrorStateEnum> & value);
+};
+
+class MTRNullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<DishwasherOperationalStateClusterOperationalStateEnumAttributeCallback>
+{
+public:
+    MTRDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherOperationalStateClusterOperationalStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherOperationalStateClusterOperationalStateEnumAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DishwasherOperationalState::OperationalStateEnum value);
+};
+
+class MTRDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge
+{
+public:
+    MTRDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallback>
+{
+public:
+    MTRNullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler) :
+        MTRCallbackBridge<NullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallback>(queue, handler,
+                                                                                                          OnSuccessFn){};
+
+    MTRNullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler,
+                                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallback>(queue, handler, action,
+                                                                                                          OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::DishwasherOperationalState::OperationalStateEnum> & value);
+};
+
+class MTRNullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

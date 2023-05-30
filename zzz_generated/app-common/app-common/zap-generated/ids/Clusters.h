@@ -157,6 +157,9 @@ static constexpr ClusterId Id = 0x00000056;
 namespace RefrigeratorAlarm {
 static constexpr ClusterId Id = 0x00000057;
 } // namespace RefrigeratorAlarm
+namespace DishwasherOperationalState {
+static constexpr ClusterId Id = 0x0000005A;
+} // namespace DishwasherOperationalState
 namespace AirQuality {
 static constexpr ClusterId Id = 0x0000005B;
 } // namespace AirQuality

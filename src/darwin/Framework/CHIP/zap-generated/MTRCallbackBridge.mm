@@ -8624,6 +8624,325 @@ void MTRRefrigeratorAlarmAttributeListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
+void MTRDishwasherOperationalStatePhaseListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & value)
+{
+    NSArray * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = value.Value().begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                NSString * newElement_1;
+                newElement_1 = AsString(entry_1);
+                if (newElement_1 == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            objCValue = array_1;
+        }
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDishwasherOperationalStatePhaseListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDishwasherOperationalStateOperationalStateListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::DecodableType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = value.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            MTRDishwasherOperationalStateClusterOperationalStateStruct * newElement_0;
+            newElement_0 = [MTRDishwasherOperationalStateClusterOperationalStateStruct new];
+            newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.operationalStateID)];
+            newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel);
+            if (newElement_0.operationalStateLabel == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+        objCValue = array_0;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDishwasherOperationalStateOperationalStateListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDishwasherOperationalStateOperationalStateStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DishwasherOperationalState::Structs::OperationalStateStruct::DecodableType & value)
+{
+    MTRDishwasherOperationalStateClusterOperationalStateStruct * _Nonnull objCValue;
+    objCValue = [MTRDishwasherOperationalStateClusterOperationalStateStruct new];
+    objCValue.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.operationalStateID)];
+    objCValue.operationalStateLabel = AsString(value.operationalStateLabel);
+    if (objCValue.operationalStateLabel == nil) {
+        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+        OnFailureFn(context, err);
+        return;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDishwasherOperationalStateOperationalStateStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDishwasherOperationalStateOperationalErrorStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DishwasherOperationalState::Structs::ErrorStateStruct::DecodableType & value)
+{
+    MTRDishwasherOperationalStateClusterErrorStateStruct * _Nonnull objCValue;
+    objCValue = [MTRDishwasherOperationalStateClusterErrorStateStruct new];
+    objCValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.errorStateID)];
+    if (value.errorStateLabel.IsNull()) {
+        objCValue.errorStateLabel = nil;
+    } else {
+        objCValue.errorStateLabel = AsString(value.errorStateLabel.Value());
+        if (objCValue.errorStateLabel == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
+    }
+    if (value.errorStateDetails.HasValue()) {
+        objCValue.errorStateDetails = AsString(value.errorStateDetails.Value());
+        if (objCValue.errorStateDetails == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
+    } else {
+        objCValue.errorStateDetails = nil;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDishwasherOperationalStateOperationalErrorStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDishwasherOperationalStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = value.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+        objCValue = array_0;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDishwasherOperationalStateGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDishwasherOperationalStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = value.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+        objCValue = array_0;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDishwasherOperationalStateAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDishwasherOperationalStateEventListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = value.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+        objCValue = array_0;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDishwasherOperationalStateEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDishwasherOperationalStateAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = value.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+        objCValue = array_0;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDishwasherOperationalStateAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
 void MTRAirQualityGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -22913,6 +23232,18 @@ void MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::OnS
     DispatchSuccess(context, response);
 };
 
+void MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::Clusters::DishwasherOperationalState::Commands::OperationalCommandResponse::DecodableType & data)
+{
+    auto * response = [MTRDishwasherOperationalStateClusterOperationalCommandResponseParams new];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
+    }
+    DispatchSuccess(context, response);
+};
+
 void MTROperationalStateClusterOperationalCommandResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & data)
 {
@@ -26532,6 +26863,107 @@ void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCall
 };
 
 void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DishwasherOperationalState::ErrorStateEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DishwasherOperationalState::ErrorStateEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableDishwasherOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DishwasherOperationalState::OperationalStateEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::DishwasherOperationalState::OperationalStateEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableDishwasherOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

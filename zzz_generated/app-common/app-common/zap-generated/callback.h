@@ -385,6 +385,14 @@ void emberAfTemperatureControlClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfRefrigeratorAlarmClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Dishwasher Operational State Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherOperationalStateClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Air Quality Cluster Init
  *
  * Cluster Init
@@ -4425,6 +4433,82 @@ void emberAfRefrigeratorAlarmClusterServerTickCallback(chip::EndpointId endpoint
  * @param endpoint  Endpoint that is being served
  */
 void emberAfRefrigeratorAlarmClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Dishwasher Operational State Cluster
+//
+
+/** @brief Dishwasher Operational State Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherOperationalStateClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Operational State Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterDishwasherOperationalStateClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Operational State Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherOperationalStateClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Operational State Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterDishwasherOperationalStateClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Dishwasher Operational State Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterDishwasherOperationalStateClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Dishwasher Operational State Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterDishwasherOperationalStateClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Dishwasher Operational State Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDishwasherOperationalStateClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Operational State Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDishwasherOperationalStateClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Air Quality Cluster
@@ -11187,6 +11271,30 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(
 bool emberAfRefrigeratorAlarmClusterResetCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::RefrigeratorAlarm::Commands::Reset::DecodableType & commandData);
+/**
+ * @brief Dishwasher Operational State Cluster Pause Command callback (from client)
+ */
+bool emberAfDishwasherOperationalStateClusterPauseCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherOperationalState::Commands::Pause::DecodableType & commandData);
+/**
+ * @brief Dishwasher Operational State Cluster Stop Command callback (from client)
+ */
+bool emberAfDishwasherOperationalStateClusterStopCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherOperationalState::Commands::Stop::DecodableType & commandData);
+/**
+ * @brief Dishwasher Operational State Cluster Start Command callback (from client)
+ */
+bool emberAfDishwasherOperationalStateClusterStartCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherOperationalState::Commands::Start::DecodableType & commandData);
+/**
+ * @brief Dishwasher Operational State Cluster Resume Command callback (from client)
+ */
+bool emberAfDishwasherOperationalStateClusterResumeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherOperationalState::Commands::Resume::DecodableType & commandData);
 /**
  * @brief Smoke CO Alarm Cluster SelfTestRequest Command callback (from client)
  */
