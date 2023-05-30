@@ -6324,6 +6324,7 @@ private:
 | Cluster FanControl                                                  | 0x0202 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * Step                                                              |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FanMode                                                           | 0x0000 |
@@ -6337,6 +6338,7 @@ private:
 | * RockSetting                                                       | 0x0008 |
 | * WindSupport                                                       | 0x0009 |
 | * WindSetting                                                       | 0x000A |
+| * AirflowDirection                                                  | 0x000B |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -6346,6 +6348,38 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command Step
+ */
+class FanControlStep : public ClusterCommand
+{
+public:
+    FanControlStep(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("step", credsIssuerConfig)
+    {
+        AddArgument("Direction", 0, UINT8_MAX, &mRequest.direction);
+        AddArgument("Wrap", 0, 1, &mRequest.wrap);
+        AddArgument("LowestOff", 0, 1, &mRequest.lowestOff);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000202, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000202) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000202, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::FanControl::Commands::Step::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster ThermostatUserInterfaceConfiguration                        | 0x0204 |
@@ -16514,6 +16548,7 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
         // Commands
         //
         make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        make_unique<FanControlStep>(credsIssuerConfig),     //
         //
         // Attributes
         //
@@ -16529,6 +16564,7 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "rock-setting", Attributes::RockSetting::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "wind-support", Attributes::WindSupport::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "wind-setting", Attributes::WindSetting::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "airflow-direction", Attributes::AirflowDirection::Id, credsIssuerConfig),          //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -16558,6 +16594,9 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "wind-setting", 0, UINT8_MAX, Attributes::WindSetting::Id,
                                              WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::FanControl::AirflowDirectionEnum>>(
+            Id, "airflow-direction", 0, UINT8_MAX, Attributes::AirflowDirection::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -16583,6 +16622,7 @@ void registerClusterFanControl(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "rock-setting", Attributes::RockSetting::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "wind-support", Attributes::WindSupport::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "wind-setting", Attributes::WindSetting::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "airflow-direction", Attributes::AirflowDirection::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //

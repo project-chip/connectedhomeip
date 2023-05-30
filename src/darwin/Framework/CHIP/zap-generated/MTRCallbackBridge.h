@@ -595,6 +595,13 @@ typedef void (*ThermostatClusterThermostatSystemModeAttributeCallback)(void *,
                                                                        chip::app::Clusters::Thermostat::ThermostatSystemMode);
 typedef void (*NullableThermostatClusterThermostatSystemModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> &);
+typedef void (*FanControlClusterAirflowDirectionEnumAttributeCallback)(void *,
+                                                                       chip::app::Clusters::FanControl::AirflowDirectionEnum);
+typedef void (*NullableFanControlClusterAirflowDirectionEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::AirflowDirectionEnum> &);
+typedef void (*FanControlClusterDirectionEnumAttributeCallback)(void *, chip::app::Clusters::FanControl::DirectionEnum);
+typedef void (*NullableFanControlClusterDirectionEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::DirectionEnum> &);
 typedef void (*FanControlClusterFanModeSequenceTypeAttributeCallback)(void *, chip::app::Clusters::FanControl::FanModeSequenceType);
 typedef void (*NullableFanControlClusterFanModeSequenceTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceType> &);
@@ -31592,6 +31599,140 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFanControlClusterAirflowDirectionEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<FanControlClusterAirflowDirectionEnumAttributeCallback>
+{
+public:
+    MTRFanControlClusterAirflowDirectionEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FanControlClusterAirflowDirectionEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFanControlClusterAirflowDirectionEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<FanControlClusterAirflowDirectionEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FanControl::AirflowDirectionEnum value);
+};
+
+class MTRFanControlClusterAirflowDirectionEnumAttributeCallbackSubscriptionBridge
+    : public MTRFanControlClusterAirflowDirectionEnumAttributeCallbackBridge
+{
+public:
+    MTRFanControlClusterAirflowDirectionEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFanControlClusterAirflowDirectionEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFanControlClusterAirflowDirectionEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFanControlClusterAirflowDirectionEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFanControlClusterAirflowDirectionEnumAttributeCallback>
+{
+public:
+    MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableFanControlClusterAirflowDirectionEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableFanControlClusterAirflowDirectionEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::AirflowDirectionEnum> & value);
+};
+
+class MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRFanControlClusterDirectionEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<FanControlClusterDirectionEnumAttributeCallback>
+{
+public:
+    MTRFanControlClusterDirectionEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<FanControlClusterDirectionEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRFanControlClusterDirectionEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             MTRActionBlock action) :
+        MTRCallbackBridge<FanControlClusterDirectionEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::FanControl::DirectionEnum value);
+};
+
+class MTRFanControlClusterDirectionEnumAttributeCallbackSubscriptionBridge
+    : public MTRFanControlClusterDirectionEnumAttributeCallbackBridge
+{
+public:
+    MTRFanControlClusterDirectionEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action,
+                                                                         MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRFanControlClusterDirectionEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRFanControlClusterDirectionEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRFanControlClusterDirectionEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableFanControlClusterDirectionEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableFanControlClusterDirectionEnumAttributeCallback>
+{
+public:
+    MTRNullableFanControlClusterDirectionEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableFanControlClusterDirectionEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableFanControlClusterDirectionEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<NullableFanControlClusterDirectionEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::DirectionEnum> & value);
+};
+
+class MTRNullableFanControlClusterDirectionEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableFanControlClusterDirectionEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableFanControlClusterDirectionEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableFanControlClusterDirectionEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableFanControlClusterDirectionEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableFanControlClusterDirectionEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

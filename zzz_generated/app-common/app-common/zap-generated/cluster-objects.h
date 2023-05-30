@@ -22138,6 +22138,57 @@ struct TypeInfo
 } // namespace Thermostat
 namespace FanControl {
 
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Step {
+struct Type;
+struct DecodableType;
+} // namespace Step
+
+} // namespace Commands
+
+namespace Commands {
+namespace Step {
+enum class Fields : uint8_t
+{
+    kDirection = 0,
+    kWrap      = 1,
+    kLowestOff = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+
+    DirectionEnum direction = static_cast<DirectionEnum>(0);
+    Optional<bool> wrap;
+    Optional<bool> lowestOff;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+
+    DirectionEnum direction = static_cast<DirectionEnum>(0);
+    Optional<bool> wrap;
+    Optional<bool> lowestOff;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Step
+} // namespace Commands
+
 namespace Attributes {
 
 namespace FanMode {
@@ -22272,6 +22323,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WindSetting
+namespace AirflowDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FanControl::AirflowDirectionEnum;
+    using DecodableType    = chip::app::Clusters::FanControl::AirflowDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::FanControl::AirflowDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AirflowDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AirflowDirection
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -22329,6 +22392,8 @@ struct TypeInfo
         Attributes::RockSetting::TypeInfo::DecodableType rockSetting   = static_cast<uint8_t>(0);
         Attributes::WindSupport::TypeInfo::DecodableType windSupport   = static_cast<uint8_t>(0);
         Attributes::WindSetting::TypeInfo::DecodableType windSetting   = static_cast<uint8_t>(0);
+        Attributes::AirflowDirection::TypeInfo::DecodableType airflowDirection =
+            static_cast<chip::app::Clusters::FanControl::AirflowDirectionEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

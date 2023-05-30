@@ -24539,6 +24539,7 @@ class FanControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="rockSetting", Tag=0x00000008, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="windSupport", Tag=0x00000009, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="windSetting", Tag=0x0000000A, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="airflowDirection", Tag=0x0000000B, Type=typing.Optional[FanControl.Enums.AirflowDirectionEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -24558,6 +24559,7 @@ class FanControl(Cluster):
     rockSetting: 'typing.Optional[uint]' = None
     windSupport: 'typing.Optional[uint]' = None
     windSetting: 'typing.Optional[uint]' = None
+    airflowDirection: 'typing.Optional[FanControl.Enums.AirflowDirectionEnum]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -24566,6 +24568,24 @@ class FanControl(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
+        class AirflowDirectionEnum(MatterIntEnum):
+            kForward = 0x00
+            kReverse = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 2,
+
+        class DirectionEnum(MatterIntEnum):
+            kIncrease = 0x00
+            kDecrease = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 2,
+
         class FanModeSequenceType(MatterIntEnum):
             kOffLowMedHigh = 0x00
             kOffLowHigh = 0x01
@@ -24599,6 +24619,8 @@ class FanControl(Cluster):
             kAuto = 0x2
             kRocking = 0x4
             kWind = 0x8
+            kStep = 0x10
+            kAirflowDirection = 0x20
 
         class RockSupportMask(IntFlag):
             kRockLeftRight = 0x1
@@ -24612,6 +24634,27 @@ class FanControl(Cluster):
         class WindSupportMask(IntFlag):
             kSleepWind = 0x1
             kNaturalWind = 0x2
+
+    class Commands:
+        @dataclass
+        class Step(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0202
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="direction", Tag=0, Type=FanControl.Enums.DirectionEnum),
+                        ClusterObjectFieldDescriptor(Label="wrap", Tag=1, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="lowestOff", Tag=2, Type=typing.Optional[bool]),
+                    ])
+
+            direction: 'FanControl.Enums.DirectionEnum' = 0
+            wrap: 'typing.Optional[bool]' = None
+            lowestOff: 'typing.Optional[bool]' = None
 
     class Attributes:
         @dataclass
@@ -24789,6 +24832,22 @@ class FanControl(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
             value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class AirflowDirection(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0202
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[FanControl.Enums.AirflowDirectionEnum])
+
+            value: 'typing.Optional[FanControl.Enums.AirflowDirectionEnum]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

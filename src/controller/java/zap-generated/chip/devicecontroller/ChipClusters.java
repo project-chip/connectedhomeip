@@ -22720,6 +22720,24 @@ public class ChipClusters {
       subscribeWindSettingAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readAirflowDirectionAttribute(IntegerAttributeCallback callback) {
+      readAirflowDirectionAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeAirflowDirectionAttribute(DefaultClusterCallback callback, Integer value) {
+      writeAirflowDirectionAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeAirflowDirectionAttribute(
+        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeAirflowDirectionAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+
+    public void subscribeAirflowDirectionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAirflowDirectionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -22880,6 +22898,18 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeWindSettingAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAirflowDirectionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeAirflowDirectionAttribute(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        Integer value,
+        @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeAirflowDirectionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(

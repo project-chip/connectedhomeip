@@ -2849,6 +2849,30 @@ enum class ModeForSequence : uint8_t
 
 namespace FanControl {
 
+// Enum for AirflowDirectionEnum
+enum class AirflowDirectionEnum : uint8_t
+{
+    kForward = 0x00,
+    kReverse = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for DirectionEnum
+enum class DirectionEnum : uint8_t
+{
+    kIncrease = 0x00,
+    kDecrease = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Enum for FanModeSequenceType
 enum class FanModeSequenceType : uint8_t
 {
@@ -2885,10 +2909,12 @@ enum class FanModeType : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kMultiSpeed = 0x1,
-    kAuto       = 0x2,
-    kRocking    = 0x4,
-    kWind       = 0x8,
+    kMultiSpeed       = 0x1,
+    kAuto             = 0x2,
+    kRocking          = 0x4,
+    kWind             = 0x8,
+    kStep             = 0x10,
+    kAirflowDirection = 0x20,
 };
 
 // Bitmap for RockSupportMask

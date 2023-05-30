@@ -9099,6 +9099,43 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRFanControlClusterStepParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _direction = @(0);
+
+        _wrap = nil;
+
+        _lowestOff = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRFanControlClusterStepParams alloc] init];
+
+    other.direction = self.direction;
+    other.wrap = self.wrap;
+    other.lowestOff = self.lowestOff;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: direction:%@; wrap:%@; lowestOff:%@; >",
+                                             NSStringFromClass([self class]), _direction, _wrap, _lowestOff];
+    return descriptionString;
+}
+
+@end
 @implementation MTRColorControlClusterMoveToHueParams
 - (instancetype)init
 {

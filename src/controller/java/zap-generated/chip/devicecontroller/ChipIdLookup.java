@@ -3297,6 +3297,9 @@ public final class ChipIdLookup {
       if (attributeId == 10L) {
         return "WindSetting";
       }
+      if (attributeId == 11L) {
+        return "AirflowDirection";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }

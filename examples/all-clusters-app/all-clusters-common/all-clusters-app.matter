@@ -3285,6 +3285,16 @@ server cluster Thermostat = 513 {
 
 /** An interface for controlling a fan in a heating/cooling system. */
 server cluster FanControl = 514 {
+  enum AirflowDirectionEnum : ENUM8 {
+    kForward = 0;
+    kReverse = 1;
+  }
+
+  enum DirectionEnum : ENUM8 {
+    kIncrease = 0;
+    kDecrease = 1;
+  }
+
   enum FanModeSequenceType : ENUM8 {
     kOffLowMedHigh = 0;
     kOffLowHigh = 1;
@@ -3309,6 +3319,8 @@ server cluster FanControl = 514 {
     kAuto = 0x2;
     kRocking = 0x4;
     kWind = 0x8;
+    kStep = 0x10;
+    kAirflowDirection = 0x20;
   }
 
   bitmap RockSupportMask : BITMAP8 {
@@ -3338,12 +3350,21 @@ server cluster FanControl = 514 {
   attribute bitmap8 rockSetting = 8;
   readonly attribute bitmap8 windSupport = 9;
   attribute bitmap8 windSetting = 10;
+  attribute AirflowDirectionEnum airflowDirection = 11;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct StepRequest {
+    DirectionEnum direction = 0;
+    optional boolean wrap = 1;
+    optional boolean lowestOff = 2;
+  }
+
+  command Step(StepRequest): DefaultSuccess = 0;
 }
 
 /** An interface for configuring the user interface of a thermostat (which may be remote from the thermostat). */
@@ -5330,6 +5351,7 @@ endpoint 1 {
     ram      attribute rockSetting default = 0x00;
     ram      attribute windSupport default = 0x00;
     ram      attribute windSetting default = 0x00;
+    ram      attribute airflowDirection default = 0;
     ram      attribute featureMap default = 0x0F;
     ram      attribute clusterRevision default = 2;
   }
