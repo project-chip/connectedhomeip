@@ -528,5 +528,5 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Run Build Coverage
-              timeout-minutes: 20
+              timeout-minutes: 30
               run: ./scripts/build_coverage.sh
