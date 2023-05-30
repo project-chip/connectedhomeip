@@ -149,8 +149,8 @@ static_library("support") {
     "verhoeff/Verhoeff36.cpp",
   ]
 
-  if (current_os == "android" || build_java_matter_controller) {
-    if (build_java_matter_controller) {
+  if (current_os == "android" || matter_enable_java_compilation) {
+    if (matter_enable_java_compilation) {
       include_dirs = java_matter_controller_dependent_paths
     }
 

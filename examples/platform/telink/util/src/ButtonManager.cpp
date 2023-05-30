@@ -29,21 +29,19 @@ LOG_MODULE_REGISTER(ButtonManager);
 ButtonManager ButtonManager::sInstance;
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-static struct gpio_callback button_cb_data;
 void button_pressed(const struct device * dev, struct gpio_callback * cb, uint32_t pins);
 #endif
 
-void Button::Configure(const struct device * port, gpio_pin_t outPin, gpio_pin_t inPin, void (*callback)(void))
+void Button::Configure(const gpio_dt_spec * input_button_dt, const gpio_dt_spec * output_button_dt, void (*callback)(void))
 {
-    if (!device_is_ready(port))
+    if (!device_is_ready(input_button_dt->port))
     {
-        LOG_ERR("%s is not ready\n", port->name);
+        LOG_ERR("Input port %s is not ready\n", input_button_dt->port->name);
     }
 
-    mPort     = port;
-    mOutPin   = outPin;
-    mInPin    = inPin;
-    mCallback = callback;
+    mInput_button      = input_button_dt;
+    mOutput_matrix_pin = output_button_dt;
+    mCallback          = callback;
 }
 
 int Button::Init(void)
@@ -51,22 +49,22 @@ int Button::Init(void)
     int ret = 0;
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-    ret = gpio_pin_configure(mPort, mInPin, GPIO_INPUT | GPIO_PULL_UP);
+    ret = gpio_pin_configure_dt(mInput_button, GPIO_INPUT);
     if (ret < 0)
     {
         LOG_ERR("Config in pin err: %d", ret);
         return ret;
     }
 
-    ret = gpio_pin_interrupt_configure(mPort, mInPin, GPIO_INT_EDGE_FALLING);
+    ret = gpio_pin_interrupt_configure_dt(mInput_button, GPIO_INT_EDGE_TO_ACTIVE);
     if (ret < 0)
     {
         LOG_ERR("Config irq pin err: %d", ret);
         return ret;
     }
 
-    gpio_init_callback(&button_cb_data, button_pressed, mInPin);
-    ret = gpio_add_callback(mPort, &button_cb_data);
+    gpio_init_callback(&mButton_cb_data, button_pressed, BIT(mInput_button->pin));
+    ret = gpio_add_callback(mInput_button->port, &mButton_cb_data);
     if (ret < 0)
     {
         LOG_ERR("Config gpio_init_callback err: %d", ret);
@@ -74,14 +72,14 @@ int Button::Init(void)
     }
 #else
 
-    ret = gpio_pin_configure(mPort, mOutPin, GPIO_OUTPUT_ACTIVE);
+    ret = gpio_pin_configure_dt(mOutput_matrix_pin, GPIO_OUTPUT_ACTIVE);
     if (ret < 0)
     {
         LOG_ERR("Config out pin err: %d", ret);
         return ret;
     }
 
-    ret = gpio_pin_configure(mPort, mInPin, GPIO_INPUT | GPIO_PULL_DOWN);
+    ret = gpio_pin_configure_dt(mInput_button, GPIO_INPUT);
     if (ret < 0)
     {
         LOG_ERR("Config in pin err: %d", ret);
@@ -97,7 +95,7 @@ int Button::Deinit(void)
     int ret = 0;
 
     /* Reconfigure output key pin to input */
-    ret = gpio_pin_configure(mPort, mOutPin, GPIO_INPUT | GPIO_PULL_DOWN);
+    ret = gpio_pin_configure(mOutput_matrix_pin->port, mOutput_matrix_pin->pin, GPIO_INPUT | GPIO_PULL_DOWN);
     if (ret < 0)
     {
         LOG_ERR("Reconfig out pin err: %d", ret);
@@ -120,7 +118,7 @@ void Button::Poll(Button * previous)
     ret = Init();
     assert(ret >= 0);
 
-    ret = gpio_pin_get(mPort, mInPin);
+    ret = gpio_pin_get_dt(mInput_button);
     assert(ret >= 0);
 
     if (ret == STATE_HIGH && ret != mPreviousState)
@@ -183,39 +181,34 @@ void ButtonEntry(void * param1, void * param2, void * param3)
 void button_pressed(const struct device * dev, struct gpio_callback * cb, uint32_t pins)
 {
     ButtonManager & sInstance = ButtonManagerInst();
-    sInstance.PollIRQ();
+    sInstance.PollIRQ(dev, pins);
 }
 
-void ButtonManager::PollIRQ(void)
+void ButtonManager::PollIRQ(const struct device * dev, uint32_t pins)
 {
     for (unsigned int i = 0; i < mButtons.size(); i++)
     {
-        mButtons[i].PollIRQ();
+        mButtons[i].PollIRQ(dev, pins);
     }
 }
 
-void Button::PollIRQ()
+void Button::PollIRQ(const struct device * dev, uint32_t pins)
 {
-    int ret = gpio_pin_get(mPort, mInPin);
-    if (ret == STATE_LOW)
+    if ((BIT(mInput_button->pin) & pins) && (mCallback != NULL) && (dev == mInput_button->port))
     {
-        if (mCallback != NULL)
-        {
-            mCallback();
-        }
+        mCallback();
     }
 }
 
-void Button::Configure(const struct device * port, gpio_pin_t inPin, void (*callback)(void))
+void Button::Configure(const gpio_dt_spec * input_button_dt, void (*callback)(void))
 {
-    if (!device_is_ready(port))
+    if (!device_is_ready(input_button_dt->port))
     {
-        LOG_ERR("%s is not ready\n", port->name);
+        LOG_ERR("%s is not ready\n", input_button_dt->port->name);
     }
 
-    mPort     = port;
-    mInPin    = inPin;
-    mCallback = callback;
+    mInput_button = input_button_dt;
+    mCallback     = callback;
 
     Init();
 }

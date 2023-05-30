@@ -57,9 +57,9 @@ public:
     /**
      *  @brief Mark the end of this InvokeResponseIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    InvokeResponseIBs::Builder & EndOfInvokeResponses();
+    CHIP_ERROR EndOfInvokeResponses();
 
 private:
     InvokeResponseIB::Builder mInvokeResponse;

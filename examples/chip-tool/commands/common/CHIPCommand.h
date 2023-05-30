@@ -57,8 +57,8 @@ public:
     using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
-    static constexpr uint16_t kMaxGroupsPerFabric    = 5;
-    static constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+    static constexpr uint16_t kMaxGroupsPerFabric    = 50;
+    static constexpr uint16_t kMaxGroupKeysPerFabric = 25;
 
     CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds, const char * helpText = nullptr) :
         Command(commandName, helpText), mCredIssuerCmds(credIssuerCmds)
