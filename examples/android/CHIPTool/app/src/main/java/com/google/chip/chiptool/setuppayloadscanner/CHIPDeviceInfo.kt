@@ -19,8 +19,8 @@
 package com.google.chip.chiptool.setuppayloadscanner
 
 import android.os.Parcelable
-import chip.setuppayload.DiscoveryCapability
-import chip.setuppayload.SetupPayload
+import chip.onboardingpayload.DiscoveryCapability
+import chip.onboardingpayload.OnboardingPayload
 import kotlinx.parcelize.Parcelize
 
 /** Class to hold the CHIP device information. */
@@ -36,11 +36,10 @@ data class CHIPDeviceInfo(
   val discoveryCapabilities: Set<DiscoveryCapability> = setOf(),
   val isShortDiscriminator: Boolean = false,
   val ipAddress: String? = null,
-
   ) : Parcelable {
 
   companion object {
-    fun fromSetupPayload(setupPayload: SetupPayload, isShortDiscriminator: Boolean = false): CHIPDeviceInfo {
+    fun fromSetupPayload(setupPayload: OnboardingPayload): CHIPDeviceInfo {
       return CHIPDeviceInfo(
         setupPayload.version,
         setupPayload.vendorId,
@@ -57,7 +56,7 @@ data class CHIPDeviceInfo(
           )
         },
         setupPayload.discoveryCapabilities,
-        isShortDiscriminator
+        setupPayload.hasShortDiscriminator
       )
     }
   }
