@@ -21,8 +21,8 @@ kotlinc_runner = "${chip_root}/build/chip/java/kotlinc_runner.py"
 jar_runner = "${chip_root}/build/chip/java/jar_runner.py"
 write_build_config = "${chip_root}/build/chip/java/write_build_config.py"
 
-assert(android_sdk_root != "" || build_java_matter_controller,
-       "android_sdk_root or java_path must be specified")
+assert(android_sdk_root != "" || matter_enable_java_compilation,
+       "android_sdk_root must be specified or JAVA_PATH must be set.")
 
 # Declare a java library target
 #
@@ -127,7 +127,8 @@ template("java_library") {
 
     # Compiles the given files into a directory and generates a 'class list'
     _javac_target_name = target_name + "__javac"
-    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/classes"
+    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/" +
+                 target_name + "/classes"
     _class_list_file = "$target_gen_dir/$target_name.classlist"
     action(_javac_target_name) {
       sources = _java_files
@@ -284,7 +285,8 @@ template("java_binary") {
 
     # Compiles the given files into a directory and generates a 'class list'
     _javac_target_name = target_name + "__javac"
-    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/classes"
+    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/" +
+                 target_name + "/classes"
     _class_list_file = "$target_gen_dir/$target_name.classlist"
     action(_javac_target_name) {
       sources = _java_files
@@ -441,7 +443,8 @@ template("kotlin_library") {
 
     # Compiles the given files into a directory and generates a 'class list'
     _kotlinc_target_name = target_name + "__kotlinc"
-    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/classes"
+    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/" +
+                 target_name + "/classes"
     _class_list_file = "$target_gen_dir/$target_name.classlist"
     action(_kotlinc_target_name) {
       sources = _kotlin_files
@@ -598,7 +601,8 @@ template("kotlin_binary") {
 
     # Compiles the given files into a directory and generates a 'class list'
     _kotlinc_target_name = target_name + "__kotlinc"
-    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/classes"
+    _class_dir = rebase_path(target_out_dir, root_build_dir) + "/" +
+                 target_name + "/classes"
     _class_list_file = "$target_gen_dir/$target_name.classlist"
     action(_kotlinc_target_name) {
       sources = _kotlin_files

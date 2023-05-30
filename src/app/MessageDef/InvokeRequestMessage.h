@@ -102,9 +102,9 @@ public:
     /**
      *  @brief Mark the end of this InvokeRequestMessage
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    InvokeRequestMessage::Builder & EndOfInvokeRequestMessage();
+    CHIP_ERROR EndOfInvokeRequestMessage();
 
 private:
     InvokeRequests::Builder mInvokeRequests;

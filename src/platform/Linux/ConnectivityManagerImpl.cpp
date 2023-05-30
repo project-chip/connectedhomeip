@@ -444,7 +444,10 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                             }
                         });
 
-                        delegate->OnAssociationFailureDetected(associationFailureCause, status);
+                        if (delegate)
+                        {
+                            delegate->OnAssociationFailureDetected(associationFailureCause, status);
+                        }
                     }
 
                     DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });

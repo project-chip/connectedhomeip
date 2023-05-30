@@ -121,10 +121,10 @@ DataVersionFilterIB::Builder & DataVersionFilterIB::Builder::DataVersion(const c
     return *this;
 }
 
-DataVersionFilterIB::Builder & DataVersionFilterIB::Builder::EndOfDataVersionFilterIB()
+CHIP_ERROR DataVersionFilterIB::Builder::EndOfDataVersionFilterIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

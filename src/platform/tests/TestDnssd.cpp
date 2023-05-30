@@ -34,6 +34,7 @@
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 
 using chip::Dnssd::DnssdService;
@@ -101,7 +102,7 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     auto * suite = ctx->mTestSuite;
     char addrBuf[100];
 
-    NL_TEST_ASSERT(suite, result != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(suite, result != nullptr);
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
 
     // The NL_TEST_ASSERT above will not abort the test, so we need to

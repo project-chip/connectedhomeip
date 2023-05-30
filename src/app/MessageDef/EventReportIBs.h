@@ -58,9 +58,9 @@ public:
     /**
      *  @brief Mark the end of this EventReportIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    EventReportIBs::Builder & EndOfEventReports();
+    CHIP_ERROR EndOfEventReports();
 
 private:
     EventReportIB::Builder mEventReport;

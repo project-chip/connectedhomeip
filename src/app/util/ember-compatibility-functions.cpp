@@ -282,8 +282,8 @@ void IncreaseClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPath
 
 CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, AttributeDataIB::Builder & aAttributeDataIBBuilder)
 {
-    ReturnErrorOnFailure(aAttributeDataIBBuilder.EndOfAttributeDataIB().GetError());
-    return aAttributeReport.EndOfAttributeReportIB().GetError();
+    ReturnErrorOnFailure(aAttributeDataIBBuilder.EndOfAttributeDataIB());
+    return aAttributeReport.EndOfAttributeReportIB();
 }
 
 CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
@@ -598,11 +598,11 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     AttributePathIB::Builder & attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
-        .Cluster(aPath.mClusterId)
-        .Attribute(aPath.mAttributeId)
-        .EndOfAttributePathIB();
-    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
+    CHIP_ERROR err = attributePathIBBuilder.Endpoint(aPath.mEndpointId)
+                         .Cluster(aPath.mClusterId)
+                         .Attribute(aPath.mAttributeId)
+                         .EndOfAttributePathIB();
+    ReturnErrorOnFailure(err);
 
     EmberAfAttributeSearchRecord record;
     record.endpoint           = aPath.mEndpointId;
