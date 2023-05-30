@@ -89,6 +89,15 @@ tests:
               type: list
               contains: [0, 1]
 
+    - label: "Read the optional attribute InPlaceIndicator (INKCREMON.S.A0002) in AttributeList"
+      PICS: INKCREMON.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -96,6 +105,15 @@ tests:
           constraints:
               type: list
               contains: []
+
+    - label: "Read the optional command (ResetCondition) in AcceptedCommandList"
+      PICS: INKCREMON.S.C00.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
