@@ -286,7 +286,9 @@
             "DSTOffset",
             "UTCTime",
             "LocalTime",
-            "Granularity"
+            "Granularity",
+            "TimeZoneListMaxSize",
+            "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"]
     },
