@@ -229,7 +229,7 @@ class EventHeader:
 class AttributeStatus:
     Path: AttributePath
     Status: Union[chip.interaction_model.Status, int]
-    DataVersion: int = 0
+    DataVersion: int
 
 
 @dataclass
