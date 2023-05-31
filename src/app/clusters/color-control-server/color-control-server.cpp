@@ -1059,7 +1059,14 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     colorHueTransitionState->up             = (direction == HueDirection::kUp);
     colorHueTransitionState->repeat         = false;
 
-    SetHSVRemainingTime(endpoint);
+    if (transitionTime > 0)
+    {
+        SetHSVRemainingTime(endpoint);
+    }
+    else
+    {
+        Attributes::RemainingTime::Set(endpoint, 0);
+    }
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), firstStepDelayMs);
@@ -1168,7 +1175,14 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
 
-    SetHSVRemainingTime(endpoint);
+    if (transitionTime > 0)
+    {
+        SetHSVRemainingTime(endpoint);
+    }
+    else
+    {
+        Attributes::RemainingTime::Set(endpoint, 0);
+    }
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), firstStepDelayMs);
@@ -1266,7 +1280,14 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     colorHueTransitionState->endpoint       = endpoint;
     colorHueTransitionState->repeat         = false;
 
-    SetHSVRemainingTime(endpoint);
+    if (transitionTime > 0)
+    {
+        SetHSVRemainingTime(endpoint);
+    }
+    else
+    {
+        Attributes::RemainingTime::Set(endpoint, 0);
+    }
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), firstStepDelayMs);
@@ -1403,7 +1424,14 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
 
-    SetHSVRemainingTime(endpoint);
+    if (transitionTime > 0)
+    {
+        SetHSVRemainingTime(endpoint);
+    }
+    else
+    {
+        Attributes::RemainingTime::Set(endpoint, 0);
+    }
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), firstStepDelayMs);
@@ -1467,7 +1495,14 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
 
-    SetHSVRemainingTime(endpoint);
+    if (transitionTime > 0)
+    {
+        SetHSVRemainingTime(endpoint);
+    }
+    else
+    {
+        Attributes::RemainingTime::Set(endpoint, 0);
+    }
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), firstStepDelayMs);
