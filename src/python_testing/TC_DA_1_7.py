@@ -41,6 +41,8 @@ def load_all_paa(paa_path: Path) -> dict:
     paa_by_skid = {}
     for filename in glob(str(paa_path.joinpath("*.der"))):
         with open(filename, "rb") as derfile:
+            logging.info(f"Loading PAA: {filename}")
+            try:
             # Load cert
             paa_der = derfile.read()
             paa_cert = load_der_x509_certificate(paa_der)
@@ -50,6 +52,8 @@ def load_all_paa(paa_path: Path) -> dict:
                 if extension.oid == SubjectKeyIdentifier.oid:
                     skid = extension.value.key_identifier
                     paa_by_skid[skid] = (Path(filename).name, paa_cert)
+            except (ValueError, IOError) as e:
+                logging.error(f"Failed to load {filename}: {str(e)}")
 
     return paa_by_skid
 
