@@ -3115,8 +3115,12 @@
               # here.
               - RegulatoryLocationTypeEnum
           NetworkCommissioning:
-              - NetworkCommissioningStatus
-              - WiFiBand
+              # NetworkCommissioningStatusEnum and WiFiBandEnum were originally
+              # just named NetworkCommissioningStatus and WiFiBand, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              - NetworkCommissioningStatusEnum
+              - WiFiBandEnum
           DiagnosticLogs:
               - LogsIntent
               - LogsStatus
@@ -3456,7 +3460,11 @@
                   - Outdoor
                   - IndoorOutdoor
           NetworkCommissioning:
-              NetworkCommissioningStatus:
+              # NetworkCommissioningStatusEnum and WiFiBandEnum were originally
+              # just named NetworkCommissioningStatus and WiFiBand, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              NetworkCommissioningStatusEnum:
                   - Success
                   - OutOfRange
                   - BoundsExceeded
@@ -3470,7 +3478,7 @@
                   - IPV6Failed
                   - IPBindFailed
                   - UnknownError
-              WiFiBand:
+              WiFiBandEnum:
                   - 2G4
                   - 3G65
                   - 5G
@@ -8153,6 +8161,10 @@
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
               - ProductAppearanceStruct
+          NetworkCommissioning:
+              - WiFiInterfaceScanResultStruct
+              - ThreadInterfaceScanResultStruct
+              - NetworkInfoStruct
           OperationalState:
               - OperationalStateStruct
               - ErrorStateStruct
@@ -8175,6 +8187,26 @@
               ProductAppearanceStruct:
                   - finish
                   - primaryColor
+          NetworkCommissioning:
+              WiFiInterfaceScanResultStruct:
+                  - security
+                  - ssid
+                  - bssid
+                  - channel
+                  - wiFiBand
+                  - rssi
+              ThreadInterfaceScanResultStruct:
+                  - panId
+                  - extendedPanId
+                  - networkName
+                  - channel
+                  - version
+                  - extendedAddress
+                  - rssi
+                  - lqi
+              NetworkInfoStruct:
+                  - networkID
+                  - connected
           OperationalState:
               OperationalStateStruct:
                   - operationalStateID
@@ -8526,7 +8558,10 @@
                   - Forward
                   - Reverse
           NetworkCommissioning:
-              WiFiBand:
+              # WiFiBandEnum was originally just named WiFiBand, but we generate
+              # the same API for both of those names, so the name can just
+              # change here.
+              WiFiBandEnum:
                   - 1G
           HEPAFilterMonitoring:
               ChangeIndicationEnum:
@@ -9405,6 +9440,8 @@
           Groups:
               - Feature
               - NameSupportBitmap
+          NetworkCommissioning:
+              - WiFiSecurityBitmap
           PressureMeasurement:
               - Feature
           PumpConfigurationAndControl:
@@ -9529,6 +9566,13 @@
                   - GroupNames
               NameSupportBitmap:
                   - GroupNames
+          NetworkCommissioning:
+              WiFiSecurityBitmap:
+                  - Unencrypted
+                  - WEP
+                  - WPAPersonal
+                  - WPA2Personal
+                  - WPA3Personal
           PressureMeasurement:
               Feature:
                   - Extended
@@ -9921,12 +9965,18 @@
       structs:
           AccessControl:
               - Target
+          NetworkCommissioning:
+              - WiFiInterfaceScanResult
+              - ThreadInterfaceScanResult
+              - NetworkInfo
           ThreadNetworkDiagnostics:
               - NeighborTable
               - RouteTable
       bitmaps:
           Groups:
               - GroupClusterFeature
+          NetworkCommissioning:
+              - WiFiSecurity
           PressureMeasurement:
               - PressureFeature
           PumpConfigurationAndControl:
@@ -9943,6 +9993,10 @@
       structs:
           AccessControl:
               AccessControlTargetStruct: Target
+          NetworkCommissioning:
+              WiFiInterfaceScanResultStruct: WiFiInterfaceScanResult
+              ThreadInterfaceScanResultStruct: ThreadInterfaceScanResult
+              NetworkInfoStruct: NetworkInfo
           ThreadNetworkDiagnostics:
               NeighborTableStruct: NeighborTable
               RouteTableStruct: RouteTable
@@ -9968,6 +10022,8 @@
       bitmaps:
           Groups:
               Feature: GroupClusterFeature
+          NetworkCommissioning:
+              WiFiSecurityBitmap: WiFiSecurity
           PressureMeasurement:
               Feature: PressureFeature
           PumpConfigurationAndControl:
