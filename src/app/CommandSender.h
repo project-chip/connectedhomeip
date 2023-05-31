@@ -121,7 +121,8 @@ public:
      * If used in a groups setting, callbacks do not need to be passed.
      * If callbacks are passed the only one that will be called in a group sesttings is the onDone
      */
-    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false);
+    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
+                  bool suppressResponse = false);
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
@@ -169,6 +170,14 @@ public:
         mSuppressResponse = aSuppressResponse;
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
     }
+
+    /**
+     * Version of SendCommandRequest that sets the TimedRequest flag but does not send the TimedInvoke
+     * action.For use in tests only.
+     */
+    CHIP_ERROR TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(const SessionHandle & session,
+                                                                      Optional<System::Clock::Timeout> timeout = NullOptional);
+
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:

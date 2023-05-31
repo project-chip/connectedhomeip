@@ -32,9 +32,10 @@
 namespace chip {
 namespace app {
 
-CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest) :
-    mExchangeCtx(*this), mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(false),
-    mTimedRequest(aIsTimedRequest)
+CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
+                             bool suppressResponse) :
+    mExchangeCtx(*this),
+    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(suppressResponse), mTimedRequest(aIsTimedRequest)
 {}
 
 CHIP_ERROR CommandSender::AllocateBuffer()
@@ -60,6 +61,28 @@ CHIP_ERROR CommandSender::AllocateBuffer()
 
     return CHIP_NO_ERROR;
 }
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+CHIP_ERROR CommandSender::TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(const SessionHandle & session,
+                                                                                 Optional<System::Clock::Timeout> timeout)
+{
+    VerifyOrReturnError(mTimedRequest, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(Finalize(mPendingInvokeData));
+
+    // Create a new exchange context.
+    auto exchange = mpExchangeMgr->NewContext(session, this);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    mExchangeCtx.Grab(exchange);
+    VerifyOrReturnError(!mExchangeCtx->IsGroupExchangeContext(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+
+    mExchangeCtx->SetResponseTimeout(timeout.ValueOr(session->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
+
+    return SendInvokeRequest();
+}
+#endif
 
 CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
 {

@@ -745,7 +745,27 @@ class ChipDeviceControllerBase():
             device.deviceProxy, upperLayerProcessingTimeoutMs))
         return res
 
-    async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: typing.Union[None, int] = None, interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
+    async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None):
+        '''
+        ONLY FOR TESTING - DO NOT USE FOR NORMAL OPERATION.
+
+        Please see SendCommand for description.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=None)
+        ClusterCommand.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(
+            future, eventLoop, responseType, device.deviceProxy, ClusterCommand.CommandPath(
+                EndpointId=endpoint,
+                ClusterId=payload.cluster_id,
+                CommandId=payload.command_id,
+            ), payload).raise_on_error()
+        return await future
+
+    async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: typing.Union[None, int] = None, interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None, suppressResponse: typing.Union[None, bool] = None):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive the response.
         If a valid responseType is passed in, that will be used to deserialize the object. If not, the type will be automatically deduced
@@ -766,7 +786,7 @@ class ChipDeviceControllerBase():
                 EndpointId=endpoint,
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
-            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
+            ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse).raise_on_error()
         return await future
 
     def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Union[None, int] = None):
