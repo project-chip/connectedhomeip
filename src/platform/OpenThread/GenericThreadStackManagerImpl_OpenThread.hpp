@@ -1036,7 +1036,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDia
  *        The info is encoded via the AttributeValueEncoder.
  *
  * @param attributeId Id of the attribute for the requested info.
- * @param encoder Encoder to encode the attribute value.
+ * @param aEncoder Encoder to encode the attribute value.
  *
  * @return CHIP_NO_ERROR = Succes.
  *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
@@ -1055,94 +1055,82 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     switch (attributeId)
     {
     case ThreadNetworkDiagnostics::Attributes::Channel::Id: {
-        err = encoder.EncodeNullableOnCondition(mIsAttached, [this](const auto pAttrEncoder) -> CHIP_ERROR {
-            uint16_t channel = otLinkGetChannel(mOTInst);
-            return pAttrEncoder->Encode(channel);
-        });
+        uint16_t channel = otLinkGetChannel(mOTInst);
+        err              = encoder.Encode(channel);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id: {
-        err = encoder.EncodeNullableOnCondition(mIsAttached, [this](const auto pAttrEncoder) -> CHIP_ERROR {
-            using ThreadNetworkDiagnostics::RoutingRoleEnum;
-            RoutingRoleEnum routingRole;
-            otDeviceRole otRole = otThreadGetDeviceRole(mOTInst);
+        using ThreadNetworkDiagnostics::RoutingRoleEnum;
+        RoutingRoleEnum routingRole;
+        otDeviceRole otRole = otThreadGetDeviceRole(mOTInst);
 
-            if (otRole == OT_DEVICE_ROLE_DISABLED)
-            {
-                routingRole = RoutingRoleEnum::kUnspecified;
-            }
-            else if (otRole == OT_DEVICE_ROLE_DETACHED)
-            {
-                routingRole = RoutingRoleEnum::kUnassigned;
-            }
-            else if (otRole == OT_DEVICE_ROLE_ROUTER)
-            {
-                routingRole = RoutingRoleEnum::kRouter;
-            }
-            else if (otRole == OT_DEVICE_ROLE_LEADER)
-            {
-                routingRole = RoutingRoleEnum::kLeader;
-            }
-            else if (otRole == OT_DEVICE_ROLE_CHILD)
-            {
-                otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
+        if (otRole == OT_DEVICE_ROLE_DISABLED)
+        {
+            routingRole = RoutingRoleEnum::kUnspecified;
+        }
+        else if (otRole == OT_DEVICE_ROLE_DETACHED)
+        {
+            routingRole = RoutingRoleEnum::kUnassigned;
+        }
+        else if (otRole == OT_DEVICE_ROLE_ROUTER)
+        {
+            routingRole = RoutingRoleEnum::kRouter;
+        }
+        else if (otRole == OT_DEVICE_ROLE_LEADER)
+        {
+            routingRole = RoutingRoleEnum::kLeader;
+        }
+        else if (otRole == OT_DEVICE_ROLE_CHILD)
+        {
+            otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
 
-                if (linkMode.mRxOnWhenIdle)
-                {
-                    routingRole = RoutingRoleEnum::kEndDevice;
+            if (linkMode.mRxOnWhenIdle)
+            {
+                routingRole = RoutingRoleEnum::kEndDevice;
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
-                    if (otThreadIsRouterEligible(mOTInst))
-                    {
-                        routingRole = RoutingRoleEnum::kReed;
-                    }
-#endif
-                }
-                else
+                if (otThreadIsRouterEligible(mOTInst))
                 {
-                    routingRole = RoutingRoleEnum::kSleepyEndDevice;
+                    routingRole = RoutingRoleEnum::kReed;
                 }
+#endif
             }
+            else
+            {
+                routingRole = RoutingRoleEnum::kSleepyEndDevice;
+            }
+        }
 
-            return pAttrEncoder->Encode(routingRole);
-        });
+        err = encoder.Encode(routingRole);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::NetworkName::Id: {
-        err = encoder.EncodeNullableOnCondition(mIsAttached, [this](const auto pAttrEncoder) -> CHIP_ERROR {
-            const char * networkName = otThreadGetNetworkName(mOTInst);
-            return pAttrEncoder->Encode(CharSpan::fromCharString(networkName));
-        });
+        const char * networkName = otThreadGetNetworkName(mOTInst);
+        err                      = encoder.Encode(CharSpan::fromCharString(networkName));
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::PanId::Id: {
-        err = encoder.EncodeNullableOnCondition(mIsAttached, [this](const auto pAttrEncoder) -> CHIP_ERROR {
-            uint16_t panId = otLinkGetPanId(mOTInst);
-            return pAttrEncoder->Encode(panId);
-        });
+        uint16_t panId = otLinkGetPanId(mOTInst);
+        err            = encoder.Encode(panId);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id: {
-        err = encoder.EncodeNullableOnCondition(mIsAttached, [this](const auto pAttrEncoder) -> CHIP_ERROR {
-            const otExtendedPanId * pExtendedPanid = otThreadGetExtendedPanId(mOTInst);
-            return pAttrEncoder->Encode(Encoding::BigEndian::Get64(pExtendedPanid->m8));
-        });
+        const otExtendedPanId * pExtendedPanid = otThreadGetExtendedPanId(mOTInst);
+        err                                    = encoder.Encode(Encoding::BigEndian::Get64(pExtendedPanid->m8));
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::Id: {
-        err = encoder.EncodeNullableOnCondition(mIsAttached, [this](const auto pAttrEncoder) -> CHIP_ERROR {
-            uint8_t meshLocaPrefix[OT_MESH_LOCAL_PREFIX_SIZE + 1] = { 0 }; // + 1  to encode prefix Len in the octstr
+        uint8_t meshLocaPrefix[OT_MESH_LOCAL_PREFIX_SIZE + 1] = { 0 }; // + 1  to encode prefix Len in the octstr
 
-            const otMeshLocalPrefix * pMeshLocalPrefix = otThreadGetMeshLocalPrefix(mOTInst);
-            meshLocaPrefix[0]                          = OT_IP6_PREFIX_BITSIZE;
+        const otMeshLocalPrefix * pMeshLocalPrefix = otThreadGetMeshLocalPrefix(mOTInst);
+        meshLocaPrefix[0]                          = OT_IP6_PREFIX_BITSIZE;
 
-            memcpy(&meshLocaPrefix[1], pMeshLocalPrefix->m8, OT_MESH_LOCAL_PREFIX_SIZE);
-            return pAttrEncoder->Encode(ByteSpan(meshLocaPrefix));
-        });
+        memcpy(&meshLocaPrefix[1], pMeshLocalPrefix->m8, OT_MESH_LOCAL_PREFIX_SIZE);
+        err = encoder.Encode(ByteSpan(meshLocaPrefix));
     }
     break;
 
@@ -1267,42 +1255,32 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::PartitionId::Id: {
-        err = encoder.EncodeNullableOnCondition(mIsAttached, [this](const auto pAttrEncoder) -> CHIP_ERROR {
-            uint32_t partitionId = otThreadGetPartitionId(mOTInst);
-            return pAttrEncoder->Encode(partitionId);
-        });
+        uint32_t partitionId = otThreadGetPartitionId(mOTInst);
+        err                  = encoder.Encode(partitionId);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Weighting::Id: {
-        err = encoder.EncodeNullableOnCondition(mIsAttached, [this](const auto pAttrEncoder) -> CHIP_ERROR {
-            uint8_t weight = otThreadGetLeaderWeight(mOTInst);
-            return pAttrEncoder->Encode(weight);
-        });
+        uint8_t weight = otThreadGetLeaderWeight(mOTInst);
+        err            = encoder.Encode(weight);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::DataVersion::Id: {
-        err = encoder.EncodeNullableOnCondition(mIsAttached, [this](const auto pAttrEncoder) -> CHIP_ERROR {
-            uint8_t dataVersion = otNetDataGetVersion(mOTInst);
-            return pAttrEncoder->Encode(dataVersion);
-        });
+        uint8_t dataVersion = otNetDataGetVersion(mOTInst);
+        err                 = encoder.Encode(dataVersion);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id: {
-        err = encoder.EncodeNullableOnCondition(mIsAttached, [this](const auto pAttrEncoder) -> CHIP_ERROR {
-            uint8_t stableVersion = otNetDataGetStableVersion(mOTInst);
-            return pAttrEncoder->Encode(stableVersion);
-        });
+        uint8_t stableVersion = otNetDataGetStableVersion(mOTInst);
+        err                   = encoder.Encode(stableVersion);
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id: {
-        err = encoder.EncodeNullableOnCondition(mIsAttached, [this](const auto pAttrEncoder) -> CHIP_ERROR {
-            uint8_t leaderRouterId = otThreadGetLeaderRouterId(mOTInst);
-            return pAttrEncoder->Encode(leaderRouterId);
-        });
+        uint8_t leaderRouterId = otThreadGetLeaderRouterId(mOTInst);
+        err                    = encoder.Encode(leaderRouterId);
     }
     break;
 
@@ -1559,53 +1537,62 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
 
     case ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id: {
-        err = encoder.EncodeNullableOnCondition(otDatasetIsCommissioned(mOTInst), [this](const auto pAttrEncoder) -> CHIP_ERROR {
+        err = CHIP_ERROR_INCORRECT_STATE;
+        if (otDatasetIsCommissioned(mOTInst))
+        {
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
-            VerifyOrReturnError(otErr == OT_ERROR_NONE, MapOpenThreadError(otErr));
+            VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 #if OPENTHREAD_API_VERSION >= 219
             uint64_t activeTimestamp = (activeDataset.mActiveTimestamp.mSeconds << 16) |
                 (activeDataset.mActiveTimestamp.mTicks << 1) | activeDataset.mActiveTimestamp.mAuthoritative;
 #else
             uint64_t activeTimestamp  = activeDataset.mActiveTimestamp;
 #endif
-            return pAttrEncoder->Encode(activeTimestamp);
-        });
+            err = encoder.Encode(activeTimestamp);
+        }
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id: {
-        err = encoder.EncodeNullableOnCondition(otDatasetIsCommissioned(mOTInst), [this](const auto pAttrEncoder) -> CHIP_ERROR {
+        err = CHIP_ERROR_INCORRECT_STATE;
+        if (otDatasetIsCommissioned(mOTInst))
+        {
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
-            VerifyOrReturnError(otErr == OT_ERROR_NONE, MapOpenThreadError(otErr));
+            VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 #if OPENTHREAD_API_VERSION >= 219
             uint64_t pendingTimestamp = (activeDataset.mPendingTimestamp.mSeconds << 16) |
                 (activeDataset.mPendingTimestamp.mTicks << 1) | activeDataset.mPendingTimestamp.mAuthoritative;
 #else
             uint64_t pendingTimestamp = activeDataset.mPendingTimestamp;
 #endif
-            return pAttrEncoder->Encode(pendingTimestamp);
-        });
+            err = encoder.Encode(pendingTimestamp);
+        }
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::Delay::Id: {
-        err = encoder.EncodeNullableOnCondition(otDatasetIsCommissioned(mOTInst), [this](const auto pAttrEncoder) -> CHIP_ERROR {
+        err = CHIP_ERROR_INCORRECT_STATE;
+        if (otDatasetIsCommissioned(mOTInst))
+        {
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
-            VerifyOrReturnError(otErr == OT_ERROR_NONE, MapOpenThreadError(otErr));
+            VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
             uint32_t delay = activeDataset.mDelay;
-            return pAttrEncoder->Encode(delay);
-        });
+            err            = encoder.Encode(delay);
+        }
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id: {
-        err = encoder.EncodeNullableOnCondition(otDatasetIsCommissioned(mOTInst), [this](const auto pAttrEncoder) -> CHIP_ERROR {
+        err = CHIP_ERROR_INCORRECT_STATE;
+
+        if (otDatasetIsCommissioned(mOTInst))
+        {
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
-            VerifyOrReturnError(otErr == OT_ERROR_NONE, MapOpenThreadError(otErr));
+            VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
             ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type securityPolicy;
             static_assert(sizeof(securityPolicy) == sizeof(activeDataset.mSecurityPolicy),
@@ -1617,16 +1604,18 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             securityPolicy.rotationTime = policyAsInts[0];
             securityPolicy.flags        = policyAsInts[1];
 
-            return pAttrEncoder->Encode(securityPolicy);
-        });
+            err = encoder.Encode(securityPolicy);
+        }
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id: {
-        err = encoder.EncodeNullableOnCondition(otDatasetIsCommissioned(mOTInst), [this](const auto pAttrEncoder) -> CHIP_ERROR {
+        err = CHIP_ERROR_INCORRECT_STATE;
+        if (otDatasetIsCommissioned(mOTInst))
+        {
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
-            VerifyOrReturnError(otErr == OT_ERROR_NONE, MapOpenThreadError(otErr));
+            VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
             // In the resultant Octet string, the most significant bit of the left-most byte indicates channel 0
             // We have to bitswap the entire uint32_t before converting to octet string
@@ -1638,16 +1627,18 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 
             uint8_t buffer[sizeof(uint32_t)] = { 0 };
             Encoding::BigEndian::Put32(buffer, bitSwappedChannelMask);
-            return pAttrEncoder->Encode(ByteSpan(buffer));
-        });
+            err = encoder.Encode(ByteSpan(buffer));
+        }
     }
     break;
 
     case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id: {
-        err = encoder.EncodeNullableOnCondition(otDatasetIsCommissioned(mOTInst), [this](const auto pAttrEncoder) -> CHIP_ERROR {
+        err = CHIP_ERROR_INCORRECT_STATE;
+        if (otDatasetIsCommissioned(mOTInst))
+        {
             otOperationalDataset activeDataset;
             otError otErr = otDatasetGetActive(mOTInst, &activeDataset);
-            VerifyOrReturnError(otErr == OT_ERROR_NONE, MapOpenThreadError(otErr));
+            VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
             ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type OpDatasetComponents;
 
             OpDatasetComponents.activeTimestampPresent  = activeDataset.mComponents.mIsActiveTimestampPresent;
@@ -1663,8 +1654,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             OpDatasetComponents.securityPolicyPresent   = activeDataset.mComponents.mIsSecurityPolicyPresent;
             OpDatasetComponents.channelMaskPresent      = activeDataset.mComponents.mIsChannelMaskPresent;
 
-            return pAttrEncoder->Encode(OpDatasetComponents);
-        });
+            err = encoder.Encode(OpDatasetComponents);
+        }
     }
     break;
 
@@ -1689,6 +1680,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     break;
     }
 
+exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "_WriteThreadNetworkDiagnosticAttributeToTlv failed: %s", ErrorStr(err));
