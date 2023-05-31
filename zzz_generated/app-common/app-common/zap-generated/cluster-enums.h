@@ -3124,8 +3124,8 @@ namespace BallastConfiguration {} // namespace BallastConfiguration
 
 namespace IlluminanceMeasurement {
 
-// Enum for LightSensorType
-enum class LightSensorType : uint8_t
+// Enum for LightSensorTypeEnum
+enum class LightSensorTypeEnum : uint8_t
 {
     kPhotodiode = 0x00,
     kCmos       = 0x01,

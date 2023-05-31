@@ -66,6 +66,7 @@ public:
 
     bool Lock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
     bool Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
+    bool Unbolt(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
 
     bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
     bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,

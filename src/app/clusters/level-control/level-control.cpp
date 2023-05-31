@@ -35,7 +35,7 @@
 #include <platform/PlatformManager.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
-#include <app/clusters/scenes/scenes.h>
+#include <app/clusters/scenes-server/scenes-server.h>
 #endif // EMBER_AF_PLUGIN_SCENES
 
 #ifdef EMBER_AF_PLUGIN_ON_OFF
@@ -283,7 +283,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     // The level has changed, so the scene is no longer valid.
     if (emberAfContainsServer(endpoint, Scenes::Id))
     {
-        emberAfScenesClusterMakeInvalidCallback(endpoint);
+        Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
     }
 #endif // EMBER_AF_PLUGIN_SCENES
 

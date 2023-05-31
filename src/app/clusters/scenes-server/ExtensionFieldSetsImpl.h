@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/clusters/scenes/ExtensionFieldSets.h>
+#include <app/clusters/scenes-server/ExtensionFieldSets.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {

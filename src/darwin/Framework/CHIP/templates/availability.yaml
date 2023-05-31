@@ -7090,6 +7090,7 @@
           - TotalTrihalomethanesConcentrationMeasurement
           - TotalVolatileOrganicCompoundsConcentrationMeasurement
           - TurbidityConcentrationMeasurement
+          - OperationalState
           - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
@@ -7182,6 +7183,7 @@
               - EventList
           FanControl:
               - EventList
+              - AirflowDirection
           ThermostatUserInterfaceConfiguration:
               - EventList
           ColorControl:
@@ -8028,6 +8030,19 @@
               - EventList
               - FeatureMap
               - ClusterRevision
+          OperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
           RefrigeratorAlarm:
               - Mask
               - Latch
@@ -8095,6 +8110,14 @@
               - ResetCondition
           TonerCartridgeMonitoring:
               - ResetCondition
+          FanControl:
+              - Step
+          OperationalState:
+              - Pause
+              - Stop
+              - Start
+              - Resume
+              - OperationalCommandResponse
           RefrigeratorAlarm:
               - Reset
           TemperatureControl:
@@ -8107,6 +8130,14 @@
           DoorLock:
               UnboltDoor:
                   - pinCode
+          FanControl:
+              Step:
+                  - direction
+                  - wrap
+                  - lowestOff
+          OperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
           RefrigeratorAlarm:
               Reset:
                   - alarms
@@ -8122,6 +8153,9 @@
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
               - ProductAppearanceStruct
+          OperationalState:
+              - OperationalStateStruct
+              - ErrorStateStruct
           TemperatureControl:
               - TemperatureLevelStruct
           ThreadNetworkDiagnostics:
@@ -8141,6 +8175,14 @@
               ProductAppearanceStruct:
                   - finish
                   - primaryColor
+          OperationalState:
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
           TemperatureControl:
               TemperatureLevelStruct:
                   - label
@@ -8173,6 +8215,9 @@
                   - allocated
                   - linkEstablished
       events:
+          OperationalState:
+              - OperationalError
+              - OperationCompletion
           RefrigeratorAlarm:
               - Notify
           SmokeCOAlarm:
@@ -8188,6 +8233,13 @@
               - InterconnectCOAlarm
               - AllClear
       event fields:
+          OperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
           RefrigeratorAlarm:
               Notify:
                   - active
@@ -8203,6 +8255,9 @@
           BridgedDeviceBasicInformation:
               - ColorEnum
               - ProductFinishEnum
+          FanControl:
+              - DirectionEnum
+              - AirflowDirectionEnum
           HEPAFilterMonitoring:
               - ChangeIndicationEnum
               - DegradationDirectionEnum
@@ -8383,6 +8438,9 @@
               - LevelValueEnum
               - MeasurementUnitEnum
               - MeasurementMediumEnum
+          OperationalState:
+              - OperationalStateEnum
+              - ErrorStateEnum
           SmokeCOAlarm:
               - AlarmStateEnum
               - ContaminationStateEnum
@@ -8460,6 +8518,13 @@
                   - Rugged
                   - Fabric
                   - Other
+          FanControl:
+              DirectionEnum:
+                  - Increase
+                  - Decrease
+              AirflowDirectionEnum:
+                  - Forward
+                  - Reverse
           NetworkCommissioning:
               WiFiBand:
                   - 1G
@@ -9286,6 +9351,17 @@
                   - Eurocylinder
               LockOperationTypeEnum:
                   - Unlatch
+          OperationalState:
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
           SmokeCOAlarm:
               AlarmStateEnum:
                   - Normal
@@ -9444,6 +9520,10 @@
                   - Moderate
                   - VeryPoor
                   - ExtremelyPoor
+          FanControl:
+              Feature:
+                  - Step
+                  - AirflowDirection
           Groups:
               Feature:
                   - GroupNames

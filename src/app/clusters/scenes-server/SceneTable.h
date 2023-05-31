@@ -17,7 +17,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/scenes/ExtensionFieldSets.h>
+#include <app/clusters/scenes-server/ExtensionFieldSets.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/IntrusiveList.h>
@@ -28,19 +28,19 @@ namespace chip {
 namespace scenes {
 
 // Storage index for scenes in nvm
-typedef uint8_t SceneIndex;
+typedef uint16_t SceneIndex;
 
 typedef uint32_t TransitionTimeMs;
 typedef uint32_t SceneTransitionTime;
 
-constexpr GroupId kGlobalGroupSceneId        = 0x0000;
-constexpr SceneIndex kUndefinedSceneIndex    = 0xff;
-constexpr SceneId kUndefinedSceneId          = 0xff;
-static constexpr uint8_t kMaxScenesPerFabric = CHIP_CONFIG_SCENES_MAX_PER_FABRIC;
-static constexpr uint8_t kMaxScenesGlobal    = CHIP_CONFIG_SCENES_MAX_NUMBER;
+constexpr GroupId kGlobalGroupSceneId     = 0x0000;
+constexpr SceneIndex kUndefinedSceneIndex = 0xffff;
+constexpr SceneId kUndefinedSceneId       = 0xff;
 
-static constexpr size_t kIteratorsMax       = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
-static constexpr size_t kSceneNameMaxLength = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
+static constexpr size_t kIteratorsMax                 = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
+static constexpr size_t kSceneNameMaxLength           = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
+static constexpr size_t kScenesMaxTransitionTimeS     = 6000u;
+static constexpr size_t kScenesMaxTransitionTime100ms = kScenesMaxTransitionTimeS * 10;
 
 /// @brief SceneHandlers are meant as interface between various clusters and the Scene table.
 /// When a scene command involving extension field sets is received, the Scene Table will go through
@@ -84,7 +84,6 @@ public:
     /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSet in command
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     /// @note Only gets called after the scene-cluster has previously verified that the endpoint,cluster pair is supported by
-
     /// the handler. It is therefore the implementation's reponsibility to also implement the SupportsCluster method.
     virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
                                     const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
@@ -135,30 +134,22 @@ public:
     /// @brief struct used to identify a scene in storage by 3 ids, endpoint, group and scene
     struct SceneStorageId
     {
-        // Identifies endpoint to which this scene applies
-        EndpointId mEndpointId = kInvalidEndpointId;
         // Identifies group within the scope of the given fabric
         GroupId mGroupId = kGlobalGroupSceneId;
         SceneId mSceneId = kUndefinedSceneId;
 
         SceneStorageId() = default;
-        SceneStorageId(EndpointId endpoint, SceneId id, GroupId groupId = kGlobalGroupSceneId) :
-            mEndpointId(endpoint), mGroupId(groupId), mSceneId(id)
-        {}
+        SceneStorageId(SceneId id, GroupId groupId = kGlobalGroupSceneId) : mGroupId(groupId), mSceneId(id) {}
 
         void Clear()
         {
-            mEndpointId = kInvalidEndpointId;
-            mGroupId    = kGlobalGroupSceneId;
-            mSceneId    = kUndefinedSceneId;
+            mGroupId = kGlobalGroupSceneId;
+            mSceneId = kUndefinedSceneId;
         }
 
-        bool IsValid() { return (mEndpointId != kInvalidEndpointId) && (mSceneId != kUndefinedSceneId); }
+        bool IsValid() { return (mSceneId != kUndefinedSceneId); }
 
-        bool operator==(const SceneStorageId & other)
-        {
-            return (mEndpointId == other.mEndpointId && mGroupId == other.mGroupId && mSceneId == other.mSceneId);
-        }
+        bool operator==(const SceneStorageId & other) { return (mGroupId == other.mGroupId && mSceneId == other.mSceneId); }
     };
 
     /// @brief struct used to store data held in a scene
@@ -270,14 +261,15 @@ public:
     virtual void Finish()                                        = 0;
 
     // Global scene count
-    virtual CHIP_ERROR GetGlobalSceneCount(uint8_t & scene_count) = 0;
+    virtual CHIP_ERROR GetEndpointSceneCount(uint8_t & scene_count)                         = 0;
+    virtual CHIP_ERROR GetFabricSceneCount(FabricIndex fabric_index, uint8_t & scene_count) = 0;
 
     // Data
-    virtual CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity)                             = 0;
-    virtual CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)                    = 0;
-    virtual CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry) = 0;
-    virtual CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)                       = 0;
-    virtual CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scene_idx)                = 0;
+    virtual CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity)                                   = 0;
+    virtual CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)                          = 0;
+    virtual CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)       = 0;
+    virtual CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)                             = 0;
+    virtual CHIP_ERROR RemoveSceneTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index, SceneIndex scene_idx) = 0;
 
     // Groups
     virtual CHIP_ERROR GetAllSceneIdsInGroup(FabricIndex fabric_index, GroupId group_id, Span<SceneId> & scene_list) = 0;
