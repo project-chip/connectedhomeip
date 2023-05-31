@@ -6083,6 +6083,180 @@ public class ClusterInfoMapping {
         }
       }
 
+      public static class DelegatedDishwasherOperationalStateClusterOperationalCommandResponseCallback implements ChipClusters.DishwasherOperationalStateCluster.OperationalCommandResponseCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+        @Override
+        public void onSuccess(ChipStructs.DishwasherOperationalStateClusterErrorStateStruct CommandResponseState) {
+           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+               // CommandResponseState: Struct ErrorStateStruct
+               // Conversion from this type to Java is not properly implemented yet
+           callback.onSuccess(responseValues);
+        }
+
+        @Override
+        public void onError(Exception error) {
+          callback.onFailure(error);
+        }
+      }
+
+      public static class DelegatedDishwasherOperationalStateClusterPhaseListAttributeCallback implements ChipClusters.DishwasherOperationalStateCluster.PhaseListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess(@Nullable List<String> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<String>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedDishwasherOperationalStateClusterCurrentPhaseAttributeCallback implements ChipClusters.DishwasherOperationalStateCluster.CurrentPhaseAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess(@Nullable Integer value) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+          responseValues.put(commandResponseInfo, value);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedDishwasherOperationalStateClusterCountdownTimeAttributeCallback implements ChipClusters.DishwasherOperationalStateCluster.CountdownTimeAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess(@Nullable Long value) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+          responseValues.put(commandResponseInfo, value);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedDishwasherOperationalStateClusterOperationalStateListAttributeCallback implements ChipClusters.DishwasherOperationalStateCluster.OperationalStateListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<ChipStructs.DishwasherOperationalStateClusterOperationalStateStruct> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.DishwasherOperationalStateClusterOperationalStateStruct>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedDishwasherOperationalStateClusterGeneratedCommandListAttributeCallback implements ChipClusters.DishwasherOperationalStateCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedDishwasherOperationalStateClusterAcceptedCommandListAttributeCallback implements ChipClusters.DishwasherOperationalStateCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedDishwasherOperationalStateClusterEventListAttributeCallback implements ChipClusters.DishwasherOperationalStateCluster.EventListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedDishwasherOperationalStateClusterAttributeListAttributeCallback implements ChipClusters.DishwasherOperationalStateCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+
       public static class DelegatedAirQualityClusterGeneratedCommandListAttributeCallback implements ChipClusters.AirQualityCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
@@ -18883,6 +19057,9 @@ public class ClusterInfoMapping {
       ClusterInfo refrigeratorAlarmClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.RefrigeratorAlarmCluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("refrigeratorAlarm", refrigeratorAlarmClusterInfo);
+      ClusterInfo dishwasherOperationalStateClusterInfo = new ClusterInfo(
+        (ptr, endpointId) -> new ChipClusters.DishwasherOperationalStateCluster(ptr, endpointId), new HashMap<>());
+      clusterMap.put("dishwasherOperationalState", dishwasherOperationalStateClusterInfo);
       ClusterInfo airQualityClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.AirQualityCluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("airQuality", airQualityClusterInfo);
@@ -19174,6 +19351,7 @@ public class ClusterInfoMapping {
       destination.get("modeSelect").combineCommands(source.get("modeSelect"));
       destination.get("temperatureControl").combineCommands(source.get("temperatureControl"));
       destination.get("refrigeratorAlarm").combineCommands(source.get("refrigeratorAlarm"));
+      destination.get("dishwasherOperationalState").combineCommands(source.get("dishwasherOperationalState"));
       destination.get("airQuality").combineCommands(source.get("airQuality"));
       destination.get("smokeCoAlarm").combineCommands(source.get("smokeCoAlarm"));
       destination.get("operationalState").combineCommands(source.get("operationalState"));
@@ -21208,6 +21386,56 @@ public class ClusterInfoMapping {
        );
        refrigeratorAlarmClusterInteractionInfoMap.put("reset", refrigeratorAlarmresetInteractionInfo);
      commandMap.put("refrigeratorAlarm", refrigeratorAlarmClusterInteractionInfoMap);
+     Map<String, InteractionInfo> dishwasherOperationalStateClusterInteractionInfoMap = new LinkedHashMap<>();
+     Map<String, CommandParameterInfo> dishwasherOperationalStatepauseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo dishwasherOperationalStatepauseInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.DishwasherOperationalStateCluster) cluster)
+           .pause((ChipClusters.DishwasherOperationalStateCluster.OperationalCommandResponseCallback) callback
+           
+           );
+         },
+         () -> new DelegatedDishwasherOperationalStateClusterOperationalCommandResponseCallback(),
+           dishwasherOperationalStatepauseCommandParams
+       );
+       dishwasherOperationalStateClusterInteractionInfoMap.put("pause", dishwasherOperationalStatepauseInteractionInfo);
+     Map<String, CommandParameterInfo> dishwasherOperationalStatestopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo dishwasherOperationalStatestopInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.DishwasherOperationalStateCluster) cluster)
+           .stop((ChipClusters.DishwasherOperationalStateCluster.OperationalCommandResponseCallback) callback
+           
+           );
+         },
+         () -> new DelegatedDishwasherOperationalStateClusterOperationalCommandResponseCallback(),
+           dishwasherOperationalStatestopCommandParams
+       );
+       dishwasherOperationalStateClusterInteractionInfoMap.put("stop", dishwasherOperationalStatestopInteractionInfo);
+     Map<String, CommandParameterInfo> dishwasherOperationalStatestartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo dishwasherOperationalStatestartInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.DishwasherOperationalStateCluster) cluster)
+           .start((ChipClusters.DishwasherOperationalStateCluster.OperationalCommandResponseCallback) callback
+           
+           );
+         },
+         () -> new DelegatedDishwasherOperationalStateClusterOperationalCommandResponseCallback(),
+           dishwasherOperationalStatestartCommandParams
+       );
+       dishwasherOperationalStateClusterInteractionInfoMap.put("start", dishwasherOperationalStatestartInteractionInfo);
+     Map<String, CommandParameterInfo> dishwasherOperationalStateresumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo dishwasherOperationalStateresumeInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.DishwasherOperationalStateCluster) cluster)
+           .resume((ChipClusters.DishwasherOperationalStateCluster.OperationalCommandResponseCallback) callback
+           
+           );
+         },
+         () -> new DelegatedDishwasherOperationalStateClusterOperationalCommandResponseCallback(),
+           dishwasherOperationalStateresumeCommandParams
+       );
+       dishwasherOperationalStateClusterInteractionInfoMap.put("resume", dishwasherOperationalStateresumeInteractionInfo);
+     commandMap.put("dishwasherOperationalState", dishwasherOperationalStateClusterInteractionInfoMap);
      Map<String, InteractionInfo> airQualityClusterInteractionInfoMap = new LinkedHashMap<>();
      commandMap.put("airQuality", airQualityClusterInteractionInfoMap);
      Map<String, InteractionInfo> smokeCoAlarmClusterInteractionInfoMap = new LinkedHashMap<>();
@@ -23509,3 +23737,4 @@ public class ClusterInfoMapping {
   }
 
 }
+

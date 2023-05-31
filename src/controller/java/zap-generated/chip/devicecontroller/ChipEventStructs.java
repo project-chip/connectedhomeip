@@ -1086,6 +1086,60 @@ public Long mask;
   }
 }
 
+public static class DishwasherOperationalStateClusterOperationalErrorEvent {
+public ChipStructs.DishwasherOperationalStateClusterErrorStateStruct errorState;
+
+  public DishwasherOperationalStateClusterOperationalErrorEvent(
+    ChipStructs.DishwasherOperationalStateClusterErrorStateStruct errorState
+  ) {
+    this.errorState = errorState;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DishwasherOperationalStateClusterOperationalErrorEvent {\n");
+    output.append("\terrorState: ");
+    output.append(errorState);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class DishwasherOperationalStateClusterOperationCompletionEvent {
+public Integer completionErrorCode;
+public @Nullable Optional<Long> totalOperationalTime;
+public @Nullable Optional<Long> pausedTime;
+
+  public DishwasherOperationalStateClusterOperationCompletionEvent(
+    Integer completionErrorCode
+      , @Nullable Optional<Long> totalOperationalTime
+      , @Nullable Optional<Long> pausedTime
+  ) {
+    this.completionErrorCode = completionErrorCode;
+    this.totalOperationalTime = totalOperationalTime;
+    this.pausedTime = pausedTime;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DishwasherOperationalStateClusterOperationCompletionEvent {\n");
+    output.append("\tcompletionErrorCode: ");
+    output.append(completionErrorCode);
+        output.append("\n");
+    output.append("\ttotalOperationalTime: ");
+    output.append(totalOperationalTime);
+        output.append("\n");
+    output.append("\tpausedTime: ");
+    output.append(pausedTime);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 public static class SmokeCoAlarmClusterSmokeAlarmEvent {
 
   public SmokeCoAlarmClusterSmokeAlarmEvent(
