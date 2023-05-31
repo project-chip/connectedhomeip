@@ -185,6 +185,8 @@ public:
         return GetFeatures(endpointId).Has(Feature::kUser) && SupportsAnyCredential(endpointId);
     }
 
+    inline bool SupportsUnbolt(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kUnbolt); }
+
     bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
     static void DoorLockOnAutoRelockCallback(chip::System::Layer *, void * callbackContext);
@@ -489,6 +491,10 @@ private:
     friend bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterUnboltDoorCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::UnboltDoor::DecodableType & commandData);
 
     friend bool emberAfDoorLockClusterSetHolidayScheduleCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -908,6 +914,19 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
  * @retval false if error happenned (err should be set to appropriate error code)
  */
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
+                                              OperationErrorEnum & err);
+
+/**
+ * @brief User handler for UnboltDoor command (server)
+ *
+ * @param   endpointId      endpoint for which UnboltDoor command is called
+ * @param   pinCode         PIN code (optional)
+ * @param   err             error code if door unbolting failed (set only if retval==false)
+ *
+ * @retval true on success
+ * @retval false if error happenned (err should be set to appropriate error code)
+ */
+bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
                                               OperationErrorEnum & err);
 
 /**

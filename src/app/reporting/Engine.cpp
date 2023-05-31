@@ -260,8 +260,7 @@ exit:
     {
         attributeReportIBs.GetWriter()->UnreserveBuffer(kReservedSizeEndOfReportIBs);
 
-        attributeReportIBs.EndOfAttributeReportIBs();
-        err = attributeReportIBs.GetError();
+        err = attributeReportIBs.EndOfAttributeReportIBs();
 
         //
         // We reserved space for this earlier - consequently, the call to end the ReportIBs should
@@ -413,8 +412,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         }
 
         SuccessOrExit(err = eventReportIBs.GetWriter()->UnreserveBuffer(kReservedSizeEndOfReportIBs));
-        eventReportIBs.EndOfEventReports();
-        SuccessOrExit(err = eventReportIBs.GetError());
+        SuccessOrExit(err = eventReportIBs.EndOfEventReports());
     }
     ChipLogDetail(DataManagement, "Fetched %u events", static_cast<unsigned int>(eventCount));
 
@@ -529,7 +527,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         }
     }
 
-    SuccessOrExit(reportDataBuilder.GetError());
+    SuccessOrExit(err = reportDataBuilder.GetError());
     SuccessOrExit(err = reportDataWriter.UnreserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForIMRevision +
                                                          kReservedSizeForEndOfReportMessage));
     if (hasMoreChunks)

@@ -114,9 +114,9 @@ public:
     /**
      *  @brief Mark the end of this CommandPathIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    CommandPathIB::Builder & EndOfCommandPathIB();
+    CHIP_ERROR EndOfCommandPathIB();
 
     CHIP_ERROR Encode(const CommandPathParams & aCommandPathParams);
     CHIP_ERROR Encode(const ConcreteCommandPath & aConcreteCommandPath);

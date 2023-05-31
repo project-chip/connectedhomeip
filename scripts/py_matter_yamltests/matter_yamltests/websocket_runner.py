@@ -22,6 +22,8 @@ import websockets
 from .hooks import WebSocketRunnerHooks
 from .runner import TestRunner
 
+_KEEP_ALIVE_TIMEOUT_IN_SECONDS = 40
+
 
 @dataclass
 class WebSocketRunnerConfig:
@@ -65,7 +67,7 @@ class WebSocketRunner(TestRunner):
             start = time.time()
             try:
                 self._hooks.connecting(url)
-                connection = await websockets.connect(url)
+                connection = await websockets.connect(url, ping_timeout=_KEEP_ALIVE_TIMEOUT_IN_SECONDS)
                 duration = round((time.time() - start) * 1000, 0)
                 self._hooks.success(duration)
                 return connection

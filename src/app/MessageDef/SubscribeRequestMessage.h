@@ -140,7 +140,7 @@ public:
     /**
      *  @brief Mark the end of this SubscribeRequestMessage
      */
-    SubscribeRequestMessage::Builder & EndOfSubscribeRequestMessage();
+    CHIP_ERROR EndOfSubscribeRequestMessage();
 
 private:
     AttributePathIBs::Builder mAttributeRequests;

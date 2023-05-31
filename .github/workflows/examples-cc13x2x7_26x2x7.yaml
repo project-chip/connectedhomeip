@@ -36,7 +36,10 @@ jobs:
             BUILD_TYPE: gn_cc26x2x7
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        # This CI is disabled because running out of flash and a solution was not found in time, see https://github.com/project-chip/connectedhomeip/pull/26186
+        # An issue was opened at https://github.com/project-chip/connectedhomeip/issues/26957
+        # TODO : Enable this once we have a way to run without out of flash failure or remove platform if it cannot support the SDK
+        if: github.actor != 'restyled-io[bot]' && false
 
         container:
             image: connectedhomeip/chip-build-ti:0.7.14

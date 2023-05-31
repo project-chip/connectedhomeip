@@ -191,8 +191,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         ReturnErrorOnFailure(attributePath.GetError());
 
         ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()), TLV::ContextTag(AttributeDataIB::Tag::kData), value));
-        ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB().GetError());
-        return attributeReport.EndOfAttributeReportIB().GetError();
+        ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
+        return attributeReport.EndOfAttributeReportIB();
     }
 
     for (size_t i = 0; i < (responseDirective == kSendTwoDataErrors ? 2 : 1); ++i)
@@ -209,7 +209,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
         attributeStatus.EndOfAttributeStatusIB();
         ReturnErrorOnFailure(attributeStatus.GetError());
-        ReturnErrorOnFailure(attributeReport.EndOfAttributeReportIB().GetError());
+        ReturnErrorOnFailure(attributeReport.EndOfAttributeReportIB());
     }
 
     return CHIP_NO_ERROR;

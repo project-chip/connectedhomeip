@@ -326,7 +326,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
     {
         ChipLogDetail(DataManagement, "Received command for Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                       concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
-        SuccessOrExit(MatterPreCommandReceivedCallback(concretePath, GetSubjectDescriptor()));
+        SuccessOrExit(err = MatterPreCommandReceivedCallback(concretePath, GetSubjectDescriptor()));
         mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
         MatterPostCommandReceivedCallback(concretePath, GetSubjectDescriptor());
     }
@@ -516,10 +516,10 @@ CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
     {
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
-    ReturnErrorOnFailure(commandData.EndOfCommandDataIB().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage().GetError());
+    ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     MoveToState(State::AddedCommand);
     return CHIP_NO_ERROR;
 }
@@ -547,11 +547,10 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
 CHIP_ERROR CommandHandler::FinishStatus()
 {
     VerifyOrReturnError(mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(
-        mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus().EndOfCommandStatusIB().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage().GetError());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus().EndOfCommandStatusIB());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     MoveToState(State::AddedCommand);
     return CHIP_NO_ERROR;
 }

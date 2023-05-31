@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    19.2.1. [TC-SC-6.1] Adding member to a group - DUT as Admin and TH as Group
+    18.2.1. [TC-SC-6.1] Adding member to a group - DUT as Admin and TH as Group
     Member [DUT-Client]
 
 PICS:
@@ -118,11 +118,7 @@ tests:
           and GroupKeySetID. Admin sets GroupKeySecurityPolicy = TrustFirst (0)
           EpochStartTime0 = 0"
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
-          "groupKeySecurityPolicy": 0, "epochKey0":
-          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
-          "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
+
       disabled: true
 
     - label:
@@ -130,6 +126,12 @@ tests:
           EP0"
       PICS: GRPKEY.C.C00.Tx
       verification: |
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
+          "groupKeySecurityPolicy": 0, "epochKey0":
+          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
+          "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
+
           Verify TH recieves KeySetWrite command on TH(Reference app)log:
 
           [1651471040.120912][4012:4012] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:2398599 on exchange 35559r

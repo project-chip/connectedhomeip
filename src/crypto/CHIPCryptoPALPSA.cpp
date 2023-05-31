@@ -47,10 +47,6 @@
 #include <string.h>
 #include <type_traits>
 
-#if !defined(MBEDTLS_PSA_CRYPTO_C)
-#error "PSA crypto API not enabled in mbedTLS config"
-#endif
-
 constexpr size_t kMaxErrorStrLen = 128;
 
 // In mbedTLS 3.0.0 direct access to structure fields was replaced with using MBEDTLS_PRIVATE macro.
@@ -130,17 +126,31 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     status = psa_aead_set_nonce(&operation, nonce, nonce_length);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-    status = psa_aead_update_ad(&operation, aad, aad_length);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    if (aad_length != 0)
+    {
+        status = psa_aead_update_ad(&operation, aad, aad_length);
+        VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    }
+    else
+    {
+        ChipLogDetail(Crypto, "AES_CCM_encrypt: Using aad == null path");
+    }
 
-    status = psa_aead_update(&operation, plaintext, plaintext_length, ciphertext,
-                             PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, plaintext_length), &out_length);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    if (plaintext_length != 0)
+    {
+        status = psa_aead_update(&operation, plaintext, plaintext_length, ciphertext,
+                                 PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, plaintext_length), &out_length);
+        VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-    ciphertext += out_length;
+        ciphertext += out_length;
 
-    status = psa_aead_finish(&operation, ciphertext, PSA_AEAD_FINISH_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm), &out_length, tag,
-                             tag_length, &tag_out_length);
+        status = psa_aead_finish(&operation, ciphertext, PSA_AEAD_FINISH_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm), &out_length, tag,
+                                 tag_length, &tag_out_length);
+    }
+    else
+    {
+        status = psa_aead_finish(&operation, nullptr, 0, &out_length, tag, tag_length, &tag_out_length);
+    }
     VerifyOrReturnError(status == PSA_SUCCESS && tag_length == tag_out_length, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -169,17 +179,32 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     status = psa_aead_set_nonce(&operation, nonce, nonce_length);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-    status = psa_aead_update_ad(&operation, aad, aad_length);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    if (aad_length != 0)
+    {
+        status = psa_aead_update_ad(&operation, aad, aad_length);
+        VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    }
+    else
+    {
+        ChipLogDetail(Crypto, "AES_CCM_decrypt: Using aad == null path");
+    }
 
-    status = psa_aead_update(&operation, ciphertext, ciphertext_length, plaintext,
-                             PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, ciphertext_length), &outLength);
-    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+    if (ciphertext_length != 0)
+    {
+        status = psa_aead_update(&operation, ciphertext, ciphertext_length, plaintext,
+                                 PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, ciphertext_length), &outLength);
+        VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-    plaintext += outLength;
+        plaintext += outLength;
 
-    status = psa_aead_verify(&operation, plaintext, PSA_AEAD_VERIFY_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm), &outLength, tag,
-                             tag_length);
+        status = psa_aead_verify(&operation, plaintext, PSA_AEAD_VERIFY_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm), &outLength, tag,
+                                 tag_length);
+    }
+    else
+    {
+        status = psa_aead_verify(&operation, nullptr, 0, &outLength, tag, tag_length);
+    }
+
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -555,7 +580,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
 
     CHIP_ERROR error                = CHIP_NO_ERROR;
     psa_status_t status             = PSA_SUCCESS;
-    mbedtls_svc_key_id_t keyId      = 0;
+    psa_key_id_t keyId              = 0;
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
 
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_PUBLIC_KEY(PSA_ECC_FAMILY_SECP_R1));
@@ -589,7 +614,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     status = psa_raw_key_agreement(PSA_ALG_ECDH, context.key_id, remote_public_key.ConstBytes(), remote_public_key.Length(),
                                    out_secret.Bytes(), outputSize, &outputLength);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-    SuccessOrExit(out_secret.SetLength(outputLength));
+    SuccessOrExit(error = out_secret.SetLength(outputLength));
 
 exit:
     logPsaError(status);
@@ -1420,7 +1445,9 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
         error  = CHIP_ERROR_CERT_NOT_TRUSTED;
         break;
     default:
-        SuccessOrExit((result = CertificateChainValidationResult::kInternalFrameworkError, error = CHIP_ERROR_INTERNAL));
+        result = CertificateChainValidationResult::kInternalFrameworkError;
+        error  = CHIP_ERROR_INTERNAL;
+        break;
     }
 
 exit:

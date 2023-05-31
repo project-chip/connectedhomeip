@@ -31,7 +31,7 @@
 #include <string.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
-#include <app/clusters/scenes/scenes.h>
+#include <app/clusters/scenes-server/scenes-server.h>
 #endif // EMBER_AF_PLUGIN_SCENES
 
 using namespace chip;

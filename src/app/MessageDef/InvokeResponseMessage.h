@@ -89,9 +89,9 @@ public:
     /**
      *  @brief Mark the end of this InvokeResponseMessage
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    InvokeResponseMessage::Builder & EndOfInvokeResponseMessage();
+    CHIP_ERROR EndOfInvokeResponseMessage();
 
 private:
     InvokeResponseIBs::Builder mInvokeResponses;

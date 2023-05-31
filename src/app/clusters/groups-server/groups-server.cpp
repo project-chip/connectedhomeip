@@ -29,7 +29,7 @@
 #include <lib/support/CodeUtils.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
-#include <app/clusters/scenes/scenes.h>
+#include <app/clusters/scenes-server/scenes-server.h>
 #endif // EMBER_AF_PLUGIN_SCENES
 
 using namespace chip;
@@ -282,8 +282,8 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
     Groups::Commands::RemoveGroupResponse::Type response;
 
 #ifdef EMBER_AF_PLUGIN_SCENES
-    // If a group is, removed the scenes associated with that group SHOULD be removed.
-    emberAfScenesClusterRemoveScenesInGroupCallback(commandPath.mEndpointId, commandData.groupID);
+    // If a group is removed the scenes associated with that group SHOULD be removed.
+    Scenes::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, commandData.groupID);
 #endif
     response.groupID = commandData.groupID;
     response.status  = GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupID);
@@ -311,11 +311,11 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
         {
             if (commandPath.mEndpointId == mapping.endpoint_id)
             {
-                emberAfScenesClusterRemoveScenesInGroupCallback(mapping.endpoint_id, mapping.group_id);
+                Scenes::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, mapping.endpoint_id, mapping.group_id);
             }
         }
         iter->Release();
-        emberAfScenesClusterRemoveScenesInGroupCallback(commandPath.mEndpointId, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
+        Scenes::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
     }
 #endif
 
