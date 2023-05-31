@@ -521,19 +521,11 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
                                                                       newElement_3_attributeID);
                 }
                 jobject newElement_3_attributeValue;
-                chip::JniReferences::GetInstance().CreateArrayList(newElement_3_attributeValue);
-
-                auto iter_newElement_3_attributeValue_5 = entry_3.attributeValue.begin();
-                while (iter_newElement_3_attributeValue_5.Next())
-                {
-                    auto & entry_5 = iter_newElement_3_attributeValue_5.GetValue();
-                    jobject newElement_5;
-                    std::string newElement_5ClassName     = "java/lang/Integer";
-                    std::string newElement_5CtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                        newElement_5ClassName.c_str(), newElement_5CtorSignature.c_str(), entry_5, newElement_5);
-                    chip::JniReferences::GetInstance().AddToList(newElement_3_attributeValue, newElement_5);
-                }
+                std::string newElement_3_attributeValueClassName     = "java/lang/Long";
+                std::string newElement_3_attributeValueCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_3_attributeValueClassName.c_str(),
+                                                                               newElement_3_attributeValueCtorSignature.c_str(),
+                                                                               entry_3.attributeValue, newElement_3_attributeValue);
 
                 jclass attributeValuePairStructClass_4;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -544,7 +536,7 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
                     return;
                 }
                 jmethodID attributeValuePairStructCtor_4 =
-                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/util/Optional;Ljava/util/ArrayList;)V");
+                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/util/Optional;Ljava/lang/Long;)V");
                 if (attributeValuePairStructCtor_4 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterAttributeValuePair constructor");
@@ -1103,19 +1095,11 @@ void CHIPScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
                                                                       newElement_3_attributeID);
                 }
                 jobject newElement_3_attributeValue;
-                chip::JniReferences::GetInstance().CreateArrayList(newElement_3_attributeValue);
-
-                auto iter_newElement_3_attributeValue_5 = entry_3.attributeValue.begin();
-                while (iter_newElement_3_attributeValue_5.Next())
-                {
-                    auto & entry_5 = iter_newElement_3_attributeValue_5.GetValue();
-                    jobject newElement_5;
-                    std::string newElement_5ClassName     = "java/lang/Integer";
-                    std::string newElement_5CtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                        newElement_5ClassName.c_str(), newElement_5CtorSignature.c_str(), entry_5, newElement_5);
-                    chip::JniReferences::GetInstance().AddToList(newElement_3_attributeValue, newElement_5);
-                }
+                std::string newElement_3_attributeValueClassName     = "java/lang/Long";
+                std::string newElement_3_attributeValueCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_3_attributeValueClassName.c_str(),
+                                                                               newElement_3_attributeValueCtorSignature.c_str(),
+                                                                               entry_3.attributeValue, newElement_3_attributeValue);
 
                 jclass attributeValuePairStructClass_4;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -1126,7 +1110,7 @@ void CHIPScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
                     return;
                 }
                 jmethodID attributeValuePairStructCtor_4 =
-                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/util/Optional;Ljava/util/ArrayList;)V");
+                    env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/util/Optional;Ljava/lang/Long;)V");
                 if (attributeValuePairStructCtor_4 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterAttributeValuePair constructor");
@@ -2825,82 +2809,9 @@ void CHIPIcdManagementClusterRegisterClientResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, ICDCounter);
 }
-CHIPModeSelectClusterChangeToModeResponseCallback::CHIPModeSelectClusterChangeToModeResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPModeSelectClusterChangeToModeResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPModeSelectClusterChangeToModeResponseCallback::~CHIPModeSelectClusterChangeToModeResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPModeSelectClusterChangeToModeResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPModeSelectClusterChangeToModeResponseCallback,
-                    void (*)(CHIPModeSelectClusterChangeToModeResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPModeSelectClusterChangeToModeResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPModeSelectClusterChangeToModeResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/util/Optional;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject Status;
-    std::string StatusClassName     = "java/lang/Integer";
-    std::string StatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
-                                                                  dataResponse.status, Status);
-    jobject StatusText;
-    if (!dataResponse.statusText.HasValue())
-    {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, StatusText);
-    }
-    else
-    {
-        jobject StatusTextInsideOptional;
-        LogErrorOnFailure(
-            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.statusText.Value(), StatusTextInsideOptional));
-        chip::JniReferences::GetInstance().CreateOptional(StatusTextInsideOptional, StatusText);
-    }
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, StatusText);
-}
-CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback::CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback(
+CHIPOperationalStateClusterOperationalCommandResponseCallback::CHIPOperationalStateClusterOperationalCommandResponseCallback(
     jobject javaCallback) :
-    Callback::Callback<CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallbackType>(CallbackFn, this)
+    Callback::Callback<CHIPOperationalStateClusterOperationalCommandResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2916,7 +2827,7 @@ CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback::CHIPLaundryWashe
     }
 }
 
-CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback::~CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback()
+CHIPOperationalStateClusterOperationalCommandResponseCallback::~CHIPOperationalStateClusterOperationalCommandResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2927,9 +2838,8 @@ CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback::~CHIPLaundryWash
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback::CallbackFn(
-    void * context,
-    const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType & dataResponse)
+void CHIPOperationalStateClusterOperationalCommandResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2939,341 +2849,73 @@ void CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback,
-                    void (*)(CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback>);
+    std::unique_ptr<CHIPOperationalStateClusterOperationalCommandResponseCallback,
+                    void (*)(CHIPOperationalStateClusterOperationalCommandResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPOperationalStateClusterOperationalCommandResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPOperationalStateClusterOperationalCommandResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/util/Optional;)V",
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
+                                                  "(Lchip/devicecontroller/ChipStructs$OperationalStateClusterErrorStateStruct;)V",
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject Status;
-    std::string StatusClassName     = "java/lang/Integer";
-    std::string StatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
-                                                                  dataResponse.status, Status);
-    jobject StatusText;
-    if (!dataResponse.statusText.HasValue())
+    jobject CommandResponseState;
+    jobject CommandResponseState_errorStateID;
+    std::string CommandResponseState_errorStateIDClassName     = "java/lang/Integer";
+    std::string CommandResponseState_errorStateIDCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+        CommandResponseState_errorStateIDClassName.c_str(), CommandResponseState_errorStateIDCtorSignature.c_str(),
+        static_cast<uint8_t>(dataResponse.commandResponseState.errorStateID), CommandResponseState_errorStateID);
+    jobject CommandResponseState_errorStateLabel;
+    if (dataResponse.commandResponseState.errorStateLabel.IsNull())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, StatusText);
+        CommandResponseState_errorStateLabel = nullptr;
     }
     else
     {
-        jobject StatusTextInsideOptional;
-        LogErrorOnFailure(
-            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.statusText.Value(), StatusTextInsideOptional));
-        chip::JniReferences::GetInstance().CreateOptional(StatusTextInsideOptional, StatusText);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+            dataResponse.commandResponseState.errorStateLabel.Value(), CommandResponseState_errorStateLabel));
     }
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, StatusText);
-}
-CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback::
-    CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallbackType>(CallbackFn,
-                                                                                                                         this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
+    jobject CommandResponseState_errorStateDetails;
+    if (!dataResponse.commandResponseState.errorStateDetails.HasValue())
     {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback::
-    ~CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback::CallbackFn(
-    void * context,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::
-        DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback,
-                    void (*)(CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback *)>
-        cppCallback(
-            reinterpret_cast<CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback *>(
-                context),
-            chip::Platform::Delete<CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/util/Optional;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject Status;
-    std::string StatusClassName     = "java/lang/Integer";
-    std::string StatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
-                                                                  dataResponse.status, Status);
-    jobject StatusText;
-    if (!dataResponse.statusText.HasValue())
-    {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, StatusText);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, CommandResponseState_errorStateDetails);
     }
     else
     {
-        jobject StatusTextInsideOptional;
-        LogErrorOnFailure(
-            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.statusText.Value(), StatusTextInsideOptional));
-        chip::JniReferences::GetInstance().CreateOptional(StatusTextInsideOptional, StatusText);
+        jobject CommandResponseState_errorStateDetailsInsideOptional;
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+            dataResponse.commandResponseState.errorStateDetails.Value(), CommandResponseState_errorStateDetailsInsideOptional));
+        chip::JniReferences::GetInstance().CreateOptional(CommandResponseState_errorStateDetailsInsideOptional,
+                                                          CommandResponseState_errorStateDetails);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, StatusText);
-}
-CHIPRvcRunModeSelectClusterChangeToModeResponseCallback::CHIPRvcRunModeSelectClusterChangeToModeResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPRvcRunModeSelectClusterChangeToModeResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
+    jclass errorStateStructStructClass_0;
+    err = chip::JniReferences::GetInstance().GetClassRef(
+        env, "chip/devicecontroller/ChipStructs$OperationalStateClusterErrorStateStruct", errorStateStructStructClass_0);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        ChipLogError(Zcl, "Could not find class ChipStructs$OperationalStateClusterErrorStateStruct");
+        return;
+    }
+    jmethodID errorStateStructStructCtor_0 =
+        env->GetMethodID(errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;Ljava/util/Optional;)V");
+    if (errorStateStructStructCtor_0 == nullptr)
+    {
+        ChipLogError(Zcl, "Could not find ChipStructs$OperationalStateClusterErrorStateStruct constructor");
         return;
     }
 
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
+    CommandResponseState =
+        env->NewObject(errorStateStructStructClass_0, errorStateStructStructCtor_0, CommandResponseState_errorStateID,
+                       CommandResponseState_errorStateLabel, CommandResponseState_errorStateDetails);
 
-CHIPRvcRunModeSelectClusterChangeToModeResponseCallback::~CHIPRvcRunModeSelectClusterChangeToModeResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPRvcRunModeSelectClusterChangeToModeResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPRvcRunModeSelectClusterChangeToModeResponseCallback,
-                    void (*)(CHIPRvcRunModeSelectClusterChangeToModeResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPRvcRunModeSelectClusterChangeToModeResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPRvcRunModeSelectClusterChangeToModeResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/util/Optional;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject Status;
-    std::string StatusClassName     = "java/lang/Integer";
-    std::string StatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
-                                                                  dataResponse.status, Status);
-    jobject StatusText;
-    if (!dataResponse.statusText.HasValue())
-    {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, StatusText);
-    }
-    else
-    {
-        jobject StatusTextInsideOptional;
-        LogErrorOnFailure(
-            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.statusText.Value(), StatusTextInsideOptional));
-        chip::JniReferences::GetInstance().CreateOptional(StatusTextInsideOptional, StatusText);
-    }
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, StatusText);
-}
-CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback::CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPRvcCleanModeSelectClusterChangeToModeResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback::~CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback,
-                    void (*)(CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/util/Optional;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject Status;
-    std::string StatusClassName     = "java/lang/Integer";
-    std::string StatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
-                                                                  dataResponse.status, Status);
-    jobject StatusText;
-    if (!dataResponse.statusText.HasValue())
-    {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, StatusText);
-    }
-    else
-    {
-        jobject StatusTextInsideOptional;
-        LogErrorOnFailure(
-            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.statusText.Value(), StatusTextInsideOptional));
-        chip::JniReferences::GetInstance().CreateOptional(StatusTextInsideOptional, StatusText);
-    }
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, StatusText);
-}
-CHIPDishwasherModeSelectClusterChangeToModeResponseCallback::CHIPDishwasherModeSelectClusterChangeToModeResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPDishwasherModeSelectClusterChangeToModeResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPDishwasherModeSelectClusterChangeToModeResponseCallback::~CHIPDishwasherModeSelectClusterChangeToModeResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPDishwasherModeSelectClusterChangeToModeResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPDishwasherModeSelectClusterChangeToModeResponseCallback,
-                    void (*)(CHIPDishwasherModeSelectClusterChangeToModeResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPDishwasherModeSelectClusterChangeToModeResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPDishwasherModeSelectClusterChangeToModeResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/util/Optional;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject Status;
-    std::string StatusClassName     = "java/lang/Integer";
-    std::string StatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
-                                                                  dataResponse.status, Status);
-    jobject StatusText;
-    if (!dataResponse.statusText.HasValue())
-    {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, StatusText);
-    }
-    else
-    {
-        jobject StatusTextInsideOptional;
-        LogErrorOnFailure(
-            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.statusText.Value(), StatusTextInsideOptional));
-        chip::JniReferences::GetInstance().CreateOptional(StatusTextInsideOptional, StatusText);
-    }
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, StatusText);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, CommandResponseState);
 }
 CHIPDoorLockClusterGetWeekDayScheduleResponseCallback::CHIPDoorLockClusterGetWeekDayScheduleResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>(CallbackFn, this)

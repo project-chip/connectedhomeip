@@ -69,10 +69,10 @@ DataVersionFilterIB::Builder & DataVersionFilterIBs::Builder::CreateDataVersionF
     return mDataVersionFilter;
 }
 
-DataVersionFilterIBs::Builder & DataVersionFilterIBs::Builder::EndOfDataVersionFilterIBs()
+CHIP_ERROR DataVersionFilterIBs::Builder::EndOfDataVersionFilterIBs()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

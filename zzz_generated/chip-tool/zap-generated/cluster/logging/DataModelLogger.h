@@ -141,47 +141,19 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::ModeSelect::Structs::ModeTagStruct::DecodableType & value);
+                           const chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeTagStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType & value);
-
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeTagStruct::DecodableType &
-             value);
-
-static CHIP_ERROR LogValue(
-    const char * label, size_t indent,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::DecodableType &
-        value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::RvcRunModeSelect::Structs::ModeTagStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::RvcCleanModeSelect::Structs::ModeTagStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::DecodableType & value);
-
-static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::DishwasherModeSelect::Structs::ModeTagStruct::DecodableType & value);
+                           const chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::DecodableType & value);
+                           const chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DoorLock::Structs::CredentialStruct::DecodableType & value);
@@ -363,6 +335,10 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::SmokeCoAlarm::Events::AllClear::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::OperationalState::Events::OperationalError::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::OperationalState::Events::OperationCompletion::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType & value);
@@ -487,20 +463,9 @@ LogValue(const char * label, size_t indent,
          const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::
-                               ChangeToModeResponse::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType & value);
+         const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

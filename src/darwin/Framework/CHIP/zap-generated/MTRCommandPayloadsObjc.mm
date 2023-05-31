@@ -20,6 +20,8 @@
 #import "MTRCommandPayloads_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 
 #include <app/data-model/Decode.h>
 #include <lib/core/TLV.h>
@@ -369,9 +371,11 @@ NS_ASSUME_NONNULL_BEGIN
         self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
     }
     {
-        self.groupName = [[NSString alloc] initWithBytes:decodableStruct.groupName.data()
-                                                  length:decodableStruct.groupName.size()
-                                                encoding:NSUTF8StringEncoding];
+        self.groupName = AsString(decodableStruct.groupName);
+        if (self.groupName == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -1090,9 +1094,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.sceneName.HasValue()) {
-            self.sceneName = [[NSString alloc] initWithBytes:decodableStruct.sceneName.Value().data()
-                                                      length:decodableStruct.sceneName.Value().size()
-                                                    encoding:NSUTF8StringEncoding];
+            self.sceneName = AsString(decodableStruct.sceneName.Value());
+            if (self.sceneName == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.sceneName = nil;
         }
@@ -1119,21 +1125,7 @@ NS_ASSUME_NONNULL_BEGIN
                             } else {
                                 newElement_3.attributeID = nil;
                             }
-                            { // Scope for our temporary variables
-                                auto * array_5 = [NSMutableArray new];
-                                auto iter_5 = entry_3.attributeValue.begin();
-                                while (iter_5.Next()) {
-                                    auto & entry_5 = iter_5.GetValue();
-                                    NSNumber * newElement_5;
-                                    newElement_5 = [NSNumber numberWithUnsignedChar:entry_5];
-                                    [array_5 addObject:newElement_5];
-                                }
-                                CHIP_ERROR err = iter_5.GetStatus();
-                                if (err != CHIP_NO_ERROR) {
-                                    return err;
-                                }
-                                newElement_3.attributeValue = array_5;
-                            }
+                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
                         CHIP_ERROR err = iter_3.GetStatus();
@@ -2255,9 +2247,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.sceneName.HasValue()) {
-            self.sceneName = [[NSString alloc] initWithBytes:decodableStruct.sceneName.Value().data()
-                                                      length:decodableStruct.sceneName.Value().size()
-                                                    encoding:NSUTF8StringEncoding];
+            self.sceneName = AsString(decodableStruct.sceneName.Value());
+            if (self.sceneName == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.sceneName = nil;
         }
@@ -2284,21 +2278,7 @@ NS_ASSUME_NONNULL_BEGIN
                             } else {
                                 newElement_3.attributeID = nil;
                             }
-                            { // Scope for our temporary variables
-                                auto * array_5 = [NSMutableArray new];
-                                auto iter_5 = entry_3.attributeValue.begin();
-                                while (iter_5.Next()) {
-                                    auto & entry_5 = iter_5.GetValue();
-                                    NSNumber * newElement_5;
-                                    newElement_5 = [NSNumber numberWithUnsignedChar:entry_5];
-                                    [array_5 addObject:newElement_5];
-                                }
-                                CHIP_ERROR err = iter_5.GetStatus();
-                                if (err != CHIP_NO_ERROR) {
-                                    return err;
-                                }
-                                newElement_3.attributeValue = array_5;
-                            }
+                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
                         CHIP_ERROR err = iter_3.GetStatus();
@@ -3732,9 +3712,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.imageURI.HasValue()) {
-            self.imageURI = [[NSString alloc] initWithBytes:decodableStruct.imageURI.Value().data()
-                                                     length:decodableStruct.imageURI.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
+            self.imageURI = AsString(decodableStruct.imageURI.Value());
+            if (self.imageURI == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.imageURI = nil;
         }
@@ -3748,17 +3730,18 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.softwareVersionString.HasValue()) {
-            self.softwareVersionString = [[NSString alloc] initWithBytes:decodableStruct.softwareVersionString.Value().data()
-                                                                  length:decodableStruct.softwareVersionString.Value().size()
-                                                                encoding:NSUTF8StringEncoding];
+            self.softwareVersionString = AsString(decodableStruct.softwareVersionString.Value());
+            if (self.softwareVersionString == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.softwareVersionString = nil;
         }
     }
     {
         if (decodableStruct.updateToken.HasValue()) {
-            self.updateToken = [NSData dataWithBytes:decodableStruct.updateToken.Value().data()
-                                              length:decodableStruct.updateToken.Value().size()];
+            self.updateToken = AsData(decodableStruct.updateToken.Value());
         } else {
             self.updateToken = nil;
         }
@@ -3772,8 +3755,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.metadataForRequestor.HasValue()) {
-            self.metadataForRequestor = [NSData dataWithBytes:decodableStruct.metadataForRequestor.Value().data()
-                                                       length:decodableStruct.metadataForRequestor.Value().size()];
+            self.metadataForRequestor = AsData(decodableStruct.metadataForRequestor.Value());
         } else {
             self.metadataForRequestor = nil;
         }
@@ -4137,9 +4119,11 @@ NS_ASSUME_NONNULL_BEGIN
         self.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.errorCode)];
     }
     {
-        self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.data()
-                                                  length:decodableStruct.debugText.size()
-                                                encoding:NSUTF8StringEncoding];
+        self.debugText = AsString(decodableStruct.debugText);
+        if (self.debugText == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -4263,9 +4247,11 @@ NS_ASSUME_NONNULL_BEGIN
         self.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.errorCode)];
     }
     {
-        self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.data()
-                                                  length:decodableStruct.debugText.size()
-                                                encoding:NSUTF8StringEncoding];
+        self.debugText = AsString(decodableStruct.debugText);
+        if (self.debugText == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -4379,9 +4365,11 @@ NS_ASSUME_NONNULL_BEGIN
         self.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.errorCode)];
     }
     {
-        self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.data()
-                                                  length:decodableStruct.debugText.size()
-                                                encoding:NSUTF8StringEncoding];
+        self.debugText = AsString(decodableStruct.debugText);
+        if (self.debugText == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -4510,9 +4498,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.debugText.HasValue()) {
-            self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.Value().data()
-                                                      length:decodableStruct.debugText.Value().size()
-                                                    encoding:NSUTF8StringEncoding];
+            self.debugText = AsString(decodableStruct.debugText.Value());
+            if (self.debugText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.debugText = nil;
         }
@@ -4527,8 +4517,8 @@ NS_ASSUME_NONNULL_BEGIN
                     MTRNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_1;
                     newElement_1 = [MTRNetworkCommissioningClusterWiFiInterfaceScanResult new];
                     newElement_1.security = [NSNumber numberWithUnsignedChar:entry_1.security.Raw()];
-                    newElement_1.ssid = [NSData dataWithBytes:entry_1.ssid.data() length:entry_1.ssid.size()];
-                    newElement_1.bssid = [NSData dataWithBytes:entry_1.bssid.data() length:entry_1.bssid.size()];
+                    newElement_1.ssid = AsData(entry_1.ssid);
+                    newElement_1.bssid = AsData(entry_1.bssid);
                     newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
                     newElement_1.wiFiBand = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.wiFiBand)];
                     newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
@@ -4555,13 +4545,14 @@ NS_ASSUME_NONNULL_BEGIN
                     newElement_1 = [MTRNetworkCommissioningClusterThreadInterfaceScanResult new];
                     newElement_1.panId = [NSNumber numberWithUnsignedShort:entry_1.panId];
                     newElement_1.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_1.extendedPanId];
-                    newElement_1.networkName = [[NSString alloc] initWithBytes:entry_1.networkName.data()
-                                                                        length:entry_1.networkName.size()
-                                                                      encoding:NSUTF8StringEncoding];
+                    newElement_1.networkName = AsString(entry_1.networkName);
+                    if (newElement_1.networkName == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        return err;
+                    }
                     newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
                     newElement_1.version = [NSNumber numberWithUnsignedChar:entry_1.version];
-                    newElement_1.extendedAddress = [NSData dataWithBytes:entry_1.extendedAddress.data()
-                                                                  length:entry_1.extendedAddress.size()];
+                    newElement_1.extendedAddress = AsData(entry_1.extendedAddress);
                     newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
                     newElement_1.lqi = [NSNumber numberWithUnsignedChar:entry_1.lqi];
                     [array_1 addObject:newElement_1];
@@ -4773,9 +4764,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.debugText.HasValue()) {
-            self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.Value().data()
-                                                      length:decodableStruct.debugText.Value().size()
-                                                    encoding:NSUTF8StringEncoding];
+            self.debugText = AsString(decodableStruct.debugText.Value());
+            if (self.debugText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.debugText = nil;
         }
@@ -4911,9 +4904,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.debugText.HasValue()) {
-            self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.Value().data()
-                                                      length:decodableStruct.debugText.Value().size()
-                                                    encoding:NSUTF8StringEncoding];
+            self.debugText = AsString(decodableStruct.debugText.Value());
+            if (self.debugText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.debugText = nil;
         }
@@ -5092,7 +5087,7 @@ NS_ASSUME_NONNULL_BEGIN
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
     }
     {
-        self.logContent = [NSData dataWithBytes:decodableStruct.logContent.data() length:decodableStruct.logContent.size()];
+        self.logContent = AsData(decodableStruct.logContent);
     }
     {
         if (decodableStruct.UTCTimeStamp.HasValue()) {
@@ -5541,12 +5536,10 @@ NS_ASSUME_NONNULL_BEGIN
     (const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &)decodableStruct
 {
     {
-        self.attestationElements = [NSData dataWithBytes:decodableStruct.attestationElements.data()
-                                                  length:decodableStruct.attestationElements.size()];
+        self.attestationElements = AsData(decodableStruct.attestationElements);
     }
     {
-        self.attestationSignature = [NSData dataWithBytes:decodableStruct.attestationSignature.data()
-                                                   length:decodableStruct.attestationSignature.size()];
+        self.attestationSignature = AsData(decodableStruct.attestationSignature);
     }
     return CHIP_NO_ERROR;
 }
@@ -5671,7 +5664,7 @@ NS_ASSUME_NONNULL_BEGIN
     (const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &)decodableStruct
 {
     {
-        self.certificate = [NSData dataWithBytes:decodableStruct.certificate.data() length:decodableStruct.certificate.size()];
+        self.certificate = AsData(decodableStruct.certificate);
     }
     return CHIP_NO_ERROR;
 }
@@ -5791,12 +5784,10 @@ NS_ASSUME_NONNULL_BEGIN
     (const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType &)decodableStruct
 {
     {
-        self.nocsrElements = [NSData dataWithBytes:decodableStruct.NOCSRElements.data()
-                                            length:decodableStruct.NOCSRElements.size()];
+        self.nocsrElements = AsData(decodableStruct.NOCSRElements);
     }
     {
-        self.attestationSignature = [NSData dataWithBytes:decodableStruct.attestationSignature.data()
-                                                   length:decodableStruct.attestationSignature.size()];
+        self.attestationSignature = AsData(decodableStruct.attestationSignature);
     }
     return CHIP_NO_ERROR;
 }
@@ -5975,9 +5966,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.debugText.HasValue()) {
-            self.debugText = [[NSString alloc] initWithBytes:decodableStruct.debugText.Value().data()
-                                                      length:decodableStruct.debugText.Value().size()
-                                                    encoding:NSUTF8StringEncoding];
+            self.debugText = AsString(decodableStruct.debugText.Value());
+            if (self.debugText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.debugText = nil;
         }
@@ -6235,8 +6228,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (decodableStruct.groupKeySet.epochKey0.IsNull()) {
             self.groupKeySet.epochKey0 = nil;
         } else {
-            self.groupKeySet.epochKey0 = [NSData dataWithBytes:decodableStruct.groupKeySet.epochKey0.Value().data()
-                                                        length:decodableStruct.groupKeySet.epochKey0.Value().size()];
+            self.groupKeySet.epochKey0 = AsData(decodableStruct.groupKeySet.epochKey0.Value());
         }
         if (decodableStruct.groupKeySet.epochStartTime0.IsNull()) {
             self.groupKeySet.epochStartTime0 = nil;
@@ -6247,8 +6239,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (decodableStruct.groupKeySet.epochKey1.IsNull()) {
             self.groupKeySet.epochKey1 = nil;
         } else {
-            self.groupKeySet.epochKey1 = [NSData dataWithBytes:decodableStruct.groupKeySet.epochKey1.Value().data()
-                                                        length:decodableStruct.groupKeySet.epochKey1.Value().size()];
+            self.groupKeySet.epochKey1 = AsData(decodableStruct.groupKeySet.epochKey1.Value());
         }
         if (decodableStruct.groupKeySet.epochStartTime1.IsNull()) {
             self.groupKeySet.epochStartTime1 = nil;
@@ -6259,8 +6250,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (decodableStruct.groupKeySet.epochKey2.IsNull()) {
             self.groupKeySet.epochKey2 = nil;
         } else {
-            self.groupKeySet.epochKey2 = [NSData dataWithBytes:decodableStruct.groupKeySet.epochKey2.Value().data()
-                                                        length:decodableStruct.groupKeySet.epochKey2.Value().size()];
+            self.groupKeySet.epochKey2 = AsData(decodableStruct.groupKeySet.epochKey2.Value());
         }
         if (decodableStruct.groupKeySet.epochStartTime2.IsNull()) {
             self.groupKeySet.epochStartTime2 = nil;
@@ -7430,6 +7420,213 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+@implementation MTROperationalStateClusterPauseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTROperationalStateClusterPauseParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTROperationalStateClusterStopParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTROperationalStateClusterStopParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTROperationalStateClusterStartParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTROperationalStateClusterStartParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTROperationalStateClusterResumeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTROperationalStateClusterResumeParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTROperationalStateClusterOperationalCommandResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _commandResponseState = [MTROperationalStateClusterErrorStateStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTROperationalStateClusterOperationalCommandResponseParams alloc] init];
+
+    other.commandResponseState = self.commandResponseState;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: commandResponseState:%@; >", NSStringFromClass([self class]), _commandResponseState];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTROperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
+{
+    {
+        self.commandResponseState = [MTROperationalStateClusterErrorStateStruct new];
+        self.commandResponseState.errorStateID =
+            [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.commandResponseState.errorStateID)];
+        if (decodableStruct.commandResponseState.errorStateLabel.IsNull()) {
+            self.commandResponseState.errorStateLabel = nil;
+        } else {
+            self.commandResponseState.errorStateLabel = AsString(decodableStruct.commandResponseState.errorStateLabel.Value());
+            if (self.commandResponseState.errorStateLabel == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        }
+        if (decodableStruct.commandResponseState.errorStateDetails.HasValue()) {
+            self.commandResponseState.errorStateDetails = AsString(decodableStruct.commandResponseState.errorStateDetails.Value());
+            if (self.commandResponseState.errorStateDetails == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.commandResponseState.errorStateDetails = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
 @end
 @implementation MTRHEPAFilterMonitoringClusterResetConditionParams
 - (instancetype)init
@@ -8766,9 +8963,11 @@ NS_ASSUME_NONNULL_BEGIN
         if (decodableStruct.userName.IsNull()) {
             self.userName = nil;
         } else {
-            self.userName = [[NSString alloc] initWithBytes:decodableStruct.userName.Value().data()
-                                                     length:decodableStruct.userName.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
+            self.userName = AsString(decodableStruct.userName.Value());
+            if (self.userName == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         }
     }
     {
@@ -10727,9 +10926,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.data.HasValue()) {
-            self.data = [[NSString alloc] initWithBytes:decodableStruct.data.Value().data()
-                                                 length:decodableStruct.data.Value().size()
-                                               encoding:NSUTF8StringEncoding];
+            self.data = AsString(decodableStruct.data.Value());
+            if (self.data == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.data = nil;
         }
@@ -10918,9 +11119,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.data.HasValue()) {
-            self.data = [[NSString alloc] initWithBytes:decodableStruct.data.Value().data()
-                                                 length:decodableStruct.data.Value().size()
-                                               encoding:NSUTF8StringEncoding];
+            self.data = AsString(decodableStruct.data.Value());
+            if (self.data == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.data = nil;
         }
@@ -11292,9 +11495,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.data.HasValue()) {
-            self.data = [[NSString alloc] initWithBytes:decodableStruct.data.Value().data()
-                                                 length:decodableStruct.data.Value().size()
-                                               encoding:NSUTF8StringEncoding];
+            self.data = AsString(decodableStruct.data.Value());
+            if (self.data == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.data = nil;
         }
@@ -11744,9 +11949,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.data.HasValue()) {
-            self.data = [[NSString alloc] initWithBytes:decodableStruct.data.Value().data()
-                                                 length:decodableStruct.data.Value().size()
-                                               encoding:NSUTF8StringEncoding];
+            self.data = AsString(decodableStruct.data.Value());
+            if (self.data == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.data = nil;
         }
@@ -12000,7 +12207,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.data.HasValue()) {
-            self.data = [NSData dataWithBytes:decodableStruct.data.Value().data() length:decodableStruct.data.Value().size()];
+            self.data = AsData(decodableStruct.data.Value());
         } else {
             self.data = nil;
         }
@@ -12114,9 +12321,11 @@ NS_ASSUME_NONNULL_BEGIN
     (const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &)decodableStruct
 {
     {
-        self.setupPIN = [[NSString alloc] initWithBytes:decodableStruct.setupPIN.data()
-                                                 length:decodableStruct.setupPIN.size()
-                                               encoding:NSUTF8StringEncoding];
+        self.setupPIN = AsString(decodableStruct.setupPIN);
+        if (self.setupPIN == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
+        }
     }
     return CHIP_NO_ERROR;
 }
@@ -12963,10 +13172,12 @@ NS_ASSUME_NONNULL_BEGIN
         newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
         newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
         newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
-        newElement_0.c.d = [NSData dataWithBytes:entry_0.c.d.data() length:entry_0.c.d.size()];
-        newElement_0.c.e = [[NSString alloc] initWithBytes:entry_0.c.e.data()
-                                                    length:entry_0.c.e.size()
-                                                  encoding:NSUTF8StringEncoding];
+        newElement_0.c.d = AsData(entry_0.c.d);
+        newElement_0.c.e = AsString(entry_0.c.e);
+        if (newElement_0.c.e == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
+        }
         newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
         newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
         newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
@@ -12980,10 +13191,12 @@ NS_ASSUME_NONNULL_BEGIN
                 newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
                 newElement_2.b = [NSNumber numberWithBool:entry_2.b];
                 newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
-                newElement_2.d = [NSData dataWithBytes:entry_2.d.data() length:entry_2.d.size()];
-                newElement_2.e = [[NSString alloc] initWithBytes:entry_2.e.data()
-                                                          length:entry_2.e.size()
-                                                        encoding:NSUTF8StringEncoding];
+                newElement_2.d = AsData(entry_2.d);
+                newElement_2.e = AsString(entry_2.e);
+                if (newElement_2.e == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    return err;
+                }
                 newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
                 newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
                 newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
@@ -13016,7 +13229,7 @@ NS_ASSUME_NONNULL_BEGIN
             while (iter_2.Next()) {
                 auto & entry_2 = iter_2.GetValue();
                 NSData * newElement_2;
-                newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                newElement_2 = AsData(entry_2);
                 [array_2 addObject:newElement_2];
             }
             CHIP_ERROR err = iter_2.GetStatus();
@@ -13060,10 +13273,12 @@ NS_ASSUME_NONNULL_BEGIN
             newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
             newElement_0.b = [NSNumber numberWithBool:entry_0.b];
             newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
-            newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
-            newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data()
-                                                      length:entry_0.e.size()
-                                                    encoding:NSUTF8StringEncoding];
+            newElement_0.d = AsData(entry_0.d);
+            newElement_0.e = AsString(entry_0.e);
+            if (newElement_0.e == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
             newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
             newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
             newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
@@ -13791,9 +14006,11 @@ return CHIP_NO_ERROR;
     }
     {
         if (decodableStruct.nullableStringValue.HasValue()) {
-            self.nullableStringValue = [[NSString alloc] initWithBytes:decodableStruct.nullableStringValue.Value().data()
-                                                                length:decodableStruct.nullableStringValue.Value().size()
-                                                              encoding:NSUTF8StringEncoding];
+            self.nullableStringValue = AsString(decodableStruct.nullableStringValue.Value());
+            if (self.nullableStringValue == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.nullableStringValue = nil;
         }
@@ -13803,9 +14020,11 @@ return CHIP_NO_ERROR;
     }
     {
         if (decodableStruct.optionalStringValue.HasValue()) {
-            self.optionalStringValue = [[NSString alloc] initWithBytes:decodableStruct.optionalStringValue.Value().data()
-                                                                length:decodableStruct.optionalStringValue.Value().size()
-                                                              encoding:NSUTF8StringEncoding];
+            self.optionalStringValue = AsString(decodableStruct.optionalStringValue.Value());
+            if (self.optionalStringValue == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.optionalStringValue = nil;
         }
@@ -13822,10 +14041,11 @@ return CHIP_NO_ERROR;
     }
     {
         if (decodableStruct.nullableOptionalStringValue.HasValue()) {
-            self.nullableOptionalStringValue =
-                [[NSString alloc] initWithBytes:decodableStruct.nullableOptionalStringValue.Value().data()
-                                         length:decodableStruct.nullableOptionalStringValue.Value().size()
-                                       encoding:NSUTF8StringEncoding];
+            self.nullableOptionalStringValue = AsString(decodableStruct.nullableOptionalStringValue.Value());
+            if (self.nullableOptionalStringValue == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.nullableOptionalStringValue = nil;
         }
@@ -13840,11 +14060,12 @@ return CHIP_NO_ERROR;
             self.nullableStructValue.b = [NSNumber numberWithBool:decodableStruct.nullableStructValue.Value().b];
             self.nullableStructValue.c =
                 [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.nullableStructValue.Value().c)];
-            self.nullableStructValue.d = [NSData dataWithBytes:decodableStruct.nullableStructValue.Value().d.data()
-                                                        length:decodableStruct.nullableStructValue.Value().d.size()];
-            self.nullableStructValue.e = [[NSString alloc] initWithBytes:decodableStruct.nullableStructValue.Value().e.data()
-                                                                  length:decodableStruct.nullableStructValue.Value().e.size()
-                                                                encoding:NSUTF8StringEncoding];
+            self.nullableStructValue.d = AsData(decodableStruct.nullableStructValue.Value().d);
+            self.nullableStructValue.e = AsString(decodableStruct.nullableStructValue.Value().e);
+            if (self.nullableStructValue.e == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
             self.nullableStructValue.f = [NSNumber numberWithUnsignedChar:decodableStruct.nullableStructValue.Value().f.Raw()];
             self.nullableStructValue.g = [NSNumber numberWithFloat:decodableStruct.nullableStructValue.Value().g];
             self.nullableStructValue.h = [NSNumber numberWithDouble:decodableStruct.nullableStructValue.Value().h];
@@ -13862,11 +14083,12 @@ return CHIP_NO_ERROR;
             self.optionalStructValue.b = [NSNumber numberWithBool:decodableStruct.optionalStructValue.Value().b];
             self.optionalStructValue.c =
                 [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.optionalStructValue.Value().c)];
-            self.optionalStructValue.d = [NSData dataWithBytes:decodableStruct.optionalStructValue.Value().d.data()
-                                                        length:decodableStruct.optionalStructValue.Value().d.size()];
-            self.optionalStructValue.e = [[NSString alloc] initWithBytes:decodableStruct.optionalStructValue.Value().e.data()
-                                                                  length:decodableStruct.optionalStructValue.Value().e.size()
-                                                                encoding:NSUTF8StringEncoding];
+            self.optionalStructValue.d = AsData(decodableStruct.optionalStructValue.Value().d);
+            self.optionalStructValue.e = AsString(decodableStruct.optionalStructValue.Value().e);
+            if (self.optionalStructValue.e == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
             self.optionalStructValue.f = [NSNumber numberWithUnsignedChar:decodableStruct.optionalStructValue.Value().f.Raw()];
             self.optionalStructValue.g = [NSNumber numberWithFloat:decodableStruct.optionalStructValue.Value().g];
             self.optionalStructValue.h = [NSNumber numberWithDouble:decodableStruct.optionalStructValue.Value().h];
@@ -13892,13 +14114,12 @@ return CHIP_NO_ERROR;
             self.nullableOptionalStructValue.b = [NSNumber numberWithBool:decodableStruct.nullableOptionalStructValue.Value().b];
             self.nullableOptionalStructValue.c =
                 [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.nullableOptionalStructValue.Value().c)];
-            self.nullableOptionalStructValue.d =
-                [NSData dataWithBytes:decodableStruct.nullableOptionalStructValue.Value().d.data()
-                               length:decodableStruct.nullableOptionalStructValue.Value().d.size()];
-            self.nullableOptionalStructValue.e =
-                [[NSString alloc] initWithBytes:decodableStruct.nullableOptionalStructValue.Value().e.data()
-                                         length:decodableStruct.nullableOptionalStructValue.Value().e.size()
-                                       encoding:NSUTF8StringEncoding];
+            self.nullableOptionalStructValue.d = AsData(decodableStruct.nullableOptionalStructValue.Value().d);
+            self.nullableOptionalStructValue.e = AsString(decodableStruct.nullableOptionalStructValue.Value().e);
+            if (self.nullableOptionalStructValue.e == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
             self.nullableOptionalStructValue.f =
                 [NSNumber numberWithUnsignedChar:decodableStruct.nullableOptionalStructValue.Value().f.Raw()];
             self.nullableOptionalStructValue.g = [NSNumber numberWithFloat:decodableStruct.nullableOptionalStructValue.Value().g];
@@ -14220,10 +14441,12 @@ return CHIP_NO_ERROR;
         self.arg1.a = [NSNumber numberWithUnsignedChar:decodableStruct.arg1.a];
         self.arg1.b = [NSNumber numberWithBool:decodableStruct.arg1.b];
         self.arg1.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.arg1.c)];
-        self.arg1.d = [NSData dataWithBytes:decodableStruct.arg1.d.data() length:decodableStruct.arg1.d.size()];
-        self.arg1.e = [[NSString alloc] initWithBytes:decodableStruct.arg1.e.data()
-                                               length:decodableStruct.arg1.e.size()
-                                             encoding:NSUTF8StringEncoding];
+        self.arg1.d = AsData(decodableStruct.arg1.d);
+        self.arg1.e = AsString(decodableStruct.arg1.e);
+        if (self.arg1.e == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
+        }
         self.arg1.f = [NSNumber numberWithUnsignedChar:decodableStruct.arg1.f.Raw()];
         self.arg1.g = [NSNumber numberWithFloat:decodableStruct.arg1.g];
         self.arg1.h = [NSNumber numberWithDouble:decodableStruct.arg1.h];

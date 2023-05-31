@@ -336,10 +336,10 @@ AttributePathIB::Builder & AttributePathIB::Builder::ListIndex(const chip::ListI
     return *this;
 }
 
-AttributePathIB::Builder & AttributePathIB::Builder::EndOfAttributePathIB()
+CHIP_ERROR AttributePathIB::Builder::EndOfAttributePathIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 CHIP_ERROR AttributePathIB::Builder::Encode(const AttributePathParams & aAttributePathParams)
@@ -364,8 +364,7 @@ CHIP_ERROR AttributePathIB::Builder::Encode(const AttributePathParams & aAttribu
         ListIndex(aAttributePathParams.mListIndex);
     }
 
-    EndOfAttributePathIB();
-    return GetError();
+    return EndOfAttributePathIB();
 }
 
 CHIP_ERROR AttributePathIB::Builder::Encode(const ConcreteDataAttributePath & aAttributePath)
@@ -388,8 +387,7 @@ CHIP_ERROR AttributePathIB::Builder::Encode(const ConcreteDataAttributePath & aA
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    EndOfAttributePathIB();
-    return GetError();
+    return EndOfAttributePathIB();
 }
 
 } // namespace app

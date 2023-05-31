@@ -60,9 +60,9 @@ public:
     /**
      *  @brief Mark the end of this AttributeDataIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    AttributeDataIBs::Builder & EndOfAttributeDataIBs();
+    CHIP_ERROR EndOfAttributeDataIBs();
 
 private:
     AttributeDataIB::Builder mAttributeDataIBBuilder;

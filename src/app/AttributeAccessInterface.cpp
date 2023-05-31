@@ -44,15 +44,15 @@ CHIP_ERROR AttributeReportBuilder::PrepareAttribute(AttributeReportIBs::Builder 
         attributePathIBBuilder.ListIndex(DataModel::Nullable<ListIndex>());
     }
 
-    ReturnErrorOnFailure(attributePathIBBuilder.EndOfAttributePathIB().GetError());
+    ReturnErrorOnFailure(attributePathIBBuilder.EndOfAttributePathIB());
 
     return attributeDataIBBuilder.GetError();
 }
 
 CHIP_ERROR AttributeReportBuilder::FinishAttribute(AttributeReportIBs::Builder & aAttributeReportIBsBuilder)
 {
-    ReturnErrorOnFailure(aAttributeReportIBsBuilder.GetAttributeReport().GetAttributeData().EndOfAttributeDataIB().GetError());
-    return aAttributeReportIBsBuilder.GetAttributeReport().EndOfAttributeReportIB().GetError();
+    ReturnErrorOnFailure(aAttributeReportIBsBuilder.GetAttributeReport().GetAttributeData().EndOfAttributeDataIB());
+    return aAttributeReportIBsBuilder.GetAttributeReport().EndOfAttributeReportIB();
 }
 
 namespace {

@@ -102,10 +102,10 @@ CommandPathIB::Builder & CommandDataIB::Builder::CreatePath()
     return mPath;
 }
 
-CommandDataIB::Builder & CommandDataIB::Builder::EndOfCommandDataIB()
+CHIP_ERROR CommandDataIB::Builder::EndOfCommandDataIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip
