@@ -29,11 +29,18 @@ from cryptography.x509 import AuthorityKeyIdentifier, Certificate, SubjectKeyIde
 from matter_testing_support import MatterBaseTest, async_test_body, bytes_from_hex, default_matter_test_main, hex_from_bytes
 from mobly import asserts
 
+# Those are SDK samples that are known to be non-production.
 FORBIDDEN_AKID = [
     bytes_from_hex("78:5C:E7:05:B8:6B:8F:4E:6F:C7:93:AA:60:CB:43:EA:69:68:82:D5"),
     bytes_from_hex("6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E")
 ]
 
+# List of certificate names that are known to have some issues, but not yet
+# updated in DCL. They will fail the test at runtime if seen, but not in CI.
+ALLOWED_SKIPPED_FILENAMES = [
+  "dcld_mirror_SERIALNUMBER_63709380400001_CN_NXP_Matter_Test_PAA_O_NXP_Semiconductors_NV_C_NL.der",
+  "dcld_mirror_SERIALNUMBER_63709330400001_CN_NXP_Matter_PAA_O_NXP_Semiconductors_NV_C_NL.der"
+]
 
 def load_all_paa(paa_path: Path) -> dict:
     logging.info("Loading all PAAs in %s" % paa_path)
@@ -54,6 +61,9 @@ def load_all_paa(paa_path: Path) -> dict:
                     paa_by_skid[skid] = (Path(filename).name, paa_cert)
             except (ValueError, IOError) as e:
                 logging.error(f"Failed to load {filename}: {str(e)}")
+                if Path(filename).name not in ALLOWED_SKIPPED_FILENAMES:
+                    logging.error(f"Re-raising error and failing: found new invalid PAA: {filename}")
+                    raise
 
     return paa_by_skid
 
