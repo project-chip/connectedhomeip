@@ -46,6 +46,9 @@ private:
 } // namespace Tracing
 } // namespace chip
 
+#define _CONCAT_IMPL(a, b) a##b
+#define _MACRO_CONCAT(a, b) _CONCAT_IMPL(a, b)
+
 /// convenience macro to create a tracing scope
 ///
 /// Usage:
@@ -56,4 +59,4 @@ private:
 ///      // ... add code here
 ///
 ///   } // TRACE_END called here
-#define MATTER_TRACE_SCOPE(scope) ::chip::Tracing::Scoped _trace_scope##__COUNTER__(scope)
+#define MATTER_TRACE_SCOPE(scope) ::chip::Tracing::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(scope)

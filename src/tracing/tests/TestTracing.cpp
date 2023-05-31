@@ -16,22 +16,97 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <tracing/backend.h>
 #include <tracing/macros.h>
+#include <tracing/scope.h>
 
 #include <nlunit-test.h>
+#include <vector>
 
 using namespace chip;
+using namespace chip::Tracing;
 
 namespace {
 
-void TestTracing(nlTestSuite * inSuite, void * inContext)
+// This traces all received trace items
+class LoggingTraceBackend : public Backend
 {
-    // FIXME: implement
-    // NL_TEST_ASSERT(inSuite, 1 == 0);
+public:
+    enum class TraceEventType
+    {
+        BEGIN,
+        END
+    };
+
+    struct ReceivedTraceEvent
+    {
+        TraceEventType type;
+        Scope scope;
+
+        bool operator==(const ReceivedTraceEvent & other) const { return (type == other.type) && (scope == other.scope); }
+    };
+
+    LoggingTraceBackend() {}
+    const std::vector<ReceivedTraceEvent> & traces() const { return mTraces; }
+
+    // Implementation
+    void TraceBegin(Scope scope) override { mTraces.push_back(ReceivedTraceEvent{ TraceEventType::BEGIN, scope }); }
+
+    void TraceEnd(Scope scope) override { mTraces.push_back(ReceivedTraceEvent{ TraceEventType::END, scope }); }
+
+    void TraceInstant(Instant instant) override
+    {
+        // NOT SUPPORTED HERE
+    }
+
+private:
+    std::vector<ReceivedTraceEvent> mTraces;
+};
+
+void TestBasicTracing(nlTestSuite * inSuite, void * inContext)
+{
+    LoggingTraceBackend backend;
+
+    {
+        ScopedRegistration scope(backend);
+
+        MATTER_TRACE_SCOPE(Scope::CASESession_SendSigma1);
+        {
+            MATTER_TRACE_SCOPE(Scope::CASESession_SendSigma2);
+
+            // direct scope begin/end (not usual, but should work)
+            MATTER_TRACE_BEGIN(Scope::OperationalCredentials_AddNOC);
+            MATTER_TRACE_BEGIN(Scope::OperationalCredentials_UpdateNOC);
+            MATTER_TRACE_END(Scope::OperationalCredentials_UpdateNOC);
+            MATTER_TRACE_END(Scope::OperationalCredentials_AddNOC);
+        }
+        {
+            MATTER_TRACE_SCOPE(Scope::CASESession_SendSigma3);
+        }
+    }
+
+    LoggingTraceBackend::ReceivedTraceEvent expected[] = {
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma1 },
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma2 },
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::OperationalCredentials_AddNOC },
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::OperationalCredentials_UpdateNOC },
+        { LoggingTraceBackend::TraceEventType::END, Scope::OperationalCredentials_UpdateNOC },
+        { LoggingTraceBackend::TraceEventType::END, Scope::OperationalCredentials_AddNOC },
+        { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma2 },
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma3 },
+        { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma3 },
+        { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma1 },
+    };
+
+    NL_TEST_ASSERT(inSuite, backend.traces().size() == sizeof(expected) / sizeof(expected[0]));
+
+    for (unsigned i = 0; i < backend.traces().size(); i++)
+    {
+        NL_TEST_ASSERT(inSuite, backend.traces()[i] == expected[i]);
+    }
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("Tracing", TestTracing), //
-    NL_TEST_SENTINEL()                   //
+    NL_TEST_DEF("BasicTracing", TestBasicTracing), //
+    NL_TEST_SENTINEL()                             //
 };
 
 } // namespace
