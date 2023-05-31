@@ -32,7 +32,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/clusters/operational-state-server/operational-state-default-impl.h>
 #include <app/clusters/operational-state-server/operational-state-delegate.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/server/Server.h>

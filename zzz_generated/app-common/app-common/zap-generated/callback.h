@@ -11134,30 +11134,6 @@ bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
 /**
- * @brief Operational State Cluster Pause Command callback (from client)
- */
-bool emberAfOperationalStateClusterPauseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalState::Commands::Pause::DecodableType & commandData);
-/**
- * @brief Operational State Cluster Stop Command callback (from client)
- */
-bool emberAfOperationalStateClusterStopCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalState::Commands::Stop::DecodableType & commandData);
-/**
- * @brief Operational State Cluster Start Command callback (from client)
- */
-bool emberAfOperationalStateClusterStartCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalState::Commands::Start::DecodableType & commandData);
-/**
- * @brief Operational State Cluster Resume Command callback (from client)
- */
-bool emberAfOperationalStateClusterResumeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalState::Commands::Resume::DecodableType & commandData);
-/**
  * @brief HEPA Filter Monitoring Cluster ResetCondition Command callback (from client)
  */
 bool emberAfHepaFilterMonitoringClusterResetConditionCallback(
