@@ -7328,11 +7328,11 @@ class NetworkCommissioning(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="maxNetworks", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="networks", Tag=0x00000001, Type=typing.List[NetworkCommissioning.Structs.NetworkInfo]),
+                ClusterObjectFieldDescriptor(Label="networks", Tag=0x00000001, Type=typing.List[NetworkCommissioning.Structs.NetworkInfoStruct]),
                 ClusterObjectFieldDescriptor(Label="scanMaxTimeSeconds", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="connectMaxTimeSeconds", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="interfaceEnabled", Tag=0x00000004, Type=bool),
-                ClusterObjectFieldDescriptor(Label="lastNetworkingStatus", Tag=0x00000005, Type=typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatus]),
+                ClusterObjectFieldDescriptor(Label="lastNetworkingStatus", Tag=0x00000005, Type=typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatusEnum]),
                 ClusterObjectFieldDescriptor(Label="lastNetworkID", Tag=0x00000006, Type=typing.Union[Nullable, bytes]),
                 ClusterObjectFieldDescriptor(Label="lastConnectErrorValue", Tag=0x00000007, Type=typing.Union[Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -7344,11 +7344,11 @@ class NetworkCommissioning(Cluster):
             ])
 
     maxNetworks: 'uint' = None
-    networks: 'typing.List[NetworkCommissioning.Structs.NetworkInfo]' = None
+    networks: 'typing.List[NetworkCommissioning.Structs.NetworkInfoStruct]' = None
     scanMaxTimeSeconds: 'typing.Optional[uint]' = None
     connectMaxTimeSeconds: 'typing.Optional[uint]' = None
     interfaceEnabled: 'bool' = None
-    lastNetworkingStatus: 'typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatus]' = None
+    lastNetworkingStatus: 'typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatusEnum]' = None
     lastNetworkID: 'typing.Union[Nullable, bytes]' = None
     lastConnectErrorValue: 'typing.Union[Nullable, int]' = None
     generatedCommandList: 'typing.List[uint]' = None
@@ -7359,7 +7359,7 @@ class NetworkCommissioning(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class NetworkCommissioningStatus(MatterIntEnum):
+        class NetworkCommissioningStatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kOutOfRange = 0x01
             kBoundsExceeded = 0x02
@@ -7379,7 +7379,7 @@ class NetworkCommissioning(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 13,
 
-        class WiFiBand(MatterIntEnum):
+        class WiFiBandEnum(MatterIntEnum):
             k2g4 = 0x00
             k3g65 = 0x01
             k5g = 0x02
@@ -7398,7 +7398,7 @@ class NetworkCommissioning(Cluster):
             kThreadNetworkInterface = 0x2
             kEthernetNetworkInterface = 0x4
 
-        class WiFiSecurity(IntFlag):
+        class WiFiSecurityBitmap(IntFlag):
             kUnencrypted = 0x1
             kWep = 0x2
             kWpaPersonal = 0x4
@@ -7407,7 +7407,7 @@ class NetworkCommissioning(Cluster):
 
     class Structs:
         @dataclass
-        class NetworkInfo(ClusterObject):
+        class NetworkInfoStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -7420,7 +7420,7 @@ class NetworkCommissioning(Cluster):
             connected: 'bool' = False
 
         @dataclass
-        class ThreadInterfaceScanResult(ClusterObject):
+        class ThreadInterfaceScanResultStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -7445,7 +7445,7 @@ class NetworkCommissioning(Cluster):
             lqi: 'uint' = 0
 
         @dataclass
-        class WiFiInterfaceScanResult(ClusterObject):
+        class WiFiInterfaceScanResultStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -7454,7 +7454,7 @@ class NetworkCommissioning(Cluster):
                         ClusterObjectFieldDescriptor(Label="ssid", Tag=1, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="bssid", Tag=2, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="channel", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=4, Type=NetworkCommissioning.Enums.WiFiBand),
+                        ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=4, Type=NetworkCommissioning.Enums.WiFiBandEnum),
                         ClusterObjectFieldDescriptor(Label="rssi", Tag=5, Type=int),
                     ])
 
@@ -7462,7 +7462,7 @@ class NetworkCommissioning(Cluster):
             ssid: 'bytes' = b""
             bssid: 'bytes' = b""
             channel: 'uint' = 0
-            wiFiBand: 'NetworkCommissioning.Enums.WiFiBand' = 0
+            wiFiBand: 'NetworkCommissioning.Enums.WiFiBandEnum' = 0
             rssi: 'int' = 0
 
     class Commands:
@@ -7495,16 +7495,16 @@ class NetworkCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatus),
+                        ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatusEnum),
                         ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="wiFiScanResults", Tag=2, Type=typing.Optional[typing.List[NetworkCommissioning.Structs.WiFiInterfaceScanResult]]),
-                        ClusterObjectFieldDescriptor(Label="threadScanResults", Tag=3, Type=typing.Optional[typing.List[NetworkCommissioning.Structs.ThreadInterfaceScanResult]]),
+                        ClusterObjectFieldDescriptor(Label="wiFiScanResults", Tag=2, Type=typing.Optional[typing.List[NetworkCommissioning.Structs.WiFiInterfaceScanResultStruct]]),
+                        ClusterObjectFieldDescriptor(Label="threadScanResults", Tag=3, Type=typing.Optional[typing.List[NetworkCommissioning.Structs.ThreadInterfaceScanResultStruct]]),
                     ])
 
-            networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatus' = 0
+            networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatusEnum' = 0
             debugText: 'typing.Optional[str]' = None
-            wiFiScanResults: 'typing.Optional[typing.List[NetworkCommissioning.Structs.WiFiInterfaceScanResult]]' = None
-            threadScanResults: 'typing.Optional[typing.List[NetworkCommissioning.Structs.ThreadInterfaceScanResult]]' = None
+            wiFiScanResults: 'typing.Optional[typing.List[NetworkCommissioning.Structs.WiFiInterfaceScanResultStruct]]' = None
+            threadScanResults: 'typing.Optional[typing.List[NetworkCommissioning.Structs.ThreadInterfaceScanResultStruct]]' = None
 
         @dataclass
         class AddOrUpdateWiFiNetwork(ClusterCommand):
@@ -7573,12 +7573,12 @@ class NetworkCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatus),
+                        ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatusEnum),
                         ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="networkIndex", Tag=2, Type=typing.Optional[uint]),
                     ])
 
-            networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatus' = 0
+            networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatusEnum' = 0
             debugText: 'typing.Optional[str]' = None
             networkIndex: 'typing.Optional[uint]' = None
 
@@ -7611,12 +7611,12 @@ class NetworkCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatus),
+                        ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatusEnum),
                         ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="errorValue", Tag=2, Type=typing.Union[Nullable, int]),
                     ])
 
-            networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatus' = 0
+            networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatusEnum' = 0
             debugText: 'typing.Optional[str]' = None
             errorValue: 'typing.Union[Nullable, int]' = NullValue
 
@@ -7669,9 +7669,9 @@ class NetworkCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[NetworkCommissioning.Structs.NetworkInfo])
+                return ClusterObjectFieldDescriptor(Type=typing.List[NetworkCommissioning.Structs.NetworkInfoStruct])
 
-            value: 'typing.List[NetworkCommissioning.Structs.NetworkInfo]' = field(default_factory=lambda: [])
+            value: 'typing.List[NetworkCommissioning.Structs.NetworkInfoStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class ScanMaxTimeSeconds(ClusterAttributeDescriptor):
@@ -7733,9 +7733,9 @@ class NetworkCommissioning(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatus])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatusEnum])
 
-            value: 'typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatus]' = NullValue
+            value: 'typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatusEnum]' = NullValue
 
         @dataclass
         class LastNetworkID(ClusterAttributeDescriptor):

@@ -7119,7 +7119,7 @@ struct TypeInfo
 } // namespace GeneralCommissioning
 namespace NetworkCommissioning {
 namespace Structs {
-namespace NetworkInfo {
+namespace NetworkInfoStruct {
 enum class Fields : uint8_t
 {
     kNetworkID = 0,
@@ -7141,8 +7141,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace NetworkInfo
-namespace ThreadInterfaceScanResult {
+} // namespace NetworkInfoStruct
+namespace ThreadInterfaceScanResultStruct {
 enum class Fields : uint8_t
 {
     kPanId           = 0,
@@ -7176,8 +7176,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ThreadInterfaceScanResult
-namespace WiFiInterfaceScanResult {
+} // namespace ThreadInterfaceScanResultStruct
+namespace WiFiInterfaceScanResultStruct {
 enum class Fields : uint8_t
 {
     kSecurity = 0,
@@ -7191,12 +7191,12 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    chip::BitMask<WiFiSecurity> security = static_cast<chip::BitMask<WiFiSecurity>>(0);
+    chip::BitMask<WiFiSecurityBitmap> security = static_cast<chip::BitMask<WiFiSecurityBitmap>>(0);
     chip::ByteSpan ssid;
     chip::ByteSpan bssid;
-    uint16_t channel  = static_cast<uint16_t>(0);
-    WiFiBand wiFiBand = static_cast<WiFiBand>(0);
-    int8_t rssi       = static_cast<int8_t>(0);
+    uint16_t channel      = static_cast<uint16_t>(0);
+    WiFiBandEnum wiFiBand = static_cast<WiFiBandEnum>(0);
+    int8_t rssi           = static_cast<int8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -7207,7 +7207,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace WiFiInterfaceScanResult
+} // namespace WiFiInterfaceScanResultStruct
 } // namespace Structs
 
 namespace Commands {
@@ -7312,10 +7312,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
-    Optional<DataModel::List<const Structs::WiFiInterfaceScanResult::Type>> wiFiScanResults;
-    Optional<DataModel::List<const Structs::ThreadInterfaceScanResult::Type>> threadScanResults;
+    Optional<DataModel::List<const Structs::WiFiInterfaceScanResultStruct::Type>> wiFiScanResults;
+    Optional<DataModel::List<const Structs::ThreadInterfaceScanResultStruct::Type>> threadScanResults;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -7330,10 +7330,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
-    Optional<DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType>> wiFiScanResults;
-    Optional<DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType>> threadScanResults;
+    Optional<DataModel::DecodableList<Structs::WiFiInterfaceScanResultStruct::DecodableType>> wiFiScanResults;
+    Optional<DataModel::DecodableList<Structs::ThreadInterfaceScanResultStruct::DecodableType>> threadScanResults;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ScanNetworksResponse
@@ -7460,7 +7460,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NetworkConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     Optional<uint8_t> networkIndex;
 
@@ -7477,7 +7477,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NetworkConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     Optional<uint8_t> networkIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -7533,7 +7533,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ConnectNetworkResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     DataModel::Nullable<int32_t> errorValue;
 
@@ -7550,7 +7550,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ConnectNetworkResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     DataModel::Nullable<int32_t> errorValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -7613,11 +7613,11 @@ struct TypeInfo
 namespace Networks {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Networks::Id; }
@@ -7663,10 +7663,10 @@ struct TypeInfo
 namespace LastNetworkingStatus {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>;
-    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>;
     using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> &;
+        const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastNetworkingStatus::Id; }
