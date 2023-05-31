@@ -194,8 +194,9 @@ static void cancelEndpointTimerCallback(EndpointId endpoint)
 
 static EmberAfLevelControlState * getState(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, LevelControl::Id);
-    return (ep == 0xFFFF ? nullptr : &stateTable[ep]);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, LevelControl::Id, EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep == 0xFFFF || ep >= kLevelControlStateTableSize ? nullptr : &stateTable[ep]);
 }
 
 #if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)

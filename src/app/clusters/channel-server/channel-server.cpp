@@ -61,7 +61,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(Zcl, "Channel NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, Channel::Id);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
     return ((ep == 0xFFFF || ep >= kChannelDelegateTableSize) ? nullptr : gDelegateTable[ep]);
 }
 
@@ -83,8 +83,8 @@ namespace Channel {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, Channel::Id);
-    // if endpoint is found and is not a dynamic endpoint
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
     if (ep != 0xFFFF && ep < kChannelDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;

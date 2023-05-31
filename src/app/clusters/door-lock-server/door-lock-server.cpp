@@ -3284,8 +3284,8 @@ CHIP_ERROR DoorLockServer::sendClusterResponse(chip::app::CommandHandler * comma
 
 EmberAfDoorLockEndpointContext * DoorLockServer::getContext(chip::EndpointId endpointId)
 {
-    auto index = emberAfFindClusterServerEndpointIndex(endpointId, ::Id);
-    if (index != 0xFFFF)
+    auto index = emberAfGetClusterServerEndpointIndex(endpointId, ::Id, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (index != 0xFFFF && index < kDoorLockClusterServerMaxEndpointCount)
     {
         return &mEndpointCtx[index];
     }

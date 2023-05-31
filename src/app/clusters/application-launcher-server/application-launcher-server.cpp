@@ -74,7 +74,8 @@ Delegate * GetDelegate(EndpointId endpoint)
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(Zcl, "ApplicationLauncher NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id,
+                                                       EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
     return ((ep == 0xFFFF || ep >= kApplicationLauncherDelegateTableSize) ? nullptr : gDelegateTable[ep]);
 }
 
@@ -96,8 +97,9 @@ namespace ApplicationLauncher {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id);
-    // if endpoint is found and is not a dynamic endpoint
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id,
+                                                       EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
     if (ep != 0xFFFF && ep < kApplicationLauncherDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;

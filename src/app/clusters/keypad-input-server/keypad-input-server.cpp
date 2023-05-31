@@ -69,7 +69,8 @@ Delegate * GetDelegate(EndpointId endpoint)
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogProgress(Zcl, "KeypadInput NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, KeypadInput::Id);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
     return ((ep == 0xFFFF || ep >= kKeypadInputDelegateTableSize) ? nullptr : gDelegateTable[ep]);
 }
 
@@ -91,8 +92,9 @@ namespace KeypadInput {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, KeypadInput::Id);
-    // if endpoint is found and is not a dynamic endpoint
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
     if (ep != 0xFFFF && ep < kKeypadInputDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
