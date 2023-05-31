@@ -134,15 +134,15 @@ public class ChipClusters {
       , @Nullable Integer timedInvokeTimeoutMs);
       {{/if}}
   {{/zcl_commands}}
-    {{#zcl_commands}}
-        {{#if (is_str_equal source 'server')}}
+  {{#zcl_commands}}
+     {{#if (is_str_equal source 'server')}}
     public interface {{asUpperCamelCase name}}Callback {
       void onSuccess({{#zcl_command_arguments}}{{#not_first}}, {{/not_first}}{{asJavaType type chipType parent.parent.name includeAnnotations=true clusterId=parent.parent.id}} {{asLowerCamelCase label}}{{/zcl_command_arguments}});
 
       void onError(Exception error);
     }
 
-        {{/if}}
+     {{/if}}
   {{/zcl_commands}}
 
   {{#zcl_attributes_server removeKeys='isOptional'}}
