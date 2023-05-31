@@ -81,7 +81,7 @@ public:
     {
         mpStatusChangeCallback = statusChangeCallback;
     }
-    void CancelOnGoingOperations(void);
+    void CancelOngoingOperations(void);
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.

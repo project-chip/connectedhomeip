@@ -370,12 +370,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::CancelOnGoingOperations(void)
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::CancelOngoingOperations(void)
 {
     if (mpConnectCallback != nullptr)
     {
         Impl()->SetThreadEnabled(false);
-        OnAttachEnd(NetworkCommissioning::Status::kUnknown);
+        OnAttachEnd(NetworkCommissioning::Status::kOtherConnectionFailure);
     }
 }
 
@@ -383,14 +383,13 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnConnectNetworkTimeout(System::Layer * systemLayer, void * appState)
 {
     DeviceLayer::SystemLayer().ScheduleLambda(
-        []() { ThreadStackManagerImpl().OnAttachEnd(NetworkCommissioning::Status::kNetworkNotFound); });
+        []() { ThreadStackMgrImpl().OnAttachEnd(NetworkCommissioning::Status::kNetworkNotFound); });
 }
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinished()
 {
-    DeviceLayer::SystemLayer().ScheduleLambda(
-        []() { ThreadStackManagerImpl().OnAttachEnd(NetworkCommissioning::Status::kSuccess); });
+    DeviceLayer::SystemLayer().ScheduleLambda([]() { ThreadStackMgrImpl().OnAttachEnd(NetworkCommissioning::Status::kSuccess); });
 }
 
 template <class ImplClass>
@@ -400,8 +399,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnAttachEnd(NetworkCom
 
     // CancelOnGoingOperations will be called when the upper driver is invalidating the callback. So the reference to the callback
     // is expected to be valid here.
-    mpConnectCallback = nullptr;
     mpConnectCallback->OnResult(status, CharSpan(), 0);
+    mpConnectCallback = nullptr;
 }
 
 template <class ImplClass>
