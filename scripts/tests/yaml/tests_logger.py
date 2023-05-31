@@ -23,6 +23,7 @@ from dataclasses import dataclass
 import click
 from matter_yamltests.errors import TestStepError, TestStepKeyError
 from matter_yamltests.hooks import TestParserHooks, TestRunnerHooks, WebSocketRunnerHooks
+from matter_yamltests.parser import TestStep
 
 
 def _strikethrough(str):
@@ -193,7 +194,7 @@ class TestRunnerLogger(TestRunnerHooks):
         self.__index += 1
         self.__skipped += 1
 
-    def step_start(self, request):
+    def step_start(self, request: TestStep):
         if self.__use_test_harness_log_format:
             print(self.__strings.test_harness_step_start.format(index=self.__index, name=request.label))
 
@@ -211,7 +212,7 @@ class TestRunnerLogger(TestRunnerHooks):
 
         self.__runned += 1
 
-    def step_success(self, logger, logs, duration: int, request):
+    def step_success(self, logger, logs, duration: int, request: TestStep):
         print(self.__strings.step_result.format(state=_SUCCESS, duration=duration))
 
         self.__print_results(logger)
@@ -230,7 +231,7 @@ class TestRunnerLogger(TestRunnerHooks):
         self.__errors += logger.errors
         self.__runned += 1
 
-    def step_failure(self, logger, logs, duration: int, request, received):
+    def step_failure(self, logger, logs, duration: int, request: TestStep, received):
         print(self.__strings.step_result.format(state=_FAILURE, duration=duration))
 
         self.__print_results(logger)
