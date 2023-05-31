@@ -104,9 +104,78 @@ void TestBasicTracing(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void TestMultipleBackends(nlTestSuite * inSuite, void * inContext)
+{
+    LoggingTraceBackend b1;
+    LoggingTraceBackend b2;
+    LoggingTraceBackend b3;
+
+    {
+        ScopedRegistration register1(b1);
+        MATTER_TRACE_SCOPE(Scope::CASESession_SendSigma1);
+
+        {
+            ScopedRegistration register2(b2);
+            MATTER_TRACE_SCOPE(Scope::CASESession_SendSigma2);
+
+            {
+                ScopedRegistration register3(b3);
+                MATTER_TRACE_SCOPE(Scope::CASESession_SendSigma3);
+            }
+            {
+                MATTER_TRACE_SCOPE(Scope::OperationalCredentials_AddNOC);
+            }
+        }
+    }
+
+    LoggingTraceBackend::ReceivedTraceEvent expected1[] = {
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma1 },
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma2 },
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma3 },
+        { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma3 },
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::OperationalCredentials_AddNOC },
+        { LoggingTraceBackend::TraceEventType::END, Scope::OperationalCredentials_AddNOC },
+        { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma2 },
+        { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma1 },
+    };
+
+    NL_TEST_ASSERT(inSuite, b1.traces().size() == sizeof(expected1) / sizeof(expected1[0]));
+    for (unsigned i = 0; i < b1.traces().size(); i++)
+    {
+        NL_TEST_ASSERT(inSuite, b1.traces()[i] == expected1[i]);
+    }
+
+    LoggingTraceBackend::ReceivedTraceEvent expected2[] = {
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma2 },
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma3 },
+        { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma3 },
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::OperationalCredentials_AddNOC },
+        { LoggingTraceBackend::TraceEventType::END, Scope::OperationalCredentials_AddNOC },
+        { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma2 },
+    };
+
+    NL_TEST_ASSERT(inSuite, b2.traces().size() == sizeof(expected2) / sizeof(expected2[0]));
+    for (unsigned i = 0; i < b2.traces().size(); i++)
+    {
+        NL_TEST_ASSERT(inSuite, b2.traces()[i] == expected2[i]);
+    }
+
+    LoggingTraceBackend::ReceivedTraceEvent expected3[] = {
+        { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma3 },
+        { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma3 },
+    };
+
+    NL_TEST_ASSERT(inSuite, b3.traces().size() == sizeof(expected3) / sizeof(expected3[0]));
+    for (unsigned i = 0; i < b3.traces().size(); i++)
+    {
+        NL_TEST_ASSERT(inSuite, b3.traces()[i] == expected3[i]);
+    }
+}
+
 const nlTest sTests[] = {
-    NL_TEST_DEF("BasicTracing", TestBasicTracing), //
-    NL_TEST_SENTINEL()                             //
+    NL_TEST_DEF("BasicTracing", TestBasicTracing),              //
+    NL_TEST_DEF("BasicMultipleBackends", TestMultipleBackends), //
+    NL_TEST_SENTINEL()                                          //
 };
 
 } // namespace
