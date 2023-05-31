@@ -39,11 +39,16 @@ class LogCommands(PseudoCluster):
     definition = _DEFINITION
 
     async def UserPrompt(self, request):
-        input_result = input("")
+        expected_value = None
         for value in request.arguments.get("values", []):
             if value.get('name') and 'expectedValue' in value['name']:
-                request.responses = [{"values": [{"name": "expectedValue", "value": value['value']}]}]
-                return {"value": {"expectedValue": input_result}}
+                expected_value = value['value']
+                request.responses = [{"values": [{"name": "expectedValue", "value": expected_value}]}]
+
+        if expected_value is not None:
+            input_result = input("")
+            return {"value": {"expectedValue": input_result}}
+
         return {}
 
     async def Log(self, request):
