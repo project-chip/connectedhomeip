@@ -167,12 +167,6 @@ uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
     return 0xFFFF;
 }
 
-void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
-{
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-}
-
 void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
 {
     if (src == nullptr)
