@@ -32,6 +32,7 @@ source_set("app1") {
   sources = [
     "../../src/bridged-actions-stub.cpp",
     "../../static-supported-modes-manager.cpp",
+    "../../operational-state-delegates.cpp",
   ]
 
   public_deps = [ ":configuration" ]
