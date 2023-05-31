@@ -44,8 +44,6 @@ class Verhoeff10 {
       for (i in 1..strLen) {
         val ch = str[strLen - i]
         val value = charToVal(ch)
-        if (value < 0)
-          return 0.toChar() // invalid character
         val p = Verhoeff.permute(value, sPermTable, Base, i)
         c = sMultiplyTable[c * Base + p]
       }
@@ -75,15 +73,19 @@ class Verhoeff10 {
 
     // Convert between a character and its corresponding value.
     fun charToVal(ch: Char): Int {
-      if (ch in '0'..'9')
+      if (ch in '0'..'9') {
         return ch - '0'
-      return -1
+      } else {
+        throw IllegalArgumentException("Input character must be a digit")
+      }
     }
 
     private fun valToChar(value: Int): Char {
-      if (value in 0..Base)
+      if (value in 0..Base) {
         return ('0'.code + value).toChar()
-      return 0.toChar()
+      } else {
+        throw IllegalArgumentException("Input value must be a digit")
+      }
     }
   }
 
