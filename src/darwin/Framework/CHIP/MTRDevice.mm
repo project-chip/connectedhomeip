@@ -1356,14 +1356,16 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
             MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]
         }];
     } else {
-        id value;
-        if (apData == nullptr) {
-            value = nil;
+        id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
+        if (value == nil) {
+            MTR_LOG_ERROR("Failed to decode event data for path %@", eventPath);
+            [mEventReports addObject:@ {
+                MTREventPathKey : eventPath,
+                MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED],
+            }];
         } else {
-            value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
+            [mEventReports addObject:[MTRBaseDevice eventReportForHeader:aEventHeader andData:value]];
         }
-
-        [mEventReports addObject:[MTRBaseDevice eventReportForHeader:aEventHeader andData:value]];
     }
 }
 
@@ -1391,7 +1393,13 @@ void SubscriptionCallback::OnAttributeData(
         }];
     } else {
         id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
-        if (value) {
+        if (value == nil) {
+            MTR_LOG_ERROR("Failed to decode attribute data for path %@", attributePath);
+            [mAttributeReports addObject:@ {
+                MTRAttributePathKey : attributePath,
+                MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED],
+            }];
+        } else {
             [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRDataKey : value }];
         }
     }

@@ -40,6 +40,12 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
     return LockManager::Instance().Unlock(endpointId, pinCode, err, OperationSourceEnum::kRemote);
 }
 
+bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
+                                              OperationErrorEnum & err)
+{
+    return LockManager::Instance().Unbolt(endpointId, pinCode, err, OperationSourceEnum::kRemote);
+}
+
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
     return LockManager::Instance().GetUser(endpointId, userIndex, user);

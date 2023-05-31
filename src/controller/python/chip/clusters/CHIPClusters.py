@@ -7054,6 +7054,15 @@ class ChipClusters:
         "clusterName": "FanControl",
         "clusterId": 0x00000202,
         "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Step",
+                "args": {
+                    "direction": "int",
+                    "wrap": "bool",
+                    "lowestOff": "bool",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -7124,6 +7133,13 @@ class ChipClusters:
             0x0000000A: {
                 "attributeName": "WindSetting",
                 "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000B: {
+                "attributeName": "AirflowDirection",
+                "attributeId": 0x0000000B,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
