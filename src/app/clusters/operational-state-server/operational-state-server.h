@@ -30,7 +30,17 @@ namespace app {
 namespace Clusters {
 namespace OperationalState {
 
-class OperationalStateServer : public CommandHandlerInterface, public AttributeAccessInterface
+class Uncopyable
+{
+protected:
+    Uncopyable() {}
+    ~Uncopyable() {}
+private:
+    Uncopyable(const Uncopyable &);
+    Uncopyable & operator=(const Uncopyable &);
+};
+
+class OperationalStateServer : public CommandHandlerInterface, public AttributeAccessInterface, public Uncopyable
 {
 
 public:
