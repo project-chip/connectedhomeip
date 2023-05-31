@@ -59,6 +59,7 @@ CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCa
 void GenericThreadDriver::Shutdown()
 {
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(nullptr);
+    ThreadStackMgrImpl().CancelOnGoingOperations();
 }
 
 CHIP_ERROR GenericThreadDriver::CommitConfiguration()

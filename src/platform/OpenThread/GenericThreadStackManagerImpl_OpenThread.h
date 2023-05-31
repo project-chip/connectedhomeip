@@ -65,7 +65,11 @@ template <class ImplClass>
 class GenericThreadStackManagerImpl_OpenThread
 {
 public:
+    // OpenThread won't report attach failure since it will continously retry in the background. 20s is the duration of about 5
+    // attach attempts.
     static constexpr uint16_t kAttachNetworkTimeoutSeconds = 20;
+    // Scan usually takes 300ms / channel * 16 channels. Use 10s for any possible lags.
+    static constexpr uint16_t kScanNetworkTimeoutSeconds = 10;
 
     // ===== Platform-specific methods directly callable by the application.
 
@@ -77,6 +81,7 @@ public:
     {
         mpStatusChangeCallback = statusChangeCallback;
     }
+    void CancelOnGoingOperations(void);
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.

@@ -88,8 +88,8 @@ public:
 
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
-    uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
-    uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
+    uint8_t GetScanNetworkTimeoutSeconds() override { return ThreadStackMgrImpl().kScanNetworkTimeoutSeconds; }
+    uint8_t GetConnectNetworkTimeoutSeconds() override { return ThreadStackMgrImpl().kAttachNetworkTimeoutSeconds; }
 
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;

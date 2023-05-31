@@ -370,28 +370,38 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinished()
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::CancelOnGoingOperations(void)
 {
-    this_->OnAttachEnd(NetworkCommissioning::Status::kSuccess);
+    if (mpConnectCallback != nullptr)
+    {
+        Impl()->SetThreadEnabled(false);
+        OnAttachEnd(NetworkCommissioning::Status::kUnknown);
+    }
 }
 
-static template <class ImplClass>
+template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnConnectNetworkTimeout(System::Layer * systemLayer, void * appState)
 {
-    GenericThreadStackManagerImpl_OpenThread<ImplClass> * this_ =
-        static_cast<GenericThreadStackManagerImpl_OpenThread<ImplClass> *>(appState);
-
-    this_->OnAttachEnd(NetworkCommissioning::Status::kNetworkNotFound);
+    DeviceLayer::SystemLayer().ScheduleLambda(
+        []() { ThreadStackManagerImpl().OnAttachEnd(NetworkCommissioning::Status::kNetworkNotFound); });
 }
 
-static template <class ImplClass>
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinished()
+{
+    DeviceLayer::SystemLayer().ScheduleLambda(
+        []() { ThreadStackManagerImpl().OnAttachEnd(NetworkCommissioning::Status::kSuccess); });
+}
+
+template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnAttachEnd(NetworkCommissioning::Status status)
 {
     VerifyOrReturn(mpConnectCallback != nullptr);
 
-    auto callback     = mpConnectCallback;
+    // CancelOnGoingOperations will be called when the upper driver is invalidating the callback. So the reference to the callback
+    // is expected to be valid here.
     mpConnectCallback = nullptr;
-    DeviceLayer::SystemLayer().ScheduleLambda([callback, status]() { callback->OnResult(status, CharSpan(), 0); });
+    mpConnectCallback->OnResult(status, CharSpan(), 0);
 }
 
 template <class ImplClass>
