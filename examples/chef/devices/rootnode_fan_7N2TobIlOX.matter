@@ -1187,6 +1187,16 @@ server cluster FixedLabel = 64 {
 
 /** An interface for controlling a fan in a heating/cooling system. */
 server cluster FanControl = 514 {
+  enum AirflowDirectionEnum : ENUM8 {
+    kForward = 0;
+    kReverse = 1;
+  }
+
+  enum DirectionEnum : ENUM8 {
+    kIncrease = 0;
+    kDecrease = 1;
+  }
+
   enum FanModeSequenceType : ENUM8 {
     kOffLowMedHigh = 0;
     kOffLowHigh = 1;
@@ -1211,6 +1221,8 @@ server cluster FanControl = 514 {
     kAuto = 0x2;
     kRocking = 0x4;
     kWind = 0x8;
+    kStep = 0x10;
+    kAirflowDirection = 0x20;
   }
 
   bitmap RockSupportMask : BITMAP8 {

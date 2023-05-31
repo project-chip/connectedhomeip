@@ -198,11 +198,22 @@ public:
     }
     static StorageKeyName SubscriptionResumptionMaxCount() { return StorageKeyName::Formatted("g/sum"); }
 
-    static StorageKeyName GlobalSceneCountKey() { return StorageKeyName::Formatted("g/scc"); }
-    static StorageKeyName FabricSceneDataKey(chip::FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/sc", fabric); }
-    static StorageKeyName FabricSceneKey(chip::FabricIndex fabric, uint8_t id)
+    // Number of scenes stored in a given endpoint's scene table, across all fabrics.
+    static StorageKeyName EndpointSceneCountKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/scc/e/%x", endpoint); }
+
+    // Stores the scene count for a fabric for the given endpoint and a map between scene storage ids (<sceneId, groupId>) and
+    // sceneIndex for a specific Fabric and endpoint.
+    static StorageKeyName FabricSceneDataKey(FabricIndex fabric, EndpointId endpoint)
     {
-        return StorageKeyName::Formatted("f/%x/sc/%x", fabric, id);
+        return StorageKeyName::Formatted("f/%x/e/%x/sc", fabric, endpoint);
+    }
+
+    // Stores the actual scene data for a given scene on a given endpoint for a particular fabric.
+    // idx corresponds to the indices read from FabricSceneDataKey.
+    // SceneIndex
+    static StorageKeyName FabricSceneKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/sc/%x", fabric, endpoint, idx);
     }
 };
 

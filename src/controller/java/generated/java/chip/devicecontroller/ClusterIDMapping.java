@@ -9328,6 +9328,7 @@ public class ClusterIDMapping {
             RockSetting(8L),
             WindSupport(9L),
             WindSetting(10L),
+            AirflowDirection(11L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -9373,7 +9374,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Command {;
+        public enum Command {
+            Step(0L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -9391,7 +9393,24 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }@Override
+        }public enum StepCommandField {Direction(0),Wrap(1),LowestOff(2),;
+                    private final int id;
+                    StepCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static StepCommandField value(int id) throws NoSuchFieldError {
+                        for (StepCommandField field : StepCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

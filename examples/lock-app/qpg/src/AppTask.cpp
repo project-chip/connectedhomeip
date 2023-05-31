@@ -105,11 +105,9 @@ void OnTriggerIdentifyEffect(Identify * identify)
 {
     sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
-    if (identify->mCurrentEffectIdentifier == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
+    if (identify->mEffectVariant != Clusters::Identify::EffectVariantEnum::kDefault)
     {
-        ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect variant %d",
-                        to_underlying(identify->mEffectVariant));
-        sIdentifyEffect = static_cast<Clusters::Identify::EffectIdentifierEnum>(identify->mEffectVariant);
+        ChipLogDetail(AppServer, "Identify Effect Variant unsupported. Using default");
     }
 
     switch (sIdentifyEffect)
@@ -117,6 +115,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
         SystemLayer().ScheduleLambda([identify] {
             (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
                                                                identify);
