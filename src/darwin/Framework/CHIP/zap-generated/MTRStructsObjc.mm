@@ -1473,7 +1473,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRThreadNetworkDiagnosticsClusterNeighborTable
+@implementation MTRThreadNetworkDiagnosticsClusterNeighborTableStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1511,7 +1511,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRThreadNetworkDiagnosticsClusterNeighborTable alloc] init];
+    auto other = [[MTRThreadNetworkDiagnosticsClusterNeighborTableStruct alloc] init];
 
     other.extAddress = self.extAddress;
     other.age = self.age;
@@ -1542,6 +1542,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRThreadNetworkDiagnosticsClusterNeighborTable : MTRThreadNetworkDiagnosticsClusterNeighborTableStruct
 @end
 
 @implementation MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents
@@ -1610,7 +1613,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRThreadNetworkDiagnosticsClusterRouteTable
+@implementation MTRThreadNetworkDiagnosticsClusterRouteTableStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1640,7 +1643,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRThreadNetworkDiagnosticsClusterRouteTable alloc] init];
+    auto other = [[MTRThreadNetworkDiagnosticsClusterRouteTableStruct alloc] init];
 
     other.extAddress = self.extAddress;
     other.rloc16 = self.rloc16;
@@ -1666,6 +1669,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRThreadNetworkDiagnosticsClusterRouteTable : MTRThreadNetworkDiagnosticsClusterRouteTableStruct
 @end
 
 @implementation MTRThreadNetworkDiagnosticsClusterSecurityPolicy

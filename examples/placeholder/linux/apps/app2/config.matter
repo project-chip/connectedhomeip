@@ -1639,14 +1639,14 @@ client cluster ThreadNetworkDiagnostics = 53 {
     kNotConnected = 1;
   }
 
-  enum NetworkFault : ENUM8 {
+  enum NetworkFaultEnum : ENUM8 {
     kUnspecified = 0;
     kLinkDown = 1;
     kHardwareFailure = 2;
     kNetworkJammed = 3;
   }
 
-  enum RoutingRole : ENUM8 {
+  enum RoutingRoleEnum : ENUM8 {
     kUnspecified = 0;
     kUnassigned = 1;
     kSleepyEndDevice = 2;
@@ -1663,7 +1663,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
     kMACCounts = 0x8;
   }
 
-  struct NeighborTable {
+  struct NeighborTableStruct {
     int64u extAddress = 0;
     int32u age = 1;
     int16u rloc16 = 2;
@@ -1695,7 +1695,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
     boolean channelMaskPresent = 11;
   }
 
-  struct RouteTable {
+  struct RouteTableStruct {
     int64u extAddress = 0;
     int16u rloc16 = 1;
     int8u routerId = 2;
@@ -1718,19 +1718,19 @@ client cluster ThreadNetworkDiagnostics = 53 {
   }
 
   info event NetworkFaultChange = 1 {
-    NetworkFault current[] = 0;
-    NetworkFault previous[] = 1;
+    NetworkFaultEnum current[] = 0;
+    NetworkFaultEnum previous[] = 1;
   }
 
   readonly attribute nullable int16u channel = 0;
-  readonly attribute nullable RoutingRole routingRole = 1;
+  readonly attribute nullable RoutingRoleEnum routingRole = 1;
   readonly attribute nullable char_string<16> networkName = 2;
   readonly attribute nullable int16u panId = 3;
   readonly attribute nullable int64u extendedPanId = 4;
   readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
   readonly attribute optional int64u overrunCount = 6;
-  readonly attribute NeighborTable neighborTable[] = 7;
-  readonly attribute RouteTable routeTable[] = 8;
+  readonly attribute NeighborTableStruct neighborTable[] = 7;
+  readonly attribute RouteTableStruct routeTable[] = 8;
   readonly attribute nullable int32u partitionId = 9;
   readonly attribute nullable int8u weighting = 10;
   readonly attribute nullable int8u dataVersion = 11;
@@ -1784,7 +1784,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable SecurityPolicy securityPolicy = 59;
   readonly attribute nullable octet_string<4> channelPage0Mask = 60;
   readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
-  readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
+  readonly attribute NetworkFaultEnum activeNetworkFaultsList[] = 62;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1803,14 +1803,14 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kNotConnected = 1;
   }
 
-  enum NetworkFault : ENUM8 {
+  enum NetworkFaultEnum : ENUM8 {
     kUnspecified = 0;
     kLinkDown = 1;
     kHardwareFailure = 2;
     kNetworkJammed = 3;
   }
 
-  enum RoutingRole : ENUM8 {
+  enum RoutingRoleEnum : ENUM8 {
     kUnspecified = 0;
     kUnassigned = 1;
     kSleepyEndDevice = 2;
@@ -1827,7 +1827,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kMACCounts = 0x8;
   }
 
-  struct NeighborTable {
+  struct NeighborTableStruct {
     int64u extAddress = 0;
     int32u age = 1;
     int16u rloc16 = 2;
@@ -1859,7 +1859,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
     boolean channelMaskPresent = 11;
   }
 
-  struct RouteTable {
+  struct RouteTableStruct {
     int64u extAddress = 0;
     int16u rloc16 = 1;
     int8u routerId = 2;
@@ -1882,19 +1882,19 @@ server cluster ThreadNetworkDiagnostics = 53 {
   }
 
   info event NetworkFaultChange = 1 {
-    NetworkFault current[] = 0;
-    NetworkFault previous[] = 1;
+    NetworkFaultEnum current[] = 0;
+    NetworkFaultEnum previous[] = 1;
   }
 
   readonly attribute nullable int16u channel = 0;
-  readonly attribute nullable RoutingRole routingRole = 1;
+  readonly attribute nullable RoutingRoleEnum routingRole = 1;
   readonly attribute nullable char_string<16> networkName = 2;
   readonly attribute nullable int16u panId = 3;
   readonly attribute nullable int64u extendedPanId = 4;
   readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
-  readonly attribute NeighborTable neighborTable[] = 7;
-  readonly attribute RouteTable routeTable[] = 8;
+  readonly attribute NeighborTableStruct neighborTable[] = 7;
+  readonly attribute RouteTableStruct routeTable[] = 8;
   readonly attribute nullable int32u partitionId = 9;
   readonly attribute nullable int8u weighting = 10;
   readonly attribute nullable int8u dataVersion = 11;
@@ -1948,7 +1948,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable SecurityPolicy securityPolicy = 59;
   readonly attribute nullable octet_string<4> channelPage0Mask = 60;
   readonly attribute nullable OperationalDatasetComponents operationalDatasetComponents = 61;
-  readonly attribute NetworkFault activeNetworkFaultsList[] = 62;
+  readonly attribute NetworkFaultEnum activeNetworkFaultsList[] = 62;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4980,7 +4980,7 @@ server cluster ColorControl = 768 {
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 server cluster IlluminanceMeasurement = 1024 {
-  enum LightSensorType : ENUM8 {
+  enum LightSensorTypeEnum : ENUM8 {
     kPhotodiode = 0;
     kCmos = 1;
   }
@@ -4989,7 +4989,7 @@ server cluster IlluminanceMeasurement = 1024 {
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
-  readonly attribute nullable enum8 lightSensorType = 4;
+  readonly attribute nullable LightSensorTypeEnum lightSensorType = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -7034,7 +7034,7 @@ endpoint 1 {
   }
 
   server cluster Scenes {
-    ram      attribute sceneCount default = 0x00;
+    callback attribute sceneCount default = 0x00;
     ram      attribute currentScene default = 0x00;
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;

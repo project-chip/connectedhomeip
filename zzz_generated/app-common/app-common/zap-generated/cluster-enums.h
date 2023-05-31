@@ -1016,9 +1016,6 @@ using InterfaceTypeEnum                                                         
 static InterfaceTypeEnum __attribute__((unused)) kInterfaceTypeEnumkUnknownEnumValue = static_cast<InterfaceTypeEnum>(5);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NetworkFaultEnum
 enum class NetworkFaultEnum : uint8_t
 {
@@ -1032,10 +1029,6 @@ enum class NetworkFaultEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NetworkFaultEnum                                                               = EmberAfNetworkFaultEnum;
-static NetworkFaultEnum __attribute__((unused)) kNetworkFaultEnumkUnknownEnumValue   = static_cast<NetworkFaultEnum>(4);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -1085,8 +1078,8 @@ enum class ConnectionStatusEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Enum for NetworkFault
-enum class NetworkFault : uint8_t
+// Enum for NetworkFaultEnum
+enum class NetworkFaultEnum : uint8_t
 {
     kUnspecified     = 0x00,
     kLinkDown        = 0x01,
@@ -1099,11 +1092,8 @@ enum class NetworkFault : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for RoutingRole
-enum class RoutingRole : uint8_t
+// Enum for RoutingRoleEnum
+enum class RoutingRoleEnum : uint8_t
 {
     kUnspecified     = 0x00,
     kUnassigned      = 0x01,
@@ -1118,10 +1108,6 @@ enum class RoutingRole : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 7,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RoutingRole                                                                    = EmberAfRoutingRole;
-static RoutingRole __attribute__((unused)) kRoutingRolekUnknownEnumValue             = static_cast<RoutingRole>(7);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -3040,6 +3026,30 @@ enum class ModeForSequence : uint8_t
 
 namespace FanControl {
 
+// Enum for AirflowDirectionEnum
+enum class AirflowDirectionEnum : uint8_t
+{
+    kForward = 0x00,
+    kReverse = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for DirectionEnum
+enum class DirectionEnum : uint8_t
+{
+    kIncrease = 0x00,
+    kDecrease = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Enum for FanModeSequenceType
 enum class FanModeSequenceType : uint8_t
 {
@@ -3076,10 +3086,12 @@ enum class FanModeType : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kMultiSpeed = 0x1,
-    kAuto       = 0x2,
-    kRocking    = 0x4,
-    kWind       = 0x8,
+    kMultiSpeed       = 0x1,
+    kAuto             = 0x2,
+    kRocking          = 0x4,
+    kWind             = 0x8,
+    kStep             = 0x10,
+    kAirflowDirection = 0x20,
 };
 
 // Bitmap for RockSupportMask
@@ -3252,8 +3264,8 @@ namespace BallastConfiguration {} // namespace BallastConfiguration
 
 namespace IlluminanceMeasurement {
 
-// Enum for LightSensorType
-enum class LightSensorType : uint8_t
+// Enum for LightSensorTypeEnum
+enum class LightSensorTypeEnum : uint8_t
 {
     kPhotodiode = 0x00,
     kCmos       = 0x01,

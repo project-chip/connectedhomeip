@@ -3291,6 +3291,9 @@ static BOOL AttributeIsSpecifiedInFanControlCluster(AttributeId aAttributeId)
     case Attributes::WindSetting::Id: {
         return YES;
     }
+    case Attributes::AirflowDirection::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
