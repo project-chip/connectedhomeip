@@ -135,8 +135,8 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
 
     // return operational error
     response.commandResponseState.errorStateID      = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel   = CharSpan::fromCharString(operationalError.ErrorStateLabel);
-    response.commandResponseState.errorStateDetails = CharSpan::fromCharString(operationalError.ErrorStateDetails);
+    response.commandResponseState.errorStateLabel.SetNonNull(operationalError.ErrorStateLabel, strlen(operationalError.ErrorStateLabel));
+    response.commandResponseState.errorStateDetails.Emplace(operationalError.ErrorStateDetails, strlen(operationalError.ErrorStateDetails));
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -164,8 +164,8 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
 
     // return operational error
     response.commandResponseState.errorStateID      = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel   = CharSpan::fromCharString(operationalError.ErrorStateLabel);
-    response.commandResponseState.errorStateDetails = CharSpan::fromCharString(operationalError.ErrorStateDetails);
+    response.commandResponseState.errorStateLabel.SetNonNull(operationalError.ErrorStateLabel, strlen(operationalError.ErrorStateLabel));
+    response.commandResponseState.errorStateDetails.Emplace(operationalError.ErrorStateDetails, strlen(operationalError.ErrorStateDetails));
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -193,8 +193,8 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
 
     // return operational error
     response.commandResponseState.errorStateID      = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel   = CharSpan::fromCharString(operationalError.ErrorStateLabel);
-    response.commandResponseState.errorStateDetails = CharSpan::fromCharString(operationalError.ErrorStateDetails);
+    response.commandResponseState.errorStateLabel.SetNonNull(operationalError.ErrorStateLabel, strlen(operationalError.ErrorStateLabel));
+    response.commandResponseState.errorStateDetails.Emplace(operationalError.ErrorStateDetails, strlen(operationalError.ErrorStateDetails));
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -222,8 +222,8 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
 
     // return operational error
     response.commandResponseState.errorStateID      = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel   = CharSpan::fromCharString(operationalError.ErrorStateLabel);
-    response.commandResponseState.errorStateDetails = CharSpan::fromCharString(operationalError.ErrorStateDetails);
+    response.commandResponseState.errorStateLabel.SetNonNull(operationalError.ErrorStateLabel, strlen(operationalError.ErrorStateLabel));
+    response.commandResponseState.errorStateDetails.Emplace(operationalError.ErrorStateDetails, strlen(operationalError.ErrorStateDetails));
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -370,8 +370,8 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         OperationalState::Structs::ErrorStateStruct::Type opError;
 
         opError.errorStateID      = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-        opError.errorStateLabel   = CharSpan::fromCharString(operationalError.ErrorStateLabel);
-        opError.errorStateDetails = CharSpan::fromCharString(operationalError.ErrorStateDetails);
+        opError.errorStateLabel.SetNonNull(operationalError.ErrorStateLabel, strlen(operationalError.ErrorStateLabel));
+        opError.errorStateDetails.Emplace(operationalError.ErrorStateDetails, strlen(operationalError.ErrorStateDetails));
 
         return aEncoder.Encode(opError);
     }
