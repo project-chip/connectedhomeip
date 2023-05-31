@@ -37,6 +37,13 @@ void Register(Backend & backend);
 /// at application main)
 void Unregister(Backend & backend);
 
+/// Convenience class to apply Register/Unregister automatically
+/// for a backend.
+///
+/// This ensures the "MUST unregister before application exit"
+/// is always met.
+///
+/// Prefer to use this class instead of direct register/unregister.
 class ScopedRegistration
 {
 public:
