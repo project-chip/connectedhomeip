@@ -225,21 +225,77 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::ModeTagStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type & request);
+static void Finalize(chip::app::Clusters::ModeSelect::Structs::ModeTagStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeTagStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::Type & request);
+
+static CHIP_ERROR
+Setup(const char * label,
+      chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeTagStruct::Type & request,
+      Json::Value & value);
+
+static void
+Finalize(chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeTagStruct::Type & request);
+
+static CHIP_ERROR
+Setup(const char * label,
+      chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::Type & request,
+      Json::Value & value);
+
+static void
+Finalize(chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcRunModeSelect::Structs::ModeTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::RvcRunModeSelect::Structs::ModeTagStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcCleanModeSelect::Structs::ModeTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::RvcCleanModeSelect::Structs::ModeTagStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DishwasherModeSelect::Structs::ModeTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DishwasherModeSelect::Structs::ModeTagStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request,
                         Json::Value & value);

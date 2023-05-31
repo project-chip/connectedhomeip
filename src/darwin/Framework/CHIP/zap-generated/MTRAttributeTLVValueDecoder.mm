@@ -9060,9 +9060,12 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(
                         }
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                         if (entry_2.tagName.HasValue()) {
-                            newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
-                                                                            length:entry_2.tagName.Value().size()
-                                                                          encoding:NSUTF8StringEncoding];
+                            newElement_2.tagName = AsString(entry_2.tagName.Value());
+                            if (newElement_2.tagName == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
                         } else {
                             newElement_2.tagName = nil;
                         }
@@ -9274,7 +9277,12 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeSelectCluster(
             return nil;
         }
         NSString * _Nonnull value;
-        value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
         return value;
     }
     case Attributes::SupportedModes::Id: {
@@ -9292,9 +9300,12 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeSelectCluster(
                 auto & entry_0 = iter_0.GetValue();
                 MTRLaundryWasherModeSelectClusterModeOptionStruct * newElement_0;
                 newElement_0 = [MTRLaundryWasherModeSelectClusterModeOptionStruct new];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
+                newElement_0.label = AsString(entry_0.label);
+                if (newElement_0.label == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
                 newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
@@ -9310,9 +9321,12 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeSelectCluster(
                         }
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                         if (entry_2.tagName.HasValue()) {
-                            newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
-                                                                            length:entry_2.tagName.Value().size()
-                                                                          encoding:NSUTF8StringEncoding];
+                            newElement_2.tagName = AsString(entry_2.tagName.Value());
+                            if (newElement_2.tagName == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
                         } else {
                             newElement_2.tagName = nil;
                         }
@@ -9524,7 +9538,12 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
             return nil;
         }
         NSString * _Nonnull value;
-        value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
         return value;
     }
     case Attributes::SupportedModes::Id: {
@@ -9542,9 +9561,12 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
                 auto & entry_0 = iter_0.GetValue();
                 MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct * newElement_0;
                 newElement_0 = [MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct new];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
+                newElement_0.label = AsString(entry_0.label);
+                if (newElement_0.label == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
                 newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
@@ -9560,9 +9582,12 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
                         }
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                         if (entry_2.tagName.HasValue()) {
-                            newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
-                                                                            length:entry_2.tagName.Value().size()
-                                                                          encoding:NSUTF8StringEncoding];
+                            newElement_2.tagName = AsString(entry_2.tagName.Value());
+                            if (newElement_2.tagName == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
                         } else {
                             newElement_2.tagName = nil;
                         }
@@ -9774,7 +9799,12 @@ static id _Nullable DecodeAttributeValueForRVCRunModeSelectCluster(
             return nil;
         }
         NSString * _Nonnull value;
-        value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
         return value;
     }
     case Attributes::SupportedModes::Id: {
@@ -9792,9 +9822,12 @@ static id _Nullable DecodeAttributeValueForRVCRunModeSelectCluster(
                 auto & entry_0 = iter_0.GetValue();
                 MTRRVCRunModeSelectClusterModeOptionStruct * newElement_0;
                 newElement_0 = [MTRRVCRunModeSelectClusterModeOptionStruct new];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
+                newElement_0.label = AsString(entry_0.label);
+                if (newElement_0.label == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
                 newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
@@ -9810,9 +9843,12 @@ static id _Nullable DecodeAttributeValueForRVCRunModeSelectCluster(
                         }
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                         if (entry_2.tagName.HasValue()) {
-                            newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
-                                                                            length:entry_2.tagName.Value().size()
-                                                                          encoding:NSUTF8StringEncoding];
+                            newElement_2.tagName = AsString(entry_2.tagName.Value());
+                            if (newElement_2.tagName == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
                         } else {
                             newElement_2.tagName = nil;
                         }
@@ -10024,7 +10060,12 @@ static id _Nullable DecodeAttributeValueForRVCCleanModeSelectCluster(
             return nil;
         }
         NSString * _Nonnull value;
-        value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
         return value;
     }
     case Attributes::SupportedModes::Id: {
@@ -10042,9 +10083,12 @@ static id _Nullable DecodeAttributeValueForRVCCleanModeSelectCluster(
                 auto & entry_0 = iter_0.GetValue();
                 MTRRVCCleanModeSelectClusterModeOptionStruct * newElement_0;
                 newElement_0 = [MTRRVCCleanModeSelectClusterModeOptionStruct new];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
+                newElement_0.label = AsString(entry_0.label);
+                if (newElement_0.label == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
                 newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
@@ -10060,9 +10104,12 @@ static id _Nullable DecodeAttributeValueForRVCCleanModeSelectCluster(
                         }
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                         if (entry_2.tagName.HasValue()) {
-                            newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
-                                                                            length:entry_2.tagName.Value().size()
-                                                                          encoding:NSUTF8StringEncoding];
+                            newElement_2.tagName = AsString(entry_2.tagName.Value());
+                            if (newElement_2.tagName == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
                         } else {
                             newElement_2.tagName = nil;
                         }
@@ -10673,7 +10720,12 @@ static id _Nullable DecodeAttributeValueForDishwasherModeSelectCluster(
             return nil;
         }
         NSString * _Nonnull value;
-        value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
         return value;
     }
     case Attributes::SupportedModes::Id: {
@@ -10691,9 +10743,12 @@ static id _Nullable DecodeAttributeValueForDishwasherModeSelectCluster(
                 auto & entry_0 = iter_0.GetValue();
                 MTRDishwasherModeSelectClusterModeOptionStruct * newElement_0;
                 newElement_0 = [MTRDishwasherModeSelectClusterModeOptionStruct new];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
+                newElement_0.label = AsString(entry_0.label);
+                if (newElement_0.label == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
                 newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
@@ -10709,9 +10764,12 @@ static id _Nullable DecodeAttributeValueForDishwasherModeSelectCluster(
                         }
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                         if (entry_2.tagName.HasValue()) {
-                            newElement_2.tagName = [[NSString alloc] initWithBytes:entry_2.tagName.Value().data()
-                                                                            length:entry_2.tagName.Value().size()
-                                                                          encoding:NSUTF8StringEncoding];
+                            newElement_2.tagName = AsString(entry_2.tagName.Value());
+                            if (newElement_2.tagName == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
                         } else {
                             newElement_2.tagName = nil;
                         }

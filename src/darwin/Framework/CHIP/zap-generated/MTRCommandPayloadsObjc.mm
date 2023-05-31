@@ -6560,9 +6560,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.statusText.HasValue()) {
-            self.statusText = [[NSString alloc] initWithBytes:decodableStruct.statusText.Value().data()
-                                                       length:decodableStruct.statusText.Value().size()
-                                                     encoding:NSUTF8StringEncoding];
+            self.statusText = AsString(decodableStruct.statusText.Value());
+            if (self.statusText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.statusText = nil;
         }
@@ -6711,9 +6713,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.statusText.HasValue()) {
-            self.statusText = [[NSString alloc] initWithBytes:decodableStruct.statusText.Value().data()
-                                                       length:decodableStruct.statusText.Value().size()
-                                                     encoding:NSUTF8StringEncoding];
+            self.statusText = AsString(decodableStruct.statusText.Value());
+            if (self.statusText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.statusText = nil;
         }
@@ -6863,9 +6867,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.statusText.HasValue()) {
-            self.statusText = [[NSString alloc] initWithBytes:decodableStruct.statusText.Value().data()
-                                                       length:decodableStruct.statusText.Value().size()
-                                                     encoding:NSUTF8StringEncoding];
+            self.statusText = AsString(decodableStruct.statusText.Value());
+            if (self.statusText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.statusText = nil;
         }
@@ -7014,9 +7020,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.statusText.HasValue()) {
-            self.statusText = [[NSString alloc] initWithBytes:decodableStruct.statusText.Value().data()
-                                                       length:decodableStruct.statusText.Value().size()
-                                                     encoding:NSUTF8StringEncoding];
+            self.statusText = AsString(decodableStruct.statusText.Value());
+            if (self.statusText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.statusText = nil;
         }
@@ -7165,9 +7173,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.statusText.HasValue()) {
-            self.statusText = [[NSString alloc] initWithBytes:decodableStruct.statusText.Value().data()
-                                                       length:decodableStruct.statusText.Value().size()
-                                                     encoding:NSUTF8StringEncoding];
+            self.statusText = AsString(decodableStruct.statusText.Value());
+            if (self.statusText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.statusText = nil;
         }
@@ -7384,9 +7394,11 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (decodableStruct.statusText.HasValue()) {
-            self.statusText = [[NSString alloc] initWithBytes:decodableStruct.statusText.Value().data()
-                                                       length:decodableStruct.statusText.Value().size()
-                                                     encoding:NSUTF8StringEncoding];
+            self.statusText = AsString(decodableStruct.statusText.Value());
+            if (self.statusText == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
             self.statusText = nil;
         }
