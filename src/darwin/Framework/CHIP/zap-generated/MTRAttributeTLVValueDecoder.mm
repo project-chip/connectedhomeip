@@ -16554,7 +16554,7 @@ static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
         }
         return value;
     }

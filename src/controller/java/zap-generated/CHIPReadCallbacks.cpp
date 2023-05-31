@@ -32075,8 +32075,8 @@ CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::~CHIPIlluminanceMeas
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::CallbackFn(void * context,
-                                                                            const chip::app::DataModel::Nullable<uint8_t> & value)
+void CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -32106,7 +32106,7 @@ void CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback::CallbackFn(void
         std::string javaValueClassName     = "java/lang/Integer";
         std::string javaValueCtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                      value.Value(), javaValue);
+                                                                      static_cast<uint8_t>(value.Value()), javaValue);
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);

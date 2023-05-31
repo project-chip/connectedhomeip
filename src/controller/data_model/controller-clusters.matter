@@ -4959,7 +4959,7 @@ client cluster BallastConfiguration = 769 {
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 client cluster IlluminanceMeasurement = 1024 {
-  enum LightSensorType : ENUM8 {
+  enum LightSensorTypeEnum : ENUM8 {
     kPhotodiode = 0;
     kCmos = 1;
   }
@@ -4968,7 +4968,7 @@ client cluster IlluminanceMeasurement = 1024 {
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly attribute optional int16u tolerance = 3;
-  readonly attribute optional nullable enum8 lightSensorType = 4;
+  readonly attribute optional nullable LightSensorTypeEnum lightSensorType = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
