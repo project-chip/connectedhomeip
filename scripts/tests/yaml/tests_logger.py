@@ -199,6 +199,8 @@ class TestRunnerLogger(TestRunnerHooks):
             print(self.__strings.test_harness_step_start.format(index=self.__index, name=request.label))
 
         print(self.__strings.step_start.format(index=self.__index, name=click.style(request.label, bold=True)), end='')
+        # This is to keep previous behavior of UserPrompt. Where it logs USER_PROMPT prior to user input. See link below:
+        # https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/suites/commands/log/LogCommands.cpp#L31
         if request.command == 'UserPrompt':
             message = request.arguments['values'][0]['value']
             print("\n" + self.__strings.user_prompt.format(message=f'{message}'))
