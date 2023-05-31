@@ -26,7 +26,7 @@ using namespace chip::Tracing;
 
 namespace {
 
-// This traces all received trace items
+// This keeps a log of all received trace items
 class LoggingTraceBackend : public Backend
 {
 public:
