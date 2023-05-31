@@ -150,7 +150,16 @@ void MatterUvFilterMonitoringPluginServerInitCallback() {}
 void MatterWaterTankMonitoringPluginServerInitCallback() {}
 void MatterZeoliteFilterMonitoringPluginServerInitCallback() {}
 void MatterAirQualityPluginServerInitCallback() {}
-
+void MatterCarbonMonoxideConcentrationMeasurementPluginServerInitCallback() {}
+void MatterCarbonDioxideConcentrationMeasurementPluginServerInitCallback() {}
+void MatterFormaldehydeConcentrationMeasurementPluginServerInitCallback() {}
+void MatterNitrogenDioxideConcentrationMeasurementPluginServerInitCallback() {}
+void MatterOzoneConcentrationMeasurementPluginServerInitCallback() {}
+void MatterPm10ConcentrationMeasurementPluginServerInitCallback() {}
+void MatterPm1ConcentrationMeasurementPluginServerInitCallback() {}
+void MatterPm25ConcentrationMeasurementPluginServerInitCallback() {}
+void MatterRadonConcentrationMeasurementPluginServerInitCallback() {}
+void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************

@@ -35,10 +35,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
-#include <app/clusters/identify-server/identify-server.h>
-#endif
-
 #include <assert.h>
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
@@ -57,67 +53,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 
-namespace {
-
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
-Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
-
-namespace {
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
-void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
-{
-    sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-}
-#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
-} // namespace
-
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
-void OnTriggerIdentifyEffect(Identify * identify)
-{
-    sIdentifyEffect = identify->mCurrentEffectIdentifier;
-
-    if (identify->mCurrentEffectIdentifier == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
-    {
-        ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
-                        to_underlying(identify->mEffectVariant));
-        sIdentifyEffect = static_cast<Clusters::Identify::EffectIdentifierEnum>(identify->mEffectVariant);
-    }
-
-    switch (sIdentifyEffect)
-    {
-    case Clusters::Identify::EffectIdentifierEnum::kBlink:
-    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
-    case Clusters::Identify::EffectIdentifierEnum::kOkay:
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-    }
-}
-#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
-
-#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
-Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnTriggerIdentifyEffect,
-};
-#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
-
-} // namespace
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
 
@@ -128,7 +63,7 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
-    err = BaseApplication::Init(&gIdentify);
+    err = BaseApplication::Init();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("BaseApplication::Init() failed");

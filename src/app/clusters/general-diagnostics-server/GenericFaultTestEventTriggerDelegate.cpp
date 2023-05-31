@@ -67,12 +67,13 @@ CHIP_ERROR GenericFaultTestEventTriggerDelegate::HandleEventTrigger(uint64_t eve
         GeneralFaults<kMaxNetworkFaults> networkFaultsCurrent;
 
         // Network faults injections
-        ReturnErrorOnFailure(networkFaultsPrevious.add(EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE));
-        ReturnErrorOnFailure(networkFaultsPrevious.add(EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED));
+        using app::Clusters::GeneralDiagnostics::NetworkFaultEnum;
+        ReturnErrorOnFailure(networkFaultsPrevious.add(to_underlying(NetworkFaultEnum::kHardwareFailure)));
+        ReturnErrorOnFailure(networkFaultsPrevious.add(to_underlying(NetworkFaultEnum::kNetworkJammed)));
 
-        ReturnErrorOnFailure(networkFaultsCurrent.add(EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE));
-        ReturnErrorOnFailure(networkFaultsCurrent.add(EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED));
-        ReturnErrorOnFailure(networkFaultsCurrent.add(EMBER_ZCL_NETWORK_FAULT_ENUM_CONNECTION_FAILED));
+        ReturnErrorOnFailure(networkFaultsCurrent.add(to_underlying(NetworkFaultEnum::kHardwareFailure)));
+        ReturnErrorOnFailure(networkFaultsCurrent.add(to_underlying(NetworkFaultEnum::kNetworkJammed)));
+        ReturnErrorOnFailure(networkFaultsCurrent.add(to_underlying(NetworkFaultEnum::kConnectionFailed)));
 
         app::Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(networkFaultsPrevious, networkFaultsCurrent);
     }
