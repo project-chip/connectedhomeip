@@ -1,7 +1,7 @@
 # Matter tracing
 
-This library provides a runtime-configurable tracing and logging
-infrastructure for matter.
+This library provides a runtime-configurable tracing and logging infrastructure
+for matter.
 
 ## Types of data
 
