@@ -79,7 +79,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x3]
+              hasMasksSet: [0x4]
 
     - label:
           "Given AIRQUAL.S.F03(ExtremelyPoor) ensure featuremap has the correct
@@ -90,7 +90,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x4]
+              hasMasksSet: [0x8]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
