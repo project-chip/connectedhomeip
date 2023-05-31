@@ -4953,7 +4953,7 @@ server cluster ColorControl = 768 {
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 server cluster IlluminanceMeasurement = 1024 {
-  enum LightSensorType : ENUM8 {
+  enum LightSensorTypeEnum : ENUM8 {
     kPhotodiode = 0;
     kCmos = 1;
   }
@@ -4962,7 +4962,7 @@ server cluster IlluminanceMeasurement = 1024 {
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
   readonly attribute int16u tolerance = 3;
-  readonly attribute nullable enum8 lightSensorType = 4;
+  readonly attribute nullable LightSensorTypeEnum lightSensorType = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6990,7 +6990,7 @@ endpoint 1 {
   }
 
   server cluster Scenes {
-    ram      attribute sceneCount default = 0x00;
+    callback attribute sceneCount default = 0x00;
     ram      attribute currentScene default = 0x00;
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;
