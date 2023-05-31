@@ -16,8 +16,8 @@
  */
 #include <lib/support/IntrusiveList.h>
 
-#include <tracing/registry.h>
 #include <platform/LockTracker.h>
+#include <tracing/registry.h>
 
 namespace chip {
 namespace Tracing {
