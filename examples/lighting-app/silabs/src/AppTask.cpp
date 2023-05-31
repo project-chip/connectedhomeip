@@ -23,7 +23,6 @@
 
 #include "LEDWidget.h"
 
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/clusters/scenes-server/scenes-server.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -56,73 +55,8 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
-
 LEDWidget sLightLED;
-
-Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-
-/**********************************************************
- * Identify Callbacks
- *********************************************************/
-
-namespace {
-void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
-{
-    ChipLogProgress(Zcl, "Trigger Identify Complete");
-    sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    AppTask::GetAppTask().StopStatusLEDTimer();
-#endif
 }
-} // namespace
-
-void OnTriggerIdentifyEffect(Identify * identify)
-{
-    sIdentifyEffect = identify->mCurrentEffectIdentifier;
-
-    if (identify->mCurrentEffectIdentifier == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
-    {
-        ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
-                        to_underlying(identify->mEffectVariant));
-        sIdentifyEffect = static_cast<Clusters::Identify::EffectIdentifierEnum>(identify->mEffectVariant);
-    }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    AppTask::GetAppTask().StartStatusLEDTimer();
-#endif
-
-    switch (sIdentifyEffect)
-    {
-    case Clusters::Identify::EffectIdentifierEnum::kBlink:
-    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
-    case Clusters::Identify::EffectIdentifierEnum::kOkay:
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-    }
-}
-
-Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    AppTask::GetAppTask().OnIdentifyStart,
-    AppTask::GetAppTask().OnIdentifyStop,
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnTriggerIdentifyEffect,
-};
-
-} // namespace
 
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
@@ -138,7 +72,7 @@ CHIP_ERROR AppTask::Init()
     GetLCD().Init((uint8_t *) "Lighting-App");
 #endif
 
-    err = BaseApplication::Init(&gIdentify);
+    err = BaseApplication::Init();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("BaseApplication::Init() failed");
@@ -207,24 +141,6 @@ void AppTask::AppTaskMain(void * pvParameter)
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
     }
-}
-
-void AppTask::OnIdentifyStart(Identify * identify)
-{
-    ChipLogProgress(Zcl, "onIdentifyStart");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    sAppTask.StartStatusLEDTimer();
-#endif
-}
-
-void AppTask::OnIdentifyStop(Identify * identify)
-{
-    ChipLogProgress(Zcl, "onIdentifyStop");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    sAppTask.StopStatusLEDTimer();
-#endif
 }
 
 void AppTask::LightActionEventHandler(AppEvent * aEvent)
