@@ -382,9 +382,9 @@ CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct)
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
 
-    ReturnErrorOnFailure(commandData.EndOfCommandDataIB().GetError());
-    ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests().GetError());
-    ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage().GetError());
+    ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
+    ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
+    ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage());
 
     MoveToState(State::AddedCommand);
 

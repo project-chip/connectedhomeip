@@ -37,7 +37,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -63,6 +62,7 @@ using chip::app::Clusters::DoorLock::OperationErrorEnum;
 using chip::app::Clusters::DoorLock::OperationSourceEnum;
 
 using namespace chip;
+using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
@@ -70,69 +70,6 @@ using namespace EFR32DoorLock::LockInitParams;
 
 namespace {
 LEDWidget sLockLED;
-
-EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-} // namespace
-/**********************************************************
- * Identify Callbacks
- *********************************************************/
-
-namespace {
-void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
-{
-    ChipLogProgress(Zcl, "Trigger Identify Complete");
-    sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    AppTask::GetAppTask().StopStatusLEDTimer();
-#endif
-}
-
-void OnTriggerIdentifyEffect(Identify * identify)
-{
-    sIdentifyEffect = identify->mCurrentEffectIdentifier;
-
-    if (identify->mCurrentEffectIdentifier == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE)
-    {
-        ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
-                        identify->mEffectVariant);
-        sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
-    }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    AppTask::GetAppTask().StartStatusLEDTimer();
-#endif
-
-    switch (sIdentifyEffect)
-    {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-    }
-}
-
-Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    AppTask::GetAppTask().OnIdentifyStart,
-    AppTask::GetAppTask().OnIdentifyStop,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
-    OnTriggerIdentifyEffect,
-};
-
 } // namespace
 
 using namespace chip::TLV;
@@ -150,7 +87,7 @@ CHIP_ERROR AppTask::Init()
     GetLCD().Init((uint8_t *) "Lock-App", true);
 #endif
 
-    err = BaseApplication::Init(&gIdentify);
+    err = BaseApplication::Init();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("BaseApplication::Init() failed");
@@ -300,24 +237,6 @@ void AppTask::AppTaskMain(void * pvParameter)
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
     }
-}
-
-void AppTask::OnIdentifyStart(Identify * identify)
-{
-    ChipLogProgress(Zcl, "onIdentifyStart");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    sAppTask.StartStatusLEDTimer();
-#endif
-}
-
-void AppTask::OnIdentifyStop(Identify * identify)
-{
-    ChipLogProgress(Zcl, "onIdentifyStop");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    sAppTask.StopStatusLEDTimer();
-#endif
 }
 
 void AppTask::LockActionEventHandler(AppEvent * aEvent)

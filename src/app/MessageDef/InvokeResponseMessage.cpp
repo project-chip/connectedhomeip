@@ -116,7 +116,7 @@ InvokeResponseIBs::Builder & InvokeResponseMessage::Builder::CreateInvokeRespons
     return mInvokeResponses;
 }
 
-InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::EndOfInvokeResponseMessage()
+CHIP_ERROR InvokeResponseMessage::Builder::EndOfInvokeResponseMessage()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -126,7 +126,7 @@ InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::EndOfInvokeResp
     {
         EndOfContainer();
     }
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

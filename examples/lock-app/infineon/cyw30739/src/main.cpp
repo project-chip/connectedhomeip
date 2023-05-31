@@ -51,6 +51,7 @@ using chip::app::Clusters::DoorLock::OperationErrorEnum;
 using chip::app::Clusters::DoorLock::OperationSourceEnum;
 
 using namespace chip;
+using namespace chip::app;
 using namespace ::chip::DeviceLayer::Internal;
 
 using namespace ::chip::Credentials;
@@ -92,7 +93,7 @@ static Identify gIdentify = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
 };
 
 APPLICATION_START()
