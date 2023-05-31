@@ -1,7 +1,7 @@
 # Matter tracing
 
-This library provides a pluggabble tracing and logging infrastructure for matter
-products.
+This library provides a runtime-configurable tracing and logging
+infrastructure for matter.
 
 ## Types of data
 
@@ -35,7 +35,7 @@ The data logging is generally limited in count and covers:
 ## Usage
 
 Backends are defined by extending `chip::Tracing::Backend` in `backend.h` and
-registering/unregistering it via functions in `registry.h`
+registering it via functions in `registry.h`
 
 Actual usage is controlled using `macros.h` (and for convenience `scope.h`
 provides scoped begin/end invocations).
