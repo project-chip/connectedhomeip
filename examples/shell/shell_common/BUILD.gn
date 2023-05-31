@@ -65,8 +65,8 @@ static_library("shell_common") {
 
     sources += [
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
-      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegates.cpp",
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     ]
 
     include_dirs =
