@@ -353,22 +353,6 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
             OTAImageHeader header;
             VerifyOrDie(ParseOTAHeader(parser, mOTAFilePath, header) == true);
             VerifyOrDie(sizeof(mSoftwareVersionString) > header.mSoftwareVersionString.size());
-            // Return Image not available if we already updated to the version that's available
-            if (header.mSoftwareVersion <= commandData.softwareVersion)
-            {
-                ChipLogDetail(SoftwareUpdate,
-                              "Available update version %" PRIu32 " is <= current version %" PRIu32 ", update ignored",
-                              header.mSoftwareVersion, commandData.softwareVersion);
-                mQueryImageStatus = OTAQueryStatus::kNotAvailable;
-
-                // Guarantees that either a response or an error status is sent
-                SendQueryImageResponse(commandObj, commandPath, commandData);
-
-                // After the first response is sent, default to these values for subsequent queries
-                mQueryImageStatus          = OTAQueryStatus::kUpdateAvailable;
-                mDelayedQueryActionTimeSec = 0;
-                return;
-            }
             mSoftwareVersion = header.mSoftwareVersion;
             memcpy(mSoftwareVersionString, header.mSoftwareVersionString.data(), header.mSoftwareVersionString.size());
             parser.Clear();

@@ -42,18 +42,20 @@ bool kSimulateDuplicateBlockError = false;
 
 // Saves the expected output event for every BDX message that should be send from the initiator.
 // For e.g When we start a BDX transfer, the initiator should send a MsgToSend with MessageType::SendInit message type.
-
-TransferSession::OutputEvent initiatorExpectedOutputEvent = TransferSession::OutputEventType::kNone;
+TransferSession::OutputEvent initiatorExpectedOutputEvent = chip::bdx::TransferSession::OutputEvent(TransferSession::OutputEventType::kNone);
 
 // Saves the expected output event for every BDX message that should be send in the state we are in.
 // For e.g When we get a BDX SendInit message, the responder should send a MsgToSend with MessageType::ReceiveInit message type.
+TransferSession::OutputEvent responderExpectedOutputEvent = chip::bdx::TransferSession::OutputEvent(TransferSession::OutputEventType::kNone);
 
-TransferSession::OutputEvent responderExpectedOutputEvent = TransferSession::OutputEventType::kNone;
+// Holds a reference to the initiating receiver that initiates the BDX transfer.
+TransferSession * bdxSender = nullptr;
 
-TransferSession * bdxSender   = nullptr;
+// Holds a reference to the responding sender that receives the BDX init and starts the transfer of the file.
 TransferSession * bdxReceiver = nullptr;
 
-System::PacketBufferHandle mBlockCopy = nullptr;
+// The packet buffer used to send the BDX blocks in the transfer.
+System::PacketBufferHandle fakeDataBuf;
 
 // Forward declaration
 void SendAcceptTransferForInitReceived(nlTestSuite * inSuite);
@@ -62,7 +64,7 @@ void SendPrematureBlockForBlockQueryReceived(nlTestSuite * inSuite);
 void SendAndVerifyBlockAck(nlTestSuite * inSuite, TransferSession & ackReceiver, TransferSession & ackSender, bool expectEOF);
 void SendAndVerifyQuery(nlTestSuite * inSuite, TransferSession & queryReceiver, TransferSession & querySender);
 
-// Helper method for generating a complete TLV structure with a list containing a single tag and string
+// Helper method: Generate a complete TLV structure with a list containing a single tag and string
 CHIP_ERROR WriteTLVString(uint8_t * buf, uint32_t bufLen, const char * data, uint32_t & written)
 {
     written = 0;
@@ -82,7 +84,7 @@ CHIP_ERROR WriteTLVString(uint8_t * buf, uint32_t bufLen, const char * data, uin
     return CHIP_NO_ERROR;
 }
 
-// Helper method: read a TLV structure with a single tag and string and verify it matches expected string.
+// Helper method: Read a TLV structure with a single tag and string and verify it matches expected string.
 CHIP_ERROR ReadAndVerifyTLVString(const uint8_t * dataStart, uint32_t len, const char * expected, size_t expectedLen)
 {
     TLV::TLVReader reader;
@@ -114,6 +116,8 @@ CHIP_ERROR ReadAndVerifyTLVString(const uint8_t * dataStart, uint32_t len, const
     return err;
 }
 
+// Helper method: Attach the payload header and send the message to the HandleMessageReceived of the receiver.
+// This simulates sending the BDX messages across the Exchange Context.
 CHIP_ERROR AttachHeaderAndSend(TransferSession::MessageTypeData typeData, chip::System::PacketBufferHandle msgBuf,
                                TransferSession & receiver)
 {
@@ -124,7 +128,7 @@ CHIP_ERROR AttachHeaderAndSend(TransferSession::MessageTypeData typeData, chip::
     return CHIP_NO_ERROR;
 }
 
-// Helper method for verifying that a PacketBufferHandle contains a valid BDX header and message type matches expected initiator's
+// Helper method: Verify that a PacketBufferHandle contains a valid BDX header and message type matches expected initiator's
 // expected output event
 void VerifyBdxMessageToSend(nlTestSuite * inSuite, const TransferSession::OutputEvent & outEvent)
 {
@@ -134,7 +138,7 @@ void VerifyBdxMessageToSend(nlTestSuite * inSuite, const TransferSession::Output
     NL_TEST_ASSERT(inSuite, outEvent.msgTypeData.MessageType == initiatorExpectedOutputEvent.msgTypeData.MessageType);
 }
 
-// Helper method for verifying that a PacketBufferHandle contains a valid StatusReport message and contains a specific StatusCode.
+// Helper method: Verify that a PacketBufferHandle contains a valid StatusReport message and contains a specific StatusCode.
 // The msg argument is expected to begin at the message data start, not at the PayloadHeader.
 void VerifyStatusReport(nlTestSuite * inSuite, const System::PacketBufferHandle & msg, StatusCode expectedCode)
 {
@@ -146,30 +150,40 @@ void VerifyStatusReport(nlTestSuite * inSuite, const System::PacketBufferHandle 
         return;
     }
 
-    System::PacketBufferHandle msgCopy = msg.CloneData();
+    /*System::PacketBufferHandle msgCopy = msg.CloneData();
     if (msgCopy.IsNull())
     {
         NL_TEST_ASSERT(inSuite, false);
         return;
-    }
+    }*/
 
     SecureChannel::StatusReport report;
-    err = report.Parse(std::move(msgCopy));
+    err = report.Parse(msg.Retain());
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, report.GetGeneralCode() == SecureChannel::GeneralStatusCode::kFailure);
     NL_TEST_ASSERT(inSuite, report.GetProtocolId() == Protocols::BDX::Id);
     NL_TEST_ASSERT(inSuite, report.GetProtocolCode() == static_cast<uint16_t>(expectedCode));
 }
 
-void VerifyNoMoreOutput(nlTestSuite * inSuite, void * inContext, TransferSession & transferSession)
+// Helper method: Reset the simulate error flags and call reset on the transfer session for both initiatingReceiver
+// and respondingSender. Set the expected output events to kNone and clear out the references to the
+// initiatingReceiver and respondingSender
+void Reset()
 {
-    TransferSession::OutputEvent event;
-    NL_TEST_ASSERT(inSuite, event.EventType == TransferSession::OutputEventType::kNone);
+    kSimulateBadAcceptMessageError = false;
+    kSimulateDuplicateBlockError   = false;
+    bdxReceiver->Reset();
+    bdxSender->Reset();
+    responderExpectedOutputEvent = chip::bdx::TransferSession::OutputEvent(TransferSession::OutputEventType::kNone);
+    initiatorExpectedOutputEvent = chip::bdx::TransferSession::OutputEvent(TransferSession::OutputEventType::kNone);
+    bdxReceiver                  = nullptr;
+    bdxSender                    = nullptr;
 }
 
-// The callback for the responder where it receives the BDX messages sent by the responder.
+// The callback for the responderSender where it receives the BDX messages sent by the initiatingReceiver.
 // When we get the message, we want to check if the Output event matches the expected output event
-// for the responder given what BDX messages was received earlier and what state we are in the BDX session.
+// for the responderSender. Based on the BDX message received by the responderSender and the state of the
+// transfer session state machine, the appropriate BDX message is sent to continue with the BDX transfer.
 void OnResponderOutputEventReceived(void * context, TransferSession::OutputEvent & event)
 {
     ChipLogProgress(BDX, "OnResponderOutputEventReceived %s", event.ToString(event.EventType));
@@ -182,15 +196,20 @@ void OnResponderOutputEventReceived(void * context, TransferSession::OutputEvent
     switch (event.EventType)
     {
     case TransferSession::OutputEventType::kMsgToSend: {
+
+        // Verify the correct BDX message is being sent
         VerifyBdxMessageToSend(inSuite, event);
+
         CHIP_ERROR err = CHIP_NO_ERROR;
 
+        // If we are not simulating duplicate block error, send the event.MsgData.
         if (!kSimulateDuplicateBlockError)
         {
             err = AttachHeaderAndSend(event.msgTypeData, std::move(event.MsgData), *bdxSender);
         }
         else
         {
+            // If we are simulating duplicate block error and we are not sending a block, just send the event.MsgData
             if (event.msgTypeData.MessageType != static_cast<uint8_t>(MessageType::Block))
             {
                 err = AttachHeaderAndSend(event.msgTypeData, std::move(event.MsgData), *bdxSender);
@@ -202,12 +221,16 @@ void OnResponderOutputEventReceived(void * context, TransferSession::OutputEvent
                 // can generate the StatusCode::kBadBlockCounter error
                 if (kNumBlocksSent == 0)
                 {
-                    mBlockCopy = System::PacketBufferHandle::NewWithData(event.MsgData->Start(), event.MsgData->DataLength());
-                    err        = AttachHeaderAndSend(event.msgTypeData, std::move(event.MsgData), *bdxSender);
+                    fakeDataBuf = System::PacketBufferHandle::NewWithData(event.MsgData->Start(), event.MsgData->DataLength());
+                    err         = AttachHeaderAndSend(event.msgTypeData, std::move(event.MsgData), *bdxSender);
                 }
-                else
+                else if (kNumBlocksSent == 1)
                 {
-                    err = AttachHeaderAndSend(event.msgTypeData, std::move(mBlockCopy), *bdxSender);
+                    if (!fakeDataBuf.IsNull())
+                    {
+                        // Send the duplicate block stored in fakeDataBuf to simulate duplicate block error
+                        err = AttachHeaderAndSend(event.msgTypeData, std::move(fakeDataBuf), *bdxSender);
+                    }
                 }
             }
         }
@@ -227,13 +250,14 @@ void OnResponderOutputEventReceived(void * context, TransferSession::OutputEvent
         NL_TEST_ASSERT(inSuite,
                        event.transferInitData.FileDesLength == responderExpectedOutputEvent.transferInitData.FileDesLength);
 
-        if (event.transferInitData.FileDesignator != nullptr)
+        if (event.transferInitData.FileDesignator != nullptr &&
+            responderExpectedOutputEvent.transferInitData.FileDesignator != nullptr)
         {
             NL_TEST_ASSERT(inSuite,
                            !memcmp(responderExpectedOutputEvent.transferInitData.FileDesignator,
                                    event.transferInitData.FileDesignator, event.transferInitData.FileDesLength));
         }
-        if (event.transferInitData.Metadata != nullptr)
+        if (event.transferInitData.Metadata != nullptr && responderExpectedOutputEvent.transferInitData.Metadata != nullptr)
         {
             size_t metadataLength = responderExpectedOutputEvent.transferInitData.MetadataLength;
             NL_TEST_ASSERT(inSuite, event.transferInitData.MetadataLength == metadataLength);
@@ -251,30 +275,54 @@ void OnResponderOutputEventReceived(void * context, TransferSession::OutputEvent
             }
         }
 
-        // Send the ReceiveAccept msg
+        // Send the Accept Transfer msg in response to the kInitReceived
         SendAcceptTransferForInitReceived(inSuite);
         break;
     }
-    case TransferSession::OutputEventType::kQueryReceived:
+    case TransferSession::OutputEventType::kQueryReceived: {
         SendBlockForBlockQueryReceived(inSuite, event);
         break;
-    case TransferSession::OutputEventType::kAckReceived:
-        if (kNumBlocksSent < kNumBlockSends)
+    }
+    case TransferSession::OutputEventType::kAckReceived: {
+        // If kSimulateDuplicateBlockError is false, send the block query request until
+        // all blocks are transferred.
+        if (!kSimulateDuplicateBlockError)
         {
-            SendAndVerifyQuery(inSuite, *bdxReceiver, *bdxSender);
+            if (kNumBlocksSent < kNumBlockSends)
+            {
+                SendAndVerifyQuery(inSuite, *bdxReceiver, *bdxSender);
+            }
+        }
+        else
+        {
+            // If kSimulateDuplicateBlockError is false, send and verify query for the first 2 blocks.
+            // The second query response should trigger a status report with StatusCode::kBadBlockCounter.
+            if (kNumBlocksSent < 3)
+            {
+                SendAndVerifyQuery(inSuite, *bdxReceiver, *bdxSender);
+            }
         }
         break;
+    }
     case TransferSession::OutputEventType::kStatusReceived: {
         if (kSimulateDuplicateBlockError)
         {
+            // Verify the status report and the status code for duplicate block being sent
             NL_TEST_ASSERT(inSuite, event.EventType == TransferSession::OutputEventType::kStatusReceived);
             NL_TEST_ASSERT(inSuite, event.statusData.statusCode == StatusCode::kBadBlockCounter);
+
+            // Reset the transfer sessions and clean up to wrap up the test
+            Reset();
         }
+        break;
+    }
+    case TransferSession::OutputEventType::kAckEOFReceived: {
+        // Reset the transfer sessions and clean up to wrap up the test
+        Reset();
         break;
     }
     case TransferSession::OutputEventType::kNone:
     case TransferSession::OutputEventType::kAcceptReceived:
-    case TransferSession::OutputEventType::kAckEOFReceived:
     case TransferSession::OutputEventType::kInternalError:
     case TransferSession::OutputEventType::kTransferTimeout:
     case TransferSession::OutputEventType::kQueryWithSkipReceived:
@@ -284,6 +332,10 @@ void OnResponderOutputEventReceived(void * context, TransferSession::OutputEvent
     }
 }
 
+// The callback for the initiatingReceiver where it receives the BDX messages sent by the respondingSender.
+// When we get the message, we want to check if the Output event matches the expected output event
+// for the initiatingReceiver. Based on the BDX message received by the initiatingReceiver and the state of the
+// transfer session state machine, the appropriate BDX message is sent to continue with the BDX transfer.
 void OnInitiatorOutputEventReceived(void * context, TransferSession::OutputEvent & event)
 {
     ChipLogProgress(BDX, "OnInitiatorOutputEventReceived %s", event.ToString(event.EventType));
@@ -297,27 +349,21 @@ void OnInitiatorOutputEventReceived(void * context, TransferSession::OutputEvent
     {
     case TransferSession::OutputEventType::kMsgToSend: {
         CHIP_ERROR err = CHIP_NO_ERROR;
-
         if (event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
         {
             VerifyStatusReport(inSuite, std::move(event.MsgData), StatusCode::kBadBlockCounter);
             System::PacketBufferHandle statusReportMsg               = event.MsgData.Retain();
             TransferSession::MessageTypeData statusReportMsgTypeData = event.msgTypeData;
             err = AttachHeaderAndSend(statusReportMsgTypeData, std::move(statusReportMsg), *bdxReceiver);
-            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         }
         else
         {
             VerifyBdxMessageToSend(inSuite, event);
             err = AttachHeaderAndSend(event.msgTypeData, std::move(event.MsgData), *bdxReceiver);
-            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         }
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         break;
     }
-    case TransferSession::OutputEventType::kAckEOFReceived:
-        bdxReceiver->Reset();
-        bdxSender->Reset();
-        break;
     case TransferSession::OutputEventType::kAcceptReceived: {
         // Verify received ReceiveAccept.
         // Client may want to inspect TransferControl, MaxBlockSize, StartOffset, Length, and Metadata, and may choose to reject the
@@ -373,23 +419,22 @@ void OnInitiatorOutputEventReceived(void * context, TransferSession::OutputEvent
                            !memcmp(responderExpectedOutputEvent.blockdata.Data, event.blockdata.Data, event.blockdata.Length));
             NL_TEST_ASSERT(inSuite, event.blockdata.BlockCounter == kNumBlocksSent);
         }
-        ChipLogProgress(BDX, "kBlockReceived");
-        // Test sending a premature block before block ack is recieved fails
+
+        // Test sending a premature block before block ack is received which should result in a failure in PrepareBlock.
         if (kNumBlocksSent == 0 && !kSimulateDuplicateBlockError)
         {
-            ChipLogProgress(BDX, "kBlockReceived ! kSimulateDuplicateBlockError");
             SendPrematureBlockForBlockQueryReceived(inSuite);
         }
 
         // Test Ack -> Query -> Block
         bool isEof = (kNumBlocksSent == kNumBlockSends - 1);
         kNumBlocksSent++;
-        ChipLogProgress(BDX, "SendAndVerifyBlockAck");
         SendAndVerifyBlockAck(inSuite, *bdxReceiver, *bdxSender, isEof);
         break;
     }
     case TransferSession::OutputEventType::kInitReceived:
     case TransferSession::OutputEventType::kStatusReceived:
+    case TransferSession::OutputEventType::kAckEOFReceived:
     case TransferSession::OutputEventType::kInternalError:
     case TransferSession::OutputEventType::kTransferTimeout:
     case TransferSession::OutputEventType::kQueryWithSkipReceived:
@@ -430,8 +475,8 @@ void SendAndVerifyTransferInit(nlTestSuite * inSuite, TransferSession & initiato
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-// Helper method for initializing two TransferSession objects, generating a TransferInit message, and passing it to a responding
-// TransferSession.
+// Helper method for initializing two TransferSession objects with an incorrect responder role, generating
+// a TransferInit message, and passing it to a responding TransferSession so that AcceptTransfer fails.
 void SendAndVerifyTransferInitBadResponderRole(nlTestSuite * inSuite, TransferSession & initiator, TransferRole initiatorRole,
                                                TransferSession::TransferInitData initData, TransferSession & responder,
                                                BitFlags<TransferControlFlags> & responderControlOpts, uint16_t responderMaxBlock)
@@ -479,7 +524,13 @@ void SendAndVerifyAcceptMsg(nlTestSuite * inSuite, TransferSession & acceptSende
     responderExpectedOutputEvent.transferAcceptData = acceptData;
 
     CHIP_ERROR err = acceptSender.AcceptTransfer(acceptData);
+    // If kSimulateBadAcceptMessageError is set to true, we expect that AcceptTransfer will fail due to incorrect parameters being
+    // set in the transferAcceptData.
     NL_TEST_ASSERT(inSuite, (kSimulateBadAcceptMessageError ? err != CHIP_NO_ERROR : err == CHIP_NO_ERROR));
+    if (kSimulateBadAcceptMessageError)
+    {
+        Reset();
+    }
 }
 
 // Helper method for preparing and sending a BlockQuery message between two TransferSession objects.
@@ -494,8 +545,8 @@ void SendAndVerifyQuery(nlTestSuite * inSuite, TransferSession & queryReceiver, 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-// Helper method for preparing and sending the same block to simulate a duplicate block error and also setting up the expected
-// output event for the responder to BlockReceived for the first block counter and StatusReceived for the duplicate block
+// Helper method for preparing and sending the same block data to simulate a duplicate block error and also setting up the expected
+// output event for the responder to kBlockReceived for the first block counter and kStatusReceived for the duplicate block
 void SendAndVerifyStatusReportForSameBlock(nlTestSuite * inSuite, TransferSession & sender, TransferSession & receiver, bool isEof,
                                            uint32_t inBlockCounter, TransferSession::OutputEvent & event)
 {
@@ -509,22 +560,18 @@ void SendAndVerifyStatusReportForSameBlock(nlTestSuite * inSuite, TransferSessio
     blockData.IsEof  = false;
 
     initiatorExpectedOutputEvent.msgTypeData.MessageType = static_cast<uint8_t>(isEof ? MessageType::BlockEOF : MessageType::Block);
-    // Set the expected BDX accept received message to the responder
+    // Set the expected BDX event type
     if (inBlockCounter == 0)
     {
         responderExpectedOutputEvent.EventType = TransferSession::OutputEventType::kBlockReceived;
         responderExpectedOutputEvent.blockdata = blockData;
-
-        // Provide Block data and verify sender emits Block message
-        err = sender.PrepareBlock(blockData);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
     else
     {
         responderExpectedOutputEvent.EventType = TransferSession::OutputEventType::kStatusReceived;
-        err                                    = sender.PrepareBlock(blockData);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
+    err = sender.PrepareBlock(blockData);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 // Helper method for preparing and sending a Block message between two TransferSession objects. The sender refers to the node that
@@ -538,13 +585,12 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, TransferSession & sender
     uint16_t maxBlockSize    = sender.GetTransferBlockSize();
 
     NL_TEST_ASSERT(inSuite, maxBlockSize > 0);
-    System::PacketBufferHandle fakeDataBuf = System::PacketBufferHandle::New(maxBlockSize);
+    fakeDataBuf = System::PacketBufferHandle::New(maxBlockSize);
     if (fakeDataBuf.IsNull())
     {
         NL_TEST_ASSERT(inSuite, false);
         return;
     }
-
     uint8_t * fakeBlockData = fakeDataBuf->Start();
     fakeBlockData[0]        = dataCount++;
 
@@ -601,14 +647,13 @@ void TestBDXTransferReceiverDrive(nlTestSuite * inSuite, void * inContext)
     initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
     initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
 
-    // Initialize respondingSender and pass ReceiveInit message
-    // Initialize respondingReceiver
+    // Initialize initiatingReceiver and respondingSender
     BitFlags<TransferControlFlags> receiverOpts;
     receiverOpts.Set(initOptions.TransferCtlFlags);
-    bdxSender                      = &initiatingReceiver;
-    bdxReceiver                    = &respondingSender;
-    kSimulateBadAcceptMessageError = false;
-    kSimulateDuplicateBlockError   = false;
+    bdxSender   = &initiatingReceiver;
+    bdxReceiver = &respondingSender;
+
+    // Send and verify transfer init from the initiatingReceiver
     SendAndVerifyTransferInit(inSuite, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender, receiverOpts,
                               kProposedBlockSize);
 }
@@ -628,14 +673,17 @@ void TestBadAcceptMessageFields(nlTestSuite * inSuite, void * inContext)
     initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
     initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
 
-    // Initialize respondingSender and pass ReceiveInit message
-    // Initialize respondingReceiver
+    // Initialize initiatingReceiver and respondingSender
     BitFlags<TransferControlFlags> receiverOpts;
     receiverOpts.Set(initOptions.TransferCtlFlags);
-    bdxSender                      = &initiatingReceiver;
-    bdxReceiver                    = &respondingSender;
+    bdxSender   = &initiatingReceiver;
+    bdxReceiver = &respondingSender;
+
+    // kSimulateBadAcceptMessageError is set to true as we are simulating a bad transfer accept data payload to test failure for
+    // AcceptTransfer.
     kSimulateBadAcceptMessageError = true;
-    kSimulateDuplicateBlockError   = false;
+
+    // Send and verify transfer init from the initiatingReceiver.
     SendAndVerifyTransferInit(inSuite, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender, receiverOpts,
                               kProposedBlockSize);
 }
@@ -656,19 +704,22 @@ void TestDuplicateBlockError(nlTestSuite * inSuite, void * inContext)
     initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
     initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
 
-    // Initialize respondingSender and pass ReceiveInit message
-    // Initialize respondingReceiver
+    // Initialize initiatingReceiver and respondingSender
     BitFlags<TransferControlFlags> receiverOpts;
     receiverOpts.Set(initOptions.TransferCtlFlags);
-    bdxSender                      = &initiatingReceiver;
-    bdxReceiver                    = &respondingSender;
-    kSimulateBadAcceptMessageError = false;
-    kSimulateDuplicateBlockError   = true;
+    bdxSender   = &initiatingReceiver;
+    bdxReceiver = &respondingSender;
+
+    // kSimulateDuplicateBlockError is set to true to simulate sending a duplicate block and getting a status report with code
+    // StatusCode::kBadBlockCounter.
+    kSimulateDuplicateBlockError = true;
+
+    // Send and verify transfer init from the initiatingReceiver
     SendAndVerifyTransferInit(inSuite, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender, receiverOpts,
                               kProposedBlockSize);
 }
 
-// Test an accept transfer using a responding receiver and an initiating sender, receiver drive.
+// Send an Accept transfer message from respondingSender when an init is received from initiatingReceiver
 void SendAcceptTransferForInitReceived(nlTestSuite * inSuite)
 {
     // Test metadata for Accept message
@@ -683,10 +734,7 @@ void SendAcceptTransferForInitReceived(nlTestSuite * inSuite)
     NL_TEST_ASSERT(inSuite, bdxSender != nullptr && bdxReceiver != nullptr);
     if (kSimulateBadAcceptMessageError)
     {
-        acceptData.ControlMode =
-            (responderExpectedOutputEvent.transferInitData.TransferCtlFlags == TransferControlFlags::kReceiverDrive)
-            ? TransferControlFlags::kSenderDrive
-            : TransferControlFlags::kReceiverDrive;
+        acceptData.ControlMode = TransferControlFlags::kSenderDrive;
     }
     else
     {
@@ -705,9 +753,8 @@ void SendAcceptTransferForInitReceived(nlTestSuite * inSuite)
     }
     else
     {
-        kTestSmallerBlockSize = 10;
         // Compose SendAccept parameters struct and give to respondingSender
-        acceptData.MaxBlockSize   = kTestSmallerBlockSize;
+        acceptData.MaxBlockSize   = 10;
         acceptData.StartOffset    = 0; // not used in SendAccept
         acceptData.Length         = 0; // not used in SendAccept
         acceptData.Metadata       = nullptr;
@@ -715,6 +762,7 @@ void SendAcceptTransferForInitReceived(nlTestSuite * inSuite)
         role                      = TransferRole::kReceiver;
     }
 
+    // Send and verify transfer accept from the respondingSender
     SendAndVerifyAcceptMsg(inSuite, *bdxReceiver, role, acceptData, *bdxSender, responderExpectedOutputEvent.transferInitData);
 }
 
@@ -724,7 +772,7 @@ void SendBlockForBlockQueryReceived(nlTestSuite * inSuite, TransferSession::Outp
     bool isEof = (kNumBlocksSent == kNumBlockSends - 1);
     if (kSimulateDuplicateBlockError)
     {
-        // Send the same block for the simulate block error case
+        // Send the same block to simulate block error.
         SendAndVerifyStatusReportForSameBlock(inSuite, *bdxReceiver, *bdxSender, isEof, kNumBlocksSent, event);
     }
     else
@@ -737,14 +785,14 @@ void SendBlockForBlockQueryReceived(nlTestSuite * inSuite, TransferSession::Outp
 void SendPrematureBlockForBlockQueryReceived(nlTestSuite * inSuite)
 {
     // Test only one block can be prepared at a time, without receiving a response to the first
-    System::PacketBufferHandle fakeBuf = System::PacketBufferHandle::New(kTestSmallerBlockSize);
+    fakeDataBuf = System::PacketBufferHandle::New(kTestSmallerBlockSize);
     TransferSession::BlockData prematureBlock;
-    if (fakeBuf.IsNull())
+    if (fakeDataBuf.IsNull())
     {
         NL_TEST_ASSERT(inSuite, false);
         return;
     }
-    prematureBlock.Data   = fakeBuf->Start();
+    prematureBlock.Data   = fakeDataBuf->Start();
     prematureBlock.Length = kTestSmallerBlockSize;
     prematureBlock.IsEof  = false;
 

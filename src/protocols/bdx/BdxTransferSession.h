@@ -108,7 +108,7 @@ public:
     /**
      * @brief
      *   All output data processed by the TransferSession object will be passed to the caller using this struct via the
-     * OutputEventCallback.
+     * OutputEventHandler.
      *
      *   NOTE: Some sub-structs may contain pointers to data in a PacketBuffer (see Blockdata). In this case, the MsgData field MUST
      *   be populated with a PacketBufferHandle that encapsulates the respective PacketBuffer, in order to ensure valid memory
@@ -152,10 +152,11 @@ public:
      *
      *   See OutputEventType for all possible output event types.
      *
+     * @param context   Opaque context that will be passed to callback.
      * @param event     Reference to an OutputEvent struct that will be filled out with
      *                  the generated output event
      */
-    using OutputEventCallback = void (*)(void * context, OutputEvent & event);
+    using OutputEventHandler = void (*)(void * context, OutputEvent & event);
 
     /**
      * @brief
@@ -166,14 +167,15 @@ public:
      * @param role      Inidcates whether this object will be sending or receiving data
      * @param initData  Data for initializing this object and for populating a TransferInit message
      *                  The role parameter will determine whether to populate a ReceiveInit or SendInit
-     * @param callback  OutputEventCallback that is to be registered with the transfer session and gets called when Output events
+     * @param callback  OutputEventHandler that is to be registered with the transfer session and gets called when Output events
      *                  are generated.
-     * @param context   Reference to the caller of this method
+     * @param context   Opaque context that will be passed to callback. Can be freed when the transfer completes successfully
+     *                  or is aborted and we will not call the mOutputEventHandler callback anymore.
      *
      * @return CHIP_ERROR Result of initialization and preparation of a TransferInit message. May also indicate if the
      *                    TransferSession object is unable to handle this request.
      */
-    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData, OutputEventCallback callback, void * context);
+    CHIP_ERROR StartTransfer(TransferRole role, const TransferInitData & initData, OutputEventHandler callback, void * context);
 
     /**
      * @brief
@@ -184,15 +186,16 @@ public:
      * @param role            Inidcates whether this object will be sending or receiving data
      * @param xferControlOpts Indicates all supported control modes. Used to respond to a TransferInit message
      * @param maxBlockSize    The max Block size that this object supports.
-     * @param callback        OutputEventCallback that is to be registered with the transfer session and gets called when Output
-     * events are generated.
-     * @param context         Reference to the caller of this method
+     * @param callback        OutputEventHandler that is to be registered with the transfer session and gets called when Output
+     *                        events are generated.
+     * @param context         Opaque context that will be passed to callback. Can be freed when the transfer completes successfully
+     *                        or is aborted and we will not call the mOutputEventHandler callback anymore.
      *
      * @return CHIP_ERROR Result of initialization. May also indicate if the TransferSession object is unable to handle this
      *                    request.
      */
     CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
-                               OutputEventCallback callback, void * context);
+                               OutputEventHandler callback, void * context);
 
     /**
      * @brief
@@ -342,50 +345,59 @@ private:
      */
     CHIP_ERROR VerifyProposedMode(const BitFlags<TransferControlFlags> & proposed);
 
+    /**
+     * @brief
+     *   Helper method to send a status report with error code OutputEventType::kInternalError
+     *
+     * @param statusReportData Status report data containing a status code.
+     */
     void SendStatusReportWithError(StatusReportData statusReportData);
-    void PrepareStatusReport(StatusCode code);
+    void SendStatusReport(StatusCode code);
     bool IsTransferLengthDefinite() const;
 
+    /**
+     * @brief
+     *   Helper method to prepare and send an outgoing message of type OutputEventType::kMsgToSend
+     */
     template <typename MessageType>
-    void PrepareOutgoingMessageEvent(MessageType messageType);
+    TransferSession::MessageTypeData PrepareOutgoingMessageEvent(MessageType messageType);
 
     /**
      * @brief
      *   Register a callback with the transfer session. The callback will be called to notify the caller about any messages received
-     *   or messages that need to be send or errors that occurred internally.
+     *   or messages that need to be sent or errors that occurred internally.
      *
-     * @param callback    OutputEventCallback that is to be registered with the transfer session and gets called when Output events
+     * @param callback    OutputEventHandler that is to be registered with the transfer session and gets called when Output events
      *                    are generated.
-     * @param context     Reference to the caller of this method
+     * @param context     Opaque context that will be passed to callback.
      */
-    void RegisterOutputEventCallback(OutputEventCallback callback, void * context);
+    void RegisterOutputEventHandler(OutputEventHandler callback, void * context);
 
     /**
      * @brief
-     *   Unregister the OutputEventCallback previously registered with the transfer session.
+     *   Unregister the OutputEventHandler previously registered with the transfer session.
      *
      */
-    void UnregisterOutputEventCallback();
+    void UnregisterOutputEventHandler();
 
     /**
      * @brief
      *   Sends the generated output event from the transfer session - BDX messages, status reports, etc to
-     *   the consumers of the messages who register the OutputEventCallback with it.
+     *   the consumers of the messages who register the OutputEventHandler with it.
      */
-    void SendOutputEvent(chip::bdx::TransferSession::OutputEvent & outputEvent);
+    void DispatchOutputEvent(chip::bdx::TransferSession::OutputEvent & outputEvent);
 
     /**
-     * The context that is passed in along with the callback. When the output event is generated, the context is passed when the
-     * OutputEventCallback is called.
+     * The opaque context that is passed in along with the callback. When the output event is generated, the context is
+     * passed back when the OutputEventHandler is called.
      */
     void * mContext;
-    OutputEventType mPendingOutput = OutputEventType::kNone;
 
     /**
-     * The output event callback that is registered with the transfer session and which gets called when any messages are received
-     * or messages that need to be send or errors that occurred internally.
+     * The output event callback that is registered with the transfer session and which gets notified about OutputEvents
+     * when they happen.
      */
-    OutputEventCallback mOutputEventCallback;
+    OutputEventHandler mOutputEventHandler;
     TransferState mState = TransferState::kUnitialized;
     TransferRole mRole;
 
@@ -400,9 +412,11 @@ private:
     uint64_t mTransferLength       = 0; ///< 0 represents indefinite length
     uint16_t mTransferMaxBlockSize = 0;
 
-    // Used to store event data send via the OutputEventCallback
-    System::PacketBufferHandle mPendingMsgHandle;
+    // Used to store event data to be sent via the OutputEventCallback
     TransferInitData mTransferRequestData;
+    TransferAcceptData mTransferAcceptData;
+    BlockData mBlockEventData;
+    TransferSkipData mBytesToSkip;
 
     size_t mNumBytesProcessed = 0;
 
@@ -412,6 +426,7 @@ private:
     uint32_t mNextQueryNum = 0;
 
     bool mAwaitingResponse = false;
+    System::PacketBufferHandle mPendingMsgHandle;
 };
 
 } // namespace bdx

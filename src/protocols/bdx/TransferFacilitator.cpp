@@ -64,7 +64,7 @@ void TransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec)
 void TransferFacilitator::OnOutputEventReceived(void * context, TransferSession::OutputEvent & event)
 {
     ChipLogProgress(BDX, "OnOutputEventReceived %s", event.ToString(event.EventType));
-    TransferFacilitator * facilitator = static_cast<TransferFacilitator *>(context);
+    auto * facilitator = static_cast<TransferFacilitator *>(context);
     if (facilitator)
     {
         facilitator->HandleTransferSessionOutput(event);

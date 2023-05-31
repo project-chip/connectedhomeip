@@ -34,8 +34,10 @@ namespace chip {
 namespace bdx {
 
 /**
- * An abstract class with methods for handling BDX messages from an ExchangeContext and gets output events from a TransferSession
- * state machine.
+ * An abstract class with methods for handling BDX messages that come over the Exchange context. When a BDX message is received,
+ * this class sends it to the transfer session state machine which processes the BDX message and generates the OutputEvent
+ * that needs to be send back.
+ *
  *
  * This class does not define any methods for beginning a transfer or initializing the underlying TransferSession object (see
  * Initiator and Responder below).
@@ -90,8 +92,7 @@ class Responder : public TransferFacilitator
 {
 public:
     /**
-     * Initialize the TransferSession state machine to be ready for an incoming transfer request and set the callback to get the
-     * output event
+     * Initialize the TransferSession state machine to be ready for an incoming transfer request
      * @param[in] role            The role of the Responder: Sender or Receiver of BDX data
      * @param[in] xferControlOpts Supported transfer modes (see TransferControlFlags)
      * @param[in] maxBlockSize    The supported maximum size of BDX Block data
@@ -111,7 +112,7 @@ class Initiator : public TransferFacilitator
 {
 public:
     /**
-     * Initialize the TransferSession state machine to prepare a transfer request message and sends the outgoing message
+     * Initialize the TransferSession state machine to prepare a transfer request message
      *
      * @param[in] role       The role of the Initiator: Sender or Receiver of BDX data
      * @param[in] initData   Data needed for preparing a transfer request BDX message

@@ -178,7 +178,7 @@ private:
         static_cast<BdxOTASender *>(state)->ResetState();
     }
 
-    bool HasTransferTimedOut()
+    bool TransferHasTimedOut()
     {
         uint32_t curBlockCounter = mTransfer.GetNextBlockNum();
 
@@ -201,7 +201,7 @@ private:
         VerifyOrReturn(systemLayer != nullptr);
         BdxOTASender * sender = static_cast<BdxOTASender *>(state);
 
-        if (sender->HasTransferTimedOut()) {
+        if (sender->TransferHasTimedOut()) {
             sender->ResetState();
         } else {
             CHIP_ERROR err = systemLayer->StartTimer(kBdxTransferTimeout, HandleBdxTransferTimeoutExpired, state);
