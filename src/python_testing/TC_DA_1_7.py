@@ -43,7 +43,7 @@ def load_all_paa(paa_path: Path) -> dict:
         with open(filename, "rb") as derfile:
             logging.info(f"Loading PAA: {filename}")
             try:
-            # Load cert
+                # Load cert
             paa_der = derfile.read()
             paa_cert = load_der_x509_certificate(paa_der)
 
