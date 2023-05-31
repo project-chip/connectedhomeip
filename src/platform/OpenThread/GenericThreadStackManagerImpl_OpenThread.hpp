@@ -1054,11 +1054,11 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 
     if (otDatasetIsCommissioned(mOTInst))
     {
-        // For the following nullable attributes of the cluster, encodeNull
-        // as thread instance cannot provide the related data
-        // when it is not currently configured
-        // Note RoutingRole is nullable but not listed here has thread
-        // provide valid data even when disabled or detached
+        // For the following nullable attributes of the cluster, encodeNull since
+        // thread instance cannot provide the related data when it is not currently configured.
+        //
+        // Note that RoutingRole is nullable but not listed here as thread provide
+        // valid data even when disabled or detached
         switch (attributeId)
         {
         case ThreadNetworkDiagnostics::Attributes::Channel::Id:
