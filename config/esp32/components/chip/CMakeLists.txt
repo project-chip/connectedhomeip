@@ -384,6 +384,11 @@ if((NOT CONFIG_USE_MINIMAL_MDNS) AND (CONFIG_ENABLE_WIFI_STATION OR CONFIG_ENABL
     list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()
 
+if (CONFIG_ENABLE_ENCRYPTED_OTA)
+    idf_component_get_property(esp_encrypted_img_lib espressif__esp_encrypted_img COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_encrypted_img_lib}>)
+endif()
+
 idf_component_get_property(main_lib main COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
