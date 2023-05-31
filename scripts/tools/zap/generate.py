@@ -223,8 +223,16 @@ def runGeneration(cmdLineArgs):
         extractGeneratedIdl(output_dir, zap_file)
     else:
         # without a zap file, assume we process controller-clusters
+        #
+        # The reason for having a zap file name is that the ".matter" file name is implied
+        # from the zap file name and we still need to generate `controller-clusters.matter`
+        #
         # TODO: this hardcoding maybe can be extracted in some other way
         #       like taking it as an argument where to process the IDL
+        #
+        # TODO: controller-clusters.zap should eventually be deleted and so should
+        #       controller-clusters.matter  (or replaced with an equivalent of "import XML"
+        #       statements)
         extractGeneratedIdl(output_dir, 'src/controller/data_model/controller-clusters.zap')
 
 
