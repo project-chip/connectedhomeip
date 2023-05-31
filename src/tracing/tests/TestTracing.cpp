@@ -13,9 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <tracing/macros.h>
-#include <tracing/backend.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <tracing/backend.h>
+#include <tracing/macros.h>
 
 #include <nlunit-test.h>
 
@@ -31,7 +31,7 @@ void TestTracing(nlTestSuite * inSuite, void * inContext)
 
 const nlTest sTests[] = {
     NL_TEST_DEF("Tracing", TestTracing), //
-    NL_TEST_SENTINEL()                                        //
+    NL_TEST_SENTINEL()                   //
 };
 
 } // namespace

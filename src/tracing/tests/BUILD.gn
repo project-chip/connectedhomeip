@@ -21,15 +21,13 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTracingTests"
 
-  test_sources = [
-    "TestTracing.cpp",
-  ]
+  test_sources = [ "TestTracing.cpp" ]
   sources = []
 
   public_deps = [
-    "${chip_root}/src/tracing",
     "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/platform",
+    "${chip_root}/src/tracing",
     "${nlunit_test_root}:nlunit-test",
   ]
 }

@@ -1,4 +1,3 @@
-
 # Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +20,7 @@ declare_args() {
 }
 
 config("tracing_enabled") {
-  defines = ["MATTER_TRACING_ENABLED"]
+  defines = [ "MATTER_TRACING_ENABLED" ]
 }
 
 static_library("tracing") {
@@ -29,15 +28,13 @@ static_library("tracing") {
     "backend.h",
     "log_declares.h",
     "macros.h",
+    "registry.cpp",
+    "registry.h",
     "scope.h",
     "scopes.h",
-    "registry.h",
-    "registry.cpp",
   ]
 
-  public_deps = [
-    "${chip_root}/src/lib/support",
-  ]
+  public_deps = [ "${chip_root}/src/lib/support" ]
 
   if (matter_enable_tracing_support) {
     public_configs = [ ":tracing_enabled" ]

@@ -39,8 +39,8 @@
 #else // MATTER_TRACING_ENABLED
 
 #include <tracing/log_declares.h>
-#include <tracing/scopes.h>
 #include <tracing/registry.h>
+#include <tracing/scopes.h>
 
 #define MATTER_TRACE_BEGIN(scope) ::chip::Tracing::Internal::Begin(scope)
 #define MATTER_TRACE_END(scope) ::chip::Tracing::Internal::End(scope)
