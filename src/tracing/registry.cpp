@@ -17,6 +17,7 @@
 #include <lib/support/IntrusiveList.h>
 
 #include <tracing/registry.h>
+#include <platform/LockTracker.h>
 
 namespace chip {
 namespace Tracing {
@@ -28,11 +29,13 @@ IntrusiveList<Backend> gTracingBackends;
 
 void Register(Backend & backend)
 {
+    assertChipStackLockedByCurrentThread();
     gTracingBackends.PushBack(&backend);
 }
 
 void Unregister(Backend & backend)
 {
+    assertChipStackLockedByCurrentThread();
     gTracingBackends.Remove(&backend);
 }
 

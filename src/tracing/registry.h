@@ -21,7 +21,20 @@
 namespace chip {
 namespace Tracing {
 
+/// Registers a tracing backend to receive trace and logging data
+/// Until it is unregistered
+///
+/// All tracing backends MUST be unregistered before the application
+/// exits. Consider using [ScopedRegistration]
+///
+/// MUST be called with chip thread lock held (from chip main loop or
+/// at application main)
 void Register(Backend & backend);
+
+/// Unregister a backend from receiving tracing/logging data
+///
+/// MUST be called with chip thread lock held (from chip main loop or
+/// at application main)
 void Unregister(Backend & backend);
 
 class ScopedRegistration
