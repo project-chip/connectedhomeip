@@ -27,10 +27,10 @@ namespace Tracing {
 ///
 /// Derived from an intrusive list base as multiple
 /// tracing back-ends may exist per application.
-class TracingBackend : public IntrusiveListNodeBase
+class TracingBackend : public ::chip::IntrusiveListNodeBase<>
 {
 public:
-    ~TracingBackend() = default;
+    virtual ~TracingBackend() = default;
 
     /// Begin a trace for the specified scope.
     ///
@@ -58,11 +58,11 @@ public:
     virtual void TraceInstant(Instant instant) = 0;
 
     virtual void LogMessageSend(MessageSendInfo &) { TraceInstant(Instant::Log_MessageSend); }
-    virtual void LogMessageReceived(MessageReceivedInfo &) { TraceInstant(Instant::Log_MessageReceived); }
+    virtual void LogMessageReceived(MessageReceiveInfo &) { TraceInstant(Instant::Log_MessageReceived); }
 
     virtual void LogNodeLookup(NodeLookupInfo &) { TraceInstant(Instant::Log_NodeLookup); }
     virtual void LogNodeDiscovered(NodeDiscoveredInfo &) { TraceInstant(Instant::Log_NodeDiscovered); }
-    virtual void LogNodeDiscoveryFailed(NodeDiscovereyFailed &) { TraceInstant(Instant::Log_NodeDiscoveryFailed); }
+    virtual void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) { TraceInstant(Instant::Log_NodeDiscoveryFailed); }
 };
 
 } // namespace Tracing

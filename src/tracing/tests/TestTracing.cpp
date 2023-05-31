@@ -13,8 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/tracing/macros.h>
-#include <lib/tracing/backend.h>
+#include <tracing/macros.h>
+#include <tracing/backend.h>
+#include <lib/support/UnitTestRegistration.h>
+
+#include <nlunit-test.h>
 
 using namespace chip;
 

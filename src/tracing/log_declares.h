@@ -26,7 +26,7 @@ struct MessageSendInfo;
 struct MessageReceiveInfo;
 struct NodeLookupInfo;
 struct NodeDiscoveredInfo;
-struct NodeDiscovereyFailedInfo;
+struct NodeDiscoveryFailedInfo;
 
 } // namespace Tracing
 } // namespace chip

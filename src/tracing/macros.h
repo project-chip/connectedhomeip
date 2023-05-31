@@ -47,15 +47,15 @@ namespace Tracing {
 // Internal calls, that will delegate to appropriate backends as needed
 namespace Internal {
 
-void Begin(Scope scope);
-void End(Scope scope);
-void Instant(Instant instant);
+void Begin(::chip::Tracing::Scope scope);
+void End(::chip::Tracing::Scope scope);
+void Instant(::chip::Tracing::Instant instant);
 
-void LogMessageSend(MessageSendInfo &info);
-void LogMessageReceived(MessageReceiveInfo &info);
-void LogNodeLookup(NodeLookupInfo &info);
-void LogNodeDiscovered(NodeDiscoveredInfo &info);
-void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &info);
+void LogMessageSend(::chip::Tracing::MessageSendInfo &info);
+void LogMessageReceived(::chip::Tracing::MessageReceiveInfo &info);
+void LogNodeLookup(::chip::Tracing::NodeLookupInfo &info);
+void LogNodeDiscovered(::chip::Tracing::NodeDiscoveredInfo &info);
+void LogNodeDiscoveryFailed(::chip::Tracing::NodeDiscoveryFailedInfo &info);
 
 } // Impl
 
@@ -101,4 +101,4 @@ void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &info);
         ::chip::Tracing::Internal::LogNodeDiscoveryFailed(_trace_data);                                                            \
     } while (false)
 
-#endir
+#endif

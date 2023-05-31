@@ -32,6 +32,11 @@ static_library("tracing") {
     "scope.h",
     "scopes.h",
   ]
+
+  public_deps = [
+    "${chip_root}/src/lib/support",
+  ]
+
   if (matter_enable_tracing_support) {
     public_configs = [ ":tracing_enabled" ]
   }
