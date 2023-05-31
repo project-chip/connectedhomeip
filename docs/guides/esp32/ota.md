@@ -71,7 +71,7 @@ chip-tool. On receiving this command OTA requestor will query for OTA image.
 ## Encrypted OTA
 
 ESP32 supports transferring encrypted OTA images. Currently, an application
-image can be encrypted/decrypted using an RSA-3072 key.
+image can be encrypted/decrypted using an RSA-3072 key pair.
 
 ### Firmware Changes
 
@@ -82,25 +82,25 @@ image can be encrypted/decrypted using an RSA-3072 key.
     CONFIG_ENABLE_ENCRYPTED_OTA=y
     ```
 
--   Applications need to provide the keypair to the OTA image processor using
+-   Applications need to provide the key pair to the OTA image processor using
     the `InitEncryptedOTA()` API to decrypt the received OTA image.
 
 -   For testing purposes, in `examples/lighting-app/esp32`, there is a logic of
     embedding the private key in the firmware. To quickly test, please generate
-    the keypair and rename it as `esp_image_encryption_public_key.pem` and copy
+    the key pair and rename it as `esp_image_encryption_public_key.pem` and copy
     it to directory `examples/lighting-app/esp32`.
 
 Please follow the steps below to generate an application image for OTA upgrades:
 
-1. Generate a new RSA-3072 keypair or use an existing one.
+1. Generate a new RSA-3072 key pair or use an existing one.
 
-    - To generate a keypair, use the following command:
+    - To generate a key pair, use the following command:
 
         ```
         openssl genrsa -out esp_image_encryption_key.pem 3072
         ```
 
-    - Extract the public key from the keypair:
+    - Extract the public key from the key pair:
         ```
         openssl rsa -in esp_image_encryption_key.pem -pubout -out esp_image_encryption_public_key.pem
         ```
