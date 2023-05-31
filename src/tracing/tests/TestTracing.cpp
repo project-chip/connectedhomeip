@@ -26,7 +26,7 @@ namespace {
 void TestTracing(nlTestSuite * inSuite, void * inContext)
 {
     // FIXME: implement
-    // NL_TEST_ASSERT(inSuite, mask.Raw() == 0);
+    // NL_TEST_ASSERT(inSuite, 1 == 0);
 }
 
 const nlTest sTests[] = {

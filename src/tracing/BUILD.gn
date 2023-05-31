@@ -31,6 +31,8 @@ static_library("tracing") {
     "macros.h",
     "scope.h",
     "scopes.h",
+    "registry.h",
+    "registry.cpp",
   ]
 
   public_deps = [

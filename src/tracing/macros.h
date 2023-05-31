@@ -40,27 +40,7 @@
 
 #include <tracing/log_declares.h>
 #include <tracing/scopes.h>
-
-namespace chip {
-namespace Tracing {
-
-// Internal calls, that will delegate to appropriate backends as needed
-namespace Internal {
-
-void Begin(::chip::Tracing::Scope scope);
-void End(::chip::Tracing::Scope scope);
-void Instant(::chip::Tracing::Instant instant);
-
-void LogMessageSend(::chip::Tracing::MessageSendInfo &info);
-void LogMessageReceived(::chip::Tracing::MessageReceiveInfo &info);
-void LogNodeLookup(::chip::Tracing::NodeLookupInfo &info);
-void LogNodeDiscovered(::chip::Tracing::NodeDiscoveredInfo &info);
-void LogNodeDiscoveryFailed(::chip::Tracing::NodeDiscoveryFailedInfo &info);
-
-} // Impl
-
-} // Tracing
-} // chip
+#include <tracing/registry.h>
 
 #define MATTER_TRACE_BEGIN(scope) ::chip::Tracing::Internal::Begin(scope)
 #define MATTER_TRACE_END(scope) ::chip::Tracing::Internal::End(scope)

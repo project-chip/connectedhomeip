@@ -27,10 +27,10 @@ namespace Tracing {
 ///
 /// Derived from an intrusive list base as multiple
 /// tracing back-ends may exist per application.
-class TracingBackend : public ::chip::IntrusiveListNodeBase<>
+class Backend : public ::chip::IntrusiveListNodeBase<>
 {
 public:
-    virtual ~TracingBackend() = default;
+    virtual ~Backend() = default;
 
     /// Begin a trace for the specified scope.
     ///
