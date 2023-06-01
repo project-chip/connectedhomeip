@@ -54,7 +54,7 @@ limitations under the License.
     <cluster code="0x0061"/>
     <item name="ErrorStateID" type="ErrorStateEnum" optional="false" />
     <item name="ErrorStateLabel" type="CHAR_STRING" optional="false" length="64" isNullable="true"/>
-    <item name="ErrorStateDetails" type="CHAR_STRING" optional="true" length="64" />
+    <item name="ErrorStateDetails" type="CHAR_STRING" optional="true" length="64" isNullable="true"/>
   </struct>
 
   <cluster>
