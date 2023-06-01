@@ -19,6 +19,7 @@
 #include "AppTaskCommon.h"
 #include "AppTask.h"
 
+#include "BLEManagerImpl.h"
 #include "ButtonManager.h"
 
 #include "ThreadUtil.h"
@@ -131,6 +132,22 @@ Identify sIdentify = {
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 #endif
+
+class AppCallbacks : public AppDelegate
+{
+    bool isComissioningStarted;
+
+public:
+    void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
+    void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
+    void OnCommissioningWindowClosed() override
+    {
+        if (!isComissioningStarted)
+            chip::DeviceLayer::Internal::BLEMgr().Shutdown();
+    }
+};
+
+AppCallbacks sCallbacks;
 } // namespace
 
 class AppFabricTableDelegate : public FabricTable::Delegate
@@ -276,6 +293,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Init ZCL Data Model and start server
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.appDelegate = &sCallbacks;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
 #if APP_SET_DEVICE_INFO_PROVIDER
