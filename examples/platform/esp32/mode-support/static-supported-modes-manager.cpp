@@ -142,7 +142,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
                                 ModeOptionsProvider(nullptr, nullptr), CleanUp(endpointId));
 
             tag.value         = static_cast<uint16_t>(modeTagValue);
-            tag.mfgCode       = static_cast<chip::VendorId>(modeTagMfgCode);
+//            tag.mfgCode       = static_cast<chip::VendorId>(modeTagMfgCode);
             modeTags[stIndex] = tag;
         }
 
