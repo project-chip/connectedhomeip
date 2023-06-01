@@ -1,7 +1,7 @@
 #include <jni.h>
 
-#include <lib/core/CHIPError.h>
 #include <controller/java/zap-generated/CHIPClientCallbacks.h>
+#include <lib/core/CHIPError.h>
 
 #include <jni/CHIPCallbackTypes.h>
 
