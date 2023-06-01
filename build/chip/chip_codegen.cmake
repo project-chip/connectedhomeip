@@ -108,7 +108,6 @@ endfunction()
 #      GENERATOR "app-templates"
 #      OUTPUTS
 #            "zap-generated/access.h",
-#            "zap-generated/CHIPClientCallbacks.h",
 #            "zap-generated/CHIPClusters.h"
 #            "zap-generated/endpoint_config.h",
 #            "zap-generated/gen_config.h",
