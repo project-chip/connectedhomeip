@@ -16,6 +16,7 @@
  */
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
+#include <lib/support/BytesToHex.h>
 #include <platform/ASR/ASRConfig.h>
 #include <platform/ASR/ASRFactoryDataProvider.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -463,9 +464,11 @@ CHIP_ERROR ASRFactoryDataProvider::GetHardwareVersionString(char * buf, size_t b
 CHIP_ERROR ASRFactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
                   "Length of unique ID for rotating device ID is smaller than minimum.");
+#if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
+#ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
     constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 
     ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -473,7 +476,20 @@ CHIP_ERROR ASRFactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan &
     memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
     uniqueIdSpan.reduce_size(sizeof(uniqueId));
     return CHIP_NO_ERROR;
-#endif
+#endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+#else  // CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
+#define ROTATING_UNIQUE_ID_STRING_LEN ConfigurationManager::kRotatingDeviceIDUniqueIDLength * 2
+    uint8_t buffer[ROTATING_UNIQUE_ID_STRING_LEN] = { 0 };
+    size_t buffer_len                             = ROTATING_UNIQUE_ID_STRING_LEN;
+    ReturnErrorCodeIf(ConfigurationManager::kRotatingDeviceIDUniqueIDLength > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_ROTATING_UNIQUE_ID_PARTITION, buffer, buffer_len, buffer_len));
+    size_t bytesLen =
+        chip::Encoding::HexToBytes(Uint8::to_char(buffer), ROTATING_UNIQUE_ID_STRING_LEN, uniqueIdSpan.data(), uniqueIdSpan.size());
+    ReturnErrorCodeIf(bytesLen != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+    uniqueIdSpan.reduce_size(bytesLen);
+    return CHIP_NO_ERROR;
+#endif // CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
     return err;
 }
 
