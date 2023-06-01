@@ -180,11 +180,3 @@ class BridgeGenerator(CodeGenerator):
             }
         )
 
-        self.internal_render_one_output(
-            template_path="BridgeClustersGlobalStructs.jinja",
-            output_file_name="bridge/BridgeGlobalStructs.h",
-            vars={
-                'idl': self.idl,
-                'structs': self.idl.structs,
-            }
-        )
