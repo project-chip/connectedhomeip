@@ -175,8 +175,7 @@
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
     "Thermostat": [
         "Test_TC_TSTAT_1_1",
-        "Test_TC_TSTAT_2_1",
-        "Test_TC_TSTAT_2_2"
+        "Test_TC_TSTAT_2_1"
     ],
     "ThermostatUserConfiguration": [
         "Test_TC_TSUIC_1_1",
