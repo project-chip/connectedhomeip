@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,22 +15,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
-
-namespace chip {
-namespace app {
 
 /**
- * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
+ *    @file
+ *      This file implements tests for the ICDManager class
  *
  */
-class ICDManager
+
+#include <lib/support/UnitTestRegistration.h>
+#include <nlunit-test.h>
+
+int TestICDManager()
 {
-public:
-    ICDManager();
+    static nlTest sTests[] = { NL_TEST_SENTINEL() };
 
-private:
-};
+    nlTestSuite cmSuite = { "TestICDManager", &sTests[0], nullptr, nullptr };
 
-} // namespace app
-} // namespace chip
+    nlTestRunner(&cmSuite, nullptr);
+    return (nlTestRunnerStats(&cmSuite));
+}
+
+CHIP_REGISTER_TEST_SUITE(TestICDManager)

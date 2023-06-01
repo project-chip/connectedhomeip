@@ -65,8 +65,10 @@
 #endif
 #include <transport/raw/UDP.h>
 
-#include <platform/ICDEventManager.h>
-#include <platform/ICDManager.h>
+#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/ICDEventManager.h>
+#include <app/ICDManager.h>
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 namespace chip {
 
@@ -138,12 +140,6 @@ struct ServerInitParams
     // Operational certificate store with access to the operational certs in persisted storage:
     // must not be null at timne of Server::Init().
     Credentials::OperationalCertificateStore * opCertStore = nullptr;
-
-#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
-    // ICD Manager: Must be injected. Used to process logic for ICD server behaviours
-    // Must NOT be initialized before provided
-    DeviceLayer::ICDManager * icdManager = nullptr;
-#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
 };
 
 /**
@@ -604,9 +600,10 @@ private:
     Inet::InterfaceId mInterfaceId;
 
     System::Clock::Microseconds64 mInitTimestamp;
-#ifdef CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
     DeviceLayer::ICDEventManager mICDEventManager;
-#endif // CHIP_DEVICE_CONFIG_ICD_SERVER_ENABLE
+    DeviceLayer::ICDManager mICDManager;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 };
 
 } // namespace chip

@@ -15,13 +15,16 @@
  *    limitations under the License.
  */
 #pragma once
-
-#include <lib/core/CHIPError.h>
-#include <platform/ICDManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <app/icd/ICDEventManager.h>
+#include <app/icd/ICDManager.h>
+#include <lib/core/CHIPError.h>
+#include <platform/CHIPDeviceEvent.h>
+
+
 namespace chip {
-namespace DeviceLayer {
+namespace app {
 
 /**
  * @brief ICDEventManager class is responsible of processing Platform Events that affect an ICDs behaviour
@@ -34,11 +37,11 @@ public:
     ICDEventManager() = default;
     CHIP_ERROR Init(ICDManager * icdManager);
     CHIP_ERROR Shutdown();
-    static void ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg);
+    static void ICDEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 private:
     ICDManager * mICDManager;
 };
 
-} // namespace DeviceLayer
+} // namespace app
 } // namespace chip

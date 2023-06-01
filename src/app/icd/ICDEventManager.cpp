@@ -15,10 +15,12 @@
  *    limitations under the License.
  */
 
-#include <platform/ICDEventManager.h>
+#include <app/icd/ICDEventManager.h>
+
+using namespace chip::DeviceLayer;
 
 namespace chip {
-namespace DeviceLayer {
+namespace app {
 
 /**
  * @brief Initialisation function of the ICDEventManager.
@@ -55,5 +57,5 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
     // TODO
 }
 
-} // namespace DeviceLayer
+} // namespace app
 } // namespace chip

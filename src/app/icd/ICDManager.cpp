@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#include <platform/ICDManager.h>
+#include <app/icd/ICDManager.h>
 
 namespace chip {
-namespace DeviceLayer {
+namespace app {
 
 ICDManager::ICDManager() {}
 
-} // namespace DeviceLayer
+} // namespace app
 } // namespace chip
