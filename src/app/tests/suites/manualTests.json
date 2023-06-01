@@ -243,7 +243,7 @@
     "WindowCovering": [],
     "FlowMeasurement": ["Test_TC_FLW_2_2"],
     "OccupancySensing": ["Test_TC_OCC_3_1"],
-    "PowerSource": ["Test_TC_PS_2_2","Test_TC_PS_3_1"],
+    "PowerSource": ["Test_TC_PS_2_2", "Test_TC_PS_3_1"],
     "BooleanState": ["Test_TC_BOOL_2_2"],
     "ColorControl": [
         "Test_TC_CC_3_1",
