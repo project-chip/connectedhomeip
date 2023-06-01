@@ -117,6 +117,21 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     MTRDeviceExpectedValueFieldIDIndex = 2
 };
 
+typedef NS_ENUM(NSUInteger, MTRDeviceReadRequestFieldIndex) {
+    MTRDeviceReadRequestFieldEndpointIDIndex = 0,
+    MTRDeviceReadRequestFieldClusterIDIndex = 1,
+    MTRDeviceReadRequestFieldAttributeIDIndex = 2,
+    MTRDeviceReadRequestFieldParamsIndex = 3
+};
+
+typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemBatchingID) {
+    MTRDeviceWorkItemBatchingReadID = 1,
+};
+
+typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
+    MTRDeviceWorkItemDuplicateReadTypeID = 1,
+};
+
 @interface MTRDevice ()
 @property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 @property (nonatomic) chip::FabricIndex fabricIndex;
@@ -775,37 +790,112 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // 4. Cache has no entry
     // TODO: add option for BaseSubscriptionCallback to report during priming, to reduce when case 4 is hit
     if (!attributeIsSpecified || ![self _subscriptionAbleToReport] || hasChangesOmittedQuality || !attributeValueToReturn) {
+        // Read requests container will be an array of items, each being an array containing:
+        //   [endpoint ID, cluster ID, attribute ID, params]
+        // Batching handler should only coalesce when params are equal.
+
+        // For this single read API there's only 1 array item. Use NSNull to stand in for nil params for easy comparison.
+        NSMutableArray<NSArray *> * readRequests =
+            [NSMutableArray arrayWithObject:@[ endpointID, clusterID, attributeID, params ?: [NSNull null] ]];
+
         // Create work item, set ready handler to perform task, then enqueue the work
         MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
+        MTRAsyncCallbackBatchingHandler batchingHandler = ^(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged) {
+            NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
+            NSMutableArray<NSArray *> * readRequestsNext = opaqueDataNext;
+
+            *fullyMerged = NO;
+
+            // Can only read up to 9 paths at a time, per spec
+            if (readRequestsCurrent.count >= 9) {
+                return;
+            }
+
+            while (readRequestsNext.count) {
+                // if params don't match then they cannot be merged
+                if (![readRequestsNext[0][MTRDeviceReadRequestFieldParamsIndex]
+                        isEqual:readRequestsCurrent[0][MTRDeviceReadRequestFieldParamsIndex]]) {
+                    return;
+                }
+
+                // merge the next item's first request into the current item's list
+                [readRequestsCurrent addObject:readRequestsNext[0]];
+                [readRequestsNext removeObjectAtIndex:0];
+
+                // Can only read up to 9 paths at a time, per spec
+                if (readRequestsCurrent.count == 9) {
+                    break;
+                }
+            }
+
+            if (readRequestsNext.count == 0) {
+                *fullyMerged = YES;
+            }
+        };
+        MTRAsyncCallbackDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate) {
+            *isDuplicate = NO;
+            for (NSArray * readItem in readRequests) {
+                if ([readItem isEqual:opaqueItemData]) {
+                    *isDuplicate = YES;
+                    return;
+                }
+            }
+        };
         MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
             MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
-            MTRBaseDevice * baseDevice = [self newBaseDevice];
-            [baseDevice readAttributesWithEndpointID:endpointID
-                                           clusterID:clusterID
-                                         attributeID:attributeID
-                                              params:params
-                                               queue:self.queue
-                                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                              NSError * _Nullable error) {
-                                              if (values) {
-                                                  // Since the format is the same data-value dictionary, this looks like an
-                                                  // attribute report
-                                                  MTR_LOG_INFO("%@ completion values %@", logPrefix, values);
-                                                  [self _handleAttributeReport:values];
-                                              }
 
-                                              // TODO: better retry logic
-                                              if (error && (retryCount < 2)) {
-                                                  MTR_LOG_ERROR("%@ completion error %@ retryWork %lu", logPrefix, error,
-                                                      (unsigned long) retryCount);
-                                                  [workItem retryWork];
-                                              } else {
-                                                  MTR_LOG_DEFAULT("%@ completion error %@ endWork", logPrefix, error);
-                                                  [workItem endWork];
-                                              }
-                                          }];
+            // Sanity check
+            if (readRequests.count == 0) {
+                MTR_LOG_ERROR("%@ dequeueWorkItem no read requests", logPrefix);
+                [workItem endWork];
+                return;
+            }
+
+            // Build the attribute paths from the read requests
+            NSMutableArray * attributePaths = [NSMutableArray array];
+            for (NSArray * readItem in readRequests) {
+                // Sanity check
+                if (readItem.count < 4) {
+                    MTR_LOG_ERROR("%@ dequeueWorkItem read item missing info %@", logPrefix, readItem);
+                    [workItem endWork];
+                    return;
+                }
+                [attributePaths addObject:[MTRAttributeRequestPath
+                                              requestPathWithEndpointID:readItem[MTRDeviceReadRequestFieldEndpointIDIndex]
+                                                              clusterID:readItem[MTRDeviceReadRequestFieldClusterIDIndex]
+                                                            attributeID:readItem[MTRDeviceReadRequestFieldAttributeIDIndex]]];
+            }
+            // If param is the NSNull stand-in, then just use nil
+            id readParamObject = readRequests[0][MTRDeviceReadRequestFieldParamsIndex];
+            MTRReadParams * readParams = (![readParamObject isEqual:[NSNull null]]) ? readParamObject : nil;
+
+            MTRBaseDevice * baseDevice = [self newBaseDevice];
+            [baseDevice
+                readAttributePaths:attributePaths
+                        eventPaths:nil
+                            params:readParams
+                             queue:self.queue
+                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                            if (values) {
+                                // Since the format is the same data-value dictionary, this looks like an
+                                // attribute report
+                                MTR_LOG_INFO("%@ completion values %@", logPrefix, values);
+                                [self _handleAttributeReport:values];
+                            }
+
+                            // TODO: better retry logic
+                            if (error && (retryCount < 2)) {
+                                MTR_LOG_ERROR("%@ completion error %@ retryWork %lu", logPrefix, error, (unsigned long) retryCount);
+                                [workItem retryWork];
+                            } else {
+                                MTR_LOG_DEFAULT("%@ completion error %@ endWork", logPrefix, error);
+                                [workItem endWork];
+                            }
+                        }];
         };
         workItem.readyHandler = readyHandler;
+        [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:batchingHandler];
+        [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:duplicateCheckHandler];
         MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncCallbackWorkQueue);
         [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
     }

@@ -256,4 +256,160 @@
     [self waitForExpectations:@[ expectation, cancelExpectation ] timeout:5];
 }
 
+- (void)testBatching
+{
+    XCTestExpectation * workItem1ReadyExpectation = [self expectationWithDescription:@"Work item 1 called"];
+    __block BOOL workItem2BatchingCalled = NO;
+    __block BOOL workItem2ReadyCalled = NO;
+    XCTestExpectation * workItem3ReadyExpectation = [self expectationWithDescription:@"Work item 3 called"];
+
+    MTRAsyncCallbackWorkQueue * workQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:nil queue:dispatch_get_main_queue()];
+
+    // Have a work item sleep so the testing items can queue
+    MTRAsyncCallbackQueueWorkItem * workItem0 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackReadyHandler readyHandler0 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        // Give the following code a chance to enqueue and merge
+        sleep(1);
+        [workItem0 endWork];
+    };
+    workItem0.readyHandler = readyHandler0;
+    // No cancel handler on purpose.
+    [workQueue enqueueWorkItem:workItem0];
+
+    MTRAsyncCallbackQueueWorkItem * workItem1 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackReadyHandler readyHandler1 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        [workItem1ReadyExpectation fulfill];
+        [workItem1 endWork];
+    };
+    workItem1.readyHandler = readyHandler1;
+    [workItem1 setBatchingID:1
+                        data:@(1)
+                     handler:^(id _Nonnull opaqueDataFirst, id _Nonnull opaqueDataSecond, BOOL * _Nonnull fullyMerged) {
+                         XCTAssertEqualObjects(opaqueDataFirst, @(1));
+                         XCTAssertEqualObjects(opaqueDataSecond, @(2));
+                         *fullyMerged = YES;
+                     }];
+    // No cancel handler on purpose.
+    [workQueue enqueueWorkItem:workItem1];
+
+    MTRAsyncCallbackQueueWorkItem * workItem2 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackReadyHandler readyHandler2 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        workItem2ReadyCalled = YES;
+        [workItem2 endWork];
+    };
+    workItem2.readyHandler = readyHandler2;
+    [workItem2 setBatchingID:1
+                        data:@(2)
+                     handler:^(id _Nonnull opaqueDataFirst, id _Nonnull opaqueDataSecond, BOOL * _Nonnull fullyMerged) {
+                         workItem2BatchingCalled = YES;
+                     }];
+    // No cancel handler on purpose.
+    [workQueue enqueueWorkItem:workItem2];
+
+    MTRAsyncCallbackQueueWorkItem * workItem3 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackReadyHandler readyHandler3 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        [workItem3ReadyExpectation fulfill];
+        [workItem3 endWork];
+    };
+    workItem3.readyHandler = readyHandler3;
+    [workQueue enqueueWorkItem:workItem3];
+
+    [self waitForExpectations:@[ workItem1ReadyExpectation, workItem3ReadyExpectation ] timeout:5];
+
+    XCTAssertFalse(workItem2BatchingCalled);
+    XCTAssertFalse(workItem2ReadyCalled);
+}
+
+- (void)testDuplicate
+{
+    XCTestExpectation * workItem0ReadyExpectation = [self expectationWithDescription:@"Work item 0 called"];
+    __block BOOL workItem0ReadyCalled = NO;
+
+    MTRAsyncCallbackWorkQueue * workQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:nil queue:dispatch_get_main_queue()];
+
+    // Have a work item sleep so the testing items can queue
+    MTRAsyncCallbackQueueWorkItem * workItem0 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackReadyHandler readyHandler0 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        // Give the following code a chance to enqueue and check for duplicates
+        sleep(1);
+        [workItem0 endWork];
+        [workItem0ReadyExpectation fulfill];
+    };
+    workItem0.readyHandler = readyHandler0;
+    // No cancel handler on purpose.
+    [workQueue enqueueWorkItem:workItem0];
+
+    MTRAsyncCallbackQueueWorkItem * workItem1 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackReadyHandler readyHandler1 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        [workItem1 endWork];
+    };
+    workItem1.readyHandler = readyHandler1;
+    [workItem1 setDuplicateTypeID:1
+                          handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate) {
+                              if ([opaqueItemData isEqual:@(1)]) {
+                                  *isDuplicate = YES;
+                              } else {
+                                  *isDuplicate = NO;
+                              }
+                          }];
+    // No cancel handler on purpose.
+    [workQueue enqueueWorkItem:workItem1];
+
+    MTRAsyncCallbackQueueWorkItem * workItem2 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackReadyHandler readyHandler2 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        [workItem2 endWork];
+    };
+    workItem2.readyHandler = readyHandler2;
+    [workItem2 setDuplicateTypeID:1
+                          handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate) {
+                              if ([opaqueItemData isEqual:@(2)]) {
+                                  *isDuplicate = YES;
+                              } else {
+                                  *isDuplicate = NO;
+                              }
+                          }];
+    // No cancel handler on purpose.
+    [workQueue enqueueWorkItem:workItem2];
+
+    MTRAsyncCallbackQueueWorkItem * workItem3 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    MTRAsyncCallbackReadyHandler readyHandler3 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        [workItem3 endWork];
+    };
+    workItem3.readyHandler = readyHandler3;
+    [workItem3 setDuplicateTypeID:2
+                          handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate) {
+                              if ([opaqueItemData isEqual:@(1)]) {
+                                  *isDuplicate = YES;
+                              } else {
+                                  *isDuplicate = NO;
+                              }
+                          }];
+    [workQueue enqueueWorkItem:workItem3];
+
+    // At this point we should have duplicate type 1 with data @(1) and @(2), and type 2 with data @(1).
+
+    XCTAssertTrue([workQueue isDuplicateForTypeID:1 workItemData:@(1)]);
+    XCTAssertTrue([workQueue isDuplicateForTypeID:1 workItemData:@(2)]);
+    XCTAssertTrue([workQueue isDuplicateForTypeID:2 workItemData:@(1)]);
+
+    XCTAssertFalse([workQueue isDuplicateForTypeID:0 workItemData:@(1)]);
+    XCTAssertFalse([workQueue isDuplicateForTypeID:0 workItemData:@(2)]);
+    XCTAssertFalse([workQueue isDuplicateForTypeID:1 workItemData:@(0)]);
+    XCTAssertFalse([workQueue isDuplicateForTypeID:1 workItemData:@(3)]);
+    XCTAssertFalse([workQueue isDuplicateForTypeID:2 workItemData:@(2)]);
+
+    // double check that items 1~3 have not processed yet because of item 0's sleep()
+    XCTAssertFalse(workItem0ReadyCalled);
+
+    [self waitForExpectations:@[ workItem0ReadyExpectation ] timeout:5];
+}
+
 @end

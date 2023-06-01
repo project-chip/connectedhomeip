@@ -18,7 +18,7 @@
 #import <dispatch/dispatch.h>
 #import <os/lock.h>
 
-#import "MTRAsyncCallbackWorkQueue.h"
+#import "MTRAsyncCallbackWorkQueue_Internal.h"
 #import "MTRLogging_Internal.h"
 
 #pragma mark - Class extensions
@@ -169,8 +169,50 @@
         self.runningWorkItemCount = 1;
 
         MTRAsyncCallbackQueueWorkItem * workItem = self.items.firstObject;
+
+        // Check if batching is possible or needed. Only ask work item to batch once for simplicity
+        if (workItem.batchable && workItem.batchingHandler && (workItem.retryCount == 0)) {
+            while (self.items.count >= 2) {
+                MTRAsyncCallbackQueueWorkItem * nextWorkItem = self.items[1];
+                if (!nextWorkItem.batchable || (nextWorkItem.batchingID != workItem.batchingID)) {
+                    // next item is not eligible to merge with this one
+                    break;
+                }
+
+                BOOL fullyMerged = NO;
+                workItem.batchingHandler(workItem.batchableData, nextWorkItem.batchableData, &fullyMerged);
+                MTR_LOG_DEFAULT(
+                    "MTRAsyncCallbackWorkQueue: merged items for batching - fully merged %@", fullyMerged ? @"YES" : @"NO");
+                if (!fullyMerged) {
+                    // if some parts of the next item is
+                    break;
+                }
+
+                [self.items removeObjectAtIndex:1];
+            }
+        }
+
         [workItem callReadyHandlerWithContext:self.context];
     }
+}
+
+- (BOOL)isDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData
+{
+    os_unfair_lock_lock(&_lock);
+    int i = 0;
+    for (MTRAsyncCallbackQueueWorkItem * item in self.items) {
+        BOOL isDuplicate = NO;
+        if (item.supportsDuplicateCheck && (item.duplicateTypeID == opaqueDuplicateTypeID) && item.duplicateCheckHandler) {
+            item.duplicateCheckHandler(opaqueWorkItemData, &isDuplicate);
+            if (isDuplicate) {
+                os_unfair_lock_unlock(&_lock);
+                return YES;
+            }
+        }
+        i++;
+    }
+    os_unfair_lock_unlock(&_lock);
+    return NO;
 }
 @end
 
@@ -277,4 +319,24 @@
         });
     }
 }
+
+- (void)setBatchingID:(NSUInteger)opaqueBatchingID
+                 data:(id)opaqueBatchableData
+              handler:(MTRAsyncCallbackBatchingHandler)batchingHandler
+{
+    os_unfair_lock_lock(&self->_lock);
+    _batchable = YES;
+    _batchingID = opaqueBatchingID;
+    _batchableData = opaqueBatchableData;
+    _batchingHandler = batchingHandler;
+    os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)setDuplicateTypeID:(NSUInteger)opaqueDuplicateTypeID handler:(MTRAsyncCallbackDuplicateCheckHandler)duplicateCheckHandler
+{
+    _supportsDuplicateCheck = YES;
+    _duplicateTypeID = opaqueDuplicateTypeID;
+    _duplicateCheckHandler = duplicateCheckHandler;
+}
+
 @end

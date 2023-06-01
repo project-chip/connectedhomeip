@@ -28,4 +28,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithContext:(id _Nullable)context queue:(dispatch_queue_t)queue;
 @end
 
+@interface MTRAsyncCallbackQueueWorkItem ()
+// Batching
+@property (nonatomic, readonly) BOOL batchable;
+@property (nonatomic, readonly) NSUInteger batchingID;
+@property (nonatomic, readonly) id batchableData;
+@property (nonatomic, readonly) MTRAsyncCallbackBatchingHandler batchingHandler;
+
+// Duplicate filter
+@property (nonatomic, readonly) BOOL supportsDuplicateCheck;
+@property (nonatomic, readonly) NSUInteger duplicateTypeID;
+@property (nonatomic, readonly) MTRAsyncCallbackDuplicateCheckHandler duplicateCheckHandler;
+@end
+
 NS_ASSUME_NONNULL_END
