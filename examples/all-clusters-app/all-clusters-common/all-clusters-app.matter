@@ -2360,6 +2360,366 @@ server cluster AirQuality = 91 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for monitoring HEPA filters in a device */
+server cluster HepaFilterMonitoring = 113 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for monitoring activated carbon filters in a device */
+server cluster ActivatedCarbonFilterMonitoring = 114 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for monitoring ceramic filters in a device */
+server cluster CeramicFilterMonitoring = 115 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for monitoring electrostatic filters in a device */
+server cluster ElectrostaticFilterMonitoring = 116 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for monitoring UV filters in a device */
+server cluster UvFilterMonitoring = 117 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for monitoring ionizing filters in a device */
+server cluster IonizingFilterMonitoring = 118 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for monitoring zeolite filters in a device */
+server cluster ZeoliteFilterMonitoring = 119 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for monitoring ozone filters in a device */
+server cluster OzoneFilterMonitoring = 120 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for monitoring water tanks in a device */
+server cluster WaterTankMonitoring = 121 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for monitoring fuel tanks in a device */
+server cluster FuelTankMonitoring = 122 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for monitoring ink cartridges in a device */
+server cluster InkCartridgeMonitoring = 123 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for monitoring toner cartridges in a device */
+server cluster TonerCartridgeMonitoring = 124 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** An interface to a generic way to secure a door */
 server cluster DoorLock = 257 {
   enum AlarmCodeEnum : ENUM8 {
@@ -5728,6 +6088,162 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 15;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster HepaFilterMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ActivatedCarbonFilterMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster CeramicFilterMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ElectrostaticFilterMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UvFilterMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster IonizingFilterMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ZeoliteFilterMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OzoneFilterMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster WaterTankMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster FuelTankMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster InkCartridgeMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster TonerCartridgeMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
   }
 
