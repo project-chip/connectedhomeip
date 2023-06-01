@@ -101,6 +101,7 @@ public:
         uint8_t finalHue;
         uint16_t stepsRemaining;
         uint16_t stepsTotal;
+        uint16_t timeRemaining;
         uint16_t initialEnhancedHue;
         uint16_t currentEnhancedHue;
         uint16_t finalEnhancedHue;
@@ -117,6 +118,7 @@ public:
         uint16_t finalValue;
         uint16_t stepsRemaining;
         uint16_t stepsTotal;
+        uint16_t timeRemaining;
         uint16_t lowLimit;
         uint16_t highLimit;
         chip::EndpointId endpoint;
