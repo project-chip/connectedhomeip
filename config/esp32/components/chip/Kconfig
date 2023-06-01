@@ -121,7 +121,6 @@ menu "CHIP Core"
             default n
             help
                 Option to enable/disable CHIP log level filtering APIs.
-                By default these APIs are enabled.
 
     endmenu # "General Options"
 
