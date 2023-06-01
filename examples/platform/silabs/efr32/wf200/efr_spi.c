@@ -143,10 +143,7 @@ sl_status_t sl_wfx_host_deinit_bus(void)
 sl_status_t sl_wfx_host_spi_cs_assert()
 {
 #if defined(EFR32MG24)
-    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
-    {
-        return SL_STATUS_TIMEOUT;
-    }
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     SPIDRV_ReInit(SL_SPIDRV_EXP_BITRATE_MULTIPLEXED);
 #endif /* EFR32MG24 */
     GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
@@ -267,11 +264,7 @@ sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_
         MY_USART->CMD = USART_CMD_CLEARRX | USART_CMD_CLEARTX;
         // Reset the semaphore
         configASSERT(spi_sem);
-        if (xSemaphoreTake(spi_sem, portMAX_DELAY) != pdTRUE)
-        {
-            return SL_STATUS_TIMEOUT;
-        }
-
+        xSemaphoreTake(spi_sem, portMAX_DELAY);
         if (is_read)
         {
             receiveDMA(buffer, buffer_length);
@@ -281,10 +274,7 @@ sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_
             transmitDMA(buffer, buffer_length);
         }
         // wait for dma_complete by using the same spi_semaphore
-        if (xSemaphoreTake(spi_sem, portMAX_DELAY) != pdTRUE)
-        {
-            return SL_STATUS_TIMEOUT;
-        }
+        xSemaphoreTake(spi_sem, portMAX_DELAY);
         xSemaphoreGive(spi_sem);
     }
     return SL_STATUS_OK;
@@ -414,10 +404,7 @@ void sl_wfx_host_spiflash_cs_deassert(void)
 
 void sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
-    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
-    {
-        return;
-    }
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     /*
      * Assert CS pin for EXT SPI Flash
      */
@@ -436,10 +423,7 @@ void sl_wfx_host_post_bootloader_spi_transfer(void)
 
 void sl_wfx_host_pre_lcd_spi_transfer(void)
 {
-    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
-    {
-        return;
-    }
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     SPIDRV_ReInit(SL_SPIDRV_LCD_BITRATE);
     /*LCD CS is handled as part of LCD gsdk*/
 }
@@ -460,10 +444,7 @@ void sl_wfx_host_pre_uart_transfer(void)
     }
     sl_wfx_disable_irq();
     sl_wfx_host_disable_platform_interrupt();
-    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
-    {
-        return;
-    }
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
 }
 

@@ -189,10 +189,7 @@ void SPIDRV_ReInit(uint32_t baudrate)
 
 sl_status_t sl_wfx_host_spi_cs_assert(void)
 {
-    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
-    {
-        return SL_STATUS_TIMEOUT;
-    }
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 
     if (!spi_enabled) // Reduce SPIDRV_Init
     {
@@ -228,10 +225,7 @@ void sl_wfx_host_spiflash_cs_deassert(void)
 
 void sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
-    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
-    {
-        return;
-    }
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     if (spi_enabled)
     {
         SPIDRV_DeInit(SL_SPIDRV_HANDLE);
@@ -263,10 +257,7 @@ void sl_wfx_host_post_bootloader_spi_transfer(void)
 
 void sl_wfx_host_pre_lcd_spi_transfer(void)
 {
-    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
-    {
-        return;
-    }
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     if (spi_enabled)
     {
         SPIDRV_DeInit(SL_SPIDRV_HANDLE);
@@ -335,10 +326,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     (void) mode; // currently not used;
     rsi_error_t rsiError = RSI_ERROR_NONE;
 
-    if (xSemaphoreTake(spiTransferLock, portMAX_DELAY) != pdTRUE)
-    {
-        return RSI_ERROR_SPI_BUSY;
-    }
+    xSemaphoreTake(spiTransferLock, portMAX_DELAY);
 
     // No other task should currently be waiting for the dma completion
     configASSERT(spiInitiatorTaskHandle == NULL);
