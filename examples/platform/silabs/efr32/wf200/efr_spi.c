@@ -144,7 +144,7 @@ sl_status_t sl_wfx_host_spi_cs_assert()
 {
 #if defined(EFR32MG24)
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
-    SPIDRV_ReInit(SL_SPIDRV_EXP_BITRATE_MULTIPLEXED);
+    SPIDRV_SetBaudrate(SL_SPIDRV_EXP_BITRATE_MULTIPLEXED);
 #endif /* EFR32MG24 */
     GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
     return SL_STATUS_OK;
@@ -373,7 +373,7 @@ void sl_wfx_host_gpio_init(void)
 
 #if defined(EFR32MG24)
 
-void SPIDRV_ReInit(uint32_t baudrate)
+void SPIDRV_SetBaudrate(uint32_t baudrate)
 {
     if (USART_BaudrateGet(MY_USART) == baudrate)
     {
@@ -408,7 +408,7 @@ void sl_wfx_host_pre_bootloader_spi_transfer(void)
     /*
      * Assert CS pin for EXT SPI Flash
      */
-    SPIDRV_ReInit(SL_SPIDRV_MX25_FLASH_BITRATE);
+    SPIDRV_SetBaudrate(SL_SPIDRV_MX25_FLASH_BITRATE);
     sl_wfx_host_spiflash_cs_assert();
 }
 
@@ -424,7 +424,7 @@ void sl_wfx_host_post_bootloader_spi_transfer(void)
 void sl_wfx_host_pre_lcd_spi_transfer(void)
 {
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
-    SPIDRV_ReInit(SL_SPIDRV_LCD_BITRATE);
+    SPIDRV_SetBaudrate(SL_SPIDRV_LCD_BITRATE);
     /*LCD CS is handled as part of LCD gsdk*/
 }
 

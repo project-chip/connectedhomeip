@@ -60,13 +60,13 @@ extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 #endif
 
 /****************************************************************************
- * @fn  void SPIDRV_ReInit()
+ * @fn  void SPIDRV_SetBaudrate()
  * @brief
- *     Re-Intializes SPI driver to required baudrate
+ *     Sets the SPI driver to required baudrate
  * @param[in] None
  * @return returns void
  *****************************************************************************/
-void SPIDRV_ReInit(uint32_t);
+void SPIDRV_SetBaudrate(uint32_t);
 
 #if defined(RS911X_WIFI)
 /****************************************************************************

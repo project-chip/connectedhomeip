@@ -177,7 +177,7 @@ void rsi_hal_board_init(void)
 
 #if defined(EFR32MG24)
 
-void SPIDRV_ReInit(uint32_t baudrate)
+void SPIDRV_SetBaudrate(uint32_t baudrate)
 {
     if (EUSART_BaudrateGet(MY_USART) == baudrate)
     {
