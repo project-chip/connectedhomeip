@@ -164,7 +164,6 @@ function(chip_zapgen TARGET_NAME)
                 "${CHIP_ROOT}/src/app/zap-templates/partials/header.zapt"
                 "${CHIP_ROOT}/src/app/zap-templates/partials/im_command_handler_cluster_commands.zapt"
                 "${CHIP_ROOT}/src/app/zap-templates/templates/app/access.zapt"
-                "${CHIP_ROOT}/src/app/zap-templates/templates/app/CHIPClientCallbacks.zapt"
                 "${CHIP_ROOT}/src/app/zap-templates/templates/app/CHIPClusters.zapt"
                 "${CHIP_ROOT}/src/app/zap-templates/templates/app/endpoint_config.zapt"
                 "${CHIP_ROOT}/src/app/zap-templates/templates/app/gen_config.zapt"

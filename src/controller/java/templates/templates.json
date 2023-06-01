@@ -88,6 +88,11 @@
             "path": "ClusterInfo-java.zapt",
             "name": "Cluster information mapping for Java",
             "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterInfoMapping.java"
+        },
+        {
+            "path": "templates/app/CHIPClientCallbacks.zapt",
+            "name": "CHIP Client Callbacks header",
+            "output": "CHIPClientCallbacks.h"
         }
     ]
 }
