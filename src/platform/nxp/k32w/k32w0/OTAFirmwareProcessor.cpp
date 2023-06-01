@@ -18,36 +18,41 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
-#include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
-#include <platform/nxp/k32w/k32w0/OTAApplicationProcessor.h>
+#include <platform/nxp/k32w/k32w0/OTAFirmwareProcessor.h>
 
 #include "OtaSupport.h"
 #include "OtaUtils.h"
 
 namespace chip {
 
-CHIP_ERROR OTAApplicationProcessor::Init()
+CHIP_ERROR OTAFirmwareProcessor::Init()
 {
-    mAccumulator.Init(sizeof(AppDescriptor));
-
+    ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
+    mAccumulator.Init(sizeof(Descriptor));
     ReturnErrorCodeIf(gOtaSuccess_c != OTA_ClientInit(), CHIP_OTA_PROCESSOR_CLIENT_INIT);
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(AppDescriptor)), CHIP_ERROR_INTERNAL);
+
+    auto offset = OTA_GetCurrentEepromAddressOffset();
+    if (offset != 0)
+    {
+        offset += 1;
+    }
+
+    ReturnErrorCodeIf(OTA_UTILS_IMAGE_INVALID_ADDR == OTA_SetStartEepromOffset(offset), CHIP_OTA_PROCESSOR_EEPROM_OFFSET);
+    ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_OTA_PROCESSOR_START_IMAGE);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAApplicationProcessor::Clear()
+CHIP_ERROR OTAFirmwareProcessor::Clear()
 {
+    OTATlvProcessor::ClearInternal();
     mAccumulator.Clear();
-    mLength              = 0;
-    mProcessedLength     = 0;
-    mWasSelected         = false;
     mDescriptorProcessed = false;
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAApplicationProcessor::ProcessInternal(ByteSpan & block)
+CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
     if (!mDescriptorProcessed)
     {
@@ -71,11 +76,10 @@ CHIP_ERROR OTAApplicationProcessor::ProcessInternal(ByteSpan & block)
     return CHIP_OTA_FETCH_ALREADY_SCHEDULED;
 }
 
-CHIP_ERROR OTAApplicationProcessor::ProcessDescriptor(ByteSpan & block)
+CHIP_ERROR OTAFirmwareProcessor::ProcessDescriptor(ByteSpan & block)
 {
     ReturnErrorOnFailure(mAccumulator.Accumulate(block));
-
-    // TODO: use accumulator data in some way. What should be done with AppDescriptor data?
+    ReturnErrorOnFailure(mCallbackProcessDescriptor(static_cast<void *>(mAccumulator.data())));
 
     mDescriptorProcessed = true;
     mAccumulator.Clear();
@@ -83,27 +87,38 @@ CHIP_ERROR OTAApplicationProcessor::ProcessDescriptor(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAApplicationProcessor::ApplyAction()
+CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
+{
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTAFirmwareProcessor::AbortAction()
+{
+    OTA_CancelImage();
+    OTA_ResetCustomEntries();
+    OTA_ResetCurrentEepromAddress();
+    OTA_SetStartEepromOffset(0);
+    Clear();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTAFirmwareProcessor::ExitAction()
 {
     if (OTA_CommitImage(NULL) != gOtaSuccess_c)
     {
-        ChipLogError(SoftwareUpdate, "Failed to commit application image.");
+        ChipLogError(SoftwareUpdate, "Failed to commit firmware image.");
         return CHIP_OTA_PROCESSOR_IMG_COMMIT;
     }
 
     if (OTA_ImageAuthenticate() != gOtaImageAuthPass_c)
     {
-        ChipLogError(SoftwareUpdate, "Failed to authenticate application image.");
+        ChipLogError(SoftwareUpdate, "Failed to authenticate firmware image.");
         return CHIP_OTA_PROCESSOR_IMG_AUTH;
     }
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OTAApplicationProcessor::AbortAction()
-{
-    OTA_CancelImage();
-    Clear();
+    OTA_AddNewImageFlag();
 
     return CHIP_NO_ERROR;
 }

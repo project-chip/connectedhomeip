@@ -23,20 +23,21 @@
 
 namespace chip {
 
-struct AppDescriptor
-{
-    uint32_t version;
-    char versionString[kVersionStringSize];
-    char buildDate[kBuildDateSize];
-};
-
-class OTAApplicationProcessor : public OTATlvProcessor
+class OTAFirmwareProcessor : public OTATlvProcessor
 {
 public:
+    struct Descriptor
+    {
+        uint32_t version;
+        char versionString[kVersionStringSize];
+        char buildDate[kBuildDateSize];
+    };
+
     CHIP_ERROR Init() override;
     CHIP_ERROR Clear() override;
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR AbortAction() override;
+    CHIP_ERROR ExitAction() override;
 
 private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
