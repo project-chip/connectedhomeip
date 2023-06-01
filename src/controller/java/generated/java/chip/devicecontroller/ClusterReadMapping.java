@@ -10072,6 +10072,17 @@ public class ClusterReadMapping {
           readFanControlWindSettingCommandParams
         );
         result.put("readWindSettingAttribute", readFanControlWindSettingAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readFanControlAirflowDirectionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readFanControlAirflowDirectionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.FanControlCluster) cluster).readAirflowDirectionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readFanControlAirflowDirectionCommandParams
+        );
+        result.put("readAirflowDirectionAttribute", readFanControlAirflowDirectionAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readFanControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readFanControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

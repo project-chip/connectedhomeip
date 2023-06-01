@@ -160,19 +160,13 @@ template("chip_data_model") {
       "${_app_root}/clusters/identify-server/identify-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
-      "${_app_root}/clusters/scenes/ExtensionFieldSets.h",
-      "${_app_root}/clusters/scenes/ExtensionFieldSetsImpl.cpp",
-      "${_app_root}/clusters/scenes/ExtensionFieldSetsImpl.h",
-      "${_app_root}/clusters/scenes/SceneTable.h",
-      "${_app_root}/clusters/scenes/SceneTableImpl.cpp",
-      "${_app_root}/clusters/scenes/SceneTableImpl.h",
-      "${_app_root}/clusters/scenes/scenes-tokens.h",
-      "${_app_root}/clusters/scenes/scenes.h",
-
-      # Disable CM cluster table tests until update is done
-      # https://github.com/project-chip/connectedhomeip/issues/24425
-      # "${_app_root}/util/ClientMonitoringRegistrationTable.cpp",
-      # "${_app_root}/util/ClientMonitoringRegistrationTable.h",
+      "${_app_root}/clusters/scenes-server/ExtensionFieldSets.h",
+      "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.h",
+      "${_app_root}/clusters/scenes-server/SceneTable.h",
+      "${_app_root}/clusters/scenes-server/SceneTableImpl.h",
+      "${_app_root}/clusters/scenes-server/scenes-server.h",
+      "${_app_root}/util/ClientMonitoringRegistrationTable.cpp",
+      "${_app_root}/util/ClientMonitoringRegistrationTable.h",
       "${_app_root}/util/DataModelHandler.cpp",
       "${_app_root}/util/attribute-size-util.cpp",
       "${_app_root}/util/attribute-storage.cpp",
@@ -257,6 +251,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/BindingManager.h",
           "${_app_root}/clusters/${cluster}/PendingNotificationMap.cpp",
           "${_app_root}/clusters/${cluster}/PendingNotificationMap.h",
+        ]
+      } else if (cluster == "scenes-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
+          "${_app_root}/clusters/scenes-server/SceneTableImpl.cpp",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]

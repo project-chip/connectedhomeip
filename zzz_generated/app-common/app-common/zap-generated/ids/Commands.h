@@ -997,6 +997,16 @@ static constexpr CommandId Id = 0x00000003;
 } // namespace Commands
 } // namespace Thermostat
 
+namespace FanControl {
+namespace Commands {
+
+namespace Step {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Step
+
+} // namespace Commands
+} // namespace FanControl
+
 namespace ColorControl {
 namespace Commands {
 

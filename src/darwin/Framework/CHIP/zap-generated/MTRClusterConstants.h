@@ -5273,6 +5273,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = 0x00000009,
     MTRAttributeIDTypeClusterFanControlAttributeWindSettingID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x0000000A,
+    MTRAttributeIDTypeClusterFanControlAttributeAirflowDirectionID MTR_NEWLY_AVAILABLE = 0x0000000B,
     MTRAttributeIDTypeClusterFanControlAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
@@ -10473,6 +10474,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     = 0x00000002,
     MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000003,
+
+    // Cluster FanControl deprecated command id names
+
+    // Cluster FanControl commands
+    MTRCommandIDTypeClusterFanControlCommandStepID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster ColorControl deprecated command id names
     MTRClusterColorControlCommandMoveToHueID MTR_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveToHueID",

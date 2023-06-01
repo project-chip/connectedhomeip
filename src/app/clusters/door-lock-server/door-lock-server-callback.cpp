@@ -58,6 +58,13 @@ emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Opti
     return false;
 }
 
+bool __attribute__((weak))
+emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, OperationErrorEnum & err)
+{
+    err = OperationErrorEnum::kUnspecified;
+    return false;
+}
+
 void __attribute__((weak)) emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId) {}
 
 // =============================================================================
