@@ -36,23 +36,11 @@ CHIP_ERROR SmokeCoAlarmManager::Init()
 
 bool SmokeCoAlarmManager::StartSelfTesting()
 {
-    bool mTestInProgress = false;
-
-    // Read current TestInProgress value on endpoint one.
-    bool success = SmokeCoAlarmServer::Instance().GetTestInProgress(1, mTestInProgress);
-
-    if (!success || mTestInProgress)
-    {
-        return false;
-    }
-
-    success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, true);
+    bool success = true;
 
     SILABS_LOG("Start self-testing!");
 
     SILABS_LOG("End self-testing!");
-
-    success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
 
     return success;
 }

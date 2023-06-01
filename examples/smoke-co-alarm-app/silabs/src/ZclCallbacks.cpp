@@ -40,6 +40,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
     if (clusterId == SmokeCoAlarm::Id && attributeId == SmokeCoAlarm::Attributes::ExpressedState::Id)
     {
+        static_assert(sizeof(SmokeCoAlarm::ExpressedStateEnum) == 1, "Wrong size");
         SmokeCoAlarm::ExpressedStateEnum expressedState = *(reinterpret_cast<SmokeCoAlarm::ExpressedStateEnum *>(value));
         ChipLogProgress(Zcl, "Smoke CO Alarm cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
                         to_underlying(expressedState));
@@ -60,7 +61,7 @@ void emberAfSmokeCoAlarmClusterInitCallback(EndpointId endpoint)
     // TODO: implement any additional Cluster Server init actions
 }
 
-bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(chip::EndpointId endpointId)
+bool emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
 {
     return AlarmMgr().StartSelfTesting();
 }

@@ -30,10 +30,6 @@
 #include <app/util/config.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#ifndef SMOKE_CO_ALARM_SERVER_ENDPOINT
-#define SMOKE_CO_ALARM_SERVER_ENDPOINT 1
-#endif
-
 /**
  * @brief Smoke CO Alarm Server Plugin class
  */
@@ -50,18 +46,31 @@ public:
     using MuteStateEnum          = chip::app::Clusters::SmokeCoAlarm::MuteStateEnum;
     using SensitivityEnum        = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
 
-    typedef bool (*RemoteOpHandler)(chip::EndpointId endpointId);
+    /**
+     * For all the functions below, the return value is true on success, false on failure
+     */
 
     /**
-     * @brief Updates the attribute with new value
+     * @brief Updates the expressed state with new value
      *
-     * @note The application is responsible for changing the expression state
+     * @note Only the highest priority alarms for multiple alarm conditions will be set.
+     *       If the value of ExpressedState is not Normal, the attribute corresponding to the value should not be Normal.
      *
      * @param endpointId ID of the endpoint
      * @param newExpressedState new expressed state
      * @return true on success, false on failure
      */
     bool SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum newExpressedState);
+
+    /**
+     * @brief Clear the expressed state with the value
+     *
+     * @param endpointId ID of the endpoint
+     * @param expressedState expressed state
+     * @return true on success, false on failure
+     */
+    bool UnsetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum expressedState);
+
     bool SetSmokeState(chip::EndpointId endpointId, AlarmStateEnum newSmokeState);
     bool SetCOState(chip::EndpointId endpointId, AlarmStateEnum newCOState);
     bool SetBatteryAlert(chip::EndpointId endpointId, AlarmStateEnum newBatteryAlert);
@@ -75,13 +84,6 @@ public:
     bool SetSensitivityLevel(chip::EndpointId endpointId, SensitivityEnum newSensitivityLevel);
     // bool SetExpiryDate(chip::EndpointId endpointId, Date newExpiryDate); // TODO: Date type encoding not defined
 
-    /**
-     * @brief Get the value of the attribute
-     *
-     * @param endpointId ID of the endpoint
-     * @param expressedState Value of expressed state attribute
-     * @return true on success, false on failure
-     */
     bool GetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum & expressedState);
     bool GetSmokeState(chip::EndpointId endpointId, AlarmStateEnum & smokeState);
     bool GetCOState(chip::EndpointId endpointId, AlarmStateEnum & coState);
@@ -102,6 +104,15 @@ public:
 
     inline bool SupportsCOAlarm(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kCoAlarm); }
 
+    /**
+     * @brief ExpressedState priority, the priority order of conditions is determined by the manufacturer
+     */
+    std::array<ExpressedStateEnum, 9> expressedStatePriority{
+        ExpressedStateEnum::kEndOfService,      ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kCOAlarm,
+        ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,
+        ExpressedStateEnum::kBatteryAlert,      ExpressedStateEnum::kTesting,        ExpressedStateEnum::kNormal,
+    };
+
 private:
     /**
      * @brief Common handler for SelfTestRequest commands
@@ -111,8 +122,7 @@ private:
      * @return true         if successful
      * @return false        if error happened
      */
-    bool HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                     RemoteOpHandler opHandler);
+    bool HandleRemoteSelfTestRequest(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
 
     /**
      * @brief Send generic event
@@ -158,6 +168,11 @@ private:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
 
+    /**
+     * @brief Expression status record values
+     */
+    int expressedStateMask = 1;
+
     static SmokeCoAlarmServer sInstance;
 };
 
@@ -170,7 +185,6 @@ private:
  * @brief User handler for SelfTestRequest command (server)
  *
  * @param   endpointId      endpoint for which SelfTestRequest command is called
- * @param   err             error code if self-test request failed (set only if retval==false)
  *
  * @retval true on success
  * @retval false if error happened (err should be set to appropriate error code)
