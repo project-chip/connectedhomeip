@@ -1324,9 +1324,9 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
 namespace {
 // wpa_supplicant's scan results don't contains the channel infomation, so we need this lookup table for resolving the band and
 // channel infomation.
-std::pair<WiFiBand, uint16_t> GetBandAndChannelFromFrequency(uint32_t freq)
+std::pair<WiFiBandEnum, uint16_t> GetBandAndChannelFromFrequency(uint32_t freq)
 {
-    std::pair<WiFiBand, uint16_t> ret = std::make_pair(WiFiBand::k2g4, 0);
+    std::pair<WiFiBandEnum, uint16_t> ret = std::make_pair(WiFiBand::k2g4, 0);
     if (freq <= 931)
     {
         ret.first = WiFiBand::k1g;

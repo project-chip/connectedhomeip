@@ -9293,8 +9293,8 @@ CHIPNetworkCommissioningNetworksAttributeCallback::~CHIPNetworkCommissioningNetw
 
 void CHIPNetworkCommissioningNetworksAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
-        list)
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9335,23 +9335,24 @@ void CHIPNetworkCommissioningNetworksAttributeCallback::CallbackFn(
                                                                    newElement_0_connectedCtorSignature.c_str(), entry_0.connected,
                                                                    newElement_0_connected);
 
-        jclass networkInfoStructClass_1;
+        jclass networkInfoStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterNetworkInfo", networkInfoStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterNetworkInfoStruct", networkInfoStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterNetworkInfo");
+            ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterNetworkInfoStruct");
             return;
         }
-        jmethodID networkInfoStructCtor_1 = env->GetMethodID(networkInfoStructClass_1, "<init>", "([BLjava/lang/Boolean;)V");
-        if (networkInfoStructCtor_1 == nullptr)
+        jmethodID networkInfoStructStructCtor_1 =
+            env->GetMethodID(networkInfoStructStructClass_1, "<init>", "([BLjava/lang/Boolean;)V");
+        if (networkInfoStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterNetworkInfo constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterNetworkInfoStruct constructor");
             return;
         }
 
-        newElement_0 =
-            env->NewObject(networkInfoStructClass_1, networkInfoStructCtor_1, newElement_0_networkID, newElement_0_connected);
+        newElement_0 = env->NewObject(networkInfoStructStructClass_1, networkInfoStructStructCtor_1, newElement_0_networkID,
+                                      newElement_0_connected);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 
@@ -9391,7 +9392,7 @@ CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback::~CHIPNetworkCommi
 
 void CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
