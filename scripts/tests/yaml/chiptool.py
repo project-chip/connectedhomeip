@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import relative_importer  # isort: split # noqa: F401
+from . import relative_importer  # isort: split # noqa: F401
 
 import asyncio
 import json
