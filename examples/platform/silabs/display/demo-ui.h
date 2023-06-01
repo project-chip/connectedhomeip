@@ -26,6 +26,7 @@ extern "C" {
 #endif
 
 #include "glib.h"
+#include "sl_status.h"
 /**************************************************************************/
 /**
  * DEMO UI uses the underlying DMD interface and the
@@ -147,9 +148,9 @@ void demoUIClearMainScreen(uint8_t * name);
  *   Clear the Lcd screen and display the main screen.
  *
  * @return
- *      Returns DMD_OK if successful, error otherwise.
+ *      Returns SL_STATUS_OK if successful, error otherwise.
  *****************************************************************************/
-EMSTATUS updateDisplay(void);
+sl_status_t updateDisplay(void);
 
 #ifdef __cplusplus
 }

@@ -120,9 +120,7 @@ int SilabsLCD::DrawPixel(void * pContext, int32_t x, int32_t y)
 
 int SilabsLCD::Update(void)
 {
-    int status;
-    status = static_cast<int>(updateDisplay());
-    return status;
+    return updateDisplay();
 }
 
 void SilabsLCD::WriteDemoUI(bool state)

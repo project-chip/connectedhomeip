@@ -100,16 +100,18 @@ void demoUIInit(GLIB_Context_t * context)
     memcpy(&glibContext, context, sizeof(GLIB_Context_t));
 }
 
-EMSTATUS updateDisplay(void)
+sl_status_t updateDisplay(void)
 {
 #if (defined(EFR32MG24) && defined(SL_WIFI))
     sl_wfx_host_pre_lcd_spi_transfer();
 #endif
-    EMSTATUS status = DMD_updateDisplay();
+    sl_status_t status = DMD_updateDisplay();
 #if (defined(EFR32MG24) && defined(SL_WIFI))
     sl_wfx_host_post_lcd_spi_transfer();
 #endif
-    return status;
+    if (status != DMD_OK)
+        return SL_STATUS_FAIL;
+    return SL_STATUS_OK;
 }
 
 void demoUIDisplayHeader(char * name)
