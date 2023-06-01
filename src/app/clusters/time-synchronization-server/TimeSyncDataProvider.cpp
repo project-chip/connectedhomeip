@@ -24,7 +24,7 @@ namespace chip {
 constexpr size_t kTrustedTimeSourceMaxSerializedSize =
     TLV::EstimateStructOverhead(sizeof(chip::FabricIndex), sizeof(chip::NodeId), sizeof(chip::EndpointId));
 constexpr size_t kTimeZoneMaxSerializedSize =
-    TLV::EstimateStructOverhead(sizeof(int32_t), sizeof(uint64_t)) + 64; // 64 for name field
+    TLV::EstimateStructOverhead(sizeof(int32_t), sizeof(uint64_t), 64); // 64 for name field
 constexpr size_t kDSTOffsetMaxSerializedSize = TLV::EstimateStructOverhead(sizeof(int32_t), sizeof(uint64_t), sizeof(uint64_t));
 
 // Multiply the serialized size by the maximum number of list size and add 2 bytes for the array start and end.
