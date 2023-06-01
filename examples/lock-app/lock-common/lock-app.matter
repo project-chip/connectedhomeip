@@ -2601,7 +2601,7 @@ endpoint 1 {
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute requirePINforRemoteOperation default = 0;
     ram      attribute featureMap default = 0x1DB3;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 7;
   }
 }
 

@@ -43,7 +43,10 @@ declare_args() {
   use_custom_factory_provider = 0
   chip_crypto_flavor = "NXP-Ultrafast-P256"
   chip_reduce_ssbl_size = false
-  chip_enable_ota_default_processors = 1
+  chip_enable_ota_firmware_processor = 1
+  chip_enable_ota_factory_data_processor = 0
+  chip_with_pdm_encryption = 1
+  ota_custom_entry_address = "0x000C1000"
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -80,6 +83,16 @@ template("k32w0_sdk") {
   assert(
       use_custom_factory_provider == 0 || chip_with_factory_data == 1,
       "Please set chip_with_factory_data=1 if using custom factory provider.")
+
+  assert(
+      chip_enable_ota_factory_data_processor == 0 ||
+          chip_enable_ota_firmware_processor == 1,
+      "Please set chip_enable_ota_firmware_processor=1 if using default factory data processor.")
+
+  assert(
+      chip_enable_ota_factory_data_processor == 0 ||
+          chip_with_factory_data == 1,
+      "Please set chip_with_factory_data=1 if using default factory data processor.")
 
   if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
       build_for_k32w041 == 1) {
@@ -125,7 +138,10 @@ template("k32w0_sdk") {
   print("increased TX power:", chip_with_high_power)
   print("FRO32k: ", use_fro_32k)
   print("low power: ", chip_with_low_power)
-  print("OTA default processors: ", chip_enable_ota_default_processors)
+  print("OTA default firmware processor: ", chip_enable_ota_firmware_processor)
+  print("OTA default factory data processor: ",
+        chip_enable_ota_factory_data_processor)
+  print("PDM Encryption: ", chip_with_pdm_encryption)
 
   if (chip_with_low_power == 1 && chip_logging == true) {
     print(
@@ -237,14 +253,8 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/middleware/wireless/ieee-802.15.4/lib/libMiniMac_Sched.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/PDM/Library/libPDM_extFlash.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/XCVR/lib/libRadio.a",
+      "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a",
     ]
-
-    if (chip_crypto == "platform" &&
-        chip_crypto_flavor == "NXP-Ultrafast-P256") {
-      libs += [ "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4_dspext.a" ]
-    } else {
-      libs += [ "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a" ]
-    }
 
     defines = [
       "gPWR_CpuClk_48MHz=1",
@@ -262,7 +272,7 @@ template("k32w0_sdk") {
       "USE_SDK_OSA=0",
       "gSerialManagerMaxInterfaces_c=2",
       "FSL_RTOS_FREE_RTOS=1",
-      "gTotalHeapSize_c=0x10000",
+      "gTotalHeapSize_c=0xF000",
       "DEBUG_SERIAL_INTERFACE_INSTANCE=0",
       "APP_SERIAL_INTERFACE_INSTANCE=1",
       "gOTA_externalFlash_d=1",
@@ -272,7 +282,6 @@ template("k32w0_sdk") {
       "gExternalFlashIsCiphered_d=1",
       "PDM_USE_DYNAMIC_MEMORY=1",
       "PDM_SAVE_IDLE=1",
-      "PDM_ENCRYPTION=1",
       "gBootData_None_c=1",
       "PROGRAM_PAGE_SZ=256",
       "configFRTOS_MEMORY_SCHEME=4",
@@ -305,6 +314,21 @@ template("k32w0_sdk") {
       "gResetSystemReset_d=1",
     ]
 
+    # If OTA default processors are enabled, then OTA custom entry structure
+    # will be saved in external flash: gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash (1)
+    if (chip_enable_ota_firmware_processor == 1) {
+      defines += [
+        "gOTAAllowCustomStartAddress=1",
+        "gOTAUseCustomOtaEntry=1",
+        "gOTACustomOtaEntryMemory=1",
+        "OTA_ENTRY_TOP_ADDR=${ota_custom_entry_address}",
+      ]
+
+      if (chip_enable_ota_factory_data_processor == 1) {
+        defines += [ "CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR=1" ]
+      }
+    }
+
     if (chip_crypto == "platform" &&
         chip_crypto_flavor == "NXP-Ultrafast-P256") {
       defines += [ "EC_P256_DSPEXT=1" ]
@@ -314,6 +338,12 @@ template("k32w0_sdk") {
       defines += [ "gClkUseFro32K=1" ]
     } else {
       defines += [ "gClkUseFro32K=0" ]
+    }
+
+    if (chip_with_pdm_encryption == 1) {
+      defines += [ "PDM_ENCRYPTION=1" ]
+    } else {
+      defines += [ "PDM_ENCRYPTION=0" ]
     }
 
     if (chip_mdns == "platform") {
@@ -427,10 +457,6 @@ template("k32w0_sdk") {
 
     if (chip_with_factory_data == 1) {
       defines += [ "CONFIG_CHIP_K32W0_REAL_FACTORY_DATA=1" ]
-    }
-
-    if (chip_enable_ota_default_processors == 1) {
-      defines += [ "CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS=1" ]
     }
 
     if (defined(invoker.defines)) {
