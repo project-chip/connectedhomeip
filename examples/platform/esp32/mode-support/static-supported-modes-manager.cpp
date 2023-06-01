@@ -28,7 +28,7 @@ using namespace chip::app::Clusters::ModeSelect;
 using chip::Protocols::InteractionModel::Status;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-using ModeTag          = Structs::ModeTagStruct::Type;
+using ModeTag              = Structs::ModeTagStruct::Type;
 template <typename T>
 using List = app::DataModel::List<T>;
 
@@ -52,7 +52,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
     }
 
     ModeOptionStructType * modeOptionStructList = nullptr;
-    ModeTag * modeTags                  = nullptr;
+    ModeTag * modeTags                          = nullptr;
 
     char keyBuf[ESP32Config::kMaxConfigKeyNameLength];
     uint32_t supportedModeCount = 0;
@@ -75,7 +75,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
     {
         Structs::ModeOptionStruct::Type option;
         uint32_t supportedModeMode = 0;
-        uint32_t modeTagCount  = 0;
+        uint32_t modeTagCount      = 0;
         size_t outLen              = 0;
 
         memset(keyBuf, 0, sizeof(char) * ESP32Config::kMaxConfigKeyNameLength);
@@ -105,8 +105,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
                             ModeOptionsProvider(nullptr, nullptr), CleanUp(endpointId));
 
         memset(keyBuf, 0, sizeof(char) * ESP32Config::kMaxConfigKeyNameLength);
-        VerifyOrReturnValue(ESP32Config::KeyAllocator::ModeTagsCount(keyBuf, sizeof(keyBuf), endpointId, index) ==
-                                CHIP_NO_ERROR,
+        VerifyOrReturnValue(ESP32Config::KeyAllocator::ModeTagsCount(keyBuf, sizeof(keyBuf), endpointId, index) == CHIP_NO_ERROR,
                             ModeOptionsProvider(nullptr, nullptr), CleanUp(endpointId));
         ESP32Config::Key stCountKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
         VerifyOrReturnValue(ESP32Config::ReadConfigValue(stCountKey, modeTagCount) == CHIP_NO_ERROR,
@@ -141,13 +140,13 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
             VerifyOrReturnValue(ESP32Config::ReadConfigValue(stMfgCodeKey, modeTagMfgCode) == CHIP_NO_ERROR,
                                 ModeOptionsProvider(nullptr, nullptr), CleanUp(endpointId));
 
-            tag.value             = static_cast<uint16_t>(modeTagValue);
-            tag.mfgCode           = static_cast<chip::VendorId>(modeTagMfgCode);
+            tag.value         = static_cast<uint16_t>(modeTagValue);
+            tag.mfgCode       = static_cast<chip::VendorId>(modeTagMfgCode);
             modeTags[stIndex] = tag;
         }
 
-        option.label        = chip::CharSpan::fromCharString(modeLabel);
-        option.mode         = static_cast<uint8_t>(supportedModeMode);
+        option.label    = chip::CharSpan::fromCharString(modeLabel);
+        option.mode     = static_cast<uint8_t>(supportedModeMode);
         option.modeTags = DataModel::List<const ModeTag>(modeTags, modeTagCount);
 
         modeOptionStructList[index] = option;

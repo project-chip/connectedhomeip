@@ -8,17 +8,16 @@ using namespace chip::app::Clusters::ModeSelect;
 using chip::Protocols::InteractionModel::Status;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-using ModeTag          = Structs::ModeTagStruct::Type;
+using ModeTag              = Structs::ModeTagStruct::Type;
 template <typename T>
 using List               = app::DataModel::List<T>;
 using storage_value_type = const ModeOptionStructType;
 namespace {
-Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode,
-                                                      const List<const ModeTag> & modeTags)
+Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode, const List<const ModeTag> & modeTags)
 {
     Structs::ModeOptionStruct::Type option;
-    option.label        = CharSpan::fromCharString(label);
-    option.mode         = mode;
+    option.label    = CharSpan::fromCharString(label);
+    option.mode     = mode;
     option.modeTags = modeTags;
     return option;
 }
