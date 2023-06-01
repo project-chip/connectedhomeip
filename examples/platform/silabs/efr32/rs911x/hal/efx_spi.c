@@ -231,8 +231,8 @@ void sl_wfx_host_pre_bootloader_spi_transfer(void)
         SPIDRV_DeInit(SL_SPIDRV_HANDLE);
         spi_enabled = false;
     }
-    int32_t status = bootloader_init();
     // bootloader_init takes care of SPIDRV_Init()
+    int32_t status = bootloader_init();
     if (status != BOOTLOADER_OK)
     {
         SILABS_LOG("%s: bootloader_init failed with error code: %d", __func__, status);
@@ -243,8 +243,8 @@ void sl_wfx_host_pre_bootloader_spi_transfer(void)
 
 void sl_wfx_host_post_bootloader_spi_transfer(void)
 {
-    int32_t status = bootloader_deinit();
     // bootloader_deinit will do USART disable
+    int32_t status = bootloader_deinit();
     if (status != BOOTLOADER_OK)
     {
         SILABS_LOG("%s: bootloader_deinit failed with error code: %d", __func__, status);
@@ -263,8 +263,8 @@ void sl_wfx_host_pre_lcd_spi_transfer(void)
         SPIDRV_DeInit(SL_SPIDRV_HANDLE);
         spi_enabled = false;
     }
-    sl_memlcd_refresh(sl_memlcd_get());
     // sl_memlcd_refresh takes care of SPIDRV_Init()
+    sl_memlcd_refresh(sl_memlcd_get());
 }
 
 void sl_wfx_host_post_lcd_spi_transfer(void)
