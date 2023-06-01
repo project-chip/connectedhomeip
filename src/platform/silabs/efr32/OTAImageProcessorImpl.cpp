@@ -71,7 +71,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
     if ((block.data() == nullptr) || block.empty())
     {
-        ChipLogError(SoftwareUpdate, "%s: block is empty", __func__);
+        ChipLogError(SoftwareUpdate, "block is empty");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -92,7 +92,6 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "%s: requestor is null", __func__);
         return false;
     }
 
@@ -104,7 +103,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "%s: requestor is null", __func__);
+        ChipLogError(SoftwareUpdate, "requestor is null");
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -128,16 +127,16 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     if (imageProcessor == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "%s: imageProcessor context is null", __func__);
+        ChipLogError(SoftwareUpdate, "imageProcessor context is null");
         return;
     }
     else if (imageProcessor->mDownloader == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "%s: mDownloader is null", __func__);
+        ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
 
-    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
+    ChipLogProgress(SoftwareUpdate, "HandlePrepareDownload: started");
 
     CORE_CRITICAL_SECTION(bootloader_init();)
     mSlotId                                 = 0; // Single slot until we support multiple images
@@ -158,7 +157,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "%s: imageProcessor context is null", __func__);
+        ChipLogError(SoftwareUpdate, "imageProcessor context is null");
         return;
     }
 
@@ -182,7 +181,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 #endif
         if (err)
         {
-            ChipLogError(SoftwareUpdate, "%s: bootloader_eraseWriteStorage() error %ld", __func__, err);
+            ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage() error: %ld", err);
             imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
             return;
         }
@@ -197,7 +196,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
     uint32_t err = SL_BOOTLOADER_OK;
 
-    ChipLogProgress(SoftwareUpdate, "%s: started", __func__);
+    ChipLogProgress(SoftwareUpdate, "HandleApply: started");
 
     // Force KVS to store pending keys such as data from StoreCurrentUpdateInfo()
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
@@ -207,7 +206,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
     if (err != SL_BOOTLOADER_OK)
     {
-        ChipLogError(SoftwareUpdate, "%s: bootloader_verifyImage() error %ld", __func__, err);
+        ChipLogError(SoftwareUpdate, "bootloader_verifyImage() error: %ld", err);
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
 #if (defined(EFR32MG24) && defined(SL_WIFI))
@@ -219,7 +218,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     CORE_CRITICAL_SECTION(err = bootloader_setImageToBootload(mSlotId);)
     if (err != SL_BOOTLOADER_OK)
     {
-        ChipLogError(SoftwareUpdate, "%s: bootloader_setImageToBootload() error %ld", __func__, err);
+        ChipLogError(SoftwareUpdate, "bootloader_setImageToBootload() error: %ld", err);
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
 #if (defined(EFR32MG24) && defined(SL_WIFI))
@@ -240,7 +239,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "%s: imageProcessor context is null", __func__);
+        ChipLogError(SoftwareUpdate, "imageProcessor context is null");
         return;
     }
     // Not clearing the image storage area as it is done during each write
@@ -253,12 +252,12 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "%s: imageProcessor context is null", __func__);
+        ChipLogError(SoftwareUpdate, "imageProcessor context is null");
         return;
     }
     else if (imageProcessor->mDownloader == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "%s: mDownloader is null", __func__);
+        ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
 
@@ -267,7 +266,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     if (chip_error != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Matter image header parser error %s", chip::ErrorStr(chip_error));
+        ChipLogError(SoftwareUpdate, "Matter image header parser error: %s", chip::ErrorStr(chip_error));
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
         return;
     }
@@ -292,7 +291,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 #endif
             if (err)
             {
-                ChipLogError(SoftwareUpdate, "%s: bootloader_eraseWriteStorage() error %ld", __func__, err);
+                ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage() error: %ld", err);
                 imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
                 return;
             }
@@ -340,7 +339,7 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
         mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
         if (mBlock.data() == nullptr)
         {
-            ChipLogError(SoftwareUpdate, "%s: mBlock is null", __func__);
+            ChipLogError(SoftwareUpdate, "mBlock is null");
             return CHIP_ERROR_NO_MEMORY;
         }
     }
