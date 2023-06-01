@@ -51,14 +51,14 @@ def load_all_paa(paa_path: Path) -> dict:
             logging.info(f"Loading PAA: {filename}")
             try:
                 # Load cert
-            paa_der = derfile.read()
-            paa_cert = load_der_x509_certificate(paa_der)
+                paa_der = derfile.read()
+                paa_cert = load_der_x509_certificate(paa_der)
 
-            # Find the subject key identifier (if present), and record it
-            for extension in paa_cert.extensions:
-                if extension.oid == SubjectKeyIdentifier.oid:
-                    skid = extension.value.key_identifier
-                    paa_by_skid[skid] = (Path(filename).name, paa_cert)
+                # Find the subject key identifier (if present), and record it
+                for extension in paa_cert.extensions:
+                    if extension.oid == SubjectKeyIdentifier.oid:
+                        skid = extension.value.key_identifier
+                        paa_by_skid[skid] = (Path(filename).name, paa_cert)
             except (ValueError, IOError) as e:
                 logging.error(f"Failed to load {filename}: {str(e)}")
                 if Path(filename).name not in ALLOWED_SKIPPED_FILENAMES:
