@@ -247,7 +247,6 @@ CHIP_ERROR ConnectivityManagerImpl::_RequestSEDActiveMode(bool onOff, bool delay
 
 void ConnectivityManagerImpl::DriveStationState()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     sl_status_t serr;
     bool stationConnected;
 
@@ -260,8 +259,7 @@ void ConnectivityManagerImpl::DriveStationState()
         // Ensure that the WFX is started.
         if ((serr = wfx_wifi_start()) != SL_STATUS_OK)
         {
-            err = CHIP_ERROR_INTERNAL;
-            ChipLogError(DeviceLayer, "wfx_wifi_start() failed: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "wfx_wifi_start() failed: %x", serr);
             return;
         }
         // Ensure that station mode is enabled in the WFX WiFi layer.
