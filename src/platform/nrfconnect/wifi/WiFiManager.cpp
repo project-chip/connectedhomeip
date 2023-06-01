@@ -215,7 +215,8 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
     if (ret)
     {
         ChipLogError(DeviceLayer, "Scan request failed %d", ret);
-        if(ret == -EBUSY && !workaroundDone){
+        if (ret == -EBUSY && !workaroundDone)
+        {
             // TODO Wi-Fi driver returned an error during recovery.
             // As a workaround schedule the recovery timer one more time in WifiSupplicantWorkaroundTime time.
             // This allows the device to run the Scan method without
