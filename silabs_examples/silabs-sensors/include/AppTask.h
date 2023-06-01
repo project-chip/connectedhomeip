@@ -29,12 +29,10 @@
 #include "AppEvent.h"
 #include "BaseApplication.h"
 #include "FreeRTOS.h"
-#include "LightingManager.h"
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_simple_button_instances.h"
 #endif
 #include "timers.h" // provides FreeRTOS timer support
-#include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -70,6 +68,8 @@ public:
      */
     static void AppTaskMain(void * pvParameter);
 
+    static void SetAppLED(bool state);
+
     CHIP_ERROR StartAppTask();
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     /**
@@ -82,30 +82,10 @@ public:
      */
     void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 #endif
-    /**
-     * @brief Callback called by the identify-server when an identify command is received
-     *
-     * @param identify identify structure the command applies on
-     */
-    static void OnIdentifyStart(Identify * identify);
-
-    /**
-     * @brief Callback called by the identify-server when an identify command is stopped or finished
-     *
-     * @param identify identify structure the command applies on
-     */
-    static void OnIdentifyStop(Identify * identify);
-
-    void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
+    // void PostSensorActionRequest(int32_t aActor, LightingManager::Action_t aAction);
 
 private:
     static AppTask sAppTask;
-
-    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(LightingManager::Action_t aAction);
-    static void LightActionEventHandler(AppEvent * aEvent);
-
-    static void UpdateClusterState(intptr_t context);
 
     /**
      * @brief AppTask initialisation function
@@ -123,11 +103,4 @@ private:
      */
     static void ButtonHandler(AppEvent * aEvent);
 
-    /**
-     * @brief PB1 Button event processing function
-     *        Function triggers a switch action sent to the CHIP task
-     *
-     * @param aEvent button event being processed
-     */
-    static void SwitchActionEventHandler(AppEvent * aEvent);
 };

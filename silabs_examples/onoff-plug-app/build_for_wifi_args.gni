@@ -11,17 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import("//build_overrides/chip.gni")
 import("${chip_root}/config/standalone/args.gni")
-import("${chip_root}/src/platform/silabs/efr32/args.gni")
 
 silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+chip_enable_openthread = false
+import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
-app_data_model =
-    "${chip_root}/silabs_examples/sl-newLight/newLight_DataModel_config"
 chip_enable_ota_requestor = true
-chip_enable_openthread = true
-
-openthread_external_platform =
-    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
+app_data_model =
+    "${chip_root}/silabs_examples/onoff-plug-app/onoff-plug-common"

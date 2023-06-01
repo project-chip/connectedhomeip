@@ -18,11 +18,11 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
 import("${efr32_sdk_build_root}/silabs_executable.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
@@ -31,60 +31,87 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-silabs_project_dir = "${chip_root}/silabs_examples/Direct_Internet_lighting-app/efr32"
-examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+silabs_project_dir = "${chip_root}/silabs_examples/silabs-sensors"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
-if (chip_enable_ble_rs911x) {
-  src_plat_dir = "${chip_root}/src/platform/silabs/efr32"
+if (wifi_soc) {
+  import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+} else {
+  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 }
 
-import("${examples_plat_dir}/args.gni")
+import("${examples_common_plat_dir}/args.gni")
 
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
 }
 
-efr32_sdk("sdk") {
-  sources = [
-    "${silabs_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_plat_dir}/FreeRTOSConfig.h",
-  ]
-
-  include_dirs = [
-    "${chip_root}/src/platform/silabs/efr32",
-    "${silabs_project_dir}/include",
-    "${examples_plat_dir}",
-    "${chip_root}/src/lib",
-    "${examples_common_plat_dir}",
-  ]
-
-  if (use_wf200) {
-    # TODO efr32_sdk should not need a header from this location
-    include_dirs += [ "${examples_plat_dir}/wf200" ]
-  }
-
-  if (chip_enable_ble_rs911x) {
-    # TODO efr32_sdk should not need a header from this location
-    include_dirs += [
-      "${examples_plat_dir}/rs911x",
-      "${examples_plat_dir}/rs911x/hal",
+if (wifi_soc) {
+  siwx917_sdk("sdk") {
+    sources = [
+      "${examples_plat_dir}/FreeRTOSConfig.h",
+      "${silabs_project_dir}/include/CHIPProjectConfig.h",
     ]
-  }
 
-  defines = []
-  if (chip_enable_pw_rpc) {
-    defines += [
-      "HAL_VCOM_ENABLE=1",
-      "PW_RPC_ENABLED",
+    include_dirs = [
+      "${chip_root}/src/platform/silabs/SiWx917",
+      "${silabs_project_dir}/include",
+      "${examples_plat_dir}",
+      "${chip_root}/src/lib",
+      "${examples_common_plat_dir}",
     ]
+
+    defines = []
+    if (chip_enable_pw_rpc) {
+      defines += [
+        "HAL_VCOM_ENABLE=1",
+        "PW_RPC_ENABLED",
+      ]
+    }
+  }
+} else {
+  efr32_sdk("sdk") {
+    sources = [
+      "${silabs_project_dir}/include/CHIPProjectConfig.h",
+      "${examples_plat_dir}/FreeRTOSConfig.h",
+    ]
+
+    include_dirs = [
+      "${chip_root}/src/platform/silabs/efr32",
+      "${silabs_project_dir}/include",
+      "${examples_plat_dir}",
+      "${chip_root}/src/lib",
+      "${examples_common_plat_dir}",
+    ]
+
+    if (use_wf200) {
+      # TODO efr32_sdk should not need a header from this location
+      include_dirs += [ "${examples_plat_dir}/wf200" ]
+    }
+
+    if (chip_enable_ble_rs911x) {
+      # TODO efr32_sdk should not need a header from this location
+      include_dirs += [
+        "${examples_plat_dir}/rs911x",
+        "${examples_plat_dir}/rs911x/hal",
+      ]
+    }
+
+    defines = []
+    if (chip_enable_pw_rpc) {
+      defines += [
+        "HAL_VCOM_ENABLE=1",
+        "PW_RPC_ENABLED",
+      ]
+    }
   }
 }
 
-silabs_executable("Direct_Internet_lighting_app") {
-  output_name = "chip-efr32-Direct_Internet_lighting-example.out"
-   public_configs = []
+silabs_executable("sensors_app") {
+  output_name = "chip-efr32-sensors-example.out"
   include_dirs = [ "include" ]
   defines = []
 
@@ -94,16 +121,21 @@ silabs_executable("Direct_Internet_lighting_app") {
 
   sources = [
     "src/AppTask.cpp",
-    "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
     "${examples_common_plat_dir}/main.cpp",
+    "src/SensorsCallbacks.cpp"
   ]
 
   deps = [
     ":sdk",
-    "${examples_plat_dir}:efr32-common",
     app_data_model,
   ]
+
+  if (wifi_soc) {
+    deps += [ "${examples_plat_dir}:siwx917-common" ]
+  } else {
+    deps += [ "${examples_plat_dir}:efr32-common" ]
+  }
 
   if (chip_enable_pw_rpc) {
     defines += [
@@ -112,7 +144,6 @@ silabs_executable("Direct_Internet_lighting_app") {
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
-      "PW_RPC_LIGHTING_SERVICE=1",
       "PW_RPC_OTCLI_SERVICE=1",
       "PW_RPC_THREAD_SERVICE=1",
       "PW_RPC_TRACING_SERVICE=1",
@@ -136,7 +167,6 @@ silabs_executable("Direct_Internet_lighting_app") {
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:Direct_Internet_lighting_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
@@ -171,16 +201,11 @@ silabs_executable("Direct_Internet_lighting_app") {
     ]
   }
 
- # MQTT
- if (enable_dic) {
-   deps += [ "${examples_plat_dir}:efr32-dic" ]
- }
-
   output_dir = root_out_dir
 }
 
 group("efr32") {
-  deps = [ ":Direct_Internet_lighting_app" ]
+  deps = [ ":sensors_app" ]
 }
 
 group("default") {

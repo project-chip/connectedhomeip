@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "efr32_utils.h"
+#include "silabs_utils.h"
 
 // ---- newLight Example App Config ----
 

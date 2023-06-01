@@ -28,7 +28,7 @@
 #ifdef SIWX_917
 #include "siwx917_utils.h"
 #else
-#include "efr32_utils.h"
+#include "silabs_utils.h"
 #endif
 
 #include <stdbool.h> //for bool

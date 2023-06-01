@@ -25,7 +25,6 @@
 #include "led_widget_rgb.h"
 #endif //RGB_LED_ENABLED
 
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -41,8 +40,8 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #define LIGHT_LED 1
-#define APP_FUNCTION_BUTTON &sl_button_btn0
-#define APP_LIGHT_SWITCH &sl_button_btn1
+#define APP_FUNCTION_BUTTON 0
+#define APP_LIGHT_SWITCH 1
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -53,68 +52,9 @@ namespace {
 #ifdef RGB_LED_ENABLED
 #define LIGHT_LED_RGB &sl_led_rgb_pwm
 LEDWidgetRGB sLightLED;
-#else 
+#else
 LEDWidget sLightLED;
 #endif
-
-EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-
-/**********************************************************
- * Identify Callbacks
- *********************************************************/
-
-namespace {
-void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
-{
-    ChipLogProgress(Zcl, "Trigger Identify Complete");
-    sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    AppTask::GetAppTask().StopStatusLEDTimer();
-#endif
-}
-} // namespace
-
-void OnTriggerIdentifyEffect(Identify * identify)
-{
-    sIdentifyEffect = identify->mCurrentEffectIdentifier;
-
-    if (identify->mCurrentEffectIdentifier == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE)
-    {
-        ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
-                        identify->mEffectVariant);
-        sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
-    }
-
-    switch (sIdentifyEffect)
-    {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-    }
-}
-
-Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    AppTask::GetAppTask().OnIdentifyStart,
-    AppTask::GetAppTask().OnIdentifyStop,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
-    OnTriggerIdentifyEffect,
-};
 
 } // namespace
 
@@ -149,7 +89,7 @@ CHIP_ERROR AppTask::Init()
 #if defined(RGB_LED_ENABLED)
     LEDWidgetRGB::InitGpioRGB();
     sLightLED.Init(LIGHT_LED_RGB);
-#else 
+#else
     sLightLED.Init(LIGHT_LED);
 #endif
 
@@ -207,24 +147,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::OnIdentifyStart(Identify * identify)
-{
-    ChipLogProgress(Zcl, "onIdentifyStart");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    sAppTask.StartStatusLEDTimer();
-#endif
-}
-
-void AppTask::OnIdentifyStop(Identify * identify)
-{
-    ChipLogProgress(Zcl, "onIdentifyStop");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    sAppTask.StopStatusLEDTimer();
-#endif
-}
-
 void AppTask::LightActionEventHandler(AppEvent * aEvent)
 {
     bool initiated = false;
@@ -247,7 +169,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
         else
         {
             action = LightingManager::ON_ACTION;
- 
+
         }
         actor = AppEvent::kEventType_Button;
     }
@@ -330,23 +252,18 @@ void AppTask::LightControlEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
-    if (buttonHandle == NULL)
-    {
-        return;
-    }
-
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (buttonHandle == APP_LIGHT_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    if (button == APP_LIGHT_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
         button_event.Handler = LightActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (buttonHandle == APP_FUNCTION_BUTTON)
+    else if (button == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);

@@ -281,9 +281,9 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
 }
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
-    if (buttonHandle == NULL)
+    if (button == NULL)
     {
         return;
     }
@@ -292,12 +292,12 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (buttonHandle == APP_LIGHT_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    if (button == APP_LIGHT_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
         button_event.Handler = LightActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (buttonHandle == APP_FUNCTION_BUTTON)
+    else if (button == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);

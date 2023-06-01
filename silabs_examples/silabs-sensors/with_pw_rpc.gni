@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# add this gni as import in your build args to use pigweed in the example
+# 'import("//with_pw_rpc.gni")'
+
 import("//build_overrides/chip.gni")
-import("${chip_root}/config/standalone/args.gni")
-import("${chip_root}/src/platform/silabs/efr32/args.gni")
+import("${chip_root}/config/efr32/lib/pw_rpc/pw_rpc.gni")
+import("${chip_root}/examples/platform/silabs/efr32/args.gni")
 
 silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-app_data_model =
-    "${chip_root}/silabs_examples/sl-newLight/newLight_DataModel_config"
-chip_enable_ota_requestor = true
+app_data_model = "${chip_root}/examples/lighting-app/lighting-common"
+chip_enable_pw_rpc = true
 chip_enable_openthread = true
+chip_build_pw_trace_lib = true
 
-openthread_external_platform =
-    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
+cpp_standard = "gnu++17"
+
+# Light app on EFR enables tracing server
+pw_trace_BACKEND = "$dir_pw_trace_tokenized"

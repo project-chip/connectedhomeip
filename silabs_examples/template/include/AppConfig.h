@@ -16,27 +16,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef __DIC_EventHandler_H
-#define __DIC_EventHandler_H
 
-#include "dic.h"
-#ifdef SIWX_917
-#include "siwx917_utils.h"
-#else
+#pragma once
+
 #include "silabs_utils.h"
-#endif
-#include <platform/CHIPDeviceLayer.h>
 
-using namespace chip;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::DeviceLayer::Internal;
+#define BLE_DEV_NAME "SL-Template"
 
-namespace chip {
+// ---- Template Example App Config ----
 
-namespace DICManager {
-    void Init();
-    void AppSpecificConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg);
-}
+#define APP_TASK_NAME "TEMPLATE"
 
-}
-#endif
+// Time it takes in ms for the simulated actuator to move from one
+// state to another.
+#define ACTUATOR_MOVEMENT_PERIOS_MS 10

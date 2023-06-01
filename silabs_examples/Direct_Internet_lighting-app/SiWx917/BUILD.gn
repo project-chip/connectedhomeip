@@ -31,7 +31,7 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-efr32_project_dir = "${chip_root}/silabs_examples/Direct_Internet_lighting-app/SiWx917"
+silabs_project_dir = "${chip_root}/silabs_examples/Direct_Internet_lighting-app/SiWx917"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
@@ -43,13 +43,13 @@ declare_args() {
 
 siwx917_sdk("sdk") {
   sources = [
-    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${silabs_project_dir}/include/CHIPProjectConfig.h",
     "${examples_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
     "${chip_root}/src/platform/silabs/SiWx917",
-    "${efr32_project_dir}/include",
+    "${silabs_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
     "${examples_common_plat_dir}",
@@ -73,7 +73,7 @@ silabs_executable("Direct_Internet_lighting_app") {
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
+    "${examples_common_plat_dir}/main.cpp",
   ]
 
   deps = [

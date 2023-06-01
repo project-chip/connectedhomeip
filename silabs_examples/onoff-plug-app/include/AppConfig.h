@@ -21,13 +21,15 @@
 
 #include "silabs_utils.h"
 
-// ---- Lighting Example App Config ----
+#define BLE_DEV_NAME "SiLabs-OnOffPlug"
 
-#define APP_TASK_NAME "Lit"
+// ---- Onoff-plug Example App Config ----
+
+#define APP_TASK_NAME "Plug"
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 10
+#define ACTUATOR_MOVEMENT_PERIOS_MS 1
 
 #define ON_DEMO_BITMAP                                                                                                             \
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f, 0xfc,  \

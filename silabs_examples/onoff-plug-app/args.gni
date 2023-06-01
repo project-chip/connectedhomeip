@@ -19,7 +19,7 @@ import("${chip_root}/src/platform/silabs/efr32/args.gni")
 silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 app_data_model =
-    "${chip_root}/silabs_examples/sl-newLight/newLight_DataModel_config"
+    "${chip_root}/silabs_examples/onoff-plug-app/onoff-plug-common"
 chip_enable_ota_requestor = true
 chip_enable_openthread = true
 

@@ -19,29 +19,22 @@
 
 #pragma once
 
-/**********************************************************
- * Includes
- *********************************************************/
-
 #include <stdbool.h>
 #include <stdint.h>
 
 #include "AppEvent.h"
 #include "BaseApplication.h"
 #include "FreeRTOS.h"
-#include "LightingManager.h"
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-#include "sl_simple_button_instances.h"
-#endif
+#include "OnOffPlugManager.h"
 #include "timers.h" // provides FreeRTOS timer support
-#include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>
-#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
 /**********************************************************
  * Defines
  *********************************************************/
+
+// Application-defined error codes in the CHIP_ERROR space.
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
@@ -54,11 +47,11 @@
 /**********************************************************
  * AppTask Declaration
  *********************************************************/
-
 class AppTask : public BaseApplication
 {
 
 public:
+
     AppTask() = default;
 
     static AppTask & GetAppTask() { return sAppTask; }
@@ -71,7 +64,7 @@ public:
     static void AppTaskMain(void * pvParameter);
 
     CHIP_ERROR StartAppTask();
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
     /**
      * @brief Event handler when a button is pressed
      * Function posts an event for button processing
@@ -81,29 +74,13 @@ public:
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-#endif
-    /**
-     * @brief Callback called by the identify-server when an identify command is received
-     *
-     * @param identify identify structure the command applies on
-     */
-    static void OnIdentifyStart(Identify * identify);
-
-    /**
-     * @brief Callback called by the identify-server when an identify command is stopped or finished
-     *
-     * @param identify identify structure the command applies on
-     */
-    static void OnIdentifyStop(Identify * identify);
-
-    void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
 
 private:
     static AppTask sAppTask;
 
-    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(LightingManager::Action_t aAction);
-    static void LightActionEventHandler(AppEvent * aEvent);
+    static void ActionInitiated(OnOffPlugManager::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(OnOffPlugManager::Action_t aAction);
+    static void OnOffActionEventHandler(AppEvent * aEvent);
 
     static void UpdateClusterState(intptr_t context);
 
@@ -114,20 +91,5 @@ private:
      */
     CHIP_ERROR Init();
 
-    /**
-     * @brief PB0 Button event processing function
-     *        Press and hold will trigger a factory reset timer start
-     *        Press and release will restart BLEAdvertising if not commisionned
-     *
-     * @param aEvent button event being processed
-     */
-    static void ButtonHandler(AppEvent * aEvent);
-
-    /**
-     * @brief PB1 Button event processing function
-     *        Function triggers a switch action sent to the CHIP task
-     *
-     * @param aEvent button event being processed
-     */
-    static void SwitchActionEventHandler(AppEvent * aEvent);
+    static void TimerEventHandler(TimerHandle_t xTimer);
 };

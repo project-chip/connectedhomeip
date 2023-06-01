@@ -1,0 +1,79 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/src/platform/device.gni")
+
+declare_args() {
+  is_occupancy_sensor = false
+
+  is_temperature_sensor = false
+
+  is_contact_sensor = false
+}
+
+if (!is_occupancy_sensor && !is_temperature_sensor && !is_contact_sensor) {
+  # Default app will be the occupancy sensor
+  is_occupancy_sensor = true
+}
+
+if (is_occupancy_sensor){
+  assert(!(is_temperature_sensor || is_contact_sensor))
+} else if (is_contact_sensor) {
+  assert(!(is_temperature_sensor || is_occupancy_sensor))
+} else if (is_temperature_sensor){
+  assert(!(is_contact_sensor || is_occupancy_sensor))
+}
+
+config("config") {
+  if (is_occupancy_sensor) {
+    defines = [
+      "SL_SENSOR_TYPE=1",
+      "BLE_DEV_NAME=\"SL-OCC-SENSOR\"",
+    ]
+  } else if (is_temperature_sensor) {
+    defines = [
+      "SL_SENSOR_TYPE=2",
+      "BLE_DEV_NAME=\"TEMP-SENSOR\"",
+      ]
+  } else if (is_contact_sensor) {
+    defines = [
+      "SL_SENSOR_TYPE=3",
+      "BLE_DEV_NAME=\"CONTACT-SENSOR\"",
+      ]
+  }
+}
+
+chip_data_model("sensor_data_model") {
+  if (chip_enable_wifi) {
+    network = "wifi"
+  } else {
+    network = "thread"
+  }
+
+  if (is_occupancy_sensor) {
+    zap_file = "./occupancy-sensor/occupancy-${network}-app.zap"
+  } else if (is_temperature_sensor) {
+    zap_file = "./temperature-sensor/temperature-${network}-app.zap"
+  } else if (is_contact_sensor) {
+    zap_file = "./contact-sensor/contact-${network}-app.zap"
+  }
+
+  # TODO remove this once the cleanup is fully completed regarding the af-gen-event.h
+  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
+  is_server = true
+
+  public_configs = [":config"]
+}

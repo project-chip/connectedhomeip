@@ -31,7 +31,7 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-efr32_project_dir = "${chip_root}/silabs_examples/sl-newLight/efr32"
+silabs_project_dir = "${chip_root}/silabs_examples/sl-newLight/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 if (chip_enable_ble_rs911x) {
@@ -55,14 +55,14 @@ if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B") {
 
 efr32_sdk("sdk") {
   sources = [
-    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${silabs_project_dir}/include/CHIPProjectConfig.h",
     "${examples_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
     "${chip_root}/src/platform/silabs/efr32",
-    "${efr32_project_dir}/include",
-    "${efr32_project_dir}/light_modules",
+    "${silabs_project_dir}/include",
+    "${silabs_project_dir}/light_modules",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
     "${examples_common_plat_dir}",
@@ -76,7 +76,6 @@ efr32_sdk("sdk") {
   if (chip_enable_ble_rs911x) {
     # TODO efr32_sdk should not need a header from this location
     include_dirs += [
-      "${src_plat_dir}/rs911x",
       "${examples_plat_dir}/rs911x",
       "${examples_plat_dir}/rs911x/hal",
     ]
@@ -93,7 +92,7 @@ efr32_sdk("sdk") {
 
 silabs_executable("newLight_app") {
   output_name = "chip-efr32-lighting-example.out"
-  public_configs = [ "${efr32_sdk_build_root}:silabs_config" ]
+  public_configs = [ ]
   include_dirs = [ "include" ]
   defines = []
 
@@ -105,7 +104,7 @@ silabs_executable("newLight_app") {
     "light_modules/LightingManager.cpp",
     "src/AppTask.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
+    "${examples_common_plat_dir}/main.cpp",
   ]
 
   deps = [

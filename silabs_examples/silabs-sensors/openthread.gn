@@ -12,16 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-import("${chip_root}/config/standalone/args.gni")
-import("${chip_root}/src/platform/silabs/efr32/args.gni")
+import("//build_overrides/build.gni")
 
-silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+# The location of the build configuration file.
+buildconfig = "${build_root}/config/BUILDCONFIG.gn"
 
-app_data_model =
-    "${chip_root}/silabs_examples/sl-newLight/newLight_DataModel_config"
-chip_enable_ota_requestor = true
-chip_enable_openthread = true
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-openthread_external_platform =
-    "${chip_root}/third_party/openthread/platforms/efr32:libopenthread-efr32"
+default_args = {
+  target_cpu = "arm"
+  target_os = "freertos"
+  chip_openthread_ftd = true
+
+  import("//openthread.gni")
+}

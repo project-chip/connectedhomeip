@@ -27,7 +27,6 @@
 #include "sl_simple_button_instances.h"
 #include "LightingManager.h"
 #include "timers.h" // provides FreeRTOS timer support
-#include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -44,16 +43,14 @@ class AppTask : public BaseApplication
 {
 
 public:
-    
+
     AppTask() = default;
     static AppTask & GetAppTask() { return sAppTask; }
     static void AppTaskMain(void * pvParameter);
     CHIP_ERROR StartAppTask();
 
 
-    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction) override;
-    static void OnIdentifyStart(Identify * identify);
-    static void OnIdentifyStop(Identify * identify);
+    void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
     void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
     void PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint8_t value);
