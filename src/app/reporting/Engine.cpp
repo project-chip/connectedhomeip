@@ -198,7 +198,9 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                 {
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
                     // The expectation is that RetrieveClusterData has already reset attributeReportIBs to a good state (rolled
-                    // back any partial changes, etc).
+                    // back any partially-written AttributeReportIB instances, reset its error status).  Since AllowPartialData()
+                    // is true, we may not have encoded a complete attribute value, but we did, if we encoded anything, encode a
+                    // set of complete AttributeReportIB instances that represent part of the attribute value.
                     apReadHandler->SetAttributeEncodeState(encodeState);
                 }
                 else
