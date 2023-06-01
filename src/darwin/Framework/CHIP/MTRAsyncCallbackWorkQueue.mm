@@ -181,8 +181,6 @@
 
                 BOOL fullyMerged = NO;
                 workItem.batchingHandler(workItem.batchableData, nextWorkItem.batchableData, &fullyMerged);
-                MTR_LOG_DEFAULT(
-                    "MTRAsyncCallbackWorkQueue: merged items for batching - fully merged %@", fullyMerged ? @"YES" : @"NO");
                 if (!fullyMerged) {
                     // if some parts of the next item is
                     break;

@@ -840,6 +840,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
 
             if (readRequestsNext.count == 0) {
+                MTR_LOG_DEFAULT("%@ batching - fully merged next item %@", logPrefix, fullyMerged ? @"YES" : @"NO");
                 *fullyMerged = YES;
             }
         };
