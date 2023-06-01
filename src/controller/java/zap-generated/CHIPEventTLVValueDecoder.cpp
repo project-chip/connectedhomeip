@@ -3016,8 +3016,15 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             else
             {
                 jobject value_errorState_errorStateDetailsInsideOptional;
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                    cppValue.errorState.errorStateDetails.Value(), value_errorState_errorStateDetailsInsideOptional));
+                if (cppValue.errorState.errorStateDetails.Value().IsNull())
+                {
+                    value_errorState_errorStateDetailsInsideOptional = nullptr;
+                }
+                else
+                {
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                        cppValue.errorState.errorStateDetails.Value().Value(), value_errorState_errorStateDetailsInsideOptional));
+                }
                 chip::JniReferences::GetInstance().CreateOptional(value_errorState_errorStateDetailsInsideOptional,
                                                                   value_errorState_errorStateDetails);
             }

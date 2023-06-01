@@ -13671,8 +13671,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             else
             {
                 jobject value_errorStateDetailsInsideOptional;
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorStateDetails.Value(),
-                                                                                     value_errorStateDetailsInsideOptional));
+                if (cppValue.errorStateDetails.Value().IsNull())
+                {
+                    value_errorStateDetailsInsideOptional = nullptr;
+                }
+                else
+                {
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorStateDetails.Value().Value(),
+                                                                                         value_errorStateDetailsInsideOptional));
+                }
                 chip::JniReferences::GetInstance().CreateOptional(value_errorStateDetailsInsideOptional, value_errorStateDetails);
             }
 

@@ -16864,12 +16864,12 @@ class RoboticVacuumOperationalState(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=RoboticVacuumOperationalState.Enums.ErrorStateEnum),
                         ClusterObjectFieldDescriptor(Label="errorStateLabel", Tag=1, Type=typing.Union[Nullable, str]),
-                        ClusterObjectFieldDescriptor(Label="errorStateDetails", Tag=2, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="errorStateDetails", Tag=2, Type=typing.Union[None, Nullable, str]),
                     ])
 
             errorStateID: 'RoboticVacuumOperationalState.Enums.ErrorStateEnum' = 0
             errorStateLabel: 'typing.Union[Nullable, str]' = NullValue
-            errorStateDetails: 'typing.Optional[str]' = None
+            errorStateDetails: 'typing.Union[None, Nullable, str]' = None
 
         @dataclass
         class OperationalStateStruct(ClusterObject):

@@ -6946,10 +6946,15 @@ NS_ASSUME_NONNULL_BEGIN
             }
         }
         if (decodableStruct.commandResponseState.errorStateDetails.HasValue()) {
-            self.commandResponseState.errorStateDetails = AsString(decodableStruct.commandResponseState.errorStateDetails.Value());
-            if (self.commandResponseState.errorStateDetails == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
+            if (decodableStruct.commandResponseState.errorStateDetails.Value().IsNull()) {
+                self.commandResponseState.errorStateDetails = nil;
+            } else {
+                self.commandResponseState.errorStateDetails
+                    = AsString(decodableStruct.commandResponseState.errorStateDetails.Value().Value());
+                if (self.commandResponseState.errorStateDetails == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    return err;
+                }
             }
         } else {
             self.commandResponseState.errorStateDetails = nil;

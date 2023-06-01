@@ -3072,7 +3072,7 @@ client cluster RoboticVacuumOperationalState = 97 {
   struct ErrorStateStruct {
     ErrorStateEnum errorStateID = 0;
     nullable char_string<64> errorStateLabel = 1;
-    optional char_string<64> errorStateDetails = 2;
+    optional nullable char_string<64> errorStateDetails = 2;
   }
 
   struct OperationalStateStruct {

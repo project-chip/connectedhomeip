@@ -2999,8 +2999,16 @@ void CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback:
     else
     {
         jobject CommandResponseState_errorStateDetailsInsideOptional;
-        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-            dataResponse.commandResponseState.errorStateDetails.Value(), CommandResponseState_errorStateDetailsInsideOptional));
+        if (dataResponse.commandResponseState.errorStateDetails.Value().IsNull())
+        {
+            CommandResponseState_errorStateDetailsInsideOptional = nullptr;
+        }
+        else
+        {
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                dataResponse.commandResponseState.errorStateDetails.Value().Value(),
+                CommandResponseState_errorStateDetailsInsideOptional));
+        }
         chip::JniReferences::GetInstance().CreateOptional(CommandResponseState_errorStateDetailsInsideOptional,
                                                           CommandResponseState_errorStateDetails);
     }

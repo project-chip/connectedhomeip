@@ -9387,11 +9387,15 @@ void MTRRoboticVacuumOperationalStateOperationalErrorStructAttributeCallbackBrid
         }
     }
     if (value.errorStateDetails.HasValue()) {
-        objCValue.errorStateDetails = AsString(value.errorStateDetails.Value());
-        if (objCValue.errorStateDetails == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            OnFailureFn(context, err);
-            return;
+        if (value.errorStateDetails.Value().IsNull()) {
+            objCValue.errorStateDetails = nil;
+        } else {
+            objCValue.errorStateDetails = AsString(value.errorStateDetails.Value().Value());
+            if (objCValue.errorStateDetails == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                OnFailureFn(context, err);
+                return;
+            }
         }
     } else {
         objCValue.errorStateDetails = nil;

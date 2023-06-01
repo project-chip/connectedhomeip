@@ -1877,11 +1877,15 @@ static id _Nullable DecodeEventPayloadForRoboticVacuumOperationalStateCluster(
                 }
             }
             if (cppValue.errorState.errorStateDetails.HasValue()) {
-                memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value());
-                if (memberValue.errorStateDetails == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
+                if (cppValue.errorState.errorStateDetails.Value().IsNull()) {
+                    memberValue.errorStateDetails = nil;
+                } else {
+                    memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value().Value());
+                    if (memberValue.errorStateDetails == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
                 }
             } else {
                 memberValue.errorStateDetails = nil;

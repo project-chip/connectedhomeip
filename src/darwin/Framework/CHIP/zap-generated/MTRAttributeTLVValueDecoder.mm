@@ -10499,11 +10499,15 @@ static id _Nullable DecodeAttributeValueForRoboticVacuumOperationalStateCluster(
             }
         }
         if (cppValue.errorStateDetails.HasValue()) {
-            value.errorStateDetails = AsString(cppValue.errorStateDetails.Value());
-            if (value.errorStateDetails == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                *aError = err;
-                return nil;
+            if (cppValue.errorStateDetails.Value().IsNull()) {
+                value.errorStateDetails = nil;
+            } else {
+                value.errorStateDetails = AsString(cppValue.errorStateDetails.Value().Value());
+                if (value.errorStateDetails == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
             }
         } else {
             value.errorStateDetails = nil;

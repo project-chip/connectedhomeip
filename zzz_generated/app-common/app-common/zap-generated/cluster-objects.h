@@ -15766,7 +15766,7 @@ struct Type
 public:
     ErrorStateEnum errorStateID = static_cast<ErrorStateEnum>(0);
     DataModel::Nullable<chip::CharSpan> errorStateLabel;
-    Optional<chip::CharSpan> errorStateDetails;
+    Optional<DataModel::Nullable<chip::CharSpan>> errorStateDetails;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
