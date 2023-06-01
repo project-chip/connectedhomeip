@@ -22,7 +22,6 @@
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceEvent.h>
 
-
 namespace chip {
 namespace app {
 
