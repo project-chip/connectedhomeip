@@ -141,8 +141,8 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
             VerifyOrReturnValue(ESP32Config::ReadConfigValue(stMfgCodeKey, modeTagMfgCode) == CHIP_NO_ERROR,
                                 ModeOptionsProvider(nullptr, nullptr), CleanUp(endpointId));
 
-            tag.value         = static_cast<uint16_t>(modeTagValue);
-//            tag.mfgCode       = static_cast<chip::VendorId>(modeTagMfgCode);
+            tag.value = static_cast<uint16_t>(modeTagValue);
+            //            tag.mfgCode       = static_cast<chip::VendorId>(modeTagMfgCode);
             modeTags[stIndex] = tag;
         }
 
