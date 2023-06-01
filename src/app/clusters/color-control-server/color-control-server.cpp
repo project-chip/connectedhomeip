@@ -680,8 +680,7 @@ void ColorControlServer::SetHSVRemainingTime(chip::EndpointId endpoint)
     // When the hue transition is loop, RemainingTime stays at MAX_INT16
     if (hueTransitionState->repeat == false)
     {
-        Attributes::RemainingTime::Set(endpoint,
-                                       max(hueTransitionState->timeRemaining, saturationTransitionState->timeRemaining));
+        Attributes::RemainingTime::Set(endpoint, max(hueTransitionState->timeRemaining, saturationTransitionState->timeRemaining));
     }
 }
 
