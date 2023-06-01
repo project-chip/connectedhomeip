@@ -454,7 +454,7 @@ class AttributeCache:
 
                 attributeType = _AttributeIndex[(clusterId, attributeId)][0]
 
-                if (attributeType not in clusterCache):
+                if attributeType not in clusterCache:
                     clusterCache[attributeType] = {}
 
                 if isinstance(value, ValueDecodeFailure):
