@@ -38,9 +38,10 @@ FORBIDDEN_AKID = [
 # List of certificate names that are known to have some issues, but not yet
 # updated in DCL. They will fail the test at runtime if seen, but not in CI.
 ALLOWED_SKIPPED_FILENAMES = [
-  "dcld_mirror_SERIALNUMBER_63709380400001_CN_NXP_Matter_Test_PAA_O_NXP_Semiconductors_NV_C_NL.der",
-  "dcld_mirror_SERIALNUMBER_63709330400001_CN_NXP_Matter_PAA_O_NXP_Semiconductors_NV_C_NL.der"
+    "dcld_mirror_SERIALNUMBER_63709380400001_CN_NXP_Matter_Test_PAA_O_NXP_Semiconductors_NV_C_NL.der",
+    "dcld_mirror_SERIALNUMBER_63709330400001_CN_NXP_Matter_PAA_O_NXP_Semiconductors_NV_C_NL.der"
 ]
+
 
 def load_all_paa(paa_path: Path) -> dict:
     logging.info("Loading all PAAs in %s" % paa_path)
