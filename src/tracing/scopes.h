@@ -95,7 +95,7 @@ enum class Scope
     PASESession_SetupSpake2p,
 };
 
-/// An event that happened instant (like a zero sized scope)
+/// An event that happened at an instant (like a zero sized scope)
 enum class Instant
 {
     // General instant notifications

@@ -45,64 +45,64 @@ namespace Internal {
 
 void Begin(::chip::Tracing::Scope scope)
 {
-    for (auto backend = gTracingBackends.begin(); backend != gTracingBackends.end(); backend++)
+    for (auto & backend : gTracingBackends)
     {
-        backend->TraceBegin(scope);
+        backend.TraceBegin(scope);
     }
 }
 
 void End(::chip::Tracing::Scope scope)
 {
-    for (auto backend = gTracingBackends.begin(); backend != gTracingBackends.end(); backend++)
+    for (auto & backend : gTracingBackends)
     {
-        backend->TraceEnd(scope);
+        backend.TraceEnd(scope);
     }
 }
 void Instant(::chip::Tracing::Instant instant)
 {
-    for (auto backend = gTracingBackends.begin(); backend != gTracingBackends.end(); backend++)
+    for (auto & backend : gTracingBackends)
     {
-        backend->TraceInstant(instant);
+        backend.TraceInstant(instant);
     }
 }
 
 void LogMessageSend(::chip::Tracing::MessageSendInfo & info)
 {
-    for (auto backend = gTracingBackends.begin(); backend != gTracingBackends.end(); backend++)
+    for (auto & backend : gTracingBackends)
     {
-        backend->LogMessageSend(info);
+        backend.LogMessageSend(info);
     }
 }
 
 void LogMessageReceived(::chip::Tracing::MessageReceiveInfo & info)
 {
-    for (auto backend = gTracingBackends.begin(); backend != gTracingBackends.end(); backend++)
+    for (auto & backend : gTracingBackends)
     {
-        backend->LogMessageReceived(info);
+        backend.LogMessageReceived(info);
     }
 }
 
 void LogNodeLookup(::chip::Tracing::NodeLookupInfo & info)
 {
-    for (auto backend = gTracingBackends.begin(); backend != gTracingBackends.end(); backend++)
+    for (auto & backend : gTracingBackends)
     {
-        backend->LogNodeLookup(info);
+        backend.LogNodeLookup(info);
     }
 }
 
 void LogNodeDiscovered(::chip::Tracing::NodeDiscoveredInfo & info)
 {
-    for (auto backend = gTracingBackends.begin(); backend != gTracingBackends.end(); backend++)
+    for (auto & backend : gTracingBackends)
     {
-        backend->LogNodeDiscovered(info);
+        backend.LogNodeDiscovered(info);
     }
 }
 
 void LogNodeDiscoveryFailed(::chip::Tracing::NodeDiscoveryFailedInfo & info)
 {
-    for (auto backend = gTracingBackends.begin(); backend != gTracingBackends.end(); backend++)
+    for (auto & backend : gTracingBackends)
     {
-        backend->LogNodeDiscoveryFailed(info);
+        backend.LogNodeDiscoveryFailed(info);
     }
 }
 
