@@ -39,7 +39,7 @@ const BLEAdvertisingArbiter::Request & ToRequest(const sys_snode_t * node)
 void NotifyAdvertisingStopped(const sys_snode_t * node)
 {
     VerifyOrReturn(node);
-    
+
     const Request & request = ToRequest(node);
 
     if (request.onStopped != nullptr)

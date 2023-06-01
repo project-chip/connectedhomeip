@@ -224,12 +224,12 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
             workaroundDone = true;
             return CHIP_NO_ERROR;
         }
-        else 
+        else
         {
             // TODO The workaround has not worked, so reboot the device
             ChipLogError(DeviceLayer, "WiFi driver does not respond, resetting the device...");
             workaroundDone = false;
-            PlatformMgr().Shutdown();      
+            PlatformMgr().Shutdown();
         }
         return CHIP_ERROR_INTERNAL;
     }
