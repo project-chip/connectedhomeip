@@ -540,11 +540,11 @@ public Integer maxCumulativeFailsafeSeconds;
   }
 }
 
-public static class NetworkCommissioningClusterNetworkInfo {
+public static class NetworkCommissioningClusterNetworkInfoStruct {
 public byte[] networkID;
 public Boolean connected;
 
-  public NetworkCommissioningClusterNetworkInfo(
+  public NetworkCommissioningClusterNetworkInfoStruct(
     byte[] networkID
       , Boolean connected
   ) {
@@ -555,7 +555,7 @@ public Boolean connected;
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("NetworkCommissioningClusterNetworkInfo {\n");
+    output.append("NetworkCommissioningClusterNetworkInfoStruct {\n");
     output.append("\tnetworkID: ");
     output.append(Arrays.toString(networkID));
     output.append("\n");
@@ -567,7 +567,7 @@ public Boolean connected;
   }
 }
 
-public static class NetworkCommissioningClusterThreadInterfaceScanResult {
+public static class NetworkCommissioningClusterThreadInterfaceScanResultStruct {
 public Integer panId;
 public Long extendedPanId;
 public String networkName;
@@ -577,7 +577,7 @@ public byte[] extendedAddress;
 public Integer rssi;
 public Integer lqi;
 
-  public NetworkCommissioningClusterThreadInterfaceScanResult(
+  public NetworkCommissioningClusterThreadInterfaceScanResultStruct(
     Integer panId
       , Long extendedPanId
       , String networkName
@@ -600,7 +600,7 @@ public Integer lqi;
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("NetworkCommissioningClusterThreadInterfaceScanResult {\n");
+    output.append("NetworkCommissioningClusterThreadInterfaceScanResultStruct {\n");
     output.append("\tpanId: ");
     output.append(panId);
         output.append("\n");
@@ -630,7 +630,7 @@ public Integer lqi;
   }
 }
 
-public static class NetworkCommissioningClusterWiFiInterfaceScanResult {
+public static class NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
 public Integer security;
 public byte[] ssid;
 public byte[] bssid;
@@ -638,7 +638,7 @@ public Integer channel;
 public Integer wiFiBand;
 public Integer rssi;
 
-  public NetworkCommissioningClusterWiFiInterfaceScanResult(
+  public NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
     Integer security
       , byte[] ssid
       , byte[] bssid
@@ -657,7 +657,7 @@ public Integer rssi;
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("NetworkCommissioningClusterWiFiInterfaceScanResult {\n");
+    output.append("NetworkCommissioningClusterWiFiInterfaceScanResultStruct {\n");
     output.append("\tsecurity: ");
     output.append(security);
         output.append("\n");
