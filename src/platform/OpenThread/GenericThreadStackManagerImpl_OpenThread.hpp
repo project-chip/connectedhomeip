@@ -1052,12 +1052,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 
     namespace ThreadNetworkDiagnostics = app::Clusters::ThreadNetworkDiagnostics;
 
-    if (otDatasetIsCommissioned(mOTInst))
+    if (!otDatasetIsCommissioned(mOTInst))
     {
         // For the following nullable attributes of the cluster, encodeNull since
         // thread instance cannot provide the related data when it is not currently configured.
         //
-        // Note that RoutingRole is nullable but not listed here as thread provide
+        // Note that RoutingRole is nullable but not listed here as thread provides
         // valid data even when disabled or detached
         switch (attributeId)
         {
