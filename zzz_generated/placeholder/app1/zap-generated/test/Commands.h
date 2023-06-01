@@ -1206,228 +1206,6 @@ private:
     }
 };
 
-class Test_TC_PS_3_1_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_PS_3_1_SimulatedSuite() : TestCommand("Test_TC_PS_3_1_Simulated", 34)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_PS_3_1_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        case 31:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 32:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 33:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Read attribute: Status");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::Status::Id);
-        }
-        case 1: {
-            LogStep(1, "Read attribute: Order");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::Order::Id);
-        }
-        case 2: {
-            LogStep(2, "Read attribute: Description");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::Description::Id);
-        }
-        case 3: {
-            LogStep(3, "Read attribute: WiredAssessedInputVoltage");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredAssessedInputVoltage::Id);
-        }
-        case 4: {
-            LogStep(4, "Read attribute: WiredAssessedInputFrequency");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredAssessedInputFrequency::Id);
-        }
-        case 5: {
-            LogStep(5, "Read attribute: WiredCurrentType");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredCurrentType::Id);
-        }
-        case 6: {
-            LogStep(6, "Read attribute: WiredAssessedCurrent");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredAssessedCurrent::Id);
-        }
-        case 7: {
-            LogStep(7, "Read attribute: WiredNominalVoltage");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredNominalVoltage::Id);
-        }
-        case 8: {
-            LogStep(8, "Read attribute: WiredPresent");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredPresent::Id);
-        }
-        case 9: {
-            LogStep(9, "Read attribute: WiredMaximumCurrent");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredMaximumCurrent::Id);
-        }
-        case 10: {
-            LogStep(10, "Read attribute: ActiveWiredFaults");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::ActiveWiredFaults::Id);
-        }
-        case 11: {
-            LogStep(11, "Read attribute: BatVoltage");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatVoltage::Id);
-        }
-        case 12: {
-            LogStep(12, "Read attribute: BatPercentRemaining");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatPercentRemaining::Id);
-        }
-        case 13: {
-            LogStep(13, "Read attribute: BatTimeRemaining");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatTimeRemaining::Id);
-        }
-        case 14: {
-            LogStep(14, "Read attribute: BatChargeLevel");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatChargeLevel::Id);
-        }
-        case 15: {
-            LogStep(15, "Read attribute: BatReplacementNeeded");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatReplacementNeeded::Id);
-        }
-        case 16: {
-            LogStep(16, "Read attribute: BatReplaceability");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatReplaceability::Id);
-        }
-        case 17: {
-            LogStep(17, "Read attribute: BatPresent");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatPresent::Id);
-        }
-        case 18: {
-            LogStep(18, "Read attribute: ActiveBatFaults");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::ActiveBatFaults::Id);
-        }
-        case 19: {
-            LogStep(19, "Read attribute: BatReplacementDescription");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatReplacementDescription::Id);
-        }
-        case 20: {
-            LogStep(20, "Read attribute: BatCommonDesignation");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatCommonDesignation::Id);
-        }
-        case 21: {
-            LogStep(21, "Read attribute: BatANSIDesignation");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatANSIDesignation::Id);
-        }
-        case 22: {
-            LogStep(22, "Read attribute: BatIECDesignation");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatIECDesignation::Id);
-        }
-        case 23: {
-            LogStep(23, "Read attribute: BatApprovedChemistry");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatApprovedChemistry::Id);
-        }
-        case 24: {
-            LogStep(24, "Read attribute: BatCapacity");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatCapacity::Id);
-        }
-        case 25: {
-            LogStep(25, "Read attribute: BatQuantity");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatQuantity::Id);
-        }
-        case 26: {
-            LogStep(26, "Read attribute: BatChargeState");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatChargeState::Id);
-        }
-        case 27: {
-            LogStep(27, "Read attribute: BatTimeToFullCharge");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatTimeToFullCharge::Id);
-        }
-        case 28: {
-            LogStep(28, "Read attribute: BatFunctionalWhileCharging");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatFunctionalWhileCharging::Id);
-        }
-        case 29: {
-            LogStep(29, "Read attribute: BatChargingCurrent");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatChargingCurrent::Id);
-        }
-        case 30: {
-            LogStep(30, "Read attribute: ActiveBatChargeFaults");
-            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::ActiveBatChargeFaults::Id);
-        }
-        case 31: {
-            LogStep(31,
-                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
-                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList. Commission "
-                    "DUT to TH again");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 32: {
-            LogStep(32, "DUT reads all supported optional attributes from TH one at a time in a manufacturer specific order");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.C.AO-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 33: {
-            LogStep(33,
-                    "DUT writes a suitable value to all supported optional attributes on the TH one at a time in a manufacturer "
-                    "specific order");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.C.AO-WRITE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
 class Test_TC_PSCFG_3_1_SimulatedSuite : public TestCommand
 {
 public:
@@ -4000,10 +3778,10 @@ private:
         switch (testIndex)
         {
         case 0: {
-            LogStep(0, "DUT reads TxUnicastCount attribute value from TH");
+            LogStep(0, "DUT reads TxTotalCount attribute value from TH");
             VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
-                                 ThreadNetworkDiagnostics::Attributes::TxUnicastCount::Id);
+                                 ThreadNetworkDiagnostics::Attributes::TxTotalCount::Id);
         }
         case 1: {
             LogStep(1, "DUT reads TxUnicastCount attribute value from TH");
@@ -5218,6 +4996,317 @@ private:
     }
 };
 
+class Test_TC_CC_2_2_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_CC_2_2_SimulatedSuite() : TestCommand("Test_TC_CC_2_2_Simulated", 52)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_CC_2_2_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "DUT reads from the TH the (0x0000) CurrentHue attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id);
+        }
+        case 1: {
+            LogStep(1, "DUT reads from the TH the (0x0001) CurrentSaturation attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT reads from the TH the Optional (0x0002) RemainingTime attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::RemainingTime::Id);
+        }
+        case 3: {
+            LogStep(3, "DUT reads from the TH the (0x0003) CurrentX attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id);
+        }
+        case 4: {
+            LogStep(4, "DUT reads from the TH the (0x0004) CurrentY attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id);
+        }
+        case 5: {
+            LogStep(5, "DUT reads from the TH the Optional (0x0005) DriftCompensation attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::DriftCompensation::Id);
+        }
+        case 6: {
+            LogStep(6, "DUT reads from the TH the Optional (0x0006) CompensationText attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CompensationText::Id);
+        }
+        case 7: {
+            LogStep(7, "DUT reads from the TH the (0x0007) ColorTemperatureMireds attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperatureMireds::Id);
+        }
+        case 8: {
+            LogStep(8, "DUT reads from the TH the (0x0008) ColorMode attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorMode::Id);
+        }
+        case 9: {
+            LogStep(9, "DUT reads from the TH the (0x000f) Options attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A000f"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Options::Id);
+        }
+        case 10: {
+            LogStep(10, "DUT reads from the TH the (0x4000) EnhancedCurrentHue attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A4000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 11: {
+            LogStep(11, "DUT reads from the TH the (0x4001) EnhancedColorMode attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A4001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedColorMode::Id);
+        }
+        case 12: {
+            LogStep(12, "DUT reads from the TH the (0x4002) ColorLoopActive attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A4002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id);
+        }
+        case 13: {
+            LogStep(13, "DUT reads from the TH the (0x4003) ColorLoopDirection attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A4003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopDirection::Id);
+        }
+        case 14: {
+            LogStep(14, "DUT reads from the TH the (0x4004) ColorLoopTime attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A4004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopTime::Id);
+        }
+        case 15: {
+            LogStep(15, "DUT reads from the TH the (0x4005) ColorLoopStartEnhancedHue attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A4005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopStartEnhancedHue::Id);
+        }
+        case 16: {
+            LogStep(16, "DUT reads from the TH the (0x4006) ColorLoopStoredEnhancedHue attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A4006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id);
+        }
+        case 17: {
+            LogStep(17, "DUT reads from the TH the (0x400a) ColorCapabilities attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A400a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorCapabilities::Id);
+        }
+        case 18: {
+            LogStep(18, "DUT reads from the TH the (0x400b) ColorTempPhysicalMinMireds attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A400b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTempPhysicalMinMireds::Id);
+        }
+        case 19: {
+            LogStep(19, "DUT reads from the TH the (0x400c) ColorTempPhysicalMaxMireds attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A400c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTempPhysicalMaxMireds::Id);
+        }
+        case 20: {
+            LogStep(20, "DUT reads from the TH the (0x400d) CoupleColorTempToLevelMinMireds attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A400d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CoupleColorTempToLevelMinMireds::Id);
+        }
+        case 21: {
+            LogStep(21, "DUT reads from the TH the (0x4010) StartUpColorTemperatureMireds attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A4010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::StartUpColorTemperatureMireds::Id);
+        }
+        case 22: {
+            LogStep(22, "DUT reads from the TH the (0x0010) NumberOfPrimaries attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::NumberOfPrimaries::Id);
+        }
+        case 23: {
+            LogStep(23, "DUT reads from the TH the (0x0011) Primary1X attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary1X::Id);
+        }
+        case 24: {
+            LogStep(24, "DUT reads from the TH the (0x0012) Primary1Y attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary1Y::Id);
+        }
+        case 25: {
+            LogStep(25, "DUT reads from the TH the (0x0013) Primary1Intensity attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary1Intensity::Id);
+        }
+        case 26: {
+            LogStep(26, "DUT reads from the TH the (0x0015) Primary2X attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary2X::Id);
+        }
+        case 27: {
+            LogStep(27, "DUT reads from the TH the (0x0016) Primary2Y attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary2Y::Id);
+        }
+        case 28: {
+            LogStep(28, "DUT reads from the TH the (0x0017) Primary2Intensity attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary2Intensity::Id);
+        }
+        case 29: {
+            LogStep(29, "DUT reads from the TH the (0x0019) Primary3X attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary3X::Id);
+        }
+        case 30: {
+            LogStep(30, "DUT reads from the TH the (0x001a) Primary3Y attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A001a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary3Y::Id);
+        }
+        case 31: {
+            LogStep(31, "DUT reads from the TH the (0x001b) Primary3Intensity attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A001b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary3Intensity::Id);
+        }
+        case 32: {
+            LogStep(32, "DUT reads from the TH the (0x0020) Primary4X attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0020"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary4X::Id);
+        }
+        case 33: {
+            LogStep(33, "DUT reads from the TH the (0x0021) Primary4Y attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0021"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary4Y::Id);
+        }
+        case 34: {
+            LogStep(34, "DUT reads from the TH the (0x0022) Primary4Intensity attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0022"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary4Intensity::Id);
+        }
+        case 35: {
+            LogStep(35, "DUT reads from the TH the (0x0024) Primary5X attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0024"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary5X::Id);
+        }
+        case 36: {
+            LogStep(36, "DUT reads from the TH the (0x0025) Primary5Y attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0025"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary5Y::Id);
+        }
+        case 37: {
+            LogStep(37, "DUT reads from the TH the (0x0026) Primary5Intensity attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0026"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary5Intensity::Id);
+        }
+        case 38: {
+            LogStep(38, "DUT reads from the TH the (0x0028) Primary6X attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0028"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary6X::Id);
+        }
+        case 39: {
+            LogStep(39, "DUT reads from the TH the (0x0029) Primary6Y attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0029"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary6Y::Id);
+        }
+        case 40: {
+            LogStep(40, "DUT reads from the TH the (0x002a) Primary6Intensity attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A002a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::Primary6Intensity::Id);
+        }
+        case 41: {
+            LogStep(41, "DUT reads from the TH the Optional (0x0030) WhitePointX attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0030"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::WhitePointX::Id);
+        }
+        case 42: {
+            LogStep(42, "DUT reads from the TH the Optional (0x0031) WhitePointY attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0031"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::WhitePointY::Id);
+        }
+        case 43: {
+            LogStep(43, "DUT reads from the TH the Optional (0x0032) ColorPointRX attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0032"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointRX::Id);
+        }
+        case 44: {
+            LogStep(44, "DUT reads from the TH the Optional (0x0033) ColorPointRY attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0033"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointRY::Id);
+        }
+        case 45: {
+            LogStep(45, "DUT reads from the TH the Optional (0x0034) ColorPointRIntensity attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0034"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointRIntensity::Id);
+        }
+        case 46: {
+            LogStep(46, "DUT reads from the TH the Optional (0x0036) ColorPointGX attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0036"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointGX::Id);
+        }
+        case 47: {
+            LogStep(47, "DUT reads from the TH the Optional (0x0037) ColorPointGY attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0037"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointGY::Id);
+        }
+        case 48: {
+            LogStep(48, "DUT reads from the TH the Optional (0x0038) ColorPointGIntensity attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A0038"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointGIntensity::Id);
+        }
+        case 49: {
+            LogStep(49, "DUT reads from the TH the Optional (0x003a) ColorPointBX attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A003a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointBX::Id);
+        }
+        case 50: {
+            LogStep(50, "DUT reads from the TH the Optional (0x003b) ColorPointBY attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A003b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointBY::Id);
+        }
+        case 51: {
+            LogStep(51, "DUT reads from the TH the Optional (0x003c) ColorPointBIntensity attribute");
+            VerifyOrDo(!ShouldSkip("CC.C.A003c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorPointBIntensity::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
 {
     if (testName == "Test_TC_BINFO_2_3_Simulated")
@@ -5263,10 +5352,6 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
     if (testName == "Test_TC_PRS_3_1_Simulated")
     {
         return std::unique_ptr<Test_TC_PRS_3_1_SimulatedSuite>(new Test_TC_PRS_3_1_SimulatedSuite());
-    }
-    if (testName == "Test_TC_PS_3_1_Simulated")
-    {
-        return std::unique_ptr<Test_TC_PS_3_1_SimulatedSuite>(new Test_TC_PS_3_1_SimulatedSuite());
     }
     if (testName == "Test_TC_PSCFG_3_1_Simulated")
     {
@@ -5400,6 +5485,10 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
     {
         return std::unique_ptr<Test_TC_TMP_3_1_SimulatedSuite>(new Test_TC_TMP_3_1_SimulatedSuite());
     }
+    if (testName == "Test_TC_CC_2_2_Simulated")
+    {
+        return std::unique_ptr<Test_TC_CC_2_2_SimulatedSuite>(new Test_TC_CC_2_2_SimulatedSuite());
+    }
 
     return nullptr;
 }
@@ -5418,7 +5507,6 @@ void PrintTestCommands()
     ChipLogError(chipTool, "\t* Test_TC_G_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_I_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_PRS_3_1_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_PS_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_PSCFG_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_RH_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_SWTCH_3_1_Simulated");
@@ -5452,4 +5540,5 @@ void PrintTestCommands()
     ChipLogError(chipTool, "\t* Test_TC_TSUIC_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_PCC_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_TMP_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_CC_2_2_Simulated");
 }
