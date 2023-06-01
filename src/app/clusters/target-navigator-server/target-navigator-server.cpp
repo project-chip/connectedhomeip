@@ -46,6 +46,7 @@ using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kTargetNavigatorDelegateTableSize =
     EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kTargetNavigatorDelegateTableSize <= kEmberInvalidEndpointIndex, "TargetNavigator Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -70,7 +71,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
                                                        EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return ((ep == 0xFFFF || ep >= kTargetNavigatorDelegateTableSize) ? nullptr : gDelegateTable[ep]);
+    return (ep >= kTargetNavigatorDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -94,7 +95,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
                                                        EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
-    if (ep != 0xFFFF && ep < kTargetNavigatorDelegateTableSize)
+    if (ep < kTargetNavigatorDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }

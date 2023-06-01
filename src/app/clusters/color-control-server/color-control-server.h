@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
+#include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -239,6 +240,7 @@ private:
     static ColorControlServer instance;
     static constexpr size_t kColorControlClusterServerMaxEndpointCount =
         EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    static_assert(kColorControlClusterServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "ColorControl endpoint count error");
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
     ColorHueTransitionState colorHueTransitionStates[kColorControlClusterServerMaxEndpointCount];

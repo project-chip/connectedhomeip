@@ -38,6 +38,7 @@ using namespace chip::app::Clusters::LowPower;
 
 static constexpr size_t kLowPowerDelegateTableSize =
     EMBER_AF_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kLowPowerDelegateTableSize <= kEmberInvalidEndpointIndex, "LowPower Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -52,7 +53,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::LowPower::Id,
                                                        EMBER_AF_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep == 0xFFFF || ep >= kLowPowerDelegateTableSize ? nullptr : gDelegateTable[ep]);
+    return (ep >= kLowPowerDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -75,7 +76,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::LowPower::Id,
                                                        EMBER_AF_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (ep != 0xFFFF && ep < kLowPowerDelegateTableSize)
+    if (ep < kLowPowerDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }

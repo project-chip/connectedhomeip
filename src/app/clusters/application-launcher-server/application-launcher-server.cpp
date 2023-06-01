@@ -49,6 +49,7 @@ using namespace chip::Uint8;
 
 static constexpr size_t kApplicationLauncherDelegateTableSize =
     EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kApplicationLauncherDelegateTableSize <= kEmberInvalidEndpointIndex, "ApplicationLauncher Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -76,7 +77,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id,
                                                        EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return ((ep == 0xFFFF || ep >= kApplicationLauncherDelegateTableSize) ? nullptr : gDelegateTable[ep]);
+    return (ep >= kApplicationLauncherDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -100,7 +101,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ApplicationLauncher::Id,
                                                        EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
-    if (ep != 0xFFFF && ep < kApplicationLauncherDelegateTableSize)
+    if (ep < kApplicationLauncherDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }

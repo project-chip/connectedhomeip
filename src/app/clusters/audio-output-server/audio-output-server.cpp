@@ -40,6 +40,7 @@ using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kAudioOutputDelegateTableSize =
     EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kAudioOutputDelegateTableSize <= kEmberInvalidEndpointIndex, "AudioOutput Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -54,7 +55,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::AudioOutput::Id,
                                                        EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep == 0xFFFF || ep >= kAudioOutputDelegateTableSize ? nullptr : gDelegateTable[ep]);
+    return (ep >= kAudioOutputDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -77,7 +78,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::AudioOutput::Id,
                                                        EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (ep != 0xFFFF && ep < kAudioOutputDelegateTableSize)
+    if (ep < kAudioOutputDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }

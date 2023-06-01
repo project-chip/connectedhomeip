@@ -47,6 +47,7 @@ using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kKeypadInputDelegateTableSize =
     EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kKeypadInputDelegateTableSize < kEmberInvalidEndpointIndex, "KeypadInput Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -71,7 +72,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return ((ep == 0xFFFF || ep >= kKeypadInputDelegateTableSize) ? nullptr : gDelegateTable[ep]);
+    return (ep >= kKeypadInputDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -95,7 +96,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
-    if (ep != 0xFFFF && ep < kKeypadInputDelegateTableSize)
+    if (ep < kKeypadInputDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }

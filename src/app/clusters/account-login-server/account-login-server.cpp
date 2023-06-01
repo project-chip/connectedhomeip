@@ -46,7 +46,7 @@ using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kAccountLoginDeletageTableSize =
     EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
+static_assert(kAccountLoginDeletageTableSize <= kEmberInvalidEndpointIndex, "AccountLogin Delegate table size error");
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 
@@ -68,7 +68,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, AccountLogin::Id, EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return ((ep == 0xFFFF || ep >= kAccountLoginDeletageTableSize) ? nullptr : gDelegateTable[ep]);
+    return (ep >= kAccountLoginDeletageTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -92,7 +92,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, AccountLogin::Id, EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
-    if (ep != 0xFFFF && ep < kAccountLoginDeletageTableSize)
+    if (ep < kAccountLoginDeletageTableSize)
     {
         gDelegateTable[ep] = delegate;
     }

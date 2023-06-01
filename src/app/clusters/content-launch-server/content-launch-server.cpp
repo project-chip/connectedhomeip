@@ -44,6 +44,7 @@ using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kContentLaunchDelegateTableSize =
     EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kContentLaunchDelegateTableSize < kEmberInvalidEndpointIndex, "ContentLaunch Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -68,7 +69,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ContentLauncher::Id,
                                                        EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return ((ep == 0xFFFF || ep >= kContentLaunchDelegateTableSize) ? nullptr : gDelegateTable[ep]);
+    return (ep >= kContentLaunchDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -92,7 +93,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ContentLauncher::Id,
                                                        EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
-    if (ep != 0xFFFF && ep < kContentLaunchDelegateTableSize)
+    if (ep < kContentLaunchDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }

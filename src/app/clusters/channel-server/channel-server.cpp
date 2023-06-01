@@ -39,6 +39,7 @@ using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kChannelDelegateTableSize =
     EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kChannelDelegateTableSize <= kEmberInvalidEndpointIndex, "Channel Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -62,7 +63,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogProgress(Zcl, "Channel NOT returning ContentApp delegate for endpoint:%u", endpoint);
 
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return ((ep == 0xFFFF || ep >= kChannelDelegateTableSize) ? nullptr : gDelegateTable[ep]);
+    return (ep >= kChannelDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -85,7 +86,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, Channel::Id, EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
-    if (ep != 0xFFFF && ep < kChannelDelegateTableSize)
+    if (ep < kChannelDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }
