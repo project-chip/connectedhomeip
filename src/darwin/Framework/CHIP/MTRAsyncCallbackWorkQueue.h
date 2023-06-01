@@ -65,7 +65,7 @@ typedef void (^MTRAsyncCallbackDuplicateCheckHandler)(id opaqueItemData, BOOL * 
 //   This is a facility that enables the API client to check if a potential work item has already been enqueued. By providing a
 //   handler that can answer if a work item's relevant data is a duplicate, it can avoid redundant queuing of requests.
 //      - The "duplicate type ID" is used for grouping different types of work items for duplicate checking. The ID value is opaque
-//        to this API, and the API client is responsible for assinging them.
+//        to this API, and the API client is responsible for assigning them.
 // See the MTRAsyncCallbackDuplicateCheckHandler definition above and the WorkItem's -setDuplicateTypeID:handler: method description
 // for more details.
 
