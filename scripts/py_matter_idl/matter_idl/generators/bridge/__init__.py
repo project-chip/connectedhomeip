@@ -179,4 +179,3 @@ class BridgeGenerator(CodeGenerator):
                 'idl': self.idl,
             }
         )
-
