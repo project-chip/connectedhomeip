@@ -159,7 +159,11 @@ void rsi_hal_board_init(void)
     xSemaphoreGive(spiTransferLock);
 
 #if defined(EFR32MG24)
-    spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripheral);
+    if (spi_sem_sync_hdl == NULL)
+    {
+        spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripheral);
+    }
+    configASSERT(spi_sem_sync_hdl);
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif /* EFR32MG24 */
 
@@ -185,7 +189,6 @@ void SPIDRV_ReInit(uint32_t baudrate)
 
 sl_status_t sl_wfx_host_spi_cs_assert(void)
 {
-    configASSERT(spi_sem_sync_hdl);
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
         return SL_STATUS_TIMEOUT;

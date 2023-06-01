@@ -114,7 +114,11 @@ sl_status_t sl_wfx_host_init_bus(void)
     xSemaphoreGive(spi_sem);
 
 #if defined(EFR32MG24)
-    spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripheral);
+    if (spi_sem_sync_hdl == NULL)
+    {
+        spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripheral);
+    }
+    configASSERT(spi_sem_sync_hdl);
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif /* EFR32MG24 */
     return SL_STATUS_OK;
@@ -139,7 +143,6 @@ sl_status_t sl_wfx_host_deinit_bus(void)
 sl_status_t sl_wfx_host_spi_cs_assert()
 {
 #if defined(EFR32MG24)
-    configASSERT(spi_sem_sync_hdl);
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
         return SL_STATUS_TIMEOUT;
