@@ -39,6 +39,7 @@ CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
 
 CHIP_ERROR ICDEventManager::Shutdown()
 {
+    PlatformMgr().RemoveEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(nullptr));
     return CHIP_NO_ERROR;
 }
 
