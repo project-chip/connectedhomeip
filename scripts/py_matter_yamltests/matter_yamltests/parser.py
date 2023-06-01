@@ -247,7 +247,7 @@ class _TestStepWithPlaceholders:
 
     def _update_mappings(self, test: dict, definitions: SpecDefinitions):
         cluster_name = self.cluster
-        if definitions is None or not definitions.has_cluster_by_name(cluster_name) or cluster_name == ANY_COMMANDS_CLUSTER_NAME or self.command in ANY_COMMANDS_LIST:
+        if definitions is None or (not definitions.has_cluster_by_name(cluster_name) and cluster_name != ANY_COMMANDS_CLUSTER_NAME):
             self.argument_mapping = None
             self.response_mapping = None
             self.response_mapping_name = None
@@ -297,6 +297,81 @@ class _TestStepWithPlaceholders:
             argument_mapping = event_mapping
             response_mapping = event_mapping
             response_mapping_name = event.name
+        elif cluster_name == ANY_COMMANDS_CLUSTER_NAME or self.command in ANY_COMMANDS_LIST:
+            # When the cluster is ANY_COMMANDS_CLUSTER_NAME the test step does not contain the direct mapping
+            # for the response in the cluster/command/attribute/event fields.
+            #
+            # When the command is part of ANY_COMMANDS_LIST the test step does not contain the direct mapping
+            # for the response in the command/attribute/event fields.
+            #
+            # NOTE: The logic for this paragraph has not yet be implemented.
+            # In some cases the response type can be inferred from the argument fields, if for example the command
+            # is a ReadById targetting a specific ClusterId/AttributeId that exists in the definitions.
+            #
+            # For the other cases, the response can NOT be inferred directly from the argumment fields, if for exammple
+            # the command is a ReadById using a wildcard in one of its fields. For this type of case, the test writer
+            # can add additional specifiers in the expected response type to help determine the response mapping.
+
+            mapping_names = []
+
+            for response in self.responses_with_placeholders:
+                for value in response.get('values'):
+                    if 'constraints' not in value:
+                        continue
+
+                    mapping_name = None
+                    cluster_name = self.cluster if self.cluster != ANY_COMMANDS_CLUSTER_NAME else response.get(
+                        'cluster')
+
+                    if cluster_name is not None:
+                        attribute_name = response.get('attribute')
+                        event_name = response.get('event')
+                        command_name = response.get('command')
+
+                        if attribute_name:
+                            attribute = definitions.get_attribute_by_name(
+                                cluster_name, attribute_name)
+
+                            if not attribute:
+                                targets = definitions.get_attribute_names(
+                                    cluster_name)
+                                test['response'] = ['...', response, '...']
+                                raise TestStepAttributeKeyError(
+                                    response, attribute_name, targets)
+
+                            mapping_name = attribute.definition.data_type.name
+                        elif event_name:
+                            event = definitions.get_event_by_name(
+                                cluster_name, event_name)
+
+                            if not event:
+                                targets = definitions.get_event_names(
+                                    cluster_name)
+                                test['response'] = ['...', response, '...']
+                                raise TestStepEventKeyError(
+                                    response, attribute_name, targets)
+
+                            mapping_name = event.name
+                        elif command_name:
+                            command = definitions.get_command_by_name(
+                                cluster_name, command_name)
+
+                            if not command:
+                                targets = definitions.get_command_names(
+                                    cluster_name)
+                                test['response'] = ['...', response, '...']
+                                raise TestStepCommandKeyError(
+                                    response, command_name, targets)
+
+                            mapping_name = command.output_param
+
+                    mapping_names.append(mapping_name)
+
+            # TODO: For now only the response_mapping_name is inferred, it allows to use the type constraint
+            #       on the responses.
+            argument_mapping = None
+            response_mapping = None
+            response_mapping_name = mapping_names
         else:
             command_name = self.command
             command = definitions.get_command_by_name(
@@ -621,6 +696,8 @@ class TestStep:
                 expected_response, received_response, result)
             self._response_cluster_error_validation(
                 expected_response, received_response, result)
+            self._response_values_source_validation(
+                expected_response, received_response, result)
             self._response_values_validation(
                 expected_response, received_response, result)
             self._response_constraints_validation(
@@ -750,6 +827,20 @@ class TestStep:
             # Nothing is logged here to not be redundant with the generic error checking code.
             pass
 
+    def _response_values_source_validation(self, expected_response, received_response, result):
+        check_type = PostProcessCheckType.RESPONSE_VALIDATION
+        error_value_wrong_source = 'The test expects a value from {source_name} "{expected}" but it received a value from {source_name} "{received}".'
+
+        sources = ['endpoint', 'cluster', 'attribute']
+        for source_name in sources:
+            expected = expected_response.get(source_name)
+            received = received_response.get(source_name)
+            success = expected is None or received is None or expected == received
+
+            if not success:
+                result.error(check_type, error_value_wrong_source.format(
+                    source_name=source_name, expected=expected, received=received))
+
     def _response_values_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.RESPONSE_VALIDATION
         error_success = 'The test expectation "{name} == {value}" is true'
@@ -816,7 +907,9 @@ class TestStep:
                 continue
 
             received_value = received_response.get('value')
-            if not self.is_attribute and not self.is_event:
+            if self.command in ANY_COMMANDS_LIST:
+                response_type_name = response_type_name.pop(0)
+            elif not self.is_attribute and not self.is_event:
                 expected_name = value.get('name')
                 if received_value is None or expected_name not in received_value:
                     received_value = None
