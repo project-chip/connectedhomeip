@@ -235,7 +235,7 @@ void sl_wfx_host_pre_bootloader_spi_transfer(void)
     int32_t status = bootloader_init();
     if (status != BOOTLOADER_OK)
     {
-        SILABS_LOG("%s: bootloader_init failed with error code: %d", __func__, status);
+        SILABS_LOG("bootloader_init error: %x", status);
         return;
     }
     sl_wfx_host_spiflash_cs_assert();
@@ -247,7 +247,7 @@ void sl_wfx_host_post_bootloader_spi_transfer(void)
     int32_t status = bootloader_deinit();
     if (status != BOOTLOADER_OK)
     {
-        SILABS_LOG("%s: bootloader_deinit failed with error code: %d", __func__, status);
+        SILABS_LOG("bootloader_deinit error: %x", status);
         return;
     }
     GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = 0;
@@ -319,7 +319,6 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     */
     if (xlen <= MIN_XLEN || (tx_buf == NULL && rx_buf == NULL))
     {
-        SILABS_LOG("%s error.", __func__);
         return RSI_ERROR_INVALID_PARAM;
     }
 
@@ -356,7 +355,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
             int itemsTransferred = 0;
             int itemsRemaining   = 0;
             SPIDRV_GetTransferStatus(SL_SPIDRV_HANDLE, &itemsTransferred, &itemsRemaining);
-            SILABS_LOG("%s: timed out %d/%d (rx%x rx%x)", __func__, itemsTransferred, itemsRemaining, (uint32_t) tx_buf,
+            SILABS_LOG("ERR: SPI timed out %d/%d (rx%x rx%x)", itemsTransferred, itemsRemaining, (uint32_t) tx_buf,
                        (uint32_t) rx_buf);
 
             SPIDRV_AbortTransfer(SL_SPIDRV_HANDLE);
@@ -365,7 +364,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     }
     else
     {
-        SILABS_LOG("%s: failed with err:%x (tx%x rx%x)", __func__, spiError, (uint32_t) tx_buf, (uint32_t) rx_buf);
+        SILABS_LOG("ERR: SPI failed with error:%x (tx%x rx%x)", spiError, (uint32_t) tx_buf, (uint32_t) rx_buf);
         rsiError               = RSI_ERROR_SPI_FAIL;
         spiInitiatorTaskHandle = NULL; // SPI operation failed. No notification to received.
     }
