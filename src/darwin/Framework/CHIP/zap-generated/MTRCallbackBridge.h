@@ -635,10 +635,10 @@ typedef void (*ColorControlClusterSaturationStepModeAttributeCallback)(void *,
                                                                        chip::app::Clusters::ColorControl::SaturationStepMode);
 typedef void (*NullableColorControlClusterSaturationStepModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationStepMode> &);
-typedef void (*IlluminanceMeasurementClusterLightSensorTypeAttributeCallback)(
-    void *, chip::app::Clusters::IlluminanceMeasurement::LightSensorType);
-typedef void (*NullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorType> &);
+typedef void (*IlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallback)(
+    void *, chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum);
+typedef void (*NullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> &);
 typedef void (*OccupancySensingClusterOccupancySensorTypeEnumAttributeCallback)(
     void *, chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum);
 typedef void (*NullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallback)(
@@ -32406,71 +32406,72 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<IlluminanceMeasurementClusterLightSensorTypeAttributeCallback>
+class MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<IlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallback>
 {
 public:
-    MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<IlluminanceMeasurementClusterLightSensorTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<IlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRActionBlock action) :
-        MTRCallbackBridge<IlluminanceMeasurementClusterLightSensorTypeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<IlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::IlluminanceMeasurement::LightSensorType value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum value);
 };
 
-class MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge
-    : public MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge
+class MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge(
+    MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(queue, handler, action),
+        MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnDone;
+    using MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallback>
+class MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallback>
 {
 public:
-    MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                   ResponseHandler handler) :
-        MTRCallbackBridge<NullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler) :
+        MTRCallbackBridge<NullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<NullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallback>(queue, handler, action,
-                                                                                                 OnSuccessFn){};
+    MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler,
+                                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<NullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                                     OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorType> & value);
+                const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> & value);
 };
 
-class MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge
-    : public MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge
+class MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge(
+    MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge(queue, handler, action),
+        MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnDone;
+    using MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
