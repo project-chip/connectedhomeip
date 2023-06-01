@@ -40,16 +40,8 @@ tests:
           value:
               [
                   { Label: "Black", Mode: 0, ModeTags: [{ "Value": 0 }] },
-                  {
-                      Label: "Cappuccino",
-                      Mode: 4,
-                      ModeTags: [{ "Value": 0 }],
-                  },
-                  {
-                      Label: "Espresso",
-                      Mode: 7,
-                      ModeTags: [{ "Value": 0 }],
-                  },
+                  { Label: "Cappuccino", Mode: 4, ModeTags: [{ "Value": 0 }] },
+                  { Label: "Espresso", Mode: 7, ModeTags: [{ "Value": 0 }] },
               ]
           constraints:
               type: list
