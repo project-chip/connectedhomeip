@@ -777,8 +777,8 @@ MTR_NEWLY_AVAILABLE
 MTR_NEWLY_AVAILABLE
 @interface MTRRoboticVacuumOperationalStateClusterErrorStateStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nonnull errorStateLabel MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nonnull errorStateDetails MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
@@ -795,8 +795,8 @@ MTR_NEWLY_AVAILABLE
 MTR_NEWLY_AVAILABLE
 @interface MTRRoboticVacuumOperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull totalOperationalTime MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull pausedTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))

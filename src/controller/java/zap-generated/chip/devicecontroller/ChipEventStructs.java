@@ -1328,13 +1328,13 @@ public ChipStructs.RoboticVacuumOperationalStateClusterErrorStateStruct errorSta
 
 public static class RoboticVacuumOperationalStateClusterOperationCompletionEvent {
 public Integer completionErrorCode;
-public Long totalOperationalTime;
-public Long pausedTime;
+public @Nullable Optional<Long> totalOperationalTime;
+public @Nullable Optional<Long> pausedTime;
 
   public RoboticVacuumOperationalStateClusterOperationCompletionEvent(
     Integer completionErrorCode
-      , Long totalOperationalTime
-      , Long pausedTime
+      , @Nullable Optional<Long> totalOperationalTime
+      , @Nullable Optional<Long> pausedTime
   ) {
     this.completionErrorCode = completionErrorCode;
     this.totalOperationalTime = totalOperationalTime;

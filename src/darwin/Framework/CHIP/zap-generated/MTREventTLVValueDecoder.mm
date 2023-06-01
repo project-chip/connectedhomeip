@@ -1866,17 +1866,25 @@ static id _Nullable DecodeEventPayloadForRoboticVacuumOperationalStateCluster(
             MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
             memberValue = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
             memberValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorState.errorStateID)];
-            memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel);
-            if (memberValue.errorStateLabel == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                *aError = err;
-                return nil;
+            if (cppValue.errorState.errorStateLabel.IsNull()) {
+                memberValue.errorStateLabel = nil;
+            } else {
+                memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
+                if (memberValue.errorStateLabel == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
             }
-            memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails);
-            if (memberValue.errorStateDetails == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                *aError = err;
-                return nil;
+            if (cppValue.errorState.errorStateDetails.HasValue()) {
+                memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value());
+                if (memberValue.errorStateDetails == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            } else {
+                memberValue.errorStateDetails = nil;
             }
             value.errorState = memberValue;
         } while (0);
@@ -1898,13 +1906,29 @@ static id _Nullable DecodeEventPayloadForRoboticVacuumOperationalStateCluster(
             value.completionErrorCode = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedInt:cppValue.totalOperationalTime];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.totalOperationalTime.HasValue()) {
+                if (cppValue.totalOperationalTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.totalOperationalTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
             value.totalOperationalTime = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedInt:cppValue.pausedTime];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.pausedTime.HasValue()) {
+                if (cppValue.pausedTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.pausedTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
             value.pausedTime = memberValue;
         } while (0);
 

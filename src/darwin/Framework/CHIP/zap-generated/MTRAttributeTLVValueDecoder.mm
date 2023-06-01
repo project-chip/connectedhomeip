@@ -10488,17 +10488,25 @@ static id _Nullable DecodeAttributeValueForRoboticVacuumOperationalStateCluster(
         MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull value;
         value = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
         value.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorStateID)];
-        value.errorStateLabel = AsString(cppValue.errorStateLabel);
-        if (value.errorStateLabel == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            *aError = err;
-            return nil;
+        if (cppValue.errorStateLabel.IsNull()) {
+            value.errorStateLabel = nil;
+        } else {
+            value.errorStateLabel = AsString(cppValue.errorStateLabel.Value());
+            if (value.errorStateLabel == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
         }
-        value.errorStateDetails = AsString(cppValue.errorStateDetails);
-        if (value.errorStateDetails == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            *aError = err;
-            return nil;
+        if (cppValue.errorStateDetails.HasValue()) {
+            value.errorStateDetails = AsString(cppValue.errorStateDetails.Value());
+            if (value.errorStateDetails == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
+        } else {
+            value.errorStateDetails = nil;
         }
         return value;
     }

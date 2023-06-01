@@ -2007,8 +2007,6 @@ ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("ErrorStateStruct.errorStateID", "errorStateID", value.isMember("errorStateID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ErrorStateStruct.errorStateLabel", "errorStateLabel",
                                                                   value.isMember("errorStateLabel")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ErrorStateStruct.errorStateDetails", "errorStateDetails",
-                                                                  value.isMember("errorStateDetails")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "errorStateID");
@@ -2019,8 +2017,11 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.errorStateLabel, value["errorStateLabel"]));
     valueCopy.removeMember("errorStateLabel");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "errorStateDetails");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.errorStateDetails, value["errorStateDetails"]));
+    if (value.isMember("errorStateDetails"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "errorStateDetails");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.errorStateDetails, value["errorStateDetails"]));
+    }
     valueCopy.removeMember("errorStateDetails");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);

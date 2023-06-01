@@ -1691,13 +1691,13 @@ public String operationalStateLabel;
 
 public static class RoboticVacuumOperationalStateClusterErrorStateStruct {
 public Integer errorStateID;
-public String errorStateLabel;
-public String errorStateDetails;
+public @Nullable String errorStateLabel;
+public Optional<String> errorStateDetails;
 
   public RoboticVacuumOperationalStateClusterErrorStateStruct(
     Integer errorStateID
-      , String errorStateLabel
-      , String errorStateDetails
+      , @Nullable String errorStateLabel
+      , Optional<String> errorStateDetails
   ) {
     this.errorStateID = errorStateID;
     this.errorStateLabel = errorStateLabel;
