@@ -402,58 +402,57 @@ class AttributeCache:
         attributeCache = self.attributeCache
 
         for attributePath in changedPathSet:
-            endpoint = attributePath.EndpointId
+            endpointId = attributePath.EndpointId
 
-            if (endpoint not in attributeCache):
-                attributeCache[endpoint] = {}
+            if endpointId not in attributeCache:
+                attributeCache[endpointId] = {}
 
-            endpointCache = attributeCache[endpoint]
+            endpointCache = attributeCache[endpointId]
 
-            cluster = attributePath.ClusterId
+            clusterId = attributePath.ClusterId
 
-            if cluster not in _ClusterIndex:
+            if clusterId not in _ClusterIndex:
                 #
                 # #22599 tracks dealing with unknown clusters more
                 # gracefully so that clients can still access this data.
                 #
                 continue
 
-            clusterType = _ClusterIndex[cluster]
+            clusterType = _ClusterIndex[clusterId]
 
             if clusterType not in endpointCache:
                 endpointCache[clusterType] = {}
 
             clusterCache = endpointCache[clusterType]
             clusterDataVersion = self.versionList.get(
-                endpoint, {}).get(cluster, None)
+                endpointId, {}).get(clusterId, None)
 
-            if (self.returnClusterObject):
+            if self.returnClusterObject:
                 try:
                     # Since the TLV data is already organized by attribute tags, we can trivially convert to a cluster object representation.
                     endpointCache[clusterType] = clusterType.FromDict(
-                        data=clusterType.descriptor.TagDictToLabelDict([], tlvCache[endpoint][cluster]))
+                        data=clusterType.descriptor.TagDictToLabelDict([], tlvCache[endpointId][clusterId]))
                     endpointCache[clusterType].SetDataVersion(
                         clusterDataVersion)
                 except Exception as ex:
                     decodedValue = ValueDecodeFailure(
-                        tlvCache[endpoint][cluster], ex)
+                        tlvCache[endpointId][clusterId], ex)
                     endpointCache[clusterType] = decodedValue
             else:
                 clusterCache[DataVersion] = clusterDataVersion
 
-                attribute = attributePath.AttributeId
+                attributeId = attributePath.AttributeId
 
-                value = tlvCache[endpoint][cluster][attribute]
+                value = tlvCache[endpointId][clusterId][attributeId]
 
-                if (cluster, attribute) not in _AttributeIndex:
+                if (clusterId, attributeId) not in _AttributeIndex:
                     #
                     # #22599 tracks dealing with unknown clusters more
                     # gracefully so that clients can still access this data.
                     #
                     continue
 
-                attributeType = _AttributeIndex[(
-                    cluster, attribute)][0]
+                attributeType = _AttributeIndex[(clusterId, attributeId)][0]
 
                 if (attributeType not in clusterCache):
                     clusterCache[attributeType] = {}
@@ -463,7 +462,7 @@ class AttributeCache:
                 else:
                     try:
                         decodedValue = attributeType.FromTagDictOrRawValue(
-                            tlvCache[endpoint][cluster][attribute])
+                            tlvCache[endpointId][clusterId][attributeId])
                     except Exception as ex:
                         decodedValue = ValueDecodeFailure(value, ex)
 
