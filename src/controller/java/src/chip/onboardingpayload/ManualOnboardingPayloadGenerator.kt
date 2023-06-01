@@ -30,8 +30,8 @@ class ManualOnboardingPayloadGenerator(private val payloadContents: OnboardingPa
   }
 
   fun payloadDecimalStringRepresentation(): String {
-    // One extra char for the check digit, another for the null terminator.
-    val decimalString = CharArray(kManualSetupLongCodeCharLength + 1 + 1)
+    // One extra char for the check digit.
+    val decimalString = CharArray(kManualSetupLongCodeCharLength + 1)
 
     if (kManualSetupCodeChunk1CharLength + kManualSetupCodeChunk2CharLength + kManualSetupCodeChunk3CharLength !=
         kManualSetupShortCodeCharLength) {
@@ -60,8 +60,8 @@ class ManualOnboardingPayloadGenerator(private val payloadContents: OnboardingPa
     }
 
     // Add two for the check digit and null terminator.
-    if ((useLongCode && decimalString.size < kManualSetupLongCodeCharLength + 2) ||
-        (!useLongCode && decimalString.size < kManualSetupShortCodeCharLength + 2)) {
+    if ((useLongCode && decimalString.size < kManualSetupLongCodeCharLength + 1) ||
+        (!useLongCode && decimalString.size < kManualSetupShortCodeCharLength + 1)) {
       throw OnboardingPayloadException("The decimalString has insufficient size")
     }
 
@@ -71,18 +71,17 @@ class ManualOnboardingPayloadGenerator(private val payloadContents: OnboardingPa
 
     var offset = 0
 
-    // Add one to the length of each chunk, since snprintf writes a null terminator.
-    decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupCodeChunk1CharLength + 1), chunk1)
+    decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupCodeChunk1CharLength), chunk1)
     offset += kManualSetupCodeChunk1CharLength
-    decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupCodeChunk2CharLength + 1), chunk2)
+    decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupCodeChunk2CharLength), chunk2)
     offset += kManualSetupCodeChunk2CharLength
-    decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupCodeChunk3CharLength + 1), chunk3)
+    decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupCodeChunk3CharLength), chunk3)
     offset += kManualSetupCodeChunk3CharLength
     
     if (useLongCode) {
-      decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupVendorIdCharLength + 1), payloadContents.vendorId)
+      decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupVendorIdCharLength), payloadContents.vendorId)
       offset += kManualSetupVendorIdCharLength
-      decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupProductIdCharLength + 1), payloadContents.productId)
+      decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupProductIdCharLength), payloadContents.productId)
       offset += kManualSetupProductIdCharLength
     }
 
