@@ -42,8 +42,8 @@ typedef void (^MTRAsyncCallbackReadyHandler)(id context, NSUInteger retryCount);
 // after the one that was dropped.
 typedef void (^MTRAsyncCallbackBatchingHandler)(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged);
 
-// The duplicate check handler is called by the work queue when the client wishes to verify if a work item is a duplicate of an
-// existing one, so that the client can decide to not enqueue the new duplicate. The work queue will
+// The duplicate check handler is called by the work queue when the client wishes to check whether a work item is a duplicate of an
+// existing one, so that the client can decide to not enqueue the new duplicate.
 typedef void (^MTRAsyncCallbackDuplicateCheckHandler)(id opaqueItemData, BOOL * isDuplicate);
 
 // MTRAsyncCallbackQueue high level description
