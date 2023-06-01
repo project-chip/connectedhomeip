@@ -2334,9 +2334,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::Saturatio
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(IlluminanceMeasurement::LightSensorType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(IlluminanceMeasurement::LightSensorTypeEnum val)
 {
-    using EnumType = IlluminanceMeasurement::LightSensorType;
+    using EnumType = IlluminanceMeasurement::LightSensorTypeEnum;
     switch (val)
     {
     case EnumType::kPhotodiode:

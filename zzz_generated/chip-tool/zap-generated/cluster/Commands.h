@@ -17163,9 +17163,10 @@ void registerClusterIlluminanceMeasurement(Commands & commands, CredentialIssuer
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "tolerance", 0, UINT16_MAX, Attributes::Tolerance::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "light-sensor-type", 0, UINT8_MAX,
-                                                                             Attributes::LightSensorType::Id,
-                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<
+            WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum>>>(
+            Id, "light-sensor-type", 0, UINT8_MAX, Attributes::LightSensorType::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
