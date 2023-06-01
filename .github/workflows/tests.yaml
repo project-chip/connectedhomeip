@@ -21,7 +21,8 @@ on:
     workflow_dispatch:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
         'pull_request' && github.event.number) || (github.event_name ==
         'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
@@ -43,7 +44,9 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS:
+                "halt_on_error=1
+                suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
             LSAN_OPTIONS: detect_leaks=1
 
         if: github.actor != 'restyled-io[bot]'
@@ -51,7 +54,8 @@ jobs:
 
         container:
             image: connectedhomeip/chip-build:0.7.3
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options:
+                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -74,8 +78,11 @@ jobs:
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-            - name: Try to ensure the directories for core dumping exist and we
+              run:
+                  scripts/checkout_submodules.py
+                  --allow-changing-global-git-config --shallow --platform linux
+            - name:
+                  Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
@@ -86,7 +93,9 @@ jobs:
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  key:
+                      ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*',
+                      'third_party/pigweed/**') }}
                   path: |
                       .environment
                       build_overrides/pigweed_environment.gni
@@ -97,7 +106,9 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
-                  name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      bootstrap-logs-linux-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
@@ -197,7 +208,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/draft/electrical-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml \
                       src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/replacable-monitoring-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.xml \
                     "
             - name: Build Apps
               timeout-minutes: 60
@@ -232,7 +243,9 @@ jobs:
                      --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
 
-            - name: Run Tests using the python parser sending commands to chip-tool
+            - name:
+                  Run Tests using the python parser sending commands to
+                  chip-tool
               timeout-minutes: 65
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -292,7 +305,9 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      crash-core-linux-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -300,7 +315,9 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      crash-objdir-linux-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
@@ -317,7 +334,9 @@ jobs:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
             TSAN_OPTIONS: "halt_on_error=1"
-            LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
+            LSAN_OPTIONS:
+                detect_leaks=1
+                suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -332,7 +351,9 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform darwin
+              run:
+                  scripts/checkout_submodules.py
+                  --allow-changing-global-git-config --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
@@ -348,7 +369,9 @@ jobs:
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  key:
+                      ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*',
+                      'third_party/pigweed/**') }}
                   path: |
                       .environment
                       build_overrides/pigweed_environment.gni
@@ -359,7 +382,9 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
-                  name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      bootstrap-logs-darwin-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
@@ -397,7 +422,9 @@ jobs:
                      --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
 
-            - name: Run Tests using the python parser sending commands to chip-tool
+            - name:
+                  Run Tests using the python parser sending commands to
+                  chip-tool
               timeout-minutes: 80
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -420,7 +447,9 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      crash-core-darwin-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: /cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -428,13 +457,17 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      crash-log-darwin-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      crash-objdir-darwin-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
@@ -444,22 +477,28 @@ jobs:
         timeout-minutes: 130
 
         env:
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS:
+                "halt_on_error=1
+                suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
 
         container:
             image: connectedhomeip/chip-build:0.7.3
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            options:
+                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
               uses: actions/checkout@v3
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-            - name: Try to ensure the directories for core dumping exist and we
+              run:
+                  scripts/checkout_submodules.py
+                  --allow-changing-global-git-config --shallow --platform linux
+            - name:
+                  Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
@@ -470,7 +509,9 @@ jobs:
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  key:
+                      ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*',
+                      'third_party/pigweed/**') }}
                   path: |
                       .environment
                       build_overrides/pigweed_environment.gni
@@ -481,7 +522,9 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
-                  name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      bootstrap-logs-linux-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
@@ -544,7 +587,9 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v3
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform darwin
+              run:
+                  scripts/checkout_submodules.py
+                  --allow-changing-global-git-config --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
@@ -560,7 +605,9 @@ jobs:
               uses: actions/cache@v3
               timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  key:
+                      ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*',
+                      'third_party/pigweed/**') }}
                   path: |
                       .environment
                       build_overrides/pigweed_environment.gni
@@ -571,7 +618,9 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
-                  name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name:
+                      bootstrap-logs-darwin-${{ matrix.build_variant }}${{
+                      matrix.chip_tool }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
