@@ -13255,29 +13255,7 @@ struct TypeInfo
 } // namespace GroupKeyManagement
 namespace FixedLabel {
 namespace Structs {
-namespace LabelStruct {
-
-using Fields = Clusters::detail::Structs::LabelStruct::Fields;
-
-// This is a struct type shared across multiple clusters.  Create a type-safe
-// declaration in this cluster namespace (so not just pulling in the shared
-// implementation via "using", but make sure we can initialize our
-// Type/DecodableType from the generic Type/DecodableType as needed.
-struct Type : public Clusters::detail::Structs::LabelStruct::Type
-{
-private:
-    using Super = Clusters::detail::Structs::LabelStruct::Type;
-
-public:
-    constexpr Type() = default;
-    constexpr Type(const Super & arg) : Super(arg) {}
-    constexpr Type(Super && arg) : Super(std::move(arg)) {}
-};
-
-using DecodableType = Type;
-
-} // namespace LabelStruct
-
+namespace LabelStruct = Clusters::detail::Structs::LabelStruct;
 } // namespace Structs
 
 namespace Attributes {
@@ -13353,29 +13331,7 @@ struct TypeInfo
 } // namespace FixedLabel
 namespace UserLabel {
 namespace Structs {
-namespace LabelStruct {
-
-using Fields = Clusters::detail::Structs::LabelStruct::Fields;
-
-// This is a struct type shared across multiple clusters.  Create a type-safe
-// declaration in this cluster namespace (so not just pulling in the shared
-// implementation via "using", but make sure we can initialize our
-// Type/DecodableType from the generic Type/DecodableType as needed.
-struct Type : public Clusters::detail::Structs::LabelStruct::Type
-{
-private:
-    using Super = Clusters::detail::Structs::LabelStruct::Type;
-
-public:
-    constexpr Type() = default;
-    constexpr Type(const Super & arg) : Super(arg) {}
-    constexpr Type(Super && arg) : Super(std::move(arg)) {}
-};
-
-using DecodableType = Type;
-
-} // namespace LabelStruct
-
+namespace LabelStruct = Clusters::detail::Structs::LabelStruct;
 } // namespace Structs
 
 namespace Attributes {
@@ -36604,29 +36560,7 @@ struct TypeInfo
 } // namespace AudioOutput
 namespace ApplicationLauncher {
 namespace Structs {
-namespace ApplicationStruct {
-
-using Fields = Clusters::detail::Structs::ApplicationStruct::Fields;
-
-// This is a struct type shared across multiple clusters.  Create a type-safe
-// declaration in this cluster namespace (so not just pulling in the shared
-// implementation via "using", but make sure we can initialize our
-// Type/DecodableType from the generic Type/DecodableType as needed.
-struct Type : public Clusters::detail::Structs::ApplicationStruct::Type
-{
-private:
-    using Super = Clusters::detail::Structs::ApplicationStruct::Type;
-
-public:
-    constexpr Type() = default;
-    constexpr Type(const Super & arg) : Super(arg) {}
-    constexpr Type(Super && arg) : Super(std::move(arg)) {}
-};
-
-using DecodableType = Type;
-
-} // namespace ApplicationStruct
-
+namespace ApplicationStruct = Clusters::detail::Structs::ApplicationStruct;
 namespace ApplicationEPStruct {
 enum class Fields : uint8_t
 {
@@ -36901,29 +36835,7 @@ struct TypeInfo
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
 namespace Structs {
-namespace ApplicationStruct {
-
-using Fields = Clusters::detail::Structs::ApplicationStruct::Fields;
-
-// This is a struct type shared across multiple clusters.  Create a type-safe
-// declaration in this cluster namespace (so not just pulling in the shared
-// implementation via "using", but make sure we can initialize our
-// Type/DecodableType from the generic Type/DecodableType as needed.
-struct Type : public Clusters::detail::Structs::ApplicationStruct::Type
-{
-private:
-    using Super = Clusters::detail::Structs::ApplicationStruct::Type;
-
-public:
-    constexpr Type() = default;
-    constexpr Type(const Super & arg) : Super(arg) {}
-    constexpr Type(Super && arg) : Super(std::move(arg)) {}
-};
-
-using DecodableType = Type;
-
-} // namespace ApplicationStruct
-
+namespace ApplicationStruct = Clusters::detail::Structs::ApplicationStruct;
 } // namespace Structs
 
 namespace Attributes {

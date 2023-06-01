@@ -54,40 +54,7 @@ namespace {{asUpperCamelCase name}} {
 namespace Structs {
 {{/first}}
 {{#if has_more_than_one_cluster}}
-namespace {{asUpperCamelCase name}} {
-
-using Fields = Clusters::detail::Structs::{{asUpperCamelCase name}}::Fields;
-
-// This is a struct type shared across multiple clusters.  Create a type-safe
-// declaration in this cluster namespace (so not just pulling in the shared
-// implementation via "using", but make sure we can initialize our
-// Type/DecodableType from the generic Type/DecodableType as needed.
-struct Type : public Clusters::detail::Structs::{{asUpperCamelCase name}}::Type
-{
-private:
-    using Super = Clusters::detail::Structs::{{asUpperCamelCase name}}::Type;
-public:
-    constexpr Type() = default;
-    constexpr Type(const Super & arg) : Super(arg) {}
-    constexpr Type(Super && arg) : Super(std::move(arg)) {}
-};
-
-{{#if struct_contains_array}}
-struct DecodableType : public Clusters::detail::Structs::{{asUpperCamelCase name}}::DecodableType
-{
-private:
-    using Super = Clusters::detail::Structs::{{asUpperCamelCase name}}::DecodableType;
-public:
-    DecodableType() = default;
-    DecodableType(const Super & arg) : Super(arg) {}
-    DecodableType(Super && arg) : Super(std::move(arg)) {}
-};
-{{else}}
-using DecodableType = Type;
-{{/if}}
-
-} // namespace {{asUpperCamelCase name}}
-
+namespace {{asUpperCamelCase name}} = Clusters::detail::Structs::{{asUpperCamelCase name}};
 {{else}}
 {{> cluster_objects_struct header=true}}
 {{/if}}

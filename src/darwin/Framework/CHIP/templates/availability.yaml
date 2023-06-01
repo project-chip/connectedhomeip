@@ -3216,7 +3216,10 @@
               - SaturationMoveMode
               - SaturationStepMode
           IlluminanceMeasurement:
-              - LightSensorType
+              # LightSensorTypeEnum was originally named LightSensorType, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end, so the name can just change here.
+              - LightSensorTypeEnum
           Channel:
               - ChannelStatusEnum
               - LineupInfoTypeEnum
@@ -3940,7 +3943,7 @@
                   - Up
                   - Down
           IlluminanceMeasurement:
-              LightSensorType:
+              LightSensorTypeEnum:
                   - Photodiode
                   - CMOS
           Channel:
