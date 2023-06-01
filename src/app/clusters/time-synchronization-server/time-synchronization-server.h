@@ -48,12 +48,23 @@ struct timeZoneName
 {
     char name[64];
 };
-enum class DSTState : uint8_t
+
+enum class TimeState : uint8_t
 {
     kInvalid = 0,
     kActive  = 1,
     kChanged = 2,
     kStopped = 2,
+};
+
+enum class TimeSyncEventFlag : uint8_t
+{
+    kNone            = 0,
+    kDSTTableEmpty   = 1,
+    kDSTStatus       = 2,
+    kTimeZoneStatus  = 4,
+    kTimeFailure     = 8,
+    kMissingTTSource = 16,
 };
 
 class TimeSynchronizationServer
@@ -94,8 +105,10 @@ public:
 
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 
-    bool GetUpdatedTimeZoneState();
-    DSTState GetUpdatedDSTOffsetState();
+    TimeState GetUpdatedTimeZoneState();
+    TimeState GetUpdatedDSTOffsetState();
+    TimeSyncEventFlag GetEventFlag(void);
+    void ClearEventFlag(TimeSyncEventFlag flag);
 
 private:
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
@@ -114,6 +127,7 @@ private:
 
     TimeSyncDataProvider mTimeSyncDataProvider;
     static TimeSynchronizationServer mTimeSyncInstance;
+    TimeSyncEventFlag mEventFlag = TimeSyncEventFlag::kNone;
 };
 
 } // namespace TimeSynchronization
