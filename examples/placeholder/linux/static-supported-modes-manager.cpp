@@ -13,7 +13,7 @@ template <typename T>
 using List               = app::DataModel::List<T>;
 using storage_value_type = const ModeOptionStructType;
 namespace {
-Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode, const List<const ModeTag> & modeTags)
+Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_t mode, const List<const ModeTagType> & modeTags)
 {
     Structs::ModeOptionStruct::Type option;
     option.label    = CharSpan::fromCharString(label);
@@ -29,9 +29,9 @@ ModeTagType modeTagsEspresso[]  = { detail::Structs::ModeTagStruct::Type{ .value
 
 // TODO: Configure your options for each endpoint
 storage_value_type StaticSupportedModesManager::coffeeOptions[] = {
-    buildModeOptionStruct("Black", 0, List<const ModeTag>(modeTagsBlack)),
-    buildModeOptionStruct("Cappuccino", 4, List<const ModeTag>(modeTagsCappucino)),
-    buildModeOptionStruct("Espresso", 7, List<const ModeTag>(modeTagsEspresso))
+    buildModeOptionStruct("Black", 0, List<const ModeTagType>(modeTagsBlack)),
+    buildModeOptionStruct("Cappuccino", 4, List<const ModeTagType>(modeTagsCappucino)),
+    buildModeOptionStruct("Espresso", 7, List<const ModeTagType>(modeTagsEspresso))
 };
 const StaticSupportedModesManager::EndpointSpanPair
     StaticSupportedModesManager::supportedOptionsByEndpoints[EMBER_AF_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT] = {
