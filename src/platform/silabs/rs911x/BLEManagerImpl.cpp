@@ -27,10 +27,8 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <platform/internal/BLEManager.h>
+#define RSI_BLE_ENABLE 1
 
-#ifndef SIWX_917
-#include "rail.h"
-#endif
 #include <crypto/RandUtils.h>
 #ifdef __cplusplus
 extern "C" {
@@ -107,15 +105,12 @@ void sl_ble_event_handling_task(void)
     //! This semaphore is waiting for wifi module initialization.
     rsi_semaphore_wait(&sl_rs_ble_init_sem, 0);
 
-    // This function initialize BLE and start BLE advertisement.
+    // Initialize BLE and starts BLE Advertisement
     sl_ble_init();
 
     // Application event map
     while (1)
     {
-        //! This semaphore is waiting for next ble event task
-        rsi_semaphore_wait(&sl_ble_event_sem, 0);
-
         // checking for events list
         event_id = rsi_ble_app_get_event();
         switch (event_id)
@@ -460,10 +455,9 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    // Nothing to do
+    // Nothing to do : Placeholder
 }
 
-// TODO: Need to add RSI BLE STATUS codes
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
     switch (bleErr)
