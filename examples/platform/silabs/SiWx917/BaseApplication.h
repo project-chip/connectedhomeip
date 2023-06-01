@@ -29,8 +29,8 @@
 #include "AppEvent.h"
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
-#include <app/util/config.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/util/config.h>
 #include <ble/BLEEndPoint.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
