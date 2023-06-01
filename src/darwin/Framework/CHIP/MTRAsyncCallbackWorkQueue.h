@@ -56,7 +56,7 @@ typedef void (^MTRAsyncCallbackDuplicateCheckHandler)(id opaqueItemData, BOOL * 
 //   When a work item is dequeued to run, if it is of a type that can be combined with similar work items in a batch, this facility
 //   gives the client of this API an opportunity to coalesce and merge work items.
 //      - The "batching ID" is used for grouping mergeable work items with unique merging strategies. The ID value is opaque to this
-//        API, and the API client is responsible for assinging them.
+//        API, and the API client is responsible for assigning them.
 //      - Each work item will only be asked to batch before it's first dequeued to run readyHandler.
 // See the MTRAsyncCallbackBatchingHandler definition above and the WorkItem's -setBatchingID:data:handler: method description for
 // more details.
