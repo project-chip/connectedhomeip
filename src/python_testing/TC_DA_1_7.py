@@ -76,16 +76,16 @@ class TC_DA_1_7(MatterBaseTest):
         One suggested method of testing:
 
         Terminal 1: (first DUT - default port 5540)
-        rm kvsa
-        <path_to_all_clusters>/chip-all-clusters-app --dac_provider \
+        rm kvs1
+        ${PATH_TO_ALL_CLUSTERS}/chip-all-clusters-app --dac_provider \
             credentials/development/commissioner_dut/struct_cd_authorized_paa_list_count1_valid/test_case_vector.json \
-            --product-id 32768 --KVS kvsa --discriminator 12
+            --product-id 32768 --KVS kvs1 --discriminator 12
 
         Terminal 2: (second DUT - port 5541)
-        rm kvsb
-        <path_to_all_clusters>/chip-all-clusters-app --dac_provider \
+        rm kvs2
+        ${PATH_TO_ALL_CLUSTERS}/chip-all-clusters-app --dac_provider \
             credentials/development/commissioner_dut/struct_cd_authorized_paa_list_count2_valid/test_case_vector.json \
-            --product-id 32768 --KVS kvsb --discriminator 34 --secured-device-port 5541
+            --product-id 32768 --KVS kvs2 --discriminator 34 --secured-device-port 5541
 
         Terminal 3: (test application)
         ./scripts/tests/run_python_test.py --script "src/python_testing/TC_DA_1_7.py" \
