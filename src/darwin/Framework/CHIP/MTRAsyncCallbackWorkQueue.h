@@ -99,7 +99,7 @@ typedef void (^MTRAsyncCallbackDuplicateCheckHandler)(id opaqueItemData, BOOL * 
 
 // Before creating a work item, a client may call this method to check with existing work items that the new potential work item
 // data is not a duplicate request. The work queue will then look for all work items matching the duplicate type ID, and call their
-// duplicateCheckHandler.
+// duplicateCheckHandler with the provided opaqueWorkItemData.
 //
 // Returns YES if any item's duplicateCheckHandler returns a match.
 - (BOOL)isDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData;
