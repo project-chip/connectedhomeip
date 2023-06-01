@@ -182,12 +182,10 @@
     ],
     "ModeSelect": [
         "Test_TC_MOD_1_2",
-        "Test_TC_MOD_1_3",
         "Test_TC_MOD_2_1",
-        "Test_TC_MOD_2_2",
+        "Test_TC_MOD_2_3",
         "Test_TC_MOD_3_1",
         "Test_TC_MOD_3_2",
-        "Test_TC_MOD_3_3",
         "Test_TC_MOD_3_4"
     ],
     "OTASoftwareUpdate": [
@@ -245,10 +243,9 @@
     "WindowCovering": [],
     "FlowMeasurement": ["Test_TC_FLW_2_2"],
     "OccupancySensing": ["Test_TC_OCC_3_1"],
-    "PowerSource": ["Test_TC_PS_2_2"],
+    "PowerSource": ["Test_TC_PS_2_2","Test_TC_PS_3_1"],
     "BooleanState": ["Test_TC_BOOL_2_2"],
     "ColorControl": [
-        "Test_TC_CC_2_2",
         "Test_TC_CC_3_1",
         "Test_TC_CC_7_1",
         "Test_TC_CC_9_1",
