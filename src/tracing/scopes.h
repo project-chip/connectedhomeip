@@ -104,18 +104,20 @@ enum class Scope
 /// An event that happened at an instant (like a zero sized scope)
 enum class Instant
 {
+    UndefinedDoNotUse = 0,
+
     // General instant notifications
-    Resolve_TxtNotApplicable,
-    Resolve_Ipv4NotApplicable,
-    Resolve_Ipv6NotApplicable,
+    Resolve_TxtNotApplicable  = 1,
+    Resolve_Ipv4NotApplicable = 2,
+    Resolve_Ipv6NotApplicable = 3,
 
     // Used if and only if default "Log*" requests
     // are not implemented in the backend.
-    Log_MessageSend,
-    Log_MessageReceived,
-    Log_NodeLookup,
-    Log_NodeDiscovered,
-    Log_NodeDiscoveryFailed,
+    Log_MessageSend         = 1000,
+    Log_MessageReceived     = 1001,
+    Log_NodeLookup          = 1002,
+    Log_NodeDiscovered      = 1003,
+    Log_NodeDiscoveryFailed = 1004,
 };
 
 } // namespace Tracing
