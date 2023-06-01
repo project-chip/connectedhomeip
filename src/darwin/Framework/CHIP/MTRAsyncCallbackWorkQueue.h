@@ -23,10 +23,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^MTRAsyncCallbackReadyHandler)(id context, NSUInteger retryCount);
 
-// The batching handler is called by the work queue when a work item is batchable. The handler will be passed the opaque data from
-// the current and the next work item, and should the next item's data be fully merged into the first, the fullyMerged BOOL should
-// be set to YES, so that the work queue can remove the "next item" from the queue. And when fullyMerged is set to YES, this handler
-// will be called again, if the following item is also batchable with the same ID.
+// The batching handler is called by the work queue when all of the following are true:
+//
+// 1) A work item that is batchable is about to be dequeued and executed for the first time.
+// 2) The next work item in the queue is also batchable.
+// 3) The two work items have matching batching ids.
+//
+// The handler will be passed the opaque data of the two work items: opaqueDataCurrent is the data of the
+// item about to be executed and opaqueDataNext is the data for the next item.
+//
+// The handler is expected to mutate the data as needed to achieve batching.
+//
+// If after the data mutations opaqueDataNext no longer requires any work, the handler
+// should set *fullyMerged to YES to indicate that the next item can be dropped from the queue.
+//  Otherwise the handler should set *fullyMerged to NO.
+//
+// If *fullyMerged is set to YES, this handler may be called again to possibly also batch the work item
+// after the one that was dropped.
 typedef void (^MTRAsyncCallbackBatchingHandler)(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged);
 
 // The duplicate check handler is called by the work queue when the client wishes to verify if a work item is a duplicate of an
