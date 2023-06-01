@@ -19,6 +19,8 @@
 #include <tracing/scope.h>
 
 #include <nlunit-test.h>
+
+#include <algorithm>
 #include <vector>
 
 using namespace chip;
@@ -83,7 +85,7 @@ void TestBasicTracing(nlTestSuite * inSuite, void * inContext)
         }
     }
 
-    LoggingTraceBackend::ReceivedTraceEvent expected[] = {
+    std::vector<LoggingTraceBackend::ReceivedTraceEvent> expected = {
         { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma1 },
         { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma2 },
         { LoggingTraceBackend::TraceEventType::BEGIN, Scope::OperationalCredentials_AddNOC },
@@ -96,12 +98,8 @@ void TestBasicTracing(nlTestSuite * inSuite, void * inContext)
         { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma1 },
     };
 
-    NL_TEST_ASSERT(inSuite, backend.traces().size() == sizeof(expected) / sizeof(expected[0]));
-
-    for (unsigned i = 0; i < backend.traces().size(); i++)
-    {
-        NL_TEST_ASSERT(inSuite, backend.traces()[i] == expected[i]);
-    }
+    NL_TEST_ASSERT(inSuite, backend.traces().size() == expected.size());
+    NL_TEST_ASSERT(inSuite, std::equal(backend.traces().begin(), backend.traces().end(), expected.begin(), expected.end()));
 }
 
 void TestMultipleBackends(nlTestSuite * inSuite, void * inContext)
@@ -128,7 +126,7 @@ void TestMultipleBackends(nlTestSuite * inSuite, void * inContext)
         }
     }
 
-    LoggingTraceBackend::ReceivedTraceEvent expected1[] = {
+    std::vector<LoggingTraceBackend::ReceivedTraceEvent> expected1 = {
         { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma1 },
         { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma2 },
         { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma3 },
@@ -139,13 +137,10 @@ void TestMultipleBackends(nlTestSuite * inSuite, void * inContext)
         { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma1 },
     };
 
-    NL_TEST_ASSERT(inSuite, b1.traces().size() == sizeof(expected1) / sizeof(expected1[0]));
-    for (unsigned i = 0; i < b1.traces().size(); i++)
-    {
-        NL_TEST_ASSERT(inSuite, b1.traces()[i] == expected1[i]);
-    }
+    NL_TEST_ASSERT(inSuite, b1.traces().size() == expected1.size());
+    NL_TEST_ASSERT(inSuite, std::equal(b1.traces().begin(), b1.traces().end(), expected1.begin(), expected1.end()));
 
-    LoggingTraceBackend::ReceivedTraceEvent expected2[] = {
+    std::vector<LoggingTraceBackend::ReceivedTraceEvent> expected2 = {
         { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma2 },
         { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma3 },
         { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma3 },
@@ -154,22 +149,16 @@ void TestMultipleBackends(nlTestSuite * inSuite, void * inContext)
         { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma2 },
     };
 
-    NL_TEST_ASSERT(inSuite, b2.traces().size() == sizeof(expected2) / sizeof(expected2[0]));
-    for (unsigned i = 0; i < b2.traces().size(); i++)
-    {
-        NL_TEST_ASSERT(inSuite, b2.traces()[i] == expected2[i]);
-    }
+    NL_TEST_ASSERT(inSuite, b2.traces().size() == expected2.size());
+    NL_TEST_ASSERT(inSuite, std::equal(b2.traces().begin(), b2.traces().end(), expected2.begin(), expected2.end()));
 
-    LoggingTraceBackend::ReceivedTraceEvent expected3[] = {
+    std::vector<LoggingTraceBackend::ReceivedTraceEvent> expected3 = {
         { LoggingTraceBackend::TraceEventType::BEGIN, Scope::CASESession_SendSigma3 },
         { LoggingTraceBackend::TraceEventType::END, Scope::CASESession_SendSigma3 },
     };
 
-    NL_TEST_ASSERT(inSuite, b3.traces().size() == sizeof(expected3) / sizeof(expected3[0]));
-    for (unsigned i = 0; i < b3.traces().size(); i++)
-    {
-        NL_TEST_ASSERT(inSuite, b3.traces()[i] == expected3[i]);
-    }
+    NL_TEST_ASSERT(inSuite, b3.traces().size() == expected3.size());
+    NL_TEST_ASSERT(inSuite, std::equal(b3.traces().begin(), b3.traces().end(), expected3.begin(), expected3.end()));
 }
 
 const nlTest sTests[] = {
