@@ -28,7 +28,8 @@ using namespace chip::app::Clusters::ModeSelect;
 using chip::Protocols::InteractionModel::Status;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-using ModeTag              = Structs::ModeTagStruct::Type;
+using ModeTagType          = Structs::ModeTagStruct::Type;
+
 template <typename T>
 using List = app::DataModel::List<T>;
 
@@ -52,7 +53,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
     }
 
     ModeOptionStructType * modeOptionStructList = nullptr;
-    ModeTag * modeTags                          = nullptr;
+    ModeTagType * modeTags                      = nullptr;
 
     char keyBuf[ESP32Config::kMaxConfigKeyNameLength];
     uint32_t supportedModeCount = 0;
@@ -111,7 +112,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
         VerifyOrReturnValue(ESP32Config::ReadConfigValue(stCountKey, modeTagCount) == CHIP_NO_ERROR,
                             ModeOptionsProvider(nullptr, nullptr), CleanUp(endpointId));
 
-        modeTags = new ModeTag[modeTagCount];
+        modeTags = new ModeTagType[modeTagCount];
         if (modeTags == nullptr)
         {
             CleanUp(endpointId);
@@ -122,7 +123,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
 
             uint32_t modeTagValue   = 0;
             uint32_t modeTagMfgCode = 0;
-            ModeTag tag;
+            ModeTagType tag;
 
             memset(keyBuf, 0, sizeof(char) * ESP32Config::kMaxConfigKeyNameLength);
             VerifyOrReturnValue(ESP32Config::KeyAllocator::ModeTagValue(keyBuf, sizeof(keyBuf), endpointId, index, stIndex) ==
@@ -147,7 +148,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
 
         option.label    = chip::CharSpan::fromCharString(modeLabel);
         option.mode     = static_cast<uint8_t>(supportedModeMode);
-        option.modeTags = DataModel::List<const ModeTag>(modeTags, modeTagCount);
+        option.modeTags = DataModel::List<const ModeTagType>(modeTags, modeTagCount);
 
         modeOptionStructList[index] = option;
     }

@@ -8,7 +8,7 @@ using namespace chip::app::Clusters::ModeSelect;
 using chip::Protocols::InteractionModel::Status;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-using ModeTag              = Structs::ModeTagStruct::Type;
+using ModeTagType          = Structs::ModeTagStruct::Type;
 template <typename T>
 using List               = app::DataModel::List<T>;
 using storage_value_type = const ModeOptionStructType;
@@ -23,9 +23,9 @@ Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_
 }
 } // namespace
 
-constexpr ModeTag modeTagsBlack[]     = { { .value = 0 } };
-constexpr ModeTag modeTagsCappucino[] = { { .value = 0 } };
-constexpr ModeTag modeTagsEspresso[]  = { { .value = 0 } };
+ModeTagType modeTagsBlack[]     = { detail::Structs::ModeTagStruct::Type{ .value = 0 } };
+ModeTagType modeTagsCappucino[] = { detail::Structs::ModeTagStruct::Type{ .value = 0 } };
+ModeTagType modeTagsEspresso[]  = { detail::Structs::ModeTagStruct::Type{ .value = 0 } };
 
 // TODO: Configure your options for each endpoint
 storage_value_type StaticSupportedModesManager::coffeeOptions[] = {
