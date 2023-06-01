@@ -790,13 +790,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // 4. Cache has no entry
     // TODO: add option for BaseSubscriptionCallback to report during priming, to reduce when case 4 is hit
     if (!attributeIsSpecified || ![self _subscriptionAbleToReport] || hasChangesOmittedQuality || !attributeValueToReturn) {
-        // Read requests container will be an array of items, each being an array containing:
+        // Read requests container will be a mutable array of items, each being an array containing:
         //   [endpoint ID, cluster ID, attribute ID, params]
         // Batching handler should only coalesce when params are equal.
 
         // For this single read API there's only 1 array item. Use NSNull to stand in for nil params for easy comparison.
-        NSMutableArray<NSArray *> * readRequests =
-            [NSMutableArray arrayWithObject:@[ endpointID, clusterID, attributeID, params ?: [NSNull null] ]];
+        NSArray * readRequestData = @[ endpointID, clusterID, attributeID, params ?: [NSNull null] ];
+
+        // But first, check if a duplicate read request is already queued and return
+        if ([_asyncCallbackWorkQueue isDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestData]) {
+            return attributeValueToReturn;
+        }
+
+        NSMutableArray<NSArray *> * readRequests = [NSMutableArray arrayWithObject:readRequestData];
 
         // Create work item, set ready handler to perform task, then enqueue the work
         MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
@@ -808,6 +814,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
             // Can only read up to 9 paths at a time, per spec
             if (readRequestsCurrent.count >= 9) {
+                MTR_LOG_DEFAULT("%@ batching cannot add more", logPrefix);
                 return;
             }
 
@@ -815,15 +822,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 // if params don't match then they cannot be merged
                 if (![readRequestsNext[0][MTRDeviceReadRequestFieldParamsIndex]
                         isEqual:readRequestsCurrent[0][MTRDeviceReadRequestFieldParamsIndex]]) {
+                    MTR_LOG_DEFAULT("%@ batching merged all possible items", logPrefix);
                     return;
                 }
 
                 // merge the next item's first request into the current item's list
                 [readRequestsCurrent addObject:readRequestsNext[0]];
+                MTR_LOG_INFO("%@ batching merging %@ => %lu total", logPrefix, readRequestsNext[0],
+                    (unsigned long) readRequestsCurrent.count);
                 [readRequestsNext removeObjectAtIndex:0];
 
                 // Can only read up to 9 paths at a time, per spec
                 if (readRequestsCurrent.count == 9) {
+                    MTR_LOG_DEFAULT("%@ batching to max paths allowed", logPrefix);
                     break;
                 }
             }
@@ -836,6 +847,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             *isDuplicate = NO;
             for (NSArray * readItem in readRequests) {
                 if ([readItem isEqual:opaqueItemData]) {
+                    MTR_LOG_DEFAULT("%@ duplicate check found %@", logPrefix, readItem);
                     *isDuplicate = YES;
                     return;
                 }
