@@ -18,7 +18,6 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <enum name="OperationalStateEnum" type="ENUM8">
-    <cluster code="0x005A"/>
     <cluster code="0x0060"/>
     <item name="Stopped" value="0x00"/>
     <item name="Running" value="0x01"/>
@@ -35,14 +34,12 @@ limitations under the License.
   </enum>
 
   <struct name="OperationalStateStruct">
-    <cluster code="0x005A"/>
     <cluster code="0x0060"/>
     <item name="OperationalStateID"    type="OperationalStateEnum" optional="false"/>
     <item name="OperationalStateLabel" type="CHAR_STRING" optional="false" length="64"/>
   </struct>
 
   <struct name="ErrorStateStruct">
-    <cluster code="0x005A"/>
     <cluster code="0x0060"/>
     <item name="ErrorStateID" type="ErrorStateEnum" optional="false" />
     <item name="ErrorStateLabel" type="CHAR_STRING" optional="false" isNullable="true" length="64"/>
