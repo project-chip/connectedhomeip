@@ -21,7 +21,6 @@ namespace app {
 
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
- *
  */
 class ICDManager
 {
