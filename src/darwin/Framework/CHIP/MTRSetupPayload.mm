@@ -17,6 +17,7 @@
 
 #import "MTRError.h"
 #import "MTRError_Internal.h"
+#import "MTRFramework.h"
 #import "MTROnboardingPayloadParser.h"
 #import "MTRSetupPayload_Internal.h"
 #import "setup_payload/ManualSetupPayloadGenerator.h"
@@ -28,6 +29,13 @@
 
 @implementation MTRSetupPayload {
     chip::SetupPayload _chipSetupPayload;
+}
+
++ (void)initialize
+{
+    // Need to make sure we set up Platform memory stuff before we start
+    // serializing payloads.
+    MTRFrameworkInit();
 }
 
 - (MTRDiscoveryCapabilities)convertRendezvousFlags:(const chip::Optional<chip::RendezvousInformationFlags> &)value

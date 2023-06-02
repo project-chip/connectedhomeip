@@ -18,6 +18,7 @@
 import re
 import string
 from abc import ABC, abstractmethod
+from typing import List
 
 from .errors import TestStepError
 
@@ -759,7 +760,7 @@ class _ConstraintAnyOf(BaseConstraint):
         return f'The response value "{value}" is not a value from {self._any_of}.'
 
 
-def get_constraints(constraints: dict) -> list[BaseConstraint]:
+def get_constraints(constraints: dict) -> List[BaseConstraint]:
     _constraints = []
     context = constraints
 

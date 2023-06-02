@@ -158,9 +158,9 @@ public:
     /**
      *  @brief Mark the end of this ReportDataMessage
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    ReportDataMessage::Builder & EndOfReportDataMessage();
+    CHIP_ERROR EndOfReportDataMessage();
 
 private:
     AttributeReportIBs::Builder mAttributeReportIBsBuilder;

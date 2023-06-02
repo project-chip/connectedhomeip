@@ -102,10 +102,16 @@
     <string name="enter_setup_pin_code_hint_text">Enter Setup PIN Code</string>
     <string name="enhanced_commissioning_method_btn_text">Enhanced Commissioning Method</string>
     <string name="revoke_btn_text">Revoke</string>
+    <string name="read_window_status_btn_text">Read Window Status</string>
+    <string name="read_admin_fabric_index_btn_text">Read Admin FabricIndex</string>
+    <string name="read_admin_vendor_id_btn_text">Read Admin VID</string>
 
     <string name="op_cred_client_btn_text">Operational Credentials cluster</string>
     <string name="op_cred_client_read_supported_fabric_btn_text">Read Supported Fabric count</string>
     <string name="op_cred_client_read_commissioned_fabric_btn_text">Read Commissioned Fabric count</string>
+    <string name="op_cred_client_read_fabrics_btn_text">Read Fabrics</string>
+    <string name="op_cred_client_remove_fabrics_btn_text">Remove Fabrics</string>
+    <string name="op_cred_client_fabric_index_hint_text">FabricIndex</string>
 
     <string name="basic_cluster_btn_text">Basic cluster</string>
     <string name="basic_cluster_write_btn_text">Write</string>

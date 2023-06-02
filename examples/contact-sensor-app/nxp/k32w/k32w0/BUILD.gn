@@ -167,10 +167,20 @@ if (chip_pw_tokenizer_logging) {
 }
 
 group("k32w0") {
-  deps = [ ":contact_sensor_app" ]
+  deps = [
+    ":binsign",
+    ":contact_sensor_app",
+  ]
   if (chip_pw_tokenizer_logging) {
     deps += [ ":contact_sensor_app.database" ]
   }
+}
+
+action("binsign") {
+  deps = [ ":contact_sensor_app" ]
+  script = "${k32w0_platform_dir}/scripts/sign-outdir.py"
+  output_name = "bignsign.log"
+  outputs = [ "${root_build_dir}/${output_name}" ]
 }
 
 group("default") {

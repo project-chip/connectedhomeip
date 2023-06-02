@@ -1614,17 +1614,20 @@ void BLEManagerImpl::blekw_new_data_received_notification(uint32_t mask)
 
 void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
-    if (sInstance.mFlags.Has(Flags::kFastAdvertisingEnabled))
+    // If stop advertising fails (timeout on event wait), then
+    // rearm the timer as fast as possible to retry.
+    // Once stop advertising is successful, slow advertising can start.
+    auto err = sInstance.StopAdvertising();
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
-
-        sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
-        // stop advertiser, change interval and restart it;
-        sInstance.StopAdvertising();
-        sInstance.StartAdvertising();
+        ChipLogDetail(DeviceLayer, "Stop advertising failed. Retrying...");
+        StartBleAdvTimeoutTimer(portTICK_PERIOD_MS);
+        return;
     }
 
-    return;
+    sInstance.mFlags.Clear(Flags::kFastAdvertisingEnabled);
+    ChipLogDetail(DeviceLayer, "Start slow advertisement");
+    sInstance.StartAdvertising();
 }
 
 void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
