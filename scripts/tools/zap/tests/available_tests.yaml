@@ -15,7 +15,6 @@ inputs/all-clusters-app.zap:
         CHIPClusters.h: outputs/all-clusters-app/app-templates/CHIPClusters.h
         endpoint_config.h: outputs/all-clusters-app/app-templates/endpoint_config.h
         gen_config.h: outputs/all-clusters-app/app-templates/gen_config.h
-        CHIPClientCallbacks.h: outputs/all-clusters-app/app-templates/CHIPClientCallbacks.h
         access.h: outputs/all-clusters-app/app-templates/access.h
         IMClusterCommandHandler.cpp: outputs/all-clusters-app/app-templates/IMClusterCommandHandler.cpp
 
@@ -24,6 +23,5 @@ inputs/lighting-app.zap:
         CHIPClusters.h: outputs/lighting-app/app-templates/CHIPClusters.h
         endpoint_config.h: outputs/lighting-app/app-templates/endpoint_config.h
         gen_config.h: outputs/lighting-app/app-templates/gen_config.h
-        CHIPClientCallbacks.h: outputs/lighting-app/app-templates/CHIPClientCallbacks.h
         access.h: outputs/lighting-app/app-templates/access.h
         IMClusterCommandHandler.cpp: outputs/lighting-app/app-templates/IMClusterCommandHandler.cpp

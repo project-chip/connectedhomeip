@@ -20,7 +20,7 @@
 #include <jni.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/JniReferences.h>
-#include <zap-generated/CHIPClientCallbacks.h>
+#include <controller/java/zap-generated/CHIPClientCallbacks.h>
 
 class CHIPBooleanAttributeCallback : public chip::Callback::Callback<BooleanAttributeCallback>
 {
