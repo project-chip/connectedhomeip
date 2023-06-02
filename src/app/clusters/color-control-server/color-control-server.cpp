@@ -2009,8 +2009,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     Attributes::CurrentX::Set(endpoint, colorXTransitionState->currentValue);
     Attributes::CurrentY::Set(endpoint, colorYTransitionState->currentValue);
 
-    ChipLogProgress(Zcl, "Color X %d Color Y %d", colorXTransitionState->currentValue,
-                                      colorYTransitionState->currentValue);
+    ChipLogProgress(Zcl, "Color X %d Color Y %d", colorXTransitionState->currentValue, colorYTransitionState->currentValue);
 
     computePwmFromXy(endpoint);
 }

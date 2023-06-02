@@ -249,8 +249,8 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     // if we dont support that attribute
     if (metadata == nullptr)
     {
-        ChipLogProgress(Zcl, "%pep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported",
-                                 "WRITE ERR: ", endpoint, ChipLogValueMEI(cluster), ChipLogValueMEI(attributeID));
+        ChipLogProgress(Zcl, "%pep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported", "WRITE ERR: ", endpoint,
+                        ChipLogValueMEI(cluster), ChipLogValueMEI(attributeID));
         emberAfAttributesFlush();
         return status;
     }
@@ -395,7 +395,7 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     record.clusterId   = cluster;
     record.attributeId = attributeID;
     status             = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
-                                      false); // write?
+                                                  false); // write?
 
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {

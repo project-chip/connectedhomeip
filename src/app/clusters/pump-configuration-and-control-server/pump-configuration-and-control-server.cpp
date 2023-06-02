@@ -253,7 +253,7 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     ChipLogProgress(Zcl, "PCC Server Cluster Attribute Pre-changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
-                        (unsigned int) attributePath.mAttributeId);
+                    (unsigned int) attributePath.mAttributeId);
 
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
 
@@ -354,7 +354,7 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
 void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
     ChipLogProgress(Zcl, "PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
-                        (unsigned int) attributePath.mAttributeId);
+                    (unsigned int) attributePath.mAttributeId);
 
     switch (attributePath.mAttributeId)
     {

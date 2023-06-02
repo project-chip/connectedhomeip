@@ -320,7 +320,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
         state.targetPosition  = percentOpen;
         state.delayMs         = calculateDelayMs(endpoint, state.targetPosition, &state.increasing);
         ChipLogProgress(Zcl, "Scheduling barrier move from %d to %d with %" PRIu32 "ms delay", state.currentPosition,
-                                            state.targetPosition, state.delayMs);
+                        state.targetPosition, state.delayMs);
         scheduleTimerCallbackMs(endpoint, state.delayMs);
 
         if (state.currentPosition < state.targetPosition)

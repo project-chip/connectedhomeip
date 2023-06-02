@@ -467,12 +467,12 @@ Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::Decodable
     if (transitionTime.IsNull())
     {
         ChipLogProgress(Zcl, "%s MOVE_TO_LEVEL %x null %x %x", "RX level-control:", level, optionsMask.Raw(),
-                                          optionsOverride.Raw());
+                        optionsOverride.Raw());
     }
     else
     {
-        ChipLogProgress(Zcl, "%s MOVE_TO_LEVEL %x %2x %x %x", "RX level-control:", level, transitionTime.Value(),
-                                          optionsMask.Raw(), optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s MOVE_TO_LEVEL %x %2x %x %x", "RX level-control:", level, transitionTime.Value(), optionsMask.Raw(),
+                        optionsOverride.Raw());
     }
 
     return moveToLevelHandler(endpointId, Commands::MoveToLevel::Id, level, transitionTime,
@@ -493,13 +493,13 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
 
     if (transitionTime.IsNull())
     {
-        ChipLogProgress(Zcl, "%s MOVE_TO_LEVEL_WITH_ON_OFF %x null %x %x", "RX level-control:", level,
-                                          optionsMask.Raw(), optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s MOVE_TO_LEVEL_WITH_ON_OFF %x null %x %x", "RX level-control:", level, optionsMask.Raw(),
+                        optionsOverride.Raw());
     }
     else
     {
-        ChipLogProgress(Zcl, "%s MOVE_TO_LEVEL_WITH_ON_OFF %x %2x %x %x", "RX level-control:", level,
-                                          transitionTime.Value(), optionsMask.Raw(), optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s MOVE_TO_LEVEL_WITH_ON_OFF %x %2x %x %x", "RX level-control:", level, transitionTime.Value(),
+                        optionsMask.Raw(), optionsOverride.Raw());
     }
 
     Status status = moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime,
@@ -522,13 +522,12 @@ bool emberAfLevelControlClusterMoveCallback(app::CommandHandler * commandObj, co
 
     if (rate.IsNull())
     {
-        ChipLogProgress(Zcl, "%s MOVE %x null %x %x", "RX level-control:", moveMode, optionsMask.Raw(),
-                                          optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s MOVE %x null %x %x", "RX level-control:", moveMode, optionsMask.Raw(), optionsOverride.Raw());
     }
     else
     {
         ChipLogProgress(Zcl, "%s MOVE %x %u %x %x", "RX level-control:", moveMode, rate.Value(), optionsMask.Raw(),
-                                          optionsOverride.Raw());
+                        optionsOverride.Raw());
     }
 
     moveHandler(commandObj, commandPath, moveMode, rate, Optional<BitMask<LevelControlOptions>>(optionsMask),
@@ -547,12 +546,12 @@ bool emberAfLevelControlClusterMoveWithOnOffCallback(app::CommandHandler * comma
     if (rate.IsNull())
     {
         ChipLogProgress(Zcl, "%s MOVE_WITH_ON_OFF %x null %x %x", "RX level-control:", moveMode, optionsMask.Raw(),
-                                          optionsOverride.Raw());
+                        optionsOverride.Raw());
     }
     else
     {
-        ChipLogProgress(Zcl, "%s MOVE_WITH_ON_OFF %u %2x %x %x", "RX level-control:", moveMode, rate.Value(),
-                                          optionsMask.Raw(), optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s MOVE_WITH_ON_OFF %u %2x %x %x", "RX level-control:", moveMode, rate.Value(), optionsMask.Raw(),
+                        optionsOverride.Raw());
     }
 
     moveHandler(commandObj, commandPath, moveMode, rate, Optional<BitMask<LevelControlOptions>>(optionsMask),
@@ -572,12 +571,12 @@ bool emberAfLevelControlClusterStepCallback(app::CommandHandler * commandObj, co
     if (transitionTime.IsNull())
     {
         ChipLogProgress(Zcl, "%s STEP %x %x null %x %x", "RX level-control:", stepMode, stepSize, optionsMask.Raw(),
-                                          optionsOverride.Raw());
+                        optionsOverride.Raw());
     }
     else
     {
-        ChipLogProgress(Zcl, "%s STEP %x %x %2x %x %x", "RX level-control:", stepMode, stepSize,
-                                          transitionTime.Value(), optionsMask.Raw(), optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s STEP %x %x %2x %x %x", "RX level-control:", stepMode, stepSize, transitionTime.Value(),
+                        optionsMask.Raw(), optionsOverride.Raw());
     }
 
     stepHandler(commandObj, commandPath, stepMode, stepSize, transitionTime, Optional<BitMask<LevelControlOptions>>(optionsMask),
@@ -596,13 +595,13 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(app::CommandHandler * comma
 
     if (transitionTime.IsNull())
     {
-        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x null %x %x", "RX level-control:", stepMode, stepSize,
-                                          optionsMask.Raw(), optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x null %x %x", "RX level-control:", stepMode, stepSize, optionsMask.Raw(),
+                        optionsOverride.Raw());
     }
     else
     {
-        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x %2x %x %x", "RX level-control:", stepMode, stepSize,
-                                          transitionTime.Value(), optionsMask.Raw(), optionsOverride.Raw());
+        ChipLogProgress(Zcl, "%s STEP_WITH_ON_OFF %x %x %2x %x %x", "RX level-control:", stepMode, stepSize, transitionTime.Value(),
+                        optionsMask.Raw(), optionsOverride.Raw());
     }
 
     stepHandler(commandObj, commandPath, stepMode, stepSize, transitionTime, Optional<BitMask<LevelControlOptions>>(optionsMask),
