@@ -19,7 +19,7 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-#import "MTRAsyncCallbackWorkQueue.h"
+#import "MTRAsyncCallbackWorkQueue_Internal.h"
 
 @interface MTRAsyncCallbackQueueTests : XCTestCase
 
@@ -326,7 +326,7 @@
 - (void)testDuplicate
 {
     XCTestExpectation * workItem0ReadyExpectation = [self expectationWithDescription:@"Work item 0 called"];
-    __block BOOL workItem0ReadyCalled = NO;
+    XCTestExpectation * workItem6ReadyExpectation = [self expectationWithDescription:@"Work item 6 called"];
 
     MTRAsyncCallbackWorkQueue * workQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:nil queue:dispatch_get_main_queue()];
 
@@ -342,14 +342,14 @@
         };
         workItem1.readyHandler = readyHandler1;
         [workItem1 setDuplicateTypeID:1
-                              handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate) {
+                              handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate, BOOL * stop) {
                                   if ([opaqueItemData isEqual:@(1)]) {
                                       *isDuplicate = YES;
+                                      *stop = YES;
                                   } else {
-                                      *isDuplicate = NO;
+                                      *stop = NO;
                                   }
                               }];
-        // No cancel handler on purpose.
         [workQueue enqueueWorkItem:workItem1];
 
         MTRAsyncCallbackQueueWorkItem * workItem2 =
@@ -359,14 +359,14 @@
         };
         workItem2.readyHandler = readyHandler2;
         [workItem2 setDuplicateTypeID:1
-                              handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate) {
+                              handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate, BOOL * stop) {
                                   if ([opaqueItemData isEqual:@(2)]) {
                                       *isDuplicate = YES;
+                                      *stop = YES;
                                   } else {
-                                      *isDuplicate = NO;
+                                      *stop = NO;
                                   }
                               }];
-        // No cancel handler on purpose.
         [workQueue enqueueWorkItem:workItem2];
 
         MTRAsyncCallbackQueueWorkItem * workItem3 =
@@ -376,11 +376,12 @@
         };
         workItem3.readyHandler = readyHandler3;
         [workItem3 setDuplicateTypeID:2
-                              handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate) {
+                              handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate, BOOL * stop) {
                                   if ([opaqueItemData isEqual:@(1)]) {
                                       *isDuplicate = YES;
+                                      *stop = YES;
                                   } else {
-                                      *isDuplicate = NO;
+                                      *stop = NO;
                                   }
                               }];
         [workQueue enqueueWorkItem:workItem3];
@@ -396,17 +397,78 @@
         XCTAssertFalse([workQueue isDuplicateForTypeID:1 workItemData:@(3)]);
         XCTAssertFalse([workQueue isDuplicateForTypeID:2 workItemData:@(2)]);
 
+        // Test returning *isDuplicate=NO and queuing one extra duplicate item, and that the extra item runs
+
+        // First have a regular item with ID/data == 3/1
+        MTRAsyncCallbackQueueWorkItem * workItem4 =
+            [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        MTRAsyncCallbackReadyHandler readyHandler4 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+            [workItem4 endWork];
+        };
+        workItem4.readyHandler = readyHandler4;
+        [workItem4 setDuplicateTypeID:3
+                              handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate, BOOL * stop) {
+                                  if ([opaqueItemData isEqual:@(1)]) {
+                                      *isDuplicate = YES;
+                                      *stop = YES;
+                                  } else {
+                                      *stop = NO;
+                                  }
+                              }];
+        [workQueue enqueueWorkItem:workItem4];
+
+        XCTAssertTrue([workQueue isDuplicateForTypeID:3 workItemData:@(1)]);
+
+        // Have a barrier item with ID/data == 3/1 that returns *isDuplicate=NO
+        MTRAsyncCallbackQueueWorkItem * workItem5 =
+            [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        MTRAsyncCallbackReadyHandler readyHandler5 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+            [workItem5 endWork];
+        };
+        workItem5.readyHandler = readyHandler5;
+        [workItem5 setDuplicateTypeID:3
+                              handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate, BOOL * stop) {
+                                  if ([opaqueItemData isEqual:@(1)]) {
+                                      *isDuplicate = NO;
+                                      *stop = YES;
+                                  } else {
+                                      *stop = NO;
+                                  }
+                              }];
+        [workQueue enqueueWorkItem:workItem5];
+
+        // After the above, the same ID/data should no longer be considered duplicate
+        XCTAssertFalse([workQueue isDuplicateForTypeID:3 workItemData:@(1)]);
+
+        // Now add regular regular item with ID/data == 3/1
+        MTRAsyncCallbackQueueWorkItem * workItem6 =
+            [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+        MTRAsyncCallbackReadyHandler readyHandler6 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+            [workItem6 endWork];
+            [workItem6ReadyExpectation fulfill];
+        };
+        workItem6.readyHandler = readyHandler6;
+        [workItem6 setDuplicateTypeID:3
+                              handler:^(id _Nonnull opaqueItemData, BOOL * _Nonnull isDuplicate, BOOL * stop) {
+                                  if ([opaqueItemData isEqual:@(1)]) {
+                                      *isDuplicate = YES;
+                                      *stop = YES;
+                                  } else {
+                                      *stop = NO;
+                                  }
+                              }];
+        [workQueue enqueueWorkItem:workItem6];
+
+        // After the above, the same ID/data should no longer be considered duplicate
+        XCTAssertTrue([workQueue isDuplicateForTypeID:3 workItemData:@(1)]);
+
         [workItem0 endWork];
         [workItem0ReadyExpectation fulfill];
     };
     workItem0.readyHandler = readyHandler0;
-    // No cancel handler on purpose.
     [workQueue enqueueWorkItem:workItem0];
 
-    // double check that items 1~3 have not processed yet because of item 0's sleep()
-    XCTAssertFalse(workItem0ReadyCalled);
-
-    [self waitForExpectations:@[ workItem0ReadyExpectation ] timeout:5];
+    [self waitForExpectations:@[ workItem0ReadyExpectation, workItem6ReadyExpectation ] timeout:5];
 }
 
 @end

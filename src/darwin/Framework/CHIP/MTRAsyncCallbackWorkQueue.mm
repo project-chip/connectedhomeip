@@ -197,17 +197,18 @@
 - (BOOL)isDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData
 {
     os_unfair_lock_lock(&_lock);
-    int i = 0;
-    for (MTRAsyncCallbackQueueWorkItem * item in self.items) {
+    // Start from the last item
+    for (NSUInteger i = self.items.count; i > 0; i--) {
+        MTRAsyncCallbackQueueWorkItem * item = self.items[i - 1];
         BOOL isDuplicate = NO;
+        BOOL stop = NO;
         if (item.supportsDuplicateCheck && (item.duplicateTypeID == opaqueDuplicateTypeID) && item.duplicateCheckHandler) {
-            item.duplicateCheckHandler(opaqueWorkItemData, &isDuplicate);
-            if (isDuplicate) {
+            item.duplicateCheckHandler(opaqueWorkItemData, &isDuplicate, &stop);
+            if (stop) {
                 os_unfair_lock_unlock(&_lock);
-                return YES;
+                return isDuplicate;
             }
         }
-        i++;
     }
     os_unfair_lock_unlock(&_lock);
     return NO;
