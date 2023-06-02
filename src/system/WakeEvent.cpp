@@ -155,7 +155,7 @@ int WriteEvent(int eventFd)
 {
     uint64_t value = 1;
 
-    return ::write(mReadFD, &value, sizeof(value));
+    return ::write(eventFd, &value, sizeof(value));
 }
 
 #endif
