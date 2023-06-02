@@ -136,7 +136,6 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);
-
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     ReturnErrorOnFailure(err);
