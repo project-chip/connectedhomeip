@@ -26,8 +26,8 @@ namespace chip {
 namespace app {
 
 /**
- * @brief ICDEventManager class is responsible of processing Platform Events that affect an ICDs behaviour
- * The class registers an Event Handler with the Platform Manager and dispatchs the processing to the ICDManager class.
+ * @brief ICDEventManager class is responsible of processing Platform Events that affect an ICD's behaviour
+ * The class registers an Event Handler with the Platform Manager and dispatches the processing to the ICDManager class.
  */
 class ICDEventManager
 {
