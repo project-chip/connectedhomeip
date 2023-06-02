@@ -150,10 +150,10 @@ void emberAfPrintAttributeTable()
                 //        halResetWatchdog();
 
                 ChipLogProgress(Zcl, ChipLogFormatMEI " / " ChipLogFormatMEI " / ", ChipLogValueMEI(cluster->clusterId),
-                                       ChipLogValueMEI(metaData->attributeId));
+                                ChipLogValueMEI(metaData->attributeId));
                 ChipLogProgress(Zcl, "----");
-                ChipLogProgress(Zcl,
-                    " / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
+                ChipLogProgress(
+                    Zcl, " / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
                     (metaData->IsReadOnly() ? "RO" : "RW"),
                     (metaData->IsAutomaticallyPersisted() ? " nonvolatile " : (metaData->IsExternal() ? " extern " : "  RAM  ")));
                 status =
@@ -425,7 +425,7 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     record.clusterId   = cluster;
     record.attributeId = attributeID;
     status             = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
-                                                  false); // write?
+                                      false); // write?
 
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
