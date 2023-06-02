@@ -69,9 +69,7 @@ OnOffManager * GetOnOffManager(EndpointId endpoint)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::OnOff::Id, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kOnffManagerTableSize)
-                ? nullptr
-                : gOnOffManagerTable[ep]);
+    return (ep >= kOnffManagerTableSize ? nullptr : gOnOffManagerTable[ep]);
 }
 
 void OnOffManager::PostOnOffChanged(chip::EndpointId endpoint, bool value)
