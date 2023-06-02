@@ -130,7 +130,7 @@ tests:
       command: "readAttribute"
       attribute: "StartUpColorTemperatureMireds"
       response:
-          saveAs: StartUpColorTemperatureMireds
+          saveAs: StartUpColorTemperatureMiredsValue
           constraints:
               type: int16u
               minValue: 0
@@ -183,14 +183,14 @@ tests:
       command: "readAttribute"
       attribute: "StartUpColorTemperatureMireds"
       response:
-          value: StartUpColorTemperatureMireds
+          value: StartUpColorTemperatureMiredsValue
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
-          value: StartUpColorTemperatureMireds
+          value: StartUpColorTemperatureMiredsValue
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F04 && CC.S.A0008
