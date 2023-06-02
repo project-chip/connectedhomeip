@@ -66,7 +66,8 @@ typedef void (^MTRAsyncCallbackBatchingHandler)(id opaqueDataCurrent, id opaqueD
 //
 // If the handler determins the data is not duplicate work, it should set *stop to YES, and set *isDuplicate to NO.
 //
-// If the handler is unable to determins if the data is duplicate work, it should set *stop to NO.
+// If the handler is unable to determine if the data is duplicate work, it should set *stop to NO.
+// In this case, the value of *isDuplicate is not examined.
 typedef void (^MTRAsyncCallbackDuplicateCheckHandler)(id opaqueItemData, BOOL * isDuplicate, BOOL * stop);
 
 @interface MTRAsyncCallbackWorkQueue ()
