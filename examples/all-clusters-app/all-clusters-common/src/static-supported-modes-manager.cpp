@@ -73,7 +73,7 @@ Status StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointI
             return Status::Success;
         }
     }
-    ChipLogDetail("Cannot find the mode %u", mode);
+    ChipLogDetail(Zcl, "Cannot find the mode %u", mode);
     return Status::InvalidCommand;
 }
 

@@ -207,6 +207,6 @@ bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
 
 void MatterAdministratorCommissioningPluginServerInitCallback()
 {
-    ChipLogDetail("Initiating Admin Commissioning cluster.");
+    ChipLogDetail(Zcl, "Initiating Admin Commissioning cluster.");
     registerAttributeAccessOverride(&gAdminCommissioningAttrAccess);
 }

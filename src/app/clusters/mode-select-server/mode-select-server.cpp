@@ -98,7 +98,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
                                                   const ModeSelect::Commands::ChangeToMode::DecodableType & commandData)
 {
-    ChipLogDetail("ModeSelect: Entering emberAfModeSelectClusterChangeToModeCallback");
+    ChipLogDetail(Zcl, "ModeSelect: Entering emberAfModeSelectClusterChangeToModeCallback");
     EndpointId endpointId = commandPath.mEndpointId;
     uint8_t newMode       = commandData.newMode;
     // Check that the newMode matches one of the supported options
@@ -107,13 +107,13 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
         ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
     if (Status::Success != checkSupportedModeStatus)
     {
-        ChipLogDetail("ModeSelect: Failed to find the option with mode %u", newMode);
+        ChipLogDetail(Zcl, "ModeSelect: Failed to find the option with mode %u", newMode);
         commandHandler->AddStatus(commandPath, checkSupportedModeStatus);
         return true;
     }
     ModeSelect::Attributes::CurrentMode::Set(endpointId, newMode);
 
-    ChipLogDetail("ModeSelect: ChangeToMode successful");
+    ChipLogDetail(Zcl, "ModeSelect: ChangeToMode successful");
     commandHandler->AddStatus(commandPath, Status::Success);
     return true;
 }
@@ -155,7 +155,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 {
                     if (onOffValueForStartUp && !onMode.IsNull())
                     {
-                        ChipLogDetail("ModeSelect: CurrentMode is overwritten by OnMode");
+                        ChipLogDetail(Zcl, "ModeSelect: CurrentMode is overwritten by OnMode");
                         return;
                     }
                 }
@@ -190,16 +190,14 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 }
                 else
                 {
-                    ChipLogDetail(EMBER_AF_PRINT_DEBUG, "ModeSelect: Successfully initialized CurrentMode to %u",
-                                  startUpMode.Value());
+                    ChipLogDetail(Zcl, "ModeSelect: Successfully initialized CurrentMode to %u", startUpMode.Value());
                 }
             }
         }
     }
     else
     {
-        ChipLogDetail(EMBER_AF_PRINT_DEBUG,
-                      "ModeSelect: Skipped initializing CurrentMode by StartUpMode because one of them is volatile");
+        ChipLogDetail(Zcl, "ModeSelect: Skipped initializing CurrentMode by StartUpMode because one of them is volatile");
     }
 }
 
