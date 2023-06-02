@@ -74,17 +74,6 @@ EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attri
     return emAfReadAttribute(endpoint, cluster, attributeID, dataPtr, readLength, nullptr);
 }
 
-static void emberAfAttributeDecodeAndPrintCluster(ClusterId cluster)
-{
-#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
-    uint16_t index = emberAfFindClusterNameIndex(cluster);
-    if (index != 0xFFFF)
-    {
-        ChipLogProgress(Zcl, "(%p)", zclClusterNames[index].name);
-    }
-#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
-}
-
 //------------------------------------------------------------------------------
 // Internal Functions
 
