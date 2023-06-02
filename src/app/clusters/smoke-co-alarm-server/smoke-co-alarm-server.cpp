@@ -55,21 +55,8 @@ SmokeCoAlarmServer & SmokeCoAlarmServer::Instance()
 
 bool SmokeCoAlarmServer::SetExpressedState(EndpointId endpointId, ExpressedStateEnum newExpressedState)
 {
-    expressedStateMask |= (1 << to_underlying(newExpressedState));
-
     ExpressedStateEnum expressedState;
     bool success = GetAttribute(endpointId, Attributes::ExpressedState::Id, Attributes::ExpressedState::Get, expressedState);
-    expressedStateMask |= (1 << to_underlying(expressedState));
-
-    // Get the highest priority alarm
-    for (ExpressedStateEnum i : expressedStatePriority)
-    {
-        if (expressedStateMask & (1 << to_underlying(i)))
-        {
-            newExpressedState = i;
-            break;
-        }
-    }
 
     if (success && (expressedState != newExpressedState))
     {
@@ -80,50 +67,6 @@ bool SmokeCoAlarmServer::SetExpressedState(EndpointId endpointId, ExpressedState
             Events::AllClear::Type event{};
             SendEvent(endpointId, event);
         }
-    }
-
-    // If unsuccessful, recover the record values
-    if (!success)
-    {
-        expressedStateMask &= ~(1 << to_underlying(newExpressedState));
-    }
-
-    return success;
-}
-
-bool SmokeCoAlarmServer::UnsetExpressedState(EndpointId endpointId, ExpressedStateEnum newExpressedState)
-{
-    expressedStateMask &= ~(1 << to_underlying(newExpressedState));
-
-    ExpressedStateEnum expressedState;
-    bool success = GetAttribute(endpointId, Attributes::ExpressedState::Id, Attributes::ExpressedState::Get, expressedState);
-    expressedStateMask |= (1 << to_underlying(expressedState));
-
-    // Get the highest priority alarm
-    for (ExpressedStateEnum i : expressedStatePriority)
-    {
-        if (expressedStateMask & (1 << to_underlying(i)))
-        {
-            newExpressedState = i;
-            break;
-        }
-    }
-
-    if (success && (expressedState != newExpressedState))
-    {
-        success = SetAttribute(endpointId, Attributes::ExpressedState::Id, Attributes::ExpressedState::Set, newExpressedState);
-
-        if (success && (newExpressedState == ExpressedStateEnum::kNormal))
-        {
-            Events::AllClear::Type event{};
-            SendEvent(endpointId, event);
-        }
-    }
-
-    // If unsuccessful, recover the record values
-    if (!success)
-    {
-        expressedStateMask |= (1 << to_underlying(newExpressedState));
     }
 
     return success;
@@ -348,9 +291,7 @@ bool SmokeCoAlarmServer::SetSensitivityLevel(EndpointId endpointId, SensitivityE
 
 bool SmokeCoAlarmServer::GetExpressedState(chip ::EndpointId endpointId, ExpressedStateEnum & expressedState)
 {
-    bool success = GetAttribute(endpointId, Attributes::ExpressedState::Id, Attributes::ExpressedState::Get, expressedState);
-    expressedStateMask |= (1 << to_underlying(expressedState));
-    return success;
+    return GetAttribute(endpointId, Attributes::ExpressedState::Id, Attributes::ExpressedState::Get, expressedState);
 }
 
 bool SmokeCoAlarmServer::GetSmokeState(EndpointId endpointId, AlarmStateEnum & smokeState)
@@ -443,19 +384,7 @@ bool SmokeCoAlarmServer::HandleRemoteSelfTestRequest(CommandHandler * commandObj
         }
         else
         {
-            success = SetExpressedState(endpointId, ExpressedStateEnum::kTesting);
-            if (success)
-            {
-                success = SetTestInProgress(endpointId, true);
-            }
-
-            if (success)
-            {
-                success = emberAfPluginSmokeCoAlarmSelfTestRequestCommand(endpointId);
-
-                UnsetExpressedState(endpointId, ExpressedStateEnum::kTesting);
-                SetTestInProgress(endpointId, false);
-            }
+            success = emberAfPluginSmokeCoAlarmSelfTestRequestCommand(endpointId);
         }
     }
 

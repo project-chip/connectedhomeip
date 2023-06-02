@@ -53,23 +53,13 @@ public:
     /**
      * @brief Updates the expressed state with new value
      *
-     * @note Only the highest priority alarms for multiple alarm conditions will be set.
-     *       If the value of ExpressedState is not Normal, the attribute corresponding to the value should not be Normal.
+     * @note If the value of ExpressedState is not Normal, the attribute corresponding to the value should not be Normal.
      *
      * @param endpointId ID of the endpoint
      * @param newExpressedState new expressed state
      * @return true on success, false on failure
      */
     bool SetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum newExpressedState);
-
-    /**
-     * @brief Clear the expressed state with the value
-     *
-     * @param endpointId ID of the endpoint
-     * @param expressedState expressed state
-     * @return true on success, false on failure
-     */
-    bool UnsetExpressedState(chip::EndpointId endpointId, ExpressedStateEnum expressedState);
 
     bool SetSmokeState(chip::EndpointId endpointId, AlarmStateEnum newSmokeState);
     bool SetCOState(chip::EndpointId endpointId, AlarmStateEnum newCOState);
@@ -103,15 +93,6 @@ public:
     inline bool SupportsSmokeAlarm(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kSmokeAlarm); }
 
     inline bool SupportsCOAlarm(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kCoAlarm); }
-
-    /**
-     * @brief ExpressedState priority, the priority order of conditions is determined by the manufacturer
-     */
-    std::array<ExpressedStateEnum, 9> expressedStatePriority{
-        ExpressedStateEnum::kEndOfService,      ExpressedStateEnum::kSmokeAlarm,     ExpressedStateEnum::kCOAlarm,
-        ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kHardwareFault,
-        ExpressedStateEnum::kBatteryAlert,      ExpressedStateEnum::kTesting,        ExpressedStateEnum::kNormal,
-    };
 
 private:
     /**
@@ -168,11 +149,6 @@ private:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
 
-    /**
-     * @brief Expression status record values
-     */
-    int expressedStateMask = 1;
-
     static SmokeCoAlarmServer sInstance;
 };
 
@@ -184,7 +160,9 @@ private:
 /**
  * @brief User handler for SelfTestRequest command (server)
  *
- * @param   endpointId      endpoint for which SelfTestRequest command is called
+ * @note The application must set the ExpressedState to "Testing"
+ *
+ * @param endpointId endpoint for which SelfTestRequest command is called
  *
  * @retval true on success
  * @retval false if error happened (err should be set to appropriate error code)

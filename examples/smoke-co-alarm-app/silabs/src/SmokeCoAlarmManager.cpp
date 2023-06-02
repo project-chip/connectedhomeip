@@ -37,10 +37,29 @@ CHIP_ERROR SmokeCoAlarmManager::Init()
 bool SmokeCoAlarmManager::StartSelfTesting()
 {
     bool success = true;
+    ExpressedStateEnum expressedState;
 
-    SILABS_LOG("Start self-testing!");
+    success = SmokeCoAlarmServer::Instance().GetExpressedState(1, expressedState);
 
-    SILABS_LOG("End self-testing!");
+    if (success)
+    {
+        success = SmokeCoAlarmServer::Instance().SetExpressedState(1, ExpressedStateEnum::kTesting);
+    }
+
+    if (success)
+    {
+        success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, true);
+    }
+
+    if (success)
+    {
+        SILABS_LOG("Start self-testing!");
+
+        SILABS_LOG("End self-testing!");
+    }
+
+    SmokeCoAlarmServer::Instance().SetExpressedState(1, expressedState);
+    SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
 
     return success;
 }
