@@ -17,8 +17,6 @@
  */
 
 #include "static-supported-modes-manager.h"
-#include <app/util/debug-printing.h>
-#include <app/util/ember-print.h>
 #include <platform/ESP32/ESP32Config.h>
 
 using namespace chip;

@@ -173,7 +173,6 @@ template("chip_data_model") {
       "${_app_root}/util/binding-table.cpp",
       "${_app_root}/util/binding-table.h",
       "${_app_root}/util/ember-compatibility-functions.cpp",
-      "${_app_root}/util/ember-print.cpp",
       "${_app_root}/util/error-mapping.cpp",
       "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/message.cpp",
