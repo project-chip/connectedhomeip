@@ -237,22 +237,25 @@ private:
      * Attributes Declaration
      *********************************************************/
     static ColorControlServer instance;
+    static constexpr size_t kColorControlFixedEndpointCount = EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT;
+    static constexpr size_t kColorControlMaxEnpointCount =
+        kColorControlFixedEndpointCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
-    ColorHueTransitionState colorHueTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
-    Color16uTransitionState colorSatTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    ColorHueTransitionState colorHueTransitionStates[kColorControlMaxEnpointCount];
+    Color16uTransitionState colorSatTransitionStates[kColorControlMaxEnpointCount];
 #endif
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
-    Color16uTransitionState colorXtransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
-    Color16uTransitionState colorYtransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    Color16uTransitionState colorXtransitionStates[kColorControlMaxEnpointCount];
+    Color16uTransitionState colorYtransitionStates[kColorControlMaxEnpointCount];
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-    Color16uTransitionState colorTempTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    Color16uTransitionState colorTempTransitionStates[kColorControlMaxEnpointCount];
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-    EmberEventControl eventControls[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    EmberEventControl eventControls[kColorControlMaxEnpointCount];
 };
 
 /**********************************************************

@@ -49,8 +49,9 @@ Delegate * gDelegateTable[kLowPowerDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::LowPower::Id);
-    return (ep == 0xFFFF ? nullptr : gDelegateTable[ep]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::LowPower::Id,
+                                                       EMBER_AF_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kLowPowerDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -71,13 +72,11 @@ namespace LowPower {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::LowPower::Id);
-    if (ep != 0xFFFF)
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, chip::app::Clusters::LowPower::Id,
+                                                       EMBER_AF_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < kLowPowerDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
-    }
-    else
-    {
     }
 }
 

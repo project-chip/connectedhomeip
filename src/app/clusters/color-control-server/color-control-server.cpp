@@ -301,9 +301,9 @@ uint16_t ColorControlServer::computeTransitionTimeFromStateAndRate(ColorControlS
  */
 EmberEventControl * ColorControlServer::getEventControl(EndpointId endpoint)
 {
-    uint16_t index            = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
     EmberEventControl * event = nullptr;
 
+    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, kColorControlFixedEndpointCount);
     if (index < ArraySize(eventControls))
     {
         event = &eventControls[index];
@@ -424,9 +424,8 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
  */
 ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTransitionState(EndpointId endpoint)
 {
-    uint16_t index                  = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
     ColorHueTransitionState * state = nullptr;
-
+    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, kColorControlFixedEndpointCount);
     if (index < ArraySize(colorHueTransitionStates))
     {
         state = &colorHueTransitionStates[index];
@@ -442,9 +441,8 @@ ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTra
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getSaturationTransitionState(EndpointId endpoint)
 {
-    uint16_t index                  = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
     Color16uTransitionState * state = nullptr;
-
+    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, kColorControlFixedEndpointCount);
     if (index < ArraySize(colorSatTransitionStates))
     {
         state = &colorSatTransitionStates[index];
@@ -1680,7 +1678,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransitionState(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
+    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, kColorControlFixedEndpointCount);
 
     Color16uTransitionState * state = nullptr;
     if (index < ArraySize(colorXtransitionStates))
@@ -1699,7 +1697,7 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransition
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getYTransitionState(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
+    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, kColorControlFixedEndpointCount);
 
     Color16uTransitionState * state = nullptr;
     if (index < ArraySize(colorYtransitionStates))
@@ -2026,7 +2024,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransitionState(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
+    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, kColorControlFixedEndpointCount);
 
     Color16uTransitionState * state = nullptr;
     if (index < ArraySize(colorTempTransitionStates))
