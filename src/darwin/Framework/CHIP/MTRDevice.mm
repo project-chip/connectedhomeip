@@ -118,10 +118,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 };
 
 typedef NS_ENUM(NSUInteger, MTRDeviceReadRequestFieldIndex) {
-    MTRDeviceReadRequestFieldEndpointIDIndex = 0,
-    MTRDeviceReadRequestFieldClusterIDIndex = 1,
-    MTRDeviceReadRequestFieldAttributeIDIndex = 2,
-    MTRDeviceReadRequestFieldParamsIndex = 3
+    MTRDeviceReadRequestFieldPathIndex = 0,
+    MTRDeviceReadRequestFieldParamsIndex = 1
 };
 
 typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemBatchingID) {
@@ -791,11 +789,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // TODO: add option for BaseSubscriptionCallback to report during priming, to reduce when case 4 is hit
     if (!attributeIsSpecified || ![self _subscriptionAbleToReport] || hasChangesOmittedQuality || !attributeValueToReturn) {
         // Read requests container will be a mutable array of items, each being an array containing:
-        //   [endpoint ID, cluster ID, attribute ID, params]
+        //   [attribute request path, params]
         // Batching handler should only coalesce when params are equal.
 
         // For this single read API there's only 1 array item. Use NSNull to stand in for nil params for easy comparison.
-        NSArray * readRequestData = @[ endpointID, clusterID, attributeID, params ?: [NSNull null] ];
+        MTRAttributeRequestPath * readRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:endpointID
+                                                                                             clusterID:clusterID
+                                                                                           attributeID:attributeID];
+        NSArray * readRequestData = @[ readRequestPath, params ?: [NSNull null] ];
 
         // But first, check if a duplicate read request is already queued and return
         if ([_asyncCallbackWorkQueue isDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestData]) {
@@ -840,7 +841,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
 
             if (readRequestsNext.count == 0) {
-                MTR_LOG_DEFAULT("%@ batching - fully merged next item %@", logPrefix, fullyMerged ? @"YES" : @"NO");
+                MTR_LOG_DEFAULT("%@ batching - fully merged next item", logPrefix);
                 *fullyMerged = YES;
             }
         };
@@ -865,18 +866,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
 
             // Build the attribute paths from the read requests
-            NSMutableArray * attributePaths = [NSMutableArray array];
+            NSMutableArray<MTRAttributeRequestPath *> * attributePaths = [NSMutableArray array];
             for (NSArray * readItem in readRequests) {
                 // Sanity check
-                if (readItem.count < 4) {
+                if (readItem.count < 2) {
                     MTR_LOG_ERROR("%@ dequeueWorkItem read item missing info %@", logPrefix, readItem);
                     [workItem endWork];
                     return;
                 }
-                [attributePaths addObject:[MTRAttributeRequestPath
-                                              requestPathWithEndpointID:readItem[MTRDeviceReadRequestFieldEndpointIDIndex]
-                                                              clusterID:readItem[MTRDeviceReadRequestFieldClusterIDIndex]
-                                                            attributeID:readItem[MTRDeviceReadRequestFieldAttributeIDIndex]]];
+                [attributePaths addObject:readItem[MTRDeviceReadRequestFieldPathIndex]];
             }
             // If param is the NSNull stand-in, then just use nil
             id readParamObject = readRequests[0][MTRDeviceReadRequestFieldParamsIndex];
