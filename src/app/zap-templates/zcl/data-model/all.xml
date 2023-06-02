@@ -56,7 +56,7 @@
    <xi:include href="chip/pump-configuration-and-control-cluster.xml" />
    <xi:include href="chip/pwm-cluster.xml" />
    <xi:include href="chip/relative-humidity-measurement-cluster.xml" />
-   <xi:include href="chip/replacable-monitoring-cluster.xml.xml" />
+   <xi:include href="chip/resource-monitoring-cluster.xml" />
    <xi:include href="chip/scene.xml" />
    <xi:include href="chip/smoke-co-alarm-cluster.xml" />
    <xi:include href="chip/software-diagnostics-cluster.xml" />
