@@ -65,7 +65,7 @@
 #endif
 #include <transport/raw/UDP.h>
 
-#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/ICDEventManager.h>
 #include <app/ICDManager.h>
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -600,7 +600,7 @@ private:
     Inet::InterfaceId mInterfaceId;
 
     System::Clock::Microseconds64 mInitTimestamp;
-#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     DeviceLayer::ICDEventManager mICDEventManager;
     DeviceLayer::ICDManager mICDManager;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
