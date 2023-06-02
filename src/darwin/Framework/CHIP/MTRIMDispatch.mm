@@ -232,7 +232,7 @@ namespace app {
  */
 uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
 {
-    if (endpoint == kSupportedEndpoint && clusterId == OtaSoftwareUpdateProvider::Id) {
+    if (endpoint == kSupportedEndpoint && cluster == OtaSoftwareUpdateProvider::Id) {
         return 0;
     }
 

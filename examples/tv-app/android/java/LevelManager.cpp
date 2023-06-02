@@ -69,7 +69,7 @@ LevelManager * GetLevelManager(EndpointId endpoint)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, app::Clusters::LevelControl::Id,
                                                        EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kLevelManagerTableSize) ? nullptr : gLevelManagerTable[ep]);
+    return ((ep >= kLevelManagerTableSize) ? nullptr : gLevelManagerTable[ep]);
 }
 
 void LevelManager::PostLevelChanged(chip::EndpointId endpoint, uint8_t value)
