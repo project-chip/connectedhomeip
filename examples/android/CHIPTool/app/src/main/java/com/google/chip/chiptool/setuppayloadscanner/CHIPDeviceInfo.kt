@@ -33,7 +33,7 @@ data class CHIPDeviceInfo(
   val setupPinCode: Long = 0L,
   var commissioningFlow: Int = 0,
   val optionalQrCodeInfoMap: Map<Int, QrCodeInfo> = mapOf(),
-  val discoveryCapabilities: Set<DiscoveryCapability> = setOf(),
+  val discoveryCapabilities: MutableSet<DiscoveryCapability> = mutableSetOf(),
   val isShortDiscriminator: Boolean = false,
   val ipAddress: String? = null,
   ) : Parcelable {

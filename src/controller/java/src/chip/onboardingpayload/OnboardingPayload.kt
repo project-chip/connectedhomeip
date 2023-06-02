@@ -95,7 +95,7 @@ class OnboardingPayload(
   /**
    * The CHIP device supported rendezvous flags: At least one DiscoveryCapability must be included.
    */
-  var discoveryCapabilities: Set<DiscoveryCapability> = emptySet(),
+  var discoveryCapabilities: MutableSet<DiscoveryCapability> = mutableSetOf(),
   
   /** The CHIP device discriminator: */
   var discriminator: Int = 0,
@@ -115,9 +115,13 @@ class OnboardingPayload(
   var setupPinCode: Long = 0
 ) {
   var optionalQRCodeInfo: HashMap<Int, OptionalQRCodeInfo>
+  private val optionalVendorData: HashMap<Int, OptionalQRCodeInfo>
+  private val optionalExtensionData: HashMap<Int, OptionalQRCodeInfoExtension>
 
   init {
     optionalQRCodeInfo = HashMap()
+    optionalVendorData = HashMap()
+    optionalExtensionData = HashMap()
   }
 
   constructor(
@@ -125,7 +129,7 @@ class OnboardingPayload(
     vendorId: Int,
     productId: Int,
     commissioningFlow: Int,
-    discoveryCapabilities: Set<DiscoveryCapability>,
+    discoveryCapabilities: MutableSet<DiscoveryCapability>,
     discriminator: Int,
     setupPinCode: Long
   ) : this(
@@ -151,6 +155,46 @@ class OnboardingPayload(
     return checkPayloadCommonConstraints()
   }
 
+  fun isValidQRCodePayload(): Boolean {
+    // 3-bit value specifying the QR code payload version.
+    if (version >= 1 shl kVersionFieldLengthInBits) {
+      return false
+    }
+
+    if (commissioningFlow.toUInt() > ((1 shl kCommissioningFlowFieldLengthInBits) - 1).toUInt()) {
+      return false
+    }
+
+    // Device Commissioning Flow
+    // 0: Standard commissioning flow: such a device, when uncommissioned, always enters commissioning mode upon power-up, subject
+    // to the rules in [ref_Announcement_Commencement]. 1: User-intent commissioning flow: user action required to enter
+    // commissioning mode. 2: Custom commissioning flow: interaction with a vendor-specified means is needed before commissioning.
+    // 3: Reserved
+    if (commissioningFlow != CommissioningFlow.STANDARD.value &&
+        commissioningFlow != CommissioningFlow.USER_ACTION_REQUIRED.value &&
+        commissioningFlow != CommissioningFlow.CUSTOM.value) {
+      return false
+    }
+
+    val allValid = setOf(
+      DiscoveryCapability.BLE,
+      DiscoveryCapability.ON_NETWORK,
+      DiscoveryCapability.SOFT_AP
+    )
+
+    // If discoveryCapabilities is empty or discoveryCapabilities contains values outside of allValid
+    if (discoveryCapabilities.isEmpty() || discoveryCapabilities.any { it !in allValid }) {
+      return false
+    }
+
+    // Discriminator validity is enforced by the SetupDiscriminator class.
+    if (setupPinCode >= 1 shl kSetupPINCodeFieldLengthInBits) {
+      return false
+    }
+
+    return checkPayloadCommonConstraints()
+  }
+
   fun getShortDiscriminatorValue(): Int {
     if (hasShortDiscriminator) {
       return discriminator
@@ -164,6 +208,266 @@ class OnboardingPayload(
     }
     return discriminator
   }
+
+  fun getRendezvousInformation(): Long {
+    var rendezvousInfo: Long = 0
+    
+    if (discoveryCapabilities.contains(DiscoveryCapability.SOFT_AP)) {
+        // set bit 0
+        rendezvousInfo = rendezvousInfo or (1L shl 0)
+    }
+    
+    if (discoveryCapabilities.contains(DiscoveryCapability.BLE)) {
+        // set bit 1
+        rendezvousInfo = rendezvousInfo or (1L shl 1)
+    }
+    
+    if (discoveryCapabilities.contains(DiscoveryCapability.ON_NETWORK)) {
+        // set bit 2
+        rendezvousInfo = rendezvousInfo or (1L shl 2)
+    }
+    
+    return rendezvousInfo
+  }
+
+  fun setRendezvousInformation(rendezvousInfo: Long) {
+    // Removes all elements from discoveryCapabilities.
+    discoveryCapabilities.clear()
+
+    // bit 0 is set
+    if (rendezvousInfo and (1L shl 0) != 0L) {
+      discoveryCapabilities.add(DiscoveryCapability.SOFT_AP) 
+    }
+
+    // bit 1 is set
+    if (rendezvousInfo and (1L shl 1) != 0L) {
+      discoveryCapabilities.add(DiscoveryCapability.BLE) 
+    }
+
+    // bit 2 is set
+    if (rendezvousInfo and (1L shl 2) != 0L) {
+      discoveryCapabilities.add(DiscoveryCapability.ON_NETWORK) 
+    }        
+  }  
+
+  /**
+   * A function to add a String serial number
+   *
+   * @param serialNumber String serial number
+   */
+  fun addSerialNumber(serialNumber: String) {
+    val info = OptionalQRCodeInfoExtension()
+    info.tag = kSerialNumberTag
+    info.type = OptionalQRCodeInfoType.TYPE_STRING
+    info.data = serialNumber
+    
+    addOptionalExtensionData(info)
+  }    
+
+  /**
+   * A function to add a Int serial number
+   *
+   * @param serialNumber Int serial number
+   */
+  fun addSerialNumber(serialNumber: Int) {
+    val info = OptionalQRCodeInfoExtension()
+    info.tag = kSerialNumberTag
+    info.type = OptionalQRCodeInfoType.TYPE_UINT32
+    info.uint32 = serialNumber.toLong()
+
+    addOptionalExtensionData(info)
+  }
+
+  /**
+   * A function to retrieve serial number as a string
+   *
+   * @return retrieved string serial number
+   */
+  fun getSerialNumber(): String {
+    val outSerialNumber = StringBuilder()
+    val info = getOptionalExtensionData(kSerialNumberTag)
+  
+    when (info.type) {
+        OptionalQRCodeInfoType.TYPE_STRING -> outSerialNumber.append(info.data)
+        OptionalQRCodeInfoType.TYPE_UINT32 -> outSerialNumber.append(info.uint32)
+        else -> throw OnboardingPayloadException("Invalid argument")
+    }
+  
+    return outSerialNumber.toString()
+  }
+
+  /**
+   * A function to remove the serial number from the payload
+   */
+  fun removeSerialNumber() {
+    if (optionalExtensionData.containsKey(kSerialNumberTag)) {
+      optionalExtensionData.remove(kSerialNumberTag)
+      return
+    } else {
+      throw OnboardingPayloadException("Key not found")
+    }
+  }
+
+  /**
+   * Checks if the tag is CHIP Common type
+   * Spec 5.1.4.2 CHIPCommon tag numbers are in the range [0x00, 0x7F]
+   * 
+   * @param tag Tag to be checked
+   * @return True if the tag is of Common type, False otherwise
+   */
+  private fun isCommonTag(tag: Int): Boolean {
+    return tag < 0x80
+  }
+
+  /**
+   * Checks if the tag is vendor-specific
+   * Spec 5.1.4.1 Manufacture-specific tag numbers are in the range [0x80, 0xFF]
+   *
+   * @param tag Tag to be checked
+   * @return True if the tag is Vendor-specific, False otherwise
+   */
+  private fun isVendorTag(tag: Int): Boolean {
+    return !isCommonTag(tag)
+  }
+
+  /**
+   * A function to add an optional vendor data
+   *
+   * @param tag  tag number in the [0x80-0xFF] range
+   * @param data String representation of data to add
+   */
+  fun addOptionalVendorData(tag: Int, data: String) {
+    val info = OptionalQRCodeInfo()
+    info.tag = tag
+    info.type = OptionalQRCodeInfoType.TYPE_STRING
+    info.data = data
+
+    addOptionalVendorData(info)
+  }    
+
+  /**
+   * A function to add an optional vendor data
+   *
+   * @param tag 7 bit [0-127] tag number
+   * @param data Integer representation of data to add
+   */
+  fun addOptionalVendorData(tag: Int, data: Int) {
+    val info = OptionalQRCodeInfo()
+    info.tag = tag
+    info.type = OptionalQRCodeInfoType.TYPE_INT32
+    info.int32 = data
+
+    addOptionalVendorData(info)
+  }    
+
+  /**
+   * A function to add an optional QR Code info vendor object
+   *
+   * @param info Optional QR code info object to add
+   */
+  private fun addOptionalVendorData(info: OptionalQRCodeInfo) {
+    if (isVendorTag(info.tag)) {
+      optionalVendorData[info.tag] = info
+      return
+    } else {
+      throw OnboardingPayloadException("Invalid argument")
+    }
+  }
+
+  /**
+   * A function to remove an optional vendor data
+   *
+   * @param tag 7 bit [0-127] tag number
+   */
+  fun removeOptionalVendorData(tag: Int) {
+    if (optionalVendorData.containsKey(tag)) {
+      optionalVendorData.remove(tag)
+      return
+    } else {
+      throw OnboardingPayloadException("Key not found")
+    }
+  }    
+
+  /**
+   * A function to retrieve the vector of OptionalQRCodeInfo infos
+   *
+   * @return a vector of optionalQRCodeInfos
+   */
+  fun getAllOptionalVendorData(): List<OptionalQRCodeInfo> {
+    val returnedOptionalInfo = mutableListOf<OptionalQRCodeInfo>()
+
+    for (entry in optionalVendorData) {
+      returnedOptionalInfo.add(entry.value)
+    }
+    
+    return returnedOptionalInfo
+  }
+
+  /**
+   * A function to add an optional QR Code info CHIP object
+   *
+   * @param info Optional QR code info object to add
+   */
+  private fun addOptionalExtensionData(info: OptionalQRCodeInfoExtension) {
+    if (isCommonTag(info.tag)) {
+      optionalExtensionData[info.tag] = info
+      return
+    } else {
+      throw OnboardingPayloadException("Invalid argument")
+    }
+  }
+
+  /**
+   * A function to retrieve the vector of CHIPQRCodeInfo infos
+   *
+   * @return a vector of OptionalQRCodeInfoExtension
+   */
+  fun getAllOptionalExtensionData(): List<OptionalQRCodeInfoExtension> {
+    val returnedOptionalInfo = mutableListOf<OptionalQRCodeInfoExtension>()
+    for (entry in optionalExtensionData) {
+      returnedOptionalInfo.add(entry.value)
+    }
+    
+    return returnedOptionalInfo
+  }
+
+  /**
+   * A function to retrieve an optional QR Code info vendor object
+   *
+   * @param tag 7 bit [0-127] tag number
+   * @return retrieved OptionalQRCodeInfo object
+   */
+  private fun getOptionalVendorData(tag: Int): OptionalQRCodeInfo {
+    return optionalVendorData[tag] ?: throw OnboardingPayloadException("Key not found")
+  }
+
+  /**
+   * A function to retrieve an optional QR Code info extended object
+   *
+   * @param tag 8 bit [128-255] tag number
+   * @return retrieved OptionalQRCodeInfoExtension object
+   */
+  private fun getOptionalExtensionData(tag: Int): OptionalQRCodeInfoExtension {
+    return optionalExtensionData[tag] ?: throw OnboardingPayloadException("Key not found")    
+  }
+
+  /**
+   * A function to retrieve the associated expected numeric value for a tag
+   *
+   * @param tag 8 bit [0-255] tag number
+   * @return an OptionalQRCodeInfoType value
+   */
+  private fun getNumericTypeFor(tag: Int): OptionalQRCodeInfoType {
+    var elemType = OptionalQRCodeInfoType.TYPE_UNKNOWN
+
+    if (isVendorTag(tag)) {
+      elemType = OptionalQRCodeInfoType.TYPE_INT32
+    } else if (tag == kSerialNumberTag) {
+      elemType = OptionalQRCodeInfoType.TYPE_UINT32
+    }
+
+    return elemType
+  }      
 
   private fun checkPayloadCommonConstraints(): Boolean {
     if (version != 0) {
