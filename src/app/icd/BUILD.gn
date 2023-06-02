@@ -1,0 +1,45 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("icd.gni")
+
+config("icd_server_config") {
+  defines = [ "CHIP_CONFIG_ICD_SERVER_ENABLE=${chip_enable_icd_server}" ]
+}
+
+source_set("icd-manager-srcs") {
+  sources = [
+    "${chip_root}/src/app/icd/ICDManager.cpp",
+    "${chip_root}/src/app/icd/ICDManager.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/lib/core" ]
+}
+
+source_set("icd-server-srcs") {
+  if (chip_enable_icd_server) {
+    sources = [
+      "${chip_root}/src/app/icd/ICDEventManager.cpp",
+      "${chip_root}/src/app/icd/ICDEventManager.h",
+    ]
+
+    public_deps = [
+      ":icd-manager-srcs",
+      "${chip_root}/src/platform:platform",
+    ]
+
+    public_configs = [ ":icd_server_config" ]
+  }
+}

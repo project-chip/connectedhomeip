@@ -18,7 +18,6 @@ import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("common_flags.gni")
-import("icd/icd.gni")
 
 declare_args() {
   # Enable strict schema checks.
@@ -56,7 +55,6 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY=${chip_access_control_policy_logging_verbosity}",
     "CHIP_CONFIG_PERSIST_SUBSCRIPTIONS=${chip_persist_subscriptions}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
-    "CHIP_CONFIG_ICD_SERVER_ENABLE=${chip_enable_icd_server}",
   ]
 }
 
@@ -194,15 +192,6 @@ static_library("app") {
     "reporting/reporting.h",
   ]
 
-  if (chip_enable_icd_server) {
-    sources += [
-      "icd/ICDEventManager.cpp",
-      "icd/ICDEventManager.h",
-      "icd/ICDManager.cpp",
-      "icd/ICDManager.h",
-    ]
-  }
-
   if (chip_persist_subscriptions) {
     sources += [
       "SimpleSubscriptionResumptionStorage.cpp",
@@ -219,6 +208,7 @@ static_library("app") {
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
+    "icd/:icd-server-srcs",
   ]
 
   cflags = [ "-Wconversion" ]
