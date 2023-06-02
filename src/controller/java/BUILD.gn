@@ -265,10 +265,15 @@ kotlin_library("onboarding_payload") {
   }
 
   sources = [
+    "src/chip/onboardingpayload/CommissioningFlow.kt",
     "src/chip/onboardingpayload/DiscoveryCapability.kt",
+    "src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt",
+    "src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt",
     "src/chip/onboardingpayload/OnboardingPayload.kt",
     "src/chip/onboardingpayload/OnboardingPayloadParser.kt",
     "src/chip/onboardingpayload/OptionalQRCodeInfo.kt",
+    "src/chip/onboardingpayload/Verhoeff.kt",
+    "src/chip/onboardingpayload/Verhoeff10.kt",
   ]
 }
 
