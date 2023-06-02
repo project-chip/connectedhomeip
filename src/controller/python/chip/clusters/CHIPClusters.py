@@ -4819,9 +4819,8 @@ class ChipClusters:
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
-                "commandName": "Reset",
+                "commandName": "ModifyEnabledAlarms",
                 "args": {
-                    "alarms": "int",
                     "mask": "int",
                 },
             },
@@ -4832,17 +4831,10 @@ class ChipClusters:
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000001: {
-                "attributeName": "Latch",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "State",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },

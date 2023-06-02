@@ -2728,12 +2728,8 @@ namespace Mask {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Mask
 
-namespace Latch {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace Latch
-
 namespace State {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace State
 
 namespace GeneratedCommandList {

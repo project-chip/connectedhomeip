@@ -7043,8 +7043,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             Mask(0L),
-            Latch(1L),
-            State(2L),
+            State(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -7092,7 +7091,7 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            Reset(0L),;
+            ModifyEnabledAlarms(0L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -7110,17 +7109,17 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum ResetCommandField {Alarms(0),Mask(1),;
+        }public enum ModifyEnabledAlarmsCommandField {Mask(0),;
                     private final int id;
-                    ResetCommandField(int id) {
+                    ModifyEnabledAlarmsCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static ResetCommandField value(int id) throws NoSuchFieldError {
-                        for (ResetCommandField field : ResetCommandField.values()) {
+                    public static ModifyEnabledAlarmsCommandField value(int id) throws NoSuchFieldError {
+                        for (ModifyEnabledAlarmsCommandField field : ModifyEnabledAlarmsCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

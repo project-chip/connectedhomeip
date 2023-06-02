@@ -12338,12 +12338,11 @@ namespace Events {} // namespace Events
 namespace RefrigeratorAlarm {
 
 namespace Commands {
-namespace Reset {
+namespace ModifyEnabledAlarms {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kAlarms), alarms));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kMask), mask));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -12363,9 +12362,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kAlarms):
-            ReturnErrorOnFailure(DataModel::Decode(reader, alarms));
-            break;
         case to_underlying(Fields::kMask):
             ReturnErrorOnFailure(DataModel::Decode(reader, mask));
             break;
@@ -12378,7 +12374,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace Reset.
+} // namespace ModifyEnabledAlarms.
 } // namespace Commands
 
 namespace Attributes {
@@ -12388,9 +12384,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::Mask::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, mask));
-        break;
-    case Attributes::Latch::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, latch));
         break;
     case Attributes::State::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, state));

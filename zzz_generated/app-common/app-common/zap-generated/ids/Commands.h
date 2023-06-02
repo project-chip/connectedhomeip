@@ -734,9 +734,9 @@ static constexpr CommandId Id = 0x00000000;
 namespace RefrigeratorAlarm {
 namespace Commands {
 
-namespace Reset {
+namespace ModifyEnabledAlarms {
 static constexpr CommandId Id = 0x00000000;
-} // namespace Reset
+} // namespace ModifyEnabledAlarms
 
 } // namespace Commands
 } // namespace RefrigeratorAlarm

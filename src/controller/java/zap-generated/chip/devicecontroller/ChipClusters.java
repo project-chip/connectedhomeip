@@ -15239,18 +15239,18 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void reset(DefaultClusterCallback callback
-      , Long alarms, Optional<Long> mask) {
-      reset(chipClusterPtr, callback, alarms, mask, null);
+    public void modifyEnabledAlarms(DefaultClusterCallback callback
+      , Long mask) {
+      modifyEnabledAlarms(chipClusterPtr, callback, mask, null);
     }
 
-    public void reset(DefaultClusterCallback callback
-      , Long alarms, Optional<Long> mask
+    public void modifyEnabledAlarms(DefaultClusterCallback callback
+      , Long mask
       , int timedInvokeTimeoutMs) {
-      reset(chipClusterPtr, callback, alarms, mask, timedInvokeTimeoutMs);
+      modifyEnabledAlarms(chipClusterPtr, callback, mask, timedInvokeTimeoutMs);
     }
-    private native void reset(long chipClusterPtr, DefaultClusterCallback Callback
-      , Long alarms, Optional<Long> mask
+    private native void modifyEnabledAlarms(long chipClusterPtr, DefaultClusterCallback Callback
+      , Long mask
       , @Nullable Integer timedInvokeTimeoutMs);
 
       public interface GeneratedCommandListAttributeCallback {
@@ -15279,30 +15279,11 @@ public class ChipClusters {
     ) {
       readMaskAttribute(chipClusterPtr, callback);
     }
-    public void writeMaskAttribute(DefaultClusterCallback callback, Long value) {
-      writeMaskAttribute(chipClusterPtr, callback, value, null);
-    }
-
-    public void writeMaskAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
-      writeMaskAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
-    }
     public void subscribeMaskAttribute(
         LongAttributeCallback callback
 ,
       int minInterval, int maxInterval) {
       subscribeMaskAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void readLatchAttribute(
-      LongAttributeCallback callback
-    ) {
-      readLatchAttribute(chipClusterPtr, callback);
-    }
-    public void subscribeLatchAttribute(
-        LongAttributeCallback callback
-,
-      int minInterval, int maxInterval) {
-      subscribeLatchAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readStateAttribute(
@@ -15392,16 +15373,7 @@ public class ChipClusters {
     private native void readMaskAttribute(long chipClusterPtr,
         LongAttributeCallback callback
     );
-
-    private native void writeMaskAttribute(long chipClusterPtr, DefaultClusterCallback callback, Long value, @Nullable Integer timedWriteTimeoutMs);
     private native void subscribeMaskAttribute(long chipClusterPtr,
-        LongAttributeCallback callback
-, int minInterval, int maxInterval);
-
-    private native void readLatchAttribute(long chipClusterPtr,
-        LongAttributeCallback callback
-    );
-    private native void subscribeLatchAttribute(long chipClusterPtr,
         LongAttributeCallback callback
 , int minInterval, int maxInterval);
 

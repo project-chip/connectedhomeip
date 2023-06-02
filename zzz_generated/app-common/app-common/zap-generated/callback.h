@@ -11603,11 +11603,11 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TemperatureControl::Commands::SetTemperature::DecodableType & commandData);
 /**
- * @brief Refrigerator Alarm Cluster Reset Command callback (from client)
+ * @brief Refrigerator Alarm Cluster ModifyEnabledAlarms Command callback (from client)
  */
-bool emberAfRefrigeratorAlarmClusterResetCallback(
+bool emberAfRefrigeratorAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::RefrigeratorAlarm::Commands::Reset::DecodableType & commandData);
+    const chip::app::Clusters::RefrigeratorAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
  * @brief Dishwasher Mode Select Cluster ChangeToMode Command callback (from client)
  */

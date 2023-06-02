@@ -14356,14 +14356,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return self;
 }
 
-- (void)resetWithParams:(MTRRefrigeratorAlarmClusterResetParams *)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completion:(MTRStatusCompletion)completion
+- (void)modifyEnabledAlarmsWithParams:(MTRRefrigeratorAlarmClusterModifyEnabledAlarmsParams *)params
+                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                           completion:(MTRStatusCompletion)completion
 {
     NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
                                      _endpoint, (unsigned int) MTRClusterIDTypeRefrigeratorAlarmID,
-                                     (unsigned int) MTRCommandIDTypeClusterRefrigeratorAlarmCommandResetID];
+                                     (unsigned int) MTRCommandIDTypeClusterRefrigeratorAlarmCommandModifyEnabledAlarmsID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -14390,7 +14390,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 Optional<uint16_t> timedInvokeTimeoutMs;
                 Optional<Timeout> invokeTimeout;
                 ListFreer listFreer;
-                RefrigeratorAlarm::Commands::Reset::Type request;
+                RefrigeratorAlarm::Commands::ModifyEnabledAlarms::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -14403,11 +14403,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                request.alarms = static_cast<std::remove_reference_t<decltype(request.alarms)>>(params.alarms.unsignedIntValue);
-                if (params.mask != nil) {
-                    auto & definedValue_0 = request.mask.Emplace();
-                    definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(params.mask.unsignedIntValue);
-                }
+                request.mask = static_cast<std::remove_reference_t<decltype(request.mask)>>(params.mask.unsignedIntValue);
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
@@ -14433,33 +14429,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
                                         attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeMaskID)
-                                             params:params];
-}
-
-- (void)writeAttributeMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeMaskWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                             params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
-                                  attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeMaskID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeLatchWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeLatchID)
                                              params:params];
 }
 

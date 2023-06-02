@@ -7219,14 +7219,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRefrigeratorAlarmClusterResetParams
+@implementation MTRRefrigeratorAlarmClusterModifyEnabledAlarmsParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _alarms = @(0);
-
-        _mask = nil;
+        _mask = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -7235,9 +7233,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRefrigeratorAlarmClusterResetParams alloc] init];
+    auto other = [[MTRRefrigeratorAlarmClusterModifyEnabledAlarmsParams alloc] init];
 
-    other.alarms = self.alarms;
     other.mask = self.mask;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -7247,8 +7244,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: alarms:%@; mask:%@; >", NSStringFromClass([self class]), _alarms, _mask];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mask:%@; >", NSStringFromClass([self class]), _mask];
     return descriptionString;
 }
 

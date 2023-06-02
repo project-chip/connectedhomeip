@@ -22174,28 +22174,23 @@ public class ClusterInfoMapping {
      Map<String, InteractionInfo> temperatureControlClusterInteractionInfoMap = new LinkedHashMap<>();
      commandMap.put("temperatureControl", temperatureControlClusterInteractionInfoMap);
      Map<String, InteractionInfo> refrigeratorAlarmClusterInteractionInfoMap = new LinkedHashMap<>();
-     Map<String, CommandParameterInfo> refrigeratorAlarmresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-       CommandParameterInfo refrigeratorAlarmresetalarmsCommandParameterInfo = new CommandParameterInfo("alarms", Long.class, Long.class);
-       refrigeratorAlarmresetCommandParams.put("alarms",refrigeratorAlarmresetalarmsCommandParameterInfo);
-      
-       CommandParameterInfo refrigeratorAlarmresetmaskCommandParameterInfo = new CommandParameterInfo("mask", Optional.class, Long.class);
-       refrigeratorAlarmresetCommandParams.put("mask",refrigeratorAlarmresetmaskCommandParameterInfo);
+     Map<String, CommandParameterInfo> refrigeratorAlarmmodifyEnabledAlarmsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       CommandParameterInfo refrigeratorAlarmmodifyEnabledAlarmsmaskCommandParameterInfo = new CommandParameterInfo("mask", Long.class, Long.class);
+       refrigeratorAlarmmodifyEnabledAlarmsCommandParams.put("mask",refrigeratorAlarmmodifyEnabledAlarmsmaskCommandParameterInfo);
      
-       InteractionInfo refrigeratorAlarmresetInteractionInfo = new InteractionInfo(
+       InteractionInfo refrigeratorAlarmmodifyEnabledAlarmsInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
            ((ChipClusters.RefrigeratorAlarmCluster) cluster)
-           .reset((DefaultClusterCallback) callback
+           .modifyEnabledAlarms((DefaultClusterCallback) callback
            , (Long)
-           commandArguments.get("alarms")
-           , (Optional<Long>)
            commandArguments.get("mask")
            
            );
          },
          () -> new DelegatedDefaultClusterCallback(),
-           refrigeratorAlarmresetCommandParams
+           refrigeratorAlarmmodifyEnabledAlarmsCommandParams
        );
-       refrigeratorAlarmClusterInteractionInfoMap.put("reset", refrigeratorAlarmresetInteractionInfo);
+       refrigeratorAlarmClusterInteractionInfoMap.put("modifyEnabledAlarms", refrigeratorAlarmmodifyEnabledAlarmsInteractionInfo);
      commandMap.put("refrigeratorAlarm", refrigeratorAlarmClusterInteractionInfoMap);
      Map<String, InteractionInfo> dishwasherModeSelectClusterInteractionInfoMap = new LinkedHashMap<>();
      Map<String, CommandParameterInfo> dishwasherModeSelectchangeToModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();

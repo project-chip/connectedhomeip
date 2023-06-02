@@ -4485,11 +4485,9 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRefrigeratorAlarmClusterResetParams : NSObject <NSCopying>
+@interface MTRRefrigeratorAlarmClusterModifyEnabledAlarmsParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull alarms MTR_NEWLY_AVAILABLE;
-
-@property (nonatomic, copy) NSNumber * _Nullable mask MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull mask MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
