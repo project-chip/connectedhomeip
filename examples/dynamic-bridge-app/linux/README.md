@@ -8,7 +8,7 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 <hr>
 
--   [Matter Linux Bridge Example](#matter-linux-bridge-example)
+-   [Matter Linux Dynamic Endpoints Bridge Example](#matter-linux-dynamic-endpoints-bridge-example)
     -   [Theory of Operation](#theory-of-operation)
     -   [Building](#building)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
