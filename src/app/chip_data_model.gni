@@ -69,7 +69,6 @@ template("chip_data_model") {
       "zap-generated/access.h",
       "zap-generated/gen_config.h",
       "zap-generated/endpoint_config.h",
-      "zap-generated/CHIPClientCallbacks.h",
     ]
 
     if (chip_code_pre_generated_directory == "") {
