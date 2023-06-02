@@ -82,7 +82,6 @@ static void emberAfAttributeDecodeAndPrintCluster(ClusterId cluster)
     {
         ChipLogProgress(Zcl, "(%p)", zclClusterNames[index].name);
     }
-    emberAfAttributesFlush();
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
 }
 
@@ -98,7 +97,6 @@ void emberAfPrintAttributeTable()
         EmberAfDefinedEndpoint * ep = &(emAfEndpoints[endpointIndex]);
         ChipLogProgress(Zcl, "ENDPOINT %x", ep->endpoint);
         ChipLogProgress(Zcl, "clus / attr / mfg  /type(len)/ rw / storage / data (raw)");
-        emberAfAttributesFlush();
         for (clusterIndex = 0; clusterIndex < ep->endpointType->clusterCount; clusterIndex++)
         {
             const EmberAfCluster * cluster = &(ep->endpointType->cluster[clusterIndex]);
@@ -119,7 +117,6 @@ void emberAfPrintAttributeTable()
                     " / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
                     (metaData->IsReadOnly() ? "RO" : "RW"),
                     (metaData->IsAutomaticallyPersisted() ? " nonvolatile " : (metaData->IsExternal() ? " extern " : "  RAM  ")));
-                emberAfAttributesFlush();
                 status =
                     emAfReadAttribute(ep->endpoint, cluster->clusterId, metaData->attributeId, data, ATTRIBUTE_LARGEST, nullptr);
                 if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
@@ -143,12 +140,10 @@ void emberAfPrintAttributeTable()
                     }
                     UNUSED_VAR(length);
                     emberAfAttributesPrintBuffer(data, length, true);
-                    emberAfAttributesFlush();
                     emberAfAttributeDecodeAndPrintCluster(cluster->clusterId);
                 }
             }
         }
-        emberAfAttributesFlush();
     }
 }
 
@@ -251,7 +246,6 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     {
         ChipLogProgress(Zcl, "%pep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported", "WRITE ERR: ", endpoint,
                         ChipLogValueMEI(cluster), ChipLogValueMEI(attributeID));
-        emberAfAttributesFlush();
         return status;
     }
 
@@ -261,14 +255,12 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         if (dataType != metadata->attributeType)
         {
             ChipLogProgress(Zcl, "%pinvalid data type", "WRITE ERR: ");
-            emberAfAttributesFlush();
             return EMBER_ZCL_STATUS_INVALID_DATA_TYPE;
         }
 
         if (metadata->IsReadOnly())
         {
             ChipLogProgress(Zcl, "%pattr not writable", "WRITE ERR: ");
-            emberAfAttributesFlush();
             return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
         }
     }
@@ -376,7 +368,6 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // in this case... We need to do something. We don't really
         // know if it will succeed.
         ChipLogProgress(Zcl, "WRITE: no write, just a test");
-        emberAfAttributesFlush();
     }
 
     return EMBER_ZCL_STATUS_SUCCESS;
@@ -410,7 +401,6 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
         if (status == EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED)
         {
             ChipLogProgress(Zcl, "READ: attribute size too large for caller");
-            emberAfAttributesFlush();
         }
     }
 
