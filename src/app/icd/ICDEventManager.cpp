@@ -22,13 +22,6 @@ using namespace chip::DeviceLayer;
 namespace chip {
 namespace app {
 
-/**
- * @brief Initialisation function of the ICDEventManager.
- *        Init function MUST be called before using the object
- *
- * @param icdManager pointer to the ICDManager object
- * @return CHIP_ERROR
- */
 CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
 {
     VerifyOrReturnError(icdManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -45,13 +38,6 @@ CHIP_ERROR ICDEventManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-/**
- * @brief Event Handler callback given to the PlatformManager
- *        Function dispatchs the event to the ICDManager member
- *
- * @param event
- * @param arg
- */
 void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
     // TODO

@@ -34,11 +34,22 @@ class ICDEventManager
 
 public:
     ICDEventManager() = default;
+
+    /**
+     * @brief Initialisation function of the ICDEventManager.
+     *        Init function MUST be called before using the object
+     */
     CHIP_ERROR Init(ICDManager * icdManager);
     CHIP_ERROR Shutdown();
-    static void ICDEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 private:
+
+    /**
+     * @brief Event Handler callback given to the PlatformManager
+     *        Function dispatchs the event to the ICDManager member
+     */
+    static void ICDEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
     ICDManager * mICDManager;
 };
 

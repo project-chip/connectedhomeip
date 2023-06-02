@@ -15,13 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file implements tests for the ICDManager class
- *
- */
-
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
