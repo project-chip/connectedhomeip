@@ -359,6 +359,7 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
 
     if (p->timeRemaining > 0)
     {
+        // The time remaining is measured in tenths of a second, which is the same as the update timer.
         (p->timeRemaining)--;
     }
 
@@ -706,6 +707,7 @@ bool ColorControlServer::computeNewHueValue(ColorControlServer::ColorHueTransiti
 
     if (p->timeRemaining > 0 && p->repeat == false)
     {
+        // The time remaining is measured in tenths of a second, which is the same as the update timer.
         (p->timeRemaining)--;
     }
 
