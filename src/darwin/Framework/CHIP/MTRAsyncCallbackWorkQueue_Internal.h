@@ -31,14 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 //      - Each work item will only be asked to batch before it's first dequeued to run readyHandler.
 // See the MTRAsyncCallbackBatchingHandler definition for more details.
 
-// Optional feature: Duplicate Filtering
-//   This is a facility that enables the API client to check if a potential work item has already been enqueued. By providing a
-//   handler that can answer if a work item's relevant data is a duplicate, it can avoid redundant queuing of requests.
-//      - The "duplicate type ID" is used for grouping different types of work items for duplicate checking. The ID value is opaque
-//        to this API, and the API client is responsible for assigning them.
-// See the MTRAsyncCallbackDuplicateCheckHandler definition and the WorkQueue's -isDuplicateForTypeID:workItemData: and
-// removeDuplicateCheckHandlerForTypeID:workItemData: method descriptions for more details.
-
 // The batching handler is called by the work queue when all of the following are true:
 //
 // 1) A work item that is batchable is about to be dequeued and executed for the first time.
@@ -56,6 +48,14 @@ NS_ASSUME_NONNULL_BEGIN
 // If *fullyMerged is set to YES, this handler may be called again to possibly also batch the work item
 // after the one that was dropped.
 typedef void (^MTRAsyncCallbackBatchingHandler)(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged);
+
+// Optional feature: Duplicate Filtering
+//   This is a facility that enables the API client to check if a potential work item has already been enqueued. By providing a
+//   handler that can answer if a work item's relevant data is a duplicate, it can avoid redundant queuing of requests.
+//      - The "duplicate type ID" is used for grouping different types of work items for duplicate checking. The ID value is opaque
+//        to this API, and the API client is responsible for assigning them.
+// See the MTRAsyncCallbackDuplicateCheckHandler definition and the WorkQueue's -isDuplicateForTypeID:workItemData: method
+// descriptions for more details.
 
 // The duplicate check handler is called by the work queue when the client wishes to check whether a work item is a duplicate of an
 // existing one, so that the client may decide to not enqueue a duplicate work item.
