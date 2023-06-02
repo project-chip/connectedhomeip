@@ -473,21 +473,19 @@ DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type>
     return mTrustedTimeSource;
 }
 
-CHIP_ERROR TimeSynchronizationServer::GetDefaultNtp(MutableByteSpan & dntp)
+CHIP_ERROR TimeSynchronizationServer::GetDefaultNtp(CharSpan & dntp)
 {
     return mTimeSyncDataProvider.LoadDefaultNtp(dntp);
 }
 
-DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type> & TimeSynchronizationServer::GetTimeZone()
+DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type> TimeSynchronizationServer::GetTimeZone()
 {
-    mTimeZoneList = DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type>(mTz, mTimeZoneListSize);
-    return mTimeZoneList;
+    return mTimeZoneList.SubSpan(0, mTimeZoneListSize);
 }
 
-DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> & TimeSynchronizationServer::GetDSTOffset()
+DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> TimeSynchronizationServer::GetDSTOffset()
 {
-    mDstOffsetList = DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type>(mDst, mDstOffsetListSize);
-    return mDstOffsetList;
+    return mDstOffsetList.SubSpan(0, mDstOffsetListSize);
 }
 
 void TimeSynchronizationServer::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,
@@ -551,8 +549,7 @@ TimeState TimeSynchronizationServer::GetUpdatedTimeZoneState()
         mTimeZoneListSize    = static_cast<uint8_t>(tzList.size() - activeTzIndex);
         auto newTimeZoneList = tzList.SubSpan(activeTzIndex);
         VerifyOrReturnValue(mTimeSyncDataProvider.StoreTimeZone(newTimeZoneList) == CHIP_NO_ERROR, TimeState::kInvalid);
-        VerifyOrReturnValue(mTimeSyncDataProvider.LoadTimeZone(TimeSynchronizationServer::Instance().GetTimeZone(),
-                                                               mTimeZoneListSize) == CHIP_NO_ERROR,
+        VerifyOrReturnValue(mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize) == CHIP_NO_ERROR,
                             TimeState::kInvalid);
         return TimeState::kChanged;
     }
@@ -587,8 +584,7 @@ TimeState TimeSynchronizationServer::GetUpdatedDSTOffsetState()
         mDstOffsetListSize    = static_cast<uint8_t>(dstList.size() - activeDstIndex);
         auto newDstOffsetList = dstList.SubSpan(activeDstIndex);
         VerifyOrReturnValue(mTimeSyncDataProvider.StoreDSTOffset(newDstOffsetList) == CHIP_NO_ERROR, TimeState::kInvalid);
-        VerifyOrReturnValue(mTimeSyncDataProvider.LoadDSTOffset(TimeSynchronizationServer::Instance().GetDSTOffset(),
-                                                                mDstOffsetListSize) == CHIP_NO_ERROR,
+        VerifyOrReturnValue(mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetList, mDstOffsetListSize) == CHIP_NO_ERROR,
                             TimeState::kInvalid);
         return TimeState::kChanged;
     }
@@ -635,12 +631,11 @@ CHIP_ERROR TimeSynchronizationAttrAccess::ReadTrustedTimeSource(EndpointId endpo
 CHIP_ERROR TimeSynchronizationAttrAccess::ReadDefaultNtp(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t buffer[DefaultNTP::TypeInfo::MaxLength()];
-    MutableByteSpan dntp(buffer);
+    char buffer[DefaultNTP::TypeInfo::MaxLength()];
+    chip::CharSpan dntp(buffer);
     if (TimeSynchronizationServer::Instance().GetDefaultNtp(dntp) == CHIP_NO_ERROR && dntp.size() != 0)
     {
-        const char * charBuf = reinterpret_cast<const char *>(buffer);
-        err                  = aEncoder.Encode(chip::CharSpan(charBuf, dntp.size()));
+        err = aEncoder.Encode(dntp);
     }
     else
     {

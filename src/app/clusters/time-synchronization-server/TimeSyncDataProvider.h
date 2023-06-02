@@ -47,7 +47,7 @@ public:
     CHIP_ERROR ClearTrustedTimeSource();
 
     CHIP_ERROR StoreDefaultNtp(const CharSpan & defaultNtp);
-    CHIP_ERROR LoadDefaultNtp(MutableByteSpan & defaultNtp);
+    CHIP_ERROR LoadDefaultNtp(CharSpan & defaultNtp);
     CHIP_ERROR ClearDefaultNtp();
 
     CHIP_ERROR StoreTimeZone(const TimeZone & timeZoneList);
