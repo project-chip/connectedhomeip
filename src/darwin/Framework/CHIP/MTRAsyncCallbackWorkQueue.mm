@@ -182,7 +182,7 @@
                 BOOL fullyMerged = NO;
                 workItem.batchingHandler(workItem.batchableData, nextWorkItem.batchableData, &fullyMerged);
                 if (!fullyMerged) {
-                    // if some parts of the next item is
+                    // We can't remove the next work item, so we can't merge anything else into this one.
                     break;
                 }
 
