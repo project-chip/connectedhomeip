@@ -28,7 +28,7 @@ source_set("icd-manager-srcs") {
   public_deps = [ "${chip_root}/src/lib/core" ]
 }
 
-source_set("icd-server-srcs") {
+source_set("server-srcs") {
   if (chip_enable_icd_server) {
     sources = [
       "${chip_root}/src/app/icd/ICDEventManager.cpp",
