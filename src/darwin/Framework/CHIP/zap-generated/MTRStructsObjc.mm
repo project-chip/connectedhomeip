@@ -1089,7 +1089,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRNetworkCommissioningClusterNetworkInfo
+@implementation MTRNetworkCommissioningClusterNetworkInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1103,7 +1103,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRNetworkCommissioningClusterNetworkInfo alloc] init];
+    auto other = [[MTRNetworkCommissioningClusterNetworkInfoStruct alloc] init];
 
     other.networkID = self.networkID;
     other.connected = self.connected;
@@ -1121,7 +1121,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRNetworkCommissioningClusterThreadInterfaceScanResult
+@implementation MTRNetworkCommissioningClusterNetworkInfo : MTRNetworkCommissioningClusterNetworkInfoStruct
+@end
+
+@implementation MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1147,7 +1150,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRNetworkCommissioningClusterThreadInterfaceScanResult alloc] init];
+    auto other = [[MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct alloc] init];
 
     other.panId = self.panId;
     other.extendedPanId = self.extendedPanId;
@@ -1173,7 +1176,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRNetworkCommissioningClusterWiFiInterfaceScanResult
+@implementation MTRNetworkCommissioningClusterThreadInterfaceScanResult
+    : MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct
+@end
+
+@implementation MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1195,7 +1202,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRNetworkCommissioningClusterWiFiInterfaceScanResult alloc] init];
+    auto other = [[MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct alloc] init];
 
     other.security = self.security;
     other.ssid = self.ssid;
@@ -1216,6 +1223,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRNetworkCommissioningClusterWiFiInterfaceScanResult : MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct
 @end
 
 @implementation MTRGeneralDiagnosticsClusterNetworkInterface

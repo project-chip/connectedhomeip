@@ -695,7 +695,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::GeneralCommissioning::
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type & request,
+                                        chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -704,9 +704,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("NetworkInfo.networkID", "networkID", value.isMember("networkID")));
+        ComplexArgumentParser::EnsureMemberExist("NetworkInfoStruct.networkID", "networkID", value.isMember("networkID")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("NetworkInfo.connected", "connected", value.isMember("connected")));
+        ComplexArgumentParser::EnsureMemberExist("NetworkInfoStruct.connected", "connected", value.isMember("connected")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "networkID");
@@ -720,7 +720,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.networkID);
     ComplexArgumentParser::Finalize(request.connected);
@@ -728,7 +728,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::NetworkCommissioning::
 
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type & request,
+                             chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResultStruct::Type & request,
                              Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -737,20 +737,21 @@ ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResult.panId", "panId", value.isMember("panId")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResult.extendedPanId", "extendedPanId",
+        ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResultStruct.panId", "panId", value.isMember("panId")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResultStruct.extendedPanId", "extendedPanId",
                                                                   value.isMember("extendedPanId")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResult.networkName", "networkName",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResultStruct.networkName", "networkName",
                                                                   value.isMember("networkName")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResult.channel", "channel", value.isMember("channel")));
+        ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResultStruct.channel", "channel", value.isMember("channel")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResult.version", "version", value.isMember("version")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResult.extendedAddress", "extendedAddress",
-                                                                  value.isMember("extendedAddress")));
+        ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResultStruct.version", "version", value.isMember("version")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResultStruct.extendedAddress",
+                                                                  "extendedAddress", value.isMember("extendedAddress")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResult.rssi", "rssi", value.isMember("rssi")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResult.lqi", "lqi", value.isMember("lqi")));
+        ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResultStruct.rssi", "rssi", value.isMember("rssi")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ThreadInterfaceScanResultStruct.lqi", "lqi", value.isMember("lqi")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "panId");
@@ -788,7 +789,8 @@ ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type & request)
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResultStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.panId);
     ComplexArgumentParser::Finalize(request.extendedPanId);
@@ -800,9 +802,10 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::NetworkCommissioning::
     ComplexArgumentParser::Finalize(request.lqi);
 }
 
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & request,
-                                        Json::Value & value)
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResultStruct::Type & request,
+                             Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -810,15 +813,17 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResult.security", "security", value.isMember("security")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResult.ssid", "ssid", value.isMember("ssid")));
+        ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResultStruct.security", "security", value.isMember("security")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResult.bssid", "bssid", value.isMember("bssid")));
+        ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResultStruct.ssid", "ssid", value.isMember("ssid")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResult.channel", "channel", value.isMember("channel")));
+        ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResultStruct.bssid", "bssid", value.isMember("bssid")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResult.wiFiBand", "wiFiBand", value.isMember("wiFiBand")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResult.rssi", "rssi", value.isMember("rssi")));
+        ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResultStruct.channel", "channel", value.isMember("channel")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResultStruct.wiFiBand", "wiFiBand", value.isMember("wiFiBand")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("WiFiInterfaceScanResultStruct.rssi", "rssi", value.isMember("rssi")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "security");
@@ -848,7 +853,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & request)
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResultStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.security);
     ComplexArgumentParser::Finalize(request.ssid);
