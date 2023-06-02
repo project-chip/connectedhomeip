@@ -43,7 +43,6 @@ public:
     CHIP_ERROR Shutdown();
 
 private:
-
     /**
      * @brief Event Handler callback given to the PlatformManager
      *        Function dispatchs the event to the ICDManager member
