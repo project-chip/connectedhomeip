@@ -397,7 +397,7 @@ private:
             const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
             if (fabric == nullptr)
             {
-                ChipLogError(AppServer, "Group added to nonexistent fabric?");
+                ChipLogError(AppServer, "Group removed from nonexistent fabric?");
                 return;
             }
 

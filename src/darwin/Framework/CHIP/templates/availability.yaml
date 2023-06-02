@@ -3115,8 +3115,12 @@
               # here.
               - RegulatoryLocationTypeEnum
           NetworkCommissioning:
-              - NetworkCommissioningStatus
-              - WiFiBand
+              # NetworkCommissioningStatusEnum and WiFiBandEnum were originally
+              # just named NetworkCommissioningStatus and WiFiBand, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              - NetworkCommissioningStatusEnum
+              - WiFiBandEnum
           DiagnosticLogs:
               - LogsIntent
               - LogsStatus
@@ -3216,7 +3220,10 @@
               - SaturationMoveMode
               - SaturationStepMode
           IlluminanceMeasurement:
-              - LightSensorType
+              # LightSensorTypeEnum was originally named LightSensorType, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end, so the name can just change here.
+              - LightSensorTypeEnum
           Channel:
               - ChannelStatusEnum
               - LineupInfoTypeEnum
@@ -3456,7 +3463,11 @@
                   - Outdoor
                   - IndoorOutdoor
           NetworkCommissioning:
-              NetworkCommissioningStatus:
+              # NetworkCommissioningStatusEnum and WiFiBandEnum were originally
+              # just named NetworkCommissioningStatus and WiFiBand, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              NetworkCommissioningStatusEnum:
                   - Success
                   - OutOfRange
                   - BoundsExceeded
@@ -3470,7 +3481,7 @@
                   - IPV6Failed
                   - IPBindFailed
                   - UnknownError
-              WiFiBand:
+              WiFiBandEnum:
                   - 2G4
                   - 3G65
                   - 5G
@@ -3940,7 +3951,7 @@
                   - Up
                   - Down
           IlluminanceMeasurement:
-              LightSensorType:
+              LightSensorTypeEnum:
                   - Photodiode
                   - CMOS
           Channel:
@@ -7090,6 +7101,7 @@
           - TotalTrihalomethanesConcentrationMeasurement
           - TotalVolatileOrganicCompoundsConcentrationMeasurement
           - TurbidityConcentrationMeasurement
+          - OperationalState
           - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
@@ -7182,6 +7194,7 @@
               - EventList
           FanControl:
               - EventList
+              - AirflowDirection
           ThermostatUserInterfaceConfiguration:
               - EventList
           ColorControl:
@@ -8028,6 +8041,19 @@
               - EventList
               - FeatureMap
               - ClusterRevision
+          OperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
           RefrigeratorAlarm:
               - Mask
               - Latch
@@ -8095,6 +8121,14 @@
               - ResetCondition
           TonerCartridgeMonitoring:
               - ResetCondition
+          FanControl:
+              - Step
+          OperationalState:
+              - Pause
+              - Stop
+              - Start
+              - Resume
+              - OperationalCommandResponse
           RefrigeratorAlarm:
               - Reset
           TemperatureControl:
@@ -8107,6 +8141,14 @@
           DoorLock:
               UnboltDoor:
                   - pinCode
+          FanControl:
+              Step:
+                  - direction
+                  - wrap
+                  - lowestOff
+          OperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
           RefrigeratorAlarm:
               Reset:
                   - alarms
@@ -8122,6 +8164,13 @@
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
               - ProductAppearanceStruct
+          NetworkCommissioning:
+              - WiFiInterfaceScanResultStruct
+              - ThreadInterfaceScanResultStruct
+              - NetworkInfoStruct
+          OperationalState:
+              - OperationalStateStruct
+              - ErrorStateStruct
           TemperatureControl:
               - TemperatureLevelStruct
           ThreadNetworkDiagnostics:
@@ -8141,6 +8190,34 @@
               ProductAppearanceStruct:
                   - finish
                   - primaryColor
+          NetworkCommissioning:
+              WiFiInterfaceScanResultStruct:
+                  - security
+                  - ssid
+                  - bssid
+                  - channel
+                  - wiFiBand
+                  - rssi
+              ThreadInterfaceScanResultStruct:
+                  - panId
+                  - extendedPanId
+                  - networkName
+                  - channel
+                  - version
+                  - extendedAddress
+                  - rssi
+                  - lqi
+              NetworkInfoStruct:
+                  - networkID
+                  - connected
+          OperationalState:
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
           TemperatureControl:
               TemperatureLevelStruct:
                   - label
@@ -8173,6 +8250,9 @@
                   - allocated
                   - linkEstablished
       events:
+          OperationalState:
+              - OperationalError
+              - OperationCompletion
           RefrigeratorAlarm:
               - Notify
           SmokeCOAlarm:
@@ -8188,6 +8268,13 @@
               - InterconnectCOAlarm
               - AllClear
       event fields:
+          OperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
           RefrigeratorAlarm:
               Notify:
                   - active
@@ -8203,6 +8290,9 @@
           BridgedDeviceBasicInformation:
               - ColorEnum
               - ProductFinishEnum
+          FanControl:
+              - DirectionEnum
+              - AirflowDirectionEnum
           HEPAFilterMonitoring:
               - ChangeIndicationEnum
               - DegradationDirectionEnum
@@ -8383,6 +8473,9 @@
               - LevelValueEnum
               - MeasurementUnitEnum
               - MeasurementMediumEnum
+          OperationalState:
+              - OperationalStateEnum
+              - ErrorStateEnum
           SmokeCOAlarm:
               - AlarmStateEnum
               - ContaminationStateEnum
@@ -8460,8 +8553,18 @@
                   - Rugged
                   - Fabric
                   - Other
+          FanControl:
+              DirectionEnum:
+                  - Increase
+                  - Decrease
+              AirflowDirectionEnum:
+                  - Forward
+                  - Reverse
           NetworkCommissioning:
-              WiFiBand:
+              # WiFiBandEnum was originally just named WiFiBand, but we generate
+              # the same API for both of those names, so the name can just
+              # change here.
+              WiFiBandEnum:
                   - 1G
           HEPAFilterMonitoring:
               ChangeIndicationEnum:
@@ -9286,6 +9389,17 @@
                   - Eurocylinder
               LockOperationTypeEnum:
                   - Unlatch
+          OperationalState:
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
           SmokeCOAlarm:
               AlarmStateEnum:
                   - Normal
@@ -9329,6 +9443,8 @@
           Groups:
               - Feature
               - NameSupportBitmap
+          NetworkCommissioning:
+              - WiFiSecurityBitmap
           PressureMeasurement:
               - Feature
           PumpConfigurationAndControl:
@@ -9444,11 +9560,22 @@
                   - Moderate
                   - VeryPoor
                   - ExtremelyPoor
+          FanControl:
+              Feature:
+                  - Step
+                  - AirflowDirection
           Groups:
               Feature:
                   - GroupNames
               NameSupportBitmap:
                   - GroupNames
+          NetworkCommissioning:
+              WiFiSecurityBitmap:
+                  - Unencrypted
+                  - WEP
+                  - WPAPersonal
+                  - WPA2Personal
+                  - WPA3Personal
           PressureMeasurement:
               Feature:
                   - Extended
@@ -9841,12 +9968,18 @@
       structs:
           AccessControl:
               - Target
+          NetworkCommissioning:
+              - WiFiInterfaceScanResult
+              - ThreadInterfaceScanResult
+              - NetworkInfo
           ThreadNetworkDiagnostics:
               - NeighborTable
               - RouteTable
       bitmaps:
           Groups:
               - GroupClusterFeature
+          NetworkCommissioning:
+              - WiFiSecurity
           PressureMeasurement:
               - PressureFeature
           PumpConfigurationAndControl:
@@ -9863,6 +9996,10 @@
       structs:
           AccessControl:
               AccessControlTargetStruct: Target
+          NetworkCommissioning:
+              WiFiInterfaceScanResultStruct: WiFiInterfaceScanResult
+              ThreadInterfaceScanResultStruct: ThreadInterfaceScanResult
+              NetworkInfoStruct: NetworkInfo
           ThreadNetworkDiagnostics:
               NeighborTableStruct: NeighborTable
               RouteTableStruct: RouteTable
@@ -9888,6 +10025,8 @@
       bitmaps:
           Groups:
               Feature: GroupClusterFeature
+          NetworkCommissioning:
+              WiFiSecurityBitmap: WiFiSecurity
           PressureMeasurement:
               Feature: PressureFeature
           PumpConfigurationAndControl:

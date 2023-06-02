@@ -95,7 +95,6 @@ if (wifi_soc) {
     if (chip_enable_ble_rs911x) {
       # TODO efr32_sdk should not need a header from this location
       include_dirs += [
-        "${src_plat_dir}/rs911x",
         "${examples_plat_dir}/rs911x",
         "${examples_plat_dir}/rs911x/hal",
       ]

@@ -26,7 +26,7 @@
 #include <app/util/util.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
-#include <app/clusters/scenes/scenes.h>
+#include <app/clusters/scenes-server/scenes-server.h>
 #endif // EMBER_AF_PLUGIN_SCENES
 
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
@@ -264,13 +264,11 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
     }
 
 #ifdef EMBER_AF_PLUGIN_SCENES
-    // the scene has been changed (the value of on/off has changed) so
-    // the current scene as described in the attribute table is invalid,
-    // so mark it as invalid (just writes the valid/invalid attribute)
-    if (emberAfContainsServer(endpoint, Scenes::Id))
-    {
-        emberAfScenesClusterMakeInvalidCallback(endpoint);
-    }
+    //  the scene has been changed (the value of on/off has changed) so
+    //  the current scene as described in the attribute table is invalid,
+    //  so mark it as invalid (just writes the valid/invalid attribute)
+
+    Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
 #endif // EMBER_AF_PLUGIN_SCENES
 
     // The returned status is based solely on the On/Off cluster.  Errors in the
@@ -420,10 +418,8 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
             {
                 groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
             }
-
-            emberAfScenesClusterStoreCurrentSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+            Scenes::ScenesServer::Instance().StoreCurrentScene(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
 #endif // EMBER_AF_PLUGIN_SCENES
-
             OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
         }
 
@@ -482,7 +478,7 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
         groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     }
 
-    emberAfScenesClusterRecallSavedSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+    Scenes::ScenesServer::Instance().RecallScene(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
 #endif // EMBER_AF_PLUGIN_SCENES
 
     OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);

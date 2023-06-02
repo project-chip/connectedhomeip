@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BridgeGlobalStructs.h"
 #include "GeneratedClusters.h"
 
 namespace clusters {

@@ -38,6 +38,7 @@ CHIP_ERROR OTAFactoryDataProcessor::Init()
 
 CHIP_ERROR OTAFactoryDataProcessor::Clear()
 {
+    OTATlvProcessor::ClearInternal();
     mAccumulator.Clear();
     mPayload.Clear();
     ClearBuffer();
@@ -86,24 +87,22 @@ exit:
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to update factory data. Error: %s", ErrorStr(error));
-        error = Restore();
-        if (error == CHIP_NO_ERROR)
-        {
-            error = FactoryProvider::GetDefaultInstance().UpdateData(mFactoryData);
-        }
     }
     else
     {
         ChipLogProgress(DeviceLayer, "Factory data update finished.");
     }
 
-    ClearBuffer();
-
     return error;
 }
 
 CHIP_ERROR OTAFactoryDataProcessor::AbortAction()
 {
+    ReturnErrorOnFailure(Restore());
+    ReturnErrorOnFailure(FactoryProvider::GetDefaultInstance().UpdateData(mFactoryData));
+
+    PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
+
     return CHIP_NO_ERROR;
 }
 
@@ -207,11 +206,10 @@ void OTAFactoryDataProcessor::ClearBuffer()
 {
     if (mFactoryData)
     {
+        memset(mFactoryData, 0, FactoryProvider::kFactoryDataSize);
         chip::Platform::MemoryFree(mFactoryData);
         mFactoryData = nullptr;
     }
-
-    PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
 }
 
 CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue)

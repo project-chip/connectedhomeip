@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <configurator>
     <domain name="CHIP" spec="chip-0.7" dependsOn="zcl-1.0-07-5123-03" certifiable="true"/>
-    <enum name="NetworkCommissioningStatus" type="ENUM8">
+    <enum name="NetworkCommissioningStatusEnum" type="ENUM8">
         <cluster code="0x0031"/>
         <item name="Success" value="0x0"/>
         <item name="OutOfRange" value="0x1"/>
@@ -32,7 +32,7 @@ limitations under the License.
         <item name="IPBindFailed" value="0xb"/>
         <item name="UnknownError" value="0xc"/>
     </enum>
-    <enum name="WiFiBand" type="ENUM8">
+    <enum name="WiFiBandEnum" type="ENUM8">
         <cluster code="0x0031"/>
         <item name="2G4" value="0x0"/>
         <item name="3G65" value="0x1"/>
@@ -41,7 +41,7 @@ limitations under the License.
         <item name="60G" value="0x4"/>
         <item name="1G" value="0x5"/>
     </enum>
-    <bitmap name="WiFiSecurity" type="BITMAP8">
+    <bitmap name="WiFiSecurityBitmap" type="BITMAP8">
         <cluster code="0x0031"/>
         <field name="Unencrypted" mask="0x1"/>
         <field name="WEP" mask="0x2"/>
@@ -49,16 +49,16 @@ limitations under the License.
         <field name="WPA2-PERSONAL" mask="0x8"/>
         <field name="WPA3-PERSONAL" mask="0x10"/>
     </bitmap>
-    <struct name="WiFiInterfaceScanResult">
+    <struct name="WiFiInterfaceScanResultStruct">
         <cluster code="0x0031"/>
-        <item name="Security" type="WiFiSecurity"/>
+        <item name="Security" type="WiFiSecurityBitmap"/>
         <item name="SSID" type="OCTET_STRING" length="32"/>
         <item name="BSSID" type="OCTET_STRING" length="6"/>
         <item name="Channel" type="INT16U"/>
-        <item name="WiFiBand" type="WiFiBand"/>
+        <item name="WiFiBand" type="WiFiBandEnum"/>
         <item name="RSSI" type="INT8S"/>
     </struct>
-    <struct name="ThreadInterfaceScanResult">
+    <struct name="ThreadInterfaceScanResultStruct">
         <cluster code="0x0031"/>
         <item name="PanId" type="INT16U"/>
         <item name="ExtendedPanId" type="INT64U"/>
@@ -69,7 +69,7 @@ limitations under the License.
         <item name="RSSI" type="INT8S"/>
         <item name="LQI" type="INT8U"/>
     </struct>
-    <struct name="NetworkInfo">
+    <struct name="NetworkInfoStruct">
         <cluster code="0x0031"/>
         <item name="NetworkID" type="OCTET_STRING" length="32"/>
         <item name="Connected" type="BOOLEAN"/>
@@ -88,7 +88,7 @@ limitations under the License.
             <description>MaxNetworks</description>
             <access op="read" privilege="administer"/>
         </attribute>
-        <attribute side="server" code="0x0001" define="NETWORKS" type="ARRAY" entryType="NetworkInfo" writable="false" optional="false">
+        <attribute side="server" code="0x0001" define="NETWORKS" type="ARRAY" entryType="NetworkInfoStruct" writable="false" optional="false">
             <description>Networks</description>
             <access op="read" privilege="administer"/>
         </attribute>
@@ -99,7 +99,7 @@ limitations under the License.
             <access op="read" privilege="view"/>
             <access op="write" privilege="administer"/>
         </attribute>
-        <attribute side="server" code="0x0005" define="LAST_NETWORKING_STATUS" type="NetworkCommissioningStatus" writable="false" optional="false" isNullable="true">
+        <attribute side="server" code="0x0005" define="LAST_NETWORKING_STATUS" type="NetworkCommissioningStatusEnum" writable="false" optional="false" isNullable="true">
             <description>LastNetworkingStatus</description>
             <access op="read" privilege="administer"/>
         </attribute>
@@ -120,10 +120,10 @@ limitations under the License.
         </command>
         <command source="server" code="0x01" name="ScanNetworksResponse" optional="false" cli="chip network_commissioning scannetworksresponse">
             <description>Relay the set of networks the device sees as available back to the client.</description>
-            <arg name="NetworkingStatus" type="NetworkCommissioningStatus"/>
+            <arg name="NetworkingStatus" type="NetworkCommissioningStatusEnum"/>
             <arg name="DebugText" type="CHAR_STRING" optional="true"/>
-            <arg name="WiFiScanResults" type="WiFiInterfaceScanResult" array="true" optional="true"/>
-            <arg name="ThreadScanResults" type="ThreadInterfaceScanResult" array="true" optional="true"/>
+            <arg name="WiFiScanResults" type="WiFiInterfaceScanResultStruct" array="true" optional="true"/>
+            <arg name="ThreadScanResults" type="ThreadInterfaceScanResultStruct" array="true" optional="true"/>
         </command>
         <command source="client" code="0x02" name="AddOrUpdateWiFiNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addorupdatewifinetwork">
             <description>Add or update the credentials for a given Wi-Fi network.</description>
@@ -146,7 +146,7 @@ limitations under the License.
         </command>
         <command source="server" code="0x05" name="NetworkConfigResponse" optional="true" cli="chip network_commissioning addwifiresponse">
             <description>Response command for various commands that add/remove/modify network credentials.</description>
-            <arg name="NetworkingStatus" type="NetworkCommissioningStatus"/>
+            <arg name="NetworkingStatus" type="NetworkCommissioningStatusEnum"/>
             <arg name="DebugText" type="CHAR_STRING" length="512" optional="true" />
             <arg name="NetworkIndex" type="INT8U" optional="true" />
         </command>
@@ -158,7 +158,7 @@ limitations under the License.
         </command>
         <command source="server" code="0x07" name="ConnectNetworkResponse" optional="false" cli="chip network_commissioning connectnetworkresponse">
             <description>Command that indicates whether we have succcessfully connected to a network.</description>
-            <arg name="NetworkingStatus" type="NetworkCommissioningStatus"/>
+            <arg name="NetworkingStatus" type="NetworkCommissioningStatusEnum"/>
             <arg name="DebugText" type="CHAR_STRING" optional="true"/>
             <arg name="ErrorValue" type="INT32S" isNullable="true"/>
         </command>
@@ -172,8 +172,8 @@ limitations under the License.
     </cluster>
     <bitmap name="Feature" type="BITMAP32">
         <cluster code="0x0031"/>
-        <field name="Wi-Fi network interface" mask="0x1"/>
-        <field name="Thread network interface" mask="0x2"/>
-        <field name="Ethernet network interface" mask="0x4"/>
+        <field name="WiFiNetworkInterface" mask="0x1"/>
+        <field name="ThreadNetworkInterface" mask="0x2"/>
+        <field name="EthernetNetworkInterface" mask="0x4"/>
     </bitmap>
 </configurator>

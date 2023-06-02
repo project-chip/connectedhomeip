@@ -158,6 +158,18 @@ bool LockManager::Unlock(chip::EndpointId endpointId, const Optional<chip::ByteS
     return lockEndpoint->Unlock(pin, err, opSource);
 }
 
+bool LockManager::Unbolt(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
+                         OperationSourceEnum opSource)
+{
+    auto lockEndpoint = getEndpoint(endpointId);
+    if (nullptr == lockEndpoint)
+    {
+        ChipLogError(Zcl, "Unable to unbolt the door - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
+        return false;
+    }
+    return lockEndpoint->Unbolt(pin, err, opSource);
+}
+
 bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
     auto lockEndpoint = getEndpoint(endpointId);

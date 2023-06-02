@@ -30,7 +30,7 @@ env:
 jobs:
     full_android:
         name: Run
-        timeout-minutes: 75
+        timeout-minutes: 120
 
         env:
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
@@ -113,6 +113,8 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm64-tv-server build"
+            - name: Clean out build output
+              run: rm -rf ./out                    
             - name: Build Android arm64-chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
