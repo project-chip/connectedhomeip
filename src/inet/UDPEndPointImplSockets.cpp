@@ -33,7 +33,7 @@
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
-#endif
+#endif // HAVE_SYS_SOCKET_H
 #include <net/if.h>
 #include <netinet/in.h>
 #include <sys/ioctl.h>

@@ -50,6 +50,10 @@ include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn_args.cmake)
 include(${COMMON_CMAKE_SOURCE_DIR}/chip_gn.cmake)
 
 # Prepare compiler flags
+if (CHIP_CFLAGS)
+    matter_add_flags("${CHIP_CFLAGS}")
+endif()
+
 matter_add_flags(-D_POSIX_C_SOURCE=200809)
 
 if (CONFIG_ARM)
