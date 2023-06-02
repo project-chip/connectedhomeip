@@ -150,10 +150,20 @@ if (chip_pw_tokenizer_logging) {
   }
 }
 group("k32w0") {
-  deps = [ ":lock_app" ]
+  deps = [
+    ":binsign",
+    ":lock_app",
+  ]
   if (chip_pw_tokenizer_logging) {
     deps += [ ":lock_app.database" ]
   }
+}
+
+action("binsign") {
+  deps = [ ":lock_app" ]
+  script = "${k32w0_platform_dir}/scripts/sign-outdir.py"
+  output_name = "bignsign.log"
+  outputs = [ "${root_build_dir}/${output_name}" ]
 }
 
 group("default") {

@@ -51,7 +51,6 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
     <attribute side="server" code="0x0006" define="SCENE_TABLE_SIZE" type="INT16U" writable="false" optional="false">SceneTableSize</attribute>
     <attribute side="server" code="0x0007" define="REMAINING_CAPACITY" type="INT8U" writable="false" optional="false">RemainingCapacity</attribute>
-
     <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes add">
       <description>
         Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}'

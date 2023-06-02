@@ -47,6 +47,7 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         'NXP_K32W0_SDK_ROOT': 'TEST_NXP_K32W0_SDK_ROOT',
         'IMX_SDK_ROOT': 'IMX_SDK_ROOT',
         'TI_SYSCONFIG_ROOT': 'TEST_TI_SYSCONFIG_ROOT',
+        'JAVA_PATH': 'TEST_JAVA_PATH',
     })
 
     retval = subprocess.run([

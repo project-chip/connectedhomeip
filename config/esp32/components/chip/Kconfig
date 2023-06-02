@@ -163,6 +163,13 @@ menu "CHIP Core"
 
                 A value of 0 disables automatic closing of idle connections.
 
+        config ENABLE_ROUTE_HOOK
+            bool "Enable route hook"
+            depends on LWIP_HOOK_IP6_ROUTE_DEFAULT && LWIP_HOOK_ND6_GET_GW_DEFAULT
+            default y
+            help
+                Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
+
     endmenu # "Networking Options"
 
     menu "System Options"

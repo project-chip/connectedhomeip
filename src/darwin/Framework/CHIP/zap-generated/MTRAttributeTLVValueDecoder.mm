@@ -4725,8 +4725,8 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRNetworkCommissioningClusterNetworkInfo * newElement_0;
-                newElement_0 = [MTRNetworkCommissioningClusterNetworkInfo new];
+                MTRNetworkCommissioningClusterNetworkInfoStruct * newElement_0;
+                newElement_0 = [MTRNetworkCommissioningClusterNetworkInfoStruct new];
                 newElement_0.networkID = AsData(entry_0.networkID);
                 newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
                 [array_0 addObject:newElement_0];
@@ -5790,8 +5790,8 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRThreadNetworkDiagnosticsClusterNeighborTable * newElement_0;
-                newElement_0 = [MTRThreadNetworkDiagnosticsClusterNeighborTable new];
+                MTRThreadNetworkDiagnosticsClusterNeighborTableStruct * newElement_0;
+                newElement_0 = [MTRThreadNetworkDiagnosticsClusterNeighborTableStruct new];
                 newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
                 newElement_0.age = [NSNumber numberWithUnsignedInt:entry_0.age];
                 newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
@@ -5838,8 +5838,8 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRThreadNetworkDiagnosticsClusterRouteTable * newElement_0;
-                newElement_0 = [MTRThreadNetworkDiagnosticsClusterRouteTable new];
+                MTRThreadNetworkDiagnosticsClusterRouteTableStruct * newElement_0;
+                newElement_0 = [MTRThreadNetworkDiagnosticsClusterRouteTableStruct new];
                 newElement_0.extAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extAddress];
                 newElement_0.rloc16 = [NSNumber numberWithUnsignedShort:entry_0.rloc16];
                 newElement_0.routerId = [NSNumber numberWithUnsignedChar:entry_0.routerId];
@@ -15082,6 +15082,17 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+    case Attributes::AirflowDirection::Id: {
+        using TypeInfo = Attributes::AirflowDirection::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
     case Attributes::GeneratedCommandList::Id: {
         using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -16543,7 +16554,7 @@ static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
         }
         return value;
     }

@@ -30,9 +30,9 @@ chip_data_model("data_model") {
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }
 
-if (current_os == "android" || build_java_matter_controller) {
+if (current_os == "android" || matter_enable_java_compilation) {
   config("java-build-config") {
-    if (build_java_matter_controller) {
+    if (matter_enable_java_compilation) {
       include_dirs = java_matter_controller_dependent_paths
     }
   }
@@ -324,7 +324,7 @@ if (current_os == "android" || build_java_matter_controller) {
       "${chip_root}/src/platform",
     ]
 
-    if (build_java_matter_controller) {
+    if (matter_enable_java_compilation) {
       if (current_os == "mac") {
         deps += [ "${chip_root}/src/platform/Darwin" ]
       } else {

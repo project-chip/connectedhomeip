@@ -19,6 +19,7 @@
 #include "AppTaskCommon.h"
 #include "AppTask.h"
 
+#include "BLEManagerImpl.h"
 #include "ButtonManager.h"
 
 #include "ThreadUtil.h"
@@ -38,6 +39,11 @@
 #include <app/InteractionModelEngine.h>
 #endif
 
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
+#include <zephyr/fs/nvs.h>
+#include <zephyr/settings/settings.h>
+#endif
+
 using namespace chip::app;
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -46,6 +52,22 @@ namespace {
 constexpr int kFactoryResetCalcTimeout = 3000;
 constexpr int kFactoryResetTriggerCntr = 3;
 constexpr int kAppEventQueueSize       = 10;
+
+#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+const struct gpio_dt_spec sFactoryResetButtonDt = BUTTON_FACTORY_RESET;
+const struct gpio_dt_spec sBleStartButtonDt     = BUTTON_BLE_START;
+#if APP_USE_THREAD_START_BUTTON
+const struct gpio_dt_spec sThreadStartButtonDt = BUTTON_THREAD_START;
+#endif
+#if APP_USE_EXAMPLE_START_BUTTON
+const struct gpio_dt_spec sExampleActionButtonDt = BUTTON_EXAMPLE_ACTION;
+#endif
+#else
+const struct gpio_dt_spec sButtonCol1Dt = BUTTON_COL_1;
+const struct gpio_dt_spec sButtonCol2Dt = BUTTON_COL_2;
+const struct gpio_dt_spec sButtonRow1Dt = BUTTON_ROW_1;
+const struct gpio_dt_spec sButtonRow2Dt = BUTTON_ROW_2;
+#endif
 
 #if APP_USE_IDENTIFY_PWM
 constexpr uint32_t kIdentifyBlinkRateMs         = 200;
@@ -110,6 +132,22 @@ Identify sIdentify = {
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 #endif
+
+class AppCallbacks : public AppDelegate
+{
+    bool isComissioningStarted;
+
+public:
+    void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
+    void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
+    void OnCommissioningWindowClosed() override
+    {
+        if (!isComissioningStarted)
+            chip::DeviceLayer::Internal::BLEMgr().Shutdown();
+    }
+};
+
+AppCallbacks sCallbacks;
 } // namespace
 
 class AppFabricTableDelegate : public FabricTable::Delegate
@@ -118,7 +156,47 @@ class AppFabricTableDelegate : public FabricTable::Delegate
     {
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            chip::Server::GetInstance().ScheduleFactoryReset();
+            ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
+
+#ifdef CONFIG_CHIP_FACTORY_RESET_ERASE_NVS
+            void * storage = nullptr;
+            int status     = settings_storage_get(&storage);
+
+            if (status == 0)
+            {
+                status = nvs_clear(static_cast<nvs_fs *>(storage));
+            }
+
+            if (!status)
+            {
+                status = nvs_mount(static_cast<nvs_fs *>(storage));
+            }
+
+            if (status)
+            {
+                ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
+            }
+#else
+            const CHIP_ERROR err = PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
+
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Factory reset failed: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+
+            ConnectivityMgr().ErasePersistentInfo();
+#endif
+        }
+    }
+};
+
+class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
+{
+    void OnShutDown() override
+    {
+        if (ThreadStackManagerImpl().IsThreadEnabled())
+        {
+            ThreadStackManagerImpl().Finalize();
         }
     }
 };
@@ -215,6 +293,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Init ZCL Data Model and start server
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.appDelegate = &sCallbacks;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
 #if APP_SET_DEVICE_INFO_PROVIDER
@@ -240,6 +319,15 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
 #endif
 
+    // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs
+    // The OpenThread thread is running during factory reset. The nvs_clear function is called during
+    // factory reset, which makes the NVS storage innaccessible, but the OpenThread knows nothing
+    // about this and tries to store the parameters to NVS. Because of this the OpenThread need to be
+    // shut down before NVS. This delegate fixes the issue "Failed to store setting , ret -13",
+    // which means that the NVS is already disabled.
+    // For this the OnShutdown function is used
+    PlatformMgr().SetDelegate(new PlatformMgrDelegate);
+
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
@@ -258,28 +346,28 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 void AppTaskCommon::InitButtons(void)
 {
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, StartBleAdvButtonEventHandler);
+    sFactoryResetButton.Configure(&sFactoryResetButtonDt, FactoryResetButtonEventHandler);
+    sBleAdvStartButton.Configure(&sBleStartButtonDt, StartBleAdvButtonEventHandler);
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
-        sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_2, ExampleActionButtonEventHandler);
+        sExampleActionButton.Configure(&sExampleActionButtonDt, ExampleActionButtonEventHandler);
     }
 #endif
 #if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, StartThreadButtonEventHandler);
+    sThreadStartButton.Configure(&sThreadStartButtonDt, StartThreadButtonEventHandler);
 #endif
 #else
-    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
+    sFactoryResetButton.Configure(&sButtonRow1Dt, &sButtonCol1Dt, FactoryResetButtonEventHandler);
+    sBleAdvStartButton.Configure(&sButtonRow2Dt, &sButtonCol2Dt, StartBleAdvButtonEventHandler);
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
-        sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, ExampleActionButtonEventHandler);
+        sExampleActionButton.Configure(&sButtonRow1Dt, &sButtonCol2Dt, ExampleActionButtonEventHandler);
     }
 #endif
 #if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    sThreadStartButton.Configure(&sButtonRow2Dt, &sButtonCol1Dt, StartThreadButtonEventHandler);
 #endif
 #endif
 

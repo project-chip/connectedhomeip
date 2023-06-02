@@ -203,6 +203,10 @@ if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
     chip_gn_arg_append("chip_enable_rotating_device_id"            "true")
 endif()
 
+if (CONFIG_ENABLE_ROUTE_HOOK)
+    chip_gn_arg_append("chip_enable_route_hook"   "true")
+endif()
+
 if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_device_platform"   "\"external\"")
     if (CONFIG_ENABLE_CHIP_SHELL)
@@ -392,7 +396,7 @@ idf_component_get_property(lwip_lib lwip COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${lwip_lib}>)
 
 
-if (CONFIG_ESP_WIFI_ENABLED)
+if (CONFIG_ESP32_WIFI_ENABLED)
     idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
     idf_component_get_property(esp_wifi_dir esp_wifi COMPONENT_DIR)
     list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)

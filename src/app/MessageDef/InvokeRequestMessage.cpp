@@ -140,7 +140,7 @@ InvokeRequests::Builder & InvokeRequestMessage::Builder::CreateInvokeRequests()
     return mInvokeRequests;
 }
 
-InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::EndOfInvokeRequestMessage()
+CHIP_ERROR InvokeRequestMessage::Builder::EndOfInvokeRequestMessage()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -150,7 +150,7 @@ InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::EndOfInvokeReques
     {
         EndOfContainer();
     }
-    return *this;
+    return GetError();
 }
 }; // namespace app
 }; // namespace chip

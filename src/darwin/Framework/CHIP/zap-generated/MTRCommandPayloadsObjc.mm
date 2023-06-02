@@ -4514,8 +4514,8 @@ NS_ASSUME_NONNULL_BEGIN
                 auto iter_1 = decodableStruct.wiFiScanResults.Value().begin();
                 while (iter_1.Next()) {
                     auto & entry_1 = iter_1.GetValue();
-                    MTRNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_1;
-                    newElement_1 = [MTRNetworkCommissioningClusterWiFiInterfaceScanResult new];
+                    MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct * newElement_1;
+                    newElement_1 = [MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct new];
                     newElement_1.security = [NSNumber numberWithUnsignedChar:entry_1.security.Raw()];
                     newElement_1.ssid = AsData(entry_1.ssid);
                     newElement_1.bssid = AsData(entry_1.bssid);
@@ -4541,8 +4541,8 @@ NS_ASSUME_NONNULL_BEGIN
                 auto iter_1 = decodableStruct.threadScanResults.Value().begin();
                 while (iter_1.Next()) {
                     auto & entry_1 = iter_1.GetValue();
-                    MTRNetworkCommissioningClusterThreadInterfaceScanResult * newElement_1;
-                    newElement_1 = [MTRNetworkCommissioningClusterThreadInterfaceScanResult new];
+                    MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct * newElement_1;
+                    newElement_1 = [MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct new];
                     newElement_1.panId = [NSNumber numberWithUnsignedShort:entry_1.panId];
                     newElement_1.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_1.extendedPanId];
                     newElement_1.networkName = AsString(entry_1.networkName);
@@ -9095,6 +9095,43 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRFanControlClusterStepParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _direction = @(0);
+
+        _wrap = nil;
+
+        _lowestOff = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRFanControlClusterStepParams alloc] init];
+
+    other.direction = self.direction;
+    other.wrap = self.wrap;
+    other.lowestOff = self.lowestOff;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: direction:%@; wrap:%@; lowestOff:%@; >",
+                                             NSStringFromClass([self class]), _direction, _wrap, _lowestOff];
     return descriptionString;
 }
 

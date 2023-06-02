@@ -5461,23 +5461,24 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            newElement_0_connectedCtorSignature.c_str(),
                                                                            entry_0.connected, newElement_0_connected);
 
-                jclass networkInfoStructClass_1;
+                jclass networkInfoStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterNetworkInfo", networkInfoStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterNetworkInfoStruct",
+                    networkInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterNetworkInfo");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterNetworkInfoStruct");
                     return nullptr;
                 }
-                jmethodID networkInfoStructCtor_1 =
-                    env->GetMethodID(networkInfoStructClass_1, "<init>", "([BLjava/lang/Boolean;)V");
-                if (networkInfoStructCtor_1 == nullptr)
+                jmethodID networkInfoStructStructCtor_1 =
+                    env->GetMethodID(networkInfoStructStructClass_1, "<init>", "([BLjava/lang/Boolean;)V");
+                if (networkInfoStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterNetworkInfo constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterNetworkInfoStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(networkInfoStructClass_1, networkInfoStructCtor_1, newElement_0_networkID,
+                newElement_0 = env->NewObject(networkInfoStructStructClass_1, networkInfoStructStructCtor_1, newElement_0_networkID,
                                               newElement_0_connected);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -6817,28 +6818,28 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            newElement_0_isChildCtorSignature.c_str(),
                                                                            entry_0.isChild, newElement_0_isChild);
 
-                jclass neighborTableStructClass_1;
+                jclass neighborTableStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable",
-                    neighborTableStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTableStruct",
+                    neighborTableStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTableStruct");
                     return nullptr;
                 }
-                jmethodID neighborTableStructCtor_1 =
-                    env->GetMethodID(neighborTableStructClass_1, "<init>",
+                jmethodID neighborTableStructStructCtor_1 =
+                    env->GetMethodID(neighborTableStructStructClass_1, "<init>",
                                      "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/"
                                      "lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
                                      "Integer;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
-                if (neighborTableStructCtor_1 == nullptr)
+                if (neighborTableStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTable constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTableStruct constructor");
                     return nullptr;
                 }
 
                 newElement_0 = env->NewObject(
-                    neighborTableStructClass_1, neighborTableStructCtor_1, newElement_0_extAddress, newElement_0_age,
+                    neighborTableStructStructClass_1, neighborTableStructStructCtor_1, newElement_0_extAddress, newElement_0_age,
                     newElement_0_rloc16, newElement_0_linkFrameCounter, newElement_0_mleFrameCounter, newElement_0_lqi,
                     newElement_0_averageRssi, newElement_0_lastRssi, newElement_0_frameErrorRate, newElement_0_messageErrorRate,
                     newElement_0_rxOnWhenIdle, newElement_0_fullThreadDevice, newElement_0_fullNetworkData, newElement_0_isChild);
@@ -6922,28 +6923,29 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            newElement_0_linkEstablishedCtorSignature.c_str(),
                                                                            entry_0.linkEstablished, newElement_0_linkEstablished);
 
-                jclass routeTableStructClass_1;
+                jclass routeTableStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable", routeTableStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterRouteTableStruct",
+                    routeTableStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterRouteTableStruct");
                     return nullptr;
                 }
-                jmethodID routeTableStructCtor_1 = env->GetMethodID(
-                    routeTableStructClass_1, "<init>",
+                jmethodID routeTableStructStructCtor_1 = env->GetMethodID(
+                    routeTableStructStructClass_1, "<init>",
                     "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
                     "Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
-                if (routeTableStructCtor_1 == nullptr)
+                if (routeTableStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterRouteTable constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterRouteTableStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 =
-                    env->NewObject(routeTableStructClass_1, routeTableStructCtor_1, newElement_0_extAddress, newElement_0_rloc16,
-                                   newElement_0_routerId, newElement_0_nextHop, newElement_0_pathCost, newElement_0_LQIIn,
-                                   newElement_0_LQIOut, newElement_0_age, newElement_0_allocated, newElement_0_linkEstablished);
+                newElement_0 = env->NewObject(routeTableStructStructClass_1, routeTableStructStructCtor_1, newElement_0_extAddress,
+                                              newElement_0_rloc16, newElement_0_routerId, newElement_0_nextHop,
+                                              newElement_0_pathCost, newElement_0_LQIIn, newElement_0_LQIOut, newElement_0_age,
+                                              newElement_0_allocated, newElement_0_linkEstablished);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -19054,6 +19056,21 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           cppValue, value);
             return value;
         }
+        case Attributes::AirflowDirection::Id: {
+            using TypeInfo = Attributes::AirflowDirection::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          static_cast<uint8_t>(cppValue), value);
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -20835,7 +20852,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string valueClassName     = "java/lang/Integer";
                 std::string valueCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                              cppValue.Value(), value);
+                                                                              static_cast<uint8_t>(cppValue.Value()), value);
             }
             return value;
         }
