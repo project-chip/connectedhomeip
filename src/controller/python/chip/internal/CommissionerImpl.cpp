@@ -183,17 +183,17 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             commissionerParams.controllerICAC                 = icacSpan;
             commissionerParams.controllerNOC                  = nocSpan;
 
-            SuccessOrExit(DeviceControllerFactory::GetInstance().Init(factoryParams));
-            err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *result);
+            SuccessOrExit(err = DeviceControllerFactory::GetInstance().Init(factoryParams));
+            SuccessOrExit(err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *result));
 
-            SuccessOrExit(result->GetCompressedFabricIdBytes(compressedFabricIdSpan));
+            SuccessOrExit(err = result->GetCompressedFabricIdBytes(compressedFabricIdSpan));
             ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
                             static_cast<unsigned>(result->GetFabricIndex()));
             ChipLogByteSpan(Support, compressedFabricIdSpan);
 
             defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-            SuccessOrExit(chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, result->GetFabricIndex(), defaultIpk,
-                                                                  compressedFabricIdSpan));
+            SuccessOrExit(err = chip::Credentials::SetSingleIpkEpochKey(&gGroupDataProvider, result->GetFabricIndex(), defaultIpk,
+                                                                        compressedFabricIdSpan));
         }
     exit:
         ChipLogProgress(Controller, "Commissioner initialization status: %s", chip::ErrorStr(err));
