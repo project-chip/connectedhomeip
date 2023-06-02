@@ -144,14 +144,14 @@ int WriteEvent(int eventFd)
 
 #else
 
-int ReadEvent(int eventFd)
+ssize_t ReadEvent(int eventFd)
 {
     uint64_t value;
 
     return ::read(eventFd, &value, sizeof(value));
 }
 
-int WriteEvent(int eventFd)
+ssize_t WriteEvent(int eventFd)
 {
     uint64_t value = 1;
 
