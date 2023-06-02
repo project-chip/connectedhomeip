@@ -1565,10 +1565,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
 } // namespace Step
 
-namespace CurrentTemperatureLevelIndex {
+namespace SelectedTemperatureLevel {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace CurrentTemperatureLevelIndex
+} // namespace SelectedTemperatureLevel
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32

@@ -2686,9 +2686,9 @@ namespace Step {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace Step
 
-namespace CurrentTemperatureLevelIndex {
+namespace SelectedTemperatureLevel {
 static constexpr AttributeId Id = 0x00000004;
-} // namespace CurrentTemperatureLevelIndex
+} // namespace SelectedTemperatureLevel
 
 namespace SupportedTemperatureLevels {
 static constexpr AttributeId Id = 0x00000005;

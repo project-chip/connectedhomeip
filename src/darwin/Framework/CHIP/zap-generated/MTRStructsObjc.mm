@@ -2686,37 +2686,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTemperatureControlClusterTemperatureLevelStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _label = @"";
-
-        _temperatureLevel = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRTemperatureControlClusterTemperatureLevelStruct alloc] init];
-
-    other.label = self.label;
-    other.temperatureLevel = self.temperatureLevel;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: label:%@; temperatureLevel:%@; >", NSStringFromClass([self class]), _label, _temperatureLevel];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRRefrigeratorAlarmClusterNotifyEvent
 - (instancetype)init
 {

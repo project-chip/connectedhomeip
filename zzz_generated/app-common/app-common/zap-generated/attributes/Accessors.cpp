@@ -8319,7 +8319,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
 
 } // namespace Step
 
-namespace CurrentTemperatureLevelIndex {
+namespace SelectedTemperatureLevel {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -8348,7 +8348,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteAttribute(endpoint, Clusters::TemperatureControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace CurrentTemperatureLevelIndex
+} // namespace SelectedTemperatureLevel
 
 namespace FeatureMap {
 

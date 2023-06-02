@@ -4463,7 +4463,7 @@ private:
 | * MinTemperature                                                    | 0x0001 |
 | * MaxTemperature                                                    | 0x0002 |
 | * Step                                                              | 0x0003 |
-| * CurrentTemperatureLevelIndex                                      | 0x0004 |
+| * SelectedTemperatureLevel                                          | 0x0004 |
 | * SupportedTemperatureLevels                                        | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -14972,7 +14972,7 @@ void registerClusterTemperatureControl(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "min-temperature", Attributes::MinTemperature::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "max-temperature", Attributes::MaxTemperature::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "step", Attributes::Step::Id, credsIssuerConfig),                                //
-        make_unique<ReadAttribute>(Id, "current-temperature-level-index", Attributes::CurrentTemperatureLevelIndex::Id,
+        make_unique<ReadAttribute>(Id, "selected-temperature-level", Attributes::SelectedTemperatureLevel::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "supported-temperature-levels", Attributes::SupportedTemperatureLevels::Id,
                                    credsIssuerConfig),                                                                     //
@@ -14991,11 +14991,10 @@ void registerClusterTemperatureControl(Commands & commands, CredentialIssuerComm
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<int16_t>>(Id, "step", INT16_MIN, INT16_MAX, Attributes::Step::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "current-temperature-level-index", 0, UINT8_MAX,
-                                             Attributes::CurrentTemperatureLevelIndex::Id, WriteCommandType::kForceWrite,
+        make_unique<WriteAttribute<uint8_t>>(Id, "selected-temperature-level", 0, UINT8_MAX,
+                                             Attributes::SelectedTemperatureLevel::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CharSpan>>>(
             Id, "supported-temperature-levels", Attributes::SupportedTemperatureLevels::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -15016,7 +15015,7 @@ void registerClusterTemperatureControl(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "min-temperature", Attributes::MinTemperature::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "max-temperature", Attributes::MaxTemperature::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "step", Attributes::Step::Id, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, "current-temperature-level-index", Attributes::CurrentTemperatureLevelIndex::Id,
+        make_unique<SubscribeAttribute>(Id, "selected-temperature-level", Attributes::SelectedTemperatureLevel::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "supported-temperature-levels", Attributes::SupportedTemperatureLevels::Id,
                                         credsIssuerConfig),                                                                     //

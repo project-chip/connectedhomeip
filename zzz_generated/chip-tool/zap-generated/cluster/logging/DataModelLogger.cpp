@@ -1719,32 +1719,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Label'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("TemperatureLevel", indent + 1, value.temperatureLevel);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TemperatureLevel'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::DecodableType & value)
 {
@@ -8097,15 +8071,13 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Step", 1, value);
         }
-        case TemperatureControl::Attributes::CurrentTemperatureLevelIndex::Id: {
+        case TemperatureControl::Attributes::SelectedTemperatureLevel::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentTemperatureLevelIndex", 1, value);
+            return DataModelLogger::LogValue("SelectedTemperatureLevel", 1, value);
         }
         case TemperatureControl::Attributes::SupportedTemperatureLevels::Id: {
-            chip::app::DataModel::DecodableList<
-                chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType>
-                value;
+            chip::app::DataModel::DecodableList<chip::CharSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedTemperatureLevels", 1, value);
         }

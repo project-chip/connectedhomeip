@@ -13103,13 +13103,13 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeCurrentTemperatureLevelIndexWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeSelectedTemperatureLevelWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeTemperatureControlID)
-                        attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeCurrentTemperatureLevelIndexID)
-                             params:params];
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeTemperatureControlID)
+                                     attributeID:@(MTRAttributeIDTypeClusterTemperatureControlAttributeSelectedTemperatureLevelID)
+                                          params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedTemperatureLevelsWithParams:(MTRReadParams * _Nullable)params

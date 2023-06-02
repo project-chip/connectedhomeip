@@ -15306,31 +15306,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace RvcCleanModeSelect
 namespace TemperatureControl {
-namespace Structs {
-namespace TemperatureLevelStruct {
-enum class Fields : uint8_t
-{
-    kLabel            = 0,
-    kTemperatureLevel = 1,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan label;
-    uint8_t temperatureLevel = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace TemperatureLevelStruct
-} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -15430,7 +15405,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Step
-namespace CurrentTemperatureLevelIndex {
+namespace SelectedTemperatureLevel {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -15438,18 +15413,16 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTemperatureLevelIndex::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SelectedTemperatureLevel::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CurrentTemperatureLevelIndex
+} // namespace SelectedTemperatureLevel
 namespace SupportedTemperatureLevels {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type>;
-    using DecodableType = chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType> &;
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedTemperatureLevels::Id; }
@@ -15501,11 +15474,11 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::TemperatureSetpoint::TypeInfo::DecodableType temperatureSetpoint                   = static_cast<int16_t>(0);
-        Attributes::MinTemperature::TypeInfo::DecodableType minTemperature                             = static_cast<int16_t>(0);
-        Attributes::MaxTemperature::TypeInfo::DecodableType maxTemperature                             = static_cast<int16_t>(0);
-        Attributes::Step::TypeInfo::DecodableType step                                                 = static_cast<int16_t>(0);
-        Attributes::CurrentTemperatureLevelIndex::TypeInfo::DecodableType currentTemperatureLevelIndex = static_cast<uint8_t>(0);
+        Attributes::TemperatureSetpoint::TypeInfo::DecodableType temperatureSetpoint           = static_cast<int16_t>(0);
+        Attributes::MinTemperature::TypeInfo::DecodableType minTemperature                     = static_cast<int16_t>(0);
+        Attributes::MaxTemperature::TypeInfo::DecodableType maxTemperature                     = static_cast<int16_t>(0);
+        Attributes::Step::TypeInfo::DecodableType step                                         = static_cast<int16_t>(0);
+        Attributes::SelectedTemperatureLevel::TypeInfo::DecodableType selectedTemperatureLevel = static_cast<uint8_t>(0);
         Attributes::SupportedTemperatureLevels::TypeInfo::DecodableType supportedTemperatureLevels;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
