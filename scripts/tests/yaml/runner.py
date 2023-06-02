@@ -16,11 +16,11 @@
 
 import relative_importer  # isort: split # noqa: F401
 
+import asyncio
 import importlib
 import os
 import sys
 import traceback
-import asyncio
 from dataclasses import dataclass
 
 import click
