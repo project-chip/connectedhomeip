@@ -173,20 +173,19 @@ In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
 -   Download
-    [K32W061DK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W061DK6.zip).
+    [K32W061DK6 SDK 2.6.11](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_11_K32W061DK6.zip).
 
 -   Start building the application either with Secure Element or without
 
     -   without Secure Element
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_10_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_11_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/nxp/k32w/k32w0
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ ninja -C out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ $NXP_K32W0_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
     -   with Secure element
@@ -204,8 +203,8 @@ running oscillator as a clock source. In this case one must set the use_fro_32k
 argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
-install the recommanded packages (python version > 3, pip3, pycrypto,
-pycryptodome):
+(run automatically) install the recommanded packages (python version > 3, pip3,
+pycrypto, pycryptodome):
 
 ```
 user@ubuntu:~$ python3 --version
@@ -223,6 +222,21 @@ The resulting output file can be found in out/debug/chip-k32w0x-lock-example.
 
 -   When using Secure element and cross-compiling on Linux, log messages from
     the Plug&Trust middleware stack may not echo to the console.
+
+## Rotating device id
+
+This is an optional feature and can be used in multiple ways (please see section
+5.4.2.4.5 from Matter specification). One use case is Amazon Frustration Free
+Setup, which leverages the C3 Characteristic (Additional commissioning-related
+data) to offer an easier way to set up the device. The rotating device id will
+be encoded in this additional data and is programmed to rotate at pre-defined
+moments. The algorithm uses a unique per-device identifier that must be
+programmed during factory provisioning.
+
+Please use the following build args:
+
+-   `chip_enable_rotating_device_id=1` - to enable rotating device id.
+-   `chip_enable_additional_data_advertising=1` - to enable C3 characteristic.
 
 ## Manufacturing data
 

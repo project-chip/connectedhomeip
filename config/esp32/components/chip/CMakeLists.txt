@@ -203,6 +203,10 @@ if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
     chip_gn_arg_append("chip_enable_rotating_device_id"            "true")
 endif()
 
+if (CONFIG_ENABLE_ROUTE_HOOK)
+    chip_gn_arg_append("chip_enable_route_hook"   "true")
+endif()
+
 if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_device_platform"   "\"external\"")
     if (CONFIG_ENABLE_CHIP_SHELL)

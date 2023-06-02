@@ -241,24 +241,6 @@ uint16_t emberAfFixedEndpointCount(void);
  */
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
 
-/**
- * @brief Function that extracts a 16-bit integer from the message buffer
- */
-uint16_t emberAfGetInt16u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-
-/**
- * @brief Macro for consistency, that extracts single byte out of the message
- */
-#define emberAfGetInt8u(message, currentIndex, msgLen) message[currentIndex]
-
-/**
- * @brief Macro for consistency that copies a uint8_t from variable into buffer.
- */
-#define emberAfCopyInt8u(data, index, x) (data[index] = (x))
-/**
- * @brief function that copies a uint16_t value into a buffer
- */
-void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x);
 /*
  * @brief Function that copies a ZCL string type into a buffer.  The size
  * parameter should indicate the maximum number of characters to copy to the
