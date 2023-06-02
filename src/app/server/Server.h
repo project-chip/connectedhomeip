@@ -65,10 +65,10 @@
 #endif
 #include <transport/raw/UDP.h>
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/ICDEventManager.h>
-#include <app/ICDManager.h>
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#ifdef CHIP_CONFIG_ICD_SERVER_ENABLE
+#include <app/icd/ICDEventManager.h>
+#include <app/icd/ICDManager.h>
+#endif // CHIP_CONFIG_ICD_SERVER_ENABLE
 
 namespace chip {
 
@@ -600,10 +600,10 @@ private:
     Inet::InterfaceId mInterfaceId;
 
     System::Clock::Microseconds64 mInitTimestamp;
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    DeviceLayer::ICDEventManager mICDEventManager;
-    DeviceLayer::ICDManager mICDManager;
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#ifdef CHIP_CONFIG_ICD_SERVER_ENABLE
+    app::ICDEventManager mICDEventManager;
+    app::ICDManager mICDManager;
+#endif // CHIP_CONFIG_ICD_SERVER_ENABLE
 };
 
 } // namespace chip

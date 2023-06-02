@@ -247,9 +247,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#ifdef CHIP_CONFIG_ICD_SERVER_ENABLE
     mICDEventManager.Init(&mICDManager);
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#endif // CHIP_CONFIG_ICD_SERVER_ENABLE
 
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler();
@@ -488,9 +488,9 @@ void Server::Shutdown()
     mAccessControl.Finish();
     Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#ifdef CHIP_CONFIG_ICD_SERVER_ENABLE
     mICDEventManager.Shutdown();
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#endif // CHIP_CONFIG_ICD_SERVER_ENABLE
     mAttributePersister.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
