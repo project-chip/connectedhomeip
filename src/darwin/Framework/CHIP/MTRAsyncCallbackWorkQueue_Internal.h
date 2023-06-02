@@ -77,7 +77,7 @@ typedef void (^MTRAsyncCallbackDuplicateCheckHandler)(id opaqueItemData, BOOL * 
 // data is not a duplicate request.
 //    - This method will call the duplicate check handler for all work items matching the duplicate type ID, starting from the last
 //      item in the queue, and if a handler sets *stop to YES, this method will return the value the handler sets for *isDuplicate
-//    - If no duplicate check handlers sets *stop to YES, this method will return NO.
+//    - If no duplicate check handlers set *stop to YES, this method will return NO.
 - (BOOL)isDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData;
 @end
 
