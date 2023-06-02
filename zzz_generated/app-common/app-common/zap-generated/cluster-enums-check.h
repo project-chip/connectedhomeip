@@ -721,9 +721,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::R
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::NetworkCommissioningStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::NetworkCommissioningStatusEnum val)
 {
-    using EnumType = NetworkCommissioning::NetworkCommissioningStatus;
+    using EnumType = NetworkCommissioning::NetworkCommissioningStatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
@@ -744,9 +744,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::N
         return static_cast<EnumType>(13);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::WiFiBand val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::WiFiBandEnum val)
 {
-    using EnumType = NetworkCommissioning::WiFiBand;
+    using EnumType = NetworkCommissioning::WiFiBandEnum;
     switch (val)
     {
     case EnumType::k2g4:

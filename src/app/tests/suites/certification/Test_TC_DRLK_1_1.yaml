@@ -36,7 +36,7 @@ tests:
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 6
+          value: 7
           constraints:
               type: int16u
 
@@ -44,7 +44,7 @@ tests:
       PICS:
           " !DRLK.S.F00 && !DRLK.S.F01 && !DRLK.S.F02 && !DRLK.S.F04 &&
           !DRLK.S.F05 && !DRLK.S.F06 && !DRLK.S.F07 && !DRLK.S.F08 &&
-          !DRLK.S.F0a && !DRLK.S.F0b "
+          !DRLK.S.F0a && !DRLK.S.F0b && !DRLK.S.F0c "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -141,6 +141,15 @@ tests:
           constraints:
               type: bitmap32
               hasMasksSet: [0x800]
+
+    - label: "Given DRLK.S.F0c(UBOLT) ensure featuremap has the correct bit set"
+      PICS: DRLK.S.F0c
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1000]
 
     - label: "TH reads AttributeList from DUT"
       command: "readAttribute"
@@ -404,6 +413,17 @@ tests:
           constraints:
               type: list
               contains: [17, 18, 19]
+
+    - label:
+          "TH reads Feature dependent commands(DRLK.S.F0c) in
+          AcceptedCommandList"
+      PICS: DRLK.S.F0c
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [39]
 
     - label:
           "TH reads Feature dependent commands(DRLK.S.F08) in

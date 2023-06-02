@@ -65,11 +65,14 @@ protected:
     pthread_t mChipTask;
     bool mInternallyManagedChipTask = false;
     std::atomic<State> mState{ State::kStopped };
+
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
     pthread_cond_t mEventQueueStoppedCond;
     pthread_mutex_t mStateLock;
 
     pthread_attr_t mChipTaskAttr;
     struct sched_param mChipTaskSchedParam;
+#endif
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool mChipStackIsLocked = false;
@@ -101,16 +104,25 @@ private:
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
-    void ProcessDeviceEvents();
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+    static void _DispatchEventViaScheduleWork(System::Layer * aLayer, void * appState);
+#else
 
     DeviceSafeQueue mChipEventQueue;
     std::atomic<bool> mShouldRunEventLoop{ true };
     static void * EventLoopTaskMain(void * arg);
+#endif
+    void ProcessDeviceEvents();
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
 extern template class GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;
 
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+// with external libev mainloop, this should be implemented externally to terminate the mainloop cleanly
+// (Note that there is a weak default implementation that just calls chipDie() when the external implementation is missing)
+extern void ExitExternalMainLoop();
+#endif
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

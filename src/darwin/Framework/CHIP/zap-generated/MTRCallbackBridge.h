@@ -277,13 +277,14 @@ typedef void (*GeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCal
     void *, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum);
 typedef void (*NullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> &);
-typedef void (*NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback)(
-    void *, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus);
-typedef void (*NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> &);
-typedef void (*NetworkCommissioningClusterWiFiBandAttributeCallback)(void *, chip::app::Clusters::NetworkCommissioning::WiFiBand);
-typedef void (*NullableNetworkCommissioningClusterWiFiBandAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBand> &);
+typedef void (*NetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallback)(
+    void *, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum);
+typedef void (*NullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> &);
+typedef void (*NetworkCommissioningClusterWiFiBandEnumAttributeCallback)(void *,
+                                                                         chip::app::Clusters::NetworkCommissioning::WiFiBandEnum);
+typedef void (*NullableNetworkCommissioningClusterWiFiBandEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBandEnum> &);
 typedef void (*DiagnosticLogsClusterIntentEnumAttributeCallback)(void *, chip::app::Clusters::DiagnosticLogs::IntentEnum);
 typedef void (*NullableDiagnosticLogsClusterIntentEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::IntentEnum> &);
@@ -1391,8 +1392,8 @@ typedef void (*GeneralCommissioningAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*NetworkCommissioningNetworksListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
-        data);
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType> & data);
 typedef void (*NetworkCommissioningGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*NetworkCommissioningAcceptedCommandListListAttributeCallback)(
@@ -6510,10 +6511,9 @@ public:
                                                                MTRActionBlock action) :
         MTRCallbackBridge<NetworkCommissioningNetworksListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
-            value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType> & value);
 };
 
 class MTRNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge
@@ -25585,142 +25585,144 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>
+class MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallback>
 {
 public:
-    MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                    ResponseHandler handler) :
-        MTRCallbackBridge<NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler) :
+        MTRCallbackBridge<NetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallback>(queue, handler,
+                                                                                                      OnSuccessFn){};
 
-    MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn){};
+    MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler,
+                                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<NetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallback>(queue, handler, action,
+                                                                                                      OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum value);
 };
 
-class MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge
-    : public MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
+class MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge
 {
 public:
-    MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge(
+    MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(queue, handler, action),
+        MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnDone;
+    using MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>
+class MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallback>
 {
 public:
-    MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                            ResponseHandler handler) :
-        MTRCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>(queue, handler,
-                                                                                                          OnSuccessFn){};
+    MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                ResponseHandler handler) :
+        MTRCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallback>(queue, handler,
+                                                                                                              OnSuccessFn){};
 
-    MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                            ResponseHandler handler,
-                                                                                            MTRActionBlock action) :
-        MTRCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>(queue, handler, action,
-                                                                                                          OnSuccessFn){};
+    MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                ResponseHandler handler,
+                                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value);
+        const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value);
 };
 
-class MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
+class MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge(
+    MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(queue, handler, action),
+        MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnDone;
+    using MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge
-    : public MTRCallbackBridge<NetworkCommissioningClusterWiFiBandAttributeCallback>
+class MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NetworkCommissioningClusterWiFiBandEnumAttributeCallback>
 {
 public:
-    MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NetworkCommissioningClusterWiFiBandAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NetworkCommissioningClusterWiFiBandEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<NetworkCommissioningClusterWiFiBandAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NetworkCommissioningClusterWiFiBandEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::NetworkCommissioning::WiFiBand value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::NetworkCommissioning::WiFiBandEnum value);
 };
 
-class MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge
-    : public MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge
+class MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackSubscriptionBridge
+    : public MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge
 {
 public:
-    MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge(
+    MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(queue, handler, action),
+        MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnDone;
+    using MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableNetworkCommissioningClusterWiFiBandAttributeCallback>
+class MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableNetworkCommissioningClusterWiFiBandEnumAttributeCallback>
 {
 public:
-    MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableNetworkCommissioningClusterWiFiBandAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableNetworkCommissioningClusterWiFiBandEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action) :
-        MTRCallbackBridge<NullableNetworkCommissioningClusterWiFiBandAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<NullableNetworkCommissioningClusterWiFiBandEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBand> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBandEnum> & value);
 };
 
-class MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge
-    : public MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge
+class MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge(
+    MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge(queue, handler, action),
+        MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnDone;
+    using MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
