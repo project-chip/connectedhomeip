@@ -151,11 +151,11 @@ Type TypeGet(chip::EndpointId endpoint)
 
 void ConfigStatusPrint(const chip::BitMask<ConfigStatus> & configStatus)
 {
-    emberAfWindowCoveringClusterPrint("ConfigStatus 0x%02X Operational=%u OnlineReserved=%u", configStatus.Raw(),
+    ChipLogProgress(Zcl, "ConfigStatus 0x%02X Operational=%u OnlineReserved=%u", configStatus.Raw(),
                                       configStatus.Has(ConfigStatus::kOperational),
                                       configStatus.Has(ConfigStatus::kOnlineReserved));
 
-    emberAfWindowCoveringClusterPrint(
+    ChipLogProgress(Zcl, 
         "Lift(PA=%u Encoder=%u Reversed=%u) Tilt(PA=%u Encoder=%u)", configStatus.Has(ConfigStatus::kLiftPositionAware),
         configStatus.Has(ConfigStatus::kLiftEncoderControlled), configStatus.Has(ConfigStatus::kLiftMovementReversed),
         configStatus.Has(ConfigStatus::kTiltPositionAware), configStatus.Has(ConfigStatus::kTiltEncoderControlled));
@@ -192,7 +192,7 @@ void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
 
 void OperationalStatusPrint(const chip::BitMask<OperationalStatus> & opStatus)
 {
-    emberAfWindowCoveringClusterPrint("OperationalStatus raw=0x%02X global=%u lift=%u tilt=%u", opStatus.Raw(),
+    ChipLogProgress(Zcl, "OperationalStatus raw=0x%02X global=%u lift=%u tilt=%u", opStatus.Raw(),
                                       opStatus.GetField(OperationalStatus::kGlobal), opStatus.GetField(OperationalStatus::kLift),
                                       opStatus.GetField(OperationalStatus::kTilt));
 }
@@ -263,7 +263,7 @@ EndProductType EndProductTypeGet(chip::EndpointId endpoint)
 
 void ModePrint(const chip::BitMask<Mode> & mode)
 {
-    emberAfWindowCoveringClusterPrint("Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u", mode.Raw(),
+    ChipLogProgress(Zcl, "Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u", mode.Raw(),
                                       mode.Has(Mode::kMotorDirectionReversed), mode.Has(Mode::kLedFeedback),
                                       mode.Has(Mode::kMaintenanceMode), mode.Has(Mode::kCalibrationMode));
 }
@@ -390,13 +390,13 @@ void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
     {
         percent.SetNull();
         rawpos.SetNull();
-        emberAfWindowCoveringClusterPrint("Lift[%u] Position Set to Null", endpoint);
+        ChipLogProgress(Zcl, "Lift[%u] Position Set to Null", endpoint);
     }
     else
     {
         percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
         rawpos.SetNonNull(Percent100thsToLift(endpoint, percent100ths.Value()));
-        emberAfWindowCoveringClusterPrint("Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
+        ChipLogProgress(Zcl, "Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
     }
     Attributes::CurrentPositionLift::Set(endpoint, rawpos);
     Attributes::CurrentPositionLiftPercentage::Set(endpoint, percent);
@@ -436,13 +436,13 @@ void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
     {
         percent.SetNull();
         rawpos.SetNull();
-        emberAfWindowCoveringClusterPrint("Tilt[%u] Position Set to Null", endpoint);
+        ChipLogProgress(Zcl, "Tilt[%u] Position Set to Null", endpoint);
     }
     else
     {
         percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
         rawpos.SetNonNull(Percent100thsToTilt(endpoint, percent100ths.Value()));
-        emberAfWindowCoveringClusterPrint("Tilt[%u] Position Set: %u", endpoint, percent100ths.Value());
+        ChipLogProgress(Zcl, "Tilt[%u] Position Set: %u", endpoint, percent100ths.Value());
     }
     Attributes::CurrentPositionTilt::Set(endpoint, rawpos);
     Attributes::CurrentPositionTiltPercentage::Set(endpoint, percent);
@@ -514,7 +514,7 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
     BitMask<ConfigStatus> configStatus;
     NPercent100ths current, target;
 
-    emberAfWindowCoveringClusterPrint("WC POST ATTRIBUTE=%u", (unsigned int) attributeId);
+    ChipLogProgress(Zcl, "WC POST ATTRIBUTE=%u", (unsigned int) attributeId);
 
     OperationalState opLift = OperationalStateGet(endpoint, OperationalStatus::kLift);
     OperationalState opTilt = OperationalStateGet(endpoint, OperationalStatus::kTilt);
@@ -527,7 +527,7 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
         Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
         if ((OperationalState::Stall != opLift) && (current == target))
         {
-            emberAfWindowCoveringClusterPrint("Lift stop");
+            ChipLogProgress(Zcl, "Lift stop");
             OperationalStateSet(endpoint, OperationalStatus::kLift, OperationalState::Stall);
         }
         break;
@@ -536,7 +536,7 @@ void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeI
         Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
         if ((OperationalState::Stall != opTilt) && (current == target))
         {
-            emberAfWindowCoveringClusterPrint("Tilt stop");
+            ChipLogProgress(Zcl, "Tilt stop");
             OperationalStateSet(endpoint, OperationalStatus::kTilt, OperationalState::Stall);
         }
         break;
@@ -604,7 +604,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
     else
     {
-        emberAfWindowCoveringClusterPrint("Failed to set WindowCovering delegate for endpoint:%u", endpoint);
+        ChipLogProgress(Zcl, "Failed to set WindowCovering delegate for endpoint:%u", endpoint);
     }
 }
 
@@ -625,12 +625,12 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("UpOrOpen command received");
+    ChipLogProgress(Zcl, "UpOrOpen command received");
 
     Status status = GetMotionLockStatus(endpoint);
     if (Status::Success != status)
     {
-        emberAfWindowCoveringClusterPrint("Err device locked");
+        ChipLogProgress(Zcl, "Err device locked");
         commandObj->AddStatus(commandPath, status);
         return true;
     }
@@ -659,7 +659,7 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
     }
     else
     {
-        emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
+        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
     }
 
     commandObj->AddStatus(commandPath, Status::Success);
@@ -675,12 +675,12 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("DownOrClose command received");
+    ChipLogProgress(Zcl, "DownOrClose command received");
 
     Status status = GetMotionLockStatus(endpoint);
     if (Status::Success != status)
     {
-        emberAfWindowCoveringClusterPrint("Err device locked");
+        ChipLogProgress(Zcl, "Err device locked");
         commandObj->AddStatus(commandPath, status);
         return true;
     }
@@ -710,7 +710,7 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
     }
     else
     {
-        emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
+        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
     }
 
     return true;
@@ -725,12 +725,12 @@ bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * comman
     app::DataModel::Nullable<Percent100ths> current;
     chip::EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("StopMotion command received");
+    ChipLogProgress(Zcl, "StopMotion command received");
 
     Status status = GetMotionLockStatus(endpoint);
     if (Status::Success != status)
     {
-        emberAfWindowCoveringClusterPrint("Err device locked");
+        ChipLogProgress(Zcl, "Err device locked");
         commandObj->AddStatus(commandPath, status);
         return true;
     }
@@ -752,7 +752,7 @@ bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * comman
     }
     else
     {
-        emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
+        ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
     }
 
     if (changeTarget)
@@ -784,12 +784,12 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToLiftValue %u command received", liftValue);
+    ChipLogProgress(Zcl, "GoToLiftValue %u command received", liftValue);
 
     Status status = GetMotionLockStatus(endpoint);
     if (Status::Success != status)
     {
-        emberAfWindowCoveringClusterPrint("Err device locked");
+        ChipLogProgress(Zcl, "Err device locked");
         commandObj->AddStatus(commandPath, status);
         return true;
     }
@@ -804,13 +804,13 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
         }
         else
         {
-            emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
+            ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
         }
         commandObj->AddStatus(commandPath, Status::Success);
     }
     else
     {
-        emberAfWindowCoveringClusterPrint("Err Device is not PA LF");
+        ChipLogProgress(Zcl, "Err Device is not PA LF");
         commandObj->AddStatus(commandPath, Status::Failure);
     }
     return true;
@@ -826,12 +826,12 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
     Percent100ths percent100ths = commandData.liftPercent100thsValue;
     EndpointId endpoint         = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToLiftPercentage %u command received", percent100ths);
+    ChipLogProgress(Zcl, "GoToLiftPercentage %u command received", percent100ths);
 
     Status status = GetMotionLockStatus(endpoint);
     if (Status::Success != status)
     {
-        emberAfWindowCoveringClusterPrint("Err device locked");
+        ChipLogProgress(Zcl, "Err device locked");
         commandObj->AddStatus(commandPath, status);
         return true;
     }
@@ -848,7 +848,7 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
             }
             else
             {
-                emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
+                ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
             }
             commandObj->AddStatus(commandPath, Status::Success);
         }
@@ -859,7 +859,7 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
     }
     else
     {
-        emberAfWindowCoveringClusterPrint("Err Device is not PA LF");
+        ChipLogProgress(Zcl, "Err Device is not PA LF");
         commandObj->AddStatus(commandPath, Status::Failure);
     }
     return true;
@@ -876,12 +876,12 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToTiltValue %u command received", tiltValue);
+    ChipLogProgress(Zcl, "GoToTiltValue %u command received", tiltValue);
 
     Status status = GetMotionLockStatus(endpoint);
     if (Status::Success != status)
     {
-        emberAfWindowCoveringClusterPrint("Err device locked");
+        ChipLogProgress(Zcl, "Err device locked");
         commandObj->AddStatus(commandPath, status);
         return true;
     }
@@ -896,13 +896,13 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
         }
         else
         {
-            emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
+            ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
         }
         commandObj->AddStatus(commandPath, Status::Success);
     }
     else
     {
-        emberAfWindowCoveringClusterPrint("Err Device is not PA TL");
+        ChipLogProgress(Zcl, "Err Device is not PA TL");
         commandObj->AddStatus(commandPath, Status::Failure);
     }
     return true;
@@ -918,12 +918,12 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
     Percent100ths percent100ths = commandData.tiltPercent100thsValue;
     EndpointId endpoint         = commandPath.mEndpointId;
 
-    emberAfWindowCoveringClusterPrint("GoToTiltPercentage %u command received", percent100ths);
+    ChipLogProgress(Zcl, "GoToTiltPercentage %u command received", percent100ths);
 
     Status status = GetMotionLockStatus(endpoint);
     if (Status::Success != status)
     {
-        emberAfWindowCoveringClusterPrint("Err device locked");
+        ChipLogProgress(Zcl, "Err device locked");
         commandObj->AddStatus(commandPath, status);
         return true;
     }
@@ -940,7 +940,7 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
             }
             else
             {
-                emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
+                ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
             }
             commandObj->AddStatus(commandPath, Status::Success);
         }
@@ -951,7 +951,7 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
     }
     else
     {
-        emberAfWindowCoveringClusterPrint("Err Device is not PA TL");
+        ChipLogProgress(Zcl, "Err Device is not PA TL");
         commandObj->AddStatus(commandPath, Status::Failure);
     }
     return true;
