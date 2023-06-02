@@ -190,16 +190,16 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 }
                 else
                 {
-                    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Successfully initialized CurrentMode to %u",
-                                   startUpMode.Value());
+                    ChipLogDetail(EMBER_AF_PRINT_DEBUG, "ModeSelect: Successfully initialized CurrentMode to %u",
+                                  startUpMode.Value());
                 }
             }
         }
     }
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "ModeSelect: Skipped initializing CurrentMode by StartUpMode because one of them is volatile");
+        ChipLogDetail(EMBER_AF_PRINT_DEBUG,
+                      "ModeSelect: Skipped initializing CurrentMode by StartUpMode because one of them is volatile");
     }
 }
 
