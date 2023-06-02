@@ -29,14 +29,16 @@ class RefrigeratorAlarmServer
 public:
     static RefrigeratorAlarmServer & Instance();
 
-    void ResetCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                      const chip::app::Clusters::RefrigeratorAlarm::Commands::Reset::DecodableType & commandData);
+    void ModifyEnabledAlarmsCommand(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::RefrigeratorAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 
-    EmberAfStatus getMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
-    EmberAfStatus getLatchValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * latch);
-    EmberAfStatus getStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
+    EmberAfStatus GetMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
+    EmberAfStatus GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
 
-    EmberAfStatus setMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
+    EmberAfStatus SetMaskValue(chip::EndpointId endpoint,
+                               const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> & mask);
+    EmberAfStatus SetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> state);
 
     bool SendNotifyEvent(chip::EndpointId endpointId, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> active,
                          chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> inActive,
