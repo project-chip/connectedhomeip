@@ -20,9 +20,17 @@
         },
         {
             "name": "Run application (Linux x64)",
-            "type": "lldb",
+            "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/out/${input:outAppLinux}",
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run test (Linux x64)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/${input:outTestLinux}",
             "args": [],
             "cwd": "${workspaceFolder}"
         },
@@ -484,6 +492,15 @@
             "args": {
                 "command": "find ${workspaceFolder}/out/linux-x64-* -maxdepth 2 -executable -name 'chip-*' |sort |sed 's$${workspaceFolder}/out/$$'",
                 "description": "Select the application to run"
+            }
+        },
+        {
+            "type": "command",
+            "id": "outTestLinux",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "find ${workspaceFolder}/out/linux-x64-*/tests -type f -executable |sort |sed 's$${workspaceFolder}/out/$$'",
+                "description": "Select the test to run"
             }
         },
         {
