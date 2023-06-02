@@ -48,14 +48,15 @@ namespace {
 
 constexpr size_t kWindowCoveringDelegateTableSize =
     EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "WindowCovering Delegate table size error");
 
 Delegate * gDelegateTable[kWindowCoveringDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, WindowCovering::Id);
-    return ((ep == kInvalidEndpointId || ep >= EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT) ? nullptr
-                                                                                                       : gDelegateTable[ep]);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kWindowCoveringDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 /*
@@ -595,10 +596,11 @@ Status GetMotionLockStatus(chip::EndpointId endpoint)
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, WindowCovering::Id);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, WindowCovering::Id, EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    // if endpoint is found and is not a dynamic endpoint
-    if (ep != 0xFFFF && ep < EMBER_AF_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT)
+    // if endpoint is found
+    if (ep < kWindowCoveringDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }
