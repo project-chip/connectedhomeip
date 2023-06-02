@@ -15,31 +15,29 @@
 import("//build_overrides/chip.gni")
 import("icd.gni")
 
-config("icd_server_config") {
+config("server_config") {
   defines = [ "CHIP_CONFIG_ICD_SERVER_ENABLE=${chip_enable_icd_server}" ]
 }
 
-source_set("icd-manager-srcs") {
+source_set("manager-srcs") {
   sources = [
-    "${chip_root}/src/app/icd/ICDManager.cpp",
-    "${chip_root}/src/app/icd/ICDManager.h",
+    "ICDManager.cpp",
+    "ICDManager.h",
   ]
 
   public_deps = [ "${chip_root}/src/lib/core" ]
 }
 
 source_set("server-srcs") {
-  if (chip_enable_icd_server) {
-    sources = [
-      "${chip_root}/src/app/icd/ICDEventManager.cpp",
-      "${chip_root}/src/app/icd/ICDEventManager.h",
-    ]
+  sources = [
+    "ICDEventManager.cpp",
+    "ICDEventManager.h",
+  ]
 
-    public_deps = [
-      ":icd-manager-srcs",
-      "${chip_root}/src/platform:platform",
-    ]
+  public_deps = [
+    ":manager-srcs",
+    "${chip_root}/src/platform:platform",
+  ]
 
-    public_configs = [ ":icd_server_config" ]
-  }
+  public_configs = [ ":icd_server_config" ]
 }
