@@ -75,11 +75,11 @@ void halOccupancyStateChangedCallback(EndpointId endpoint, HalOccupancyState occ
     if (occupancyState & HAL_OCCUPANCY_STATE_OCCUPIED)
     {
         mappedOccupancyState.Set(OccupancyBitmap::kOccupied);
-        emberAfOccupancySensingClusterPrintln("Occupancy detected");
+        ChipLogProgress(Zcl, "Occupancy detected");
     }
     else
     {
-        emberAfOccupancySensingClusterPrintln("Occupancy no longer detected");
+        ChipLogProgress(Zcl, "Occupancy no longer detected");
     }
 
     Attributes::Occupancy::Set(endpoint, occupancyState);
