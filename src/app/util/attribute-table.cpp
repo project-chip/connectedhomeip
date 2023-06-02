@@ -85,6 +85,45 @@ static void emberAfAttributeDecodeAndPrintCluster(ClusterId cluster)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
 }
 
+static void attributePrintBuffer(const uint8_t * buffer, uint16_t length, bool withSpace)
+{
+#ifdef CHIP_PROGRESS_LOGGING
+    if (buffer == nullptr || length == 0)
+    {
+        ChipLogProgress(Zcl, "NULL");
+        return;
+    }
+
+    constexpr uint16_t kBufferSize = CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE;
+    const char * perByteFormatStr  = withSpace ? "%02X " : "%02X";
+    const uint8_t perByteCharCount = withSpace ? 3 : 2;
+    const uint16_t bytesPerBuffer  = static_cast<uint16_t>((kBufferSize - 1) / perByteCharCount);
+    char result[kBufferSize];
+
+    uint16_t index = 0;
+    while (index < length)
+    {
+        const uint16_t remainingBytes = static_cast<uint16_t>(length - index);
+        const uint16_t segmentLength  = chip::min(bytesPerBuffer, remainingBytes);
+        const uint16_t segmentEnd     = static_cast<uint16_t>(index + segmentLength);
+        const uint32_t outStringEnd   = segmentLength * perByteCharCount;
+        for (uint32_t dst_idx = 0; dst_idx < outStringEnd && index < segmentEnd; dst_idx += perByteCharCount, index++)
+        {
+            // The perByteFormatStr is in fact a literal (one of two), but
+            // the compiler does not realize that.  We could branch on
+            // perByteFormatStr and have separate snprintf calls, but this
+            // seems like it might lead to smaller code.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+            snprintf(result + dst_idx, outStringEnd - dst_idx + 1, perByteFormatStr, buffer[index]);
+#pragma GCC diagnostic pop
+        }
+        result[outStringEnd] = 0;
+        ChipLogProgress(Zcl, "%s", result);
+    }
+#endif
+}
+
 void emberAfPrintAttributeTable()
 {
     uint8_t data[ATTRIBUTE_LARGEST];
@@ -110,10 +149,10 @@ void emberAfPrintAttributeTable()
                 // manually reset the watchdog.
                 //        halResetWatchdog();
 
-                emberAfAttributesPrint(ChipLogFormatMEI " / " ChipLogFormatMEI " / ", ChipLogValueMEI(cluster->clusterId),
+                ChipLogProgress(Zcl, ChipLogFormatMEI " / " ChipLogFormatMEI " / ", ChipLogValueMEI(cluster->clusterId),
                                        ChipLogValueMEI(metaData->attributeId));
-                emberAfAttributesPrint("----");
-                emberAfAttributesPrint(
+                ChipLogProgress(Zcl, "----");
+                ChipLogProgress(Zcl, 
                     " / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
                     (metaData->IsReadOnly() ? "RO" : "RW"),
                     (metaData->IsAutomaticallyPersisted() ? " nonvolatile " : (metaData->IsExternal() ? " extern " : "  RAM  ")));
@@ -139,7 +178,7 @@ void emberAfPrintAttributeTable()
                         length = emberAfAttributeSize(metaData);
                     }
                     UNUSED_VAR(length);
-                    emberAfAttributesPrintBuffer(data, length, true);
+                    attributePrintBuffer(data, length, true);
                     emberAfAttributeDecodeAndPrintCluster(cluster->clusterId);
                 }
             }
