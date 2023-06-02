@@ -74,84 +74,6 @@ EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attri
     return emAfReadAttribute(endpoint, cluster, attributeID, dataPtr, readLength, nullptr);
 }
 
-static void emberAfAttributeDecodeAndPrintCluster(ClusterId cluster)
-{
-#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
-    uint16_t index = emberAfFindClusterNameIndex(cluster);
-    if (index != 0xFFFF)
-    {
-        emberAfAttributesPrintln("(%p)", zclClusterNames[index].name);
-    }
-    emberAfAttributesFlush();
-#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
-}
-
-void emberAfPrintAttributeTable()
-{
-    uint8_t data[ATTRIBUTE_LARGEST];
-    decltype(emberAfEndpointCount()) endpointIndex;
-    decltype(EmberAfEndpointType::clusterCount) clusterIndex;
-    uint16_t attributeIndex;
-    EmberAfStatus status;
-    for (endpointIndex = 0; endpointIndex < emberAfEndpointCount(); endpointIndex++)
-    {
-        EmberAfDefinedEndpoint * ep = &(emAfEndpoints[endpointIndex]);
-        emberAfAttributesPrintln("ENDPOINT %x", ep->endpoint);
-        emberAfAttributesPrintln("clus / attr / mfg  /type(len)/ rw / storage / data (raw)");
-        emberAfAttributesFlush();
-        for (clusterIndex = 0; clusterIndex < ep->endpointType->clusterCount; clusterIndex++)
-        {
-            const EmberAfCluster * cluster = &(ep->endpointType->cluster[clusterIndex]);
-
-            for (attributeIndex = 0; attributeIndex < cluster->attributeCount; attributeIndex++)
-            {
-                const EmberAfAttributeMetadata * metaData = &(cluster->attributes[attributeIndex]);
-
-                // Depending on user config, this loop can take a very long time to
-                // run and watchdog reset will  kick in. As a workaround, we'll
-                // manually reset the watchdog.
-                //        halResetWatchdog();
-
-                emberAfAttributesPrint(ChipLogFormatMEI " / " ChipLogFormatMEI " / ", ChipLogValueMEI(cluster->clusterId),
-                                       ChipLogValueMEI(metaData->attributeId));
-                emberAfAttributesPrint("----");
-                emberAfAttributesPrint(
-                    " / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
-                    (metaData->IsReadOnly() ? "RO" : "RW"),
-                    (metaData->IsAutomaticallyPersisted() ? " nonvolatile " : (metaData->IsExternal() ? " extern " : "  RAM  ")));
-                emberAfAttributesFlush();
-                status =
-                    emAfReadAttribute(ep->endpoint, cluster->clusterId, metaData->attributeId, data, ATTRIBUTE_LARGEST, nullptr);
-                if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
-                {
-                    emberAfAttributesPrintln("Unsupported");
-                }
-                else
-                {
-                    uint16_t length;
-                    if (emberAfIsStringAttributeType(metaData->attributeType))
-                    {
-                        length = static_cast<uint16_t>(emberAfStringLength(data) + 1);
-                    }
-                    else if (emberAfIsLongStringAttributeType(metaData->attributeType))
-                    {
-                        length = static_cast<uint16_t>(emberAfLongStringLength(data) + 2);
-                    }
-                    else
-                    {
-                        length = emberAfAttributeSize(metaData);
-                    }
-                    UNUSED_VAR(length);
-                    emberAfAttributesPrintBuffer(data, length, true);
-                    emberAfAttributesFlush();
-                    emberAfAttributeDecodeAndPrintCluster(cluster->clusterId);
-                }
-            }
-        }
-        emberAfAttributesFlush();
-    }
-}
-
 //------------------------------------------------------------------------------
 // Internal Functions
 
@@ -249,9 +171,8 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     // if we dont support that attribute
     if (metadata == nullptr)
     {
-        emberAfAttributesPrintln("%pep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported",
-                                 "WRITE ERR: ", endpoint, ChipLogValueMEI(cluster), ChipLogValueMEI(attributeID));
-        emberAfAttributesFlush();
+        ChipLogProgress(Zcl, "%pep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported", "WRITE ERR: ", endpoint,
+                        ChipLogValueMEI(cluster), ChipLogValueMEI(attributeID));
         return status;
     }
 
@@ -260,15 +181,13 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     {
         if (dataType != metadata->attributeType)
         {
-            emberAfAttributesPrintln("%pinvalid data type", "WRITE ERR: ");
-            emberAfAttributesFlush();
+            ChipLogProgress(Zcl, "%pinvalid data type", "WRITE ERR: ");
             return EMBER_ZCL_STATUS_INVALID_DATA_TYPE;
         }
 
         if (metadata->IsReadOnly())
         {
-            emberAfAttributesPrintln("%pattr not writable", "WRITE ERR: ");
-            emberAfAttributesFlush();
+            ChipLogProgress(Zcl, "%pattr not writable", "WRITE ERR: ");
             return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
         }
     }
@@ -375,8 +294,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // bug: 11618, we are not handling properly external attributes
         // in this case... We need to do something. We don't really
         // know if it will succeed.
-        emberAfAttributesPrintln("WRITE: no write, just a test");
-        emberAfAttributesFlush();
+        ChipLogProgress(Zcl, "WRITE: no write, just a test");
     }
 
     return EMBER_ZCL_STATUS_SUCCESS;
@@ -409,8 +327,7 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     { // failed, print debug info
         if (status == EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED)
         {
-            emberAfAttributesPrintln("READ: attribute size too large for caller");
-            emberAfAttributesFlush();
+            ChipLogProgress(Zcl, "READ: attribute size too large for caller");
         }
     }
 

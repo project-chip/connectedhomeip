@@ -35,9 +35,6 @@
 
 #include <app/util/af-types.h>
 
-#include <app/util/debug-printing.h>
-#include <app/util/ember-print.h>
-
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
 #include <lib/support/SafeInt.h>
