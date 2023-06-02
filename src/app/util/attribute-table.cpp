@@ -152,7 +152,7 @@ void emberAfPrintAttributeTable()
                 ChipLogProgress(Zcl, ChipLogFormatMEI " / " ChipLogFormatMEI " / ", ChipLogValueMEI(cluster->clusterId),
                                        ChipLogValueMEI(metaData->attributeId));
                 ChipLogProgress(Zcl, "----");
-                ChipLogProgress(Zcl, 
+                ChipLogProgress(Zcl,
                     " / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
                     (metaData->IsReadOnly() ? "RO" : "RW"),
                     (metaData->IsAutomaticallyPersisted() ? " nonvolatile " : (metaData->IsExternal() ? " extern " : "  RAM  ")));
