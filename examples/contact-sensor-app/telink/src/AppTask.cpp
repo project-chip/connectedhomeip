@@ -41,7 +41,7 @@ CHIP_ERROR AppTask::Init(void)
     InitCommonParts();
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    sContactSensorLED.Init(CONTACT_STATE_LED);
+    sContactSensorLED.Init(GPIO_DT_SPEC_GET(DT_ALIAS(led2), gpios));
     sContactSensorLED.Set(ContactSensorMgr().IsContactClosed());
 #endif
 
