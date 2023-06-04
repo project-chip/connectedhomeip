@@ -2154,7 +2154,7 @@ void DeviceCommissioner::OnNetworkConfigResponse(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received NetworkConfig response, networkingStatus=%u", to_underlying(data.networkingStatus));
-    if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatus::kSuccess)
+    if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
         report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus);
@@ -2170,7 +2170,7 @@ void DeviceCommissioner::OnConnectNetworkResponse(
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received ConnectNetwork response, networkingStatus=%u", to_underlying(data.networkingStatus));
-    if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatus::kSuccess)
+    if (data.networkingStatus != NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess)
     {
         err = CHIP_ERROR_INTERNAL;
         report.Set<NetworkCommissioningStatusInfo>(data.networkingStatus);

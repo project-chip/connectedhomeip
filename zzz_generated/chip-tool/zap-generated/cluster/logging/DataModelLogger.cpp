@@ -657,8 +657,9 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -684,7 +685,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
-    const chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::DecodableType & value)
+    const chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResultStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -756,9 +757,9 @@ CHIP_ERROR DataModelLogger::LogValue(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResultStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -6223,7 +6224,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MaxNetworks", 1, value);
         }
         case NetworkCommissioning::Attributes::Networks::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType>
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Networks", 1, value);
@@ -6244,7 +6246,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("InterfaceEnabled", 1, value);
         }
         case NetworkCommissioning::Attributes::LastNetworkingStatus::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LastNetworkingStatus", 1, value);
         }

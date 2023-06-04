@@ -19,8 +19,8 @@
 #include <jni/CHIPCallbackTypes.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <controller/java/zap-generated/CHIPClientCallbacks.h>
 #include <jni.h>
-#include <zap-generated/CHIPClientCallbacks.h>
 
 namespace chip {
 

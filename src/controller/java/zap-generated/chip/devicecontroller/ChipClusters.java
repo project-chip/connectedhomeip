@@ -6734,7 +6734,7 @@ public class ChipClusters {
       , byte[] networkID, Integer networkIndex, Optional<Long> breadcrumb
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface ScanNetworksResponseCallback {
-      void onSuccess(Integer networkingStatus, Optional<String> debugText, Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>> wiFiScanResults, Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>> threadScanResults);
+      void onSuccess(Integer networkingStatus, Optional<String> debugText, Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>> wiFiScanResults, Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>> threadScanResults);
       
       void onError(Exception error);
     }
@@ -6753,7 +6753,7 @@ public class ChipClusters {
 
 
       public interface NetworksAttributeCallback {
-        void onSuccess( List<ChipStructs.NetworkCommissioningClusterNetworkInfo> valueList);
+        void onSuccess( List<ChipStructs.NetworkCommissioningClusterNetworkInfoStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }

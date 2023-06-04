@@ -242,7 +242,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Clang-tidy validation
-              timeout-minutes: 45
+              timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
@@ -462,7 +462,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Clang-tidy validation
-              timeout-minutes: 45
+              timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \

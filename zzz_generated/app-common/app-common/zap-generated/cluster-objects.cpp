@@ -5924,7 +5924,7 @@ namespace Events {} // namespace Events
 } // namespace GeneralCommissioning
 namespace NetworkCommissioning {
 namespace Structs {
-namespace NetworkInfo {
+namespace NetworkInfoStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -5967,8 +5967,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace NetworkInfo
-namespace ThreadInterfaceScanResult {
+} // namespace NetworkInfoStruct
+namespace ThreadInterfaceScanResultStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -6035,8 +6035,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ThreadInterfaceScanResult
-namespace WiFiInterfaceScanResult {
+} // namespace ThreadInterfaceScanResultStruct
+namespace WiFiInterfaceScanResultStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -6095,7 +6095,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace WiFiInterfaceScanResult
+} // namespace WiFiInterfaceScanResultStruct
 } // namespace Structs
 
 namespace Commands {

@@ -2843,7 +2843,7 @@ public class ClusterInfoMapping {
         }
 
         @Override
-        public void onSuccess(Integer NetworkingStatus, Optional<String> DebugText, Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>> WiFiScanResults, Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>> ThreadScanResults) {
+        public void onSuccess(Integer NetworkingStatus, Optional<String> DebugText, Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>> WiFiScanResults, Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>> ThreadScanResults) {
            Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
                CommandResponseInfo NetworkingStatusResponseValue = new CommandResponseInfo("NetworkingStatus", "Integer");
                responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
@@ -2920,9 +2920,9 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.NetworkCommissioningClusterNetworkInfo> valueList) {
+        public void onSuccess( List<ChipStructs.NetworkCommissioningClusterNetworkInfoStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.NetworkCommissioningClusterNetworkInfo>");
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.NetworkCommissioningClusterNetworkInfoStruct>");
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }

@@ -21,7 +21,7 @@
 #include <jni/CHIPReadCallbacks.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <zap-generated/CHIPClientCallbacks.h>
+#include <controller/java/zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
 #include <controller/java/AndroidCallbacks.h>

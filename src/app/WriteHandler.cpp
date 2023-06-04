@@ -330,7 +330,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         MatterPreAttributeWriteCallback(dataAttributePath);
         TLV::TLVWriter backup;
         DataVersion version = 0;
-        mWriteResponseBuilder.Checkpoint(backup);
+        mWriteResponseBuilder.GetWriteResponses().Checkpoint(backup);
         err = element.GetDataVersion(&version);
         if (CHIP_NO_ERROR == err)
         {
@@ -344,7 +344,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, dataReader, this);
         if (err != CHIP_NO_ERROR)
         {
-            mWriteResponseBuilder.Rollback(backup);
+            mWriteResponseBuilder.GetWriteResponses().Rollback(backup);
             err = AddStatus(dataAttributePath, StatusIB(err));
         }
         MatterPostAttributeWriteCallback(dataAttributePath);

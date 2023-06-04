@@ -834,13 +834,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 
 namespace LastNetworkingStatus {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> &
-                      value); // NetworkCommissioningStatus
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value);
+                  DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> &
+                      value); // NetworkCommissioningStatusEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus
 Set(chip::EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value);
+    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value);
 } // namespace LastNetworkingStatus
 
 namespace LastNetworkID {

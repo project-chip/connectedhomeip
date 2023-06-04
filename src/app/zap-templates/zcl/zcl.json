@@ -79,6 +79,7 @@
         "rvc-clean-mode-select-cluster.xml ",
         "rvc-run-mode-select-cluster.xml",
         "replacable-monitoring-cluster.xml",
+        "resource-monitoring-cluster.xml",
         "scene.xml",
         "smoke-co-alarm-cluster.xml",
         "software-diagnostics-cluster.xml",

@@ -4725,8 +4725,8 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRNetworkCommissioningClusterNetworkInfo * newElement_0;
-                newElement_0 = [MTRNetworkCommissioningClusterNetworkInfo new];
+                MTRNetworkCommissioningClusterNetworkInfoStruct * newElement_0;
+                newElement_0 = [MTRNetworkCommissioningClusterNetworkInfoStruct new];
                 newElement_0.networkID = AsData(entry_0.networkID);
                 newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
                 [array_0 addObject:newElement_0];

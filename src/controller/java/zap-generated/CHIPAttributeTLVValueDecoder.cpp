@@ -5461,23 +5461,24 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            newElement_0_connectedCtorSignature.c_str(),
                                                                            entry_0.connected, newElement_0_connected);
 
-                jclass networkInfoStructClass_1;
+                jclass networkInfoStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterNetworkInfo", networkInfoStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterNetworkInfoStruct",
+                    networkInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterNetworkInfo");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterNetworkInfoStruct");
                     return nullptr;
                 }
-                jmethodID networkInfoStructCtor_1 =
-                    env->GetMethodID(networkInfoStructClass_1, "<init>", "([BLjava/lang/Boolean;)V");
-                if (networkInfoStructCtor_1 == nullptr)
+                jmethodID networkInfoStructStructCtor_1 =
+                    env->GetMethodID(networkInfoStructStructClass_1, "<init>", "([BLjava/lang/Boolean;)V");
+                if (networkInfoStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterNetworkInfo constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterNetworkInfoStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(networkInfoStructClass_1, networkInfoStructCtor_1, newElement_0_networkID,
+                newElement_0 = env->NewObject(networkInfoStructStructClass_1, networkInfoStructStructCtor_1, newElement_0_networkID,
                                               newElement_0_connected);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

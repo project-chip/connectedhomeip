@@ -433,7 +433,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -2447,7 +2447,7 @@
               "code": 5,
               "mfgCode": null,
               "side": "server",
-              "type": "NetworkCommissioningStatus",
+              "type": "NetworkCommissioningStatusEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -5755,7 +5755,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -5867,7 +5867,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -8322,6 +8322,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 257
     }
-  ],
-  "log": []
+  ]
 }

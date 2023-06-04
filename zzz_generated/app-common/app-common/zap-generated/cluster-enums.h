@@ -853,8 +853,8 @@ enum class RegulatoryLocationTypeEnum : uint8_t
 
 namespace NetworkCommissioning {
 
-// Enum for NetworkCommissioningStatus
-enum class NetworkCommissioningStatus : uint8_t
+// Enum for NetworkCommissioningStatusEnum
+enum class NetworkCommissioningStatusEnum : uint8_t
 {
     kSuccess                = 0x00,
     kOutOfRange             = 0x01,
@@ -876,8 +876,8 @@ enum class NetworkCommissioningStatus : uint8_t
     kUnknownEnumValue = 13,
 };
 
-// Enum for WiFiBand
-enum class WiFiBand : uint8_t
+// Enum for WiFiBandEnum
+enum class WiFiBandEnum : uint8_t
 {
     k2g4  = 0x00,
     k3g65 = 0x01,
@@ -900,8 +900,8 @@ enum class Feature : uint32_t
     kEthernetNetworkInterface = 0x4,
 };
 
-// Bitmap for WiFiSecurity
-enum class WiFiSecurity : uint8_t
+// Bitmap for WiFiSecurityBitmap
+enum class WiFiSecurityBitmap : uint8_t
 {
     kUnencrypted  = 0x1,
     kWep          = 0x2,

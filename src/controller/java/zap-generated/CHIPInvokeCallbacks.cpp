@@ -1773,25 +1773,26 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
             chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(
                 newElement_1_rssiClassName.c_str(), newElement_1_rssiCtorSignature.c_str(), entry_1.rssi, newElement_1_rssi);
 
-            jclass wiFiInterfaceScanResultStructClass_2;
+            jclass wiFiInterfaceScanResultStructStructClass_2;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResult",
-                wiFiInterfaceScanResultStructClass_2);
+                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResultStruct",
+                wiFiInterfaceScanResultStructStructClass_2);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResult");
+                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResultStruct");
                 return;
             }
-            jmethodID wiFiInterfaceScanResultStructCtor_2 =
-                env->GetMethodID(wiFiInterfaceScanResultStructClass_2, "<init>",
+            jmethodID wiFiInterfaceScanResultStructStructCtor_2 =
+                env->GetMethodID(wiFiInterfaceScanResultStructStructClass_2, "<init>",
                                  "(Ljava/lang/Integer;[B[BLjava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-            if (wiFiInterfaceScanResultStructCtor_2 == nullptr)
+            if (wiFiInterfaceScanResultStructStructCtor_2 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResult constructor");
+                ChipLogError(Zcl,
+                             "Could not find ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResultStruct constructor");
                 return;
             }
 
-            newElement_1 = env->NewObject(wiFiInterfaceScanResultStructClass_2, wiFiInterfaceScanResultStructCtor_2,
+            newElement_1 = env->NewObject(wiFiInterfaceScanResultStructStructClass_2, wiFiInterfaceScanResultStructStructCtor_2,
                                           newElement_1_security, newElement_1_ssid, newElement_1_bssid, newElement_1_channel,
                                           newElement_1_wiFiBand, newElement_1_rssi);
             chip::JniReferences::GetInstance().AddToList(WiFiScanResultsInsideOptional, newElement_1);
@@ -1855,29 +1856,30 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                 newElement_1_lqiClassName.c_str(), newElement_1_lqiCtorSignature.c_str(), entry_1.lqi, newElement_1_lqi);
 
-            jclass threadInterfaceScanResultStructClass_2;
+            jclass threadInterfaceScanResultStructStructClass_2;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResult",
-                threadInterfaceScanResultStructClass_2);
+                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResultStruct",
+                threadInterfaceScanResultStructStructClass_2);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResult");
+                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResultStruct");
                 return;
             }
-            jmethodID threadInterfaceScanResultStructCtor_2 =
-                env->GetMethodID(threadInterfaceScanResultStructClass_2, "<init>",
+            jmethodID threadInterfaceScanResultStructStructCtor_2 =
+                env->GetMethodID(threadInterfaceScanResultStructStructClass_2, "<init>",
                                  "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/"
                                  "Integer;[BLjava/lang/Integer;Ljava/lang/Integer;)V");
-            if (threadInterfaceScanResultStructCtor_2 == nullptr)
+            if (threadInterfaceScanResultStructStructCtor_2 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResult constructor");
+                ChipLogError(Zcl,
+                             "Could not find ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResultStruct constructor");
                 return;
             }
 
             newElement_1 =
-                env->NewObject(threadInterfaceScanResultStructClass_2, threadInterfaceScanResultStructCtor_2, newElement_1_panId,
-                               newElement_1_extendedPanId, newElement_1_networkName, newElement_1_channel, newElement_1_version,
-                               newElement_1_extendedAddress, newElement_1_rssi, newElement_1_lqi);
+                env->NewObject(threadInterfaceScanResultStructStructClass_2, threadInterfaceScanResultStructStructCtor_2,
+                               newElement_1_panId, newElement_1_extendedPanId, newElement_1_networkName, newElement_1_channel,
+                               newElement_1_version, newElement_1_extendedAddress, newElement_1_rssi, newElement_1_lqi);
             chip::JniReferences::GetInstance().AddToList(ThreadScanResultsInsideOptional, newElement_1);
         }
         chip::JniReferences::GetInstance().CreateOptional(ThreadScanResultsInsideOptional, ThreadScanResults);

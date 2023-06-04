@@ -4419,9 +4419,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 namespace LastNetworkingStatus {
 
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value)
+                  DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
@@ -4436,9 +4436,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -4451,7 +4451,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NetworkCommiss
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
@@ -4460,7 +4460,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
 
 EmberAfStatus
 Set(chip::EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value)
 {
     if (value.IsNull())
     {
