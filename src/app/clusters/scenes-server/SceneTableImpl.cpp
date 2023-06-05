@@ -741,8 +741,7 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
         // over-allocation
         uint8_t clusterCount = GetClusterCountFromEndpoint();
         chip::Platform::ScopedMemoryBuffer<clusterId> cBuffer;
-        cBuffer.Alloc(clusterCount);
-        VerifyOrReturnError(nullptr != cBuffer.Get(), CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(cBuffer.Calloc(clusterCount), CHIP_ERROR_NO_MEMORY);
         clusterCount = GetClustersFromEndpoint(cBuffer.Get(), clusterCount);
 
         Span<clusterId> cSpan(cBuffer.Get(), clusterCount);
