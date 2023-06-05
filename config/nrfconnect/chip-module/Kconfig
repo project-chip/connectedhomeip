@@ -127,6 +127,13 @@ config CHIP_FACTORY_DATA_VERSION
 	  this value in the factory data provider implementation to verify that the
 	  factory data saved in the flash memory has the expected version.
 
+config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
+	int "Maximum length of rotating device ID unique ID in bytes"
+	default 16
+	depends on CHIP_FACTORY_DATA
+	help
+	  Maximum acceptable length of rotating device ID unique ID in bytes.
+
 if CHIP_FACTORY_DATA_BUILD
 
 # Factory data definitions
