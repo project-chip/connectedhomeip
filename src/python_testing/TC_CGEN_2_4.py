@@ -45,7 +45,7 @@ class TC_CGEN_2_4(MatterBaseTest):
             self, stage: int, expectedErrorPart: chip.native.ErrorSDKPart, expectedErrCode: int):
 
         logging.info("-----------------Fail on step {}-------------------------".format(stage))
-        pin, _ = self.OpenCommissioningWindow()
+        pin, _, _ = self.OpenCommissioningWindow()
         self.th2.ResetTestCommissioner()
         # This will run the commissioning up to the point where stage x is run and the
         # response is sent before the test commissioner simulates a failure
@@ -86,7 +86,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         await self.CommissionToStageSendCompleteAndCleanup(13, chip.native.ErrorSDKPart.IM_CLUSTER_STATUS, 0x02)
 
         logging.info('Step 15 - TH1 opens a commissioning window')
-        pin, _ = self.OpenCommissioningWindow()
+        pin, _, _ = self.OpenCommissioningWindow()
 
         logging.info('Step 16 - TH2 fully commissions the DUT')
         self.th2.ResetTestCommissioner()

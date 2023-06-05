@@ -162,7 +162,7 @@ class TC_DA_1_5(MatterBaseTest):
         await self.send_single_cmd(cmd=gcomm.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1))
 
         self.print_step(13, "Open commissioning window")
-        pin, _ = self.default_controller.OpenCommissioningWindow(
+        pin, _, _ = self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
         self.print_step(14, "Commission to TH2")
