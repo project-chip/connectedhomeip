@@ -36,11 +36,10 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
-import chip.setuppayload.SetupPayload
-import chip.setuppayload.SetupPayloadParser
-import chip.setuppayload.SetupPayloadParser.SetupPayloadException
-import chip.setuppayload.SetupPayloadParser.InvalidEntryCodeFormatException
-import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
+import chip.onboardingpayload.OnboardingPayload
+import chip.onboardingpayload.OnboardingPayloadException
+import chip.onboardingpayload.OnboardingPayloadParser
+import chip.onboardingpayload.UnrecognizedQrCodeException
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.SelectActionFragment
 import com.google.chip.chiptool.databinding.BarcodeFragmentBinding
@@ -182,14 +181,12 @@ class BarcodeFragment : Fragment() {
     }
 
     private fun handleInputQrCode(qrCode: String) {
-        lateinit var payload: SetupPayload
-        var isShortDiscriminator = false
+        lateinit var payload: OnboardingPayload
         try {
-            payload = SetupPayloadParser().parseQrCode(qrCode)
-        } catch (ex: SetupPayloadException) {
+            payload = OnboardingPayloadParser().parseQrCode(qrCode)
+        } catch (ex: OnboardingPayloadException) {
             try {
-                payload = SetupPayloadParser().parseManualEntryCode(qrCode)
-                isShortDiscriminator = true
+                payload = OnboardingPayloadParser().parseManualPairingCode(qrCode)
             } catch (ex: Exception) {
                 Log.e(TAG, "Unrecognized Manual Pairing Code", ex)
                 Toast.makeText(requireContext(), "Unrecognized Manual Pairing Code", Toast.LENGTH_SHORT).show()
@@ -199,14 +196,14 @@ class BarcodeFragment : Fragment() {
             Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
         }
         FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-            ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isShortDiscriminator))
+            ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
     }
 
     private fun handleScannedQrCode(barcode: Barcode) {
         Handler(Looper.getMainLooper()).post {
-            lateinit var payload: SetupPayload
+            lateinit var payload: OnboardingPayload
             try {
-                payload = SetupPayloadParser().parseQrCode(barcode.displayValue)
+                payload = barcode.displayValue?.let { OnboardingPayloadParser().parseQrCode(it) } ?: return@post
             } catch (ex: UnrecognizedQrCodeException) {
                 Log.e(TAG, "Unrecognized QR Code", ex)
                 Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
