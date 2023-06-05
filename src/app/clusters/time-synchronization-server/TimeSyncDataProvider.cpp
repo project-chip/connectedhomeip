@@ -72,9 +72,12 @@ CHIP_ERROR TimeSyncDataProvider::StoreDefaultNtp(const CharSpan & defaultNtp)
                                                static_cast<uint16_t>(defaultNtp.size()));
 }
 
-CHIP_ERROR TimeSyncDataProvider::LoadDefaultNtp(MutableByteSpan & defaultNtp)
+CHIP_ERROR TimeSyncDataProvider::LoadDefaultNtp(MutableCharSpan & defaultNtp)
 {
-    return Load(DefaultStorageKeyAllocator::TSDefaultNTP().KeyName(), defaultNtp);
+    MutableByteSpan byteSpan(Uint8::from_char(defaultNtp.data()), defaultNtp.size());
+    ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::TSDefaultNTP().KeyName(), byteSpan));
+    defaultNtp.reduce_size(byteSpan.size());
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TimeSyncDataProvider::ClearDefaultNtp()
@@ -82,7 +85,7 @@ CHIP_ERROR TimeSyncDataProvider::ClearDefaultNtp()
     return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::TSDefaultNTP().KeyName());
 }
 
-CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const TimeZone & timeZoneList)
+CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const TimeZones & timeZoneList)
 {
     uint8_t buffer[kTimeZoneListMaxSerializedSize];
     TLV::TLVWriter writer;
@@ -101,7 +104,7 @@ CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const TimeZone & timeZoneList)
     return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::TSTimeZone().KeyName(), buffer,
                                                static_cast<uint16_t>(writer.GetLengthWritten()));
 }
-CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZone & timeZoneList, uint8_t & size)
+CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZones & timeZoneList, uint8_t & size)
 {
     uint8_t buffer[kTimeZoneListMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
@@ -112,10 +115,13 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZone & timeZoneList, uint8_t &
 
     TLV::TLVReader reader;
     TLV::TLVType outerType;
+    size_t count;
 
     reader.Init(bufferSpan);
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
+    reader.CountRemainingInContainer(&count);
+    VerifyOrReturnError(count <= timeZoneList.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     uint8_t i = 0;
 
     while ((err = reader.Next()) == CHIP_NO_ERROR && i < timeZoneList.size())
@@ -162,7 +168,7 @@ CHIP_ERROR TimeSyncDataProvider::ClearTimeZone()
     return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::TSTimeZone().KeyName());
 }
 
-CHIP_ERROR TimeSyncDataProvider::StoreDSTOffset(const DSTOffset & dstOffsetList)
+CHIP_ERROR TimeSyncDataProvider::StoreDSTOffset(const DSTOffsets & dstOffsetList)
 {
     uint8_t buffer[kDSTOffsetListMaxSerializedSize];
     TLV::TLVWriter writer;
@@ -183,7 +189,7 @@ CHIP_ERROR TimeSyncDataProvider::StoreDSTOffset(const DSTOffset & dstOffsetList)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffset & dstOffsetList, uint8_t & size)
+CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffsets & dstOffsetList, uint8_t & size)
 {
     uint8_t buffer[kDSTOffsetListMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
@@ -194,10 +200,13 @@ CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffset & dstOffsetList, uint8_
 
     TLV::TLVReader reader;
     TLV::TLVType outerType;
+    size_t count;
 
     reader.Init(bufferSpan);
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
+    reader.CountRemainingInContainer(&count);
+    VerifyOrReturnError(count <= dstOffsetList.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     auto dst  = dstOffsetList.begin();
     uint8_t i = 0;
 

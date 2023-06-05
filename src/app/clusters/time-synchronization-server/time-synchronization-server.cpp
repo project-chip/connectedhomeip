@@ -473,7 +473,7 @@ DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type>
     return mTrustedTimeSource;
 }
 
-CHIP_ERROR TimeSynchronizationServer::GetDefaultNtp(MutableByteSpan & dntp)
+CHIP_ERROR TimeSynchronizationServer::GetDefaultNtp(MutableCharSpan & dntp)
 {
     return mTimeSyncDataProvider.LoadDefaultNtp(dntp);
 }
@@ -631,12 +631,11 @@ CHIP_ERROR TimeSynchronizationAttrAccess::ReadTrustedTimeSource(EndpointId endpo
 CHIP_ERROR TimeSynchronizationAttrAccess::ReadDefaultNtp(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t buffer[DefaultNTP::TypeInfo::MaxLength()];
-    MutableByteSpan dntp(buffer);
+    char buffer[DefaultNTP::TypeInfo::MaxLength()];
+    MutableCharSpan dntp(buffer);
     if (TimeSynchronizationServer::Instance().GetDefaultNtp(dntp) == CHIP_NO_ERROR && dntp.size() != 0)
     {
-        const char * charBuf = reinterpret_cast<const char *>(buffer);
-        err                  = aEncoder.Encode(chip::CharSpan(charBuf, dntp.size()));
+        err = aEncoder.Encode(CharSpan(buffer, dntp.size()));
     }
     else
     {

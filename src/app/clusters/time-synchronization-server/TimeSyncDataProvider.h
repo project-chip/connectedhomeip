@@ -35,8 +35,8 @@ class TimeSyncDataProvider
 public:
     using TrustedTimeSource = app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::Type;
     using DefaultNtp        = app::Clusters::TimeSynchronization::Attributes::DefaultNTP::TypeInfo::Type;
-    using TimeZone          = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>;
-    using DSTOffset         = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>;
+    using TimeZones         = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>;
+    using DSTOffsets        = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>;
 
     ~TimeSyncDataProvider() {}
 
@@ -47,15 +47,15 @@ public:
     CHIP_ERROR ClearTrustedTimeSource();
 
     CHIP_ERROR StoreDefaultNtp(const CharSpan & defaultNtp);
-    CHIP_ERROR LoadDefaultNtp(MutableByteSpan & defaultNtp);
+    CHIP_ERROR LoadDefaultNtp(MutableCharSpan & defaultNtp);
     CHIP_ERROR ClearDefaultNtp();
 
-    CHIP_ERROR StoreTimeZone(const TimeZone & timeZoneList);
-    CHIP_ERROR LoadTimeZone(TimeZone & timeZoneList, uint8_t & size);
+    CHIP_ERROR StoreTimeZone(const TimeZones & timeZoneList);
+    CHIP_ERROR LoadTimeZone(TimeZones & timeZoneList, uint8_t & size);
     CHIP_ERROR ClearTimeZone();
 
-    CHIP_ERROR StoreDSTOffset(const DSTOffset & dstOffsetList);
-    CHIP_ERROR LoadDSTOffset(DSTOffset & dstOffsetList, uint8_t & size);
+    CHIP_ERROR StoreDSTOffset(const DSTOffsets & dstOffsetList);
+    CHIP_ERROR LoadDSTOffset(DSTOffsets & dstOffsetList, uint8_t & size);
     CHIP_ERROR ClearDSTOffset();
 
 private:

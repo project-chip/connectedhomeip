@@ -73,14 +73,14 @@ void TestDefaultNTPStoreLoad(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.StoreDefaultNtp(defaultNTP));
 
-    uint8_t buf[5];
-    chip::MutableByteSpan getDefaultNtp(buf);
+    char buf[5];
+    chip::MutableCharSpan getDefaultNtp(buf);
 
     NL_TEST_ASSERT(inSuite, CHIP_ERROR_BUFFER_TOO_SMALL == timeSyncDataProv.LoadDefaultNtp(getDefaultNtp));
     NL_TEST_ASSERT(inSuite, getDefaultNtp.size() == 5);
 
-    uint8_t buf1[20];
-    chip::MutableByteSpan getDefaultNtp1(buf1);
+    char buf1[20];
+    chip::MutableCharSpan getDefaultNtp1(buf1);
 
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.LoadDefaultNtp(getDefaultNtp1));
     NL_TEST_ASSERT(inSuite, getDefaultNtp1.size() == 10);
@@ -92,7 +92,7 @@ void TestDefaultNTPEmpty(nlTestSuite * inSuite, void * inContext)
     TimeSyncDataProvider timeSyncDataProv;
     timeSyncDataProv.Init(persistentStorage);
 
-    chip::MutableByteSpan defaultNTP;
+    chip::MutableCharSpan defaultNTP;
 
     NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == timeSyncDataProv.LoadDefaultNtp(defaultNTP));
 }
@@ -122,14 +122,14 @@ void TestTimeZoneStoreLoad(nlTestSuite * inSuite, void * inContext)
 
     char tzA[10];
     char tzB[64];
-    char tzC[10];
+    char tzC[65];
     TimeZone emptyTzS[3] = { makeTimeZone(0, 0, tzA, sizeof(tzA)), makeTimeZone(0, 0, tzB, sizeof(tzB)),
                              makeTimeZone(0, 0, tzC, sizeof(tzC)) };
 
     tzL = TimeZoneList(emptyTzS);
     uint8_t size;
     NL_TEST_ASSERT(inSuite, tzL.size() == 3);
-    NL_TEST_ASSERT(inSuite, CHIP_ERROR_BUFFER_TOO_SMALL == timeSyncDataProv.LoadTimeZone(tzL, size));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.LoadTimeZone(tzL, size));
     NL_TEST_ASSERT(inSuite, size == 3);
 
     NL_TEST_ASSERT(inSuite, !tzL.empty());
@@ -162,7 +162,7 @@ void TestTimeZoneStoreLoad(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, tz.offset == 3);
         NL_TEST_ASSERT(inSuite, tz.validAt == 3);
         NL_TEST_ASSERT(inSuite, tz.name.HasValue());
-        NL_TEST_ASSERT(inSuite, tz.name.Value().size() == 10);
+        NL_TEST_ASSERT(inSuite, tz.name.Value().size() == 65);
 
         tzL = tzL.SubSpan(1);
     }

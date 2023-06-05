@@ -96,7 +96,7 @@ public:
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource(void);
     DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type> GetTimeZone(void);
     DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> GetDSTOffset(void);
-    CHIP_ERROR GetDefaultNtp(MutableByteSpan & dntp);
+    CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp);
 
     CHIP_ERROR SetUTCTime(chip::EndpointId ep, uint64_t utcTime, TimeSynchronization::GranularityEnum granularity,
                           TimeSynchronization::TimeSourceEnum source);
