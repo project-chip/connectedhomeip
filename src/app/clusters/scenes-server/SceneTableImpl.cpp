@@ -737,17 +737,15 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
     if (!HandlerListEmpty())
     {
+        // TODO : Once zap supports the scenable quality, implement a GetSceneableClusterCountFromEndpointType function to avoid
+        // over-allocation
         uint8_t clusterCount = GetClusterCountFromEndpoint();
-        clusterId * cBuffer  = static_cast<clusterId *>(chip::Platform::MemoryCalloc(sizeof(clusterId), clusterCount));
-        VerifyOrReturnError(nullptr != cBuffer, CHIP_ERROR_NO_MEMORY);
+        chip::Platform::ScopedMemoryBuffer<clusterId> cBuffer;
+        cBuffer.Alloc(clusterCount);
+        VerifyOrReturnError(nullptr != cBuffer.Get(), CHIP_ERROR_NO_MEMORY);
+        clusterCount = GetClustersFromEndpoint(cBuffer.Get(), clusterCount);
 
-        clusterCount = GetClustersFromEndpoint(cBuffer, clusterCount);
-        chip::Platform::MemoryRealloc(cBuffer, clusterCount);
-
-        // If there were no supported clusters on the endpoint, returns no error
-        VerifyOrReturnError(nullptr != cBuffer, CHIP_NO_ERROR);
-
-        Span<clusterId> cSpan(cBuffer, clusterCount);
+        Span<clusterId> cSpan(cBuffer.Get(), clusterCount);
         for (clusterId cluster : cSpan)
         {
             ExtensionFieldSet EFS;
@@ -758,24 +756,13 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
             {
                 if (handler.SupportsCluster(mEndpointId, cluster))
                 {
-                    CHIP_ERROR err = handler.SerializeSave(mEndpointId, EFS.mID, EFSSpan);
-                    if (CHIP_NO_ERROR != err)
-                    {
-                        chip::Platform::MemoryFree(cBuffer);
-                        return err;
-                    }
+                    ReturnErrorOnFailure(handler.SerializeSave(mEndpointId, EFS.mID, EFSSpan));
                     EFS.mUsedBytes = static_cast<uint8_t>(EFSSpan.size());
-                    err            = scene.mStorageData.mExtensionFieldSets.InsertFieldSet(EFS);
-                    if (CHIP_NO_ERROR != err)
-                    {
-                        chip::Platform::MemoryFree(cBuffer);
-                        return err;
-                    }
+                    ReturnErrorOnFailure(scene.mStorageData.mExtensionFieldSets.InsertFieldSet(EFS));
                     break;
                 }
             }
         }
-        chip::Platform::MemoryFree(cBuffer);
     }
 
     return CHIP_NO_ERROR;
