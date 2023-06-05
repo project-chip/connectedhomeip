@@ -44,7 +44,8 @@ tests:
       command: "readAttribute"
       attribute: "InputList"
       response:
-          type: list
+          constraints:
+              type: list
 
     - label:
           "TH sends a RenameInput command to DUT to rename an input from the
