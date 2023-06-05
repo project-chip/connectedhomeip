@@ -9,9 +9,10 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
-import chip.setuppayload.DiscoveryCapability;
-import chip.setuppayload.SetupPayload;
-import chip.setuppayload.SetupPayloadParser;
+import chip.onboardingpayload.DiscoveryCapability;
+import chip.onboardingpayload.OnboardingPayload;
+import chip.onboardingpayload.OnboardingPayloadException;
+import chip.onboardingpayload.OnboardingPayloadParser;
 import com.matter.tv.server.QRUtils;
 import com.matter.tv.server.R;
 import com.matter.tv.server.service.MatterServant;
@@ -58,24 +59,24 @@ public class QrCodeFragment extends Fragment {
     // TODO: Get these parameters from PreferencesConfigurationManager
     HashSet<DiscoveryCapability> discoveryCapabilities = new HashSet<>();
     discoveryCapabilities.add(DiscoveryCapability.ON_NETWORK);
-    SetupPayload payload =
-        new SetupPayload(0, 9050, 65279, 0, discoveryCapabilities, 3840, 20202021);
+    OnboardingPayload payload =
+        new OnboardingPayload(0, 9050, 65279, 0, discoveryCapabilities, 3840, 20202021);
 
-    SetupPayloadParser parser = new SetupPayloadParser();
+    OnboardingPayloadParser parser = new OnboardingPayloadParser();
     try {
       String qrCode = parser.getQrCodeFromPayload(payload);
       mQrCodeTxt.setText(qrCode);
 
       Bitmap qrCodeBitmap = QRUtils.createQRCodeBitmap(qrCode, 800, 800);
       mQrCodeImg.setImageBitmap(qrCodeBitmap);
-    } catch (SetupPayloadParser.SetupPayloadException e) {
+    } catch (OnboardingPayloadException e) {
       e.printStackTrace();
     }
 
     try {
-      String manualPairingCode = parser.getManualEntryCodeFromPayload(payload);
+      String manualPairingCode = parser.getManualPairingCodeFromPayload(payload);
       mManualPairingCodeTxt.setText("ManualPairingCode:" + manualPairingCode);
-    } catch (SetupPayloadParser.SetupPayloadException e) {
+    } catch (OnboardingPayloadException e) {
       e.printStackTrace();
     }
 
