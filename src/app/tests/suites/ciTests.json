@@ -351,6 +351,6 @@
         "Subscriptions",
         "DoorLock",
         "Groups",
-        "ResourceMonitoring"
+        "ReplaceableMonitoring"
     ]
 }
