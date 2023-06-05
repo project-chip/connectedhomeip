@@ -743,6 +743,8 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 
         clusterCount = GetClustersFromEndpoint(cBuffer, clusterCount);
         chip::Platform::MemoryRealloc(cBuffer, clusterCount);
+
+        // If there were no supported clusters on the endpoint, returns no error
         VerifyOrReturnError(nullptr != cBuffer, CHIP_NO_ERROR);
 
         Span<clusterId> cSpan(cBuffer, clusterCount);
