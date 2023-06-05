@@ -824,17 +824,17 @@ class CommissionDeviceTest(MatterBaseTest):
                 raise signals.TestAbortAll(f"Failed to commission node: {str(err)}")
 
     def _commission_device(self, i) -> Tuple[bool, PyChipError]:
-        dev_ctrl=self.default_controller
-        conf=self.matter_test_config
+        dev_ctrl = self.default_controller
+        conf = self.matter_test_config
 
         # TODO: support by manual code and QR
 
         if conf.commissioning_method == "on-network":
             return dev_ctrl.CommissionOnNetwork(
-                nodeId = conf.dut_node_id[i],
-                setupPinCode = conf.setup_passcode[i],
-                filterType = DiscoveryFilterType.LONG_DISCRIMINATOR,
-                filter = conf.discriminator[i]
+                nodeId=conf.dut_node_id[i],
+                setupPinCode=conf.setup_passcode[i],
+                filterType=DiscoveryFilterType.LONG_DISCRIMINATOR,
+                filter=conf.discriminator[i]
             )
         elif conf.commissioning_method == "ble-wifi":
             return dev_ctrl.CommissionWiFi(

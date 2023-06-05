@@ -89,7 +89,7 @@ def connect_device(devCtrl, setupPayload, commissionableDevice, nodeId=None):
 
     pincode = int(setupPayload.attributes['SetUpPINCode'])
     res, err = devCtrl.CommissionOnNetwork(
-            nodeId, pincode, filterType=discovery.FilterType.INSTANCE_NAME, filter=commissionableDevice.instanceName)
+        nodeId, pincode, filterType=discovery.FilterType.INSTANCE_NAME, filter=commissionableDevice.instanceName)
     if not res:
         log.error("Commission discovered device failed {}".format(str(err)))
         return None
@@ -111,7 +111,7 @@ def disconnect_device(devCtrl, nodeId):
     return True
 
 
-def send_zcl_command(devCtrl, cluster: str, command: str, nodeId: int, endpoint: int, args, requestTimeoutMs: int=None):
+def send_zcl_command(devCtrl, cluster: str, command: str, nodeId: int, endpoint: int, args, requestTimeoutMs: int = None):
     """
     Send ZCL command to device.
     :param devCtrl: device controller instance
@@ -123,28 +123,28 @@ def send_zcl_command(devCtrl, cluster: str, command: str, nodeId: int, endpoint:
     :param requestTimeoutMs: command request timeout in ms
     :return: error code and command response
     """
-    res=None
-    err=0
+    res = None
+    err = 0
     try:
-        allCommands=devCtrl.ZCLCommandList()
+        allCommands = devCtrl.ZCLCommandList()
         if cluster not in allCommands:
             raise exceptions.UnknownCluster(cluster)
-        cmd=allCommands.get(cluster).get(command)
+        cmd = allCommands.get(cluster).get(command)
         if cmd is None:
             raise exceptions.UnknownCommand(cluster, command)
 
-        clusterObj=getattr(GeneratedObjects, cluster)
-        commandObj=getattr(clusterObj.Commands, command)
-        req=commandObj(**args)
+        clusterObj = getattr(GeneratedObjects, cluster)
+        commandObj = getattr(clusterObj.Commands, command)
+        req = commandObj(**args)
 
-        res=asyncio.run(devCtrl.SendCommand(int(nodeId), int(endpoint), req, timedRequestTimeoutMs=requestTimeoutMs))
+        res = asyncio.run(devCtrl.SendCommand(int(nodeId), int(endpoint), req, timedRequestTimeoutMs=requestTimeoutMs))
 
     except exceptions.ChipStackException as ex:
         log.error("An exception occurred during processing ZCL command: {}".format(str(ex)))
-        err=-1
+        err = -1
     except Exception as ex:
         log.error("An exception occurred during processing input: {}".format(str(ex)))
-        err=-1
+        err = -1
 
     return (err, res)
 
@@ -160,29 +160,29 @@ def write_zcl_attribute(devCtrl, cluster: str, attribute: str, nodeId: int, endp
     :parma value: attribute value to write
     :return: error code and attribute response
     """
-    res=None
-    err=0
+    res = None
+    err = 0
     try:
-        allAttrs=devCtrl.ZCLAttributeList()
+        allAttrs = devCtrl.ZCLAttributeList()
         if cluster not in allAttrs:
             raise exceptions.UnknownCluster(cluster)
 
-        attrDetails=allAttrs.get(cluster).get(attribute)
+        attrDetails = allAttrs.get(cluster).get(attribute)
         if attrDetails is None:
             raise exceptions.UnknownAttribute(cluster, attribute)
 
-        clusterObj=getattr(GeneratedObjects, cluster)
-        attributeObj=getattr(clusterObj.Attributes, attribute)
-        req=attributeObj(value)
+        clusterObj = getattr(GeneratedObjects, cluster)
+        attributeObj = getattr(clusterObj.Attributes, attribute)
+        req = attributeObj(value)
 
-        res=asyncio.run(devCtrl.WriteAttribute(nodeId, [(endpoint, req)]))
+        res = asyncio.run(devCtrl.WriteAttribute(nodeId, [(endpoint, req)]))
 
     except exceptions.ChipStackException as ex:
         log.error("An exception occurred during processing ZCL attribute: {}".format(str(ex)))
-        err=-1
+        err = -1
     except Exception as ex:
         log.error("An exception occurred during processing input: {}".format(str(ex)))
-        err=-1
+        err = -1
 
     return (err, res)
 
@@ -197,33 +197,33 @@ def read_zcl_attribute(devCtrl, cluster: str, attribute: str, nodeId: int, endpo
     :param endpoint: device endpoint
     :return: error code and attribute response
     """
-    res=None
-    err=0
+    res = None
+    err = 0
     try:
-        allAttrs=devCtrl.ZCLAttributeList()
+        allAttrs = devCtrl.ZCLAttributeList()
         if cluster not in allAttrs:
             raise exceptions.UnknownCluster(cluster)
 
-        attrDetails=allAttrs.get(cluster).get(attribute)
+        attrDetails = allAttrs.get(cluster).get(attribute)
         if attrDetails is None:
             raise exceptions.UnknownAttribute(cluster, attribute)
 
-        clusterObj=getattr(GeneratedObjects, cluster)
-        attributeObj=getattr(clusterObj.Attributes, attribute)
+        clusterObj = getattr(GeneratedObjects, cluster)
+        attributeObj = getattr(clusterObj.Attributes, attribute)
 
-        result=asyncio.run(devCtrl.ReadAttribute(nodeId, [(endpoint, attributeObj)]))
+        result = asyncio.run(devCtrl.ReadAttribute(nodeId, [(endpoint, attributeObj)]))
 
-        path=ClusterAttribute.AttributePath(
+        path = ClusterAttribute.AttributePath(
             EndpointId=endpoint, Attribute=attributeObj)
 
-        res=IM.AttributeReadResult(path=IM.AttributePath(nodeId=nodeId, endpointId=path.EndpointId, clusterId=path.ClusterId,
-                                     attributeId=path.AttributeId), status=0, value=result[endpoint][clusterObj][attributeObj])
+        res = IM.AttributeReadResult(path=IM.AttributePath(nodeId=nodeId, endpointId=path.EndpointId, clusterId=path.ClusterId,
+                                                           attributeId=path.AttributeId), status=0, value=result[endpoint][clusterObj][attributeObj])
 
     except exceptions.ChipStackException as ex:
         log.error("An exception occurred during processing ZCL attribute: {}".format(str(ex)))
-        err=-1
+        err = -1
     except Exception as ex:
         log.error("An exception occurred during processing input: {}".format(str(ex)))
-        err=-1
+        err = -1
 
     return (err, res)
