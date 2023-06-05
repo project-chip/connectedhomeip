@@ -13083,16 +13083,6 @@
           "define": "REFRIGERATOR_ALARM",
           "side": "client",
           "enabled": 0,
-          "commands": [
-            {
-              "name": "Reset",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
           "attributes": [
             {
               "name": "FeatureMap",
@@ -13146,23 +13136,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "Latch",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "type": "AlarmMap",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

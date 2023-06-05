@@ -29,22 +29,20 @@ class RefrigeratorAlarmServer
 public:
     static RefrigeratorAlarmServer & Instance();
 
-    void ModifyEnabledAlarmsCommand(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::RefrigeratorAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
-
     EmberAfStatus GetMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
     EmberAfStatus GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
 
     EmberAfStatus SetMaskValue(chip::EndpointId endpoint,
                                const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> & mask);
-    EmberAfStatus SetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> state);
 
-    bool SendNotifyEvent(chip::EndpointId endpointId, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> active,
-                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> inActive,
-                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> state,
-                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
+    // When State changes we are generating Notify event
+    EmberAfStatus SetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
 
 private:
     static RefrigeratorAlarmServer instance;
+
+    void SendNotifyEvent(chip::EndpointId endpointId, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> becameActive,
+                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> becameInactive,
+                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState,
+                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
 };
