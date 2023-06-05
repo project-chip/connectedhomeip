@@ -482,6 +482,16 @@ class TestStep:
                 self._test.run_if)
             self._test.event_number = self._config_variable_substitution(
                 self._test.event_number)
+            self._test.cluster = self._config_variable_substitution(
+                self._test.cluster)
+            self._test.command = self._config_variable_substitution(
+                self._test.command)
+            self._test.attribute = self._config_variable_substitution(
+                self._test.attribute)
+            self._test.event = self._config_variable_substitution(
+                self._test.event)
+            self._test.endpoint = self._config_variable_substitution(
+                self._test.endpoint)
             test.update_arguments(self.arguments)
             test.update_responses(self.responses)
 
@@ -984,12 +994,15 @@ class TestParser:
             if value is None or not key in config:
                 continue
 
+            is_node_id = key == 'nodeId' or (isinstance(
+                config[key], dict) and config[key].get('type') == 'node_id')
+
             if type(value) is str:
                 if key == 'timeout' or key == 'endpoint':
                     value = int(value)
-                elif key == 'nodeId' and value.startswith('0x'):
+                elif is_node_id and value.startswith('0x'):
                     value = int(value, 16)
-                elif key == 'nodeId':
+                elif is_node_id:
                     value = int(value)
 
             if isinstance(config[key], dict) and 'defaultValue' in config[key]:

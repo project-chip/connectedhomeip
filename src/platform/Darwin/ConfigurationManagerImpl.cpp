@@ -96,7 +96,7 @@ CHIP_ERROR GetMACAddressFromInterfaces(io_iterator_t primaryInterfaceIterator, u
 
     kern_return_t kernResult;
     io_object_t interfaceService;
-    io_object_t controllerService;
+    io_object_t controllerService = 0;
 
     while ((interfaceService = IOIteratorNext(primaryInterfaceIterator)))
     {

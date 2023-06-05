@@ -96,9 +96,9 @@ public:
     /**
      *  @brief Mark the end of this EventFilterIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    EventFilterIB::Builder & EndOfEventFilterIB();
+    CHIP_ERROR EndOfEventFilterIB();
 };
 }; // namespace EventFilterIB
 }; // namespace app

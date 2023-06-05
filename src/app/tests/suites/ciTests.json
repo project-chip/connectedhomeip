@@ -177,6 +177,7 @@
         "Test_TC_DGTHREAD_2_3",
         "Test_TC_DGTHREAD_2_4"
     ],
+    "TimeSynchronization": ["Test_TC_TIMESYNC_1_1"],
     "WiFiNetworkDiagnostics": [
         "Test_TC_DGWIFI_1_1",
         "Test_TC_DGWIFI_2_1",
@@ -272,9 +273,11 @@
         "Test_TC_G_2_1"
     ],
     "Scenes": ["Test_TC_S_1_1"],
+    "AirQuality": ["Test_TC_AIRQUAL_1_1", "Test_TC_AIRQUAL_2_1"],
     "collection": [
         "AccessControl",
         "AccessControlEnforcement",
+        "AirQuality",
         "BooleanState",
         "BridgedDeviceBasicInformation",
         "Actions",
@@ -311,6 +314,7 @@
         "Thermostat",
         "ThermostatUserConfiguration",
         "ThreadNetworkDiagnostics",
+        "TimeSynchronization",
         "UserLabel",
         "WiFiNetworkDiagnostics",
         "WindowCovering",

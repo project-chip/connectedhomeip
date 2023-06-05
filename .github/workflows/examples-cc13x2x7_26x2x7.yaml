@@ -22,7 +22,6 @@ on:
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
-
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
     # XXX: Workaround for https://github.com/actions/cache/issues/1141
@@ -37,10 +36,13 @@ jobs:
             BUILD_TYPE: gn_cc26x2x7
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        # This CI is disabled because running out of flash and a solution was not found in time, see https://github.com/project-chip/connectedhomeip/pull/26186
+        # An issue was opened at https://github.com/project-chip/connectedhomeip/issues/26957
+        # TODO : Enable this once we have a way to run without out of flash failure or remove platform if it cannot support the SDK
+        if: github.actor != 'restyled-io[bot]' && false
 
         container:
-            image: connectedhomeip/chip-build-ti:0.7.3
+            image: connectedhomeip/chip-build-ti:0.7.14
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -79,5 +81,93 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-                      
 
+            - name: Build examples
+              timeout-minutes: 100
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target ti-cc13x2x7_26x2x7-lock-mtd \
+                      --target ti-cc13x2x7_26x2x7-pump-mtd \
+                      --target ti-cc13x2x7_26x2x7-lighting \
+                      --target ti-cc13x2x7_26x2x7-pump-controller-mtd \
+                      --target ti-cc13x4_26x4-lighting \
+                      --target ti-cc13x4_26x4-lock-ftd \
+                      --target ti-cc13x4_26x4-lock-mtd \
+                      --target ti-cc13x4_26x4-pump-mtd \
+                      --target ti-cc13x4_26x4-pump-ftd \
+                      --target ti-cc13x4_26x4-pump-controller-mtd \
+                      --target ti-cc13x4_26x4-pump-controller-ftd \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
+            - name: Get lock MTD size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc13x2_26x2 LP_CC2652R7 lock-mtd \
+                    out/artifacts/ti-cc13x2x7_26x2x7-lock-mtd/chip-LP_CC2652R7-lock-example.out \
+                    /tmp/bloat_reports/
+            - name: Get Pump App size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc13x2_26x2 LP_CC2652R7 pump-app \
+                    out/artifacts/ti-cc13x2x7_26x2x7-pump-mtd/chip-LP_CC2652R7-pump-example.out \
+                    /tmp/bloat_reports/
+            - name: Get Pump Controller App size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc13x2_26x2 LP_CC2652R7 pump-controller-app \
+                    out/artifacts/ti-cc13x2x7_26x2x7-pump-controller-mtd/chip-LP_CC2652R7-pump-controller-example.out \
+                    /tmp/bloat_reports/
+            - name: Get lock FTD size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc13x4_26x4 LP_EM_CC1354P10_6 lock-ftd \
+                    out/artifacts/ti-cc13x4_26x4-lock-ftd/chip-LP_EM_CC1354P10_6-lock-example.out \
+                    /tmp/bloat_reports/
+            - name: Get lock MTD size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc13x4_26x4 LP_EM_CC1354P10_6 lock-mtd \
+                    out/artifacts/ti-cc13x4_26x4-lock-mtd/chip-LP_EM_CC1354P10_6-lock-example.out \
+                    /tmp/bloat_reports/
+            - name: Get Pump App size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc13x4_26x4 LP_EM_CC1354P10_6 pump-app \
+                    out/artifacts/ti-cc13x4_26x4-pump-mtd/chip-LP_EM_CC1354P10_6-pump-example.out \
+                    /tmp/bloat_reports/
+            - name: Get Pump Controller App size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc13x4_26x4 LP_EM_CC1354P10_6 pump-controller-app \
+                    out/artifacts/ti-cc13x4_26x4-pump-controller-mtd/chip-LP_EM_CC1354P10_6-pump-controller-example.out \
+                    /tmp/bloat_reports/
+            - name: Get Lighting App size stats
+              timeout-minutes: 5
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc13x4_26x4 LP_EM_CC1354P10_6 lighting-app \
+                    out/artifacts/ti-cc13x4_26x4-lighting/chip-LP_EM_CC1354P10_6-lighting-example.out \
+                    /tmp/bloat_reports/
+            - name: Uploading Size Reports
+              uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
+              with:
+                  name: Size,cc13x2x7_26x2x7-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  path: |
+                      /tmp/bloat_reports/
+            - name: Uploading Size Reports
+              uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
+              with:
+                  name: Size,cc13x4_26x4-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  path: |
+                      /tmp/bloat_reports/

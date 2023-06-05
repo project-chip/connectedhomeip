@@ -20,7 +20,7 @@
 #include <jni.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/JniReferences.h>
-#include <zap-generated/CHIPClientCallbacks.h>
+#include <controller/java/zap-generated/CHIPClientCallbacks.h>
 
 {% for type in globalTypes -%}
 class CHIP{{type.name}}AttributeCallback : public chip::Callback::Callback<{{type.name}}AttributeCallback>

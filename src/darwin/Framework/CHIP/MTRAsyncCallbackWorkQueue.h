@@ -56,8 +56,6 @@ typedef void (^MTRAsyncCallbackReadyHandler)(id context, NSUInteger retryCount);
 // Work items may be enqueued from any queue or thread
 // Note: Once a work item is enqueued, its handlers cannot be modified
 - (void)enqueueWorkItem:(MTRAsyncCallbackQueueWorkItem *)item;
-
-// TODO: Add a "set concurrency width" method to allow for more than 1 work item at a time
 @end
 
 // An item in the work queue

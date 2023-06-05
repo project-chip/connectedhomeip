@@ -254,33 +254,6 @@ def runClangPrettifier(templates_file, output_dir):
         print('clang-format error:', err)
 
 
-def runJavaPrettifier(templates_file, output_dir):
-    try:
-        jsonData = json.loads(Path(templates_file).read_text())
-        outputs = [(os.path.join(output_dir, template['output']))
-                   for template in jsonData['templates']]
-        javaOutputs = list(
-            filter(lambda filepath: os.path.splitext(filepath)[1] == ".java", outputs))
-
-        if len(javaOutputs) > 0:
-            # Keep this version in sync with what restyler uses (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml).
-            google_java_format_version = "1.6"
-            google_java_format_url = 'https://github.com/google/google-java-format/releases/download/google-java-format-' + \
-                google_java_format_version + '/'
-            google_java_format_jar = 'google-java-format-' + \
-                google_java_format_version + '-all-deps.jar'
-            jar_url = google_java_format_url + google_java_format_jar
-
-            home = str(Path.home())
-            path, http_message = urllib.request.urlretrieve(
-                jar_url, home + '/' + google_java_format_jar)
-            args = ['java', '-jar', path, '--replace']
-            args.extend(javaOutputs)
-            subprocess.check_call(args)
-    except Exception as err:
-        print('google-java-format error:', err)
-
-
 class LockFileSerializer:
     def __init__(self, path):
         self.lock_file_path = path
@@ -329,7 +302,6 @@ def main():
     if cmdLineArgs.prettify_output:
         prettifiers = [
             runClangPrettifier,
-            runJavaPrettifier,
         ]
 
         for prettifier in prettifiers:

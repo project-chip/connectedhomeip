@@ -203,4 +203,11 @@
     });
 }
 
+- (void)callSubscriptionEstablishedHandler:(dispatch_block_t)handler
+{
+    // Call the handler from our _workQueue, so that we guarantee the same
+    // number of queue hops as for handleReportWithController.
+    dispatch_async(_workQueue, handler);
+}
+
 @end

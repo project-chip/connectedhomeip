@@ -66,7 +66,6 @@ class HostApp(Enum):
     EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
-    DYNAMIC_BRIDGE = auto()
     JAVA_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
 
@@ -109,8 +108,6 @@ class HostApp(Enum):
             return 'tv-casting-app/linux'
         elif self == HostApp.BRIDGE:
             return 'bridge-app/linux'
-        elif self == HostApp.DYNAMIC_BRIDGE:
-            return 'dynamic-bridge-app/linux'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
         elif self == HostApp.CONTACT_SENSOR:
@@ -188,9 +185,6 @@ class HostApp(Enum):
         elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
-        elif self == HostApp.DYNAMIC_BRIDGE:
-            yield 'dynamic-chip-bridge-app'
-            yield 'dynamic-chip-bridge-app.map'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'

@@ -160,13 +160,12 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
     AttributePathIB::Builder & attributePathBuilder = attributeDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder.Node(1)
-        .Endpoint(2)
-        .Cluster(3)
-        .Attribute(4)
-        .ListIndex(DataModel::Nullable<ListIndex>())
-        .EndOfAttributePathIB();
-    err = attributePathBuilder.GetError();
+    err = attributePathBuilder.Node(1)
+              .Endpoint(2)
+              .Cluster(3)
+              .Attribute(4)
+              .ListIndex(DataModel::Nullable<ListIndex>())
+              .EndOfAttributePathIB();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     // Construct attribute data
@@ -211,13 +210,12 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
 
     AttributePathIB::Builder & attributePathBuilder = attributeStatusIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder.Node(1)
-        .Endpoint(2)
-        .Cluster(3)
-        .Attribute(4)
-        .ListIndex(DataModel::Nullable<ListIndex>())
-        .EndOfAttributePathIB();
-    err = attributePathBuilder.GetError();
+    err = attributePathBuilder.Node(1)
+              .Endpoint(2)
+              .Cluster(3)
+              .Attribute(4)
+              .ListIndex(DataModel::Nullable<ListIndex>())
+              .EndOfAttributePathIB();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     StatusIB::Builder & statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();

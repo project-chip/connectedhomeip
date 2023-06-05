@@ -1454,6 +1454,32 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [device setDelegate:delegate queue:queue];
 
+    // Test batching and duplicate check
+    //   - Read 13 different attributes in a row, expect that the 1st to go out by itself, the next 9 batch, and then the 3 after
+    //     are correctly queued in one batch
+    //   - Then read 3 duplicates and expect them to be filtered
+    //   - Note that these tests can only be verified via logs
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(0) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(1) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(2) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(3) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(4) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(5) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(6) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(7) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(0) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(1) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(2) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(3) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
 
     XCTAssertNotEqual(attributeReportsReceived, 0);

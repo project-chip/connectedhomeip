@@ -126,10 +126,10 @@ StatusIB::Builder & CommandStatusIB::Builder::CreateErrorStatus()
     return mErrorStatus;
 }
 
-CommandStatusIB::Builder & CommandStatusIB::Builder::EndOfCommandStatusIB()
+CHIP_ERROR CommandStatusIB::Builder::EndOfCommandStatusIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

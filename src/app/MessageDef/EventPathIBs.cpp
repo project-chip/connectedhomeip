@@ -77,10 +77,10 @@ EventPathIB::Builder & EventPathIBs::Builder::CreatePath()
     return mEventPath;
 }
 
-EventPathIBs::Builder & EventPathIBs::Builder::EndOfEventPaths()
+CHIP_ERROR EventPathIBs::Builder::EndOfEventPaths()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 }; // namespace app
 }; // namespace chip

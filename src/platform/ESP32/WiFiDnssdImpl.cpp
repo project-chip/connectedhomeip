@@ -282,10 +282,26 @@ static CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
     CHIP_ERROR error              = CHIP_NO_ERROR;
     mdns_result_t * currentResult = nullptr;
     size_t servicesIndex          = 0;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+    mdns_result_t * delegatedResults = nullptr;
+#endif
     VerifyOrExit(ctx && ctx->mBrowseCb, error = CHIP_ERROR_INVALID_ARGUMENT);
-    if (ctx->mPtrQueryResult)
+    ctx->mServiceSize = GetResultSize(ctx->mPtrQueryResult);
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+    mdns_lookup_delegated_service(NULL, ctx->mType, GetProtocolString(ctx->mProtocol), kMaxResults - ctx->mServiceSize,
+                                  &delegatedResults);
+    while (delegatedResults)
     {
-        ctx->mServiceSize = GetResultSize(ctx->mPtrQueryResult);
+        mdns_result_t * tmp    = delegatedResults->next;
+        delegatedResults->next = ctx->mPtrQueryResult;
+        ctx->mPtrQueryResult   = delegatedResults;
+        delegatedResults       = tmp;
+        ctx->mServiceSize++;
+    }
+#endif // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+
+    if (ctx->mPtrQueryResult && ctx->mServiceSize > 0)
+    {
         if (ctx->mServiceSize > 0)
         {
             ctx->mService = static_cast<DnssdService *>(chip::Platform::MemoryCalloc(ctx->mServiceSize, sizeof(DnssdService)));
@@ -484,7 +500,14 @@ static void MdnsQueryDone(intptr_t context)
         ResolveContext * resolveCtx = reinterpret_cast<ResolveContext *>(ctx);
         if (resolveCtx->mSrvQueryHandle == queryHandle)
         {
-            // No result found.
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+            // No result found, look up delegated services.
+            if (!result)
+            {
+                mdns_lookup_delegated_service(resolveCtx->mInstanceName, resolveCtx->mType,
+                                              GetProtocolString(resolveCtx->mProtocol), kMaxResults, &result);
+            }
+#endif
             if (!result)
             {
                 resolveCtx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(nullptr, 0), CHIP_ERROR_INVALID_ARGUMENT);
@@ -529,6 +552,14 @@ static void MdnsQueryDone(intptr_t context)
         }
         else if (resolveCtx->mTxtQueryHandle == queryHandle)
         {
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+            // No result found, look up delegated services.
+            if (!result)
+            {
+                mdns_lookup_delegated_service(resolveCtx->mInstanceName, resolveCtx->mType,
+                                              GetProtocolString(resolveCtx->mProtocol), kMaxResults, &result);
+            }
+#endif
             resolveCtx->mTxtQueryResult   = result;
             resolveCtx->mTxtQueryFinished = true;
         }

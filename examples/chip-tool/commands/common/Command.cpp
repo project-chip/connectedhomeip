@@ -321,7 +321,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
             // (e.g a struct argument with multiple fields). In case one needs to use ";" it can be overriden with the following
             // environment variable.
             constexpr const char * kSeparatorVariable = "CHIPTOOL_CUSTOM_ARGUMENTS_SEPARATOR";
-            getline(ss, valueAsString, getenv(kSeparatorVariable) ? getenv(kSeparatorVariable)[0] : ';');
+            char * getenvSeparatorVariableResult      = getenv(kSeparatorVariable);
+            getline(ss, valueAsString, getenvSeparatorVariableResult ? getenvSeparatorVariableResult[0] : ';');
 
             CustomArgument * customArgument = new CustomArgument();
             vectorArgument->push_back(customArgument);

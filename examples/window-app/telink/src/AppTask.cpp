@@ -27,6 +27,19 @@ constexpr int kToggleMoveTypeTriggerTimeout = 700;
 
 k_timer sToggleMoveTypeTimer;
 
+#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+#define OPEN_WINDOW_BUTTON GPIO_DT_SPEC_GET(DT_NODELABEL(key_4), gpios)
+#define CLOSE_WINDOW_BUTTON GPIO_DT_SPEC_GET(DT_NODELABEL(key_3), gpios)
+
+const struct gpio_dt_spec sOpenWindowButtonDt  = OPEN_WINDOW_BUTTON;
+const struct gpio_dt_spec sCloseWindowButtonDt = CLOSE_WINDOW_BUTTON;
+#else
+const struct gpio_dt_spec sButtonCol1Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_col1), gpios);
+const struct gpio_dt_spec sButtonCol2Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_col2), gpios);
+const struct gpio_dt_spec sButtonRow1Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_row1), gpios);
+const struct gpio_dt_spec sButtonRow2Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_row2), gpios);
+#endif
+
 Button sOpenButton;
 Button sCloseButton;
 
@@ -40,11 +53,11 @@ CHIP_ERROR AppTask::Init(void)
     InitCommonParts();
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-    sOpenButton.Configure(BUTTON_PORT, BUTTON_PIN_2, OpenActionAndToggleMoveTypeButtonEventHandler);
-    sCloseButton.Configure(BUTTON_PORT, BUTTON_PIN_3, CloseActionButtonEventHandler);
+    sOpenButton.Configure(&sOpenWindowButtonDt, OpenActionAndToggleMoveTypeButtonEventHandler);
+    sCloseButton.Configure(&sCloseWindowButtonDt, CloseActionButtonEventHandler);
 #else
-    sOpenButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, OpenActionAndToggleMoveTypeButtonEventHandler);
-    sCloseButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, CloseActionButtonEventHandler);
+    sOpenButton.Configure(&sButtonRow1Dt, &sButtonCol2Dt, OpenActionAndToggleMoveTypeButtonEventHandler);
+    sCloseButton.Configure(&sButtonRow2Dt, &sButtonCol1Dt, CloseActionButtonEventHandler);
 #endif
     ButtonManagerInst().AddButton(sOpenButton);
     ButtonManagerInst().AddButton(sCloseButton);

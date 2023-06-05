@@ -58,21 +58,6 @@ class CodegenTarget:
         self.runner.run(cmd)
 
 
-class CodegenBridgePregenerator:
-    """Pregeneration logic for "bridge" codegen.py outputs"""
-
-    def __init__(self, sdk_root):
-        self.sdk_root = sdk_root
-
-    def Accept(self, idl: InputIdlFile):
-        # Bridge is highly specific, a single path is acceptable for dynamic
-        # bridge codegen
-        return idl.relative_path == "examples/dynamic-bridge-app/bridge-common/bridge-app.matter"
-
-    def CreateTarget(self, idl: InputIdlFile, runner):
-        return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="bridge", runner=runner)
-
-
 class CodegenJavaJNIPregenerator:
     """Pregeneration logic for "java" codegen.py outputs"""
 

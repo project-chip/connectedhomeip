@@ -161,20 +161,31 @@ void ShutdownTestInetCommon()
 
 void InitSystemLayer()
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // LwIP implementation uses the event loop for servicing events.
+    // The CHIP stack initialization is required then.
+    chip::DeviceLayer::PlatformMgr().InitChipStack();
+#ifndef CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
     AcquireLwIP();
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
+#endif // !CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     gSystemLayer.Init();
 }
 
 void ShutdownSystemLayer()
 {
+
     gSystemLayer.Shutdown();
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // LwIP implementation uses the event loop for servicing events.
+    // The CHIP stack shutdown is required then.
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+#ifndef CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
     ReleaseLwIP();
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
+#endif // !CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
