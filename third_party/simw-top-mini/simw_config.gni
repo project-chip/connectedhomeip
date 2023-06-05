@@ -13,7 +13,3 @@
 # limitations under the License.
 
 # Configuration file
-
-declare_args() {
-  chip_rpi_se05x_t4t_demo = 0
-}
