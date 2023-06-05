@@ -7718,3 +7718,93 @@ PICS:
     #
     - label: "Does the DUT(server) support the SetTimeZoneResponse command?"
       id: TIMESYNC.S.C03.Tx
+
+
+
+    # Carbon Dioxide Concentration Measurement Cluster Test Plan
+    - label:
+        "Does the device implement the Carbon Dioxide Concentration Measurement 
+          Cluster as a server?"
+      id: CDOCONC.S
+
+    - label:
+        "Does the device implement the Carbon Dioxide Concentration Measurement 
+          Cluster as a client?"
+      id: CDOCONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: CDOCONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: CDOCONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: CDOCONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: CDOCONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: CDOCONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: CDOCONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: CDOCONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: CDOCONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: CDOCONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: CDOCONC.S.A0003
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: CDOCONC.S.A0004
+
+    - label: "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: CDOCONC.S.A0005
+
+    - label: "Does the DUT(server) implement the AverageMeasuredValueWindow attribute?"
+      id: CDOCONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: CDOCONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: CDOCONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: CDOCONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: CDOCONC.S.A000a
+
+    - label: "Does the device implement the (0xFFF8) GeneratedCommandList attribute?"
+      id: CDOCONC.S.Afff8
+
+    - label: "Does the device implement the (0xFFF9) AcceptedCommandList attribute?"
+      id: CDOCONC.S.Afff9
+
+    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
+      id: CDOCONC.S.Afffa
+
+    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
+      id: CDOCONC.S.Afffb
+
+    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
+      id: CDOCONC.S.Afffc
+
+    - label: "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
+      id: CDOCONC.S.Afffd

@@ -273,6 +273,10 @@
         "Test_TC_G_2_1"
     ],
     "Scenes": ["Test_TC_S_1_1"],
+    "CarbonDioxideConcentrationMeasurement": [
+        "Test_TC_CDOCONC_1_1",
+        "Test_TC_CDOCONC_2_1"
+    ],
     "collection": [
         "AccessControl",
         "AccessControlEnforcement",
@@ -280,6 +284,7 @@
         "BridgedDeviceBasicInformation",
         "Actions",
         "Binding",
+        "CarbonDioxideConcentrationMeasurement",
         "ColorControl",
         "DeviceManagement",
         "Descriptor",
