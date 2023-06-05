@@ -16501,7 +16501,7 @@ class TemperatureControl(Cluster):
         class Feature(IntFlag):
             kTemperatureNumber = 0x1
             kTemperatureLevel = 0x2
-            kTemperatureStep = 0x3
+            kTemperatureStep = 0x4
 
     class Commands:
         @dataclass
