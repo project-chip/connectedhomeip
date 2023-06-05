@@ -34,6 +34,7 @@ _EVENT = 'event'
 _ERROR = 'error'
 _CLUSTER_ERROR = 'clusterError'
 _VALUE = 'value'
+_DATA_VERSION = 'dataVersion'
 
 # FabricIndex is a special case where the field is added as a struct field by the SDK
 # if needed but is not part of the XML definition of the struct.
@@ -88,7 +89,7 @@ class Decoder:
                 elif key == _EVENT_ID:
                     key = _EVENT
                     value = specs.get_event_name(payload[_CLUSTER_ID], value)
-                elif key == _VALUE or key == _ERROR or key == _CLUSTER_ERROR:
+                elif key == _VALUE or key == _ERROR or key == _CLUSTER_ERROR or key == _DATA_VERSION:
                     pass
                 else:
                     # Raise an error since the other fields probably needs to be translated too.
