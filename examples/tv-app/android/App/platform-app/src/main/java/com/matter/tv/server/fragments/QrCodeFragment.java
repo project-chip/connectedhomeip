@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import chip.onboardingpayload.DiscoveryCapability;
 import chip.onboardingpayload.OnboardingPayload;
+import chip.onboardingpayload.OnboardingPayloadException;
 import chip.onboardingpayload.OnboardingPayloadParser;
 import com.matter.tv.server.QRUtils;
 import com.matter.tv.server.R;
@@ -68,14 +69,14 @@ public class QrCodeFragment extends Fragment {
 
       Bitmap qrCodeBitmap = QRUtils.createQRCodeBitmap(qrCode, 800, 800);
       mQrCodeImg.setImageBitmap(qrCodeBitmap);
-    } catch (OnboardingPayloadParser.OnboardingPayloadException e) {
+    } catch (OnboardingPayloadException e) {
       e.printStackTrace();
     }
 
     try {
       String manualPairingCode = parser.getManualPairingCodeFromPayload(payload);
       mManualPairingCodeTxt.setText("ManualPairingCode:" + manualPairingCode);
-    } catch (OnboardingPayloadParser.OnboardingPayloadException e) {
+    } catch (OnboardingPayloadException e) {
       e.printStackTrace();
     }
 
