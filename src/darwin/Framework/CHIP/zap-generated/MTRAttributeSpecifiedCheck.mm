@@ -1802,6 +1802,174 @@ static BOOL AttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInLaundryWasherModeSelectCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LaundryWasherModeSelect;
+    switch (aAttributeId) {
+    case Attributes::Description::Id: {
+        return YES;
+    }
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::OnMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInRefrigeratorAndTemperatureControlledCabinetModeSelectCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect;
+    switch (aAttributeId) {
+    case Attributes::Description::Id: {
+        return YES;
+    }
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::OnMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInRVCRunModeSelectCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::RvcRunModeSelect;
+    switch (aAttributeId) {
+    case Attributes::Description::Id: {
+        return YES;
+    }
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::OnMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInRVCCleanModeSelectCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::RvcCleanModeSelect;
+    switch (aAttributeId) {
+    case Attributes::Description::Id: {
+        return YES;
+    }
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::OnMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInTemperatureControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::TemperatureControl;
@@ -1858,6 +2026,48 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAlarmCluster(AttributeId aAttribut
         return YES;
     }
     case Attributes::State::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInDishwasherModeSelectCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DishwasherModeSelect;
+    switch (aAttributeId) {
+    case Attributes::Description::Id: {
+        return YES;
+    }
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::OnMode::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -7038,11 +7248,26 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ModeSelect::Id: {
         return AttributeIsSpecifiedInModeSelectCluster(aAttributeId);
     }
+    case Clusters::LaundryWasherModeSelect::Id: {
+        return AttributeIsSpecifiedInLaundryWasherModeSelectCluster(aAttributeId);
+    }
+    case Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
+        return AttributeIsSpecifiedInRefrigeratorAndTemperatureControlledCabinetModeSelectCluster(aAttributeId);
+    }
+    case Clusters::RvcRunModeSelect::Id: {
+        return AttributeIsSpecifiedInRVCRunModeSelectCluster(aAttributeId);
+    }
+    case Clusters::RvcCleanModeSelect::Id: {
+        return AttributeIsSpecifiedInRVCCleanModeSelectCluster(aAttributeId);
+    }
     case Clusters::TemperatureControl::Id: {
         return AttributeIsSpecifiedInTemperatureControlCluster(aAttributeId);
     }
     case Clusters::RefrigeratorAlarm::Id: {
         return AttributeIsSpecifiedInRefrigeratorAlarmCluster(aAttributeId);
+    }
+    case Clusters::DishwasherModeSelect::Id: {
+        return AttributeIsSpecifiedInDishwasherModeSelectCluster(aAttributeId);
     }
     case Clusters::AirQuality::Id: {
         return AttributeIsSpecifiedInAirQualityCluster(aAttributeId);
