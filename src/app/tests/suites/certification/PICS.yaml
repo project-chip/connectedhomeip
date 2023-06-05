@@ -7718,3 +7718,38 @@ PICS:
     #
     - label: "Does the DUT(server) support the SetTimeZoneResponse command?"
       id: TIMESYNC.S.C03.Tx
+
+    #####################################################################################
+    # Air Quality Cluster Test Plan
+    - label: "Does the device implement the Air Quality cluster as a server?"
+      id: AIRQUAL.S
+
+    - label: "Does the device implement the Air Quality cluster as a client?"
+      id: AIRQUAL.C
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the AirQuality attribute?"
+      id: AIRQUAL.S.A0000
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Fair feature?"
+      id: AIRQUAL.S.F00
+
+    - label: "Does the device support the Moderate feature?"
+      id: AIRQUAL.S.F01
+
+    - label: "Does the device support the VeryPoor feature?"
+      id: AIRQUAL.S.F02
+
+    - label: "Does the device support the ExtremelyPoor feature?"
+      id: AIRQUAL.S.F03
+
+    #
+    # server / manual
+    #
+    - label: "Changes air quality significantly"
+      id: AIRQUAL.M.AirQualityChange

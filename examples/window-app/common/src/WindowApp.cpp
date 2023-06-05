@@ -295,7 +295,7 @@ void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::At
 
     if (nullptr == cover)
     {
-        emberAfWindowCoveringClusterPrint("Ep[%u] not supported AttributeId=%u\n", endpoint, (unsigned int) attribute);
+        ChipLogProgress(Zcl, "Ep[%u] not supported AttributeId=%u\n", endpoint, (unsigned int) attribute);
         return;
     }
 
@@ -675,7 +675,7 @@ void WindowApp::Cover::OnTiltTimeout(WindowApp::Timer & timer)
 void WindowApp::Cover::SchedulePositionSet(chip::Percent100ths position, bool isTilt)
 {
     CoverWorkData * data = chip::Platform::New<CoverWorkData>();
-    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::SchedulePositionSet - Out of Memory for WorkData"));
+    VerifyOrReturn(data != nullptr, ChipLogProgress(Zcl, "Cover::SchedulePositionSet - Out of Memory for WorkData"));
 
     data->mEndpointId   = mEndpoint;
     data->percent100ths = position;
@@ -701,7 +701,7 @@ void WindowApp::Cover::CallbackPositionSet(intptr_t arg)
 void WindowApp::Cover::ScheduleOperationalStateSet(OperationalState opState, bool isTilt)
 {
     CoverWorkData * data = chip::Platform::New<CoverWorkData>();
-    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::OperationalStatusSet - Out of Memory for WorkData"));
+    VerifyOrReturn(data != nullptr, ChipLogProgress(Zcl, "Cover::OperationalStatusSet - Out of Memory for WorkData"));
 
     data->mEndpointId = mEndpoint;
     data->opState     = opState;

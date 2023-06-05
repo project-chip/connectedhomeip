@@ -19,14 +19,17 @@
 #include "app-common/zap-generated/ids/Attributes.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "lib/core/TLVTags.h"
+#include "lib/core/TLVWriter.h"
 #include "protocols/interaction_model/Constants.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ClusterStateCache.h>
+#include <app/MessageDef/DataVersionFilterIBs.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -540,8 +543,75 @@ void RunAndValidateSequence(AttributeInstructionListType list)
     ForwardedDataCallbackValidator dataCallbackValidator;
     CacheValidator client(list, dataCallbackValidator);
     ClusterStateCache cache(client);
+
+    // In order for the cache to track our data versions, we need to claim to it
+    // that we are dealing with a wildcard path.  And we need to do that before
+    // it has seen any reports.
+    AttributePathParams wildcardPath;
+    const Span<AttributePathParams> pathSpan(&wildcardPath, 1);
+    {
+        // Just need a buffer big enough that we can start the list.  We don't
+        // care about the actual data versions here.
+        uint8_t buf[20];
+        TLV::TLVWriter writer;
+        writer.Init(buf);
+        DataVersionFilterIBs::Builder builder;
+        CHIP_ERROR err = builder.Init(&writer);
+        NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+        bool encodedDataVersionList = false;
+        err = cache.GetBufferedCallback().OnUpdateDataVersionFilterList(builder, pathSpan, encodedDataVersionList);
+
+        // We had nothing to encode so far.
+        NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, !encodedDataVersionList);
+    }
+
     DataSeriesGenerator generator(&cache.GetBufferedCallback(), list);
     generator.Generate(dataCallbackValidator);
+
+    // Now verify that we would do the right thing when encoding our data
+    // versions.
+
+    size_t bufferSize = 1;
+    do
+    {
+        Platform::ScopedMemoryBuffer<uint8_t> buf;
+        if (!buf.Calloc(bufferSize))
+        {
+            NL_TEST_ASSERT(gSuite, false);
+            break;
+        }
+
+        TLV::TLVWriter writer;
+        writer.Init(buf.Get(), bufferSize);
+
+        DataVersionFilterIBs::Builder builder;
+        CHIP_ERROR err = builder.Init(&writer);
+        NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL);
+        if (err == CHIP_NO_ERROR)
+        {
+            // We had enough space to start the list.  Now try encoding the data
+            // version filters.
+            bool encodedDataVersionList = false;
+            err = cache.GetBufferedCallback().OnUpdateDataVersionFilterList(builder, pathSpan, encodedDataVersionList);
+
+            // We should be rolling back properly if we run out of space.
+            NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(gSuite, builder.GetError() == CHIP_NO_ERROR);
+
+            if (writer.GetRemainingFreeLength() > 40)
+            {
+                // We have lots of empty space left, so we did not end up
+                // needing to roll back; no point testing larger buffer sizes.
+                //
+                // Note: we may still have encodedDataVersionList false here, if
+                // there were no non-status attribute values cached.
+                break;
+            }
+        }
+
+        ++bufferSize;
+    } while (true);
 }
 
 /*

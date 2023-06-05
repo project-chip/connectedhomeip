@@ -405,7 +405,7 @@ void Server::CheckServerReadyEvent()
     // are ready, and emit the 'server ready' event if so.
     if (mIsDnssdReady)
     {
-        ChipLogError(AppServer, "Server initialization complete");
+        ChipLogProgress(AppServer, "Server initialization complete");
 
         ChipDeviceEvent event = { .Type = DeviceEventType::kServerReady };
         PlatformMgr().PostEventOrDie(&event);

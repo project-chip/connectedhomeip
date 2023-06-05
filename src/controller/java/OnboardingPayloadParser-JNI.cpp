@@ -1,7 +1,5 @@
 #include "lib/core/CHIPError.h"
 #include "lib/support/JniTypeWrappers.h"
-#include <setup_payload/ManualSetupPayloadGenerator.h>
-#include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
@@ -31,7 +29,6 @@ static jobject CreateCapabilitiesHashSet(JNIEnv * env, RendezvousInformationFlag
 static void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPayload & payload);
 static void CreateCapabilitiesFromHashSet(JNIEnv * env, jobject discoveryCapabilitiesObj, RendezvousInformationFlags & flags);
 static CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj);
-static CHIP_ERROR ThrowInvalidManualPairingCodeFormatException(JNIEnv * env, jstring manualPairingCodeObj);
 
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
@@ -64,39 +61,6 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SetupPayload, "Error throwing UnrecognizedQRCodeException: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        return nullptr;
-    }
-
-    return TransformSetupPayload(env, payload);
-}
-
-JNI_METHOD(jobject, parsePayloadFromManualPairingCode)
-(JNIEnv * env, jobject self, jstring manualPairingCode, jboolean skipPayloadValidation)
-{
-    CHIP_ERROR err                       = CHIP_NO_ERROR;
-    const char * manualPairingCodeString = NULL;
-    SetupPayload payload;
-
-    manualPairingCodeString = env->GetStringUTFChars(manualPairingCode, 0);
-
-    err = ManualSetupPayloadParser(manualPairingCodeString).populatePayload(payload);
-    env->ReleaseStringUTFChars(manualPairingCode, manualPairingCodeString);
-
-    if (skipPayloadValidation == JNI_FALSE && !payload.isValidManualCode())
-    {
-        jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
-        JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
-        return nullptr;
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        err = ThrowInvalidManualPairingCodeFormatException(env, manualPairingCode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(SetupPayload, "Error throwing ThrowInvalidManualPairingCodeFormatException: %" CHIP_ERROR_FORMAT,
-                         err.Format());
         }
         return nullptr;
     }
@@ -254,25 +218,6 @@ JNI_METHOD(jstring, getQrCodeFromPayload)(JNIEnv * env, jobject self, jobject se
     return env->NewStringUTF(qrString.c_str());
 }
 
-JNI_METHOD(jstring, getManualPairingCodeFromPayload)(JNIEnv * env, jobject self, jobject setupPayload)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    SetupPayload payload;
-    std::string outDecimalString;
-
-    TransformSetupPayloadFromJobject(env, setupPayload, payload);
-
-    err = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(outDecimalString);
-    if (err != CHIP_NO_ERROR)
-    {
-        jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
-        JniReferences::GetInstance().ThrowError(env, exceptionCls, err);
-        return nullptr;
-    }
-
-    return env->NewStringUTF(outDecimalString.c_str());
-}
-
 void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPayload & payload)
 {
     jclass setupPayloadClass = env->FindClass("chip/setuppayload/SetupPayload");
@@ -352,25 +297,6 @@ CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj)
     exceptionConstructor = env->GetMethodID(exceptionCls, "<init>", "(Ljava/lang/String;)V");
     VerifyOrReturnError(exceptionConstructor != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_METHOD_NOT_FOUND);
     exception = (jthrowable) env->NewObject(exceptionCls, exceptionConstructor, qrCodeObj);
-    VerifyOrReturnError(exception != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_EXCEPTION_THROWN);
-
-    env->Throw(exception);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ThrowInvalidManualPairingCodeFormatException(JNIEnv * env, jstring manualPairingCodeObj)
-{
-    jclass exceptionCls            = nullptr;
-    jmethodID exceptionConstructor = nullptr;
-    jthrowable exception           = nullptr;
-
-    env->ExceptionClear();
-
-    exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$InvalidEntryCodeFormatException");
-    VerifyOrReturnError(exceptionCls != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_TYPE_NOT_FOUND);
-    exceptionConstructor = env->GetMethodID(exceptionCls, "<init>", "(Ljava/lang/String;)V");
-    VerifyOrReturnError(exceptionConstructor != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_METHOD_NOT_FOUND);
-    exception = (jthrowable) env->NewObject(exceptionCls, exceptionConstructor, manualPairingCodeObj);
     VerifyOrReturnError(exception != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_EXCEPTION_THROWN);
 
     env->Throw(exception);

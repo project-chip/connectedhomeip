@@ -87,6 +87,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     // TODO: Watch for LockState, DoorState, Mode, etc changes and trigger appropriate action
     if (attributePath.mClusterId == Clusters::DoorLock::Id)
     {
-        emberAfDoorLockClusterPrintln("Door Lock attribute changed");
+        ChipLogProgress(Zcl, "Door Lock attribute changed");
     }
 }
