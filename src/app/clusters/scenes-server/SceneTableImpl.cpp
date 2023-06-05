@@ -737,7 +737,7 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
     if (!HandlerListEmpty())
     {
-        uint8_t clusterCount = emberAfGetClusterCountForEndpoint(mEndpointId);
+        uint8_t clusterCount = GetClusterCountFromEndpoint();
         clusterId * cBuffer  = static_cast<clusterId *>(chip::Platform::MemoryCalloc(sizeof(clusterId), clusterCount));
         VerifyOrReturnError(nullptr != cBuffer, CHIP_ERROR_NO_MEMORY);
 
@@ -851,6 +851,14 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen)
 {
     return emberAfGetClustersFromEndpoint(mEndpointId, clusterList, listLen, true);
+}
+
+/// @brief wrapper function around emberAfGetClusterCountForEndpoint to allow testing enforcing a specific count, shimmed in test
+/// configuration because emberAfGetClusterCountForEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated
+/// files
+uint8_t DefaultSceneTableImpl::GetClusterCountFromEndpoint()
+{
+    return emberAfGetClusterCountForEndpoint(mEndpointId);
 }
 
 void DefaultSceneTableImpl::SetEndpoint(EndpointId endpoint)

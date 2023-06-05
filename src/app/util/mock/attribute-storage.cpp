@@ -62,7 +62,7 @@ EndpointId endpoints[]    = { kMockEndpoint1, kMockEndpoint2, kMockEndpoint3 };
 uint16_t clusterIndex[]   = { 0, 2, 5 };
 uint8_t clusterCount[]    = { 2, 3, 4 };
 ClusterId clusters[]      = { MockClusterId(1), MockClusterId(2), MockClusterId(1), MockClusterId(2), MockClusterId(3),
-                         MockClusterId(1), MockClusterId(2), MockClusterId(3), MockClusterId(4) };
+                              MockClusterId(1), MockClusterId(2), MockClusterId(3), MockClusterId(4) };
 uint16_t attributeIndex[] = { 0, 2, 5, 7, 11, 16, 19, 25, 27 };
 uint16_t attributeCount[] = { 2, 3, 2, 4, 5, 3, 6, 2, 2 };
 AttributeId attributes[]  = {
@@ -116,7 +116,7 @@ uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint)
     return UINT16_MAX;
 }
 
-uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
+uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint)
 {
     for (size_t i = 0; i < ArraySize(endpoints); i++)
     {
@@ -126,6 +126,11 @@ uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
         }
     }
     return 0;
+}
+
+uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
+{
+    return emberAfGetClusterCountForEndpoint(endpoint);
 }
 
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
