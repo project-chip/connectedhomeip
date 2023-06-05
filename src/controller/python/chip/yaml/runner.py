@@ -662,7 +662,7 @@ class CommissionerCommandAction(BaseAction):
         if self._command == 'GetCommissionerNodeId':
             return _ActionResult(status=_ActionStatus.SUCCESS, response=_GetCommissionerNodeIdResult(dev_ctrl.nodeId))
 
-        resp = dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
+        resp, err = dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
         if resp:
             return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
         else:
