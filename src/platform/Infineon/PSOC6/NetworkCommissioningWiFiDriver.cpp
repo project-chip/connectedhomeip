@@ -190,30 +190,30 @@ exit:
     }
 }
 
-BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurity> P6WiFiDriver::ConvertSecuritytype(cy_wcm_security_t security)
+BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> P6WiFiDriver::ConvertSecuritytype(cy_wcm_security_t security)
 {
-    using app::Clusters::NetworkCommissioning::WiFiSecurity;
+    using app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
 
-    BitFlags<WiFiSecurity> securityType;
+    BitFlags<WiFiSecurityBitmap> securityType;
     if (security == CY_WCM_SECURITY_OPEN)
     {
-        securityType.Set(WiFiSecurity::kUnencrypted);
+        securityType.Set(WiFiSecurityBitmap::kUnencrypted);
     }
     else if (security & WPA3_SECURITY)
     {
-        securityType.Set(WiFiSecurity::kWpa3Personal);
+        securityType.Set(WiFiSecurityBitmap::kWpa3Personal);
     }
     else if (security & WPA2_SECURITY)
     {
-        securityType.Set(WiFiSecurity::kWpa2Personal);
+        securityType.Set(WiFiSecurityBitmap::kWpa2Personal);
     }
     else if (security & WPA_SECURITY)
     {
-        securityType.Set(WiFiSecurity::kWpaPersonal);
+        securityType.Set(WiFiSecurityBitmap::kWpaPersonal);
     }
     else if (security & WEP_ENABLED)
     {
-        securityType.Set(WiFiSecurity::kWep);
+        securityType.Set(WiFiSecurityBitmap::kWep);
     }
     return securityType;
 }

@@ -2694,6 +2694,9 @@ PICS:
     - label: "Does the DUT(server) support the Clear Credential command?"
       id: DRLK.S.C26.Rsp
 
+    - label: "Does the DUT(server) support the Unbolt Door command?"
+      id: DRLK.S.C27.Rsp
+
     #
     # server / commandsGenerated
     #
@@ -2791,6 +2794,9 @@ PICS:
           "Does the DUT(server) support the Lock supports holiday access
           schedules feature?"
       id: DRLK.S.F0b
+
+    - label: "Does the DUT(server) support the Lock supports unbolting feature?"
+      id: DRLK.S.F0c
 
     #
     # server / manually
@@ -3068,6 +3074,9 @@ PICS:
     - label: "Does the DUT(Client) support the Clear Credential command?"
       id: DRLK.C.C26.Tx
 
+    - label: "Does the DUT(Client) support the Unbolt Door command?"
+      id: DRLK.C.C27.Tx
+
     #
     # client / Events
     #
@@ -3138,6 +3147,9 @@ PICS:
           "Does the DUT(client) support the Lock supports holiday access
           schedules feature?"
       id: DRLK.C.F0b
+
+    - label: "Does the DUT(client) support the Lock supports unbolting feature?"
+      id: DRLK.C.F0c
 
     # Ethernet Network Diagnostics Cluster Test Plan
     - label:
@@ -5585,6 +5597,12 @@ PICS:
     - label: "Does the device implement the LastConfiguredBy attribute?"
       id: S.S.A0005
 
+    - label: "Does the device implement the SceneTableSize attribute?"
+      id: S.S.A0006
+
+    - label: "Does the device implement the RemainingCapacity attribute?"
+      id: S.S.A0007
+
     #
     # server / commandsReceived
     #
@@ -7700,3 +7718,38 @@ PICS:
     #
     - label: "Does the DUT(server) support the SetTimeZoneResponse command?"
       id: TIMESYNC.S.C03.Tx
+
+    #####################################################################################
+    # Air Quality Cluster Test Plan
+    - label: "Does the device implement the Air Quality cluster as a server?"
+      id: AIRQUAL.S
+
+    - label: "Does the device implement the Air Quality cluster as a client?"
+      id: AIRQUAL.C
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the AirQuality attribute?"
+      id: AIRQUAL.S.A0000
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Fair feature?"
+      id: AIRQUAL.S.F00
+
+    - label: "Does the device support the Moderate feature?"
+      id: AIRQUAL.S.F01
+
+    - label: "Does the device support the VeryPoor feature?"
+      id: AIRQUAL.S.F02
+
+    - label: "Does the device support the ExtremelyPoor feature?"
+      id: AIRQUAL.S.F03
+
+    #
+    # server / manual
+    #
+    - label: "Changes air quality significantly"
+      id: AIRQUAL.M.AirQualityChange

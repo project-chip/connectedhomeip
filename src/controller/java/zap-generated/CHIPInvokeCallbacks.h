@@ -19,8 +19,8 @@
 #include <jni/CHIPCallbackTypes.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <controller/java/zap-generated/CHIPClientCallbacks.h>
 #include <jni.h>
-#include <zap-generated/CHIPClientCallbacks.h>
 
 namespace chip {
 
@@ -459,6 +459,21 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPOperationalStateClusterOperationalCommandResponseCallback
+    : public Callback::Callback<CHIPOperationalStateClusterOperationalCommandResponseCallbackType>
+{
+public:
+    CHIPOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback);
+
+    ~CHIPOperationalStateClusterOperationalCommandResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

@@ -92,7 +92,7 @@ jobs:
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
             - name: Build Apps
-              timeout-minutes: 75
+              timeout-minutes: 90
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \

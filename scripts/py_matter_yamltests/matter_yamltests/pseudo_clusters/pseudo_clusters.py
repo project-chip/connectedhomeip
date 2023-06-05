@@ -12,6 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+from typing import List
+
 from .clusters.commissioner_commands import CommissionerCommands
 from .clusters.delay_commands import DelayCommands
 from .clusters.discovery_commands import DiscoveryCommands
@@ -22,7 +24,7 @@ from .pseudo_cluster import PseudoCluster
 
 
 class PseudoClusters:
-    def __init__(self, clusters: list[PseudoCluster]):
+    def __init__(self, clusters: List[PseudoCluster]):
         self.clusters = clusters
 
     def supports(self, request) -> bool:

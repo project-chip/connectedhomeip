@@ -232,8 +232,13 @@ private:
         uint16_t fdl = 0;
         auto fd = mTransfer.GetFileDesignator(fdl);
         VerifyOrReturnError(fdl <= bdx::kMaxFileDesignatorLen, CHIP_ERROR_INVALID_ARGUMENT);
+        CharSpan fileDesignatorSpan(Uint8::to_const_char(fd), fdl);
 
-        auto fileDesignator = [[NSString alloc] initWithBytes:fd length:fdl encoding:NSUTF8StringEncoding];
+        auto fileDesignator = AsString(fileDesignatorSpan);
+        if (fileDesignator == nil) {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
         auto offset = @(mTransfer.GetStartOffset());
 
         auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:mFabricIndex.Value()];
@@ -565,8 +570,8 @@ CommandHandler * _Nullable EnsureValidState(
     if (error != nil) {
         auto * desc = [error description];
         auto err = [MTRError errorToCHIPErrorCode:error];
-        ChipLogError(Controller, "%s: application returned error: '%s', sending error: '%s'", prefix,
-            [desc cStringUsingEncoding:NSUTF8StringEncoding], chip::ErrorStr(err));
+        ChipLogError(
+            Controller, "%s: application returned error: '%s', sending error: '%s'", prefix, desc.UTF8String, err.AsString());
 
         handler->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
         handle.Release();
@@ -635,8 +640,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                 CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "QueryImage", data, error);
                 VerifyOrReturn(handler != nullptr);
 
-                ChipLogDetail(Controller, "QueryImage: application responded with: %s",
-                    [[data description] cStringUsingEncoding:NSUTF8StringEncoding]);
+                ChipLogDetail(Controller, "QueryImage: application responded with: %s", [[data description] UTF8String]);
 
                 auto hasUpdate = [data.status isEqual:@(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable)];
                 auto isBDXProtocolSupported = [commandParams.protocolsSupported
@@ -753,27 +757,26 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
     __block CommandHandler::Handle handle(commandObj);
     __block ConcreteCommandPath cachedCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
-    auto completionHandler
-        = ^(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error) {
-              [controller
-                  asyncDispatchToMatterQueue:^() {
-                      assertChipStackLockedByCurrentThread();
+    auto completionHandler = ^(
+        MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error) {
+        [controller
+            asyncDispatchToMatterQueue:^() {
+                assertChipStackLockedByCurrentThread();
 
-                      CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "ApplyUpdateRequest", data, error);
-                      VerifyOrReturn(handler != nullptr);
+                CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "ApplyUpdateRequest", data, error);
+                VerifyOrReturn(handler != nullptr);
 
-                      ChipLogDetail(Controller, "ApplyUpdateRequest: application responded with: %s",
-                          [[data description] cStringUsingEncoding:NSUTF8StringEncoding]);
+                ChipLogDetail(Controller, "ApplyUpdateRequest: application responded with: %s", [[data description] UTF8String]);
 
-                      Commands::ApplyUpdateResponse::Type response;
-                      ConvertFromApplyUpdateRequestResponseParms(data, response);
-                      handler->AddResponse(cachedCommandPath, response);
-                      handle.Release();
-                  }
-                                errorHandler:^(NSError *) {
-                                    // Not much we can do here
-                                }];
-          };
+                Commands::ApplyUpdateResponse::Type response;
+                ConvertFromApplyUpdateRequestResponseParms(data, response);
+                handler->AddResponse(cachedCommandPath, response);
+                handle.Release();
+            }
+                          errorHandler:^(NSError *) {
+                              // Not much we can do here
+                          }];
+    };
 
     auto * commandParams = [[MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
     ConvertToApplyUpdateRequestParams(commandData, commandParams);

@@ -516,10 +516,10 @@ CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
     {
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
-    ReturnErrorOnFailure(commandData.EndOfCommandDataIB().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage().GetError());
+    ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     MoveToState(State::AddedCommand);
     return CHIP_NO_ERROR;
 }
@@ -547,11 +547,10 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
 CHIP_ERROR CommandHandler::FinishStatus()
 {
     VerifyOrReturnError(mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(
-        mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus().EndOfCommandStatusIB().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses().GetError());
-    ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage().GetError());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus().EndOfCommandStatusIB());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
+    ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     MoveToState(State::AddedCommand);
     return CHIP_NO_ERROR;
 }
@@ -560,7 +559,6 @@ CHIP_ERROR CommandHandler::RollbackResponse()
 {
     VerifyOrReturnError(mState == State::Preparing || mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
     mInvokeResponseBuilder.Rollback(mBackupWriter);
-    mInvokeResponseBuilder.ResetError();
     // Note: We only support one command per request, so we reset the state to Idle here, need to review the states when adding
     // supports of having multiple requests in the same transaction.
     MoveToState(State::Idle);

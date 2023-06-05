@@ -47,9 +47,9 @@ class EventTimestampType(Enum):
 
 @unique
 class EventPriority(Enum):
-    DEBUG = 1
-    INFO = 2
-    CRITICAL = 3
+    DEBUG = 0
+    INFO = 1
+    CRITICAL = 2
 
 
 @dataclass
@@ -535,7 +535,7 @@ class SubscriptionTransaction:
             self._onResubscriptionAttemptedCb = callback
             self._onResubscriptionAttemptedCb_isAsync = isAsync
 
-    def SetResubscriptionSucceededCallback(self, callback: Callback[[SubscriptionTransaction], None], isAsync=False):
+    def SetResubscriptionSucceededCallback(self, callback: Callable[[SubscriptionTransaction], None], isAsync=False):
         '''
         Sets the callback function that gets invoked when a re-subscription attempt succeeds. The callback
         is expected to have the following signature:
@@ -886,8 +886,13 @@ def _OnReadAttributeDataCallback(closure, dataVersion: int, endpoint: int, clust
 def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: c_uint64, number: int, priority: int, timestamp: int, timestampType: int, data, len, status):
     dataBytes = ctypes.string_at(data, len)
     path = EventPath(ClusterId=cluster, EventId=event)
-    closure.handleEventData(EventHeader(
-        EndpointId=endpoint, ClusterId=cluster, EventId=event, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), path, dataBytes[:], status)
+
+    # EventHeader is valid only when successful
+    eventHeader = None
+    if status == chip.interaction_model.Status.Success.value:
+        eventHeader = EventHeader(
+            EndpointId=endpoint, ClusterId=cluster, EventId=event, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType))
+    closure.handleEventData(eventHeader, path, dataBytes[:], status)
 
 
 @_OnSubscriptionEstablishedCallbackFunct
@@ -1078,10 +1083,6 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
                 path.Urgent = 0
             path = chip.interaction_model.EventPathIBstruct.build(path)
             readargs.append(ctypes.c_char_p(path))
-
-    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    minInterval = 0
-    maxInterval = 0
 
     readClientObj = ctypes.POINTER(c_void_p)()
     readCallbackObj = ctypes.POINTER(c_void_p)()
