@@ -40,13 +40,9 @@ void OnTriggerEffect(Identify * identify)
 {
     Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
-    ChipLogProgress(Zcl, "IDENTFY  OnTriggerEffect");
-
-    if (identify->mCurrentEffectIdentifier == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
+    if (identify->mEffectVariant != Clusters::Identify::EffectVariantEnum::kDefault)
     {
-        ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
-                        to_underlying(identify->mEffectVariant));
-        sIdentifyEffect = static_cast<Clusters::Identify::EffectIdentifierEnum>(identify->mEffectVariant);
+        ChipLogDetail(AppServer, "Identify Effect Variant unsupported. Using default");
     }
 
     switch (sIdentifyEffect)
@@ -54,6 +50,7 @@ void OnTriggerEffect(Identify * identify)
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
         WindowApp::Instance().PostEvent(WindowApp::EventId::WinkOn);
         (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerEffectCompleted, identify);
         break;
@@ -298,7 +295,7 @@ void WindowApp::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::At
 
     if (nullptr == cover)
     {
-        emberAfWindowCoveringClusterPrint("Ep[%u] not supported AttributeId=%u\n", endpoint, (unsigned int) attribute);
+        ChipLogProgress(Zcl, "Ep[%u] not supported AttributeId=%u\n", endpoint, (unsigned int) attribute);
         return;
     }
 
@@ -678,7 +675,7 @@ void WindowApp::Cover::OnTiltTimeout(WindowApp::Timer & timer)
 void WindowApp::Cover::SchedulePositionSet(chip::Percent100ths position, bool isTilt)
 {
     CoverWorkData * data = chip::Platform::New<CoverWorkData>();
-    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::SchedulePositionSet - Out of Memory for WorkData"));
+    VerifyOrReturn(data != nullptr, ChipLogProgress(Zcl, "Cover::SchedulePositionSet - Out of Memory for WorkData"));
 
     data->mEndpointId   = mEndpoint;
     data->percent100ths = position;
@@ -704,7 +701,7 @@ void WindowApp::Cover::CallbackPositionSet(intptr_t arg)
 void WindowApp::Cover::ScheduleOperationalStateSet(OperationalState opState, bool isTilt)
 {
     CoverWorkData * data = chip::Platform::New<CoverWorkData>();
-    VerifyOrReturn(data != nullptr, emberAfWindowCoveringClusterPrint("Cover::OperationalStatusSet - Out of Memory for WorkData"));
+    VerifyOrReturn(data != nullptr, ChipLogProgress(Zcl, "Cover::OperationalStatusSet - Out of Memory for WorkData"));
 
     data->mEndpointId = mEndpoint;
     data->opState     = opState;

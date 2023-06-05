@@ -994,12 +994,15 @@ class TestParser:
             if value is None or not key in config:
                 continue
 
+            is_node_id = key == 'nodeId' or (isinstance(
+                config[key], dict) and config[key].get('type') == 'node_id')
+
             if type(value) is str:
                 if key == 'timeout' or key == 'endpoint':
                     value = int(value)
-                elif key == 'nodeId' and value.startswith('0x'):
+                elif is_node_id and value.startswith('0x'):
                     value = int(value, 16)
-                elif key == 'nodeId':
+                elif is_node_id:
                     value = int(value)
 
             if isinstance(config[key], dict) and 'defaultValue' in config[key]:

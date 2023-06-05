@@ -180,11 +180,11 @@ class TestRunner(TestRunnerBase):
                     hooks.step_skipped(request.label, request.pics)
                     continue
                 elif not config.adapter:
-                    hooks.step_start(request.label)
+                    hooks.step_start(request)
                     hooks.step_unknown()
                     continue
                 else:
-                    hooks.step_start(request.label)
+                    hooks.step_start(request)
 
                 start = time.time()
                 if config.pseudo_clusters.supports(request):

@@ -89,12 +89,12 @@ static_assert(sizeof(Network::networkID) <= std::numeric_limits<decltype(Network
 struct WiFiScanResponse
 {
 public:
-    chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurity> security;
+    chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
     uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
     uint8_t ssidLen;
     uint8_t bssid[6];
     uint16_t channel;
-    app::Clusters::NetworkCommissioning::WiFiBand wiFiBand;
+    app::Clusters::NetworkCommissioning::WiFiBandEnum wiFiBand;
     int8_t rssi;
 };
 
@@ -120,9 +120,9 @@ static_assert(sizeof(ThreadScanResponse::networkName) <= std::numeric_limits<dec
 using NetworkIterator            = Iterator<Network>;
 using WiFiScanResponseIterator   = Iterator<WiFiScanResponse>;
 using ThreadScanResponseIterator = Iterator<ThreadScanResponse>;
-using Status                     = app::Clusters::NetworkCommissioning::NetworkCommissioningStatus;
-using WiFiBand                   = app::Clusters::NetworkCommissioning::WiFiBand;
-using WiFiSecurity               = app::Clusters::NetworkCommissioning::WiFiSecurity;
+using Status                     = app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum;
+using WiFiBand                   = app::Clusters::NetworkCommissioning::WiFiBandEnum;
+using WiFiSecurity               = app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
 
 // BaseDriver and WirelessDriver are the common interfaces for a network driver, platform drivers should not implement this
 // directly, instead, users are expected to implement WiFiDriver, ThreadDriver and EthernetDriver.
