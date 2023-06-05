@@ -737,11 +737,15 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
     if (!HandlerListEmpty())
     {
-        uint8_t clusterCount = 0;
-        clusterId cArray[kMaxClustersPerScene];
-        Span<clusterId> cSpan(cArray);
-        clusterCount = GetClustersFromEndpoint(cArray, kMaxClustersPerScene);
-        cSpan.reduce_size(clusterCount);
+        uint8_t clusterCount = emberAfGetClusterCountForEndpoint(mEndpointId);
+        clusterId * cBuffer  = static_cast<clusterId *>(chip::Platform::MemoryCalloc(sizeof(clusterId), clusterCount));
+        VerifyOrReturnError(nullptr != cBuffer, CHIP_ERROR_NO_MEMORY);
+
+        clusterCount = GetClustersFromEndpoint(cBuffer, clusterCount);
+        chip::Platform::MemoryRealloc(cBuffer, clusterCount);
+        VerifyOrReturnError(nullptr != cBuffer, CHIP_NO_ERROR);
+
+        Span<clusterId> cSpan(cBuffer, clusterCount);
         for (clusterId cluster : cSpan)
         {
             ExtensionFieldSet EFS;
@@ -752,13 +756,24 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
             {
                 if (handler.SupportsCluster(mEndpointId, cluster))
                 {
-                    ReturnErrorOnFailure(handler.SerializeSave(mEndpointId, EFS.mID, EFSSpan));
+                    CHIP_ERROR err = handler.SerializeSave(mEndpointId, EFS.mID, EFSSpan);
+                    if (CHIP_NO_ERROR != err)
+                    {
+                        chip::Platform::MemoryFree(cBuffer);
+                        return err;
+                    }
                     EFS.mUsedBytes = static_cast<uint8_t>(EFSSpan.size());
-                    ReturnErrorOnFailure(scene.mStorageData.mExtensionFieldSets.InsertFieldSet(EFS));
+                    err            = scene.mStorageData.mExtensionFieldSets.InsertFieldSet(EFS);
+                    if (CHIP_NO_ERROR != err)
+                    {
+                        chip::Platform::MemoryFree(cBuffer);
+                        return err;
+                    }
                     break;
                 }
             }
         }
+        chip::Platform::MemoryFree(cBuffer);
     }
 
     return CHIP_NO_ERROR;
