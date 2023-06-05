@@ -17,7 +17,6 @@
 #pragma once
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <app/icd/ICDEventManager.h>
 #include <app/icd/ICDManager.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceEvent.h>
