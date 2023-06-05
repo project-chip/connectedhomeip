@@ -24,6 +24,7 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/Linux/GlibTypeDeleter.h>
 
 #include "BluezObjectList.h"
 #include "Types.h"

@@ -1,5 +1,6 @@
 / {
 	aliases {
+		system-state-led = &led_red;
 		pwm-led0 = &pwm_led0;
 		pwm-led1 = &pwm_led1;
 		pwm-led2 = &pwm_led2;
