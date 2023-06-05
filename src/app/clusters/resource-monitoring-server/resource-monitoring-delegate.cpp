@@ -27,6 +27,6 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 
 Status Delegate::HandleResetCondition()
 { 
-    ChipLogError(Zcl, "Hepa: HandleResetCondition");
+    ChipLogError(Zcl, "ResourceMonitoring: HandleResetCondition");
     return Status::Success;
 }
