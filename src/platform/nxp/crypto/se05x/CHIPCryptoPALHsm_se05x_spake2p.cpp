@@ -22,16 +22,16 @@
  *      chip crypto apis use either HSM or rollback to software implementation.
  */
 
-#include "CHIPCryptoPALHsm_SE05X_utils.h"
+#include "CHIPCryptoPALHsm_se05x_utils.h"
 
-#if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))
+#if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
 
-#if ENABLE_HSM_SPAKE_VERIFIER
+#if ENABLE_SE05X_SPAKE_VERIFIER
 const uint32_t w0in_id_v = 0x7D200001;
 const uint32_t Lin_id_v  = 0x7D200002;
 #endif
 
-#if ENABLE_HSM_SPAKE_PROVER
+#if ENABLE_SE05X_SPAKE_PROVER
 const uint32_t w0in_id_p = 0x7D200003;
 const uint32_t w1in_id_p = 0x7D200004;
 #endif
@@ -42,7 +42,7 @@ void Spake2p_Finish_HSM(hsm_pake_context_t * phsm_pake_context)
     if (gex_sss_chip_ctx.ks.session != NULL)
     {
         Se05x_API_DeleteCryptoObject(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, phsm_pake_context->spake_objId);
-        setObjID(phsm_pake_context->spake_objId, OBJ_ID_TABLE_OBJID_STATUS_FREE);
+        se05x_setCryptoObjID(phsm_pake_context->spake_objId, OBJ_ID_TABLE_OBJID_STATUS_FREE);
 
         if (spake_objects_created > 0)
         {
@@ -59,7 +59,7 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
     SE05x_CryptoModeSubType_t subtype;
 
 #if ENABLE_REENTRANCY
-    SE05x_CryptoObjectID_t spakeObjectId = getObjID();
+    SE05x_CryptoObjectID_t spakeObjectId = se05x_getCryptoObjID();
 #else
     SE05x_CryptoObjectID_t spakeObjectId =
         (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER) ? kSE05x_CryptoObject_PAKE_TYPE_B : kSE05x_CryptoObject_PAKE_TYPE_A;
@@ -82,7 +82,7 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
         return CHIP_ERROR_INTERNAL;
     }
 
-    se05x_sessionOpen();
+    VerifyOrReturnError(se05x_sessionOpen() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     subtype.pakeMode = kSE05x_SPAKE2PLUS_P256_SHA256_HKDF_HMAC;
@@ -200,8 +200,8 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::Init(const uint8_t * context, size_
     static uint8_t alreadyInitialised = 0;
     if (alreadyInitialised == false)
     {
-        delete_crypto_objects();
-        init_cryptoObj_mutex();
+        se05x_delete_crypto_objects();
+        se05x_init_cryptoObj_mutex();
         alreadyInitialised = true;
     }
 #endif //#if ENABLE_REENTRANCY
@@ -227,7 +227,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::Init(const uint8_t * context, size_
     return error;
 }
 
-#if ENABLE_HSM_SPAKE_VERIFIER
+#if ENABLE_SE05X_SPAKE_VERIFIER
 CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_identity, size_t my_identity_len,
                                                            const uint8_t * peer_identity, size_t peer_identity_len,
                                                            const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
@@ -280,7 +280,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
 }
 #endif
 
-#if ENABLE_HSM_SPAKE_PROVER
+#if ENABLE_SE05X_SPAKE_PROVER
 CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_identity, size_t my_identity_len,
                                                          const uint8_t * peer_identity, size_t peer_identity_len,
                                                          const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
@@ -345,13 +345,13 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundOne(const uint8_t * pab
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::STARTED, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(*out_len >= point_size, CHIP_ERROR_INTERNAL);
 
-#if !ENABLE_HSM_SPAKE_VERIFIER
+#if !ENABLE_SE05X_SPAKE_VERIFIER
     const bool sw_rollback_verifier = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER);
 #else
     constexpr bool sw_rollback_verifier = false;
 #endif
 
-#if ((CHIP_CRYPTO_HSM) && (!ENABLE_HSM_SPAKE_PROVER))
+#if ((CHIP_CRYPTO_HSM) && (!ENABLE_SE05X_SPAKE_PROVER))
     const bool sw_rollback_prover = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER);
 #else
     constexpr bool sw_rollback_prover   = false;
@@ -376,13 +376,13 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in,
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::R1, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(in_len == point_size, CHIP_ERROR_INTERNAL);
 
-#if !ENABLE_HSM_SPAKE_VERIFIER
+#if !ENABLE_SE05X_SPAKE_VERIFIER
     const bool sw_rollback_verifier = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER);
 #else
     constexpr bool sw_rollback_verifier = false;
 #endif
 
-#if !ENABLE_HSM_SPAKE_PROVER
+#if !ENABLE_SE05X_SPAKE_PROVER
     const bool sw_rollback_prover = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER);
 #else
     constexpr bool sw_rollback_prover   = false;
@@ -411,13 +411,13 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
 {
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::R2, CHIP_ERROR_INTERNAL);
 
-#if !ENABLE_HSM_SPAKE_VERIFIER
+#if !ENABLE_SE05X_SPAKE_VERIFIER
     const bool sw_rollback_verifier = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER);
 #else
     constexpr bool sw_rollback_verifier = false;
 #endif
 
-#if !ENABLE_HSM_SPAKE_PROVER
+#if !ENABLE_SE05X_SPAKE_PROVER
     const bool sw_rollback_prover = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER);
 #else
     constexpr bool sw_rollback_prover   = false;
@@ -441,4 +441,4 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
 } // namespace Crypto
 } // namespace chip
 
-#endif //#if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))
+#endif //#if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))

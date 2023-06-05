@@ -47,9 +47,6 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <trace/trace.h>
 #include <transport/SessionManager.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 
 namespace {
 

@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 
-import("${chip_root}/config/standalone/args.gni")
-
-# Include to define nxp_crypto_impl
-import("${chip_root}/src/platform/nxp/crypto/se05x/args.gni")
+nxp_crypto_impl = "se05x"
+chip_crypto = "platform"
+nxp_crypto_mw_root = "//third_party/simw-top-mini"
