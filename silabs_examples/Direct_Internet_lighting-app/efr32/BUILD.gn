@@ -83,7 +83,7 @@ efr32_sdk("sdk") {
 }
 
 silabs_executable("Direct_Internet_lighting_app") {
-  output_name = "chip-efr32-Direct_Internet_lighting-example.out"
+  output_name = "matter-silabs-Direct_Internet_lighting-example.out"
    public_configs = []
   include_dirs = [ "include" ]
   defines = []

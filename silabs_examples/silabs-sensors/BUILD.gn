@@ -111,7 +111,7 @@ if (wifi_soc) {
 }
 
 silabs_executable("sensors_app") {
-  output_name = "chip-efr32-sensors-example.out"
+  output_name = "matter-silabs-sensors-example.out"
   include_dirs = [ "include" ]
   defines = []
 

@@ -112,7 +112,7 @@ if (wifi_soc) {
 }
 
 silabs_executable("template_app") {
-  output_name = "chip-efr32-lighting-example.out"
+  output_name = "matter-silabs-template-example.out"
   public_configs = []
   include_dirs = [ "include" ]
   defines = []

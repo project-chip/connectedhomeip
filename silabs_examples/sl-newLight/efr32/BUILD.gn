@@ -91,7 +91,7 @@ efr32_sdk("sdk") {
 }
 
 silabs_executable("newLight_app") {
-  output_name = "chip-efr32-lighting-example.out"
+  output_name = "matter-silabs-lighting-example.out"
   public_configs = [ ]
   include_dirs = [ "include" ]
   defines = []
