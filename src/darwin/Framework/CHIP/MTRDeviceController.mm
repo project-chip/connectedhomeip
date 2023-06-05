@@ -31,6 +31,7 @@
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRSetupPayload.h"
 #import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
 #import <zap-generated/MTRBaseClusters.h>
@@ -491,6 +492,9 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             self->_deviceAttestationDelegateBridge = new MTRDeviceAttestationDelegateBridge(
                 self, commissioningParams.deviceAttestationDelegate, timeoutSecs, shouldWaitAfterDeviceAttestation);
             params.SetDeviceAttestationDelegate(self->_deviceAttestationDelegateBridge);
+        }
+        if (commissioningParams.countryCode != nil) {
+            params.SetCountryCode(AsCharSpan(commissioningParams.countryCode));
         }
 
         chip::NodeId deviceId = [nodeID unsignedLongLongValue];
