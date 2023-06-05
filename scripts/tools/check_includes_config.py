@@ -33,7 +33,6 @@ IGNORE: Set[str] = {
     '/Test',
     '/tests/',
     '/tools/',
-    r'/lib/assign/ValueAssign\.h',
 
     # Platforms can opt in or out.
     '/darwin/',
