@@ -204,6 +204,9 @@ protected:
     // wrapper function around emberAfGetClustersFromEndpoint to allow override when testing
     virtual uint8_t GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen);
 
+    // wrapper function around emberAfGetClusterCountForEndpoint to allow override when testing
+    virtual uint8_t GetClusterCountFromEndpoint();
+
     class SceneEntryIteratorImpl : public SceneEntryIterator
     {
     public:
