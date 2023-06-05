@@ -223,6 +223,7 @@ void sl_wfx_host_spiflash_cs_deassert(void)
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
 }
 
+// TODO: (MATTER-1904) Add logic to return from function and implement error checking
 void sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);

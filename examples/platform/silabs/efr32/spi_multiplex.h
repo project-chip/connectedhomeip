@@ -24,7 +24,7 @@ extern "C" {
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "sl_mx25_flash_shutdown_usart_config.h"
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(WF200_WIFI)) // TODO: (MATTER-1905) clean up of MACROs
 #include "sl_spidrv_exp_config.h"
 #endif /* EFR32MG24 && WF200_WIFI */
 #if (defined(EFR32MG24) && defined(RS911X_WIFI))
@@ -37,13 +37,14 @@ extern "C" {
 #include "spidrv.h"
 
 #ifdef WF200_WIFI
-// TODO: Investigate why using SL_SPIDRV_EXP_BITRATE is causing WF200 init failure
+// TODO: (MATTER-1906) Investigate why using SL_SPIDRV_EXP_BITRATE is causing WF200 init failure
 // REF: sl_spidrv_exp_config.h
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED 10000000
 #else
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
 #endif /* WF200_WIFI */
 
+// TODO: (MATTER-1907) Replace with GSDK MACROs
 #define SL_SPIDRV_LCD_BITRATE 1100000
 #define SL_SPIDRV_MX25_FLASH_BITRATE 16000000
 #define SL_SPIDRV_UART_CONSOLE_BITRATE 16000000
@@ -52,6 +53,7 @@ extern "C" {
 #define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EUSART_EXP_FRAME_LENGTH
 extern SPIDRV_Handle_t sl_spidrv_eusart_exp_handle;
 #define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
+// TODO: (MATTER-1907) Replace use of extern variable
 extern SPIDRV_Init_t sl_spidrv_eusart_init_exp;
 #elif WF200_WIFI
 #define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EXP_FRAME_LENGTH

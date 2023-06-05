@@ -25,7 +25,7 @@ extern "C" {
 #include "em_bus.h" // For CORE_CRITICAL_SECTION
 #if (defined(EFR32MG24) && defined(SL_WIFI))
 #include "spi_multiplex.h"
-#ifdef WF200_WIFI
+#ifdef WF200_WIFI // TODO: (MATTER-1905) clean up of MACROs
 #include "sl_wfx_host_api.h"
 #endif
 #endif
