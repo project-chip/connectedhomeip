@@ -29,12 +29,12 @@ from mobly import asserts
 
 class TC_CGEN_2_4(MatterBaseTest):
 
-    def OpenCommissioningWindow(self) -> int:
+    def OpenCommissioningWindow(self) -> int, str, str:
         try:
-            pin, code = self.th1.OpenCommissioningWindow(
+            pin, manual_code, qr_code = self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.matter_test_config.discriminator[0], option=1)
             time.sleep(5)
-            return pin, code
+            return pin, manual_code, qr_code
 
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
@@ -44,7 +44,7 @@ class TC_CGEN_2_4(MatterBaseTest):
             self, stage: int, expectedErrorPart: chip.native.ErrorSDKPart, expectedErrCode: int):
 
         logging.info("-----------------Fail on step {}-------------------------".format(stage))
-        pin, code = self.OpenCommissioningWindow()
+        pin, _ = self.OpenCommissioningWindow()
         self.th2.ResetTestCommissioner()
         # This will run the commissioning up to the point where stage x is run and the
         # response is sent before the test commissioner simulates a failure
@@ -85,7 +85,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         await self.CommissionToStageSendCompleteAndCleanup(13, chip.native.ErrorSDKPart.IM_CLUSTER_STATUS, 0x02)
 
         logging.info('Step 15 - TH1 opens a commissioning window')
-        pin, code = self.OpenCommissioningWindow()
+        pin, _ = self.OpenCommissioningWindow()
 
         logging.info('Step 16 - TH2 fully commissions the DUT')
         self.th2.ResetTestCommissioner()

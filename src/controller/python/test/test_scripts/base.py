@@ -258,7 +258,7 @@ class BaseTestHelper:
         return True
 
     def TestEnhancedCommissioningWindow(self, ip: str, nodeid: int):
-        pin, code = self.devCtrl.OpenCommissioningWindow(nodeid=nodeid, timeout=600, iteration=10000, discriminator=3840, option=1)
+        pin, _ = self.devCtrl.OpenCommissioningWindow(nodeid=nodeid, timeout=600, iteration=10000, discriminator=3840, option=1)
         return self.TestPaseOnly(ip=ip, nodeid=nodeid, setuppin=pin, devCtrl=self.devCtrl2)
 
     def TestPaseOnly(self, ip: str, setuppin: int, nodeid: int, devCtrl=None):

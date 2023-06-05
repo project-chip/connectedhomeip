@@ -64,7 +64,7 @@ _DeviceUnpairingCompleteFunct = CFUNCTYPE(None, c_uint64, PyChipError)
 _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
     None, c_uint64, PyChipError)
 _DevicePairingDelegate_OnOpenWindowCompleteFunct = CFUNCTYPE(
-    None, c_uint64, c_uint32, c_char_p, PyChipError)
+    None, c_uint64, c_uint32, c_char_p, c_char_p, PyChipError)
 _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
     None, c_uint64, c_uint8, PyChipError)
 # void (*)(Device *, CHIP_ERROR).
@@ -256,10 +256,10 @@ class ChipDeviceControllerBase():
             self._ChipStack.commissioningCompleteEvent.set()
             self._ChipStack.completeEvent.set()
 
-        def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupCode: str, err: PyChipError) -> None:
+        def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, manualCode: str, setupCode: str, err: PyChipError) -> None:
             if err.is_success:
                 print("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
-                self._ChipStack.openCommissioningWindowPincode[nodeid] = (setupPinCode, setupCode)
+                self._ChipStack.openCommissioningWindowPincode[nodeid] = (setupPinCode, manualCode.decode(), setupCode.decode())
             else:
                 print("Failed to open commissioning window: {}".format(err))
 
@@ -652,7 +652,7 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         ).raise_on_error()
 
-    def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int, discriminator: int, option: int) -> (int, str):
+    def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int, discriminator: int, option: int) -> (int, str, str):
         self.CheckIsActive()
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(

@@ -20,6 +20,7 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "lib/support/TypeTraits.h"
 #include <controller/python/chip/native/PyChipError.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 namespace chip {
@@ -133,11 +134,15 @@ void ScriptDevicePairingDelegate::OnOpenCommissioningWindow(NodeId deviceId, CHI
 {
     if (mOnWindowOpenCompleteCallback != nullptr)
     {
-        QRCodeSetupPayloadGenerator generator(payload);
-        std::string code;
-        generator.payloadBase38Representation(code);
-        ChipLogProgress(Zcl, "code = %s", code.c_str());
-        mOnWindowOpenCompleteCallback(deviceId, payload.setUpPINCode, code.c_str(), ToPyChipError(status));
+        std::string manualPairingCode;
+        std::string QRCode;
+
+        ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
+        QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode);
+        ChipLogProgress(Zcl, "ManualPairingCode = %s", manualPairingCode.c_str());
+        ChipLogProgress(Zcl, "QRCode = %s", QRCode.c_str());
+        mOnWindowOpenCompleteCallback(deviceId, payload.setUpPINCode, manualPairingCode.c_str(), QRCode.c_str(),
+                                      ToPyChipError(status));
     }
     if (mWindowOpener != nullptr)
     {
