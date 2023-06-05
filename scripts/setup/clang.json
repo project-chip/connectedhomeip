@@ -3,7 +3,7 @@
         {
             "path": "fuchsia/third_party/clang/mac-arm64",
             "platforms": ["mac-arm64"],
-            "tags": ["git_revision:6d667d4b261e81f325756fdfd5bb43b3b3d2451d"]
+            "tags": ["git_revision:895b55537870cdaf6e4c304a09f4bf01954ccbd6"]
         }
     ]
 }
