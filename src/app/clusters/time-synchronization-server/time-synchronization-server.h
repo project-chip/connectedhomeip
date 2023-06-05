@@ -94,9 +94,9 @@ public:
     CHIP_ERROR SetDSTOffset(DataModel::DecodableList<TimeSynchronization::Structs::DSTOffsetStruct::Type> dstL);
     CHIP_ERROR ClearDSTOffset(void);
     DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource(void);
-    CHIP_ERROR GetDefaultNtp(CharSpan & dntp);
     DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type> GetTimeZone(void);
     DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> GetDSTOffset(void);
+    CHIP_ERROR GetDefaultNtp(MutableByteSpan & dntp);
 
     CHIP_ERROR SetUTCTime(chip::EndpointId ep, uint64_t utcTime, TimeSynchronization::GranularityEnum granularity,
                           TimeSynchronization::TimeSourceEnum source);

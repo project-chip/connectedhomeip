@@ -72,12 +72,9 @@ CHIP_ERROR TimeSyncDataProvider::StoreDefaultNtp(const CharSpan & defaultNtp)
                                                static_cast<uint16_t>(defaultNtp.size()));
 }
 
-CHIP_ERROR TimeSyncDataProvider::LoadDefaultNtp(CharSpan & defaultNtp)
+CHIP_ERROR TimeSyncDataProvider::LoadDefaultNtp(MutableByteSpan & defaultNtp)
 {
-    MutableByteSpan dntpSpan(const_cast<uint8_t *>(Uint8::from_const_char(defaultNtp.data())), defaultNtp.size());
-    ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::TSDefaultNTP().KeyName(), dntpSpan));
-    defaultNtp.reduce_size(dntpSpan.size());
-    return CHIP_NO_ERROR;
+    return Load(DefaultStorageKeyAllocator::TSDefaultNTP().KeyName(), defaultNtp);
 }
 
 CHIP_ERROR TimeSyncDataProvider::ClearDefaultNtp()
