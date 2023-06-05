@@ -258,7 +258,16 @@ template("chip_data_model") {
           "${_app_root}/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
           "${_app_root}/clusters/scenes-server/SceneTableImpl.cpp",
         ]
-      } else {
+      } 
+      else if (cluster == "resource-monitoring-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/resource-monitoring-delegate.cpp",
+          "${_app_root}/clusters/${cluster}/resource-monitoring-delegate.h",
+        ]
+      }
+      else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
     }

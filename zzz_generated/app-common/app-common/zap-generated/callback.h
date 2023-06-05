@@ -11158,12 +11158,6 @@ bool emberAfOperationalStateClusterResumeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalState::Commands::Resume::DecodableType & commandData);
 /**
- * @brief HEPA Filter Monitoring Cluster ResetCondition Command callback (from client)
- */
-bool emberAfHepaFilterMonitoringClusterResetConditionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::HepaFilterMonitoring::Commands::ResetCondition::DecodableType & commandData);
-/**
  * @brief Activated Carbon Filter Monitoring Cluster ResetCondition Command callback (from client)
  */
 bool emberAfActivatedCarbonFilterMonitoringClusterResetConditionCallback(
