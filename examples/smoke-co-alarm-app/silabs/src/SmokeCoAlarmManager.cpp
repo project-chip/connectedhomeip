@@ -31,25 +31,20 @@ SmokeCoAlarmManager SmokeCoAlarmManager::sAlarm;
 
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
+    ExpressedStateEnum currentExpressedState = ExpressedStateEnum::kNormal;
+    // read current ExpressedState on endpoint one
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    SmokeCoAlarmServer::Instance().GetExpressedState(1, currentExpressedState);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    mExpressedState = currentExpressedState;
+
     return CHIP_NO_ERROR;
 }
 
 bool SmokeCoAlarmManager::StartSelfTesting()
 {
-    bool success = true;
-    ExpressedStateEnum expressedState;
-
-    success = SmokeCoAlarmServer::Instance().GetExpressedState(1, expressedState);
-
-    if (success)
-    {
-        success = SmokeCoAlarmServer::Instance().SetExpressedState(1, ExpressedStateEnum::kTesting);
-    }
-
-    if (success)
-    {
-        success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, true);
-    }
+    bool success = SmokeCoAlarmServer::Instance().SetTestInProgress(1, true);
 
     if (success)
     {
@@ -58,7 +53,7 @@ bool SmokeCoAlarmManager::StartSelfTesting()
         SILABS_LOG("End self-testing!");
     }
 
-    SmokeCoAlarmServer::Instance().SetExpressedState(1, expressedState);
+    SmokeCoAlarmServer::Instance().SetExpressedState(1, mExpressedState);
     SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
 
     return success;

@@ -384,7 +384,12 @@ bool SmokeCoAlarmServer::HandleRemoteSelfTestRequest(CommandHandler * commandObj
         }
         else
         {
-            success = emberAfPluginSmokeCoAlarmSelfTestRequestCommand(endpointId);
+            success = SetExpressedState(endpointId, ExpressedStateEnum::kTesting);
+
+            if (success)
+            {
+                success = emberAfPluginSmokeCoAlarmSelfTestRequestCommand(endpointId);
+            }
         }
     }
 

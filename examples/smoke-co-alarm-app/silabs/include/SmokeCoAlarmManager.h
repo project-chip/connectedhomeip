@@ -42,6 +42,8 @@ public:
 private:
     friend SmokeCoAlarmManager & AlarmMgr(void);
 
+    chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum mExpressedState;
+
     static SmokeCoAlarmManager sAlarm;
 };
 
