@@ -131,7 +131,7 @@ static bool sendDSTTableEmptyEvent(EndpointId ep)
     }
     ChipLogProgress(Zcl, "Emit DSTTableEmpty event [ep=%d]", ep);
 
-    // TODO re-schedule event for after min 1hr
+    // TODO: re-schedule event for after min 1hr
     // delegate->scheduleDSTTableEmptyEvent()
     return true;
 }
@@ -190,7 +190,7 @@ static bool sendTimeFailureEvent(EndpointId ep)
         return false;
     }
 
-    // TODO re-schedule event for after min 1hr if no time is still available
+    // TODO: re-schedule event for after min 1hr if no time is still available
     ChipLogProgress(Zcl, "Emit sendTimeFailure event [ep=%d]", ep);
     return true;
 }
@@ -208,7 +208,7 @@ static bool sendMissingTrustedTimeSourceEvent(EndpointId ep)
         return false;
     }
 
-    // TODO re-schedule event for after min 1hr if TTS is null or cannot be reached
+    // TODO: re-schedule event for after min 1hr if TTS is null or cannot be reached
     ChipLogProgress(Zcl, "Emit sendMissingTrustedTimeSource event [ep=%d]", ep);
     return true;
 }
@@ -235,7 +235,7 @@ void TimeSynchronizationServer::Init()
     mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize);
     mTimeZoneListSize = (mTimeZoneListSize == 0) ? 1 : mTimeZoneListSize; // initialize default value
     mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetList, mDstOffsetListSize);
-    // TODO if trusted time source is available schedule a time read
+    // TODO: if trusted time source is available schedule a time read
     if (!mTrustedTimeSource.IsNull())
     {
     }
@@ -779,7 +779,7 @@ bool emberAfTimeSynchronizationClusterSetTrustedTimeSourceCallback(
         TimeSynchronization::Structs::TrustedTimeSourceStruct::Type ts = { commandObj->GetAccessingFabricIndex(),
                                                                            timeSource.Value().nodeID, timeSource.Value().endpoint };
         tts.SetNonNull(ts);
-        // TODO schedule a utctime read from this time source
+        // : schedule a utctime read from this time source
     }
     else
     {
