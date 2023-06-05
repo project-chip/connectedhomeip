@@ -17,6 +17,7 @@
 
 import logging
 import time
+from typing import Tuple
 
 import chip.CertificateAuthority
 import chip.clusters as Clusters
@@ -29,7 +30,7 @@ from mobly import asserts
 
 class TC_CGEN_2_4(MatterBaseTest):
 
-    def OpenCommissioningWindow(self) -> int, str, str:
+    def OpenCommissioningWindow(self) -> Tuple[int, str, str]:
         try:
             pin, manual_code, qr_code = self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.matter_test_config.discriminator[0], option=1)
