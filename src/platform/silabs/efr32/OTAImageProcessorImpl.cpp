@@ -71,7 +71,6 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
     if ((block.data() == nullptr) || block.empty())
     {
-        ChipLogError(SoftwareUpdate, "block is empty");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -103,7 +102,6 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "requestor is null");
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -339,7 +337,6 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
         mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
         if (mBlock.data() == nullptr)
         {
-            ChipLogError(SoftwareUpdate, "mBlock is null");
             return CHIP_ERROR_NO_MEMORY;
         }
     }
