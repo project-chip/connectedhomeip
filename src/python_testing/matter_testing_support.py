@@ -823,7 +823,7 @@ class CommissionDeviceTest(MatterBaseTest):
             if not res:
                 raise signals.TestAbortAll(f"Failed to commission node: {str(err)}")
 
-    def _commission_device(self, i) -> Tuple[bool, PyChipError]):
+    def _commission_device(self, i) -> Tuple[bool, PyChipError]:
         dev_ctrl=self.default_controller
         conf=self.matter_test_config
 

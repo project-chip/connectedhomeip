@@ -91,7 +91,7 @@ def connect_device(devCtrl, setupPayload, commissionableDevice, nodeId=None):
     res, err = devCtrl.CommissionOnNetwork(
             nodeId, pincode, filterType=discovery.FilterType.INSTANCE_NAME, filter=commissionableDevice.instanceName)
     if not res:
-        log.error("Commission discovered device failed {}".format(str(err))
+        log.error("Commission discovered device failed {}".format(str(err)))
         return None
     return nodeId
 
