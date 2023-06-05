@@ -232,6 +232,8 @@ class _ConstraintType(BaseConstraint):
         success = False
         if self._type == 'boolean' and type(value) is bool:
             success = True
+        elif self._type == 'struct' and type(value) is dict:
+            success = True
         elif self._type == 'list' and type(value) is list:
             success = True
         elif self._type == 'char_string' and type(value) is str:
@@ -367,6 +369,8 @@ class _ConstraintType(BaseConstraint):
 
         if type(value) is bool:
             types.append('boolean')
+        elif type(value) is dict:
+            types.append('struct')
         elif type(value) is list:
             types.append('list')
         elif type(value) is str:

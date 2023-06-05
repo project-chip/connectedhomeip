@@ -1,0 +1,53 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("icd.gni")
+
+# ICD Server sources and configurations
+
+# ICD Manager source-set is broken out of the main source-set to enable unit tests
+# All sources and configurations used by the ICDManager need to go in this source-set
+source_set("manager-srcs") {
+  sources = [
+    "ICDManager.cpp",
+    "ICDManager.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/lib/core" ]
+}
+
+# ICD Server Configuration
+# All configurations necessary to the ICD Server featureset need to in this configuration
+config("server-config") {
+  defines = [ "CHIP_CONFIG_ENABLE_ICD_SERVER" ]
+}
+
+# servers-srcs source-set contains all the sources and configurations necessary to build the ICD Server functionality
+# All sources, configurations and dependencies necessary for the ICD Server featureset need to go in this source-set
+#
+# The ICD Server featureset is enabled with the chip_enable_icd_server in the src/app/BUILD.gn file
+source_set("server-srcs") {
+  sources = [
+    "ICDEventManager.cpp",
+    "ICDEventManager.h",
+  ]
+
+  public_deps = [
+    ":manager-srcs",
+    "${chip_root}/src/platform:platform",
+  ]
+
+  public_configs = [ ":server-config" ]
+}

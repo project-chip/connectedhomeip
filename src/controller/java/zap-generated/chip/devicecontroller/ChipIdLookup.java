@@ -20,8 +20,8 @@ package chip.devicecontroller;
 
 public final class ChipIdLookup {
   /**
-   * Translates cluster ID to a cluster name in upper camel case. If no matching ID is found,
-   * returns an empty string.
+   * Translates cluster ID to a cluster name in upper camel case. If no matching
+   * ID is found, returns an empty string.
    */
   public static String clusterIdToName(long clusterId) {
     if (clusterId == 3L) {
@@ -150,11 +150,26 @@ public final class ChipIdLookup {
     if (clusterId == 80L) {
       return "ModeSelect";
     }
+    if (clusterId == 81L) {
+      return "LaundryWasherModeSelect";
+    }
+    if (clusterId == 82L) {
+      return "RefrigeratorAndTemperatureControlledCabinetModeSelect";
+    }
+    if (clusterId == 84L) {
+      return "RvcRunModeSelect";
+    }
+    if (clusterId == 85L) {
+      return "RvcCleanModeSelect";
+    }
     if (clusterId == 86L) {
       return "TemperatureControl";
     }
     if (clusterId == 87L) {
       return "RefrigeratorAlarm";
+    }
+    if (clusterId == 89L) {
+      return "DishwasherModeSelect";
     }
     if (clusterId == 91L) {
       return "AirQuality";
@@ -403,8 +418,8 @@ public final class ChipIdLookup {
   }
 
   /**
-   * Translates cluster ID and attribute ID to an attribute name in upper camel case. If no matching
-   * IDs are found, returns an empty string.
+   * Translates cluster ID and attribute ID to an attribute name in upper camel case.
+   * If no matching IDs are found, returns an empty string.
    */
   public static String attributeIdToName(long clusterId, long attributeId) {
     if (clusterId == 3L) {
@@ -2153,6 +2168,150 @@ public final class ChipIdLookup {
       }
       return "";
     }
+    if (clusterId == 81L) {
+      if (attributeId == 0L) {
+        return "Description";
+      }
+      if (attributeId == 2L) {
+        return "SupportedModes";
+      }
+      if (attributeId == 3L) {
+        return "CurrentMode";
+      }
+      if (attributeId == 4L) {
+        return "StartUpMode";
+      }
+      if (attributeId == 5L) {
+        return "OnMode";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 82L) {
+      if (attributeId == 0L) {
+        return "Description";
+      }
+      if (attributeId == 2L) {
+        return "SupportedModes";
+      }
+      if (attributeId == 3L) {
+        return "CurrentMode";
+      }
+      if (attributeId == 4L) {
+        return "StartUpMode";
+      }
+      if (attributeId == 5L) {
+        return "OnMode";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 84L) {
+      if (attributeId == 0L) {
+        return "Description";
+      }
+      if (attributeId == 2L) {
+        return "SupportedModes";
+      }
+      if (attributeId == 3L) {
+        return "CurrentMode";
+      }
+      if (attributeId == 4L) {
+        return "StartUpMode";
+      }
+      if (attributeId == 5L) {
+        return "OnMode";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 85L) {
+      if (attributeId == 0L) {
+        return "Description";
+      }
+      if (attributeId == 2L) {
+        return "SupportedModes";
+      }
+      if (attributeId == 3L) {
+        return "CurrentMode";
+      }
+      if (attributeId == 4L) {
+        return "StartUpMode";
+      }
+      if (attributeId == 5L) {
+        return "OnMode";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
     if (clusterId == 86L) {
       if (attributeId == 0L) {
         return "TemperatureSetpoint";
@@ -2201,6 +2360,42 @@ public final class ChipIdLookup {
       }
       if (attributeId == 2L) {
         return "State";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 89L) {
+      if (attributeId == 0L) {
+        return "Description";
+      }
+      if (attributeId == 2L) {
+        return "SupportedModes";
+      }
+      if (attributeId == 3L) {
+        return "CurrentMode";
+      }
+      if (attributeId == 4L) {
+        return "StartUpMode";
+      }
+      if (attributeId == 5L) {
+        return "OnMode";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -3296,6 +3491,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 10L) {
         return "WindSetting";
+      }
+      if (attributeId == 11L) {
+        return "AirflowDirection";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -6807,8 +7005,8 @@ public final class ChipIdLookup {
   }
 
   /**
-   * Translates cluster ID and event ID to an attribute name in upper camel case. If no matching IDs
-   * are found, returns an empty string.
+   * Translates cluster ID and event ID to an attribute name in upper camel case.
+   * If no matching IDs are found, returns an empty string.
    */
   public static String eventIdToName(long clusterId, long eventId) {
     if (clusterId == 3L) {
@@ -7060,6 +7258,18 @@ public final class ChipIdLookup {
     if (clusterId == 80L) {
       return "";
     }
+    if (clusterId == 81L) {
+      return "";
+    }
+    if (clusterId == 82L) {
+      return "";
+    }
+    if (clusterId == 84L) {
+      return "";
+    }
+    if (clusterId == 85L) {
+      return "";
+    }
     if (clusterId == 86L) {
       return "";
     }
@@ -7067,6 +7277,9 @@ public final class ChipIdLookup {
       if (eventId == 0L) {
         return "Notify";
       }
+      return "";
+    }
+    if (clusterId == 89L) {
       return "";
     }
     if (clusterId == 91L) {
@@ -7426,3 +7639,4 @@ public final class ChipIdLookup {
     return "";
   }
 }
+

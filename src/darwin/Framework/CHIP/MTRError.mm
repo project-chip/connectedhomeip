@@ -89,6 +89,9 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         [userInfo addEntriesFromDictionary:@{
             NSLocalizedDescriptionKey : NSLocalizedString(@"The device is already a member of this fabric.", nil)
         }];
+    } else if (errorCode == CHIP_ERROR_DECODE_FAILED) {
+        code = MTRErrorCodeTLVDecodeFailed;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"TLV decoding failed.", nil) }];
     } else {
         code = MTRErrorCodeGeneralError;
         [userInfo addEntriesFromDictionary:@{

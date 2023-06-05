@@ -69,6 +69,13 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * expected schema.
      */
     MTRErrorCodeSchemaMismatch MTR_NEWLY_AVAILABLE = 13,
+    /**
+     * MTRErrorCodeTLVDecodeFailed means that the TLV being decoded was malformed in
+     * some way.  This can include things like lengths running past the end of
+     * the buffer, strings that are not actually UTF-8, and various other
+     * TLV-level failures.
+     */
+    MTRErrorCodeTLVDecodeFailed MTR_NEWLY_AVAILABLE = 14,
 };
 // clang-format on
 

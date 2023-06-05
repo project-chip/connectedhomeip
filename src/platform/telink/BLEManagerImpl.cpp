@@ -176,6 +176,12 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
     return CHIP_NO_ERROR;
 }
 
+void BLEManagerImpl::_Shutdown()
+{
+    bt_disable();
+    mBLERadioInitialized = false;
+}
+
 void BLEManagerImpl::DriveBLEState(intptr_t arg)
 {
     BLEMgrImpl().DriveBLEState();

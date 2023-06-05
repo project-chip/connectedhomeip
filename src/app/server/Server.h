@@ -65,6 +65,11 @@
 #endif
 #include <transport/raw/UDP.h>
 
+#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDEventManager.h> // nogncheck
+#include <app/icd/ICDManager.h>      // nogncheck
+#endif
+
 namespace chip {
 
 constexpr size_t kMaxBlePendingPackets = 1;
@@ -397,7 +402,7 @@ private:
             const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
             if (fabric == nullptr)
             {
-                ChipLogError(AppServer, "Group added to nonexistent fabric?");
+                ChipLogError(AppServer, "Group removed from nonexistent fabric?");
                 return;
             }
 
@@ -595,6 +600,10 @@ private:
     Inet::InterfaceId mInterfaceId;
 
     System::Clock::Microseconds64 mInitTimestamp;
+#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::ICDEventManager mICDEventManager;
+    app::ICDManager mICDManager;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 };
 
 } // namespace chip

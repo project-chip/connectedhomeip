@@ -201,6 +201,23 @@ class DeviceProxyWrapper():
 
         return numSessions.value
 
+    @property
+    def attestationChallenge(self) -> bytes:
+        self._dmLib.pychip_GetAttestationChallenge.argtypes = (c_void_p, POINTER(c_uint8), POINTER(c_size_t))
+        self._dmLib.pychip_GetAttestationChallenge.restype = PyChipError
+
+        # this buffer is overly large, but we shall resize
+        size = 64
+        buf = ctypes.c_uint8(size)
+        csize = ctypes.c_size_t(size)
+        builtins.chipStack.Call(
+            lambda: self._dmLib.pychip_GetAttestationChallenge(self._deviceProxy, buf, ctypes.byref(csize))
+        ).raise_on_error()
+
+        resize(buf, csize.value)
+
+        return bytes(buf)
+
 
 DiscoveryFilterType = discovery.FilterType
 
