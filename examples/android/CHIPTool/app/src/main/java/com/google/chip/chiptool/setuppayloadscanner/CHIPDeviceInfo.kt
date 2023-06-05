@@ -44,7 +44,7 @@ data class CHIPDeviceInfo(
         setupPayload.version,
         setupPayload.vendorId,
         setupPayload.productId,
-        setupPayload.discriminator,
+        setupPayload.getLongDiscriminatorValue(),
         setupPayload.setupPinCode,
         setupPayload.commissioningFlow,
         setupPayload.optionalQRCodeInfo.mapValues { (_, info) ->

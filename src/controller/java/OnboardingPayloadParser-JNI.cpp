@@ -1,7 +1,5 @@
 #include "lib/core/CHIPError.h"
 #include "lib/support/JniTypeWrappers.h"
-#include <setup_payload/ManualSetupPayloadGenerator.h>
-#include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
@@ -32,7 +30,7 @@ static jobject CreateCapabilitiesHashSet(JNIEnv * env, RendezvousInformationFlag
 static void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPayload & payload);
 static void CreateCapabilitiesFromHashSet(JNIEnv * env, jobject discoveryCapabilitiesObj, RendezvousInformationFlags & flags);
 static CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj);
-static CHIP_ERROR ThrowInvalidManualPairingCodeFormatException(JNIEnv * env, jstring manualPairingCodeObj);
+static CHIP_ERROR ThrowOnboardingPayloadException(JNIEnv * env, CHIP_ERROR errToThrow);
 
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
@@ -54,8 +52,11 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
 
     if (skipPayloadValidation == JNI_FALSE && !payload.isValidQRCodePayload())
     {
-        jclass exceptionCls = env->FindClass("chip/onboardingpayload/OnboardingPayloadParser$OnboardingPayloadException");
-        JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        ThrowOnboardingPayloadException(env, err);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SetupPayload, "Error throwing OnboardingPayloadException: %" CHIP_ERROR_FORMAT, err.Format());
+        }
         return nullptr;
     }
 
@@ -65,39 +66,6 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SetupPayload, "Error throwing UnrecognizedQRCodeException: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        return nullptr;
-    }
-
-    return TransformSetupPayload(env, payload);
-}
-
-JNI_METHOD(jobject, parsePayloadFromManualPairingCode)
-(JNIEnv * env, jobject self, jstring manualPairingCode, jboolean skipPayloadValidation)
-{
-    CHIP_ERROR err                       = CHIP_NO_ERROR;
-    const char * manualPairingCodeString = NULL;
-    SetupPayload payload;
-
-    manualPairingCodeString = env->GetStringUTFChars(manualPairingCode, 0);
-
-    err = ManualSetupPayloadParser(manualPairingCodeString).populatePayload(payload);
-    env->ReleaseStringUTFChars(manualPairingCode, manualPairingCodeString);
-
-    if (skipPayloadValidation == JNI_FALSE && !payload.isValidManualCode())
-    {
-        jclass exceptionCls = env->FindClass("chip/onboardingpayload/OnboardingPayloadParser$OnboardingPayloadException");
-        JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
-        return nullptr;
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        err = ThrowInvalidManualPairingCodeFormatException(env, manualPairingCode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(SetupPayload, "Error throwing ThrowInvalidManualPairingCodeFormatException: %" CHIP_ERROR_FORMAT,
-                         err.Format());
         }
         return nullptr;
     }
@@ -249,31 +217,15 @@ JNI_METHOD(jstring, getQrCodeFromPayload)(JNIEnv * env, jobject self, jobject se
     err = QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(qrString);
     if (err != CHIP_NO_ERROR)
     {
-        jclass exceptionCls = env->FindClass("chip/onboardingpayload/OnboardingPayloadParser$OnboardingPayloadException");
-        JniReferences::GetInstance().ThrowError(env, exceptionCls, err);
+        ThrowOnboardingPayloadException(env, err);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SetupPayload, "Error throwing OnboardingPayloadException: %" CHIP_ERROR_FORMAT, err.Format());
+        }
         return nullptr;
     }
 
     return env->NewStringUTF(qrString.c_str());
-}
-
-JNI_METHOD(jstring, getManualPairingCodeFromPayload)(JNIEnv * env, jobject self, jobject setupPayload)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    SetupPayload payload;
-    std::string outDecimalString;
-
-    TransformSetupPayloadFromJobject(env, setupPayload, payload);
-
-    err = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(outDecimalString);
-    if (err != CHIP_NO_ERROR)
-    {
-        jclass exceptionCls = env->FindClass("chip/onboardingpayload/OnboardingPayloadParser$OnboardingPayloadException");
-        JniReferences::GetInstance().ThrowError(env, exceptionCls, err);
-        return nullptr;
-    }
-
-    return env->NewStringUTF(outDecimalString.c_str());
 }
 
 void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPayload & payload)
@@ -351,7 +303,7 @@ CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj)
 
     env->ExceptionClear();
 
-    exceptionCls = env->FindClass("chip/onboardingpayload/OnboardingPayloadParser$UnrecognizedQrCodeException");
+    exceptionCls = env->FindClass("chip/onboardingpayload/UnrecognizedQrCodeException");
     VerifyOrReturnError(exceptionCls != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_TYPE_NOT_FOUND);
     exceptionConstructor = env->GetMethodID(exceptionCls, "<init>", "(Ljava/lang/String;)V");
     VerifyOrReturnError(exceptionConstructor != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_METHOD_NOT_FOUND);
@@ -362,7 +314,7 @@ CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThrowInvalidManualPairingCodeFormatException(JNIEnv * env, jstring manualPairingCodeObj)
+CHIP_ERROR ThrowOnboardingPayloadException(JNIEnv * env, CHIP_ERROR errToThrow)
 {
     jclass exceptionCls            = nullptr;
     jmethodID exceptionConstructor = nullptr;
@@ -370,11 +322,14 @@ CHIP_ERROR ThrowInvalidManualPairingCodeFormatException(JNIEnv * env, jstring ma
 
     env->ExceptionClear();
 
-    exceptionCls = env->FindClass("chip/onboardingpayload/OnboardingPayloadParser$InvalidManualPairingCodeFormatException");
+    exceptionCls = env->FindClass("chip/onboardingpayload/OnboardingPayloadException");
     VerifyOrReturnError(exceptionCls != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_TYPE_NOT_FOUND);
     exceptionConstructor = env->GetMethodID(exceptionCls, "<init>", "(Ljava/lang/String;)V");
     VerifyOrReturnError(exceptionConstructor != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_METHOD_NOT_FOUND);
-    exception = (jthrowable) env->NewObject(exceptionCls, exceptionConstructor, manualPairingCodeObj);
+
+    jstring jerrStr = env->NewStringUTF(ErrorStr(errToThrow));
+
+    exception = (jthrowable) env->NewObject(exceptionCls, exceptionConstructor, jerrStr);
     VerifyOrReturnError(exception != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_EXCEPTION_THROWN);
 
     env->Throw(exception);

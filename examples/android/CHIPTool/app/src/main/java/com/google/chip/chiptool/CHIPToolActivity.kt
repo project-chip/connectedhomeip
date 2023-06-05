@@ -30,7 +30,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import chip.onboardingpayload.OnboardingPayload
 import chip.onboardingpayload.OnboardingPayloadParser
-import chip.onboardingpayload.OnboardingPayloadParser.UnrecognizedQrCodeException
+import chip.onboardingpayload.UnrecognizedQrCodeException
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.EnterNetworkFragment

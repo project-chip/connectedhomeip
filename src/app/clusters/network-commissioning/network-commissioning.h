@@ -93,7 +93,7 @@ private:
     // Setting these values don't have to care about parallel requests, since we will reject other requests when there is another
     // request ongoing.
     // These values can be updated via OnNetworkingStatusChange callback, ScanCallback::OnFinished and ConnectCallback::OnResult.
-    DataModel::Nullable<NetworkCommissioningStatus> mLastNetworkingStatusValue;
+    DataModel::Nullable<NetworkCommissioningStatusEnum> mLastNetworkingStatusValue;
     Attributes::LastConnectErrorValue::TypeInfo::Type mLastConnectErrorValue;
     uint8_t mConnectingNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
     uint8_t mConnectingNetworkIDLen = 0;

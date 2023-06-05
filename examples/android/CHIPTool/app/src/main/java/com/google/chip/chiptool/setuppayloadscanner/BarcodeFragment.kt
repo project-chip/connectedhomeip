@@ -37,9 +37,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import chip.onboardingpayload.OnboardingPayload
+import chip.onboardingpayload.OnboardingPayloadException
 import chip.onboardingpayload.OnboardingPayloadParser
-import chip.onboardingpayload.OnboardingPayloadParser.OnboardingPayloadException
-import chip.onboardingpayload.OnboardingPayloadParser.UnrecognizedQrCodeException
+import chip.onboardingpayload.UnrecognizedQrCodeException
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.SelectActionFragment
 import com.google.chip.chiptool.databinding.BarcodeFragmentBinding

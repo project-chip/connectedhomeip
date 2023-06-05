@@ -69,7 +69,6 @@ template("chip_data_model") {
       "zap-generated/access.h",
       "zap-generated/gen_config.h",
       "zap-generated/endpoint_config.h",
-      "zap-generated/CHIPClientCallbacks.h",
     ]
 
     if (chip_code_pre_generated_directory == "") {
@@ -174,7 +173,6 @@ template("chip_data_model") {
       "${_app_root}/util/binding-table.cpp",
       "${_app_root}/util/binding-table.h",
       "${_app_root}/util/ember-compatibility-functions.cpp",
-      "${_app_root}/util/ember-print.cpp",
       "${_app_root}/util/error-mapping.cpp",
       "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/message.cpp",
