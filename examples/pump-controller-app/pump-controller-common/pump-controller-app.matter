@@ -1,6 +1,18 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+    optional char_string<64> tagName = 2;
+}
+
+struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+}
+
 struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;

@@ -1554,6 +1554,56 @@ static id _Nullable DecodeEventPayloadForModeSelectCluster(EventId aEventId, TLV
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForLaundryWasherModeSelectCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::LaundryWasherModeSelect;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForRefrigeratorAndTemperatureControlledCabinetModeSelectCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForRVCRunModeSelectCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::RvcRunModeSelect;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForRVCCleanModeSelectCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::RvcCleanModeSelect;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForTemperatureControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TemperatureControl;
@@ -1602,6 +1652,19 @@ static id _Nullable DecodeEventPayloadForRefrigeratorAlarmCluster(EventId aEvent
 
         return value;
     }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForDishwasherModeSelectCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::DishwasherModeSelect;
+    switch (aEventId) {
     default: {
         break;
     }
@@ -3500,11 +3563,26 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::ModeSelect::Id: {
         return DecodeEventPayloadForModeSelectCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::LaundryWasherModeSelect::Id: {
+        return DecodeEventPayloadForLaundryWasherModeSelectCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
+        return DecodeEventPayloadForRefrigeratorAndTemperatureControlledCabinetModeSelectCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::RvcRunModeSelect::Id: {
+        return DecodeEventPayloadForRVCRunModeSelectCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::RvcCleanModeSelect::Id: {
+        return DecodeEventPayloadForRVCCleanModeSelectCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::TemperatureControl::Id: {
         return DecodeEventPayloadForTemperatureControlCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::RefrigeratorAlarm::Id: {
         return DecodeEventPayloadForRefrigeratorAlarmCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::DishwasherModeSelect::Id: {
+        return DecodeEventPayloadForDishwasherModeSelectCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::AirQuality::Id: {
         return DecodeEventPayloadForAirQualityCluster(aPath.mEventId, aReader, aError);

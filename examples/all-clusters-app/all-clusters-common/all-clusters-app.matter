@@ -1,6 +1,18 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+    optional char_string<64> tagName = 2;
+}
+
+struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+}
+
 struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
@@ -2296,22 +2308,43 @@ server cluster IcdManagement = 70 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 server cluster ModeSelect = 80 {
-  bitmap Feature : BITMAP32 {
-    kDeponoff = 0x1;
+  enum ModeTag : ENUM16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
   }
 
-  struct SemanticTagStruct {
-    vendor_id mfgCode = 0;
+  enum StatusCode : ENUM8 {
+    kSuccess = 0;
+    kUnsupportedMode = 1;
+    kGenericFailure = 2;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+    kExtendedStatus = 0x2;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
     enum16 value = 1;
+    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
-    SemanticTagStruct semanticTags[] = 2;
+    ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute char_string<32> description = 0;
+  readonly attribute char_string<64> description = 0;
   readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
