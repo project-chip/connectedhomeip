@@ -40,7 +40,6 @@ chip_codegen("chip-bridge-codegen") {
     "bridge/Switch.h",
     "bridge/TemperatureMeasurement.h",
     "bridge/BridgeClustersImpl.h",
-    "bridge/BridgeGlobalStructs.h",
   ]
 }
 

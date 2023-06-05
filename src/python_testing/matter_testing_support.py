@@ -400,8 +400,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
         return result
 
-    def print_step(self, stepnum: int, title: str) -> None:
-        logging.info('***** Test Step %d : %s', stepnum, title)
+    def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
+        logging.info('***** Test Step {} : {}'.format(stepnum, title))
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
@@ -560,6 +560,8 @@ def root_index(s: str) -> int:
 
 
 def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConfig) -> bool:
+    config.dut_node_id = args.dut_node_id
+
     if args.commissioning_method is None:
         return True
 
@@ -569,7 +571,6 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     if args.dut_node_id is None:
         print("error: When --commissioning-method present, --dut-node-id is mandatory!")
         return False
-    config.dut_node_id = args.dut_node_id
 
     if args.discriminator is None and (args.qr_code is None and args.manual_code is None):
         print("error: Missing --discriminator when no --qr-code/--manual-code present!")

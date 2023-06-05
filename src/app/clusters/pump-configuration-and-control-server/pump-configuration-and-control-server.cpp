@@ -246,14 +246,14 @@ bool HasFeature(EndpointId endpoint, Feature feature)
 
 void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
 {
-    emberAfDebugPrintln("Initialize PCC Server Cluster [EP:%d]", endpoint);
+    ChipLogProgress(Zcl, "Initialize PCC Server Cluster [EP:%d]", endpoint);
 }
 
 chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClusterServerPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    emberAfDebugPrintln("PCC Server Cluster Attribute Pre-changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
-                        (unsigned int) attributePath.mAttributeId);
+    ChipLogProgress(Zcl, "PCC Server Cluster Attribute Pre-changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
+                    (unsigned int) attributePath.mAttributeId);
 
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
 
@@ -353,8 +353,8 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
 
 void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    emberAfDebugPrintln("PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
-                        (unsigned int) attributePath.mAttributeId);
+    ChipLogProgress(Zcl, "PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
+                    (unsigned int) attributePath.mAttributeId);
 
     switch (attributePath.mAttributeId)
     {
@@ -363,7 +363,7 @@ void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(cons
         setEffectiveModes(attributePath.mEndpointId);
         break;
     default:
-        emberAfDebugPrintln("PCC Server: unhandled attribute ID");
+        ChipLogProgress(Zcl, "PCC Server: unhandled attribute ID");
     }
 }
 

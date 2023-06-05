@@ -210,7 +210,7 @@ class AndroidBuilder(Builder):
         #   If we unify the JNI libraries, libc++_shared.so may not be needed anymore, which could
         # be another path of resolving this inconsistency.
         for libName in [
-            "libSetupPayloadParser.so",
+            "libOnboardingPayload.so",
             "libCHIPController.so",
             "libc++_shared.so",
         ]:
@@ -226,7 +226,7 @@ class AndroidBuilder(Builder):
 
         jars = {
             "CHIPController.jar": "src/controller/java/CHIPController.jar",
-            "SetupPayloadParser.jar": "src/setup_payload/java/SetupPayloadParser.jar",
+            "OnboardingPayload.jar": "src/controller/java/OnboardingPayload.jar",
             "AndroidPlatform.jar": "src/platform/android/AndroidPlatform.jar",
             "libCHIPTlv.jar": "src/controller/java/libCHIPTlv.jar",
         }
@@ -478,11 +478,11 @@ class AndroidBuilder(Builder):
                     self.root, "examples/", self.app.ExampleName(), "android/App/app/libs"
                 )
 
-                libs = ["libSetupPayloadParser.so",
+                libs = ["libOnboardingPayload.so",
                         "libc++_shared.so", "libTvApp.so"]
 
                 jars = {
-                    "SetupPayloadParser.jar": "third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar",
+                    "OnboardingPayload.jar": "third_party/connectedhomeip/src/controller/java/OnboardingPayload.jar",
                     "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
                     "CHIPAppServer.jar": "third_party/connectedhomeip/src/app/server/java/CHIPAppServer.jar",
                     "TvApp.jar": "TvApp.jar",
@@ -535,12 +535,12 @@ class AndroidBuilder(Builder):
                 "AndroidPlatform.jar": os.path.join(
                     self.output_dir, "lib", "src/platform/android/AndroidPlatform.jar"
                 ),
-                "SetupPayloadParser.jar": os.path.join(
+                "OnboardingPayload.jar": os.path.join(
                     self.output_dir,
                     "lib",
-                    "src/setup_payload/java/SetupPayloadParser.jar",
+                    "src/controller/java/OnboardingPayload.jar",
                 ),
-                "jni/%s/libSetupPayloadParser.so"
+                "jni/%s/libOnboardingPayload.so"
                 % self.board.AbiName(): os.path.join(
                     self.output_dir,
                     "lib",

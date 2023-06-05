@@ -112,11 +112,15 @@ menu "CHIP Core"
             int  "Set threshold in ms"
             default 700
             help
-                 Time threshold for warning that dispatched took too long. You can
-		 set this default set to 0 to to disable event dispatching time
-		 measurement and suppress the logs "Long dispatch time:...".
+                Time threshold for warning that dispatched took too long. You can
+                set this default set to 0 to to disable event dispatching time
+                measurement and suppress the logs "Long dispatch time:...".
 
-        # TODO: add log level selection
+        config CHIP_LOG_FILTERING
+            bool "CHIP log level filtering APIs"
+            default n
+            help
+                Option to enable/disable CHIP log level filtering APIs.
 
     endmenu # "General Options"
 
@@ -162,6 +166,13 @@ menu "CHIP Core"
                 application.
 
                 A value of 0 disables automatic closing of idle connections.
+
+        config ENABLE_ROUTE_HOOK
+            bool "Enable route hook"
+            depends on LWIP_HOOK_IP6_ROUTE_DEFAULT && LWIP_HOOK_ND6_GET_GW_DEFAULT
+            default y
+            help
+                Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
 
     endmenu # "Networking Options"
 

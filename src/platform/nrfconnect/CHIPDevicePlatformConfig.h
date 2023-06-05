@@ -249,3 +249,15 @@
 #ifdef CONFIG_CHIP_EXTENDED_DISCOVERY
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 #endif // CONFIG_CHIP_EXTENDED_DISCOVERY
+
+#ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
+#if CONFIG_CHIP_FACTORY_DATA
+// UID will be copied from the externally programmed factory data, so we don't know the actual length and we need to assume some max
+// boundary.
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH CONFIG_CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
+#else
+// UID will be copied from hex encoded Kconfig option, so we may calculate its length in bytes by subtracting null terminator and
+// dividing size by 2.
+#define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH ((sizeof(CONFIG_CHIP_DEVICE_ROTATING_DEVICE_UID) - 1) / 2)
+#endif // CONFIG_CHIP_FACTORY_DATA
+#endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH

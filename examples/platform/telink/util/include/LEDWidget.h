@@ -26,10 +26,8 @@ class LEDWidget
 public:
     typedef void (*LEDWidgetStateUpdateHandler)(LEDWidget * ledWidget);
 
-    static void InitGpio(const device * port);
     static void SetStateUpdateCallback(LEDWidgetStateUpdateHandler stateUpdateCb);
-    const static struct device * mPort;
-    void Init(gpio_pin_t gpioNum);
+    void Init(gpio_dt_spec gpio);
     void Set(bool state);
     void Invert(void);
     void Blink(uint32_t changeRateMS);
@@ -39,7 +37,7 @@ public:
 private:
     uint32_t mBlinkOnTimeMS;
     uint32_t mBlinkOffTimeMS;
-    gpio_pin_t mGPIONum;
+    gpio_dt_spec mGPIO;
     bool mState;
     k_timer mLedTimer;
 

@@ -27,6 +27,7 @@
  * INCLUDE FILES
  ****************************************************************************************
  */
+#include <platform/DeviceInstanceInfoProvider.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,6 +52,10 @@ enum csvc_att_db_handles
     CSVC_IDX_TX_CHAR,
     CSVC_IDX_TX_VAL,
     CSVC_IDX_TX_CFG,
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    CSVC_IDX_C3_CHAR,
+    CSVC_IDX_C3_VAL,
+#endif
     CSVC_IDX_NB,
 };
 
@@ -75,14 +80,16 @@ uint16_t matter_ble_complete_event_handler(int opt_id, uint8_t status, uint16_t 
 
 void matter_ble_stop_adv();
 
-void matter_ble_start_adv();
+void matter_ble_start_adv(bool fast);
 
 void matter_set_connection_id(uint8_t conId);
-
+void matter_close_connection(uint8_t conId);
 void matter_tx_CCCD_write_cb(uint8_t * data, uint16_t size);
 void matter_rx_char_write_cb(uint8_t * data, uint16_t size);
 void matter_tx_CCCD_read_cb(uint8_t * data, uint16_t * size);
-
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+void matter_c3_char_read_cb(uint8_t * data, uint16_t * size);
+#endif
 void matter_tx_char_send_indication(uint8_t conId, uint16_t size, uint8_t * data);
 
 void matter_init_callback(void);
