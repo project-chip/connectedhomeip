@@ -573,6 +573,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(OO_list.data(), buff_span.data(), buff_span.size()));
     memset(buffer, 0, buff_span.size());
+    buff_span = MutableByteSpan(buffer);
 
     // Setup the Level Control Extension field set in the expected state from a command
     reader.Init(LC_list);
@@ -589,6 +590,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(LC_list.data(), buff_span.data(), buff_span.size()));
     memset(buffer, 0, buff_span.size());
+    buff_span = MutableByteSpan(buffer);
 
     // Setup the Color control Extension field set in the expected state from a command
     reader.Init(CC_list);
@@ -605,6 +607,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(CC_list.data(), buff_span.data(), buff_span.size()));
     memset(buffer, 0, buff_span.size());
+    buff_span = MutableByteSpan(buffer);
 
     // Verify Deserializing is properly filling out output extension field set for on off
     NL_TEST_ASSERT(aSuite, sHandler.SupportsCluster(kTestEndpoint1, kOnOffClusterId));
