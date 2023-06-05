@@ -1432,6 +1432,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE 2
 #endif
 
+#if (CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE < 1 || CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE > 2)
+#error "Please ensure CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE meets minimum and maximum requirements."
+#endif
+
 /**
  * @def CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE
  *
@@ -1439,6 +1443,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE
 #define CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE 2
+#endif
+
+#if (CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE < 1)
+#error "Please ensure CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE meets minimum requirements."
 #endif
 
 /**
