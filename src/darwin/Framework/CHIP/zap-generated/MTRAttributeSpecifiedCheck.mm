@@ -2087,48 +2087,6 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAlarmCluster(AttributeId aAttribut
     }
     }
 }
-static BOOL AttributeIsSpecifiedInDishwasherModeSelectCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::DishwasherModeSelect;
-    switch (aAttributeId) {
-    case Attributes::Description::Id: {
-        return YES;
-    }
-    case Attributes::SupportedModes::Id: {
-        return YES;
-    }
-    case Attributes::CurrentMode::Id: {
-        return YES;
-    }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
-    case Attributes::OnMode::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL AttributeIsSpecifiedInAirQualityCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AirQuality;
@@ -7304,9 +7262,6 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::RefrigeratorAlarm::Id: {
         return AttributeIsSpecifiedInRefrigeratorAlarmCluster(aAttributeId);
-    }
-    case Clusters::DishwasherModeSelect::Id: {
-        return AttributeIsSpecifiedInDishwasherModeSelectCluster(aAttributeId);
     }
     case Clusters::AirQuality::Id: {
         return AttributeIsSpecifiedInAirQualityCluster(aAttributeId);

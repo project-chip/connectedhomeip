@@ -42,6 +42,7 @@
         "TestColorControl_9_2"
     ],
     "DeviceManagement": [
+        "TestIcdManagementCluster",
         "Test_TC_OPCREDS_1_2",
         "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",

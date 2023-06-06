@@ -240,7 +240,7 @@ jobs:
             - name: Build example nRF Connect SDK All Clusters App on nRF7002 PDK
               timeout-minutes: 20
               run: |
-                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf7002dk_nrf5340_cpuapp
+                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf7002dk_nrf5340_cpuapp -DCONF_FILE=prj_release.conf
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf7002dk_nrf5340_cpuapp all-clusters-app \
                     examples/all-clusters-app/nrfconnect/build/zephyr/zephyr.elf \
