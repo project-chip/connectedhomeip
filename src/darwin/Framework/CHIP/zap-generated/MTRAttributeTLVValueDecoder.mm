@@ -10757,17 +10757,6 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAlarmCluster(
         value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
         return value;
     }
-    case Attributes::Latch::Id: {
-        using TypeInfo = Attributes::Latch::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
-        return value;
-    }
     case Attributes::State::Id: {
         using TypeInfo = Attributes::State::TypeInfo;
         TypeInfo::DecodableType cppValue;
