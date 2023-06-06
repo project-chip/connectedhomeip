@@ -21484,7 +21484,7 @@ CHIPWasherControlsSpinSpeedsAttributeCallback::~CHIPWasherControlsSpinSpeedsAttr
 }
 
 void CHIPWasherControlsSpinSpeedsAttributeCallback::CallbackFn(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+                                                               const chip::app::DataModel::DecodableList<chip::CharSpan> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -21513,10 +21513,7 @@ void CHIPWasherControlsSpinSpeedsAttributeCallback::CallbackFn(void * context,
     {
         auto & entry_0 = iter_arrayListObj_0.GetValue();
         jobject newElement_0;
-        jbyteArray newElement_0ByteArray = env->NewByteArray(static_cast<jsize>(entry_0.size()));
-        env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
-                                reinterpret_cast<const jbyte *>(entry_0.data()));
-        newElement_0 = newElement_0ByteArray;
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0, newElement_0));
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

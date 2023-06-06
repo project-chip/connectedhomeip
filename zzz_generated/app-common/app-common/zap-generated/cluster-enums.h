@@ -1557,8 +1557,8 @@ enum class Feature : uint32_t
 
 namespace WasherControls {
 
-// Bitmap for WasherControlFeature
-enum class WasherControlFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kSpin  = 0x1,
     kRinse = 0x2,

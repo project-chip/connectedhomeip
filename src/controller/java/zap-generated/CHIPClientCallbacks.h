@@ -501,7 +501,7 @@ typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectEventListLis
 typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*WasherControlsSpinSpeedsListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
+                                                              const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
 typedef void (*WasherControlsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WasherControlsAcceptedCommandListListAttributeCallback)(

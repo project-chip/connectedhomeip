@@ -2945,12 +2945,12 @@ client cluster RefrigeratorAndTemperatureControlledCabinetModeSelect = 82 {
 
 /** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
 client cluster WasherControls = 83 {
-  bitmap WasherControlFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kSpin = 0x1;
     kRinse = 0x2;
   }
 
-  readonly attribute optional OCTET_STRING spinSpeeds[] = 0;
+  readonly attribute optional CHAR_STRING spinSpeeds[] = 0;
   attribute optional nullable int8u spinSpeedCurrent = 1;
   attribute optional nullable int8u numberOfRinses = 2;
   readonly attribute optional int8u maxRinses = 3;

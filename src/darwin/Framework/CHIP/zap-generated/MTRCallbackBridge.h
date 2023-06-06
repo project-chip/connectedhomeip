@@ -1661,7 +1661,7 @@ typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectEventListLis
 typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*WasherControlsSpinSpeedsListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
+                                                              const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
 typedef void (*WasherControlsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*WasherControlsAcceptedCommandListListAttributeCallback)(
@@ -9908,7 +9908,7 @@ public:
     MTRWasherControlsSpinSpeedsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<WasherControlsSpinSpeedsListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value);
 };
 
 class MTRWasherControlsSpinSpeedsListAttributeCallbackSubscriptionBridge

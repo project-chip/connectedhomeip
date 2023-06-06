@@ -14806,9 +14806,9 @@ namespace Attributes {
 namespace SpinSpeeds {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::ByteSpan>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SpinSpeeds::Id; }

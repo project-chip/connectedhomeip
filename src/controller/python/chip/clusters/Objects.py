@@ -15830,7 +15830,7 @@ class WasherControls(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="spinSpeeds", Tag=0x00000000, Type=typing.Optional[typing.List[bytes]]),
+                ClusterObjectFieldDescriptor(Label="spinSpeeds", Tag=0x00000000, Type=typing.Optional[typing.List[str]]),
                 ClusterObjectFieldDescriptor(Label="spinSpeedCurrent", Tag=0x00000001, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="numberOfRinses", Tag=0x00000002, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="maxRinses", Tag=0x00000003, Type=typing.Optional[uint]),
@@ -15842,7 +15842,7 @@ class WasherControls(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    spinSpeeds: 'typing.Optional[typing.List[bytes]]' = None
+    spinSpeeds: 'typing.Optional[typing.List[str]]' = None
     spinSpeedCurrent: 'typing.Union[None, Nullable, uint]' = None
     numberOfRinses: 'typing.Union[None, Nullable, uint]' = None
     maxRinses: 'typing.Optional[uint]' = None
@@ -15854,7 +15854,7 @@ class WasherControls(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class WasherControlFeature(IntFlag):
+        class Feature(IntFlag):
             kSpin = 0x1
             kRinse = 0x2
 
@@ -15871,9 +15871,9 @@ class WasherControls(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[bytes]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[str]])
 
-            value: 'typing.Optional[typing.List[bytes]]' = None
+            value: 'typing.Optional[typing.List[str]]' = None
 
         @dataclass
         class SpinSpeedCurrent(ClusterAttributeDescriptor):

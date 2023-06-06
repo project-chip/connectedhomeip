@@ -7954,7 +7954,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case WasherControls::Attributes::SpinSpeeds::Id: {
-            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+            chip::app::DataModel::DecodableList<chip::CharSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SpinSpeeds", 1, value);
         }

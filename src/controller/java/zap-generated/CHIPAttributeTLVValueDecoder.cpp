@@ -12900,10 +12900,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jbyteArray newElement_0ByteArray = env->NewByteArray(static_cast<jsize>(entry_0.size()));
-                env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
-                                        reinterpret_cast<const jbyte *>(entry_0.data()));
-                newElement_0 = newElement_0ByteArray;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0, newElement_0));
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

@@ -4553,7 +4553,7 @@ class ChipClusters:
             0x00000000: {
                 "attributeName": "SpinSpeeds",
                 "attributeId": 0x00000000,
-                "type": "bytes",
+                "type": "str",
                 "reportable": True,
             },
             0x00000001: {

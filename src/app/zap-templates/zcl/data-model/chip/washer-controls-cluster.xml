@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="WasherControlFeature" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0053"/>
     <field mask="0x01" name="Spin"/>
     <field mask="0x02" name="Rinse"/>
@@ -35,8 +35,8 @@ limitations under the License.
     <globalAttribute side="server" code="0xFFFD" value="1" />
 
     <attribute side="server" code="0x0000" define="SPIN_SPEEDS"               type="ARRAY" entryType="CHAR_STRING"                                writable="false" isNullable="false" optional="true">SpinSpeeds</attribute>
-    <attribute side="server" code="0x0001" define="SPIN_SPEED_CURRENT"        type="INT8U"                                min="0x00" max="0x1F"    writable="true"  isNullable="true"  optional="true">SpinSpeedCurrent</attribute>
-    <attribute side="server" code="0x0002" define="NUMBER_OF_RINSES"          type="INT8U"                                                         writable="true"  isNullable="true"  optional="true">NumberOfRinses</attribute>
-    <attribute side="server" code="0x0003" define="MAXRINSES"                 type="INT8U"                                                         writable="false"                    optional="true">MaxRinses</attribute>
+    <attribute side="server" code="0x0001" define="SPIN_SPEED_CURRENT"        type="INT8U"                                min="0x00" max="0x1F"   writable="true"  isNullable="true"  optional="true">SpinSpeedCurrent</attribute>
+    <attribute side="server" code="0x0002" define="NUMBER_OF_RINSES"          type="INT8U"                                                        writable="true"  isNullable="true"  optional="true">NumberOfRinses</attribute>
+    <attribute side="server" code="0x0003" define="MAXRINSES"                 type="INT8U"                                min="0x00" max="0x08"   writable="false"                    optional="true">MaxRinses</attribute>
   </cluster>
 </configurator>

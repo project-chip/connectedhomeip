@@ -14359,7 +14359,7 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
       public interface SpinSpeedsAttributeCallback {
-        void onSuccess( List<byte[]> valueList);
+        void onSuccess( List<String> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }

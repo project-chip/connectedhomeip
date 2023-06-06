@@ -6255,9 +6255,9 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<byte[]> valueList) {
+        public void onSuccess( List<String> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<byte[]>");
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<String>");
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
