@@ -16,6 +16,7 @@
  */
 
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRBackwardsCompatShims.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommandPayloads_Internal.h"
 #import "MTRError_Internal.h"
