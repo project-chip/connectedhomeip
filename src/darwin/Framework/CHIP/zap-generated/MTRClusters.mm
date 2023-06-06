@@ -12739,76 +12739,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     }
 }
 
-- (void)changeToModeWithStatusWithParams:(MTRModeSelectClusterChangeToModeWithStatusParams *)params
-                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                              completion:(void (^)(MTRModeSelectClusterChangeToModeResponseParams * _Nullable data,
-                                             NSError * _Nullable error))completion
-{
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
-                                     _endpoint, (unsigned int) MTRClusterIDTypeModeSelectID,
-                                     (unsigned int) MTRCommandIDTypeClusterModeSelectCommandChangeToModeWithStatusID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
-    if (timedInvokeTimeoutMsParam) {
-        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
-    }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
-                                                                controller:self.device.deviceController];
-        auto * bridge = new MTRModeSelectClusterChangeToModeResponseCallbackBridge(
-            self.device.queue,
-            ^(id _Nullable value, NSError * _Nullable error) {
-                MTRClustersLogCompletion(logPrefix, value, error);
-                dispatch_async(self.callbackQueue, ^{
-                    completion(value, error);
-                });
-                [workItem endWork];
-            },
-            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
-                ModeSelectClusterChangeToModeResponseCallbackType successCb, MTRErrorCallback failureCb,
-                MTRCallbackBridgeBase * bridge) {
-                auto * typedBridge = static_cast<MTRModeSelectClusterChangeToModeResponseCallbackBridge *>(bridge);
-                Optional<uint16_t> timedInvokeTimeoutMs;
-                Optional<Timeout> invokeTimeout;
-                ListFreer listFreer;
-                ModeSelect::Commands::ChangeToModeWithStatus::Type request;
-                if (timedInvokeTimeoutMsParam != nil) {
-                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
-                }
-                if (params != nil) {
-                    if (params.serverSideProcessingTimeout != nil) {
-                        // Clamp to a number of seconds that will not overflow 32-bit
-                        // int when converted to ms.
-                        auto * serverSideProcessingTimeout
-                            = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
-                        invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
-                    }
-                }
-                request.newMode = params.newMode.unsignedCharValue;
-
-                return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
-                    self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
-            });
-        std::move(*bridge).DispatchAction(baseDevice);
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
-
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
-}
-
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
@@ -12961,21 +12891,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   expectedValues:expectedDataValueDictionaries
            expectedValueInterval:expectedValueIntervalMs
                       completion:completionHandler];
-}
-- (void)changeToModeWithStatusWithParams:(MTRModeSelectClusterChangeToModeWithStatusParams *)params
-                          expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
-                   expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                       completionHandler:(void (^)(MTRModeSelectClusterChangeToModeResponseParams * _Nullable data,
-                                             NSError * _Nullable error))completionHandler
-{
-    [self changeToModeWithStatusWithParams:params
-                            expectedValues:expectedDataValueDictionaries
-                     expectedValueInterval:expectedValueIntervalMs
-                                completion:^(
-                                    MTRModeSelectClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error) {
-                                    // Cast is safe because subclass does not add any selectors.
-                                    completionHandler(static_cast<MTRModeSelectClusterChangeToModeResponseParams *>(data), error);
-                                }];
 }
 @end
 
