@@ -307,7 +307,7 @@ protected:
         {
             return true;
         }
-        return CheckConstraintMinValue(itemName, current.Value(), static_cast<T>(expected.Value()));
+        return CheckConstraintMinValue(itemName, current, expected.Value());
     }
 
     template <typename T, typename U>
