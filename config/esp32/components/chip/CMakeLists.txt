@@ -388,6 +388,11 @@ if((NOT CONFIG_USE_MINIMAL_MDNS) AND (CONFIG_ENABLE_WIFI_STATION OR CONFIG_ENABL
     list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()
 
+if (CONFIG_ENABLE_ENCRYPTED_OTA)
+    idf_component_get_property(esp_encrypted_img_lib espressif__esp_encrypted_img COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_encrypted_img_lib}>)
+endif()
+
 idf_component_get_property(main_lib main COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
@@ -413,6 +418,9 @@ if (CONFIG_ESP32_WIFI_ENABLED)
     foreach(blob ${blobs})
     list(APPEND chip_libraries "${esp_wifi_dir}/lib/${target_name}/lib${blob}.a")
     endforeach()
+
+    idf_component_get_property(wpa_supplicant_lib wpa_supplicant COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${wpa_supplicant_lib}>)
 endif()
 
 idf_component_get_property(esp_netif_lib esp_netif COMPONENT_LIB)
