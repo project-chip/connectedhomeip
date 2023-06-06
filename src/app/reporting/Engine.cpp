@@ -324,7 +324,7 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
                 break;
             }
             aHasEncodedData = true;
-            ChipLogDetail(InteractionModel, "Acces to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by ACL",
+            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by ACL",
                           current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
                           ChipLogValueMEI(current->mValue.mEventId));
         }
