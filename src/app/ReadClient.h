@@ -486,7 +486,7 @@ private:
     void CancelResubscribeTimer();
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
-    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload, bool aIsUnsolicitedReport);
     const char * GetStateStr() const;
 
     /*
