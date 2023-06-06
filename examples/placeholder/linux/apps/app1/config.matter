@@ -1,6 +1,18 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+    optional char_string<64> tagName = 2;
+}
+
+struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+}
+
 struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
@@ -2634,23 +2646,44 @@ server cluster BooleanState = 69 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 client cluster ModeSelect = 80 {
-  bitmap Feature : BITMAP32 {
-    kDeponoff = 0x1;
+  enum ModeTag : ENUM16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
   }
 
-  struct SemanticTagStruct {
-    vendor_id mfgCode = 0;
+  enum StatusCode : ENUM8 {
+    kSuccess = 0;
+    kUnsupportedMode = 1;
+    kGenericFailure = 2;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+    kExtendedStatus = 0x2;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
     enum16 value = 1;
+    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
-    SemanticTagStruct semanticTags[] = 2;
+    ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute char_string<32> description = 0;
-  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute char_string<64> description = 0;
+  readonly attribute optional nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
@@ -2666,28 +2699,63 @@ client cluster ModeSelect = 80 {
     INT8U newMode = 0;
   }
 
-  /** On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** If the NewMode field doesn't match the Mode field in an entry of the SupportedModes list the server SHALL respond with an INVALID_COMMAND status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list but the device is unable to transition as requested, the server SHALL respond with a FAILURE status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response. */
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  /** This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on NewMode field, see ChangeToMode command.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): ChangeToModeResponse = 1;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 server cluster ModeSelect = 80 {
-  bitmap Feature : BITMAP32 {
-    kDeponoff = 0x1;
+  enum ModeTag : ENUM16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
   }
 
-  struct SemanticTagStruct {
-    vendor_id mfgCode = 0;
+  enum StatusCode : ENUM8 {
+    kSuccess = 0;
+    kUnsupportedMode = 1;
+    kGenericFailure = 2;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+    kExtendedStatus = 0x2;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
     enum16 value = 1;
+    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
-    SemanticTagStruct semanticTags[] = 2;
+    ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute char_string<32> description = 0;
+  readonly attribute char_string<64> description = 0;
   readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;

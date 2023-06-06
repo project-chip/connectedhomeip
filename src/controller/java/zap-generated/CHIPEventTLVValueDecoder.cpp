@@ -2425,6 +2425,46 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::LaundryWasherModeSelect::Id: {
+        using namespace app::Clusters::LaundryWasherModeSelect;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
+        using namespace app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::RvcRunModeSelect::Id: {
+        using namespace app::Clusters::RvcRunModeSelect;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::RvcCleanModeSelect::Id: {
+        using namespace app::Clusters::RvcCleanModeSelect;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::TemperatureControl::Id: {
         using namespace app::Clusters::TemperatureControl;
         switch (aPath.mEventId)
@@ -2491,6 +2531,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::DishwasherModeSelect::Id: {
+        using namespace app::Clusters::DishwasherModeSelect;
+        switch (aPath.mEventId)
+        {
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

@@ -140,6 +140,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-select-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/fan-control-cluster.xml \
@@ -154,6 +155,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/laundry-washer-mode-select-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/level-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/localization-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/low-power-cluster.xml \
@@ -173,8 +175,11 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/proxy-valid-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pump-configuration-and-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pwm-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/refrigerator-and-temperature-controlled-cabinet-mode-select-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/refrigerator-alarm.xml \
                       src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-select-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-select-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/scene.xml \
                       src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml \

@@ -22,6 +22,16 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPError.h>
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ModeTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::detail::Structs::ModeTagStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ModeOptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::detail::Structs::ModeOptionStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ApplicationStruct::Type & request,
                         Json::Value & value);
 
@@ -223,16 +233,6 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request,
