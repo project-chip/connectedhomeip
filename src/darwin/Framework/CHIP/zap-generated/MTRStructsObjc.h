@@ -702,62 +702,6 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRLaundryWasherModeSelectClusterModeTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable tagName MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRLaundryWasherModeSelectClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable tagName MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRRefrigeratorAndTemperatureControlledCabinetModeSelectClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRRVCRunModeSelectClusterModeTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable tagName MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRRVCRunModeSelectClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRRVCCleanModeSelectClusterModeTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable tagName MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRRVCCleanModeSelectClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
 @interface MTRTemperatureControlClusterTemperatureLevelStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull temperatureLevel MTR_NEWLY_AVAILABLE;
@@ -769,20 +713,6 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull inactive MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull state MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull mask MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRDishwasherModeSelectClusterModeTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable tagName MTR_NEWLY_AVAILABLE;
-@end
-
-MTR_NEWLY_AVAILABLE
-@interface MTRDishwasherModeSelectClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE

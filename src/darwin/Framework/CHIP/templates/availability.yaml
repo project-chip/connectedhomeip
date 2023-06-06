@@ -10035,6 +10035,11 @@
       clusters:
           # Not ready to be public API yet.
           - ICDManagement
+          - LaundryWasherModeSelect
+          - RefrigeratorAndTemperatureControlledCabinetModeSelect
+          - RVCRunModeSelect
+          - RVCCleanModeSelect
+          - DishwasherModeSelect
       # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
       ids:
