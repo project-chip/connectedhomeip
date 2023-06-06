@@ -543,16 +543,6 @@ client cluster BinaryInputBasic = 15 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Cluster to control pulse width modulation */
-client cluster PulseWidthModulation = 28 {
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 client cluster Descriptor = 29 {
   struct DeviceTypeStruct {
@@ -2655,36 +2645,6 @@ client cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Cluster to control Proxy Configuration */
-client cluster ProxyConfiguration = 66 {
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Cluster to control Proxy Discovery */
-client cluster ProxyDiscovery = 67 {
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Cluster to control Proxy Valid */
-client cluster ProxyValid = 68 {
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** This cluster provides an interface to a boolean state called StateValue. */
 client cluster BooleanState = 69 {
   info event StateChange = 0 {
@@ -3074,40 +3034,6 @@ client cluster RvcCleanModeSelect = 85 {
   /** This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on NewMode field, see ChangeToMode command.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
   command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): ChangeToModeResponse = 1;
-}
-
-/** Attributes and commands for configuring the temperature control, and reporting temperature. */
-client cluster TemperatureControl = 86 {
-  bitmap Feature : BITMAP32 {
-    kTemperatureNumber = 0x1;
-    kTemperatureLevel = 0x2;
-  }
-
-  struct TemperatureLevelStruct {
-    char_string<64> label = 0;
-    int8u temperatureLevel = 1;
-  }
-
-  readonly attribute optional int16s temperatureSetpoint = 0;
-  readonly attribute optional int16s minTemperature = 1;
-  readonly attribute optional int16s maxTemperature = 2;
-  readonly attribute optional int16s step = 3;
-  readonly attribute optional int8u currentTemperatureLevelIndex = 4;
-  readonly attribute optional TemperatureLevelStruct supportedTemperatureLevels[] = 5;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct SetTemperatureRequest {
-    optional INT16S targetTemperature = 0;
-    optional INT8U targetTemperatureLevel = 1;
-  }
-
-  /** Set Temperature */
-  command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for configuring the Refrigerator alarm. */
@@ -8678,40 +8604,132 @@ client cluster UnitTesting = 4294048773 {
   command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): TestEmitTestFabricScopedEventResponse = 21;
 }
 
-/** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */
-client cluster FaultInjection = 4294048774 {
-  enum FaultType : ENUM8 {
-    kUnspecified = 0;
-    kSystemFault = 1;
-    kInetFault = 2;
-    kChipFault = 3;
-    kCertFault = 4;
-  }
-
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct FailAtFaultRequest {
-    FaultType type = 0;
-    INT32U id = 1;
-    INT32U numCallsToSkip = 2;
-    INT32U numCallsToFail = 3;
-    BOOLEAN takeMutex = 4;
-  }
-
-  request struct FailRandomlyAtFaultRequest {
-    FaultType type = 0;
-    INT32U id = 1;
-    INT8U percentage = 2;
-  }
-
-  /** Configure a fault to be triggered deterministically */
-  command access(invoke: manage) FailAtFault(FailAtFaultRequest): DefaultSuccess = 0;
-  /** Configure a fault to be triggered randomly, with a given probability defined as a percentage */
-  command access(invoke: manage) FailRandomlyAtFault(FailRandomlyAtFaultRequest): DefaultSuccess = 1;
+endpoint 1 {
+  device type rootdevice = 22, version 1;
+  binding cluster Identify;
+  binding cluster Groups;
+  binding cluster Scenes;
+  binding cluster OnOff;
+  binding cluster OnOffSwitchConfiguration;
+  binding cluster LevelControl;
+  binding cluster BinaryInputBasic;
+  binding cluster Descriptor;
+  binding cluster Binding;
+  binding cluster AccessControl;
+  binding cluster Actions;
+  binding cluster BasicInformation;
+  binding cluster OtaSoftwareUpdateProvider;
+  binding cluster OtaSoftwareUpdateRequestor;
+  binding cluster LocalizationConfiguration;
+  binding cluster TimeFormatLocalization;
+  binding cluster UnitLocalization;
+  binding cluster PowerSourceConfiguration;
+  binding cluster PowerSource;
+  binding cluster GeneralCommissioning;
+  binding cluster NetworkCommissioning;
+  binding cluster DiagnosticLogs;
+  binding cluster GeneralDiagnostics;
+  binding cluster SoftwareDiagnostics;
+  binding cluster ThreadNetworkDiagnostics;
+  binding cluster WiFiNetworkDiagnostics;
+  binding cluster EthernetNetworkDiagnostics;
+  binding cluster TimeSynchronization;
+  binding cluster BridgedDeviceBasicInformation;
+  binding cluster Switch;
+  binding cluster AdministratorCommissioning;
+  binding cluster OperationalCredentials;
+  binding cluster GroupKeyManagement;
+  binding cluster FixedLabel;
+  binding cluster UserLabel;
+  binding cluster BooleanState;
+  binding cluster IcdManagement;
+  binding cluster ModeSelect;
+  binding cluster LaundryWasherModeSelect;
+  binding cluster RefrigeratorAndTemperatureControlledCabinetModeSelect;
+  binding cluster RvcRunModeSelect;
+  binding cluster RvcCleanModeSelect;
+  binding cluster RefrigeratorAlarm;
+  binding cluster DishwasherModeSelect;
+  binding cluster AirQuality;
+  binding cluster SmokeCoAlarm;
+  binding cluster OperationalState;
+  binding cluster HepaFilterMonitoring;
+  binding cluster ActivatedCarbonFilterMonitoring;
+  binding cluster CeramicFilterMonitoring;
+  binding cluster ElectrostaticFilterMonitoring;
+  binding cluster UvFilterMonitoring;
+  binding cluster IonizingFilterMonitoring;
+  binding cluster ZeoliteFilterMonitoring;
+  binding cluster OzoneFilterMonitoring;
+  binding cluster WaterTankMonitoring;
+  binding cluster FuelTankMonitoring;
+  binding cluster InkCartridgeMonitoring;
+  binding cluster TonerCartridgeMonitoring;
+  binding cluster DoorLock;
+  binding cluster WindowCovering;
+  binding cluster BarrierControl;
+  binding cluster PumpConfigurationAndControl;
+  binding cluster Thermostat;
+  binding cluster FanControl;
+  binding cluster ThermostatUserInterfaceConfiguration;
+  binding cluster ColorControl;
+  binding cluster BallastConfiguration;
+  binding cluster IlluminanceMeasurement;
+  binding cluster TemperatureMeasurement;
+  binding cluster PressureMeasurement;
+  binding cluster FlowMeasurement;
+  binding cluster RelativeHumidityMeasurement;
+  binding cluster OccupancySensing;
+  binding cluster CarbonMonoxideConcentrationMeasurement;
+  binding cluster CarbonDioxideConcentrationMeasurement;
+  binding cluster EthyleneConcentrationMeasurement;
+  binding cluster EthyleneOxideConcentrationMeasurement;
+  binding cluster HydrogenConcentrationMeasurement;
+  binding cluster HydrogenSulfideConcentrationMeasurement;
+  binding cluster NitricOxideConcentrationMeasurement;
+  binding cluster NitrogenDioxideConcentrationMeasurement;
+  binding cluster OxygenConcentrationMeasurement;
+  binding cluster OzoneConcentrationMeasurement;
+  binding cluster SulfurDioxideConcentrationMeasurement;
+  binding cluster DissolvedOxygenConcentrationMeasurement;
+  binding cluster BromateConcentrationMeasurement;
+  binding cluster ChloraminesConcentrationMeasurement;
+  binding cluster ChlorineConcentrationMeasurement;
+  binding cluster FecalColiformEColiConcentrationMeasurement;
+  binding cluster FluorideConcentrationMeasurement;
+  binding cluster HaloaceticAcidsConcentrationMeasurement;
+  binding cluster TotalTrihalomethanesConcentrationMeasurement;
+  binding cluster TotalColiformBacteriaConcentrationMeasurement;
+  binding cluster TurbidityConcentrationMeasurement;
+  binding cluster CopperConcentrationMeasurement;
+  binding cluster LeadConcentrationMeasurement;
+  binding cluster ManganeseConcentrationMeasurement;
+  binding cluster SulfateConcentrationMeasurement;
+  binding cluster BromodichloromethaneConcentrationMeasurement;
+  binding cluster BromoformConcentrationMeasurement;
+  binding cluster ChlorodibromomethaneConcentrationMeasurement;
+  binding cluster ChloroformConcentrationMeasurement;
+  binding cluster SodiumConcentrationMeasurement;
+  binding cluster Pm25ConcentrationMeasurement;
+  binding cluster FormaldehydeConcentrationMeasurement;
+  binding cluster Pm1ConcentrationMeasurement;
+  binding cluster Pm10ConcentrationMeasurement;
+  binding cluster TotalVolatileOrganicCompoundsConcentrationMeasurement;
+  binding cluster RadonConcentrationMeasurement;
+  binding cluster WakeOnLan;
+  binding cluster Channel;
+  binding cluster TargetNavigator;
+  binding cluster MediaPlayback;
+  binding cluster MediaInput;
+  binding cluster LowPower;
+  binding cluster KeypadInput;
+  binding cluster ContentLauncher;
+  binding cluster AudioOutput;
+  binding cluster ApplicationLauncher;
+  binding cluster ApplicationBasic;
+  binding cluster AccountLogin;
+  binding cluster ElectricalMeasurement;
+  binding cluster UnitTesting;
 }
+
 
