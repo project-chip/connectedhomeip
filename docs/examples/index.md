@@ -193,6 +193,15 @@ shell/README*
 shell/**/README
 ```
 
+## Smoke CO Alarm example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+smoke-co-alarm-app/**/README
+```
+
 ## Temperature measurement example
 
 ```{toctree}
