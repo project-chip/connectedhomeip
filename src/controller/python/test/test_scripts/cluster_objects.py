@@ -204,7 +204,7 @@ class ClusterObjectTests:
     @ base.test_case
     async def TestAttributeCacheAttributeView(cls, devCtrl):
         logger.info("Test AttributeCache Attribute-View")
-        sub: SubscriptionTransaction = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], returnClusterObject=False, reportInterval=(0, 10))
+        sub: SubscriptionTransaction = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], returnClusterObject=False, reportInterval=(3, 10))
 
         event = asyncio.Event()
 
@@ -242,7 +242,7 @@ class ClusterObjectTests:
     @ base.test_case
     async def TestAttributeCacheClusterView(cls, devCtrl):
         logger.info("Test AttributeCache Cluster-View")
-        sub: SubscriptionTransaction = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], returnClusterObject=True, reportInterval=(0, 10))
+        sub: SubscriptionTransaction = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], returnClusterObject=True, reportInterval=(3, 10))
 
         event = asyncio.Event()
 
