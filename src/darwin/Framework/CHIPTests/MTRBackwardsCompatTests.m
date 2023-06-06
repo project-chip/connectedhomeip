@@ -1196,6 +1196,15 @@ static BOOL sNeedsStackShutdown = YES;
     CHECK_RETURN_TYPE(sig, NSData *);
 }
 
+- (void)test047_MTRGroupKeyManagementClusterKeySetReadAllIndicesParams
+{
+    __auto_type * params = [[MTRGroupKeyManagementClusterKeySetReadAllIndicesParams alloc] init];
+    CHECK_PROPERTY(params, groupKeySetIDs, setGroupKeySetIDs, NSArray *);
+
+    params.groupKeySetIDs = @[ @(16) ];
+    XCTAssertEqualObjects(params.groupKeySetIDs, @[ @(16) ]);
+}
+
 - (void)test999_TearDown
 {
     ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), self, kTimeoutInSeconds);

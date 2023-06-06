@@ -95,11 +95,14 @@ class Decoder:
                     # Raise an error since the other fields probably needs to be translated too.
                     raise KeyError(f'Error: field "{key}" not supported')
 
-                if value is None and (key == _CLUSTER or key == _RESPONSE or key == _ATTRIBUTE or key == _EVENT):
+                if value is None and (key == _CLUSTER or key == _RESPONSE or key == _ATTRIBUTE or key == _EVENT) and _ERROR not in payload:
                     # If the definition for this cluster/command/attribute/event is missing, there is not
                     # much we can do to convert the response to the proper format. It usually indicates that
                     # the cluster definition is missing something. So we just raise an exception to tell the
                     # user something is wrong and the cluster definition needs to be updated.
+                    # The only exception being when the definition can not be found but the returned payload
+                    # contains an error. It could be because the payload is for an unknown cluster/command/attribute/event
+                    # in which case we obviously don't have a definition for it.
                     cluster_code = hex(payload[_CLUSTER_ID])
                     if key == _CLUSTER:
                         raise KeyError(

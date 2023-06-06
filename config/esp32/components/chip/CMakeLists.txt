@@ -85,6 +85,10 @@ chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                ${is_debug})
 
+if (CONFIG_CHIP_CONFIG_IM_PRETTY_PRINT)
+    chip_gn_arg_bool("enable_im_pretty_print" "true")
+endif()
+
 # Config the chip log level by IDF menuconfig
 if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
     chip_gn_arg_bool  ("chip_error_logging" "true")

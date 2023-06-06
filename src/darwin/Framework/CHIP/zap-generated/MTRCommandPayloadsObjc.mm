@@ -16,6 +16,7 @@
  */
 
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRBackwardsCompatShims.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommandPayloads_Internal.h"
 #import "MTRError_Internal.h"
@@ -6297,8 +6298,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
-
-        _groupKeySetIDs = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -6309,7 +6308,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupKeyManagementClusterKeySetReadAllIndicesParams alloc] init];
 
-    other.groupKeySetIDs = self.groupKeySetIDs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -6318,8 +6316,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupKeySetIDs:%@; >", NSStringFromClass([self class]), _groupKeySetIDs];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
     return descriptionString;
 }
 
@@ -7215,40 +7212,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: targetTemperature:%@; targetTemperatureLevel:%@; >",
                                              NSStringFromClass([self class]), _targetTemperature, _targetTemperatureLevel];
-    return descriptionString;
-}
-
-@end
-@implementation MTRRefrigeratorAlarmClusterResetParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _alarms = @(0);
-
-        _mask = nil;
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRRefrigeratorAlarmClusterResetParams alloc] init];
-
-    other.alarms = self.alarms;
-    other.mask = self.mask;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: alarms:%@; mask:%@; >", NSStringFromClass([self class]), _alarms, _mask];
     return descriptionString;
 }
 

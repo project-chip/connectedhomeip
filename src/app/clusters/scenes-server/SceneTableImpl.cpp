@@ -737,11 +737,14 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
     if (!HandlerListEmpty())
     {
-        uint8_t clusterCount = 0;
-        clusterId cArray[kMaxClustersPerScene];
-        Span<clusterId> cSpan(cArray);
-        clusterCount = GetClustersFromEndpoint(cArray, kMaxClustersPerScene);
-        cSpan.reduce_size(clusterCount);
+        // TODO : Once zap supports the scenable quality, implement a GetSceneableClusterCountFromEndpointType function to avoid
+        // over-allocation
+        uint8_t clusterCount = GetClusterCountFromEndpoint();
+        chip::Platform::ScopedMemoryBuffer<clusterId> cBuffer;
+        VerifyOrReturnError(cBuffer.Calloc(clusterCount), CHIP_ERROR_NO_MEMORY);
+        clusterCount = GetClustersFromEndpoint(cBuffer.Get(), clusterCount);
+
+        Span<clusterId> cSpan(cBuffer.Get(), clusterCount);
         for (clusterId cluster : cSpan)
         {
             ExtensionFieldSet EFS;
@@ -834,6 +837,14 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen)
 {
     return emberAfGetClustersFromEndpoint(mEndpointId, clusterList, listLen, true);
+}
+
+/// @brief wrapper function around emberAfGetClusterCountForEndpoint to allow testing enforcing a specific count, shimmed in test
+/// configuration because emberAfGetClusterCountForEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated
+/// files
+uint8_t DefaultSceneTableImpl::GetClusterCountFromEndpoint()
+{
+    return emberAfGetClusterCountForEndpoint(mEndpointId);
 }
 
 void DefaultSceneTableImpl::SetEndpoint(EndpointId endpoint)

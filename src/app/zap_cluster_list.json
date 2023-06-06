@@ -270,7 +270,7 @@
         "RVC_CLEAN_MODE_SELECT_CLUSTER": ["mode-select-server"],
         "RVC_RUN_MODE_SELECT_CLUSTER": ["mode-select-server"],
         "SCENES_CLUSTER": ["scenes-server"],
-        "SMOKE_CO_ALARM_CLUSTER": [],
+        "SMOKE_CO_ALARM_CLUSTER": ["smoke-co-alarm-server"],
         "SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "SOFTWARE_DIAGNOSTICS_CLUSTER": ["software-diagnostics-server"],
         "SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER": [],

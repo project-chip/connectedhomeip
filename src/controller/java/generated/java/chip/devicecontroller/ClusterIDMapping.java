@@ -5411,23 +5411,6 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum KeySetReadAllIndicesCommandField {GroupKeySetIDs(0),;
-                    private final int id;
-                    KeySetReadAllIndicesCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static KeySetReadAllIndicesCommandField value(int id) throws NoSuchFieldError {
-                        for (KeySetReadAllIndicesCommandField field : KeySetReadAllIndicesCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
                 }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
@@ -7043,7 +7026,6 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             Mask(0L),
-            Latch(1L),
             State(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
@@ -7091,8 +7073,7 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Command {
-            Reset(0L),;
+        public enum Command {;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -7110,24 +7091,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum ResetCommandField {Alarms(0),Mask(1),;
-                    private final int id;
-                    ResetCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static ResetCommandField value(int id) throws NoSuchFieldError {
-                        for (ResetCommandField field : ResetCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }@Override
+        }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }
