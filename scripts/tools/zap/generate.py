@@ -243,7 +243,7 @@ def getClangFormatBinary():
         # Running the binary with `--version` yields a string of the form:
         # "Fuchsia clang-format version 17.0.0 (https://llvm.googlesource.com/llvm-project 6d667d4b261e81f325756fdfd5bb43b3b3d2451d)"
         #
-        # the SHA at the end generall should match pigweed version
+        # the SHA at the end generally should match pigweed version
 
         try:
             version_string = subprocess.check_output([binary, '--version']).decode('utf8')
