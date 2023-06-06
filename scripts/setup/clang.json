@@ -1,9 +1,0 @@
-{
-    "packages": [
-        {
-            "path": "fuchsia/third_party/clang/mac-arm64",
-            "platforms": ["mac-arm64"],
-            "tags": ["git_revision:895b55537870cdaf6e4c304a09f4bf01954ccbd6"]
-        }
-    ]
-}
