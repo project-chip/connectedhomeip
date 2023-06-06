@@ -40,7 +40,7 @@ using clusterId = chip::ClusterId;
 class DefaultSceneHandlerImpl : public scenes::SceneHandler
 {
 public:
-    static constexpr uint8_t kMaxAvPair = 15;
+    static constexpr uint8_t kMaxAvPair = CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS;
 
     DefaultSceneHandlerImpl() = default;
     ~DefaultSceneHandlerImpl() override{};

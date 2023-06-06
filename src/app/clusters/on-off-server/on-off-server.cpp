@@ -59,14 +59,102 @@ static void sceneOnOffCallback(EndpointId endpoint);
 class DefaultOnOffSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    bool mSceneOnOffState = false;
+    /// @brief Struct to keep track of the desired state of the OnOff attribute between ApplyScene and
+    /// transition time expiration
+    struct EndpointStatePair
+    {
+        EndpointStatePair(EndpointId endpoint = kInvalidEndpointId, bool status = false) : mEndpoint(endpoint), mState(status) {}
+        EndpointId mEndpoint;
+        bool mState;
+    };
+
+    /// @brief Struct holding an array of EndpointStatePair, handles insertion , get and removal by EndpointID.
+    /// TODO: Implemente generic object to handle this boilerplate array manipulation
+    struct StatePairBuffer
+    {
+        bool IsEmpty() const { return (mPairCount == 0); }
+
+        CHIP_ERROR FindPair(const EndpointId endpoint, uint16_t & found_index) const
+        {
+            VerifyOrReturnError(!IsEmpty(), CHIP_ERROR_NOT_FOUND);
+            for (found_index = 0; found_index < mPairCount; found_index++)
+            {
+                if (endpoint == mStatePairBuffer[found_index].mEndpoint)
+                {
+                    return CHIP_NO_ERROR;
+                }
+            }
+
+            return CHIP_ERROR_NOT_FOUND;
+        }
+
+        CHIP_ERROR InsertPair(const EndpointStatePair & status)
+        {
+            uint16_t idx;
+            CHIP_ERROR err = FindPair(status.mEndpoint, idx);
+
+            if (CHIP_NO_ERROR == err)
+            {
+                mStatePairBuffer[idx] = status;
+            }
+            else if (mPairCount < MAX_ENDPOINT_COUNT)
+            {
+                // if not found, insert at the end
+                mStatePairBuffer[mPairCount] = status;
+                mPairCount++;
+            }
+            else
+            {
+                return CHIP_ERROR_NO_MEMORY;
+            }
+
+            return CHIP_NO_ERROR;
+        }
+
+        CHIP_ERROR GetPair(const EndpointId endpoint, EndpointStatePair & status) const
+        {
+            uint16_t idx;
+            ReturnErrorOnFailure(FindPair(endpoint, idx));
+
+            status = mStatePairBuffer[idx];
+            return CHIP_NO_ERROR;
+        }
+
+        /// @brief Removes Pair and decrements Pair count if the endpoint existed in the array
+        /// @param endpoint : endpoint id of the pair
+        CHIP_ERROR RemovePair(const EndpointId endpoint)
+        {
+            uint16_t position;
+            VerifyOrReturnValue(CHIP_NO_ERROR == FindPair(endpoint, position), CHIP_NO_ERROR);
+
+            uint16_t nextPos = static_cast<uint16_t>(position + 1);
+            uint16_t moveNum = static_cast<uint16_t>(MAX_ENDPOINT_COUNT - nextPos);
+
+            // Compress array after removal, if the removed position is not the last
+            if (moveNum)
+            {
+                memmove(&mStatePairBuffer[position], &mStatePairBuffer[nextPos], sizeof(EndpointStatePair) * moveNum);
+            }
+
+            mPairCount--;
+            // Clear last occupied position
+            mStatePairBuffer[mPairCount].mEndpoint = kInvalidEndpointId;
+
+            return CHIP_NO_ERROR;
+        }
+
+        uint16_t mPairCount;
+        EndpointStatePair mStatePairBuffer[MAX_ENDPOINT_COUNT];
+    };
+
+    StatePairBuffer mSceneEndpointStatePairs;
     // As per spec, 1 attribute is scenable in the on off cluster
     static constexpr uint8_t scenableAttributeCount = 1;
 
     DefaultOnOffSceneHandler() = default;
     ~DefaultOnOffSceneHandler() override {}
 
-    // Default function for OnOff cluster, only puts the OnOff cluster ID in the span if supported on the caller endpoint
+    // Default function for OnOff cluster, only puts the OnOff cluster ID in the span if supported on the given endpoint
     virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
     {
         ClusterId * buffer = clusterBuffer.data();
@@ -132,7 +220,6 @@ public:
                           scenes::TransitionTimeMs timeMs) override
     {
         app::DataModel::DecodableList<Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
-        Scenes::Structs::AttributeValuePair::DecodableType decodePair;
 
         TLV::TLVReader reader;
         TLV::TLVType outer;
@@ -147,27 +234,25 @@ public:
         ReturnErrorOnFailure(reader.Next(
             TLV::kTLVType_Array, TLV::ContextTag(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)));
         ReturnErrorOnFailure(attributeValueList.Decode(reader));
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
 
         ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
         VerifyOrReturnError(attributeCount <= scenableAttributeCount, CHIP_ERROR_BUFFER_TOO_SMALL);
-        auto pair_iterator = attributeValueList.begin();
 
-        // Assumes the OnOff cluster has only one Attribute
-        pair_iterator.Next();
+        auto pair_iterator = attributeValueList.begin();
+        while (pair_iterator.Next())
+        {
+            Scenes::Structs::AttributeValuePair::DecodableType decodePair = pair_iterator.GetValue();
+            if (decodePair.attributeID.HasValue())
+            {
+                // If attribute ID was encoded, verify it is the proper ID for the OnOff attribute
+                VerifyOrReturnError(decodePair.attributeID.Value() == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
+            }
+            ReturnErrorOnFailure(
+                mSceneEndpointStatePairs.InsertPair(EndpointStatePair(endpoint, static_cast<bool>(decodePair.attributeValue))));
+        }
         // Verify that the EFS was completely read
         ReturnErrorOnFailure(pair_iterator.GetStatus());
-
-        decodePair = pair_iterator.GetValue();
-
-        if (decodePair.attributeID.HasValue())
-        {
-            // If attribute ID was encoded, verify it is the proper ID for the OnOff attribute
-            VerifyOrReturnError(decodePair.attributeID.Value() == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
-        }
-
-        mSceneOnOffState = decodePair.attributeValue;
-
-        ReturnErrorOnFailure(reader.ExitContainer(outer));
 
         OnOffServer::Instance().scheduleTimerCallbackMs(sceneEventControl(endpoint), timeMs);
 
@@ -184,7 +269,7 @@ private:
     EmberEventControl * sceneEventControl(EndpointId endpoint)
     {
         EmberEventControl * controller = OnOffServer::Instance().getEventControl(endpoint);
-        VerifyOrReturnError(controller != nullptr, nullptr);
+        VerifyOrReturnValue(controller != nullptr, nullptr);
 
         controller->endpoint = endpoint;
         controller->callback = &sceneOnOffCallback;
@@ -196,8 +281,11 @@ static DefaultOnOffSceneHandler sOnOffSceneHandler;
 
 static void sceneOnOffCallback(EndpointId endpoint)
 {
-    chip::CommandId command = (sOnOffSceneHandler.mSceneOnOffState) ? Commands::On::Id : Commands::Off::Id;
+    DefaultOnOffSceneHandler::EndpointStatePair savedState;
+    ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.GetPair(endpoint, savedState));
+    chip::CommandId command = (savedState.mState) ? Commands::On::Id : Commands::Off::Id;
     OnOffServer::Instance().setOnOffValue(endpoint, command, false);
+    ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint));
 }
 #endif // EMBER_AF_PLUGIN_SCENES
 
@@ -823,7 +911,7 @@ EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
 }
 
 /**
- * @brief Configures EnventControl callback when using XY colors
+ * @brief Configures EventControl callback when using XY colors
  *
  * @param[in] endpoint endpoint to start timer for
  * @return EmberEventControl* configured event control
