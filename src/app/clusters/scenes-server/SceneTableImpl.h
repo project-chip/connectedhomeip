@@ -52,19 +52,7 @@ public:
     /// @return CHIP_ERROR
     virtual CHIP_ERROR
     EncodeAttributeValueList(const app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> & aVlist,
-                             MutableByteSpan & serializedBytes)
-    {
-        TLV::TLVWriter writer;
-        TLV::TLVType outer;
-        writer.Init(serializedBytes);
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
-        ReturnErrorOnFailure(app::DataModel::Encode(
-            writer, TLV::ContextTag(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList), aVlist));
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-        serializedBytes.reduce_size(writer.GetLengthWritten());
-
-        return CHIP_NO_ERROR;
-    }
+                             MutableByteSpan & serializedBytes);
 
     /// @brief Decodes an attribute value list from a TLV structure and ensure it fits the member pair buffer
     /// @param serializedBytes [in] Buffer to read from
@@ -72,25 +60,7 @@ public:
     /// @return CHIP_ERROR
     virtual CHIP_ERROR DecodeAttributeValueList(
         const ByteSpan & serializedBytes,
-        app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> & aVlist)
-    {
-        TLV::TLVReader reader;
-        TLV::TLVType outer;
-        size_t pairTotal = 0;
-
-        reader.Init(serializedBytes);
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-        ReturnErrorOnFailure(reader.EnterContainer(outer));
-        ReturnErrorOnFailure(reader.Next(
-            TLV::kTLVType_Array, TLV::ContextTag(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)));
-        aVlist.Decode(reader);
-        ReturnErrorOnFailure(reader.ExitContainer(outer));
-        // Verify size of list
-        ReturnErrorOnFailure(aVlist.ComputeSize(&pairTotal));
-        VerifyOrReturnError(pairTotal <= ArraySize(mAVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        return CHIP_NO_ERROR;
-    }
+        app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> & aVlist);
 
     /// @brief From command AddScene, allows handler to filter through clusters in command to serialize only the supported ones.
     /// @param endpoint[in] Endpoint ID
@@ -100,30 +70,7 @@ public:
     /// otherwise
     virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
                                     const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
-                                    MutableByteSpan & serializedBytes) override
-    {
-        app::Clusters::Scenes::Structs::AttributeValuePair::Type aVPairs[kMaxAvPair];
-
-        size_t pairTotal = 0;
-        // Verify size of list
-        ReturnErrorOnFailure(extensionFieldSet.attributeValueList.ComputeSize(&pairTotal));
-        VerifyOrReturnError(pairTotal <= ArraySize(aVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        uint8_t pairCount  = 0;
-        auto pair_iterator = extensionFieldSet.attributeValueList.begin();
-        while (pair_iterator.Next())
-        {
-            app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType aVPair = pair_iterator.GetValue();
-            aVPairs[pairCount].attributeID                                           = aVPair.attributeID;
-            aVPairs[pairCount].attributeValue                                        = aVPair.attributeValue;
-            pairCount++;
-        }
-        ReturnErrorOnFailure(pair_iterator.GetStatus());
-        app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList(aVPairs);
-        attributeValueList.reduce_size(pairCount);
-
-        return EncodeAttributeValueList(attributeValueList, serializedBytes);
-    }
+                                    MutableByteSpan & serializedBytes) override;
 
     /// @brief Simulates taking data from nvm and loading it in a command object if the cluster is supported by the endpoint
     /// @param endpoint target endpoint
@@ -132,29 +79,7 @@ public:
     /// @return CHIP_NO_ERROR if Extension Field Set was successfully populated, CHIP_ERROR_INVALID_ARGUMENT if the cluster is not
     /// supported, specific CHIP_ERROR otherwise
     virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
-                                   app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) override
-    {
-        app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
-
-        ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
-
-        uint8_t pairCount  = 0;
-        auto pair_iterator = attributeValueList.begin();
-        while (pair_iterator.Next())
-        {
-            app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType decodePair = pair_iterator.GetValue();
-            mAVPairs[pairCount].attributeID                                              = decodePair.attributeID;
-            mAVPairs[pairCount].attributeValue                                           = decodePair.attributeValue;
-            pairCount++;
-        };
-        ReturnErrorOnFailure(pair_iterator.GetStatus());
-
-        extensionFieldSet.clusterID          = cluster;
-        extensionFieldSet.attributeValueList = mAVPairs;
-        extensionFieldSet.attributeValueList.reduce_size(pairCount);
-
-        return CHIP_NO_ERROR;
-    }
+                                   app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) override;
 
 private:
     app::Clusters::Scenes::Structs::AttributeValuePair::Type mAVPairs[kMaxAvPair];
