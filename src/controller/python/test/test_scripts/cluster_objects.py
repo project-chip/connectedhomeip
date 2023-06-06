@@ -238,7 +238,6 @@ class ClusterObjectTests:
         finally:
             sub.Shutdown()
 
-
     @ classmethod
     @ base.test_case
     async def TestAttributeCacheClusterView(cls, devCtrl):
@@ -279,7 +278,6 @@ class ClusterObjectTests:
             raise AssertionError("Did not receive updated attribute")
         finally:
             sub.Shutdown()
-
 
     @ classmethod
     @ base.test_case
