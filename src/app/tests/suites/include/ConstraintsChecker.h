@@ -394,7 +394,7 @@ protected:
         {
             return true;
         }
-        return CheckConstraintMaxValue(itemName, current.Value(), static_cast<T>(expected.Value()));
+        return CheckConstraintMaxValue(itemName, current, expected.Value());
     }
 
     template <typename T, typename U>
