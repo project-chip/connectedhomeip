@@ -195,17 +195,14 @@ config("disabled_warnings") {
   cflags = [
     "-Wno-deprecated-declarations",
     "-Wno-missing-field-initializers",
+    "-Wno-unknown-warning-option",
     "-Wno-unused-parameter",
   ]
   if (!is_debug) {
     # assert() causes unused variable warnings in release.
     cflags += [ "-Wno-unused" ]
   }
-  if (is_clang) {
-    cflags += [
-      "-Wno-unknown-warning-option",
-    ]
-  } else {
+  if (!is_clang) {
     cflags += [
       "-Wno-cast-function-type",
       "-Wno-psabi",
