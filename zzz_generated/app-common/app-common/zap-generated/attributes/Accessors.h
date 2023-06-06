@@ -1591,11 +1591,6 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
 } // namespace Mask
 
-namespace Latch {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * value); // AlarmMap
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
-} // namespace Latch
-
 namespace State {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * value); // AlarmMap
 EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);

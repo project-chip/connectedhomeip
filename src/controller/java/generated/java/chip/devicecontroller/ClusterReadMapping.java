@@ -6704,17 +6704,6 @@ public class ClusterReadMapping {
           readRefrigeratorAlarmMaskCommandParams
         );
         result.put("readMaskAttribute", readRefrigeratorAlarmMaskAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readRefrigeratorAlarmLatchCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readRefrigeratorAlarmLatchAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.RefrigeratorAlarmCluster) cluster).readLatchAttribute(
-              (ChipClusters.LongAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readRefrigeratorAlarmLatchCommandParams
-        );
-        result.put("readLatchAttribute", readRefrigeratorAlarmLatchAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readRefrigeratorAlarmStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readRefrigeratorAlarmStateAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

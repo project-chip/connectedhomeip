@@ -1697,7 +1697,6 @@ typedef void (*TemperatureControlEventListListAttributeCallback)(void * context,
 typedef void (*TemperatureControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*RefrigeratorAlarmMaskAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
-typedef void (*RefrigeratorAlarmLatchAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
 typedef void (*RefrigeratorAlarmStateAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
 typedef void (*RefrigeratorAlarmGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -10416,36 +10415,6 @@ public:
     void OnSubscriptionEstablished();
     using MTRRefrigeratorAlarmMaskAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRRefrigeratorAlarmMaskAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRRefrigeratorAlarmLatchAttributeCallbackBridge : public MTRCallbackBridge<RefrigeratorAlarmLatchAttributeCallback>
-{
-public:
-    MTRRefrigeratorAlarmLatchAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RefrigeratorAlarmLatchAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRRefrigeratorAlarmLatchAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<RefrigeratorAlarmLatchAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
-};
-
-class MTRRefrigeratorAlarmLatchAttributeCallbackSubscriptionBridge : public MTRRefrigeratorAlarmLatchAttributeCallbackBridge
-{
-public:
-    MTRRefrigeratorAlarmLatchAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 MTRActionBlock action,
-                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRRefrigeratorAlarmLatchAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRRefrigeratorAlarmLatchAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRRefrigeratorAlarmLatchAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

@@ -957,28 +957,6 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeTemperatureControlInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("temperatureControl", writeTemperatureControlInteractionInfo);
     Map<String, InteractionInfo> writeRefrigeratorAlarmInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeRefrigeratorAlarmMaskCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo refrigeratorAlarmmaskCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Long.class, 
-            Long.class 
-        );
-    writeRefrigeratorAlarmMaskCommandParams.put(
-        "value",
-        refrigeratorAlarmmaskCommandParameterInfo
-    );
-    InteractionInfo writeRefrigeratorAlarmMaskAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.RefrigeratorAlarmCluster) cluster).writeMaskAttribute(
-          (DefaultClusterCallback) callback,
-          (Long) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeRefrigeratorAlarmMaskCommandParams
-    );
-    writeRefrigeratorAlarmInteractionInfo.put("writeMaskAttribute", writeRefrigeratorAlarmMaskAttributeInteractionInfo);
     writeAttributeMap.put("refrigeratorAlarm", writeRefrigeratorAlarmInteractionInfo);
     Map<String, InteractionInfo> writeDishwasherModeSelectInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDishwasherModeSelectStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();

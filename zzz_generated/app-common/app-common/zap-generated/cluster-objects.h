@@ -15519,54 +15519,6 @@ struct TypeInfo
 } // namespace TemperatureControl
 namespace RefrigeratorAlarm {
 
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace Reset {
-struct Type;
-struct DecodableType;
-} // namespace Reset
-
-} // namespace Commands
-
-namespace Commands {
-namespace Reset {
-enum class Fields : uint8_t
-{
-    kAlarms = 0,
-    kMask   = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
-
-    chip::BitMask<AlarmMap> alarms = static_cast<chip::BitMask<AlarmMap>>(0);
-    Optional<chip::BitMask<AlarmMap>> mask;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
-
-    chip::BitMask<AlarmMap> alarms = static_cast<chip::BitMask<AlarmMap>>(0);
-    Optional<chip::BitMask<AlarmMap>> mask;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace Reset
-} // namespace Commands
-
 namespace Attributes {
 
 namespace Mask {
@@ -15581,18 +15533,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Mask
-namespace Latch {
-struct TypeInfo
-{
-    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Latch::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Latch
 namespace State {
 struct TypeInfo
 {
@@ -15651,8 +15591,6 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Mask::TypeInfo::DecodableType mask =
-            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>(0);
-        Attributes::Latch::TypeInfo::DecodableType latch =
             static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>(0);
         Attributes::State::TypeInfo::DecodableType state =
             static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>(0);

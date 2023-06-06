@@ -9366,29 +9366,6 @@ void MTRRefrigeratorAlarmMaskAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRRefrigeratorAlarmLatchAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRRefrigeratorAlarmLatchAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
 void MTRRefrigeratorAlarmStateAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
 {
