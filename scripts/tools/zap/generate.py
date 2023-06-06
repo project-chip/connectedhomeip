@@ -217,6 +217,7 @@ def runGeneration(cmdLineArgs):
 
     extractGeneratedIdl(output_dir, zap_file)
 
+
 def getClangFormatBinaryChoices():
     """
     Returns an ordered list of paths that may be suitable clang-format versions
@@ -234,6 +235,7 @@ def getClangFormatBinaryChoices():
     if os_name:
         yield os_name
 
+
 def getClangFormatBinary():
     """Fetches the clang-format binary that is to be used for formatting.
 
@@ -248,7 +250,8 @@ def getClangFormatBinary():
         try:
             version_string = subprocess.check_output([binary, '--version']).decode('utf8')
 
-            pigweed_config = json.load(open(os.path.join(CHIP_ROOT_DIR, 'third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json')))
+            pigweed_config = json.load(
+                open(os.path.join(CHIP_ROOT_DIR, 'third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json')))
             clang_config = [p for p in pigweed_config['packages'] if p['path'].startswith('fuchsia/third_party/clang/')][0]
 
             # Tags should be like:
@@ -290,7 +293,7 @@ def runClangPrettifier(templates_file, output_dir):
             err = None
             print('Formatted using %s (%s)' % (clang_format, subprocess.check_output([clang_format, '--version'])))
             for outputName in clangOutputs:
-               print('  - %s' % outputName)
+                print('  - %s' % outputName)
     except Exception as err:
         print('clang-format error:', err)
 
