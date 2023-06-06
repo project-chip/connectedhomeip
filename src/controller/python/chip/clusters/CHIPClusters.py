@@ -4817,13 +4817,6 @@ class ChipClusters:
         "clusterName": "RefrigeratorAlarm",
         "clusterId": 0x00000057,
         "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "ModifyEnabledAlarms",
-                "args": {
-                    "mask": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
@@ -4832,9 +4825,9 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
-            0x00000001: {
+            0x00000002: {
                 "attributeName": "State",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
             },

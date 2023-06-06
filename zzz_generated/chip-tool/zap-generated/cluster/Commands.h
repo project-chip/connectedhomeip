@@ -4513,11 +4513,10 @@ private:
 | Cluster RefrigeratorAlarm                                           | 0x0057 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ModifyEnabledAlarms                                               |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Mask                                                              | 0x0000 |
-| * State                                                             | 0x0001 |
+| * State                                                             | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -4528,37 +4527,6 @@ private:
 | Events:                                                             |        |
 | * Notify                                                            | 0x0000 |
 \*----------------------------------------------------------------------------*/
-
-/*
- * Command ModifyEnabledAlarms
- */
-class RefrigeratorAlarmModifyEnabledAlarms : public ClusterCommand
-{
-public:
-    RefrigeratorAlarmModifyEnabledAlarms(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("modify-enabled-alarms", credsIssuerConfig)
-    {
-        AddArgument("Mask", 0, UINT32_MAX, &mRequest.mask);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000057) command (0x00000000) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000057, 0x00000000, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000057) command (0x00000000) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000057, 0x00000000, mRequest);
-    }
-
-private:
-    chip::app::Clusters::RefrigeratorAlarm::Commands::ModifyEnabledAlarms::Type mRequest;
-};
 
 /*----------------------------------------------------------------------------*\
 | Cluster DishwasherModeSelect                                        | 0x0059 |
@@ -15079,8 +15047,7 @@ void registerClusterRefrigeratorAlarm(Commands & commands, CredentialIssuerComma
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
-        make_unique<RefrigeratorAlarmModifyEnabledAlarms>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
         //
         // Attributes
         //

@@ -7219,36 +7219,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRefrigeratorAlarmClusterModifyEnabledAlarmsParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mask = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRRefrigeratorAlarmClusterModifyEnabledAlarmsParams alloc] init];
-
-    other.mask = self.mask;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mask:%@; >", NSStringFromClass([self class]), _mask];
-    return descriptionString;
-}
-
-@end
 @implementation MTRDishwasherModeSelectClusterChangeToModeParams
 - (instancetype)init
 {

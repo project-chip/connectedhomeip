@@ -3877,7 +3877,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster RefrigeratorAlarm attributes
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeMaskID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeStateID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeStateID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
@@ -10318,9 +10318,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 
     // Cluster TemperatureControl commands
     MTRCommandIDTypeClusterTemperatureControlCommandSetTemperatureID MTR_NEWLY_AVAILABLE = 0x00000000,
-
-    // Cluster RefrigeratorAlarm commands
-    MTRCommandIDTypeClusterRefrigeratorAlarmCommandModifyEnabledAlarmsID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster DishwasherModeSelect commands
     MTRCommandIDTypeClusterDishwasherModeSelectCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,

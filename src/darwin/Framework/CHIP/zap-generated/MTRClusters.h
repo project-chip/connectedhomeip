@@ -3101,11 +3101,6 @@ MTR_NEWLY_AVAILABLE
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)modifyEnabledAlarmsWithParams:(MTRRefrigeratorAlarmClusterModifyEnabledAlarmsParams *)params
-                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
-                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                           completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-
 - (NSDictionary<NSString *, id> *)readAttributeMaskWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeStateWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;

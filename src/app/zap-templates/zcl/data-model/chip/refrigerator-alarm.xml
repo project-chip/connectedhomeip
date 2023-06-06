@@ -29,12 +29,7 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <attribute side="server" code="0x0000" define="MASK" type="AlarmMap" default="0" writable="false" optional="false">Mask</attribute>
-    <attribute side="server" code="0x0001" define="STATE" type="AlarmMap" default="0" writable="false" optional="false">State</attribute>
-
-    <command source="client" code="0x00" name="ModifyEnabledAlarms" optional="true">
-        <description>Modify enabled alarms</description>
-        <arg name="Mask" type="AlarmMap" optional="false"/>
-    </command>
+    <attribute side="server" code="0x0002" define="STATE" type="AlarmMap" default="0" writable="false" optional="false">State</attribute>
 
     <event side="server" code="0x00" priority="info" name="Notify" optional="false">
         <description>Notify</description>

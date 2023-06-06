@@ -2355,7 +2355,7 @@ public final class ChipIdLookup {
       if (attributeId == 0L) {
         return "Mask";
       }
-      if (attributeId == 1L) {
+      if (attributeId == 2L) {
         return "State";
       }
       if (attributeId == 65528L) {

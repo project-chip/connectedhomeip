@@ -15239,20 +15239,6 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void modifyEnabledAlarms(DefaultClusterCallback callback
-      , Long mask) {
-      modifyEnabledAlarms(chipClusterPtr, callback, mask, null);
-    }
-
-    public void modifyEnabledAlarms(DefaultClusterCallback callback
-      , Long mask
-      , int timedInvokeTimeoutMs) {
-      modifyEnabledAlarms(chipClusterPtr, callback, mask, timedInvokeTimeoutMs);
-    }
-    private native void modifyEnabledAlarms(long chipClusterPtr, DefaultClusterCallback Callback
-      , Long mask
-      , @Nullable Integer timedInvokeTimeoutMs);
-
       public interface GeneratedCommandListAttributeCallback {
         void onSuccess( List<Long> valueList);
         void onError(Exception ex);

@@ -731,16 +731,6 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace TemperatureControl
 
-namespace RefrigeratorAlarm {
-namespace Commands {
-
-namespace ModifyEnabledAlarms {
-static constexpr CommandId Id = 0x00000000;
-} // namespace ModifyEnabledAlarms
-
-} // namespace Commands
-} // namespace RefrigeratorAlarm
-
 namespace DishwasherModeSelect {
 namespace Commands {
 
