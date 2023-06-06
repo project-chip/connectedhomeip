@@ -25,7 +25,6 @@ import sys
 import tempfile
 import traceback
 import urllib.request
-
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
