@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,28 +14,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include "app/util/attribute-storage.h"
-#include "bridge_service/bridge_service.rpc.pb.h"
-#include "pigweed/rpc_services/internal/StatusUtils.h"
-#include <platform/PlatformManager.h>
-
 namespace chip {
-namespace rpc {
+namespace app {
 
-class Bridge : public bridge::pw_rpc::nanopb::Bridge::Service<Bridge>
+/**
+ * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
+ */
+class ICDManager
 {
 public:
-    Bridge() = default;
+    ICDManager();
 
-    virtual ~Bridge() = default;
-
-    ::pw::Status Add(const ::chip_rpc_bridge_AddDevice & request, ::chip_rpc_bridge_AddDeviceResponse & response);
-
-    ::pw::Status Remove(const ::chip_rpc_bridge_RemoveDevice & request, ::chip_rpc_bridge_Empty & response);
+private:
 };
 
-} // namespace rpc
+} // namespace app
 } // namespace chip

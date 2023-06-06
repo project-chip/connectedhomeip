@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,33 +14,36 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
 
-#include <lib/support/Span.h>
-#include <string>
+#include <app/icd/ICDEventManager.h>
+
+using namespace chip::DeviceLayer;
 
 namespace chip {
-namespace Value {
+namespace app {
 
-template <class DEST, class SRC>
-DEST & Assign(DEST & dest, const SRC & src)
+CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
 {
-    return dest = src;
+    VerifyOrReturnError(icdManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mICDManager = icdManager;
+
+    PlatformMgr().AddEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(nullptr));
+
+    return CHIP_NO_ERROR;
 }
 
-template <>
-std::string & Assign(std::string & dest, const CharSpan & src)
+CHIP_ERROR ICDEventManager::Shutdown()
 {
-    dest = std::string(src.begin(), src.end());
-    return dest;
+    PlatformMgr().RemoveEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(nullptr));
+    mICDManager = nullptr;
+
+    return CHIP_NO_ERROR;
 }
 
-template <>
-CharSpan & Assign(CharSpan & dest, const std::string & src)
+void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    dest = CharSpan(src.c_str(), src.size());
-    return dest;
+    // TODO
 }
 
-} // namespace Value
+} // namespace app
 } // namespace chip

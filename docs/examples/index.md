@@ -69,15 +69,6 @@ chip-tool/README
 darwin-framework-tool/README
 ```
 
-## Dynamic bridge example
-
-```{toctree}
-:glob:
-:maxdepth: 1
-
-dynamic-bridge-app/**/README
-```
-
 ## Java matter controller example
 
 ```{toctree}

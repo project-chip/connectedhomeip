@@ -101,7 +101,6 @@ steps:
               --target linux-arm64-chip-tool-ipv6only-clang
               --target linux-arm64-chip-tool-nodeps
               --target linux-arm64-chip-tool-nodeps-ipv6only
-              --target linux-arm64-dynamic-bridge-ipv6only-clang
               --target linux-arm64-light-clang
               --target linux-arm64-light-ipv6only-clang
               --target linux-arm64-light-rpc-clang
@@ -131,7 +130,6 @@ steps:
               --target linux-x64-chip-tool-coverage
               --target linux-x64-chip-tool-nodeps-ipv6only
               --target linux-x64-chip-tool-nodeps-ipv6only-minmdns-verbose
-              --target linux-x64-dynamic-bridge-ipv6only
               --target linux-x64-efr32-test-runner
               --target linux-x64-light-rpc-ipv6only
               --target linux-x64-light-rpc-ipv6only-minmdns-verbose

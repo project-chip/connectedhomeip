@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,14 +15,12 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <app/icd/ICDManager.h>
 
-#include "DynamicDevice.h"
+namespace chip {
+namespace app {
 
-void StartUserInput();
+ICDManager::ICDManager() {}
 
-extern std::vector<std::unique_ptr<Device>> g_devices;
-extern std::vector<std::unique_ptr<DynamicDevice>> g_device_impls;
-
-bool RemoveDeviceAt(uint32_t index);
-int AddDevice(std::unique_ptr<DynamicDevice> device);
+} // namespace app
+} // namespace chip

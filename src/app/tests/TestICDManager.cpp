@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,20 +15,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/UnitTestRegistration.h>
+#include <nlunit-test.h>
 
-/**
- *    @file
- *          Example project configuration file for CHIP.
- *
- *          This is a place to put application or project-specific overrides
- *          to the default configuration values for general CHIP features.
- *
- */
+int TestICDManager()
+{
+    static nlTest sTests[] = { NL_TEST_SENTINEL() };
 
-#pragma once
+    nlTestSuite cmSuite = { "TestICDManager", &sTests[0], nullptr, nullptr };
 
-// overrides CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT in CHIPProjectConfig
-#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 16
+    nlTestRunner(&cmSuite, nullptr);
+    return (nlTestRunnerStats(&cmSuite));
+}
 
-// include the CHIPProjectConfig from config/standalone
-#include <CHIPProjectConfig.h>
+CHIP_REGISTER_TEST_SUITE(TestICDManager)

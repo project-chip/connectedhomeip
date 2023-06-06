@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
+declare_args() {
+  # Matter SDK Configuration flag to enable ICD server functionality
+  # TODO - Add Specifics when the design is refined
+  chip_enable_icd_server = false
 
-static_library("assign") {
-  sources = [ "ValueAssign.h" ]
-
-  public_deps = [ "${chip_root}/src/lib/support" ]
+  # Matter SDK Configuration flag to enable ICD client functionality
+  # TODO - Add Specifics when the design is refined
+  chip_enable_icd_client = false
 }
