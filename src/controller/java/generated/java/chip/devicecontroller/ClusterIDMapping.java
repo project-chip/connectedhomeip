@@ -5411,23 +5411,6 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum KeySetReadAllIndicesCommandField {GroupKeySetIDs(0),;
-                    private final int id;
-                    KeySetReadAllIndicesCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static KeySetReadAllIndicesCommandField value(int id) throws NoSuchFieldError {
-                        for (KeySetReadAllIndicesCommandField field : KeySetReadAllIndicesCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
                 }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();

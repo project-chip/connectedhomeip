@@ -170,6 +170,7 @@
 		51E51FBF282AD37A00FC978D /* MTRDeviceControllerStartupParams.h in Headers */ = {isa = PBXBuildFile; fileRef = 51E51FBC282AD37A00FC978D /* MTRDeviceControllerStartupParams.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51E51FC0282AD37A00FC978D /* MTRDeviceControllerStartupParams_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 51E51FBD282AD37A00FC978D /* MTRDeviceControllerStartupParams_Internal.h */; };
 		51E51FC1282AD37A00FC978D /* MTRDeviceControllerStartupParams.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51E51FBE282AD37A00FC978D /* MTRDeviceControllerStartupParams.mm */; };
+		51EF279F2A2A3EB100E33F75 /* MTRBackwardsCompatShims.h in Headers */ = {isa = PBXBuildFile; fileRef = 51EF279E2A2A3EB100E33F75 /* MTRBackwardsCompatShims.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A60370827EA1FF60020DB79 /* MTRClusterStateCacheContainer+XPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A60370727EA1FF60020DB79 /* MTRClusterStateCacheContainer+XPC.h */; };
 		5A6FEC9027B563D900F25F42 /* MTRDeviceControllerOverXPC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5A6FEC8F27B563D900F25F42 /* MTRDeviceControllerOverXPC.mm */; };
 		5A6FEC9227B5669C00F25F42 /* MTRDeviceControllerOverXPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 5A6FEC8D27B5624E00F25F42 /* MTRDeviceControllerOverXPC.h */; };
@@ -461,6 +462,7 @@
 		51E51FBC282AD37A00FC978D /* MTRDeviceControllerStartupParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerStartupParams.h; sourceTree = "<group>"; };
 		51E51FBD282AD37A00FC978D /* MTRDeviceControllerStartupParams_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerStartupParams_Internal.h; sourceTree = "<group>"; };
 		51E51FBE282AD37A00FC978D /* MTRDeviceControllerStartupParams.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceControllerStartupParams.mm; sourceTree = "<group>"; };
+		51EF279E2A2A3EB100E33F75 /* MTRBackwardsCompatShims.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRBackwardsCompatShims.h; sourceTree = "<group>"; };
 		5A60370727EA1FF60020DB79 /* MTRClusterStateCacheContainer+XPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MTRClusterStateCacheContainer+XPC.h"; sourceTree = "<group>"; };
 		5A6FEC8B27B5609C00F25F42 /* MTRDeviceOverXPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceOverXPC.h; sourceTree = "<group>"; };
 		5A6FEC8D27B5624E00F25F42 /* MTRDeviceControllerOverXPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerOverXPC.h; sourceTree = "<group>"; };
@@ -937,6 +939,7 @@
 				27A53C1627FBC6920053F131 /* MTRAttestationTrustStoreBridge.mm */,
 				513DDB852761F69300DAA01A /* MTRAttributeTLVValueDecoder_Internal.h */,
 				75B765C02A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h */,
+				51EF279E2A2A3EB100E33F75 /* MTRBackwardsCompatShims.h */,
 				51E4D120291D0EB400C8C535 /* MTRBaseClusterUtils.h */,
 				2C222ADE255C811800E446B9 /* MTRBaseDevice_Internal.h */,
 				2C222ACE255C620600E446B9 /* MTRBaseDevice.h */,
@@ -1137,6 +1140,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51EF279F2A2A3EB100E33F75 /* MTRBackwardsCompatShims.h in Headers */,
 				5173A47729C0E2ED00F67F48 /* MTRFabricInfo.h in Headers */,
 				517BF3F0282B62B800A8B7DB /* MTRCertificates.h in Headers */,
 				51E51FBF282AD37A00FC978D /* MTRDeviceControllerStartupParams.h in Headers */,

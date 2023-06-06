@@ -16,6 +16,7 @@
  */
 
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRBackwardsCompatShims.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommandPayloads_Internal.h"
 #import "MTRError_Internal.h"
@@ -6297,8 +6298,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
-
-        _groupKeySetIDs = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -6309,7 +6308,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupKeyManagementClusterKeySetReadAllIndicesParams alloc] init];
 
-    other.groupKeySetIDs = self.groupKeySetIDs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -6318,8 +6316,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupKeySetIDs:%@; >", NSStringFromClass([self class]), _groupKeySetIDs];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
     return descriptionString;
 }
 

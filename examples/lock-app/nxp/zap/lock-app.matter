@@ -938,10 +938,6 @@ server cluster GroupKeyManagement = 63 {
     INT16U groupKeySetID = 0;
   }
 
-  request struct KeySetReadAllIndicesRequest {
-    INT16U groupKeySetIDs[] = 0;
-  }
-
   response struct KeySetReadResponse = 2 {
     GroupKeySetStruct groupKeySet = 0;
   }
@@ -953,7 +949,7 @@ server cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
   fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
   fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
-  fabric command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
+  fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
 /** An interface to a generic way to secure a door */

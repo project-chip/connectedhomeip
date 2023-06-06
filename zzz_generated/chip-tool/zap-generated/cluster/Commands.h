@@ -3785,9 +3785,8 @@ class GroupKeyManagementKeySetReadAllIndices : public ClusterCommand
 {
 public:
     GroupKeyManagementKeySetReadAllIndices(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("key-set-read-all-indices", credsIssuerConfig), mComplex_GroupKeySetIDs(&mRequest.groupKeySetIDs)
+        ClusterCommand("key-set-read-all-indices", credsIssuerConfig)
     {
-        AddArgument("GroupKeySetIDs", &mComplex_GroupKeySetIDs);
         ClusterCommand::AddArguments();
     }
 
@@ -3807,7 +3806,6 @@ public:
 
 private:
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const uint16_t>> mComplex_GroupKeySetIDs;
 };
 
 /*----------------------------------------------------------------------------*\

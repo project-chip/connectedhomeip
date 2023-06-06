@@ -11870,14 +11870,14 @@ public class ChipClusters {
     }
 
     public void keySetReadAllIndices(KeySetReadAllIndicesResponseCallback callback
-      , ArrayList<Integer> groupKeySetIDs) {
-      keySetReadAllIndices(chipClusterPtr, callback, groupKeySetIDs, null);
+      ) {
+      keySetReadAllIndices(chipClusterPtr, callback, null);
     }
 
     public void keySetReadAllIndices(KeySetReadAllIndicesResponseCallback callback
-      , ArrayList<Integer> groupKeySetIDs
+      
       , int timedInvokeTimeoutMs) {
-      keySetReadAllIndices(chipClusterPtr, callback, groupKeySetIDs, timedInvokeTimeoutMs);
+      keySetReadAllIndices(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
     private native void keySetWrite(long chipClusterPtr, DefaultClusterCallback Callback
       , ChipStructs.GroupKeyManagementClusterGroupKeySetStruct groupKeySet
@@ -11889,7 +11889,7 @@ public class ChipClusters {
       , Integer groupKeySetID
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void keySetReadAllIndices(long chipClusterPtr, KeySetReadAllIndicesResponseCallback Callback
-      , ArrayList<Integer> groupKeySetIDs
+      
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface KeySetReadResponseCallback {
       void onSuccess(ChipStructs.GroupKeyManagementClusterGroupKeySetStruct groupKeySet);

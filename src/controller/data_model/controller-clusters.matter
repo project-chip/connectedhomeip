@@ -2608,10 +2608,6 @@ client cluster GroupKeyManagement = 63 {
     INT16U groupKeySetID = 0;
   }
 
-  request struct KeySetReadAllIndicesRequest {
-    INT16U groupKeySetIDs[] = 0;
-  }
-
   response struct KeySetReadAllIndicesResponse = 5 {
     INT16U groupKeySetIDs[] = 0;
   }
@@ -2623,7 +2619,7 @@ client cluster GroupKeyManagement = 63 {
   /** Revoke a Root Key from a Group */
   fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
   /** Return the list of Group Key Sets associated with the accessing fabric */
-  fabric command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
+  fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only

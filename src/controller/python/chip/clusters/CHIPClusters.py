@@ -3814,7 +3814,6 @@ class ChipClusters:
                 "commandId": 0x00000004,
                 "commandName": "KeySetReadAllIndices",
                 "args": {
-                    "groupKeySetIDs": "int",
                 },
             },
         },

@@ -21894,15 +21894,10 @@ public class ClusterInfoMapping {
        );
        groupKeyManagementClusterInteractionInfoMap.put("keySetRemove", groupKeyManagementkeySetRemoveInteractionInfo);
      Map<String, CommandParameterInfo> groupKeyManagementkeySetReadAllIndicesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-       CommandParameterInfo groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo = new CommandParameterInfo("groupKeySetIDs", ArrayList.class, Integer.class);
-       groupKeyManagementkeySetReadAllIndicesCommandParams.put("groupKeySetIDs",groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo);
-     
        InteractionInfo groupKeyManagementkeySetReadAllIndicesInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
            ((ChipClusters.GroupKeyManagementCluster) cluster)
            .keySetReadAllIndices((ChipClusters.GroupKeyManagementCluster.KeySetReadAllIndicesResponseCallback) callback
-           , (ArrayList<Integer>)
-           commandArguments.get("groupKeySetIDs")
            
            );
          },

@@ -13531,10 +13531,7 @@ class GroupKeyManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupKeySetIDs", Tag=0, Type=typing.List[uint]),
                     ])
-
-            groupKeySetIDs: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class KeySetReadAllIndicesResponse(ClusterCommand):
