@@ -546,7 +546,7 @@ class AndroidBuilder(Builder):
                     "lib",
                     "jni",
                     self.board.AbiName(),
-                    "libSetupPayloadParser.so",
+                    "libOnboardingPayload.so",
                 ),
                 "jni/%s/libCHIPController.so"
                 % self.board.AbiName(): os.path.join(
