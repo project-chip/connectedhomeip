@@ -304,11 +304,6 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/WindowCoveringClient-ReadImpl.cpp",
       "jni/ZeoliteFilterMonitoringClient-InvokeSubscribeImpl.cpp",
       "jni/ZeoliteFilterMonitoringClient-ReadImpl.cpp",
-
-      # Disable CM cluster table tests until update is done
-      # https://github.com/project-chip/connectedhomeip/issues/24425
-      #"jni/ClientMonitoringClient-ReadImpl.cpp",
-      #"jni/ClientMonitoringClient-InvokeSubscribeImpl.cpp",
     ]
 
     deps = [

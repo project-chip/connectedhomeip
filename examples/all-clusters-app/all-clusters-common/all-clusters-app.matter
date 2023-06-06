@@ -5934,7 +5934,7 @@ endpoint 0 {
     ram      attribute activeModeThreshold default = 300;
     callback attribute registeredClients;
     ram      attribute ICDCounter default = 0;
-    ram      attribute clientsSupportedPerFabric default = 1;
+    ram      attribute clientsSupportedPerFabric default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
