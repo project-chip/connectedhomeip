@@ -1104,9 +1104,6 @@ void TestAddMultipleSameFabricIdDifferentRoot(nlTestSuite * inSuite, void * inCo
     uint8_t rcac1Buf[kMaxCHIPCertLength];
     MutableByteSpan rcac1Span{ rcac1Buf };
 
-    uint8_t rcac2Buf[kMaxCHIPCertLength];
-    MutableByteSpan rcac2Span{ rcac2Buf };
-
     // First scope: add FabricID 1111, node ID 55
     {
         FabricId fabricId = 1111;
@@ -1150,7 +1147,7 @@ void TestAddMultipleSameFabricIdDifferentRoot(nlTestSuite * inSuite, void * inCo
     size_t numStorageKeysAfterFirstAdd = storage.GetNumKeys();
     NL_TEST_ASSERT(inSuite, numStorageKeysAfterFirstAdd == 7); // Metadata, index, 3 certs, 1 opkey, last known good time
 
-    // Second scope: add FabricID 1111, node ID 66, different root as first
+    // Second scope: add FabricID 1111, node ID 66, different root from first
     {
         FabricId fabricId = 1111;
         NodeId nodeId     = 66;
