@@ -160,10 +160,9 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     //      hard-coded logic of this unit test.
     //      The size of TLV-encoded event can vary depending on the UTC vs system time controlled by
     //      the CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS, because the relative system time
-    //      will be most likely encoded on 1 byte, while the UTC time will be encoded on 8 bytes.
+    //      will be most likely encoded in 1 byte, while the UTC time will be encoded in 8 bytes.
     NL_TEST_ASSERT(apSuite, sizeof(gDebugEventBuffer) >= eventTLVSize * 3 && sizeof(gDebugEventBuffer) < eventTLVSize * 4);
 
-    printf("length written : %u \n", static_cast<unsigned int>(writer.GetLengthWritten()));
     reader.Init(backingStore.Get(), writer.GetLengthWritten());
 
     err = chip::TLV::Utilities::Count(reader, totalNumElements, false);
