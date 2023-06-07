@@ -136,10 +136,9 @@ public:
 
         const char * ToString(OutputEventType outputEventType);
 
-        static OutputEvent TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg);
+        static OutputEvent TransferInitEvent(TransferInitData data);
         static OutputEvent TransferAcceptEvent(TransferAcceptData data);
-        static OutputEvent TransferAcceptEvent(TransferAcceptData data, System::PacketBufferHandle msg);
-        static OutputEvent BlockDataEvent(BlockData data, System::PacketBufferHandle msg);
+        static OutputEvent BlockDataEvent(BlockData data);
         static OutputEvent StatusReportEvent(OutputEventType type, StatusReportData data);
         static OutputEvent MsgToSendEvent(MessageTypeData typeData, System::PacketBufferHandle msg);
         static OutputEvent QueryWithSkipEvent(TransferSkipData bytesToSkip);
@@ -299,8 +298,8 @@ public:
     size_t GetNumBytesProcessed() const { return mNumBytesProcessed; }
     const uint8_t * GetFileDesignator(uint16_t & fileDesignatorLen) const
     {
-        fileDesignatorLen = mTransferRequestData.FileDesLength;
-        return mTransferRequestData.FileDesignator;
+        fileDesignatorLen = mFileDesLength;
+        return mFileDesignator;
     }
 
     TransferSession();
@@ -411,12 +410,13 @@ private:
     uint64_t mStartOffset          = 0; ///< 0 represents no offset
     uint64_t mTransferLength       = 0; ///< 0 represents indefinite length
     uint16_t mTransferMaxBlockSize = 0;
-
-    // Used to store event data to be sent via the OutputEventCallback
-    TransferInitData mTransferRequestData;
-    TransferAcceptData mTransferAcceptData;
+    
+    const uint8_t * mFileDesignator = nullptr;
+    uint16_t mFileDesLength         = 0;
+    uint16_t mTransferRequestMaxBlockSize = 0;
+    TransferControlFlags mTransferRequestControlFlags;
+    
     BlockData mBlockEventData;
-    TransferSkipData mBytesToSkip;
 
     size_t mNumBytesProcessed = 0;
 

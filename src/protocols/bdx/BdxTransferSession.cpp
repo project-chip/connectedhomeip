@@ -131,7 +131,7 @@ CHIP_ERROR TransferSession::StartTransfer(TransferRole role, const TransferInitD
 
     mState            = TransferState::kAwaitingAccept;
     mAwaitingResponse = true;
-
+   
     TransferSession::MessageTypeData outputMsgType = PrepareOutgoingMessageEvent(msgType);
     OutputEvent event = TransferSession::OutputEvent::MsgToSendEvent(outputMsgType, std::move(mPendingMsgHandle));
     DispatchOutputEvent(event);
@@ -161,14 +161,14 @@ CHIP_ERROR TransferSession::AcceptTransfer(const TransferAcceptData & acceptData
 {
     MessageType msgType;
 
-    const BitFlags<TransferControlFlags> proposedControlOpts(mTransferRequestData.TransferCtlFlags);
+    const BitFlags<TransferControlFlags> proposedControlOpts(mTransferRequestControlFlags);
 
     VerifyOrReturnError(mState == TransferState::kNegotiateTransferParams, CHIP_ERROR_INCORRECT_STATE);
 
     // Don't allow a Control method that wasn't supported by the initiator
     // MaxBlockSize can't be larger than the proposed value
     VerifyOrReturnError(proposedControlOpts.Has(acceptData.ControlMode), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(acceptData.MaxBlockSize <= mTransferRequestData.MaxBlockSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(acceptData.MaxBlockSize <= mTransferRequestMaxBlockSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     mTransferMaxBlockSize = acceptData.MaxBlockSize;
 
@@ -383,8 +383,11 @@ void TransferSession::Reset()
     mStartOffset           = 0;
     mTransferLength        = 0;
     mTransferMaxBlockSize  = 0;
+    mTransferRequestMaxBlockSize = 0;
 
     mPendingMsgHandle = nullptr;
+    mFileDesignator = nullptr;
+    mFileDesLength = 0;
 
     mNumBytesProcessed = 0;
     mLastBlockNum      = 0;
@@ -431,62 +434,48 @@ CHIP_ERROR TransferSession::HandleBdxMessage(const PayloadHeader & header, Syste
     case MessageType::SendInit:
     case MessageType::ReceiveInit: {
         HandleTransferInit(msgType, std::move(msg));
-        OutputEvent event = OutputEvent::TransferInitEvent(mTransferRequestData, std::move(msg));
-        DispatchOutputEvent(event);
         break;
     }
     case MessageType::SendAccept: {
         HandleSendAccept(std::move(msg));
-        OutputEvent event = OutputEvent::TransferAcceptEvent(mTransferAcceptData, std::move(msg));
-        DispatchOutputEvent(event);
         break;
     }
 
     case MessageType::ReceiveAccept: {
         HandleReceiveAccept(std::move(msg));
-        OutputEvent event = OutputEvent::TransferAcceptEvent(mTransferAcceptData, std::move(msg));
-        DispatchOutputEvent(event);
         break;
     }
 
     case MessageType::BlockQuery: {
         HandleBlockQuery(std::move(msg));
-        OutputEvent event = OutputEvent(OutputEventType::kQueryReceived);
-        DispatchOutputEvent(event);
         break;
     }
 
     case MessageType::BlockQueryWithSkip: {
         HandleBlockQueryWithSkip(std::move(msg));
-        OutputEvent event = OutputEvent::QueryWithSkipEvent(mBytesToSkip);
-        DispatchOutputEvent(event);
         break;
     }
 
     case MessageType::Block: {
         HandleBlock(std::move(msg));
-        OutputEvent event = OutputEvent::BlockDataEvent(mBlockEventData, std::move(msg));
+        OutputEvent event = OutputEvent::BlockDataEvent(mBlockEventData);
         DispatchOutputEvent(event);
         break;
     }
     case MessageType::BlockEOF: {
         HandleBlockEOF(std::move(msg));
-        OutputEvent event = OutputEvent::BlockDataEvent(mBlockEventData, std::move(msg));
+        OutputEvent event = OutputEvent::BlockDataEvent(mBlockEventData);
         DispatchOutputEvent(event);
         break;
     }
 
     case MessageType::BlockAck: {
         HandleBlockAck(std::move(msg));
-        OutputEvent event = OutputEvent(OutputEventType::kAckReceived);
-        DispatchOutputEvent(event);
         break;
     }
 
     case MessageType::BlockAckEOF: {
         HandleBlockAckEOF(std::move(msg));
-        OutputEvent event = OutputEvent(OutputEventType::kAckEOFReceived);
-        DispatchOutputEvent(event);
         break;
     }
 
@@ -549,16 +538,22 @@ void TransferSession::HandleTransferInit(MessageType msgType, System::PacketBuff
     // Accept for now, they may be changed or rejected by the peer if this is a ReceiveInit
     mStartOffset    = transferInit.StartOffset;
     mTransferLength = transferInit.MaxLength;
+    mFileDesignator = transferInit.FileDesignator;
+    mFileDesLength = transferInit.FileDesLength;
+    mTransferRequestMaxBlockSize = transferInit.MaxBlockSize;
+    mTransferRequestControlFlags = transferInit.TransferCtlOptions;
 
+
+    TransferInitData transferRequestData;
     // Store the Request data to share with the caller for verification
-    mTransferRequestData.TransferCtlFlags = transferInit.TransferCtlOptions;
-    mTransferRequestData.MaxBlockSize     = transferInit.MaxBlockSize;
-    mTransferRequestData.StartOffset      = transferInit.StartOffset;
-    mTransferRequestData.Length           = transferInit.MaxLength;
-    mTransferRequestData.FileDesignator   = transferInit.FileDesignator;
-    mTransferRequestData.FileDesLength    = transferInit.FileDesLength;
-    mTransferRequestData.Metadata         = transferInit.Metadata;
-    mTransferRequestData.MetadataLength   = transferInit.MetadataLength;
+    transferRequestData.TransferCtlFlags = transferInit.TransferCtlOptions;
+    transferRequestData.MaxBlockSize     = transferInit.MaxBlockSize;
+    transferRequestData.StartOffset      = transferInit.StartOffset;
+    transferRequestData.Length           = transferInit.MaxLength;
+    transferRequestData.FileDesignator   = transferInit.FileDesignator;
+    transferRequestData.FileDesLength    = transferInit.FileDesLength;
+    transferRequestData.Metadata         = transferInit.Metadata;
+    transferRequestData.MetadataLength   = transferInit.MetadataLength;
 
     mState = TransferState::kNegotiateTransferParams;
     mPendingMsgHandle = std::move(msgData);
@@ -566,6 +561,9 @@ void TransferSession::HandleTransferInit(MessageType msgType, System::PacketBuff
 #if CHIP_AUTOMATION_LOGGING
     transferInit.LogMessage(msgType);
 #endif // CHIP_AUTOMATION_LOGGING
+
+    OutputEvent event = OutputEvent::TransferInitEvent(transferRequestData);
+    DispatchOutputEvent(event);
 }
 
 void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
@@ -586,20 +584,24 @@ void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
 
     // Note: if VerifyProposedMode() returned with no error, then mControlMode must match the proposed mode in the ReceiveAccept
     // message
-    mTransferAcceptData.ControlMode    = mControlMode;
-    mTransferAcceptData.MaxBlockSize   = rcvAcceptMsg.MaxBlockSize;
-    mTransferAcceptData.StartOffset    = rcvAcceptMsg.StartOffset;
-    mTransferAcceptData.Length         = rcvAcceptMsg.Length;
-    mTransferAcceptData.Metadata       = rcvAcceptMsg.Metadata;
-    mTransferAcceptData.MetadataLength = rcvAcceptMsg.MetadataLength;
+    TransferAcceptData transferAcceptData;
+    transferAcceptData.ControlMode    = mControlMode;
+    transferAcceptData.MaxBlockSize   = rcvAcceptMsg.MaxBlockSize;
+    transferAcceptData.StartOffset    = rcvAcceptMsg.StartOffset;
+    transferAcceptData.Length         = rcvAcceptMsg.Length;
+    transferAcceptData.Metadata       = rcvAcceptMsg.Metadata;
+    transferAcceptData.MetadataLength = rcvAcceptMsg.MetadataLength;
 
     mAwaitingResponse = (mControlMode == TransferControlFlags::kSenderDrive);
     mState            = TransferState::kTransferInProgress;
-    mPendingMsgHandle = std::move(msgData);
+    //mPendingMsgHandle = std::move(msgData);
 
 #if CHIP_AUTOMATION_LOGGING
     rcvAcceptMsg.LogMessage(MessageType::ReceiveAccept);
 #endif // CHIP_AUTOMATION_LOGGING
+
+    OutputEvent event = OutputEvent::TransferAcceptEvent(transferAcceptData);
+    DispatchOutputEvent(event);
 }
 
 void TransferSession::HandleSendAccept(System::PacketBufferHandle msgData)
@@ -617,21 +619,24 @@ void TransferSession::HandleSendAccept(System::PacketBufferHandle msgData)
     // Note: if VerifyProposedMode() returned with no error, then mControlMode must match the proposed mode in the SendAccept
     // message
     mTransferMaxBlockSize = sendAcceptMsg.MaxBlockSize;
-
-    mTransferAcceptData.ControlMode    = mControlMode;
-    mTransferAcceptData.MaxBlockSize   = sendAcceptMsg.MaxBlockSize;
-    mTransferAcceptData.StartOffset    = mStartOffset;    // Not included in SendAccept msg, so use member
-    mTransferAcceptData.Length         = mTransferLength; // Not included in SendAccept msg, so use member
-    mTransferAcceptData.Metadata       = sendAcceptMsg.Metadata;
-    mTransferAcceptData.MetadataLength = sendAcceptMsg.MetadataLength;
+    TransferAcceptData transferAcceptData;
+    transferAcceptData.ControlMode    = mControlMode;
+    transferAcceptData.MaxBlockSize   = sendAcceptMsg.MaxBlockSize;
+    transferAcceptData.StartOffset    = mStartOffset;    // Not included in SendAccept msg, so use member
+    transferAcceptData.Length         = mTransferLength; // Not included in SendAccept msg, so use member
+    transferAcceptData.Metadata       = sendAcceptMsg.Metadata;
+    transferAcceptData.MetadataLength = sendAcceptMsg.MetadataLength;
 
     mAwaitingResponse = (mControlMode == TransferControlFlags::kReceiverDrive);
     mState            = TransferState::kTransferInProgress;
-    mPendingMsgHandle = std::move(msgData);
+    //mPendingMsgHandle = std::move(msgData);
 
 #if CHIP_AUTOMATION_LOGGING
     sendAcceptMsg.LogMessage(MessageType::SendAccept);
 #endif // CHIP_AUTOMATION_LOGGING
+
+    OutputEvent event = OutputEvent::TransferAcceptEvent(transferAcceptData);
+    DispatchOutputEvent(event);
 }
 
 void TransferSession::HandleBlockQuery(System::PacketBufferHandle msgData)
@@ -652,6 +657,9 @@ void TransferSession::HandleBlockQuery(System::PacketBufferHandle msgData)
 #if CHIP_AUTOMATION_LOGGING
     query.LogMessage(MessageType::BlockQuery);
 #endif // CHIP_AUTOMATION_LOGGING
+
+    OutputEvent event = OutputEvent(OutputEventType::kQueryReceived);
+    DispatchOutputEvent(event);
 }
 
 void TransferSession::HandleBlockQueryWithSkip(System::PacketBufferHandle msgData)
@@ -669,11 +677,14 @@ void TransferSession::HandleBlockQueryWithSkip(System::PacketBufferHandle msgDat
     mAwaitingResponse = false;
     mLastQueryNum     = query.BlockCounter;
 
-    mBytesToSkip.BytesToSkip = query.BytesToSkip;
-
 #if CHIP_AUTOMATION_LOGGING
     query.LogMessage(MessageType::BlockQueryWithSkip);
 #endif // CHIP_AUTOMATION_LOGGING
+
+    TransferSkipData bytesToSkip;
+    bytesToSkip.BytesToSkip = query.BytesToSkip;
+    OutputEvent event = OutputEvent::QueryWithSkipEvent(bytesToSkip);
+    DispatchOutputEvent(event);
 }
 
 void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
@@ -704,7 +715,7 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
     mLastBlockNum = blockMsg.BlockCounter;
 
     mAwaitingResponse = false;
-    mPendingMsgHandle = std::move(msgData);
+    //mPendingMsgHandle = std::move(msgData);
 
 #if CHIP_AUTOMATION_LOGGING
     blockMsg.LogMessage(MessageType::Block);
@@ -734,7 +745,7 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
 
     mAwaitingResponse = false;
     mState            = TransferState::kReceivedEOF;
-    mPendingMsgHandle = std::move(msgData);
+    //mPendingMsgHandle = std::move(msgData);
 
 #if CHIP_AUTOMATION_LOGGING
     blockEOFMsg.LogMessage(MessageType::BlockEOF);
@@ -759,6 +770,9 @@ void TransferSession::HandleBlockAck(System::PacketBufferHandle msgData)
 #if CHIP_AUTOMATION_LOGGING
     ackMsg.LogMessage(MessageType::BlockAck);
 #endif // CHIP_AUTOMATION_LOGGING
+
+    OutputEvent event = OutputEvent(OutputEventType::kAckReceived);
+    DispatchOutputEvent(event);
 }
 
 void TransferSession::HandleBlockAckEOF(System::PacketBufferHandle msgData)
@@ -779,6 +793,9 @@ void TransferSession::HandleBlockAckEOF(System::PacketBufferHandle msgData)
 #if CHIP_AUTOMATION_LOGGING
     ackMsg.LogMessage(MessageType::BlockAckEOF);
 #endif // CHIP_AUTOMATION_LOGGING
+    
+    OutputEvent event = OutputEvent(OutputEventType::kAckEOFReceived);
+    DispatchOutputEvent(event);
 }
 
 void TransferSession::ResolveTransferControlOptions(const BitFlags<TransferControlFlags> & proposed)
@@ -895,6 +912,7 @@ void TransferSession::SendStatusReport(StatusCode code)
     {
         TransferSession::MessageTypeData outputMsgType =
             PrepareOutgoingMessageEvent(Protocols::SecureChannel::MsgType::StatusReport);
+            ChipLogError(BDX, "Error preparing status report move mpendingmsghandle");
         OutputEvent event = TransferSession::OutputEvent::MsgToSendEvent(outputMsgType, std::move(mPendingMsgHandle));
         DispatchOutputEvent(event);
     }
@@ -938,17 +956,16 @@ const char * TransferSession::OutputEvent::ToString(OutputEventType outputEventT
     }
 }
 
-TransferSession::OutputEvent TransferSession::OutputEvent::TransferInitEvent(TransferInitData data, System::PacketBufferHandle msg)
+TransferSession::OutputEvent TransferSession::OutputEvent::TransferInitEvent(TransferInitData data)
 {
     OutputEvent event(OutputEventType::kInitReceived);
-    event.MsgData          = std::move(msg);
     event.transferInitData = data;
     return event;
 }
 
 /**
  * @brief
- *   Convenience method for constructing an OutputEvent with TransferAcceptData that does not contain Metadata
+ *   Convenience method for constructing an OutputEvent with TransferAcceptData that contains Metadata
  */
 TransferSession::OutputEvent TransferSession::OutputEvent::TransferAcceptEvent(TransferAcceptData data)
 {
@@ -956,22 +973,10 @@ TransferSession::OutputEvent TransferSession::OutputEvent::TransferAcceptEvent(T
     event.transferAcceptData = data;
     return event;
 }
-/**
- * @brief
- *   Convenience method for constructing an OutputEvent with TransferAcceptData that contains Metadata
- */
-TransferSession::OutputEvent TransferSession::OutputEvent::TransferAcceptEvent(TransferAcceptData data,
-                                                                               System::PacketBufferHandle msg)
-{
-    OutputEvent event = TransferAcceptEvent(data);
-    event.MsgData     = std::move(msg);
-    return event;
-}
 
-TransferSession::OutputEvent TransferSession::OutputEvent::BlockDataEvent(BlockData data, System::PacketBufferHandle msg)
+TransferSession::OutputEvent TransferSession::OutputEvent::BlockDataEvent(BlockData data)
 {
     OutputEvent event(OutputEventType::kBlockReceived);
-    event.MsgData   = std::move(msg);
     event.blockdata = data;
     return event;
 }
