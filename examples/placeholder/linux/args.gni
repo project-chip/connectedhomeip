@@ -22,3 +22,4 @@ chip_project_config_include = "<CHIPProjectConfig.h>"
 chip_project_config_include_dirs =
     [ "${chip_root}/examples/placeholder/linux/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
+matter_enable_tracing_support = true
