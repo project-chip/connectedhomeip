@@ -26,6 +26,9 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
 
+#include <tracing/registry.h>
+#include <tracing/log_json/log_json_tracing.h>
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceDecoder.h"
 #include "TraceHandlers.h"
@@ -48,6 +51,42 @@ const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = null
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 
 namespace {
+
+class StringCommaSplitter {
+public:
+    StringCommaSplitter(const char *s) : mData(strdup(s)) {
+        VerifyOrDie(mData != nullptr);
+        mNext = mData;
+    }
+    ~StringCommaSplitter() {
+        free(mData);
+    }
+
+    // returns null when no more items available
+    const char *Next() {
+        char *current = mNext;
+        if (*current == '\0') {
+            return nullptr; // nothing left
+        }
+
+        char *comma = strchr(current, ',');
+
+        if (comma != nullptr) {
+            mNext = comma + 1;
+            *comma = '\0';
+        } else {
+            // last element, position on the final 0
+            mNext = current + strlen(current);
+        }
+
+        return current;
+    }
+
+private:
+    char *mNext; // next element to return by calling Next()
+    char *mData; // allocated data
+};
+
 CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::Credentials::AttestationTrustStore ** trustStore)
 {
     if (paaTrustStorePath == nullptr)
@@ -77,6 +116,14 @@ CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::
     *trustStore = &attestationTrustStore;
     return CHIP_NO_ERROR;
 }
+
+using ::chip::Tracing::ScopedRegistration;
+using ::chip::Tracing::LogJson::LogJsonBackend;
+
+LogJsonBackend log_json_backend;
+
+std::vector<std::unique_ptr<ScopedRegistration>> tracing_backends;
+
 } // namespace
 
 CHIP_ERROR CHIPCommand::MaybeSetUpStack()
@@ -240,6 +287,20 @@ CHIP_ERROR CHIPCommand::Run()
 
 void CHIPCommand::StartTracing()
 {
+    if (mTraceTo.HasValue()) {
+        StringCommaSplitter splitter(mTraceTo.Value());
+        const char *destination;
+
+        while ((destination = splitter.Next()) != nullptr) {
+            if (strcmp(destination, "log") == 0) {
+                /// Scoped registration auto-registers and unregisters itself
+                tracing_backends.push_back(std::make_unique<ScopedRegistration>(log_json_backend));
+            } else {
+                ChipLogError(AppServer, "Unknown trace destination: '%s'", destination);
+            }
+        }
+    }
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::InitTrace();
 
@@ -266,6 +327,8 @@ void CHIPCommand::StartTracing()
 
 void CHIPCommand::StopTracing()
 {
+    tracing_backends.clear();
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::DeInitTrace();
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED

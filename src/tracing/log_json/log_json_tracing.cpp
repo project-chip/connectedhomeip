@@ -18,16 +18,20 @@
 
 #include <tracing/log_json/log_json_tracing.h>
 
+#include <lib/support/StringBuilder.h>
+
 #include <json/json.h>
 
+#include <sstream>
 #include <string>
-#include <stringstream>
 
 namespace chip {
 namespace Tracing {
 namespace LogJson {
 
 namespace {
+
+using chip::StringBuilder;
 
 std::string ScopeToString(Scope scope)
 {
@@ -174,7 +178,7 @@ std::string ScopeToString(Scope scope)
         builder.Add("Scope::Unknown(");
         builder.Add(static_cast<int>(scope));
         builder.Add(")");
-        return s.c_str();
+        return builder.c_str();
     }
     }
 }
@@ -194,16 +198,20 @@ std::string InstantToString(Instant instant)
         builder.Add("Instant::Unknown(");
         builder.Add(static_cast<int>(instant));
         builder.Add(")");
-        return s.c_str();
+        return builder.c_str();
     }
     }
 }
 /// Writes the given value to chip log
-void LogJsonValue(json::Value const & value)
+void LogJsonValue(Json::Value const & value)
 {
-    Json::StreamWriterBuilder wbuilder;
+    Json::StreamWriterBuilder builder;
+
+    std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
     std::stringstream output;
-    wbuilder.write(value, &output);
+
+    writer->write(value, &output);
+
     ChipLogProgress(Automation, "%s", output.str().c_str());
 }
 
@@ -211,7 +219,7 @@ void LogJsonValue(json::Value const & value)
 
 void LogJsonBackend::TraceBegin(Scope scope)
 {
-    json::Value value;
+    Json::Value value;
     value["event"] = "begin";
     value["scope"] = ScopeToString(scope);
     LogJsonValue(value);
@@ -219,7 +227,7 @@ void LogJsonBackend::TraceBegin(Scope scope)
 
 void LogJsonBackend::TraceEnd(Scope scope)
 {
-    json::Value value;
+    Json::Value value;
     value["event"] = "end";
     value["scope"] = ScopeToString(scope);
     LogJsonValue(value);
@@ -227,7 +235,7 @@ void LogJsonBackend::TraceEnd(Scope scope)
 
 void LogJsonBackend::TraceInstant(Instant instant)
 {
-    json::Value value;
+    Json::Value value;
     value["event"]   = "instant";
     value["instant"] = InstantToString(instant);
     LogJsonValue(value);
@@ -235,35 +243,35 @@ void LogJsonBackend::TraceInstant(Instant instant)
 
 void LogJsonBackend::LogMessageSend(MessageSendInfo &)
 {
-    json::Value value;
+    Json::Value value;
     value["TODO"] = "LogMessageSend";
     LogJsonValue(value);
 }
 
 void LogJsonBackend::LogMessageReceived(MessageReceiveInfo &)
 {
-    json::Value value;
+    Json::Value value;
     value["TODO"] = "LogMessageReceived";
     LogJsonValue(value);
 }
 
 void LogJsonBackend::LogNodeLookup(NodeLookupInfo &)
 {
-    json::Value value;
+    Json::Value value;
     value["TODO"] = "LogNodeLookup";
     LogJsonValue(value);
 }
 
 void LogJsonBackend::LogNodeDiscovered(NodeDiscoveredInfo &)
 {
-    json::Value value;
+    Json::Value value;
     value["TODO"] = "LogNodeDiscovered";
     LogJsonValue(value);
 }
 
 void LogJsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &)
 {
-    json::Value value;
+    Json::Value value;
     value["TODO"] = "LogNodeDiscoveryFailed";
     LogJsonValue(value);
 }
