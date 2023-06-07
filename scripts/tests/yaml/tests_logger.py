@@ -23,6 +23,7 @@ from dataclasses import dataclass
 import click
 from matter_yamltests.errors import TestStepError, TestStepKeyError
 from matter_yamltests.hooks import TestParserHooks, TestRunnerHooks, WebSocketRunnerHooks
+from matter_yamltests.parser import TestStep
 
 
 def _strikethrough(str):
@@ -193,11 +194,16 @@ class TestRunnerLogger(TestRunnerHooks):
         self.__index += 1
         self.__skipped += 1
 
-    def step_start(self, name: str):
+    def step_start(self, request: TestStep):
         if self.__use_test_harness_log_format:
-            print(self.__strings.test_harness_step_start.format(index=self.__index, name=name))
+            print(self.__strings.test_harness_step_start.format(index=self.__index, name=request.label))
 
-        print(self.__strings.step_start.format(index=self.__index, name=click.style(name, bold=True)), end='')
+        print(self.__strings.step_start.format(index=self.__index, name=click.style(request.label, bold=True)), end='')
+        # This is to keep previous behavior of UserPrompt. Where it logs USER_PROMPT prior to user input. See link below:
+        # https://github.com/project-chip/connectedhomeip/blob/6644a4b0b0d1272ae325c651b27bd0e7068f3a8a/src/app/tests/suites/commands/log/LogCommands.cpp#L31
+        if request.command == 'UserPrompt':
+            message = request.arguments['values'][0]['value']
+            print("\n" + self.__strings.user_prompt.format(message=f'{message}'))
         # flushing stdout such that the previous print statement is visible on the screen for long running tasks.
         sys.stdout.flush()
 
@@ -208,7 +214,7 @@ class TestRunnerLogger(TestRunnerHooks):
 
         self.__runned += 1
 
-    def step_success(self, logger, logs, duration: int, request):
+    def step_success(self, logger, logs, duration: int, request: TestStep):
         print(self.__strings.step_result.format(state=_SUCCESS, duration=duration))
 
         self.__print_results(logger)
@@ -218,9 +224,6 @@ class TestRunnerLogger(TestRunnerHooks):
             elif request.command == 'Log':
                 message = request.arguments['values'][0]['value']
                 print(self.__strings.log.format(message=f'{message}'))
-            elif request.command == 'UserPrompt':
-                message = request.arguments['values'][0]['value']
-                print(self.__strings.user_prompt.format(message=f'{message}'))
 
         if self.__show_adapter_logs:
             self.__log_printer.print(logs)
@@ -230,7 +233,7 @@ class TestRunnerLogger(TestRunnerHooks):
         self.__errors += logger.errors
         self.__runned += 1
 
-    def step_failure(self, logger, logs, duration: int, request, received):
+    def step_failure(self, logger, logs, duration: int, request: TestStep, received):
         print(self.__strings.step_result.format(state=_FAILURE, duration=duration))
 
         self.__print_results(logger)

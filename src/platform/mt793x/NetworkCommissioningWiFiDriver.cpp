@@ -213,9 +213,9 @@ exit:
     }
 }
 
-chip::BitFlags<WiFiSecurity> GenioWiFiDriver::ConvertSecuritytype(wifi_auth_mode_t auth_mode)
+chip::BitFlags<WiFiSecurityBitmap> GenioWiFiDriver::ConvertSecuritytype(wifi_auth_mode_t auth_mode)
 {
-    chip::BitFlags<WiFiSecurity> securityType;
+    chip::BitFlags<WiFiSecurityBitmap> securityType;
     if (auth_mode == WIFI_AUTH_MODE_OPEN)
     {
         securityType = WiFiSecurity::kUnencrypted;
@@ -281,7 +281,7 @@ void GenioWiFiDriver::OnScanWiFiNetworkDone(wifi_scan_list_item_t * aScanResult)
         while (aScanResult->is_valid)
         {
             NetworkCommissioning::WiFiScanResponse scanResponse = {};
-            chip::BitFlags<WiFiSecurity> security;
+            chip::BitFlags<WiFiSecurityBitmap> security;
 
             security = GetInstance().ConvertSecuritytype(aScanResult->auth_mode);
 

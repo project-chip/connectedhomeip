@@ -4725,8 +4725,8 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRNetworkCommissioningClusterNetworkInfo * newElement_0;
-                newElement_0 = [MTRNetworkCommissioningClusterNetworkInfo new];
+                MTRNetworkCommissioningClusterNetworkInfoStruct * newElement_0;
+                newElement_0 = [MTRNetworkCommissioningClusterNetworkInfoStruct new];
                 newElement_0.networkID = AsData(entry_0.networkID);
                 newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
                 [array_0 addObject:newElement_0];
@@ -9048,13 +9048,27 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(
                 newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
                 { // Scope for our temporary variables
                     auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.semanticTags.begin();
+                    auto iter_2 = entry_0.modeTags.begin();
                     while (iter_2.Next()) {
                         auto & entry_2 = iter_2.GetValue();
-                        MTRModeSelectClusterSemanticTagStruct * newElement_2;
-                        newElement_2 = [MTRModeSelectClusterSemanticTagStruct new];
-                        newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                        MTRModeSelectClusterModeTagStruct * newElement_2;
+                        newElement_2 = [MTRModeSelectClusterModeTagStruct new];
+                        if (entry_2.mfgCode.HasValue()) {
+                            newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
+                        } else {
+                            newElement_2.mfgCode = nil;
+                        }
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                        if (entry_2.tagName.HasValue()) {
+                            newElement_2.tagName = AsString(entry_2.tagName.Value());
+                            if (newElement_2.tagName == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
+                        } else {
+                            newElement_2.tagName = nil;
+                        }
                         [array_2 addObject:newElement_2];
                     }
                     CHIP_ERROR err = iter_2.GetStatus();
@@ -9062,7 +9076,7 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(
                         *aError = err;
                         return nil;
                     }
-                    newElement_0.semanticTags = array_2;
+                    newElement_0.modeTags = array_2;
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -9484,17 +9498,6 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAlarmCluster(
     switch (aAttributeId) {
     case Attributes::Mask::Id: {
         using TypeInfo = Attributes::Mask::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
-        return value;
-    }
-    case Attributes::Latch::Id: {
-        using TypeInfo = Attributes::Latch::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

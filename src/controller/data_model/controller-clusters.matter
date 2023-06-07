@@ -1,6 +1,18 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+    optional char_string<64> tagName = 2;
+}
+
+struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+}
+
 struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
@@ -1481,7 +1493,7 @@ client cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 client cluster NetworkCommissioning = 49 {
-  enum NetworkCommissioningStatus : ENUM8 {
+  enum NetworkCommissioningStatusEnum : ENUM8 {
     kSuccess = 0;
     kOutOfRange = 1;
     kBoundsExceeded = 2;
@@ -1497,7 +1509,7 @@ client cluster NetworkCommissioning = 49 {
     kUnknownError = 12;
   }
 
-  enum WiFiBand : ENUM8 {
+  enum WiFiBandEnum : ENUM8 {
     k2g4 = 0;
     k3g65 = 1;
     k5g = 2;
@@ -1512,7 +1524,7 @@ client cluster NetworkCommissioning = 49 {
     kEthernetNetworkInterface = 0x4;
   }
 
-  bitmap WiFiSecurity : BITMAP8 {
+  bitmap WiFiSecurityBitmap : BITMAP8 {
     kUnencrypted = 0x1;
     kWep = 0x2;
     kWpaPersonal = 0x4;
@@ -1520,12 +1532,12 @@ client cluster NetworkCommissioning = 49 {
     kWpa3Personal = 0x10;
   }
 
-  struct NetworkInfo {
+  struct NetworkInfoStruct {
     octet_string<32> networkID = 0;
     boolean connected = 1;
   }
 
-  struct ThreadInterfaceScanResult {
+  struct ThreadInterfaceScanResultStruct {
     int16u panId = 0;
     int64u extendedPanId = 1;
     char_string<16> networkName = 2;
@@ -1536,21 +1548,21 @@ client cluster NetworkCommissioning = 49 {
     int8u lqi = 7;
   }
 
-  struct WiFiInterfaceScanResult {
-    WiFiSecurity security = 0;
+  struct WiFiInterfaceScanResultStruct {
+    WiFiSecurityBitmap security = 0;
     octet_string<32> ssid = 1;
     octet_string<6> bssid = 2;
     int16u channel = 3;
-    WiFiBand wiFiBand = 4;
+    WiFiBandEnum wiFiBand = 4;
     int8s rssi = 5;
   }
 
   readonly attribute access(read: administer) int8u maxNetworks = 0;
-  readonly attribute access(read: administer) NetworkInfo networks[] = 1;
+  readonly attribute access(read: administer) NetworkInfoStruct networks[] = 1;
   readonly attribute optional int8u scanMaxTimeSeconds = 2;
   readonly attribute optional int8u connectMaxTimeSeconds = 3;
   attribute access(write: administer) boolean interfaceEnabled = 4;
-  readonly attribute access(read: administer) nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1566,10 +1578,10 @@ client cluster NetworkCommissioning = 49 {
   }
 
   response struct ScanNetworksResponse = 1 {
-    NetworkCommissioningStatus networkingStatus = 0;
+    NetworkCommissioningStatusEnum networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
-    optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
-    optional ThreadInterfaceScanResult threadScanResults[] = 3;
+    optional WiFiInterfaceScanResultStruct wiFiScanResults[] = 2;
+    optional ThreadInterfaceScanResultStruct threadScanResults[] = 3;
   }
 
   request struct AddOrUpdateWiFiNetworkRequest {
@@ -1589,7 +1601,7 @@ client cluster NetworkCommissioning = 49 {
   }
 
   response struct NetworkConfigResponse = 5 {
-    NetworkCommissioningStatus networkingStatus = 0;
+    NetworkCommissioningStatusEnum networkingStatus = 0;
     optional CHAR_STRING<512> debugText = 1;
     optional INT8U networkIndex = 2;
   }
@@ -1600,7 +1612,7 @@ client cluster NetworkCommissioning = 49 {
   }
 
   response struct ConnectNetworkResponse = 7 {
-    NetworkCommissioningStatus networkingStatus = 0;
+    NetworkCommissioningStatusEnum networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     nullable INT32S errorValue = 2;
   }
@@ -2596,10 +2608,6 @@ client cluster GroupKeyManagement = 63 {
     INT16U groupKeySetID = 0;
   }
 
-  request struct KeySetReadAllIndicesRequest {
-    INT16U groupKeySetIDs[] = 0;
-  }
-
   response struct KeySetReadAllIndicesResponse = 5 {
     INT16U groupKeySetIDs[] = 0;
   }
@@ -2611,7 +2619,7 @@ client cluster GroupKeyManagement = 63 {
   /** Revoke a Root Key from a Group */
   fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
   /** Return the list of Group Key Sets associated with the accessing fabric */
-  fabric command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
+  fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
@@ -2744,23 +2752,44 @@ client cluster IcdManagement = 70 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 client cluster ModeSelect = 80 {
-  bitmap Feature : BITMAP32 {
-    kDeponoff = 0x1;
+  enum ModeTag : ENUM16 {
+    kAuto = 0;
+    kQuick = 1;
+    kQuiet = 2;
+    kLowNoise = 3;
+    kLowEnergy = 4;
+    kVacation = 5;
+    kMin = 6;
+    kMax = 7;
+    kNight = 8;
+    kDay = 9;
   }
 
-  struct SemanticTagStruct {
-    vendor_id mfgCode = 0;
+  enum StatusCode : ENUM8 {
+    kSuccess = 0;
+    kUnsupportedMode = 1;
+    kGenericFailure = 2;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+    kExtendedStatus = 0x2;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
     enum16 value = 1;
+    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
-    SemanticTagStruct semanticTags[] = 2;
+    ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute char_string<32> description = 0;
-  readonly attribute nullable enum16 standardNamespace = 1;
+  readonly attribute char_string<64> description = 0;
+  readonly attribute optional nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
@@ -2776,8 +2805,275 @@ client cluster ModeSelect = 80 {
     INT8U newMode = 0;
   }
 
-  /** On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** If the NewMode field doesn't match the Mode field in an entry of the SupportedModes list the server SHALL respond with an INVALID_COMMAND status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list but the device is unable to transition as requested, the server SHALL respond with a FAILURE status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response. */
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  /** This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on NewMode field, see ChangeToMode command.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): ChangeToModeResponse = 1;
+}
+
+/** This cluster is an alias of the Mode Select cluster, defining additional semantics and
+      namespaced enumerated values for laundry washer devices. */
+client cluster LaundryWasherModeSelect = 81 {
+  enum ModeTag : ENUM16 {
+    kNormal = 16384;
+    kDelicate = 16385;
+    kHeavy = 16386;
+    kWhites = 16387;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+    kExtendedStatus = 0x2;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+    optional char_string<64> tagName = 2;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute char_string<64> description = 0;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute optional nullable int8u startUpMode = 4;
+  attribute optional nullable int8u onMode = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** If the NewMode field doesn't match the Mode field in an entry of the SupportedModes list the server SHALL respond with an INVALID_COMMAND status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list but the device is unable to transition as requested, the server SHALL respond with a FAILURE status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response. */
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  /** This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on NewMode field, see ChangeToMode command.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): ChangeToModeResponse = 1;
+}
+
+/** This cluster is an alias of the Mode Select cluster, defining additional semantics and
+      namespaced enumerated values for refrigerator and temperature controlled cabinet devices. */
+client cluster RefrigeratorAndTemperatureControlledCabinetModeSelect = 82 {
+  enum ModeTag : ENUM16 {
+    kRapidCool = 16384;
+    kRapidFreeze = 16385;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+    kExtendedStatus = 0x2;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+    optional char_string<64> tagName = 2;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute char_string<64> description = 0;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute optional nullable int8u startUpMode = 4;
+  attribute optional nullable int8u onMode = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** If the NewMode field doesn't match the Mode field in an entry of the SupportedModes list the server SHALL respond with an INVALID_COMMAND status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list but the device is unable to transition as requested, the server SHALL respond with a FAILURE status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response. */
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  /** This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on NewMode field, see ChangeToMode command.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): ChangeToModeResponse = 1;
+}
+
+/** This cluster is an alias of the Mode Select cluster which also defines a namespace for the running modes of the Robotic Vacuum Cleaner devices. */
+client cluster RvcRunModeSelect = 84 {
+  enum ModeTag : ENUM16 {
+    kIdle = 16384;
+    kCleaning = 16385;
+  }
+
+  enum StatusCode : ENUM8 {
+    kStuck = 65;
+    kDustBinMissing = 66;
+    kDustBinFull = 67;
+    kWaterTankEmpty = 68;
+    kWaterTankMissing = 69;
+    kWaterTankLidOpen = 70;
+    kMopCleaningPadMissing = 71;
+    kBatteryLow = 72;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+    kExtendedStatus = 0x2;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+    optional char_string<64> tagName = 2;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute char_string<64> description = 0;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute optional nullable int8u startUpMode = 4;
+  attribute optional nullable int8u onMode = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** If the NewMode field doesn't match the Mode field in an entry of the SupportedModes list the server SHALL respond with an INVALID_COMMAND status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list but the device is unable to transition as requested, the server SHALL respond with a FAILURE status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response. */
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  /** This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on NewMode field, see ChangeToMode command.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): ChangeToModeResponse = 1;
+}
+
+/** This cluster is an alias of the Mode Select cluster which also defines a namespace for the
+      cleaning type of the Robotic Vacuum Cleaner devices. */
+client cluster RvcCleanModeSelect = 85 {
+  enum ModeTag : ENUM16 {
+    kDeepClean = 16384;
+    kVacuum = 16385;
+    kMop = 16386;
+  }
+
+  enum StatusCode : ENUM8 {
+    kCleaningInProgress = 64;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+    kExtendedStatus = 0x2;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+    optional char_string<64> tagName = 2;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute char_string<64> description = 0;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute optional nullable int8u startUpMode = 4;
+  attribute optional nullable int8u onMode = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** If the NewMode field doesn't match the Mode field in an entry of the SupportedModes list the server SHALL respond with an INVALID_COMMAND status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list but the device is unable to transition as requested, the server SHALL respond with a FAILURE status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response. */
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  /** This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on NewMode field, see ChangeToMode command.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): ChangeToModeResponse = 1;
 }
 
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
@@ -2827,8 +3123,7 @@ client cluster RefrigeratorAlarm = 87 {
     AlarmMap mask = 3;
   }
 
-  attribute AlarmMap mask = 0;
-  readonly attribute AlarmMap latch = 1;
+  readonly attribute AlarmMap mask = 0;
   readonly attribute AlarmMap state = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2836,14 +3131,66 @@ client cluster RefrigeratorAlarm = 87 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
 
-  request struct ResetRequest {
-    AlarmMap alarms = 0;
-    optional AlarmMap mask = 1;
+/** This cluster is an alias of the Mode Select cluster, defining additional semantics and
+      namespaced enumerated values for dishwasher devices. */
+client cluster DishwasherModeSelect = 89 {
+  enum ModeTag : ENUM16 {
+    kNormal = 16384;
+    kHeavy = 16385;
+    kLight = 16386;
   }
 
-  /** Reset alarm */
-  command Reset(ResetRequest): DefaultSuccess = 0;
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+    kExtendedStatus = 0x2;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+    optional char_string<64> tagName = 2;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute char_string<64> description = 0;
+  readonly attribute ModeOptionStruct supportedModes[] = 2;
+  readonly attribute int8u currentMode = 3;
+  attribute optional nullable int8u startUpMode = 4;
+  attribute optional nullable int8u onMode = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  request struct ChangeToModeWithStatusRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 2 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** If the NewMode field doesn't match the Mode field in an entry of the SupportedModes list the server SHALL respond with an INVALID_COMMAND status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list but the device is unable to transition as requested, the server SHALL respond with a FAILURE status response.
+        If the NewMode field matches the Mode field in an entry of the SupportedModes list and the device is able to transition as requested the server SHALL set the CurrentMode attribute to the NewMode value and SHALL respond with a SUCCESS status response. */
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+  /** This command is used to change device modes using the same mechanism and semantics as ChangeToMode, and additionally obtaining a response with an ability for clients to determine causes of failures with fine-grained details. For status response depending on NewMode field, see ChangeToMode command.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): ChangeToModeResponse = 1;
 }
 
 /** Attributes for reporting air quality classification */

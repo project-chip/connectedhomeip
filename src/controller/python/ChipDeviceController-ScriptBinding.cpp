@@ -198,6 +198,7 @@ PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommission
 PyChipError pychip_FreeOperationalDeviceProxy(chip::OperationalDeviceProxy * deviceProxy);
 PyChipError pychip_GetLocalSessionId(chip::OperationalDeviceProxy * deviceProxy, uint16_t * localSessionId);
 PyChipError pychip_GetNumSessionsToPeer(chip::OperationalDeviceProxy * deviceProxy, uint32_t * numSessions);
+PyChipError pychip_GetAttestationChallenge(chip::OperationalDeviceProxy * deviceProxy, uint8_t * buf, size_t * size);
 PyChipError pychip_GetDeviceBeingCommissioned(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                               CommissioneeDeviceProxy ** proxy);
 PyChipError pychip_ExpireSessions(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId);
@@ -709,6 +710,19 @@ PyChipError pychip_GetNumSessionsToPeer(chip::OperationalDeviceProxy * devicePro
     *numSessions = 0;
     deviceProxy->GetExchangeManager()->GetSessionManager()->ForEachMatchingSession(
         deviceProxy->GetPeerScopedNodeId(), [numSessions](auto * session) { (*numSessions)++; });
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_GetAttestationChallenge(chip::OperationalDeviceProxy * deviceProxy, uint8_t * buf, size_t * size)
+{
+    VerifyOrReturnError(deviceProxy->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
+    VerifyOrReturnError(buf != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    ByteSpan challenge = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+    VerifyOrReturnError(challenge.size() <= *size, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    memcpy(buf, challenge.data(), challenge.size());
+    *size = challenge.size();
 
     return ToPyChipError(CHIP_NO_ERROR);
 }

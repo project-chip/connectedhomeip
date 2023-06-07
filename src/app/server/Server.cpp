@@ -247,6 +247,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
+#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
+    mICDEventManager.Init(&mICDManager);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler();
 
@@ -405,7 +409,7 @@ void Server::CheckServerReadyEvent()
     // are ready, and emit the 'server ready' event if so.
     if (mIsDnssdReady)
     {
-        ChipLogError(AppServer, "Server initialization complete");
+        ChipLogProgress(AppServer, "Server initialization complete");
 
         ChipDeviceEvent event = { .Type = DeviceEventType::kServerReady };
         PlatformMgr().PostEventOrDie(&event);
@@ -484,6 +488,9 @@ void Server::Shutdown()
     mAccessControl.Finish();
     Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
+#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
+    mICDEventManager.Shutdown();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();

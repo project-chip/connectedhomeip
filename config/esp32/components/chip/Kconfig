@@ -112,11 +112,15 @@ menu "CHIP Core"
             int  "Set threshold in ms"
             default 700
             help
-                 Time threshold for warning that dispatched took too long. You can
-		 set this default set to 0 to to disable event dispatching time
-		 measurement and suppress the logs "Long dispatch time:...".
+                Time threshold for warning that dispatched took too long. You can
+                set this default set to 0 to to disable event dispatching time
+                measurement and suppress the logs "Long dispatch time:...".
 
-        # TODO: add log level selection
+        config CHIP_LOG_FILTERING
+            bool "CHIP log level filtering APIs"
+            default n
+            help
+                Option to enable/disable CHIP log level filtering APIs.
 
     endmenu # "General Options"
 
@@ -163,6 +167,13 @@ menu "CHIP Core"
 
                 A value of 0 disables automatic closing of idle connections.
 
+        config ENABLE_ROUTE_HOOK
+            bool "Enable route hook"
+            depends on LWIP_HOOK_IP6_ROUTE_DEFAULT && LWIP_HOOK_ND6_GET_GW_DEFAULT
+            default y
+            help
+                Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
+
     endmenu # "Networking Options"
 
     menu "System Options"
@@ -178,6 +189,13 @@ menu "CHIP Core"
             default n
             help
                 Enable this option to enable OTA Requestor for example
+
+        config ENABLE_ENCRYPTED_OTA
+            bool "Enable pre encrypted OTA"
+            depends on ENABLE_OTA_REQUESTOR
+            default n
+            help
+                Enable this option to use the pre encrypted OTA image
 
         config OTA_AUTO_REBOOT_ON_APPLY
             bool "Reboot the device after applying the OTA image"

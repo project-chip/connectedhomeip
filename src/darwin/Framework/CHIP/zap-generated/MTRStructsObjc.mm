@@ -1089,7 +1089,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRNetworkCommissioningClusterNetworkInfo
+@implementation MTRNetworkCommissioningClusterNetworkInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1103,7 +1103,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRNetworkCommissioningClusterNetworkInfo alloc] init];
+    auto other = [[MTRNetworkCommissioningClusterNetworkInfoStruct alloc] init];
 
     other.networkID = self.networkID;
     other.connected = self.connected;
@@ -1121,7 +1121,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRNetworkCommissioningClusterThreadInterfaceScanResult
+@implementation MTRNetworkCommissioningClusterNetworkInfo : MTRNetworkCommissioningClusterNetworkInfoStruct
+@end
+
+@implementation MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1147,7 +1150,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRNetworkCommissioningClusterThreadInterfaceScanResult alloc] init];
+    auto other = [[MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct alloc] init];
 
     other.panId = self.panId;
     other.extendedPanId = self.extendedPanId;
@@ -1173,7 +1176,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRNetworkCommissioningClusterWiFiInterfaceScanResult
+@implementation MTRNetworkCommissioningClusterThreadInterfaceScanResult
+    : MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct
+@end
+
+@implementation MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1195,7 +1202,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRNetworkCommissioningClusterWiFiInterfaceScanResult alloc] init];
+    auto other = [[MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct alloc] init];
 
     other.security = self.security;
     other.ssid = self.ssid;
@@ -1216,6 +1223,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRNetworkCommissioningClusterWiFiInterfaceScanResult : MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct
 @end
 
 @implementation MTRGeneralDiagnosticsClusterNetworkInterface
@@ -2608,38 +2618,38 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRModeSelectClusterSemanticTagStruct
+@implementation MTRModeSelectClusterModeTagStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _mfgCode = @(0);
+        _mfgCode = nil;
 
         _value = @(0);
+
+        _tagName = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRModeSelectClusterSemanticTagStruct alloc] init];
+    auto other = [[MTRModeSelectClusterModeTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
+    other.tagName = self.tagName;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: mfgCode:%@; value:%@; tagName:%@; >", NSStringFromClass([self class]), _mfgCode, _value, _tagName];
     return descriptionString;
 }
 
-@end
-
-@implementation MTRModeSelectClusterSemanticTag : MTRModeSelectClusterSemanticTagStruct
 @end
 
 @implementation MTRModeSelectClusterModeOptionStruct
@@ -2651,7 +2661,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mode = @(0);
 
-        _semanticTags = [NSArray array];
+        _modeTags = [NSArray array];
     }
     return self;
 }
@@ -2662,15 +2672,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.label = self.label;
     other.mode = self.mode;
-    other.semanticTags = self.semanticTags;
+    other.modeTags = self.modeTags;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; semanticTags:%@; >",
-                                             NSStringFromClass([self class]), _label, _mode, _semanticTags];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
     return descriptionString;
 }
 

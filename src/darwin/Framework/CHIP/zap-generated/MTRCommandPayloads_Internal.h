@@ -217,6 +217,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRModeSelectClusterChangeToModeResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTROperationalStateClusterOperationalCommandResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:

@@ -21,6 +21,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/jsontlv/TlvJson.h>
 
+constexpr const char * kDataVersionKey    = "dataVersion";
 constexpr const char * kClusterIdKey      = "clusterId";
 constexpr const char * kEndpointIdKey     = "endpointId";
 constexpr const char * kAttributeIdKey    = "attributeId";
@@ -69,6 +70,10 @@ CHIP_ERROR LogAttributeAsJSON(const chip::app::ConcreteDataAttributePath & path,
     value[kClusterIdKey]   = path.mClusterId;
     value[kEndpointIdKey]  = path.mEndpointId;
     value[kAttributeIdKey] = path.mAttributeId;
+    if (path.mDataVersion.HasValue())
+    {
+        value[kDataVersionKey] = path.mDataVersion.Value();
+    }
 
     chip::TLV::TLVReader reader;
     reader.Init(*data);

@@ -94,6 +94,7 @@ if (chip_build_tests) {
         "${chip_root}/src/lib/support/tests",
         "${chip_root}/src/protocols/secure_channel/tests",
         "${chip_root}/src/system/tests",
+        "${chip_root}/src/tracing/tests",
         "${chip_root}/src/transport/tests",
       ]
     }

@@ -301,7 +301,8 @@ uint16_t ColorControlServer::computeTransitionTimeFromStateAndRate(ColorControlS
  */
 EmberEventControl * ColorControlServer::getEventControl(EndpointId endpoint)
 {
-    uint16_t index            = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
+    uint16_t index =
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     EmberEventControl * event = nullptr;
 
     if (index < ArraySize(eventControls))
@@ -424,7 +425,8 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
  */
 ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTransitionState(EndpointId endpoint)
 {
-    uint16_t index                  = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
+    uint16_t index =
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     ColorHueTransitionState * state = nullptr;
 
     if (index < ArraySize(colorHueTransitionStates))
@@ -442,7 +444,8 @@ ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTra
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getSaturationTransitionState(EndpointId endpoint)
 {
-    uint16_t index                  = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
+    uint16_t index =
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     Color16uTransitionState * state = nullptr;
 
     if (index < ArraySize(colorSatTransitionStates))
@@ -1646,7 +1649,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
             Attributes::EnhancedCurrentHue::Set(endpoint, colorHueTransitionState->currentEnhancedHue);
             Attributes::CurrentHue::Set(endpoint, static_cast<uint8_t>(colorHueTransitionState->currentEnhancedHue >> 8));
 
-            emberAfColorControlClusterPrintln("Enhanced Hue %d endpoint %d", colorHueTransitionState->currentEnhancedHue, endpoint);
+            ChipLogProgress(Zcl, "Enhanced Hue %d endpoint %d", colorHueTransitionState->currentEnhancedHue, endpoint);
         }
     }
     else
@@ -1654,7 +1657,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
         if (previousHue != colorHueTransitionState->currentHue)
         {
             Attributes::CurrentHue::Set(colorHueTransitionState->endpoint, colorHueTransitionState->currentHue);
-            emberAfColorControlClusterPrintln("Hue %d endpoint %d", colorHueTransitionState->currentHue, endpoint);
+            ChipLogProgress(Zcl, "Hue %d endpoint %d", colorHueTransitionState->currentHue, endpoint);
         }
     }
 
@@ -1662,7 +1665,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     {
         Attributes::CurrentSaturation::Set(colorSaturationTransitionState->endpoint,
                                            (uint8_t) colorSaturationTransitionState->currentValue);
-        emberAfColorControlClusterPrintln("Saturation %d endpoint %d", colorSaturationTransitionState->currentValue, endpoint);
+        ChipLogProgress(Zcl, "Saturation %d endpoint %d", colorSaturationTransitionState->currentValue, endpoint);
     }
 
     computePwmFromHsv(endpoint);
@@ -1680,7 +1683,8 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransitionState(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
+    uint16_t index =
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     Color16uTransitionState * state = nullptr;
     if (index < ArraySize(colorXtransitionStates))
@@ -1699,7 +1703,8 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransition
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getYTransitionState(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
+    uint16_t index =
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     Color16uTransitionState * state = nullptr;
     if (index < ArraySize(colorYtransitionStates))
@@ -2009,8 +2014,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     Attributes::CurrentX::Set(endpoint, colorXTransitionState->currentValue);
     Attributes::CurrentY::Set(endpoint, colorYTransitionState->currentValue);
 
-    emberAfColorControlClusterPrintln("Color X %d Color Y %d", colorXTransitionState->currentValue,
-                                      colorYTransitionState->currentValue);
+    ChipLogProgress(Zcl, "Color X %d Color Y %d", colorXTransitionState->currentValue, colorYTransitionState->currentValue);
 
     computePwmFromXy(endpoint);
 }
@@ -2026,7 +2030,8 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
  */
 ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransitionState(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ColorControl::Id);
+    uint16_t index =
+        emberAfGetClusterServerEndpointIndex(endpoint, ColorControl::Id, EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     Color16uTransitionState * state = nullptr;
     if (index < ArraySize(colorTempTransitionStates))
@@ -2209,7 +2214,7 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
 
     Attributes::ColorTemperatureMireds::Set(endpoint, colorTempTransitionState->currentValue);
 
-    emberAfColorControlClusterPrintln("Color Temperature %d", colorTempTransitionState->currentValue);
+    ChipLogProgress(Zcl, "Color Temperature %d", colorTempTransitionState->currentValue);
 
     computePwmFromTemp(endpoint);
 }
@@ -2699,7 +2704,7 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
 
 void MatterColorControlClusterServerShutdownCallback(EndpointId endpoint)
 {
-    emberAfColorControlClusterPrintln("Shuting down color control server cluster on endpoint %d", endpoint);
+    ChipLogProgress(Zcl, "Shuting down color control server cluster on endpoint %d", endpoint);
     ColorControlServer::Instance().cancelEndpointTimerCallback(endpoint);
 }
 

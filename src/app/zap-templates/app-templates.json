@@ -35,11 +35,6 @@
             "output": "gen_config.h"
         },
         {
-            "path": "templates/app/CHIPClientCallbacks.zapt",
-            "name": "CHIP Client Callbacks header",
-            "output": "CHIPClientCallbacks.h"
-        },
-        {
             "path": "templates/app/im-cluster-command-handler.zapt",
             "name": "CHIP Client Callbacks for Interaction Model",
             "output": "IMClusterCommandHandler.cpp"

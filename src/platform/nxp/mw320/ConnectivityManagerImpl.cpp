@@ -367,7 +367,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const uint8_t sid, NetworkCommissionin
     // => rssi
     result.rssi = static_cast<int8_t>(0 - res.rssi);
     // => band, mw320 only works in 2.4G
-    result.wiFiBand = app::Clusters::NetworkCommissioning::WiFiBand::k2g4;
+    result.wiFiBand = app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4;
     // => channel
     result.channel = res.channel;
     // => security
