@@ -39,19 +39,6 @@ limitations under the License.
     <item name="WaterLevelError"            value="0x45"/>
   </enum>
 
-  <struct name="OperationalStateStruct">
-    <cluster code="0x005A"/>
-    <item name="OperationalStateID"    type="OperationalStateEnum" optional="false"/>
-    <item name="OperationalStateLabel" type="CHAR_STRING" optional="false" length="64"/>
-  </struct>
-
-  <struct name="ErrorStateStruct">
-    <cluster code="0x005A"/>
-    <item name="ErrorStateID" type="ErrorStateEnum" optional="false" />
-    <item name="ErrorStateLabel" type="CHAR_STRING" optional="false" isNullable="true" length="64"/>
-    <item name="ErrorStateDetails" type="CHAR_STRING" optional="true" length="64"/>
-  </struct>
-
   <cluster>
     <domain>Appliances</domain>
     <name>Dishwasher Operational State</name>
