@@ -195,47 +195,48 @@ def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None
 
 @dataclass
 class MatterTestConfig:
-    storage_path: pathlib.Path = None
-    logs_path: pathlib.Path = None
-    paa_trust_store_path: pathlib.Path = None
-    ble_interface_id: int = None
+    storage_path: pathlib.Path = pathlib.Path(".")
+    logs_path: pathlib.Path = pathlib.Path(".")
+    paa_trust_store_path: Optional[pathlib.Path] = None
+    ble_interface_id: Optional[int] = None
     commission_only: bool = False
 
     admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
-    case_admin_subject: int = None
+    case_admin_subject: Optional[int] = None
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
     tests: List[str] = field(default_factory=list)
 
-    commissioning_method: str = None
-    discriminators: List[int] = None
-    setup_passcodes: List[int] = None
-    commissionee_ip_address_just_for_testing: str = None
+    commissioning_method: Optional[str] = None
+    discriminators: Optional[List[int]] = None
+    setup_passcodes: Optional[List[int]] = None
+    commissionee_ip_address_just_for_testing: Optional[str] = None
     maximize_cert_chains: bool = False
 
-    qr_code_content: str = None
-    manual_code: str = None
+    qr_code_content: Optional[str] = None
+    manual_code: Optional[str] = None
 
-    wifi_ssid: str = None
-    wifi_passphrase: str = None
-    thread_operational_dataset: str = None
+    wifi_ssid: Optional[str] = None
+    wifi_passphrase: Optional[str] = None
+    thread_operational_dataset: Optional[str] = None
 
     pics: dict[bool, str] = field(default_factory=dict)
 
     # Node ID for basic DUT
-    dut_node_ids: List[int] = None
+    dut_node_ids: Optional[List[int]] = None
     # Node ID to use for controller/commissioner
     controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
     # CAT Tags for default controller/commissioner
     controller_cat_tags: List[int] = field(default_factory=list)
 
     # Fabric ID which to use
-    fabric_id: int = None
+    fabric_id: int = 1
+
     # "Alpha" by default
     root_of_trust_index: int = _DEFAULT_TRUST_ROOT_INDEX
 
     # If this is set, we will reuse root of trust keys at that location
-    chip_tool_credentials_path: pathlib.Path = None
+    chip_tool_credentials_path: Optional[pathlib.Path] = None
 
 
 class MatterStackState:
@@ -458,6 +459,7 @@ def byte_string_from_hex(s: str) -> bytes:
 
 
 def int_from_manual_code(s: str) -> int:
+    s = s.replace('-', '')
     regex = r"^([0-9]{11}|[0-9]{21})$"
     match = re.match(regex, s)
     if not match:
@@ -582,7 +584,10 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
 
     # TODO: this should also allow multiple once QR and manual codes are supported.
     config.qr_code_content = args.qr_code
-    config.manual_code = "%d" % args.manual_code
+    if args.manual_code:
+      config.manual_code = "%d" % args.manual_code
+    else:
+      config.manual_code = None
 
     if args.commissioning_method is None:
         return True
