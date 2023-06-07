@@ -291,10 +291,13 @@ void CHIPCommand::StartTracing()
         StringCommaSplitter splitter(mTraceTo.Value());
         const char *destination;
 
+        // Use scoped_registration to register each backend and ensure
+        // uniqueness by checking in-list.
         while ((destination = splitter.Next()) != nullptr) {
             if (strcmp(destination, "log") == 0) {
-                /// Scoped registration auto-registers and unregisters itself
-                tracing_backends.push_back(std::make_unique<ScopedRegistration>(log_json_backend));
+                if (!log_json_backend.IsInList()) {
+                    tracing_backends.push_back(std::make_unique<ScopedRegistration>(log_json_backend));
+                }
             } else {
                 ChipLogError(AppServer, "Unknown trace destination: '%s'", destination);
             }
