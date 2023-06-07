@@ -26,7 +26,8 @@ namespace LogJson {
 /// A Backend that outputs data to chip logging.
 ///
 /// Structured data is formatted as json strings.
-class LogJsonBackend : public ::chip::Tracing::Backend {
+class LogJsonBackend : public ::chip::Tracing::Backend
+{
 public:
     LogJsonBackend() = default;
 
@@ -38,10 +39,8 @@ public:
     void LogNodeLookup(NodeLookupInfo &) override;
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
-
 };
 
 } // namespace LogJson
 } // namespace Tracing
 } // namespace chip
-

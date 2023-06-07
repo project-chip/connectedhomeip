@@ -19,8 +19,8 @@ import("//build_overrides/chip.gni")
 # for embedded devices.
 static_library("log_json") {
   sources = [
-    "log_json_tracing.h",
     "log_json_tracing.cpp",
+    "log_json_tracing.h",
   ]
 
   public_deps = [
