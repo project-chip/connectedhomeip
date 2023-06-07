@@ -235,41 +235,38 @@ void LogJsonBackend::TraceInstant(Instant instant)
 
 void LogJsonBackend::LogMessageSend(MessageSendInfo &)
 {
-    // TODO: implement
     json::Value value;
-    value["TODO"]   = "LogMessageSend";
+    value["TODO"] = "LogMessageSend";
     LogJsonValue(value);
 }
 
 void LogJsonBackend::LogMessageReceived(MessageReceiveInfo &)
 {
     json::Value value;
-    value["TODO"]   = "LogMessageReceived";
+    value["TODO"] = "LogMessageReceived";
     LogJsonValue(value);
 }
 
 void LogJsonBackend::LogNodeLookup(NodeLookupInfo &)
 {
     json::Value value;
-    value["TODO"]   = "LogNodeLookup";
+    value["TODO"] = "LogNodeLookup";
     LogJsonValue(value);
 }
 
 void LogJsonBackend::LogNodeDiscovered(NodeDiscoveredInfo &)
 {
     json::Value value;
-    value["TODO"]   = "LogNodeDiscovered";
+    value["TODO"] = "LogNodeDiscovered";
     LogJsonValue(value);
 }
 
 void LogJsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &)
 {
     json::Value value;
-    value["TODO"]   = "LogNodeDiscoveryFailed";
+    value["TODO"] = "LogNodeDiscoveryFailed";
     LogJsonValue(value);
 }
-
-}; // namespace
 
 } // namespace LogJson
 } // namespace Tracing
