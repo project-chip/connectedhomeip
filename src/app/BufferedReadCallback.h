@@ -56,7 +56,7 @@ private:
      *  2. The path provided in aPath is similar to what is buffered but we've hit the end of the report.
      *
      */
-    CHIP_ERROR DispatchBufferedData(const ConcreteAttributePath & aPath, const StatusIB & aStatus, bool aEndOfReport = false);
+    CHIP_ERROR DispatchBufferedData(const ConcreteDataAttributePath & aPath, const StatusIB & aStatus, bool aEndOfReport = false);
 
     /*
      * Buffer up list data as they arrive.

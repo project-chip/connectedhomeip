@@ -169,10 +169,10 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteDataAttributePath & aP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteAttributePath & aPath, const StatusIB & aStatusIB,
+CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteDataAttributePath & aPath, const StatusIB & aStatusIB,
                                                       bool aEndOfReport)
 {
-    if (aPath == mBufferedPath)
+    if (aPath == mBufferedPath && aPath.IsListItemOperation())
     {
         //
         // If we encountered the same list again and it's not the last DataIB, then
