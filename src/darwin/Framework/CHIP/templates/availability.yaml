@@ -8056,7 +8056,6 @@
               - ClusterRevision
           RefrigeratorAlarm:
               - Mask
-              - Latch
               - State
               - GeneratedCommandList
               - AcceptedCommandList
@@ -8129,8 +8128,6 @@
               - Start
               - Resume
               - OperationalCommandResponse
-          RefrigeratorAlarm:
-              - Reset
           TemperatureControl:
               - SetTemperature
           DoorLock:
@@ -8149,10 +8146,6 @@
           OperationalState:
               OperationalCommandResponse:
                   - commandResponseState
-          RefrigeratorAlarm:
-              Reset:
-                  - alarms
-                  - mask
           TemperatureControl:
               SetTemperature:
                   - targetTemperature
