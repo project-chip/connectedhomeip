@@ -115,21 +115,14 @@ class ErrorAccumulatingRule(LintRule):
         pass
 
 
-class RequiredAttributesRule(ErrorAccumulatingRule):
+class ClusterValidationRule(ErrorAccumulatingRule):
     def __init__(self, name):
-        super(RequiredAttributesRule, self).__init__(name)
-        # Map attribute code to name
-        self._mandatory_attributes: List[AttributeRequirement] = []
+        super().__init__(name)
         self._mandatory_clusters: List[ClusterRequirement] = []
         self._rejected_clusters: List[ClusterRequirement] = []
 
     def __repr__(self):
-        result = "RequiredAttributesRule{\n"
-
-        if self._mandatory_attributes:
-            result += "  mandatory_attributes:\n"
-            for attr in self._mandatory_attributes:
-                result += "    - %r\n" % attr
+        result = "ClusterValidationRule{\n"
 
         if self._mandatory_clusters:
             result += "  mandatory_clusters:\n"
@@ -142,17 +135,87 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
                 result += "    - %r\n" % cluster
 
         result += "}"
-        return result
 
-    def RequireAttribute(self, attr: AttributeRequirement):
-        """Mark an attribute required"""
-        self._mandatory_attributes.append(attr)
+        return result
 
     def RequireClusterInEndpoint(self, requirement: ClusterRequirement):
         self._mandatory_clusters.append(requirement)
 
     def RejectClusterInEndpoint(self, requirement: ClusterRequirement):
         self._rejected_clusters.append(requirement)
+
+    def _ClusterCode(self, name: str, location: Optional[LocationInFile]):
+        """Finds the server cluster definition with the given name.
+
+        On error returns None and _lint_errors is updated internlly
+        """
+        if not self._idl:
+            raise MissingIdlError()
+
+        cluster_definition = [
+            c for c in self._idl.clusters if c.name == name and c.side == ClusterSide.SERVER
+        ]
+        if not cluster_definition:
+            self._AddLintError(
+                "Cluster definition for %s not found" % name, location)
+            return None
+
+        if len(cluster_definition) > 1:
+            self._AddLintError(
+                "Multiple cluster definitions found for %s" % name, location)
+            return None
+
+        return cluster_definition[0].code
+
+    def _LintImpl(self):
+        if not self._idl:
+            raise MissingIdlError()
+
+        for endpoint in self._idl.endpoints:
+            cluster_codes = set()
+            for cluster in endpoint.server_clusters:
+                cluster_code = self._ClusterCode(cluster.name, self._ParseLocation(cluster.parse_meta))
+                if not cluster_code:
+                    continue
+
+                cluster_codes.add(cluster_code)
+
+            for requirement in self._mandatory_clusters:
+                if requirement.endpoint_id != endpoint.number:
+                    continue
+
+                if requirement.cluster_code not in cluster_codes:
+                    self._AddLintError("Endpoint %d DOES NOT expose cluster %s (%d)" %
+                                       (requirement.endpoint_id, requirement.cluster_name, requirement.cluster_code), location=None)
+
+            for requirement in self._rejected_clusters:
+                if requirement.endpoint_id != endpoint.number:
+                    continue
+
+                if requirement.cluster_code in cluster_codes:
+                    self._AddLintError("Endpoint %d EXPOSES cluster %s (%d)" %
+                                       (requirement.endpoint_id, requirement.cluster_name, requirement.cluster_code), location=None)
+
+
+class RequiredAttributesRule(ErrorAccumulatingRule):
+    def __init__(self, name):
+        super().__init__(name)
+        self._mandatory_attributes: List[AttributeRequirement] = []
+
+    def __repr__(self):
+        result = "RequiredAttributesRule{\n"
+
+        if self._mandatory_attributes:
+            result += "  mandatory_attributes:\n"
+            for attr in self._mandatory_attributes:
+                result += "    - %r\n" % attr
+
+        result += "}"
+        return result
+
+    def RequireAttribute(self, attr: AttributeRequirement):
+        """Mark an attribute required"""
+        self._mandatory_attributes.append(attr)
 
     def _ServerClusterDefinition(self, name: str, location: Optional[LocationInFile]):
         """Finds the server cluster definition with the given name.
@@ -221,22 +284,6 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
                                            (endpoint.number, cluster.name,
                                             check.name, check.code),
                                            self._ParseLocation(cluster.parse_meta))
-
-            for requirement in self._mandatory_clusters:
-                if requirement.endpoint_id != endpoint.number:
-                    continue
-
-                if requirement.cluster_code not in cluster_codes:
-                    self._AddLintError("Endpoint %d DOES NOT expose cluster %s (%d)" %
-                                       (requirement.endpoint_id, requirement.cluster_name, requirement.cluster_code), location=None)
-
-            for requirement in self._rejected_clusters:
-                if requirement.endpoint_id != endpoint.number:
-                    continue
-
-                if requirement.cluster_code in cluster_codes:
-                    self._AddLintError("Endpoint %d EXPOSES cluster %s (%d)" %
-                                       (requirement.endpoint_id, requirement.cluster_name, requirement.cluster_code), location=None)
 
 
 @dataclass

@@ -12,14 +12,14 @@ from lark.visitors import Discard, Transformer, v_args
 
 try:
     from .types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
-                        RequiredCommandsRule)
+                        RequiredCommandsRule, ClusterValidationRule)
 except ImportError:
     import sys
 
     sys.path.append(os.path.join(os.path.abspath(
         os.path.dirname(__file__)), "..", ".."))
     from matter_idl.lint.types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
-                                       RequiredCommandsRule)
+                                       RequiredCommandsRule, ClusterValidationRule)
 
 
 class ElementNotFoundError(Exception):
@@ -153,6 +153,8 @@ class LintRulesContext:
     def __init__(self):
         self._required_attributes_rule = RequiredAttributesRule(
             "Required attributes")
+        self._cluster_validation_rule = ClusterValidationRule(
+            "Cluster validation")
         self._required_commands_rule = RequiredCommandsRule(
             "Required commands")
 
@@ -160,7 +162,7 @@ class LintRulesContext:
         self._cluster_codes: MutableMapping[str, int] = {}
 
     def GetLinterRules(self):
-        return [self._required_attributes_rule, self._required_commands_rule]
+        return [self._required_attributes_rule, self._required_commands_rule, self._cluster_validation_rule]
 
     def RequireAttribute(self, r: AttributeRequirement):
         self._required_attributes_rule.RequireAttribute(r)
@@ -187,7 +189,7 @@ class LintRulesContext:
 
         name, cluster_code = cluster_info
 
-        self._required_attributes_rule.RequireClusterInEndpoint(ClusterRequirement(
+        self._cluster_validation_rule.RequireClusterInEndpoint(ClusterRequirement(
             endpoint_id=code,
             cluster_code=cluster_code,
             cluster_name=name,
@@ -202,7 +204,7 @@ class LintRulesContext:
 
         name, cluster_code = cluster_info
 
-        self._required_attributes_rule.RejectClusterInEndpoint(ClusterRequirement(
+        self._cluster_validation_rule.RejectClusterInEndpoint(ClusterRequirement(
             endpoint_id=code,
             cluster_code=cluster_code,
             cluster_name=name,
