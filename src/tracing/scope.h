@@ -69,6 +69,9 @@ private:
 
 #else
 
-#define MATTER_TRACE_SCOPE(scope) do{}while(false)
+#define MATTER_TRACE_SCOPE(scope)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (false)
 
 #endif
