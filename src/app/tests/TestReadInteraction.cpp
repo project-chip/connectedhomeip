@@ -4104,7 +4104,7 @@ void TestReadInteraction::TestSubscribeInvalidateFabric(nlTestSuite * apSuite, v
 
     readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = Test::kMockEndpoint3;
     readPrepareParams.mpAttributePathParamsList[0].mClusterId   = Test::MockClusterId(2);
-    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = Test::MockAttributeId(4);
+    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = Test::MockAttributeId(1);
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 0;
@@ -4163,7 +4163,7 @@ void TestReadInteraction::TestShutdownSubscription(nlTestSuite * apSuite, void *
 
     readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = Test::kMockEndpoint3;
     readPrepareParams.mpAttributePathParamsList[0].mClusterId   = Test::MockClusterId(2);
-    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = Test::MockAttributeId(4);
+    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = Test::MockAttributeId(1);
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 0;
@@ -4210,7 +4210,7 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathParams subscribePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(4));
+    AttributePathParams subscribePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(1));
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     readPrepareParams.mpAttributePathParamsList    = &subscribePath;
@@ -4231,6 +4231,7 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
         ctx.DrainAndServiceIO();
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 0);
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
@@ -4244,12 +4245,14 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
 
         // Test that we send reports as needed.
         readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mGotReport = false;
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
         engine->GetReportingEngine().SetDirty(subscribePath);
 
         ctx.DrainAndServiceIO();
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 0);
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
@@ -4258,12 +4261,14 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
         // up properly.
         readHandler->GetSession()->MarkAsDefunct();
         readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mGotReport = false;
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
         engine->GetReportingEngine().SetDirty(subscribePath);
 
         ctx.DrainAndServiceIO();
 
         NL_TEST_ASSERT(apSuite, !delegate.mGotReport);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 0);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 0);
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
