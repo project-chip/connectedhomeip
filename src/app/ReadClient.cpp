@@ -466,7 +466,10 @@ exit:
 
     if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
     {
-        Close(err);
+        // If we're just setting up this subscription and we received an error, don't try
+        // to reconnect, just error out.
+        bool reconnect = !(IsSubscriptionType() && IsAwaitingInitialReport());
+        Close(err, reconnect);
     }
 
     return err;
