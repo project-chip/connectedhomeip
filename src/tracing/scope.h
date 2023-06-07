@@ -40,7 +40,10 @@ public:
     inline ~Scoped() { MATTER_TRACE_END(mScope); }
 
 private:
+
+#ifdef MATTER_TRACING_ENABLED
     Scope mScope;
+#endif
 };
 
 } // namespace Tracing
