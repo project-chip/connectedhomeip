@@ -16474,8 +16474,8 @@ class TemperatureControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="minTemperature", Tag=0x00000001, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="maxTemperature", Tag=0x00000002, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="step", Tag=0x00000003, Type=typing.Optional[int]),
-                ClusterObjectFieldDescriptor(Label="currentTemperatureLevelIndex", Tag=0x00000004, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="supportedTemperatureLevels", Tag=0x00000005, Type=typing.Optional[typing.List[TemperatureControl.Structs.TemperatureLevelStruct]]),
+                ClusterObjectFieldDescriptor(Label="selectedTemperatureLevel", Tag=0x00000004, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="supportedTemperatureLevels", Tag=0x00000005, Type=typing.Optional[typing.List[str]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -16488,8 +16488,8 @@ class TemperatureControl(Cluster):
     minTemperature: 'typing.Optional[int]' = None
     maxTemperature: 'typing.Optional[int]' = None
     step: 'typing.Optional[int]' = None
-    currentTemperatureLevelIndex: 'typing.Optional[uint]' = None
-    supportedTemperatureLevels: 'typing.Optional[typing.List[TemperatureControl.Structs.TemperatureLevelStruct]]' = None
+    selectedTemperatureLevel: 'typing.Optional[uint]' = None
+    supportedTemperatureLevels: 'typing.Optional[typing.List[str]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -16501,20 +16501,7 @@ class TemperatureControl(Cluster):
         class Feature(IntFlag):
             kTemperatureNumber = 0x1
             kTemperatureLevel = 0x2
-
-    class Structs:
-        @dataclass
-        class TemperatureLevelStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="label", Tag=0, Type=str),
-                        ClusterObjectFieldDescriptor(Label="temperatureLevel", Tag=1, Type=uint),
-                    ])
-
-            label: 'str' = ""
-            temperatureLevel: 'uint' = 0
+            kTemperatureStep = 0x4
 
     class Commands:
         @dataclass
@@ -16601,7 +16588,7 @@ class TemperatureControl(Cluster):
             value: 'typing.Optional[int]' = None
 
         @dataclass
-        class CurrentTemperatureLevelIndex(ClusterAttributeDescriptor):
+        class SelectedTemperatureLevel(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0056
@@ -16628,9 +16615,9 @@ class TemperatureControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[TemperatureControl.Structs.TemperatureLevelStruct]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[str]])
 
-            value: 'typing.Optional[typing.List[TemperatureControl.Structs.TemperatureLevelStruct]]' = None
+            value: 'typing.Optional[typing.List[str]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

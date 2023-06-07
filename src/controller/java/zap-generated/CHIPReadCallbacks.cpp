@@ -22630,9 +22630,7 @@ CHIPTemperatureControlSupportedTemperatureLevelsAttributeCallback::
 }
 
 void CHIPTemperatureControlSupportedTemperatureLevelsAttributeCallback::CallbackFn(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -22661,34 +22659,7 @@ void CHIPTemperatureControlSupportedTemperatureLevelsAttributeCallback::Callback
     {
         auto & entry_0 = iter_arrayListObj_0.GetValue();
         jobject newElement_0;
-        jobject newElement_0_label;
-        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.label, newElement_0_label));
-        jobject newElement_0_temperatureLevel;
-        std::string newElement_0_temperatureLevelClassName     = "java/lang/Integer";
-        std::string newElement_0_temperatureLevelCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_temperatureLevelClassName.c_str(),
-                                                                      newElement_0_temperatureLevelCtorSignature.c_str(),
-                                                                      entry_0.temperatureLevel, newElement_0_temperatureLevel);
-
-        jclass temperatureLevelStructStructClass_1;
-        err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$TemperatureControlClusterTemperatureLevelStruct",
-            temperatureLevelStructStructClass_1);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Could not find class ChipStructs$TemperatureControlClusterTemperatureLevelStruct");
-            return;
-        }
-        jmethodID temperatureLevelStructStructCtor_1 =
-            env->GetMethodID(temperatureLevelStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/lang/Integer;)V");
-        if (temperatureLevelStructStructCtor_1 == nullptr)
-        {
-            ChipLogError(Zcl, "Could not find ChipStructs$TemperatureControlClusterTemperatureLevelStruct constructor");
-            return;
-        }
-
-        newElement_0 = env->NewObject(temperatureLevelStructStructClass_1, temperatureLevelStructStructCtor_1, newElement_0_label,
-                                      newElement_0_temperatureLevel);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0, newElement_0));
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

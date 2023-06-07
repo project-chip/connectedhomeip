@@ -1818,7 +1818,7 @@ static BOOL AttributeIsSpecifiedInTemperatureControlCluster(AttributeId aAttribu
     case Attributes::Step::Id: {
         return YES;
     }
-    case Attributes::CurrentTemperatureLevelIndex::Id: {
+    case Attributes::SelectedTemperatureLevel::Id: {
         return YES;
     }
     case Attributes::SupportedTemperatureLevels::Id: {

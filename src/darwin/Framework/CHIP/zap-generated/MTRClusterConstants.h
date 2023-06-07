@@ -3773,7 +3773,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterTemperatureControlAttributeMinTemperatureID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterTemperatureControlAttributeMaxTemperatureID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterTemperatureControlAttributeStepID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterTemperatureControlAttributeCurrentTemperatureLevelIndexID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterTemperatureControlAttributeSelectedTemperatureLevelID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterTemperatureControlAttributeSupportedTemperatureLevelsID MTR_NEWLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterTemperatureControlAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
@@ -10184,8 +10184,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster ModeSelect commands
     MTRCommandIDTypeClusterModeSelectCommandChangeToModeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000000,
-    MTRCommandIDTypeClusterModeSelectCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterModeSelectCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster TemperatureControl commands
     MTRCommandIDTypeClusterTemperatureControlCommandSetTemperatureID MTR_NEWLY_AVAILABLE = 0x00000000,

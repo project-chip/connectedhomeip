@@ -14975,7 +14975,7 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
       public interface SupportedTemperatureLevelsAttributeCallback {
-        void onSuccess( List<ChipStructs.TemperatureControlClusterTemperatureLevelStruct> valueList);
+        void onSuccess( List<String> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -15048,16 +15048,16 @@ public class ChipClusters {
       subscribeStepAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readCurrentTemperatureLevelIndexAttribute(
+    public void readSelectedTemperatureLevelAttribute(
       IntegerAttributeCallback callback
     ) {
-      readCurrentTemperatureLevelIndexAttribute(chipClusterPtr, callback);
+      readSelectedTemperatureLevelAttribute(chipClusterPtr, callback);
     }
-    public void subscribeCurrentTemperatureLevelIndexAttribute(
+    public void subscribeSelectedTemperatureLevelAttribute(
         IntegerAttributeCallback callback
 ,
       int minInterval, int maxInterval) {
-      subscribeCurrentTemperatureLevelIndexAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      subscribeSelectedTemperatureLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readSupportedTemperatureLevelsAttribute(
@@ -15172,10 +15172,10 @@ public class ChipClusters {
         IntegerAttributeCallback callback
 , int minInterval, int maxInterval);
 
-    private native void readCurrentTemperatureLevelIndexAttribute(long chipClusterPtr,
+    private native void readSelectedTemperatureLevelAttribute(long chipClusterPtr,
         IntegerAttributeCallback callback
     );
-    private native void subscribeCurrentTemperatureLevelIndexAttribute(long chipClusterPtr,
+    private native void subscribeSelectedTemperatureLevelAttribute(long chipClusterPtr,
         IntegerAttributeCallback callback
 , int minInterval, int maxInterval);
 
