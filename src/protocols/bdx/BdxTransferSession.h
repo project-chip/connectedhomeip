@@ -415,8 +415,6 @@ private:
     uint16_t mFileDesLength         = 0;
     uint16_t mTransferRequestMaxBlockSize = 0;
     TransferControlFlags mTransferRequestControlFlags;
-    
-    BlockData mBlockEventData;
 
     size_t mNumBytesProcessed = 0;
 
@@ -426,7 +424,6 @@ private:
     uint32_t mNextQueryNum = 0;
 
     bool mAwaitingResponse = false;
-    System::PacketBufferHandle mPendingMsgHandle;
 };
 
 } // namespace bdx
