@@ -127,6 +127,8 @@ using ::chip::Tracing::LogJson::LogJsonBackend;
 
 LogJsonBackend log_json_backend;
 
+// ScopedRegistration ensures register/unregister is met, as long
+// as the vector is cleared (and we do so when stopping tracing).
 std::vector<std::unique_ptr<ScopedRegistration>> tracing_backends;
 
 } // namespace
