@@ -30,6 +30,7 @@
 #include <app/MessageDef/SubscribeResponseMessage.h>
 #include <lib/core/TLVUtilities.h>
 #include <messaging/ExchangeContext.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
@@ -323,6 +324,14 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
             // successfully sent the message, we need to return success from
             // this method.
             UpdateReportTimer();
+        }
+
+        ChipDeviceEvent event;
+        event.Type        = DeviceEventType::kSubcriptionReportSent;
+        CHIP_ERROR status = PlatformMgr().PostEvent(&event);
+        if (status != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to post Report sent event %" CHIP_ERROR_FORMAT, status.Format());
         }
     }
     if (!aMoreChunks)

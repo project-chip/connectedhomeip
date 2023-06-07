@@ -259,7 +259,11 @@ enum InternalEventTypes
     kCHIPoBLEWriteReceived,
     kCHIPoBLEIndicateConfirm,
     kCHIPoBLEConnectionError,
-    kCHIPoBLENotifyConfirm
+    kCHIPoBLENotifyConfirm,
+    kSubcriptionReportSent,
+    kChipMsgSentEvent,
+    kChipMsgReceivedEvent,
+    kPhysicallyAwaken
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");

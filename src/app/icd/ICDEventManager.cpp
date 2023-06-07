@@ -42,8 +42,19 @@ CHIP_ERROR ICDEventManager::Shutdown()
 
 void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
-    // TODO
+    switch (event->Type)
+    {
+    case DeviceEventType::kChipSubscriptionSent:
+        break;
+    case DeviceEventType::kChipMsgSentEvent:
+        break;
+    case DeviceEventType::kChipMsgReceivedEvent:
+        break;
+    case DeviceEventType::kChipMsgReceivedEvent:
+        break;
+    default:
+        break;
+    }
 }
-
 } // namespace app
 } // namespace chip

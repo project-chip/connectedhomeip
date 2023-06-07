@@ -237,6 +237,16 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             {
                 session->AsSecureSession()->MarkAsDefunct();
             }
+
+#if CONFIG_DEVICE_LAYER
+            ChipDeviceEvent event;
+            event.Type        = DeviceEventType::kChipMsgSentEvent;
+            CHIP_ERROR status = DeviceLayer::PlatformMgr().PostEvent(&event);
+            if (status != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to post Message sent event %" CHIP_ERROR_FORMAT, status.Format());
+            }
+#endif // CONFIG_DEVICE_LAYER
         }
 
         // Standalone acks are not application-level message sends.
@@ -635,6 +645,15 @@ void ExchangeContext::MessageHandled()
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
     UpdateSEDIntervalMode();
 #endif
+#if CONFIG_DEVICE_LAYER
+    ChipDeviceEvent event;
+    event.Type        = DeviceEventType::kChipMsgReceivedEvent;
+    CHIP_ERROR status = DeviceLayer::PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post Message sent event %" CHIP_ERROR_FORMAT, status.Format());
+    }
+#endif // CONFIG_DEVICE_LAYER
 
     if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())
     {
