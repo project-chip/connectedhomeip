@@ -1116,6 +1116,7 @@ class TestParser:
             tests
         )
         self.timeout = config['timeout']
+        self.definitions = parser_config.definitions
 
     def __apply_config_override(self, config, config_override):
         for key, value in config_override.items():
