@@ -175,11 +175,11 @@ public:
     static StorageKeyName BindingTable() { return StorageKeyName::FromConst("g/bt"); }
     static StorageKeyName BindingTableEntry(uint8_t index) { return StorageKeyName::Formatted("g/bt/%x", index); }
 
-    // ICD Management
+    // Client Monitoring
 
-    static StorageKeyName IcdManagementTableEntry(chip::FabricIndex fabric, uint16_t index)
+    static StorageKeyName ClientMonitoringTableEntry(chip::FabricIndex fabric)
     {
-        return StorageKeyName::Formatted("f/%x/icd/%x", fabric, index);
+        return StorageKeyName::Formatted("f/%x/cm", fabric);
     }
 
     static StorageKeyName OTADefaultProviders() { return StorageKeyName::FromConst("g/o/dp"); }
