@@ -14,12 +14,11 @@
 #    limitations under the License.
 #
 
-from chip.native import GetLibraryHandle, NativeLibraryHandleMethodArguments
-from chip.exceptions import ChipStackError
-
 from ctypes import CFUNCTYPE, c_char_p, c_int32, c_uint8
-
 from typing import Optional
+
+from chip.exceptions import ChipStackError
+from chip.native import GetLibraryHandle, NativeLibraryHandleMethodArguments
 
 
 class SetupPayload:
