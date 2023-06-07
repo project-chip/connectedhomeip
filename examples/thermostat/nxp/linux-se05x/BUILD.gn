@@ -18,9 +18,9 @@ import("${chip_root}/src/platform/nxp/crypto/nxp_crypto.gni")
 
 executable("thermostat-app") {
   sources = [
-    "${chip_root}/examples/thermostat/linux/main.cpp",
-    "include/low-power/LowPowerManager.cpp",
-    "include/low-power/LowPowerManager.h",
+    "../../linux/main.cpp",
+    "../../linux/include/low-power/LowPowerManager.cpp",
+    "../../linux/include/low-power/LowPowerManager.h",
   ]
   include_dirs = [ "${chip_root}/examples/platform/linux" ]
 

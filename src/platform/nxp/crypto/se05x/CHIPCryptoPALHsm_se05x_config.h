@@ -70,5 +70,5 @@
 /*
  * Enable se05x for DA
  */
-#define ENABLE_SE05X_DEVICE_ATTESTATION 1
+#define ENABLE_SE05X_DEVICE_ATTESTATION 0
 
