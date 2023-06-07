@@ -299,7 +299,7 @@ protected:
         return CheckConstraintMinValue(itemName, current.Value(), static_cast<T>(expected));
     }
 
-    template <typename T, typename U, std::enable_if_t<!std::is_pointer<U>::value, int> = 0>
+    template <typename T, typename U>
     bool CheckConstraintMinValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current,
                                  const chip::app::DataModel::Nullable<U> & expected)
     {
@@ -386,7 +386,7 @@ protected:
         return CheckConstraintMaxValue(itemName, current.Value(), static_cast<T>(expected));
     }
 
-    template <typename T, typename U, std::enable_if_t<!std::is_pointer<U>::value, int> = 0>
+    template <typename T, typename U>
     bool CheckConstraintMaxValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current,
                                  const chip::app::DataModel::Nullable<U> & expected)
     {
