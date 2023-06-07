@@ -31,8 +31,6 @@ env:
 jobs:
     asr:
         name: ASR
-        env:
-            BUILD_TYPE: asr
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'

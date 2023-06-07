@@ -27,17 +27,7 @@ The ASR platform is supported on:
 ## Matter Example Applications
 
 Sample Matter applications are provided for the ASR platform. They can be used
-to speed up development:
-
--   all-clusters-app
--   all-clusters-minimal-app
--   [lighting-app](../../examples/lighting-app/asr/README.md)
--   light-switch-app
--   lock-app
--   ota-requestor-app
--   temperature-measurement-app
--   bridge-app
--   thermostat
+to speed up development. You can find them in the samples with `/asr` subfolder.
 
 ## Building the Example Application
 
