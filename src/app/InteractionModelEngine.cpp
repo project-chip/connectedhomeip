@@ -413,6 +413,61 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
     return err;
 }
 
+CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                                   EventPathIBs::Parser & aEventPathListParser, bool & aHasValidPath,
+                                                   size_t & aRequestedPathCount)
+{
+    TLV::TLVReader pathReader;
+    aEventPathListParser.GetReader(&pathReader);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    aHasValidPath       = false;
+    aRequestedPathCount = 0;
+
+    while (CHIP_NO_ERROR == (err = pathReader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag() == pathReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+
+        EventPathIB::Parser path;
+        ObjectList<EventPathParams> paramsList;
+
+        ReturnErrorOnFailure(path.Init(pathReader));
+        ReturnErrorOnFailure(path.ParsePath(paramsList.mValue));
+
+        // TODO: There isn't an Event path expander for wildcard paths currently, so for now assume
+        // that a wildcard path has at least one valid entry
+        if (paramsList.mValue.HasEventWildcard())
+        {
+            aHasValidPath = true;
+        }
+        else
+        {
+            ConcreteEventPath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId, paramsList.mValue.mEventId);
+            Protocols::InteractionModel::Status status = ServerClusterEventExists(concretePath);
+            if (status == Protocols::InteractionModel::Status::Success)
+            {
+                Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+
+                err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
+                                                       RequiredPrivilege::ForReadEvent(concretePath));
+                if (err == CHIP_NO_ERROR)
+                {
+                    aHasValidPath = true;
+                }
+            }
+        }
+
+        aRequestedPathCount++;
+    }
+
+    if (err == CHIP_ERROR_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+    return err;
+}
+
 Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
                                                                                  const PayloadHeader & aPayloadHeader,
                                                                                  System::PacketBufferHandle && aPayload,
@@ -490,12 +545,13 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             }
 
             EventPathIBs::Parser eventpathListParser;
-            err = subscribeRequestParser.GetEventRequests(&eventpathListParser);
+            err                    = subscribeRequestParser.GetEventRequests(&eventpathListParser);
+            bool hasValidEventPath = false;
             if (err == CHIP_NO_ERROR)
             {
-                TLV::TLVReader pathReader;
-                eventpathListParser.GetReader(&pathReader);
-                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) != CHIP_NO_ERROR,
+                auto subjectDescriptor = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetSubjectDescriptor();
+                ReturnErrorCodeIf(ParseEventPaths(subjectDescriptor, eventpathListParser, hasValidEventPath,
+                                                  requestedEventPathCount) != CHIP_NO_ERROR,
                                   Status::InvalidAction);
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
@@ -512,12 +568,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 return Status::InvalidAction;
             }
 
-            //
-            // TODO: We don't have an easy way to do a similar 'path expansion' for events to deduce
-            // access so for now, assume that the presence of any path in the event list means they
-            // might have some access to those events.
-            //
-            if (!hasValidAttributePath && requestedEventPathCount == 0)
+            if (!hasValidAttributePath && !hasValidEventPath)
             {
                 ChipLogError(InteractionModel,
                              "Subscription from [%u:" ChipLogFormatX64 "] has no access at all. Rejecting request.",

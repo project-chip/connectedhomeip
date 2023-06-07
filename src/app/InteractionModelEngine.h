@@ -398,6 +398,10 @@ private:
                                           AttributePathIBs::Parser & aAttributePathListParser, bool & aHasValidAttributePath,
                                           size_t & aRequestedAttributePathCount);
 
+    static CHIP_ERROR ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                      EventPathIBs::Parser & aEventPathListParser, bool & aHasValidPath,
+                                      size_t & aRequestedPathCount);
+
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
      * the Read Request are handled entirely within this function.  If the
@@ -620,6 +624,14 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
  *  will be returned, depending on how the command fails to exist.
  */
 Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
+
+/**
+ *  Check whether the given cluster exists on the given endpoint and supports
+ *  the given event.  If it does, Success will be returned.  If it does not,
+ *  one of UnsupportedEndpoint, UnsupportedCluster, or UnsupportedEvent
+ *  will be returned, depending on how the command fails to exist.
+ */
+Protocols::InteractionModel::Status ServerClusterEventExists(const ConcreteEventPath & aPath);
 
 /**
  *  Fetch attribute value and version info and write to the AttributeReport provided.
