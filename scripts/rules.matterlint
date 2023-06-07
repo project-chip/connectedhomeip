@@ -112,6 +112,9 @@ endpoint 0 {
   require server cluster OperationalCredentials;
   require server cluster GeneralDiagnostics;
 
+  reject server cluster Groups;
+  reject server cluster Scenes;
+
   // Required only if !CustomNetworkConfig. 
   // require server cluster NetworkCommissioning;
 
