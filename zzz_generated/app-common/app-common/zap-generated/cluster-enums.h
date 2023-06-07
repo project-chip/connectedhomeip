@@ -1555,6 +1555,16 @@ enum class Feature : uint32_t
 };
 } // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
 
+namespace WasherControls {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kSpin  = 0x1,
+    kRinse = 0x2,
+};
+} // namespace WasherControls
+
 namespace RvcRunModeSelect {
 
 // Enum for ModeTag

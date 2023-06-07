@@ -6247,6 +6247,140 @@ public class ClusterInfoMapping {
         }
       }
 
+      public static class DelegatedWasherControlsClusterSpinSpeedsAttributeCallback implements ChipClusters.WasherControlsCluster.SpinSpeedsAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<String> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<String>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedWasherControlsClusterSpinSpeedCurrentAttributeCallback implements ChipClusters.WasherControlsCluster.SpinSpeedCurrentAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess(@Nullable Integer value) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+          responseValues.put(commandResponseInfo, value);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedWasherControlsClusterNumberOfRinsesAttributeCallback implements ChipClusters.WasherControlsCluster.NumberOfRinsesAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess(@Nullable Integer value) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+          responseValues.put(commandResponseInfo, value);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedWasherControlsClusterGeneratedCommandListAttributeCallback implements ChipClusters.WasherControlsCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedWasherControlsClusterAcceptedCommandListAttributeCallback implements ChipClusters.WasherControlsCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedWasherControlsClusterEventListAttributeCallback implements ChipClusters.WasherControlsCluster.EventListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedWasherControlsClusterAttributeListAttributeCallback implements ChipClusters.WasherControlsCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+
       public static class DelegatedRvcRunModeSelectClusterChangeToModeResponseCallback implements ChipClusters.RvcRunModeSelectCluster.ChangeToModeResponseCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
@@ -19691,6 +19825,9 @@ public class ClusterInfoMapping {
       ClusterInfo refrigeratorAndTemperatureControlledCabinetModeSelectClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.RefrigeratorAndTemperatureControlledCabinetModeSelectCluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("refrigeratorAndTemperatureControlledCabinetModeSelect", refrigeratorAndTemperatureControlledCabinetModeSelectClusterInfo);
+      ClusterInfo washerControlsClusterInfo = new ClusterInfo(
+        (ptr, endpointId) -> new ChipClusters.WasherControlsCluster(ptr, endpointId), new HashMap<>());
+      clusterMap.put("washerControls", washerControlsClusterInfo);
       ClusterInfo rvcRunModeSelectClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.RvcRunModeSelectCluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("rvcRunModeSelect", rvcRunModeSelectClusterInfo);
@@ -19997,6 +20134,7 @@ public class ClusterInfoMapping {
       destination.get("modeSelect").combineCommands(source.get("modeSelect"));
       destination.get("laundryWasherModeSelect").combineCommands(source.get("laundryWasherModeSelect"));
       destination.get("refrigeratorAndTemperatureControlledCabinetModeSelect").combineCommands(source.get("refrigeratorAndTemperatureControlledCabinetModeSelect"));
+      destination.get("washerControls").combineCommands(source.get("washerControls"));
       destination.get("rvcRunModeSelect").combineCommands(source.get("rvcRunModeSelect"));
       destination.get("rvcCleanModeSelect").combineCommands(source.get("rvcCleanModeSelect"));
       destination.get("temperatureControl").combineCommands(source.get("temperatureControl"));
@@ -22094,6 +22232,8 @@ public class ClusterInfoMapping {
        );
        refrigeratorAndTemperatureControlledCabinetModeSelectClusterInteractionInfoMap.put("changeToModeWithStatus", refrigeratorAndTemperatureControlledCabinetModeSelectchangeToModeWithStatusInteractionInfo);
      commandMap.put("refrigeratorAndTemperatureControlledCabinetModeSelect", refrigeratorAndTemperatureControlledCabinetModeSelectClusterInteractionInfoMap);
+     Map<String, InteractionInfo> washerControlsClusterInteractionInfoMap = new LinkedHashMap<>();
+     commandMap.put("washerControls", washerControlsClusterInteractionInfoMap);
      Map<String, InteractionInfo> rvcRunModeSelectClusterInteractionInfoMap = new LinkedHashMap<>();
      Map<String, CommandParameterInfo> rvcRunModeSelectchangeToModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo rvcRunModeSelectchangeToModenewModeCommandParameterInfo = new CommandParameterInfo("newMode", Integer.class, Integer.class);
