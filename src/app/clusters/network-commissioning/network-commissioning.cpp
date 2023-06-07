@@ -244,6 +244,7 @@ void Instance::OnNetworkingStatusChange(NetworkCommissioning::Status aCommission
 void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleScanNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleScanNetwork);
     if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
         ByteSpan ssid;
@@ -316,6 +317,7 @@ bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
 void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleAddOrUpdateWiFiNetwork);
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
@@ -374,6 +376,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleAddOrUpdateThreadNetwork);
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
@@ -411,6 +414,7 @@ void Instance::CommitSavedBreadcrumb()
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleRemoveNetwork);
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
@@ -433,6 +437,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleConnectNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleConnectNetwork);
     if (req.networkID.size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
@@ -451,6 +456,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
 void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::ReorderNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleReorderNetwork);
     Commands::NetworkConfigResponse::Type response;
     MutableCharSpan debugText;
 #if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
