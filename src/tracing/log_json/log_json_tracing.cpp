@@ -173,6 +173,8 @@ std::string ScopeToString(Scope scope)
         return "PASESession::SendPBKDFParamResponse";
     case Scope::PASESession_SetupSpake2p:
         return "PASESession::SetupSpake2p";
+    case Scope::Resolve_IncrementalRecordParse:
+        return "Resolve::IncrementalRecordParse";
     default: {
         StringBuilder<64> builder;
         builder.Add("Scope::Unknown(");

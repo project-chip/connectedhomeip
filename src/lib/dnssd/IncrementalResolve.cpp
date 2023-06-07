@@ -240,7 +240,7 @@ IncrementalResolver::RequiredInformationFlags IncrementalResolver::GetMissingReq
 
 CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const ResourceData & data, BytesRange packetRange)
 {
-    MATTER_TRACE_EVENT_SCOPE("Incremental resolver record parsing"); // measure until loop finished
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::Resolve_IncrementalRecordParse);
 
     if (!IsActive())
     {
