@@ -124,6 +124,31 @@ public:
 using DecodableType = Type;
 
 } // namespace ApplicationStruct
+namespace ErrorStateStruct {
+enum class Fields : uint8_t
+{
+    kErrorStateID      = 0,
+    kErrorStateLabel   = 1,
+    kErrorStateDetails = 2,
+};
+
+struct Type
+{
+public:
+    ErrorStateEnum errorStateID = static_cast<ErrorStateEnum>(0);
+    DataModel::Nullable<chip::CharSpan> errorStateLabel;
+    Optional<chip::CharSpan> errorStateDetails;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ErrorStateStruct
 namespace LabelStruct {
 enum class Fields : uint8_t
 {
@@ -147,6 +172,29 @@ public:
 using DecodableType = Type;
 
 } // namespace LabelStruct
+namespace OperationalStateStruct {
+enum class Fields : uint8_t
+{
+    kOperationalStateID    = 0,
+    kOperationalStateLabel = 1,
+};
+
+struct Type
+{
+public:
+    OperationalStateEnum operationalStateID = static_cast<OperationalStateEnum>(0);
+    chip::CharSpan operationalStateLabel;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace OperationalStateStruct
 } // namespace Structs
 } // namespace detail
 
@@ -15903,54 +15951,8 @@ struct TypeInfo
 } // namespace DishwasherModeSelect
 namespace DishwasherOperationalState {
 namespace Structs {
-namespace ErrorStateStruct {
-enum class Fields : uint8_t
-{
-    kErrorStateID      = 0,
-    kErrorStateLabel   = 1,
-    kErrorStateDetails = 2,
-};
-
-struct Type
-{
-public:
-    ErrorStateEnum errorStateID = static_cast<ErrorStateEnum>(0);
-    DataModel::Nullable<chip::CharSpan> errorStateLabel;
-    Optional<chip::CharSpan> errorStateDetails;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ErrorStateStruct
-namespace OperationalStateStruct {
-enum class Fields : uint8_t
-{
-    kOperationalStateID    = 0,
-    kOperationalStateLabel = 1,
-};
-
-struct Type
-{
-public:
-    OperationalStateEnum operationalStateID = static_cast<OperationalStateEnum>(0);
-    chip::CharSpan operationalStateLabel;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace OperationalStateStruct
+namespace ErrorStateStruct       = Clusters::detail::Structs::ErrorStateStruct;
+namespace OperationalStateStruct = Clusters::detail::Structs::OperationalStateStruct;
 } // namespace Structs
 
 namespace Commands {
@@ -16993,54 +16995,8 @@ public:
 } // namespace SmokeCoAlarm
 namespace OperationalState {
 namespace Structs {
-namespace ErrorStateStruct {
-enum class Fields : uint8_t
-{
-    kErrorStateID      = 0,
-    kErrorStateLabel   = 1,
-    kErrorStateDetails = 2,
-};
-
-struct Type
-{
-public:
-    ErrorStateEnum errorStateID = static_cast<ErrorStateEnum>(0);
-    DataModel::Nullable<chip::CharSpan> errorStateLabel;
-    Optional<chip::CharSpan> errorStateDetails;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ErrorStateStruct
-namespace OperationalStateStruct {
-enum class Fields : uint8_t
-{
-    kOperationalStateID    = 0,
-    kOperationalStateLabel = 1,
-};
-
-struct Type
-{
-public:
-    OperationalStateEnum operationalStateID = static_cast<OperationalStateEnum>(0);
-    chip::CharSpan operationalStateLabel;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace OperationalStateStruct
+namespace ErrorStateStruct       = Clusters::detail::Structs::ErrorStateStruct;
+namespace OperationalStateStruct = Clusters::detail::Structs::OperationalStateStruct;
 } // namespace Structs
 
 namespace Commands {
