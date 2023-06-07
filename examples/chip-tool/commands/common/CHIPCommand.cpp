@@ -26,8 +26,8 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
 
-#include <tracing/registry.h>
 #include <tracing/log_json/log_json_tracing.h>
+#include <tracing/registry.h>
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceDecoder.h"
@@ -52,29 +52,34 @@ chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGr
 
 namespace {
 
-class StringCommaSplitter {
+class StringCommaSplitter
+{
 public:
-    StringCommaSplitter(const char *s) : mData(strdup(s)) {
+    StringCommaSplitter(const char * s) : mData(strdup(s))
+    {
         VerifyOrDie(mData != nullptr);
         mNext = mData;
     }
-    ~StringCommaSplitter() {
-        free(mData);
-    }
+    ~StringCommaSplitter() { free(mData); }
 
     // returns null when no more items available
-    const char *Next() {
-        char *current = mNext;
-        if (*current == '\0') {
+    const char * Next()
+    {
+        char * current = mNext;
+        if (*current == '\0')
+        {
             return nullptr; // nothing left
         }
 
-        char *comma = strchr(current, ',');
+        char * comma = strchr(current, ',');
 
-        if (comma != nullptr) {
-            mNext = comma + 1;
+        if (comma != nullptr)
+        {
+            mNext  = comma + 1;
             *comma = '\0';
-        } else {
+        }
+        else
+        {
             // last element, position on the final 0
             mNext = current + strlen(current);
         }
@@ -83,8 +88,8 @@ public:
     }
 
 private:
-    char *mNext; // next element to return by calling Next()
-    char *mData; // allocated data
+    char * mNext; // next element to return by calling Next()
+    char * mData; // allocated data
 };
 
 CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::Credentials::AttestationTrustStore ** trustStore)
@@ -287,18 +292,24 @@ CHIP_ERROR CHIPCommand::Run()
 
 void CHIPCommand::StartTracing()
 {
-    if (mTraceTo.HasValue()) {
+    if (mTraceTo.HasValue())
+    {
         StringCommaSplitter splitter(mTraceTo.Value());
-        const char *destination;
+        const char * destination;
 
         // Use scoped_registration to register each backend and ensure
         // uniqueness by checking in-list.
-        while ((destination = splitter.Next()) != nullptr) {
-            if (strcmp(destination, "log") == 0) {
-                if (!log_json_backend.IsInList()) {
+        while ((destination = splitter.Next()) != nullptr)
+        {
+            if (strcmp(destination, "log") == 0)
+            {
+                if (!log_json_backend.IsInList())
+                {
                     tracing_backends.push_back(std::make_unique<ScopedRegistration>(log_json_backend));
                 }
-            } else {
+            }
+            else
+            {
                 ChipLogError(AppServer, "Unknown trace destination: '%s'", destination);
             }
         }
