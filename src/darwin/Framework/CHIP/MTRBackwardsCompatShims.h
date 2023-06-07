@@ -17,6 +17,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRStructsObjc.h>
 
 /**
  * This file defines manual backwards-compat shims of various sorts to handle
@@ -32,6 +33,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSArray * groupKeySetIDs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     MTR_NEWLY_DEPRECATED("This field has been removed");
 
+@end
+
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+MTR_NEWLY_DEPRECATED("Please use MTRModeSelectClusterModeTagStruct")
+@interface MTRModeSelectClusterSemanticTagStruct : MTRModeSelectClusterModeTagStruct
 @end
 
 NS_ASSUME_NONNULL_END

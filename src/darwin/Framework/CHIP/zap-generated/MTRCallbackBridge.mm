@@ -8021,16 +8021,6 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
                         newElement_2.mfgCode = nil;
                     }
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
-                    if (entry_2.tagName.HasValue()) {
-                        newElement_2.tagName = AsString(entry_2.tagName.Value());
-                        if (newElement_2.tagName == nil) {
-                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                            OnFailureFn(context, err);
-                            return;
-                        }
-                    } else {
-                        newElement_2.tagName = nil;
-                    }
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();
@@ -22901,18 +22891,6 @@ void MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::OnS
     DispatchSuccess(context, response);
 };
 
-void MTRModeSelectClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType & data)
-{
-    auto * response = [MTRModeSelectClusterChangeToModeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    DispatchSuccess(context, response);
-};
-
 void MTROperationalStateClusterOperationalCommandResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & data)
 {
@@ -26532,105 +26510,6 @@ void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCall
 };
 
 void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRModeSelectClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ModeSelect::ModeTag value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRModeSelectClusterModeTagAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableModeSelectClusterModeTagAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::ModeTag> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableModeSelectClusterModeTagAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRModeSelectClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ModeSelect::StatusCode value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRModeSelectClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableModeSelectClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::StatusCode> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableModeSelectClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

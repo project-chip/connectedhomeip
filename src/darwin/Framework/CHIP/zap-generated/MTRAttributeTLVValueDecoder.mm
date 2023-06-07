@@ -9059,16 +9059,6 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(
                             newElement_2.mfgCode = nil;
                         }
                         newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
-                        if (entry_2.tagName.HasValue()) {
-                            newElement_2.tagName = AsString(entry_2.tagName.Value());
-                            if (newElement_2.tagName == nil) {
-                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                                *aError = err;
-                                return nil;
-                            }
-                        } else {
-                            newElement_2.tagName = nil;
-                        }
                         [array_2 addObject:newElement_2];
                     }
                     CHIP_ERROR err = iter_2.GetStatus();
