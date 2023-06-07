@@ -174,7 +174,8 @@ class ClusterValidationRule(ErrorAccumulatingRule):
         for endpoint in self._idl.endpoints:
             cluster_codes = set()
             for cluster in endpoint.server_clusters:
-                cluster_code = self._ClusterCode(cluster.name, self._ParseLocation(cluster.parse_meta))
+                cluster_code = self._ClusterCode(
+                    cluster.name, self._ParseLocation(cluster.parse_meta))
                 if not cluster_code:
                     continue
 

@@ -11,15 +11,15 @@ from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
 
 try:
-    from .types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
-                        RequiredCommandsRule, ClusterValidationRule)
+    from .types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, ClusterValidationRule,
+                        RequiredAttributesRule, RequiredCommandsRule)
 except ImportError:
     import sys
 
     sys.path.append(os.path.join(os.path.abspath(
         os.path.dirname(__file__)), "..", ".."))
-    from matter_idl.lint.types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
-                                       RequiredCommandsRule, ClusterValidationRule)
+    from matter_idl.lint.types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, ClusterValidationRule,
+                                       RequiredAttributesRule, RequiredCommandsRule)
 
 
 class ElementNotFoundError(Exception):
