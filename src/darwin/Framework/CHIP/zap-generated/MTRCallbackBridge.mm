@@ -4657,8 +4657,8 @@ void MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge
 }
 
 void MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
-        value)
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4666,8 +4666,8 @@ void MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(voi
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRNetworkCommissioningClusterNetworkInfo * newElement_0;
-            newElement_0 = [MTRNetworkCommissioningClusterNetworkInfo new];
+            MTRNetworkCommissioningClusterNetworkInfoStruct * newElement_0;
+            newElement_0 = [MTRNetworkCommissioningClusterNetworkInfoStruct new];
             newElement_0.networkID = AsData(entry_0.networkID);
             newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
             [array_0 addObject:newElement_0];
@@ -8010,13 +8010,27 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
             newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
             { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
-                auto iter_2 = entry_0.semanticTags.begin();
+                auto iter_2 = entry_0.modeTags.begin();
                 while (iter_2.Next()) {
                     auto & entry_2 = iter_2.GetValue();
-                    MTRModeSelectClusterSemanticTagStruct * newElement_2;
-                    newElement_2 = [MTRModeSelectClusterSemanticTagStruct new];
-                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
+                    MTRModeSelectClusterModeTagStruct * newElement_2;
+                    newElement_2 = [MTRModeSelectClusterModeTagStruct new];
+                    if (entry_2.mfgCode.HasValue()) {
+                        newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
+                    } else {
+                        newElement_2.mfgCode = nil;
+                    }
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
+                    if (entry_2.tagName.HasValue()) {
+                        newElement_2.tagName = AsString(entry_2.tagName.Value());
+                        if (newElement_2.tagName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            OnFailureFn(context, err);
+                            return;
+                        }
+                    } else {
+                        newElement_2.tagName = nil;
+                    }
                     [array_2 addObject:newElement_2];
                 }
                 CHIP_ERROR err = iter_2.GetStatus();
@@ -8024,7 +8038,7 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
                     OnFailureFn(context, err);
                     return;
                 }
-                newElement_0.semanticTags = array_2;
+                newElement_0.modeTags = array_2;
             }
             [array_0 addObject:newElement_0];
         }
@@ -8412,29 +8426,6 @@ void MTRRefrigeratorAlarmMaskAttributeCallbackBridge::OnSuccessFn(
 };
 
 void MTRRefrigeratorAlarmMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRRefrigeratorAlarmLatchAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRRefrigeratorAlarmLatchAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23232,6 +23223,18 @@ void MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::OnS
     DispatchSuccess(context, response);
 };
 
+void MTRModeSelectClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType & data)
+{
+    auto * response = [MTRModeSelectClusterChangeToModeResponseParams new];
+    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
+    }
+    DispatchSuccess(context, response);
+};
+
 void MTRDishwasherOperationalStateClusterOperationalCommandResponseCallbackBridge::OnSuccessFn(void * context,
     const chip::app::Clusters::DishwasherOperationalState::Commands::OperationalCommandResponse::DecodableType & data)
 {
@@ -25520,15 +25523,15 @@ void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCa
     }
 }
 
-void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value)
+void MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25543,8 +25546,8 @@ void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSu
     }
 }
 
-void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value)
+void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25555,7 +25558,7 @@ void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::
+void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackSubscriptionBridge::
     OnSubscriptionEstablished()
 {
     if (!mQueue) {
@@ -25571,15 +25574,15 @@ void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCa
     }
 }
 
-void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NetworkCommissioning::WiFiBand value)
+void MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NetworkCommissioning::WiFiBandEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25594,8 +25597,8 @@ void MTRNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBand> & value)
+void MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBandEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25606,7 +25609,7 @@ void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26863,6 +26866,105 @@ void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCall
 };
 
 void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRModeSelectClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ModeSelect::ModeTag value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRModeSelectClusterModeTagAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableModeSelectClusterModeTagAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::ModeTag> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableModeSelectClusterModeTagAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRModeSelectClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ModeSelect::StatusCode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRModeSelectClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableModeSelectClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ModeSelect::StatusCode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableModeSelectClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

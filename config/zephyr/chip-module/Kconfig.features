@@ -24,23 +24,23 @@ config MCUMGR
 	bool
 	default y
 
-config MCUMGR_CMD_IMG_MGMT
+config MCUMGR_GRP_IMG
 	bool
 	default y
 
-config MCUMGR_CMD_OS_MGMT
+config MCUMGR_GRP_OS
 	bool
 	default y
 
-config MCUMGR_SMP_BT
+config MCUMGR_TRANSPORT_BT
 	bool
 	default y
 
-config MCUMGR_SMP_BT_AUTHEN
+config MCUMGR_TRANSPORT_BT_AUTHEN
 	bool
 	default n
 
-config MCUMGR_BUF_COUNT
+config MCUMGR_TRANSPORT_NETBUF_COUNT
 	int
 	default 6
 
@@ -53,8 +53,8 @@ config BT_BUF_ACL_RX_SIZE
 	int
 	default 502
 
-# Increase MCUMGR_BUF_SIZE, as it must be big enough to fit MAX MTU + overhead and for single-image DFU default is 384 B
-config MCUMGR_BUF_SIZE
+# Increase MCUMGR_TRANSPORT_NETBUF_SIZE, as it must be big enough to fit MAX MTU + overhead and for single-image DFU default is 384 B
+config MCUMGR_TRANSPORT_NETBUF_SIZE
 	int
 	default 1024
 

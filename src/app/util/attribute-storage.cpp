@@ -121,14 +121,6 @@ DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
 } // anonymous namespace
 
-//------------------------------------------------------------------------------
-// Forward declarations
-
-// Returns endpoint index within a given cluster
-static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterId, uint8_t mask);
-
-//------------------------------------------------------------------------------
-
 // Initial configuration
 void emberAfEndpointConfigure()
 {
@@ -823,40 +815,6 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(EndpointId e
         return emberAfFindClusterInType(emAfEndpoints[ep].endpointType, clusterId, mask);
     }
     return nullptr;
-}
-
-// Server wrapper for findClusterEndpointIndex
-uint16_t emberAfFindClusterServerEndpointIndex(EndpointId endpoint, ClusterId clusterId)
-{
-    return findClusterEndpointIndex(endpoint, clusterId, CLUSTER_MASK_SERVER);
-}
-
-// Returns the endpoint index within a given cluster
-static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterId, uint8_t mask)
-{
-    uint16_t i, epi = 0;
-
-    if (emberAfFindServerCluster(endpoint, clusterId) == nullptr)
-    {
-        return kEmberInvalidEndpointIndex;
-    }
-
-    for (i = 0; i < emberAfEndpointCount(); i++)
-    {
-        if (emAfEndpoints[i].endpoint == endpoint)
-        {
-            break;
-        }
-        if (emAfEndpoints[i].endpoint == kInvalidEndpointId)
-        {
-            // Not actually a configured endpoint.
-            continue;
-        }
-        epi = static_cast<uint16_t>(
-            epi + ((emberAfFindClusterIncludingDisabledEndpoints(emAfEndpoints[i].endpoint, clusterId, mask) != nullptr) ? 1 : 0));
-    }
-
-    return epi;
 }
 
 static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints)

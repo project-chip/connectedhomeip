@@ -1854,9 +1854,6 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAlarmCluster(AttributeId aAttribut
     case Attributes::Mask::Id: {
         return YES;
     }
-    case Attributes::Latch::Id: {
-        return YES;
-    }
     case Attributes::State::Id: {
         return YES;
     }

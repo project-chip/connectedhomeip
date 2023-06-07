@@ -1083,6 +1083,113 @@ void TestAddMultipleSameRootDifferentFabricId(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, numStorageKeysAfterSecondAdd == (numStorageKeysAfterFirstAdd + 5)); // Add 3 certs, 1 metadata, 1 opkey
 }
 
+void TestAddMultipleSameFabricIdDifferentRoot(nlTestSuite * inSuite, void * inContext)
+{
+    Credentials::TestOnlyLocalCertificateAuthority fabricCertAuthority1;
+    Credentials::TestOnlyLocalCertificateAuthority fabricCertAuthority2;
+
+    chip::TestPersistentStorageDelegate storage;
+    NL_TEST_ASSERT(inSuite, fabricCertAuthority1.Init().IsSuccess());
+    NL_TEST_ASSERT(inSuite, fabricCertAuthority2.Init().IsSuccess());
+
+    constexpr uint16_t kVendorId = 0xFFF1u;
+
+    // Initialize a fabric table.
+    ScopedFabricTable fabricTableHolder;
+    NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&storage) == CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+
+    uint8_t rcac1Buf[kMaxCHIPCertLength];
+    MutableByteSpan rcac1Span{ rcac1Buf };
+
+    // First scope: add FabricID 1111, node ID 55
+    {
+        FabricId fabricId = 1111;
+        NodeId nodeId     = 55;
+
+        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        MutableByteSpan csrSpan{ csrBuf };
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
+
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricCertAuthority1.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+        ByteSpan rcac = fabricCertAuthority1.GetRcac();
+        // Keep a copy for second scope check
+        CopySpanToMutableSpan(rcac, rcac1Span);
+
+        ByteSpan icac = fabricCertAuthority1.GetIcac();
+        ByteSpan noc  = fabricCertAuthority1.GetNoc();
+
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
+        FabricIndex newFabricIndex = kUndefinedFabricIndex;
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex));
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+        NL_TEST_ASSERT(inSuite, newFabricIndex == 1);
+
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
+
+        // Validate contents
+        const auto * fabricInfo = fabricTable.FindFabricWithIndex(1);
+        NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
+        if (fabricInfo != nullptr)
+        {
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 1);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetNodeId() == 55);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricId() == 1111);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetVendorId() == kVendorId);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricLabel().size() == 0);
+        }
+    }
+    size_t numStorageKeysAfterFirstAdd = storage.GetNumKeys();
+    NL_TEST_ASSERT(inSuite, numStorageKeysAfterFirstAdd == 7); // Metadata, index, 3 certs, 1 opkey, last known good time
+
+    // Second scope: add FabricID 1111, node ID 66, different root from first
+    {
+        FabricId fabricId = 1111;
+        NodeId nodeId     = 66;
+
+        uint8_t csrBuf[chip::Crypto::kMAX_CSR_Length];
+        MutableByteSpan csrSpan{ csrBuf };
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
+
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricCertAuthority2.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus());
+        ByteSpan rcac2 = fabricCertAuthority2.GetRcac();
+        NL_TEST_ASSERT(inSuite, !rcac2.data_equal(rcac1Span));
+
+        ByteSpan icac = fabricCertAuthority2.GetIcac();
+        ByteSpan noc  = fabricCertAuthority2.GetNoc();
+
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac2));
+        FabricIndex newFabricIndex = kUndefinedFabricIndex;
+        NL_TEST_ASSERT_SUCCESS(inSuite,
+                               fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex));
+        NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
+        NL_TEST_ASSERT(inSuite, newFabricIndex == 2);
+
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
+
+        // Validate contents
+        const auto * fabricInfo = fabricTable.FindFabricWithIndex(2);
+        NL_TEST_ASSERT(inSuite, fabricInfo != nullptr);
+        if (fabricInfo != nullptr)
+        {
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricIndex() == 2);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetNodeId() == 66);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricId() == 1111);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetVendorId() == kVendorId);
+            NL_TEST_ASSERT(inSuite, fabricInfo->GetFabricLabel().size() == 0);
+        }
+    }
+    size_t numStorageKeysAfterSecondAdd = storage.GetNumKeys();
+    NL_TEST_ASSERT(inSuite, numStorageKeysAfterSecondAdd == (numStorageKeysAfterFirstAdd + 5)); // Add 3 certs, 1 metadata, 1 opkey
+}
+
 void TestPersistence(nlTestSuite * inSuite, void * inContext)
 {
     /**
@@ -2788,6 +2895,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Set Last Known Good Time", TestSetLastKnownGoodTime),
     NL_TEST_DEF("Test basic AddNOC flow", TestBasicAddNocUpdateNocFlow),
     NL_TEST_DEF("Test adding multiple fabrics that chain to same root, different fabric ID", TestAddMultipleSameRootDifferentFabricId),
+    NL_TEST_DEF("Test adding multiple fabrics that chain to different roots, same fabric ID", TestAddMultipleSameFabricIdDifferentRoot),
     NL_TEST_DEF("Validate fabrics are loaded from persistence at FabricTable::init", TestPersistence),
     NL_TEST_DEF("Test fail-safe handling during AddNOC", TestAddNocFailSafe),
     NL_TEST_DEF("Test fail-safe handling during UpdateNoc", TestUpdateNocFailSafe),

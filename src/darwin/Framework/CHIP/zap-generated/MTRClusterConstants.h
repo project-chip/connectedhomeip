@@ -3791,7 +3791,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster RefrigeratorAlarm attributes
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeMaskID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeLatchID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeStateID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
@@ -10206,12 +10205,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster ModeSelect commands
     MTRCommandIDTypeClusterModeSelectCommandChangeToModeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000000,
+    MTRCommandIDTypeClusterModeSelectCommandChangeToModeWithStatusID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterModeSelectCommandChangeToModeResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster TemperatureControl commands
     MTRCommandIDTypeClusterTemperatureControlCommandSetTemperatureID MTR_NEWLY_AVAILABLE = 0x00000000,
-
-    // Cluster RefrigeratorAlarm commands
-    MTRCommandIDTypeClusterRefrigeratorAlarmCommandResetID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster DishwasherOperationalState commands
     MTRCommandIDTypeClusterDishwasherOperationalStateCommandPauseID MTR_NEWLY_AVAILABLE = 0x00000000,

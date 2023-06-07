@@ -32,7 +32,6 @@ set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_
 if(NOT ${CONFIG_DEVICE_PRODUCT_NAME} STREQUAL "")
     set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\"${CONFIG_DEVICE_PRODUCT_NAME}\"")
 endif()
-set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_PLATFORM_NRFCONNECT=1")
 if(NOT ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING} STREQUAL "")
   set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING}\"")
 endif()
@@ -76,7 +75,7 @@ target_include_directories(app PRIVATE
                            ${NRFCONNECT_COMMON}/app/include
 )
 
-if (CONFIG_ENABLE_CHIP_SHELL)
+if (CONFIG_CHIP_LIB_SHELL)
   target_sources(app PRIVATE
     ${CHEF}/shell_common/globals.cpp
     ${CHEF}/shell_common/cmd_misc.cpp
@@ -86,7 +85,7 @@ if (CONFIG_ENABLE_CHIP_SHELL)
   target_include_directories(app PRIVATE
     ${CHEF}/shell_common/include
   )
-endif (CONFIG_ENABLE_CHIP_SHELL)
+endif()
 
 target_sources(app PRIVATE
     ${CHEF}/nrfconnect/main.cpp

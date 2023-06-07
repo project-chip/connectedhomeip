@@ -116,7 +116,7 @@ public:
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
     static void scan_result_callback(cy_wcm_scan_result_t * result_ptr, void * user_data, cy_wcm_scan_status_t status);
-    BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurity> ConvertSecuritytype(cy_wcm_security_t security);
+    BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> ConvertSecuritytype(cy_wcm_security_t security);
 
     void OnConnectWiFiNetwork();
     void OnScanWiFiNetworkDone();

@@ -1,14 +1,14 @@
-# CHIP Linux Bridge Example
+# Matter Linux Bridge Example
 
 An example demonstrating a simple lighting bridge and the use of dynamic
 endpoints. The document will describe the theory of operation and how to build
-and run CHIP Linux Bridge Example on Raspberry Pi. This doc is tested on
+and run Matter Linux Bridge Example on Raspberry Pi. This doc is tested on
 **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
 Raspberry Pi Desktop 20.10 (aarch64)**
 
 <hr>
 
--   [CHIP Linux Bridge Example](#chip-linux-bridge-example)
+-   [Matter Linux Bridge Example](#matter-linux-bridge-example)
     -   [Theory of Operation](#theory-of-operation)
     -   [Building](#building)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
