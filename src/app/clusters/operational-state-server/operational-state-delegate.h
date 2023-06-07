@@ -26,10 +26,23 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace OperationalState {
+/**
+ * Intent to impl class can be used for all operational state aliases,
+ * define the struct OperationalErrorStateStruct to instead of
+ * Clusters::OperationalState::Structs::ErrorStateStruct::type.
+ * And define the struct OperationalStateStruct to instead of
+ * Clusters::OperationalState::Structs::OperationalStateStruct::type.
+ * For other alias cluster, the Structs are in different namespace.
+ * It's not convinent for impl class to operate data.
+ */
 constexpr size_t kErrorStateLabelMaxSize       = 64u;
 constexpr size_t kErrorStateDetailsMaxSize     = 64u;
 constexpr size_t kOperationalStateLabelMaxSize = 64u;
 
+/**
+ * Considering the ErrorStateEnum in operational state aliases have different namespace.
+ * It's not convinent for impl class to use. So ErrorStateID use untyped integer, not an enum.
+ */
 struct OperationalErrorStateStruct
 {
     uint8_t ErrorStateID;
@@ -51,32 +64,40 @@ class Delegate
 public:
     /**
      * Handle Command Callback: Pause
-     * @param state operational state.
-     * @param error operational error.
+     * Input the param for user to handle business logic.
+     * Output the param to save the result after handle business logic.
+     * @param[in,out] state make a copy of the operational state.
+     * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     virtual void HandlePauseState(OperationalStateStruct & state, OperationalErrorStateStruct & error) = 0;
 
     /**
      * Handle Command Callback: Resume
-     * @param state operational state.
-     * @param error operational error.
+     * Input the param for user to handle business logic.
+     * Output the param to save the result after handle business logic.
+     * @param[in,out] state make a copy of the operational state.
+     * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     virtual void HandleResumeState(OperationalStateStruct & state, OperationalErrorStateStruct & error) = 0;
 
     /**
      * Handle Command Callback: Start
-     * @param state operational state.
-     * @param error operational error.
+     * Input the param for user to handle business logic.
+     * Output the param to save the result after handle business logic.
+     * @param[in,out] state make a copy of the operational state.
+     * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     virtual void HandleStartState(OperationalStateStruct & state, OperationalErrorStateStruct & error) = 0;
 
     /**
      * Handle Command Callback: Stop
-     * @param state operational state.
-     * @param error operational error.
+     * Input the param for user to handle business logic.
+     * Output the param to save the result after handle business logic.
+     * @param[in,out] state make a copy of the operational state.
+     * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     virtual void HandleStopState(OperationalStateStruct & state, OperationalErrorStateStruct & error) = 0;

@@ -36,33 +36,41 @@ private:
 
 public:
     /**
-     * Handle Command Callback: Pause
-     * @param state operational state.
-     * @param error operational error.
+     * Handle Command Callback: Pause.
+     * Input the param for user to handle business logic.
+     * Output the param to save the result after handle business logic.
+     * @param[in,out] state make a copy of the operational state.
+     * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     void HandlePauseState(OperationalStateStruct & state, OperationalErrorStateStruct & error) override;
 
     /**
      * Handle Command Callback: Resume
-     * @param state operational state.
-     * @param error operational error.
+     * Input the param for user to handle business logic.
+     * Output the param to save the result after handle business logic.
+     * @param[in,out] state make a copy of the operational state.
+     * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     void HandleResumeState(OperationalStateStruct & state, OperationalErrorStateStruct & error) override;
 
     /**
      * Handle Command Callback: Start
-     * @param state operational state.
-     * @param error operational error.
+     * Input the param for user to handle business logic.
+     * Output the param to save the result after handle business logic.
+     * @param[in,out] state make a copy of the operational state.
+     * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     void HandleStartState(OperationalStateStruct & state, OperationalErrorStateStruct & error) override;
 
     /**
      * Handle Command Callback: Stop
-     * @param state operational state.
-     * @param error operational error.
+     * Input the param for user to handle business logic.
+     * Output the param to save the result after handle business logic.
+     * @param[in,out] state make a copy of the operational state.
+     * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     void HandleStopState(OperationalStateStruct & state, OperationalErrorStateStruct & error) override;
