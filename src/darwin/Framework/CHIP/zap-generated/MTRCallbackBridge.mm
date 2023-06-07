@@ -8414,9 +8414,8 @@ void MTRWasherControlsAttributeListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType> & value)
+void MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8424,15 +8423,13 @@ void MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge:
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRTemperatureControlClusterTemperatureLevelStruct * newElement_0;
-            newElement_0 = [MTRTemperatureControlClusterTemperatureLevelStruct new];
-            newElement_0.label = AsString(entry_0.label);
-            if (newElement_0.label == nil) {
+            NSString * newElement_0;
+            newElement_0 = AsString(entry_0);
+            if (newElement_0 == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                 OnFailureFn(context, err);
                 return;
             }
-            newElement_0.temperatureLevel = [NSNumber numberWithUnsignedChar:entry_0.temperatureLevel];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();

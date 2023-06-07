@@ -1610,9 +1610,7 @@ typedef void (*WasherControlsEventListListAttributeCallback)(void * context,
 typedef void (*WasherControlsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*TemperatureControlSupportedTemperatureLevelsListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType> & data);
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
 typedef void (*TemperatureControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TemperatureControlAcceptedCommandListListAttributeCallback)(
@@ -9614,9 +9612,7 @@ public:
                                                                                MTRActionBlock action) :
         MTRCallbackBridge<TemperatureControlSupportedTemperatureLevelsListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value);
 };
 
 class MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackSubscriptionBridge

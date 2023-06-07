@@ -2362,7 +2362,7 @@ public final class ChipIdLookup {
         return "Step";
       }
       if (attributeId == 4L) {
-        return "CurrentTemperatureLevelIndex";
+        return "SelectedTemperatureLevel";
       }
       if (attributeId == 5L) {
         return "SupportedTemperatureLevels";
