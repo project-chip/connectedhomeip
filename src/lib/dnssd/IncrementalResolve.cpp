@@ -22,7 +22,8 @@
 #include <lib/dnssd/minimal_mdns/Logging.h>
 #include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
-#include <trace/trace.h>
+#include <tracing/macros.h>
+#include <tracing/scopes.h>
 
 namespace chip {
 namespace Dnssd {
@@ -251,14 +252,15 @@ CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const Reso
     case QType::TXT:
         if (data.GetName() != mRecordName.Get())
         {
-            MATTER_TRACE_EVENT_INSTANT("TXT not applicable");
+            MATTER_TRACE_INSTANT(::chip::Tracing::Instant::Resolve_TxtNotApplicable);
+
             return CHIP_NO_ERROR;
         }
         return OnTxtRecord(data, packetRange);
     case QType::A: {
         if (data.GetName() != mTargetHostName.Get())
         {
-            MATTER_TRACE_EVENT_INSTANT("A (IPv4) not applicable");
+            MATTER_TRACE_INSTANT(::chip::Tracing::Instant::Resolve_Ipv4NotApplicable);
             return CHIP_NO_ERROR;
         }
 
@@ -281,7 +283,7 @@ CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const Reso
     case QType::AAAA: {
         if (data.GetName() != mTargetHostName.Get())
         {
-            MATTER_TRACE_EVENT_INSTANT("AAAA (IPv6) not applicable");
+            MATTER_TRACE_INSTANT(::chip::Tracing::Instant::Resolve_Ipv6NotApplicable);
             return CHIP_NO_ERROR;
         }
 
