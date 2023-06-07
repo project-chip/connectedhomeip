@@ -1074,14 +1074,20 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
 {
     using Protocols::InteractionModel::Status;
-#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-    auto * cluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
-    if (cluster == nullptr)
+
+    const EmberAfEndpointType * type = emberAfFindEndpointType(aPath.mEndpointId);
+    if (type == nullptr)
     {
-        // Spec seems to say UNSUPPORTED_EVENT for this situation.
-        return Status::UnsupportedEvent;
+        return Status::UnsupportedEndpoint;
     }
 
+    const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, CLUSTER_MASK_SERVER);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     for (size_t i = 0; i < cluster->eventCount; ++i)
     {
         if (cluster->eventList[i] == aPath.mEventId)

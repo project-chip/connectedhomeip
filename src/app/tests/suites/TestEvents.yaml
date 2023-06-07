@@ -38,7 +38,7 @@ tests:
       event: "TestEvent"
       endpoint: 0
       response:
-          error: UNSUPPORTED_EVENT
+          error: UNSUPPORTED_CLUSTER
 
     - label: "Generate an event on the accessory"
       command: "TestEmitTestEventRequest"

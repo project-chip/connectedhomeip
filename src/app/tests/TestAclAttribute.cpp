@@ -146,7 +146,7 @@ Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventP
 {
     if (aPath.mClusterId == kTestDeniedClusterId1)
     {
-        return Protocols::InteractionModel::Status::UnsupportedEvent;
+        return Protocols::InteractionModel::Status::UnsupportedCluster;
     }
 
     return Protocols::InteractionModel::Status::Success;

@@ -2088,9 +2088,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 XCTAssertEqualObjects(path.event, @0);
                 XCTAssertNil(result[@"data"]);
                 XCTAssertNotNil(result[@"error"]);
-                // Spec for now says UNSUPPORTED_EVENT even if it's the endpoint
-                // that's unsupported.
-                XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]], MTRInteractionErrorCodeUnsupportedEvent);
+                XCTAssertEqual(
+                    [MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]], MTRInteractionErrorCodeUnsupportedEndpoint);
                 [eventErrorReportExpectation fulfill];
             } else {
                 XCTFail("Unexpected result dictionary");

@@ -311,8 +311,7 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         if (status != Status::Success)
         {
             TLV::TLVWriter checkpoint = aWriter;
-            // For events, spec says to use UNSUPPORTED_EVENT
-            err = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(status));
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(status));
             if (err != CHIP_NO_ERROR)
             {
                 aWriter = checkpoint;
