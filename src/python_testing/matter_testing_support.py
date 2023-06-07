@@ -585,9 +585,9 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     # TODO: this should also allow multiple once QR and manual codes are supported.
     config.qr_code_content = args.qr_code
     if args.manual_code:
-      config.manual_code = "%d" % args.manual_code
+        config.manual_code = "%d" % args.manual_code
     else:
-      config.manual_code = None
+        config.manual_code = None
 
     if args.commissioning_method is None:
         return True
