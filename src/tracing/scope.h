@@ -20,6 +20,8 @@
 #include <tracing/macros.h>
 #include <tracing/scopes.h>
 
+#ifdef MATTER_TRACING_ENABLED
+
 namespace chip {
 namespace Tracing {
 
@@ -33,7 +35,6 @@ namespace Tracing {
 ///      // ... add code here
 ///
 ///   } // TRACE_END called here
-#ifdef MATTER_TRACING_ENABLED
 
 class Scoped
 {
@@ -45,12 +46,9 @@ private:
     Scope mScope;
 };
 
-#endif
 
 } // namespace Tracing
 } // namespace chip
-
-#ifdef MATTER_TRACING_ENABLED
 
 #define _CONCAT_IMPL(a, b) a##b
 #define _MACRO_CONCAT(a, b) _CONCAT_IMPL(a, b)
@@ -67,7 +65,7 @@ private:
 ///   } // TRACE_END called here
 #define MATTER_TRACE_SCOPE(scope) ::chip::Tracing::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(scope)
 
-#else
+#else // ifdef MATTER_TRACING_ENABLED
 
 #define MATTER_TRACE_SCOPE(scope)                                                                                                  \
     do                                                                                                                             \
