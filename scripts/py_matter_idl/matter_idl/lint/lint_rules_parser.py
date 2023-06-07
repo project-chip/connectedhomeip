@@ -4,9 +4,8 @@ import logging
 import os
 import xml.etree.ElementTree
 from dataclasses import dataclass
-from typing import List, MutableMapping, Union, Tuple
 from enum import Enum, auto
-
+from typing import List, MutableMapping, Tuple, Union
 
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
@@ -63,7 +62,7 @@ class ClusterActionEnum(Enum):
 @dataclass
 class ServerClusterRequirement:
     action: ClusterActionEnum
-    id: Union[str,int]
+    id: Union[str, int]
 
 
 def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
@@ -178,7 +177,6 @@ class LintRulesContext:
                 return None
         else:
             return name, self._cluster_codes[name]
-
 
     def RequireClusterInEndpoint(self, name: str, code: int):
         """Mark that a specific cluster is always required in the given endpoint
@@ -307,7 +305,8 @@ class LintRulesTransformer(Transformer):
             elif requirement.action == ClusterActionEnum.REJECT:
                 self.context.RejectClusterInEndpoint(requirement.id, code)
             else:
-                raise Exception("Unexpected requirement action %r" % requirement.action)
+                raise Exception("Unexpected requirement action %r" %
+                                requirement.action)
 
         return Discard
 
