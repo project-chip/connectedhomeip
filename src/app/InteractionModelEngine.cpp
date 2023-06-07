@@ -411,12 +411,18 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
     return err;
 }
 
+static bool HaveAccess(const ConcreteClusterPath & aPath, const Access::SubjectDescriptor & aSubjectDescriptor,
+                       Access::Privilege aNeededPrivilege)
+{
+    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege);
+    return (err == CHIP_NO_ERROR);
+}
+
 static bool IsValidEventPath(const ConcreteEventPath & aPath, const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     // If we get here, the path exists.  We just have to do an ACL check for it.
-    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
-    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, RequiredPrivilege::ForReadEvent(aPath));
-    return (err == CHIP_NO_ERROR);
+    return HaveAccess(aPath, aSubjectDescriptor, RequiredPrivilege::ForReadEvent(aPath));
 }
 
 /**
@@ -441,9 +447,10 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
 
         return false;
 #else
-        // We have no way to expand wildcards.  Just give up and claim this is
-        // valid.
-        return true;
+        // We have no way to expand wildcards.  Just assume that we would need
+        // View permissions for whatever events are involved.
+        ConcreteClusterPath clusterPath(aEndpoint, aCluster->clusterId);
+        return HaveAccess(clusterPath, aSubjectDescriptor, Access::Privilege::kView);
 #endif
     }
 
