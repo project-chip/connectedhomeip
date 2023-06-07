@@ -33,6 +33,8 @@ namespace Tracing {
 ///      // ... add code here
 ///
 ///   } // TRACE_END called here
+#ifdef MATTER_TRACING_ENABLED
+
 class Scoped
 {
 public:
@@ -40,14 +42,15 @@ public:
     inline ~Scoped() { MATTER_TRACE_END(mScope); }
 
 private:
-
-#ifdef MATTER_TRACING_ENABLED
     Scope mScope;
-#endif
 };
+
+#endif
 
 } // namespace Tracing
 } // namespace chip
+
+#ifdef MATTER_TRACING_ENABLED
 
 #define _CONCAT_IMPL(a, b) a##b
 #define _MACRO_CONCAT(a, b) _CONCAT_IMPL(a, b)
@@ -63,3 +66,9 @@ private:
 ///
 ///   } // TRACE_END called here
 #define MATTER_TRACE_SCOPE(scope) ::chip::Tracing::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(scope)
+
+#else
+
+#define MATTER_TRACE_SCOPE(scope) do{}while(false)
+
+#endif
