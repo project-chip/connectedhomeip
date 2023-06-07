@@ -190,6 +190,13 @@ menu "CHIP Core"
             help
                 Enable this option to enable OTA Requestor for example
 
+        config ENABLE_ENCRYPTED_OTA
+            bool "Enable pre encrypted OTA"
+            depends on ENABLE_OTA_REQUESTOR
+            default n
+            help
+                Enable this option to use the pre encrypted OTA image
+
         config OTA_AUTO_REBOOT_ON_APPLY
             bool "Reboot the device after applying the OTA image"
             depends on ENABLE_OTA_REQUESTOR
