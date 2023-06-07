@@ -154,4 +154,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/controller/SetUpCodePairer.h': {'deque'},
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream'}
+
+    # Library meant for non-embedded
+    'src/tracing/log_json/log_json_tracing.cpp': {'string', 'sstream'}
 }
