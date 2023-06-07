@@ -208,6 +208,7 @@ class _TestStepWithPlaceholders:
         self.wait_for = _value_or_none(test, 'wait')
         self.event_number = _value_or_none(test, 'eventNumber')
         self.run_if = _value_or_none(test, 'runIf')
+        self.save_response_as = _value_or_none(test, 'saveResponseAs')
 
         self.is_attribute = self.__is_attribute_command()
         self.is_event = self.__is_event_command()
@@ -694,6 +695,9 @@ class TestStep:
         # TODO It should be removed once all decoders returns a list.
         if not isinstance(received_responses, list):
             received_responses = [received_responses]
+
+        if self._test.save_response_as:
+            self._runtime_config_variable_storage[self._test.save_response_as] = received_responses
 
         if self.wait_for is not None:
             self._response_cluster_wait_validation(received_responses, result)
