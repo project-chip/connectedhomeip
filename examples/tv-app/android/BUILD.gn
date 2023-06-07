@@ -164,7 +164,7 @@ group("default") {
     ":java",
     ":jni",
     "${chip_root}/src/app/server/java",
+    "${chip_root}/src/controller/java:onboarding_payload",
     "${chip_root}/src/platform/android:java",
-    "${chip_root}/src/setup_payload/java",
   ]
 }

@@ -96,10 +96,11 @@ static MTRBaseDevice * GetConnectedDevice(void)
 {
     XCTAssertEqual(error.code, 0);
 
+    __auto_type * params = [[MTRCommissioningParameters alloc] init];
+    params.countryCode = @("au");
+
     NSError * commissionError = nil;
-    [sController commissionNodeWithID:@(kDeviceId)
-                  commissioningParams:[[MTRCommissioningParameters alloc] init]
-                                error:&commissionError];
+    [sController commissionNodeWithID:@(kDeviceId) commissioningParams:params error:&commissionError];
     XCTAssertNil(commissionError);
 
     // Keep waiting for controller:commissioningComplete:
@@ -2348,6 +2349,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Wait till establishment
     [self waitForExpectations:@[ startupEventExpectation, expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test026_LocationAttribute
+{
+    __auto_type * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read Basic Information Location attribute"];
+
+    __auto_type * cluster = [[MTRBaseClusterBasicInformation alloc] initWithDevice:device endpointID:@(0) queue:queue];
+    [cluster readAttributeLocationWithCompletion:^(NSString * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+
+        // Matches what we passed in during commissioning.
+        XCTAssertEqualObjects(value, @"au");
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test900_SubscribeAllAttributes

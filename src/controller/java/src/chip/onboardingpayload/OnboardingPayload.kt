@@ -847,7 +847,14 @@ class OnboardingPayload(
       return discriminator
     }
     return longToShortValue(discriminator)
-  }  
+  }
+
+  fun getLongDiscriminatorValue(): Int {
+    if (hasShortDiscriminator) {
+      return shortToLongValue(discriminator)
+    }
+    return discriminator
+  }
 
   private fun checkPayloadCommonConstraints(): Boolean {
     if (version != 0) {
@@ -884,6 +891,10 @@ class OnboardingPayload(
 
     private fun longToShortValue(longValue: Int): Int {
       return (longValue shr (kDiscriminatorLongBits - kDiscriminatorShortBits))
+    }
+
+    private fun shortToLongValue(shortValue: Int): Int {
+      return (shortValue shl (kDiscriminatorLongBits - kDiscriminatorShortBits))
     }
   }  
 }

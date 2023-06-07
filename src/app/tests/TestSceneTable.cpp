@@ -405,6 +405,8 @@ protected:
 
         return 0;
     }
+
+    uint8_t GetClusterCountFromEndpoint() override { return 3; }
 };
 
 // Storage
