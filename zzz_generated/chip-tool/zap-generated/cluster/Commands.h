@@ -4484,7 +4484,7 @@ public:
     TemperatureControlSetTemperature(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("set-temperature", credsIssuerConfig)
     {
-        AddArgument("TargetTemperature", 0, UINT16_MAX, &mRequest.targetTemperature);
+        AddArgument("TargetTemperature", INT16_MIN, INT16_MAX, &mRequest.targetTemperature);
         AddArgument("TargetTemperatureLevel", 0, UINT8_MAX, &mRequest.targetTemperatureLevel);
         ClusterCommand::AddArguments();
     }
@@ -14983,13 +14983,13 @@ void registerClusterTemperatureControl(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<int16_t>>(Id, "temperature-setpoint", 0, UINT16_MAX, Attributes::TemperatureSetpoint::Id,
+        make_unique<WriteAttribute<int16_t>>(Id, "temperature-setpoint", INT16_MIN, INT16_MAX, Attributes::TemperatureSetpoint::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int16_t>>(Id, "min-temperature", 0, UINT16_MAX, Attributes::MinTemperature::Id,
+        make_unique<WriteAttribute<int16_t>>(Id, "min-temperature", INT16_MIN, INT16_MAX, Attributes::MinTemperature::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int16_t>>(Id, "max-temperature", 0, UINT16_MAX, Attributes::MaxTemperature::Id,
+        make_unique<WriteAttribute<int16_t>>(Id, "max-temperature", INT16_MIN, INT16_MAX, Attributes::MaxTemperature::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int16_t>>(Id, "step", 0, UINT16_MAX, Attributes::Step::Id, WriteCommandType::kForceWrite,
+        make_unique<WriteAttribute<int16_t>>(Id, "step", INT16_MIN, INT16_MAX, Attributes::Step::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "selected-temperature-level", 0, UINT8_MAX,
                                              Attributes::SelectedTemperatureLevel::Id, WriteCommandType::kForceWrite,
