@@ -9313,8 +9313,8 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(
         value = [NSNumber numberWithShort:cppValue];
         return value;
     }
-    case Attributes::CurrentTemperatureLevelIndex::Id: {
-        using TypeInfo = Attributes::CurrentTemperatureLevelIndex::TypeInfo;
+    case Attributes::SelectedTemperatureLevel::Id: {
+        using TypeInfo = Attributes::SelectedTemperatureLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -9337,15 +9337,13 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRTemperatureControlClusterTemperatureLevelStruct * newElement_0;
-                newElement_0 = [MTRTemperatureControlClusterTemperatureLevelStruct new];
-                newElement_0.label = AsString(entry_0.label);
-                if (newElement_0.label == nil) {
+                NSString * newElement_0;
+                newElement_0 = AsString(entry_0);
+                if (newElement_0 == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;
                 }
-                newElement_0.temperatureLevel = [NSNumber numberWithUnsignedChar:entry_0.temperatureLevel];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

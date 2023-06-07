@@ -6905,7 +6905,7 @@ public class ClusterIDMapping {
             MinTemperature(1L),
             MaxTemperature(2L),
             Step(3L),
-            CurrentTemperatureLevelIndex(4L),
+            SelectedTemperatureLevel(4L),
             SupportedTemperatureLevels(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
