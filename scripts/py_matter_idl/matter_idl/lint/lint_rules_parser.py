@@ -4,7 +4,9 @@ import logging
 import os
 import xml.etree.ElementTree
 from dataclasses import dataclass
-from typing import List, MutableMapping
+from typing import List, MutableMapping, Union, Tuple
+from enum import Enum, auto
+
 
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
@@ -51,6 +53,17 @@ class DecodedCluster:
     code: int
     required_attributes: List[RequiredAttribute]
     required_commands: List[RequiredCommand]
+
+
+class ClusterActionEnum(Enum):
+    REQUIRE = auto()
+    REJECT = auto()
+
+
+@dataclass
+class ServerClusterRequirement:
+    action: ClusterActionEnum
+    id: Union[str,int]
 
 
 def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
@@ -153,23 +166,45 @@ class LintRulesContext:
     def RequireAttribute(self, r: AttributeRequirement):
         self._required_attributes_rule.RequireAttribute(r)
 
-    def RequireClusterInEndpoint(self, name: str, code: int):
-        """Mark that a specific cluster is always required in the given endpoint
-        """
+    def FindClusterCode(self, name: str) -> Tuple[str, int]:
         if name not in self._cluster_codes:
             # Name may be a number. If this can be parsed as a number, accept it anyway
             try:
-                cluster_code = parseNumberString(name)
-                name = "ID_%s" % name
+                return "ID_%s" % name, parseNumberString(name)
             except ValueError:
                 logging.error("UNKNOWN cluster name %s" % name)
                 logging.error("Known names: %s" %
                               (",".join(self._cluster_codes.keys()), ))
-                return
+                return None
         else:
-            cluster_code = self._cluster_codes[name]
+            return name, self._cluster_codes[name]
+
+
+    def RequireClusterInEndpoint(self, name: str, code: int):
+        """Mark that a specific cluster is always required in the given endpoint
+        """
+        cluster_info = self.FindClusterCode(name)
+        if not cluster_info:
+            return
+
+        name, cluster_code = cluster_info
 
         self._required_attributes_rule.RequireClusterInEndpoint(ClusterRequirement(
+            endpoint_id=code,
+            cluster_code=cluster_code,
+            cluster_name=name,
+        ))
+
+    def RejectClusterInEndpoint(self, name: str, code: int):
+        """Mark that a specific cluster is always rejected in the given endpoint
+        """
+        cluster_info = self.FindClusterCode(name)
+        if not cluster_info:
+            return
+
+        name, cluster_code = cluster_info
+
+        self._required_attributes_rule.RejectClusterInEndpoint(ClusterRequirement(
             endpoint_id=code,
             cluster_code=cluster_code,
             cluster_name=name,
@@ -265,14 +300,24 @@ class LintRulesTransformer(Transformer):
         return AttributeRequirement(code=code, name=name)
 
     @v_args(inline=True)
-    def specific_endpoint_rule(self, code, *names):
-        for name in names:
-            self.context.RequireClusterInEndpoint(name, code)
+    def specific_endpoint_rule(self, code, *requirements):
+        for requirement in requirements:
+            if requirement.action == ClusterActionEnum.REQUIRE:
+                self.context.RequireClusterInEndpoint(requirement.id, code)
+            elif requirement.action == ClusterActionEnum.REJECT:
+                self.context.RejectClusterInEndpoint(requirement.id, code)
+            else:
+                raise Exception("Unexpected requirement action %r" % requirement.action)
+
         return Discard
 
     @v_args(inline=True)
     def required_server_cluster(self, id):
-        return id
+        return ServerClusterRequirement(ClusterActionEnum.REQUIRE, id)
+
+    @v_args(inline=True)
+    def rejected_server_cluster(self, id):
+        return ServerClusterRequirement(ClusterActionEnum.REJECT, id)
 
 
 class Parser:

@@ -121,6 +121,7 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
         # Map attribute code to name
         self._mandatory_attributes: List[AttributeRequirement] = []
         self._mandatory_clusters: List[ClusterRequirement] = []
+        self._rejected_clusters: List[ClusterRequirement] = []
 
     def __repr__(self):
         result = "RequiredAttributesRule{\n"
@@ -135,6 +136,11 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
             for cluster in self._mandatory_clusters:
                 result += "    - %r\n" % cluster
 
+        if self._rejected_clusters:
+            result += "   rejected_clusters:\n"
+            for cluster in self._rejected_clusters:
+                result += "    - %r\n" % cluster
+
         result += "}"
         return result
 
@@ -144,6 +150,9 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
 
     def RequireClusterInEndpoint(self, requirement: ClusterRequirement):
         self._mandatory_clusters.append(requirement)
+
+    def RejectClusterInEndpoint(self, requirement: ClusterRequirement):
+        self._rejected_clusters.append(requirement)
 
     def _ServerClusterDefinition(self, name: str, location: Optional[LocationInFile]):
         """Finds the server cluster definition with the given name.
@@ -218,7 +227,15 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
                     continue
 
                 if requirement.cluster_code not in cluster_codes:
-                    self._AddLintError("Endpoint %d does not expose cluster %s (%d)" %
+                    self._AddLintError("Endpoint %d DOES NOT expose cluster %s (%d)" %
+                                       (requirement.endpoint_id, requirement.cluster_name, requirement.cluster_code), location=None)
+
+            for requirement in self._rejected_clusters:
+                if requirement.endpoint_id != endpoint.number:
+                    continue
+
+                if requirement.cluster_code in cluster_codes:
+                    self._AddLintError("Endpoint %d EXPOSES cluster %s (%d)" %
                                        (requirement.endpoint_id, requirement.cluster_name, requirement.cluster_code), location=None)
 
 
