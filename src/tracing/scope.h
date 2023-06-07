@@ -46,7 +46,6 @@ private:
     Scope mScope;
 };
 
-
 } // namespace Tracing
 } // namespace chip
 
