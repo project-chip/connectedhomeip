@@ -17,8 +17,6 @@
 
 import logging
 import queue
-import time
-
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -36,7 +34,6 @@ class AttributeChangeCallback:
         self._expected_attribute = expected_attribute
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        print(transaction)
         if path.AttributeType == self._expected_attribute:
             q = (path, transaction)
             logging.info(f'Got subscription report for {path.AttributeType}')
@@ -50,7 +47,6 @@ class EventChangeCallback:
         self._expected_event_id = expected_event.event_id
 
     def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
-        print(res)
         if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster_id and res.Header.EventId == self._expected_event_id:
             logging.info(
                 f'Got subscription report for event {self._expected_event_id} on cluster {self._expected_cluster_id}: {res.Data}')
@@ -91,7 +87,6 @@ class TC_ACE_1_2(MatterBaseTest):
         # This returns an attribute status
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
-        print(result)
 
     async def steps_receive_breadcrumb(self, print_steps: bool):
         if print_steps:
@@ -139,6 +134,7 @@ class TC_ACE_1_2(MatterBaseTest):
 
         self.TH2 = fabric_admin.NewController(nodeId=TH2_nodeid,
                                               paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
+
         self.print_step(2, "TH1 writes ACL for admin with two subjects")
         TH1_2_admin = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
@@ -176,7 +172,9 @@ class TC_ACE_1_2(MatterBaseTest):
         self.print_step(8, "TH2 waits for subscription report for access control entry changed event")
         WaitForEventReport(ace_queue, Clusters.AccessControl.Events.AccessControlEntryChanged)
 
+        # this function prints the steps for 9 and 10
         await self.steps_receive_breadcrumb(print_steps=True)
+
         self.print_step(11, "TH1 writes ACL attribute")
         acl1 = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
@@ -192,14 +190,12 @@ class TC_ACE_1_2(MatterBaseTest):
 
         self.print_step(12, "TH2 Repeats steps to change breadcrumb and receive subscription report")
         await self.steps_receive_breadcrumb(print_steps=False)
-        subscription_acl.Shutdown()
-        subscription_ace.Shutdown()
 
         # step 13 and 14 - printed in the function
         await self.steps_admin_subscription_error(print_steps=True)
 
         self.print_step(15, "TH2 subscribes to breadcrumb attribute")
-        self.steps_subscribe_breadcrumb(print_steps=False)
+        await self.steps_subscribe_breadcrumb(print_steps=False)
 
         self.print_step(16, "TH2 Repeats steps to change breadcrumb and receive subscription report")
         await self.steps_receive_breadcrumb(print_steps=False)
@@ -249,7 +245,7 @@ class TC_ACE_1_2(MatterBaseTest):
         await self.steps_admin_subscription_error(print_steps=False)
 
         self.print_step(25, "TH2 subscribes to breadcrumb attribute")
-        self.steps_subscribe_breadcrumb(print_steps=False)
+        await self.steps_subscribe_breadcrumb(print_steps=False)
 
         self.print_step(26, "TH2 Repeats steps to change breadcrumb and receive subscription report")
         await self.steps_receive_breadcrumb(print_steps=False)
@@ -271,9 +267,6 @@ class TC_ACE_1_2(MatterBaseTest):
             asserts.fail("Incorrectly subscribed to attribute with invalid permissions")
         except ChipStackError as e:
             asserts.assert_equal(e.err, 0x580, "Incorrect error message received from subcription with no permission")
-
-        if self.subscription_breadcrumb:
-            self.subscription_breadcrumb.Shutdown()
 
 
 if __name__ == "__main__":
