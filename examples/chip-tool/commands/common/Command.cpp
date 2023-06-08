@@ -223,11 +223,12 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::VectorString: {
         std::vector<std::string> vectorArgument;
-        chip::StrdupStringSplitter splitter(argValue, ',');
 
-        for (const char * value = splitter.Next(); value != nullptr; value = splitter.Next())
-        {
-            vectorArgument.push_back(value);
+        chip::StringSplitter splitter(argValue, ',');
+        chip::CharSpan value;
+
+        while (splitter.Next(value)) {
+            vectorArgument.push_back(std::string(value.data(), value.size()));
         }
 
         if (arg.flags == Argument::kOptional)
