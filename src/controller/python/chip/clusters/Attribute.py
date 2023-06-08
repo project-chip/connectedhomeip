@@ -599,7 +599,7 @@ class SubscriptionTransaction:
         return f'<Subscription (Id={self._subscriptionId})>'
 
 
-async def DefaultResubscriptionAttemptedCallback(transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
+def DefaultResubscriptionAttemptedCallback(transaction: SubscriptionTransaction, terminationError, nextResubscribeIntervalMsec):
     print(f"Previous subscription failed with Error: {terminationError} - re-subscribing in {nextResubscribeIntervalMsec}ms...")
 
 
@@ -755,6 +755,8 @@ class AsyncReadTransaction:
             self._handleSubscriptionEstablished, subscriptionId)
 
     def handleResubscriptionAttempted(self, terminationCause: PyChipError, nextResubscribeIntervalMsec: int):
+        if not self._subscription_handler:
+            return
         if (self._subscription_handler._onResubscriptionAttemptedCb_isAsync):
             self._event_loop.create_task(self._subscription_handler._onResubscriptionAttemptedCb(
                 self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec))
@@ -1018,10 +1020,11 @@ _ReadParams = construct.Struct(
     "IsSubscription" / construct.Flag,
     "IsFabricFiltered" / construct.Flag,
     "KeepSubscriptions" / construct.Flag,
+    "AutoResubscribe" / construct.Flag,
 )
 
 
-def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath] = None, dataVersionFilters: List[DataVersionFilter] = None, events: List[EventPath] = None, eventNumberFilter: Optional[int] = None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True, keepSubscriptions: bool = False) -> PyChipError:
+def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath] = None, dataVersionFilters: List[DataVersionFilter] = None, events: List[EventPath] = None, eventNumberFilter: Optional[int] = None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True) -> PyChipError:
     if (not attributes) and dataVersionFilters:
         raise ValueError(
             "Must provide valid attribute list when data version filters is not null")
@@ -1093,6 +1096,7 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
     if subscriptionParameters is not None:
         params.MinInterval = subscriptionParameters.MinReportIntervalFloorSeconds
         params.MaxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
+        params.AutoResubscribe = autoResubscribe
         params.IsSubscription = True
         params.KeepSubscriptions = keepSubscriptions
     params.IsFabricFiltered = fabricFiltered
