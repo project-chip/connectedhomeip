@@ -67,6 +67,27 @@ void TestStrdupSplitter(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "f") == 0);
         NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
     }
+
+    // some edge cases
+    {
+        StrdupStringSplitter splitter(",", ',');
+        // Note that even though "" is nullptr right away, "," becomes two empty strings
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
+        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+    }
+    {
+        StrdupStringSplitter splitter("log,", ',');
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "log") == 0);
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
+        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+    }
+    {
+        StrdupStringSplitter splitter(",log", ',');
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "log") == 0);
+        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+    }
 }
 
 void TestFixedStringSplitter(nlTestSuite * inSuite, void * inContext)
@@ -78,6 +99,30 @@ void TestFixedStringSplitter(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "b") == 0);
         NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "c") == 0);
         NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+    }
+
+    {
+        FixedStringSplitter<128> splitter(",a", ',');
+
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "a") == 0);
+        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+    }
+    {
+        FixedStringSplitter<128> splitter("a,", ',');
+
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "a") == 0);
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
+        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+    }
+    {
+        FixedStringSplitter<128> splitter(",,,", ',');
+
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
+        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
         NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
     }
 
