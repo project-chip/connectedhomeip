@@ -113,11 +113,13 @@ class TC_DA_1_7(MatterBaseTest):
         # On the CI, this doesn't make sense to do since all the examples use the same DAC
         # To specify more than 1 DUT, use a list of discriminators and passcodes
         allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
+        if allow_sdk_dac:
+            asserts.assert_equal(len(self.matter_test_config.discriminators), 1, "Only one device can be tested with SDK DAC")
         if not allow_sdk_dac:
-            asserts.assert_equal(len(self.matter_test_config.discriminator), 2, "This test requires 2 DUTs")
+            asserts.assert_equal(len(self.matter_test_config.discriminators), 2, "This test requires 2 DUTs")
         pk = []
-        for i in range(len(self.matter_test_config.dut_node_id)):
-            pk.append(await self.single_DUT(i, self.matter_test_config.dut_node_id[i]))
+        for i in range(len(self.matter_test_config.dut_node_ids)):
+            pk.append(await self.single_DUT(i, self.matter_test_config.dut_node_ids[i]))
 
         asserts.assert_equal(len(pk), len(set(pk)), "Found matching public keys in different DUTs")
 

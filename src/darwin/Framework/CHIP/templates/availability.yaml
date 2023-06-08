@@ -8060,7 +8060,7 @@
               - MinTemperature
               - MaxTemperature
               - Step
-              - CurrentTemperatureLevelIndex
+              - SelectedTemperatureLevel
               - SupportedTemperatureLevels
               - GeneratedCommandList
               - AcceptedCommandList
@@ -8158,8 +8158,6 @@
           OperationalState:
               - OperationalStateStruct
               - ErrorStateStruct
-          TemperatureControl:
-              - TemperatureLevelStruct
           ThreadNetworkDiagnostics:
               - NeighborTableStruct
               - RouteTableStruct
@@ -8211,10 +8209,6 @@
                   - errorStateID
                   - errorStateLabel
                   - errorStateDetails
-          TemperatureControl:
-              TemperatureLevelStruct:
-                  - label
-                  - temperatureLevel
           ThreadNetworkDiagnostics:
               NeighborTableStruct:
                   - extAddress
@@ -9939,6 +9933,7 @@
               Feature:
                   - TemperatureNumber
                   - TemperatureLevel
+                  - TemperatureStep
           SmokeCOAlarm:
               Feature:
                   - SmokeAlarm

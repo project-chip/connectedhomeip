@@ -2943,6 +2943,25 @@ client cluster RefrigeratorAndTemperatureControlledCabinetModeSelect = 82 {
   command ChangeToModeWithStatus(ChangeToModeWithStatusRequest): ChangeToModeResponse = 1;
 }
 
+/** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
+client cluster WasherControls = 83 {
+  bitmap Feature : BITMAP32 {
+    kSpin = 0x1;
+    kRinse = 0x2;
+  }
+
+  readonly attribute optional CHAR_STRING spinSpeeds[] = 0;
+  attribute optional nullable int8u spinSpeedCurrent = 1;
+  attribute optional nullable int8u numberOfRinses = 2;
+  readonly attribute optional int8u maxRinses = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster is an alias of the Mode Select cluster which also defines a namespace for the running modes of the Robotic Vacuum Cleaner devices. */
 client cluster RvcRunModeSelect = 84 {
   enum ModeTag : ENUM16 {
