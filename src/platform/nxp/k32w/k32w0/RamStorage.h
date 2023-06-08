@@ -75,6 +75,7 @@ private:
 
     uint16_t mPdmId;
     Buffer * mBuffer;
+    bool mExtendedSearch;
 };
 
 } // namespace Internal
