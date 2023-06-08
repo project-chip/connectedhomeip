@@ -587,7 +587,7 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & params,
-                                          DiscoveryType discoveryType)
+                                          DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
 {
     MATTER_TRACE_EVENT_SCOPE("PairDevice", "DeviceCommissioner");
 
@@ -598,13 +598,16 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
     }
     ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
 
-    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType);
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType,
+                                       resolutionData);
 }
 
-CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType)
+CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
+                                          Optional<Dnssd::CommonResolutionData> resolutionData)
 {
     MATTER_TRACE_EVENT_SCOPE("PairDevice", "DeviceCommissioner");
-    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType);
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType,
+                                       resolutionData);
 }
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params)
@@ -622,10 +625,12 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     return Commission(remoteDeviceId, commissioningParams);
 }
 
-CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType)
+CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
+                                                       Optional<Dnssd::CommonResolutionData> resolutionData)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
-    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType);
+    return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType,
+                                       resolutionData);
 }
 
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
