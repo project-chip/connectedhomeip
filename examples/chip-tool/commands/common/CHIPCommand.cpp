@@ -24,6 +24,7 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/StringSplitter.h>
 #include <lib/support/TestGroupData.h>
 
 #include <tracing/log_json/log_json_tracing.h>
@@ -51,46 +52,6 @@ const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = null
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 
 namespace {
-
-class StringCommaSplitter
-{
-public:
-    StringCommaSplitter(const char * s) : mData(strdup(s))
-    {
-        VerifyOrDie(mData != nullptr);
-        mNext = mData;
-    }
-    ~StringCommaSplitter() { free(mData); }
-
-    // returns null when no more items available
-    const char * Next()
-    {
-        char * current = mNext;
-        if (*current == '\0')
-        {
-            return nullptr; // nothing left
-        }
-
-        char * comma = strchr(current, ',');
-
-        if (comma != nullptr)
-        {
-            mNext  = comma + 1;
-            *comma = '\0';
-        }
-        else
-        {
-            // last element, position on the final 0
-            mNext = current + strlen(current);
-        }
-
-        return current;
-    }
-
-private:
-    char * mNext; // next element to return by calling Next()
-    char * mData; // allocated data
-};
 
 CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::Credentials::AttestationTrustStore ** trustStore)
 {
@@ -296,7 +257,7 @@ void CHIPCommand::StartTracing()
 {
     if (mTraceTo.HasValue())
     {
-        StringCommaSplitter splitter(mTraceTo.Value());
+        chip::StrdupStringSplitter splitter(mTraceTo.Value(), ',');
         const char * destination;
 
         // Use scoped_registration to register each backend and ensure
