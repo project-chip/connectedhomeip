@@ -208,7 +208,7 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
         spi_enabled = false;
     }
     GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
-    GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = PIN_OUT_CLEAR;
+    GPIO->EUSARTROUTE[SL_SPIDRV_EUSART_EXP_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
     xSemaphoreGive(spi_sem_sync_hdl);
     return SL_STATUS_OK;
 }
@@ -251,7 +251,7 @@ void sl_wfx_host_post_bootloader_spi_transfer(void)
         SILABS_LOG("bootloader_deinit error: %x", status);
         return;
     }
-    GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = PIN_OUT_CLEAR;
+    GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
     sl_wfx_host_spiflash_cs_deassert();
     xSemaphoreGive(spi_sem_sync_hdl);
 }
@@ -272,7 +272,7 @@ void sl_wfx_host_post_lcd_spi_transfer(void)
 {
     USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
     CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
-    GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PIN_OUT_CLEAR;
+    GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
     xSemaphoreGive(spi_sem_sync_hdl);
 }
 
