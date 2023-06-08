@@ -307,7 +307,7 @@ CHIP_ERROR OperationalStateServer::SetOperationalState(OperationalStateStruct & 
 
     if (&mOperationalState != &opState)
     {
-        char * dest = const_cast<char *>(mOperationalState.OperationalStateLabel);
+        char * dest = mOperationalState.OperationalStateLabel;
         size_t len  = op.operationalStateLabel.size();
         memset(dest, 0, sizeof(mOperationalState.OperationalStateLabel));
         memcpy(dest, op.operationalStateLabel.data(), len);
