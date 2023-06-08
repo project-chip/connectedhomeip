@@ -97,6 +97,7 @@ class ManualOnboardingPayloadParser(decimalRepresentation: String) {
     outPayload.setupPinCode = setUpPINCode
     require(kManualSetupDiscriminatorFieldLengthInBits <= 8) { "Won't fit in UInt8" }
     outPayload.discriminator = discriminator
+    outPayload.hasShortDiscriminator = true
   }
 
   companion object {

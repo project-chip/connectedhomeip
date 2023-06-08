@@ -28,11 +28,8 @@ static int cmd_matter(const struct shell * shell, size_t argc, char ** argv)
     chip::Shell::streamer_set_shell(shell);
     return (Engine::Root().ExecCommand(argc - 1, argv + 1) == CHIP_NO_ERROR) ? 0 : -ENOEXEC;
 }
-#ifdef CONFIG_BOARD_TLSR9518ADK80D
-static int RegisterCommands(void)
-#else
-static int RegisterCommands(const struct device * dev)
-#endif /* CONFIG_BOARD_TLSR9518ADK80D */
+
+static int RegisterCommands()
 {
     Engine::Root().RegisterDefaultCommands();
     return 0;

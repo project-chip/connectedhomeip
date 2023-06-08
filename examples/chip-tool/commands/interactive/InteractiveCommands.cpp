@@ -153,50 +153,56 @@ struct InteractiveServerResult
     {
         auto lock = ScopedLock(mMutex);
 
-        std::string resultsStr;
+        std::stringstream content;
+        content << "{";
+
+        content << "  \"results\": [";
         if (mResults.size())
         {
             for (const auto & result : mResults)
             {
-                resultsStr = resultsStr + result + ",";
+                content << result << ",";
             }
 
             // Remove last comma.
-            resultsStr.pop_back();
+            content.seekp(-1, std::ios_base::end);
         }
 
         if (mStatus != EXIT_SUCCESS)
         {
-            if (resultsStr.size())
+            if (mResults.size())
             {
-                resultsStr = resultsStr + ",";
+                content << ",";
             }
-            resultsStr = resultsStr + "{ \"error\": \"FAILURE\" }";
+            content << "{ \"error\": \"FAILURE\" }";
         }
+        content << "],";
 
-        std::string logsStr;
+        content << "\"logs\": [";
         if (mLogs.size())
         {
             for (const auto & log : mLogs)
             {
-                logsStr = logsStr + "{";
-                logsStr = logsStr + "  \"module\": \"" + log.module + "\",";
-                logsStr = logsStr + "  \"category\": \"" + log.messageType + "\",";
-                logsStr = logsStr + "  \"message\": \"" + log.message + "\"";
-                logsStr = logsStr + "},";
+                content << "{"
+                           "  \"module\": \"" +
+                        log.module +
+                        "\","
+                        "  \"category\": \"" +
+                        log.messageType +
+                        "\","
+                        "  \"message\": \"" +
+                        log.message +
+                        "\""
+                        "},";
             }
 
             // Remove last comma.
-            logsStr.pop_back();
+            content.seekp(-1, std::ios_base::end);
         }
+        content << "]";
 
-        std::string jsonLog;
-        jsonLog = jsonLog + "{";
-        jsonLog = jsonLog + "  \"results\": [" + resultsStr + "],";
-        jsonLog = jsonLog + "  \"logs\": [" + logsStr + "]";
-        jsonLog = jsonLog + "}";
-
-        return jsonLog;
+        content << "}";
+        return content.str();
     }
 };
 

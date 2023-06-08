@@ -230,9 +230,9 @@ namespace app {
  * Called by the OTA provider cluster server to determine an index
  * into its array.
  */
-uint16_t emberAfFindClusterServerEndpointIndex(EndpointId endpoint, ClusterId clusterId)
+uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
 {
-    if (endpoint == kSupportedEndpoint && clusterId == OtaSoftwareUpdateProvider::Id) {
+    if (endpoint == kSupportedEndpoint && cluster == OtaSoftwareUpdateProvider::Id) {
         return 0;
     }
 
