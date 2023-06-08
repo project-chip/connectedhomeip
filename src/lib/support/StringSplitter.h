@@ -26,18 +26,30 @@ namespace chip {
 
 /// Provides the ability to split a given string by a character.
 ///
+/// Converts things like:
+///   "a,b,c" split by ',': "a", "b", "c"
+///   ",b,c" split by ',': "", "b", "c"
+///   "a,,c" split by ',': "a", "", "c"
+///   "a," split by ',': "a", ""
+///   ",a" split by ',': "", "a"
+///
+///
 /// WARNING: WILL DESTRUCTIVELY MODIFY THE STRING IN PLACE
 ///
 class StringSplitter
 {
 public:
-    StringSplitter(char * s, char separator) : mNext(s), mSeparator(separator) {}
+    StringSplitter(char * s, char separator) : mNext(s), mSeparator(separator) {
+        if ((mNext != nullptr) && (*mNext == '\0')) {
+            mNext = nullptr; // end of string right away
+        }
+    }
 
     // returns null when no more items available
     const char * Next()
     {
         char * current = mNext;
-        if ((current == nullptr) || (*current == '\0'))
+        if (current == nullptr)
         {
             return nullptr; // nothing left
         }
@@ -52,7 +64,7 @@ public:
         else
         {
             // last element, position on the final 0
-            mNext = current + strlen(current);
+            mNext = nullptr;
         }
 
         return current;
@@ -70,7 +82,7 @@ class StrdupStringSplitter : public StringSplitter
 public:
     StrdupStringSplitter(const char * s, char separator) : StringSplitter(nullptr, separator)
     {
-        if (s != nullptr)
+        if ((s != nullptr) && (*s != '\0'))
         {
             mData = strdup(s);
             VerifyOrDie(mData != nullptr);
@@ -101,15 +113,17 @@ template <size_t N>
 class FixedStringSplitter : public StringSplitter
 {
 public:
-    FixedStringSplitter(const char * s, char separator) : StringSplitter(mData, separator)
+    FixedStringSplitter(const char * s, char separator) : StringSplitter(nullptr, separator)
     {
         if (s != nullptr)
         {
             chip::Platform::CopyString(mData, s);
+            mNext = mData;
         }
         else
         {
             mData[0] = '\0';
+            mNext = nullptr;
         }
     }
 
