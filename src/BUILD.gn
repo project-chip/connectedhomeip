@@ -99,7 +99,7 @@ if (chip_build_tests) {
       ]
 
       if (matter_enable_tracing_support) {
-        deps += ["${chip_root}/src/tracing/tests"]
+        deps += [ "${chip_root}/src/tracing/tests" ]
       }
     }
 
