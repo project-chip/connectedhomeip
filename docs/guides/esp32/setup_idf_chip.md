@@ -70,7 +70,7 @@ Whenever Matter environment is out of date, it can be updated by running above
 command.
 
 In IDF v4.4.x, `esptool` is part of the esp-idf repository, but in IDF v5.x, it
-is moved out as an installable Python package.
+is moved out as a Python package which can be installed using pip.
 
 If you are using IDF v5.x or later, please install `esptool` using the command
 below:
