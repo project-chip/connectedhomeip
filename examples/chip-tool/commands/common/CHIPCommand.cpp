@@ -24,7 +24,6 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
-#include <lib/support/StringSplitter.h>
 #include <lib/support/TestGroupData.h>
 
 #include <tracing/log_json/log_json_tracing.h>
@@ -255,16 +254,8 @@ CHIP_ERROR CHIPCommand::Run()
 
 void CHIPCommand::StartTracing()
 {
-    if (mTraceTo.HasValue())
-    {
-        chip::StrdupStringSplitter splitter(mTraceTo.Value(), ',');
-        const char * destination;
-
-        // Use scoped_registration to register each backend and ensure
-        // uniqueness by checking in-list.
-        while ((destination = splitter.Next()) != nullptr)
-        {
-            if (strcmp(destination, "log") == 0)
+        for (auto destination : mTraceTo) {
+            if (destination == "log") 
             {
                 if (!log_json_backend.IsInList())
                 {
@@ -273,10 +264,9 @@ void CHIPCommand::StartTracing()
             }
             else
             {
-                ChipLogError(AppServer, "Unknown trace destination: '%s'", destination);
+                ChipLogError(AppServer, "Unknown trace destination: '%s'", destination.c_str());
             }
         }
-    }
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::InitTrace();

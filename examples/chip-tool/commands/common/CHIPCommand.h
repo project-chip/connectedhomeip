@@ -240,5 +240,5 @@ private:
     chip::Optional<bool> mTraceDecode;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
-    chip::Optional<char *> mTraceTo;
+    std::vector<std::string> mTraceTo;
 };

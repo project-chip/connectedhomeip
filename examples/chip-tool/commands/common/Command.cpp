@@ -35,6 +35,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/StringSplitter.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 constexpr const char * kOptionalArgumentPrefix = "--";
@@ -60,7 +61,7 @@ bool Command::InitArguments(int argc, char ** argv)
         }
     }
 
-    VerifyOrExit((size_t)(argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
+    VerifyOrExit((size_t) (argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
                  ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %u", argc,
                               static_cast<unsigned int>(mandatoryArgsCount)));
 
@@ -220,6 +221,24 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         return CHIP_NO_ERROR == customArgument->Parse(arg.name, argValue);
     }
 
+    case ArgumentType::VectorString: {
+        // Currently only std::vector<std::string> is supported.
+        if (arg.flags != 0)
+        {
+            return false;
+        }
+        std::vector<std::string> vectorArgument;
+        chip::StrdupStringSplitter splitter(argValue, ',');
+
+        for (const char * value = splitter.Next(); value != nullptr; value = splitter.Next())
+        {
+            vectorArgument.push_back(value);
+        }
+
+        auto optionalArgument = static_cast<std::vector<std::string> *>(arg.value);
+        *optionalArgument = vectorArgument;
+        return true;
+    }
     case ArgumentType::VectorBool: {
         // Currently only chip::Optional<std::vector<bool>> is supported.
         if (arg.flags != Argument::kOptional)
@@ -798,6 +817,18 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void *
     return AddArgumentToList(std::move(arg));
 }
 
+size_t Command::AddArgument(const char * name, std::vector<std::string> *value, const char *desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::VectorString;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.flags = 0;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
 const char * Command::GetArgumentName(size_t index) const
 {
     if (index < mArgs.size())
@@ -914,6 +945,10 @@ void Command::ResetArguments()
             case ArgumentType::Custom: {
                 // No optional custom arguments so far.
                 VerifyOrDie(false);
+                break;
+            }
+            case ArgumentType::VectorString: {
+                ResetOptionalArg<std::vector<std::string>>(arg);
                 break;
             }
             case ArgumentType::VectorBool: {
