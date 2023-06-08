@@ -133,13 +133,12 @@ void TestNullResilience(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, !splitter.Next(span));
         NL_TEST_ASSERT(inSuite, span.data() == nullptr);
     }
-
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestSplitter", TestStrdupSplitter),           //
-    NL_TEST_DEF("TestNullResilience", TestNullResilience),           //
-    NL_TEST_SENTINEL()                                               //
+    NL_TEST_DEF("TestSplitter", TestStrdupSplitter),       //
+    NL_TEST_DEF("TestNullResilience", TestNullResilience), //
+    NL_TEST_SENTINEL()                                     //
 };
 
 } // namespace
