@@ -37,9 +37,6 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -61,8 +58,6 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <credentials/tests/CHIPCert_test_vectors.h>
-
-#define HSM_ECC_KEYID 0x11223344
 
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
