@@ -67,7 +67,7 @@ public:
         if (*end != '\0')
         {
             // intermediate element
-            out   = CharSpan(mNext, end - mNext);
+            out   = CharSpan(mNext, static_cast<size_t>(end - mNext));
             mNext = end + 1;
         }
         else
