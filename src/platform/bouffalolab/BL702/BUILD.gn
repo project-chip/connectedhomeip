@@ -39,10 +39,11 @@ static_library("BL702") {
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.cpp",
 
-    "${chip_root}/src/credentials/CHIPCert.h",
-    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
-    "../common/FactoryDataProvider.cpp",
-    "../common/FactoryDataProvider.h",
+    # "${chip_root}/src/credentials/CHIPCert.h",
+    # "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    
+    # "../common/FactoryDataProvider.cpp",
+    # "../common/FactoryDataProvider.h",
   ]
 
   if (chip_enable_ota_requestor) {
