@@ -57,7 +57,7 @@ from .interaction_model import InteractionModelError
 from .interaction_model import delegate as im
 from .native import PyChipError
 
-__all__ = ["ChipDeviceController"]
+__all__ = ["ChipDeviceController", "CommissioningParameters"]
 
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, PyChipError)
 _DeviceUnpairingCompleteFunct = CFUNCTYPE(None, c_uint64, PyChipError)
@@ -80,6 +80,13 @@ _ChipDeviceController_IterateDiscoveredCommissionableNodesFunct = CFUNCTYPE(None
 
 
 @dataclass
+class CommissioningParameters:
+    setupPinCode: int
+    setupManualCode: str
+    setupQRCode: str
+
+
+@dataclass
 class NOCChain:
     nocBytes: bytes
     icacBytes: bytes
@@ -89,7 +96,8 @@ class NOCChain:
 
 
 @_IssueNOCChainCallbackPythonCallbackFunct
-def _IssueNOCChainCallbackPythonCallback(devCtrl, status: PyChipError, noc: c_void_p, nocLen: int, icac: c_void_p, icacLen: int, rcac: c_void_p, rcacLen: int, ipk: c_void_p, ipkLen: int, adminSubject: int):
+def _IssueNOCChainCallbackPythonCallback(devCtrl, status: PyChipError, noc: c_void_p, nocLen: int, icac: c_void_p,
+                                         icacLen: int, rcac: c_void_p, rcacLen: int, ipk: c_void_p, ipkLen: int, adminSubject: int):
     nocChain = NOCChain(None, None, None, None, 0)
     if status.is_success:
         nocBytes = None
@@ -259,7 +267,8 @@ class ChipDeviceControllerBase():
         def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, manualCode: str, setupCode: str, err: PyChipError) -> None:
             if err.is_success:
                 print("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
-                self._ChipStack.openCommissioningWindowPincode[nodeid] = (setupPinCode, manualCode.decode(), setupCode.decode())
+                self._ChipStack.openCommissioningWindowPincode[nodeid] = CommissioningParameters(
+                    setupPinCode=setupPinCode, setupManualCode=manualCode.decode(), setupQRCode=setupCode.decode())
             else:
                 print("Failed to open commissioning window: {}".format(err))
 
@@ -354,7 +363,7 @@ class ChipDeviceControllerBase():
             C++ constructor instance in the SDK.
         '''
         if (self._isActive):
-            if self.devCtrl != None:
+            if self.devCtrl is not None:
                 self._ChipStack.Call(
                     lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
                         self.devCtrl)
@@ -521,7 +530,8 @@ class ChipDeviceControllerBase():
 
         return (address.value.decode(), port.value) if error == 0 else None
 
-    def DiscoverCommissionableNodes(self, filterType: discovery.FilterType = discovery.FilterType.NONE, filter: typing.Any = None, stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
+    def DiscoverCommissionableNodes(self, filterType: discovery.FilterType = discovery.FilterType.NONE, filter: typing.Any = None,
+                                    stopOnFirst: bool = False, timeoutSecond: int = 5) -> typing.Union[None, CommissionableNode, typing.List[CommissionableNode]]:
         ''' Discover commissionable nodes via DNS-SD with specified filters.
             Supported filters are:
 
@@ -550,7 +560,8 @@ class ChipDeviceControllerBase():
             if stopOnFirst:
                 target = time.time() + timeoutSecond
                 while time.time() < target:
-                    if self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode(self.devCtrl)):
+                    if self._ChipStack.Call(
+                            lambda: self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode(self.devCtrl)):
                         break
                     time.sleep(0.1)
             else:
@@ -652,7 +663,8 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         ).raise_on_error()
 
-    def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int, discriminator: int, option: int) -> (int, str, str):
+    def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int,
+                                discriminator: int, option: int) -> CommissioningParameters:
         self.CheckIsActive()
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
@@ -831,7 +843,8 @@ class ChipDeviceControllerBase():
             future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
 
-    def WriteGroupAttribute(self, groupid: int, attributes: typing.List[typing.Tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Union[None, int] = None):
+    def WriteGroupAttribute(
+            self, groupid: int, attributes: typing.List[typing.Tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Union[None, int] = None):
         '''
         Write a list of attributes on a target group.
 
@@ -878,8 +891,8 @@ class ChipDeviceControllerBase():
         if pathTuple == ('*') or pathTuple == ():
             # Wildcard
             pass
-        elif type(pathTuple) is not tuple:
-            if type(pathTuple) is int:
+        elif not isinstance(pathTuple, tuple):
+            if isinstance(pathTuple, int):
                 endpoint = pathTuple
             elif issubclass(pathTuple, ClusterObjects.Cluster):
                 cluster = pathTuple
@@ -934,9 +947,9 @@ class ChipDeviceControllerBase():
         if pathTuple in [('*'), ()]:
             # Wildcard
             pass
-        elif type(pathTuple) is not tuple:
+        elif not isinstance(pathTuple, tuple):
             print(type(pathTuple))
-            if type(pathTuple) is int:
+            if isinstance(pathTuple, int):
                 endpoint = pathTuple
             elif issubclass(pathTuple, ClusterObjects.Cluster):
                 cluster = pathTuple
@@ -1133,7 +1146,7 @@ class ChipDeviceControllerBase():
         try:
             req = eval(
                 f"GeneratedObjects.{cluster}.Commands.{command}")(**args)
-        except:
+        except BaseException:
             raise UnknownCommand(cluster, command)
         try:
             res = asyncio.run(self.SendCommand(nodeid, endpoint, req))
@@ -1151,21 +1164,22 @@ class ChipDeviceControllerBase():
         try:
             attributeType = eval(
                 f"GeneratedObjects.{cluster}.Attributes.{attribute}")
-        except:
+        except BaseException:
             raise UnknownAttribute(cluster, attribute)
 
         result = asyncio.run(self.ReadAttribute(
             nodeid, [(endpoint, attributeType)]))
         path = ClusterAttribute.AttributePath(
             EndpointId=endpoint, Attribute=attributeType)
-        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[endpoint][clusterType][attributeType])
+        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId,
+                                      attributeId=path.AttributeId), status=0, value=result[endpoint][clusterType][attributeType])
 
     def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, dataVersion=0, blocking=True):
         req = None
         try:
             req = eval(
                 f"GeneratedObjects.{cluster}.Attributes.{attribute}")(value)
-        except:
+        except BaseException:
             raise UnknownAttribute(cluster, attribute)
 
         return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req, dataVersion)]))
@@ -1176,7 +1190,7 @@ class ChipDeviceControllerBase():
         req = None
         try:
             req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
-        except:
+        except BaseException:
             raise UnknownAttribute(cluster, attribute)
         return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], None, False, reportInterval=(minInterval, maxInterval)))
 
@@ -1430,7 +1444,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
     TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
     '''
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: FabricAdmin = None, name: str = None, keypair: p256keypair.P256Keypair = None):
+    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [
+    ], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: FabricAdmin = None, name: str = None, keypair: p256keypair.P256Keypair = None):
         super().__init__(
             name or
             f"caIndex({fabricAdmin.caIndex:x})/fabricId(0x{fabricId:016X})/nodeId(0x{nodeId:016X})"
@@ -1522,7 +1537,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
                 threadOperationalDataset, len(threadOperationalDataset))
         ).raise_on_error()
 
-    def CommissionOnNetwork(self, nodeId: int, setupPinCode: int, filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None):
+    def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
+                            filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None):
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
         Supported filters are:
@@ -1611,7 +1627,8 @@ class BareChipDeviceController(ChipDeviceControllerBase):
     ''' A bare device controller without AutoCommissioner support.
     '''
 
-    def __init__(self, operationalKey: p256keypair.P256Keypair, noc: bytes, icac: typing.Union[bytes, None], rcac: bytes, ipk: typing.Union[bytes, None], adminVendorId: int, name: str = None):
+    def __init__(self, operationalKey: p256keypair.P256Keypair, noc: bytes,
+                 icac: typing.Union[bytes, None], rcac: bytes, ipk: typing.Union[bytes, None], adminVendorId: int, name: str = None):
         '''Creates a controller without autocommissioner.
 
         The allocated controller uses the noc, icac, rcac and ipk instead of the default,
