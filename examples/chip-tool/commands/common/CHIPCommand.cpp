@@ -254,8 +254,11 @@ CHIP_ERROR CHIPCommand::Run()
 
 void CHIPCommand::StartTracing()
 {
-        for (auto destination : mTraceTo) {
-            if (destination == "log") 
+    if (mTraceTo.HasValue())
+    {
+        for (auto destination : mTraceTo.Value())
+        {
+            if (destination == "log")
             {
                 if (!log_json_backend.IsInList())
                 {
@@ -267,6 +270,7 @@ void CHIPCommand::StartTracing()
                 ChipLogError(AppServer, "Unknown trace destination: '%s'", destination.c_str());
             }
         }
+    }
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::InitTrace();

@@ -222,11 +222,6 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     }
 
     case ArgumentType::VectorString: {
-        // Currently only std::vector<std::string> is supported.
-        if (arg.flags != 0)
-        {
-            return false;
-        }
         std::vector<std::string> vectorArgument;
         chip::StrdupStringSplitter splitter(argValue, ',');
 
@@ -235,8 +230,16 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
             vectorArgument.push_back(value);
         }
 
-        auto optionalArgument = static_cast<std::vector<std::string> *>(arg.value);
-        *optionalArgument = vectorArgument;
+        if (arg.flags != Argument::kOptional)
+        {
+            auto argument = static_cast<chip::Optional<std::vector<std::string>> *>(arg.value);
+            argument->SetValue(vectorArgument);
+        }
+        else
+        {
+            auto argument = static_cast<std::vector<std::string> *>(arg.value);
+            *argument     = vectorArgument;
+        }
         return true;
     }
     case ArgumentType::VectorBool: {
@@ -817,13 +820,25 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void *
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, std::vector<std::string> *value, const char *desc)
+size_t Command::AddArgument(const char * name, std::vector<std::string> * value, const char * desc)
 {
     Argument arg;
     arg.type  = ArgumentType::VectorString;
     arg.name  = name;
     arg.value = static_cast<void *>(value);
     arg.flags = 0;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, chip::Optional<std::vector<std::string>> * value, const char * desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::VectorString;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.flags = Argument::kOptional;
     arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
