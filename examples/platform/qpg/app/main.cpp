@@ -192,7 +192,7 @@ CHIP_ERROR CHIP_Init(void)
     qvIO_EnableSleep(true);
 #elif CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-    qvIO_EnableSleep(false);
+    qvIO_EnableSleep(true);
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
     qvIO_EnableSleep(false);
