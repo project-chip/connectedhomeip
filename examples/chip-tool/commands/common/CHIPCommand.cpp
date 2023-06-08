@@ -256,7 +256,7 @@ void CHIPCommand::StartTracing()
 {
     if (mTraceTo.HasValue())
     {
-        for (auto destination : mTraceTo.Value())
+        for (const auto &destination : mTraceTo.Value())
         {
             if (destination == "log")
             {
