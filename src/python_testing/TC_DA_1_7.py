@@ -79,14 +79,40 @@ def extract_akid(cert: Certificate) -> Optional[bytes]:
 
 
 class TC_DA_1_7(MatterBaseTest):
+    ''' TC-DA-1.7
+
+        This test requires two instances of the DUT with the same PID/VID to confirm that the individual
+        devices are provisioned with different device attestation keys even in the same product line.
+
+        In order to fully test this locally, it requires two separate instances of the example app
+        with different keys, different discrimimators, different ports, and different KVSs.
+        The example apps use the SDK authority key, so the script needs the allow_sdk_dac arg set.
+
+        One suggested method of testing:
+
+        Terminal 1: (first DUT - default port 5540)
+        rm kvs1
+        ${PATH_TO_ALL_CLUSTERS}/chip-all-clusters-app --dac_provider \
+            credentials/development/commissioner_dut/struct_cd_authorized_paa_list_count1_valid/test_case_vector.json \
+            --product-id 32768 --KVS kvs1 --discriminator 12
+
+        Terminal 2: (second DUT - port 5541)
+        rm kvs2
+        ${PATH_TO_ALL_CLUSTERS}/chip-all-clusters-app --dac_provider \
+            credentials/development/commissioner_dut/struct_cd_authorized_paa_list_count2_valid/test_case_vector.json \
+            --product-id 32768 --KVS kvs2 --discriminator 34 --secured-device-port 5541
+
+        Terminal 3: (test application)
+        ./scripts/tests/run_python_test.py --script "src/python_testing/TC_DA_1_7.py" \
+            --script-args "--storage-path admin_storage.json --commissioning-method on-network \
+                --discriminator 12 34 --passcode 20202021 20202021 --bool-arg allow_sdk_dac:true"
+    '''
     @async_test_body
     async def test_TC_DA_1_7(self):
         # For real tests, we require more than one DUT
         # On the CI, this doesn't make sense to do since all the examples use the same DAC
         # To specify more than 1 DUT, use a list of discriminators and passcodes
         allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
-        if allow_sdk_dac:
-            asserts.assert_equal(len(self.matter_test_config.discriminator), 1, "Only one device can be tested with SDK DAC")
         if not allow_sdk_dac:
             asserts.assert_equal(len(self.matter_test_config.discriminator), 2, "This test requires 2 DUTs")
         pk = []

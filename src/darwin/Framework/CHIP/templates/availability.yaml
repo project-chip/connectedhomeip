@@ -5316,8 +5316,6 @@
               - ThreadMetricsStruct
           GeneralDiagnostics:
               - NetworkInterface
-          ModeSelect:
-              - SemanticTagStruct
           OperationalCredentials:
               - FabricDescriptorStruct
           DoorLock:
@@ -5434,10 +5432,6 @@
                   - iPv4Addresses
                   - iPv6Addresses
                   - type
-          ModeSelect:
-              SemanticTagStruct:
-                  - mfgCode
-                  - value
           OperationalCredentials:
               FabricDescriptorStruct:
                   - rootPublicKey
@@ -6534,8 +6528,6 @@
               ThreadMetricsStruct: ThreadMetrics
           GeneralDiagnostics:
               NetworkInterface: NetworkInterfaceType
-          ModeSelect:
-              SemanticTagStruct: SemanticTag
           OperationalCredentials:
               FabricDescriptorStruct: FabricDescriptor
           DoorLock:
@@ -7046,7 +7038,7 @@
               PumpFeature:
                   LocalOperation: Local
 
-- release: "TBD"
+- release: "Fall 2023"
   versions: "future"
   introduced:
       clusters:
@@ -8056,7 +8048,6 @@
               - ClusterRevision
           RefrigeratorAlarm:
               - Mask
-              - Latch
               - State
               - GeneratedCommandList
               - AcceptedCommandList
@@ -8069,7 +8060,7 @@
               - MinTemperature
               - MaxTemperature
               - Step
-              - CurrentTemperatureLevelIndex
+              - SelectedTemperatureLevel
               - SupportedTemperatureLevels
               - GeneratedCommandList
               - AcceptedCommandList
@@ -8129,8 +8120,6 @@
               - Start
               - Resume
               - OperationalCommandResponse
-          RefrigeratorAlarm:
-              - Reset
           TemperatureControl:
               - SetTemperature
           DoorLock:
@@ -8149,10 +8138,6 @@
           OperationalState:
               OperationalCommandResponse:
                   - commandResponseState
-          RefrigeratorAlarm:
-              Reset:
-                  - alarms
-                  - mask
           TemperatureControl:
               SetTemperature:
                   - targetTemperature
@@ -8164,6 +8149,8 @@
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
               - ProductAppearanceStruct
+          ModeSelect:
+              - ModeTagStruct
           NetworkCommissioning:
               - WiFiInterfaceScanResultStruct
               - ThreadInterfaceScanResultStruct
@@ -8171,8 +8158,6 @@
           OperationalState:
               - OperationalStateStruct
               - ErrorStateStruct
-          TemperatureControl:
-              - TemperatureLevelStruct
           ThreadNetworkDiagnostics:
               - NeighborTableStruct
               - RouteTableStruct
@@ -8190,6 +8175,12 @@
               ProductAppearanceStruct:
                   - finish
                   - primaryColor
+          ModeSelect:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - modeTags
           NetworkCommissioning:
               WiFiInterfaceScanResultStruct:
                   - security
@@ -8218,10 +8209,6 @@
                   - errorStateID
                   - errorStateLabel
                   - errorStateDetails
-          TemperatureControl:
-              TemperatureLevelStruct:
-                  - label
-                  - temperatureLevel
           ThreadNetworkDiagnostics:
               NeighborTableStruct:
                   - extAddress
@@ -9569,6 +9556,9 @@
                   - GroupNames
               NameSupportBitmap:
                   - GroupNames
+          ModeSelect:
+              Feature:
+                  - OnOff
           NetworkCommissioning:
               WiFiSecurityBitmap:
                   - Unencrypted
@@ -9943,6 +9933,7 @@
               Feature:
                   - TemperatureNumber
                   - TemperatureLevel
+                  - TemperatureStep
           SmokeCOAlarm:
               Feature:
                   - SmokeAlarm
@@ -9975,6 +9966,10 @@
           ThreadNetworkDiagnostics:
               - NeighborTable
               - RouteTable
+      struct fields:
+          ModeSelect:
+              ModeOptionStruct:
+                  - semanticTags
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -9984,6 +9979,10 @@
               - PressureFeature
           PumpConfigurationAndControl:
               - PumpFeature
+      bitmap values:
+          ModeSelect:
+              Feature:
+                  - DEPONOFF
   renames:
       attributes:
           TimeSynchronization:
@@ -9996,6 +9995,8 @@
       structs:
           AccessControl:
               AccessControlTargetStruct: Target
+          ModeSelect:
+              ModeTagStruct: SemanticTag
           NetworkCommissioning:
               WiFiInterfaceScanResultStruct: WiFiInterfaceScanResult
               ThreadInterfaceScanResultStruct: ThreadInterfaceScanResult
@@ -10003,6 +10004,10 @@
           ThreadNetworkDiagnostics:
               NeighborTableStruct: NeighborTable
               RouteTableStruct: RouteTable
+      struct fields:
+          ModeSelect:
+              ModeOptionStruct:
+                  modeTags: semanticTags
       enum values:
           TimeSynchronization:
               TimeSourceEnum:
@@ -10031,10 +10036,37 @@
               Feature: PressureFeature
           PumpConfigurationAndControl:
               Feature: PumpFeature
+      bitmap values:
+          ModeSelect:
+              Feature:
+                  OnOff: DEPONOFF
   provisional:
       clusters:
           # Not ready to be public API yet.
           - ICDManagement
+          - LaundryWasherModeSelect
+          - RefrigeratorAndTemperatureControlledCabinetModeSelect
+          - RVCRunModeSelect
+          - RVCCleanModeSelect
+          - DishwasherModeSelect
+      commands:
+          ModeSelect:
+              # Still very in-flux.
+              - ChangeToModeWithStatus
+              - ChangeToModeResponse
+      struct fields:
+          ModeSelect:
+              ModeTagStruct:
+                  - tagName
+      enums:
+          ModeSelect:
+              # Still very in-flux.
+              - ModeTag
+              - StatusCode
+      bitmap values:
+          ModeSelect:
+              Feature:
+                  - ExtendedStatus
       # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
       ids:

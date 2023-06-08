@@ -589,7 +589,8 @@ namespace DeviceLayer {
         return;
     }
 
-    [_centralManager scanForPeripheralsWithServices:@[ _shortServiceUUID ] options:nil];
+    auto scanOptions = @{ CBCentralManagerScanOptionAllowDuplicatesKey : @YES };
+    [_centralManager scanForPeripheralsWithServices:@[ _shortServiceUUID ] options:scanOptions];
 }
 
 - (void)stopScanning
@@ -716,7 +717,7 @@ namespace DeviceLayer {
         ChipLogProgress(Ble, "  - Version: %u", info.GetAdvertisementVersion());
         ChipLogProgress(Ble, "  - Discriminator: %u", info.GetDeviceDiscriminator());
         ChipLogProgress(Ble, "  - VendorId: %u", info.GetVendorId());
-        ChipLogProgress(Ble, "  - ProductId: %u", info.GetVendorId());
+        ChipLogProgress(Ble, "  - ProductId: %u", info.GetProductId());
     }
 }
 

@@ -41,7 +41,7 @@ limitations under the License.
     <define>SCENES_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="4"/>
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
    
     <attribute side="server" code="0x0000" define="SCENE_COUNT" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="false">SceneCount</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_SCENE" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="false">CurrentScene</attribute>

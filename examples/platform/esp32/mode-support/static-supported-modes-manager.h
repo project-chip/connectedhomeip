@@ -30,7 +30,7 @@ class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::Supp
 {
 private:
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-    using SemanticTag          = Structs::SemanticTagStruct::Type;
+    using ModeTag              = Structs::ModeTagStruct::Type;
 
     static ModeOptionsProvider epModeOptionsProviderList[FIXED_ENDPOINT_COUNT];
 
