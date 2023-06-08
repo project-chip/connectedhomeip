@@ -50,7 +50,7 @@ public:
     ///       no elements available
     ///
     /// Returns true if an element is available, false otherwise.
-    bool Next(CharSpan &out)
+    bool Next(CharSpan & out)
     {
         if (mNext == nullptr)
         {
@@ -58,21 +58,22 @@ public:
             return false; // nothing left
         }
 
-        const char *end = mNext;
-        while ((*end != '\0') && (*end != mSeparator)) {
+        const char * end = mNext;
+        while ((*end != '\0') && (*end != mSeparator))
+        {
             end++;
         }
 
         if (*end != '\0')
         {
             // intermediate element
-            out = CharSpan(mNext, end - mNext);
-            mNext  = end + 1;
+            out   = CharSpan(mNext, end - mNext);
+            mNext = end + 1;
         }
         else
         {
             // last element
-            out = CharSpan::fromCharString(mNext);
+            out   = CharSpan::fromCharString(mNext);
             mNext = nullptr;
         }
 
@@ -83,6 +84,5 @@ protected:
     const char * mNext; // start of next element to return by Next()
     const char mSeparator;
 };
-
 
 } // namespace chip
