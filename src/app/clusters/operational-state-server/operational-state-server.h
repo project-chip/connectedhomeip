@@ -147,12 +147,12 @@ public:
     CHIP_ERROR SetOperationalError(OperationalErrorStateStruct & opErrState);
 
 private:
-    EndpointId endpointId;
-    ClusterId clusterId;
-    Delegate * delegate;
+    EndpointId mEndpointId;
+    ClusterId mClusterId;
+    Delegate * mDelegate;
     OperationalStateDataProvider mOperationalStateDataProvider;
-    OperationalStateStruct operationalState;
-    OperationalErrorStateStruct operationalError;
+    OperationalStateStruct mOperationalState;
+    OperationalErrorStateStruct mOperationalError;
 
     /**
      * Handle Command: Pause.
@@ -187,9 +187,9 @@ public:
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId)
     {
 
-        endpointId = aEndpointId;
-        clusterId  = aClusterId;
-        delegate   = aDelegate;
+        mEndpointId = aEndpointId;
+        mClusterId  = aClusterId;
+        mDelegate   = aDelegate;
     }
 
     // Inherited from CommandHandlerInterface
@@ -202,7 +202,7 @@ public:
 template <typename T>
 CHIP_ERROR OperationalStateServer::SetOperationalStateList(const DataModelListTemplate<T> & operationalStateList)
 {
-    return mOperationalStateDataProvider.StoreOperationalStateList<T>(endpointId, clusterId, operationalStateList);
+    return mOperationalStateDataProvider.StoreOperationalStateList<T>(mEndpointId, mClusterId, operationalStateList);
 }
 
 } // namespace OperationalState

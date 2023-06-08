@@ -49,9 +49,9 @@ using Status = Protocols::InteractionModel::Status;
 CHIP_ERROR OperationalStateServer::Init()
 {
     // Check if the cluster has been selected in zap
-    if (!emberAfContainsServer(endpointId, clusterId))
+    if (!emberAfContainsServer(mEndpointId, mClusterId))
     {
-        ChipLogError(Zcl, "Operational State: The cluster with ID %lu was not enabled in zap.", long(clusterId));
+        ChipLogError(Zcl, "Operational State: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -60,8 +60,8 @@ CHIP_ERROR OperationalStateServer::Init()
 
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrReturnError(delegate, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(delegate->Init());
+    VerifyOrReturnError(mDelegate, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mDelegate->Init());
 
     return CHIP_NO_ERROR;
 }
@@ -120,25 +120,25 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     OperationalStateStruct currentOperationalState;
 
     // copy current operational state
-    currentOperationalState = operationalState;
+    currentOperationalState = mOperationalState;
     // copy current operational error
-    currentErrState = operationalError;
+    currentErrState = mOperationalError;
 
     // callback
-    delegate->HandlePauseState(currentOperationalState, currentErrState);
+    mDelegate->HandlePauseState(currentOperationalState, currentErrState);
 
     // set operational error
     SetOperationalState(currentOperationalState);
 
     // copy current operational error
-    operationalError = currentErrState;
+    mOperationalError = currentErrState;
 
     // return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel.SetNonNull(operationalError.ErrorStateLabel,
-                                                             strlen(operationalError.ErrorStateLabel));
-    response.commandResponseState.errorStateDetails.Emplace(operationalError.ErrorStateDetails,
-                                                            strlen(operationalError.ErrorStateDetails));
+    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
+    response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel,
+                                                             strlen(mOperationalError.ErrorStateLabel));
+    response.commandResponseState.errorStateDetails.Emplace(mOperationalError.ErrorStateDetails,
+                                                            strlen(mOperationalError.ErrorStateDetails));
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -151,25 +151,25 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     OperationalStateStruct currentOperationalState;
 
     // copy current operational state
-    currentOperationalState = operationalState;
+    currentOperationalState = mOperationalState;
     // copy current operational error
-    currentErrState = operationalError;
+    currentErrState = mOperationalError;
 
     // callback
-    delegate->HandleResumeState(currentOperationalState, currentErrState);
+    mDelegate->HandleResumeState(currentOperationalState, currentErrState);
 
     // set operational error
     SetOperationalState(currentOperationalState);
 
     // copy current operational error
-    operationalError = currentErrState;
+    mOperationalError = currentErrState;
 
     // return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel.SetNonNull(operationalError.ErrorStateLabel,
-                                                             strlen(operationalError.ErrorStateLabel));
-    response.commandResponseState.errorStateDetails.Emplace(operationalError.ErrorStateDetails,
-                                                            strlen(operationalError.ErrorStateDetails));
+    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
+    response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel,
+                                                             strlen(mOperationalError.ErrorStateLabel));
+    response.commandResponseState.errorStateDetails.Emplace(mOperationalError.ErrorStateDetails,
+                                                            strlen(mOperationalError.ErrorStateDetails));
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -182,25 +182,25 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
     OperationalStateStruct currentOperationalState;
 
     // copy current operational state
-    currentOperationalState = operationalState;
+    currentOperationalState = mOperationalState;
     // copy current operational error
-    currentErrState = operationalError;
+    currentErrState = mOperationalError;
 
     // callback
-    delegate->HandleStartState(currentOperationalState, currentErrState);
+    mDelegate->HandleStartState(currentOperationalState, currentErrState);
 
     // set operational error
     SetOperationalState(currentOperationalState);
 
     // copy current operational error
-    operationalError = currentErrState;
+    mOperationalError = currentErrState;
 
     // return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel.SetNonNull(operationalError.ErrorStateLabel,
-                                                             strlen(operationalError.ErrorStateLabel));
-    response.commandResponseState.errorStateDetails.Emplace(operationalError.ErrorStateDetails,
-                                                            strlen(operationalError.ErrorStateDetails));
+    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
+    response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel,
+                                                             strlen(mOperationalError.ErrorStateLabel));
+    response.commandResponseState.errorStateDetails.Emplace(mOperationalError.ErrorStateDetails,
+                                                            strlen(mOperationalError.ErrorStateDetails));
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -213,25 +213,25 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
     OperationalStateStruct currentOperationalState;
 
     // copy current operational state
-    currentOperationalState = operationalState;
+    currentOperationalState = mOperationalState;
     // copy current operational error
-    currentErrState = operationalError;
+    currentErrState = mOperationalError;
 
     // callback
-    delegate->HandleStopState(currentOperationalState, currentErrState);
+    mDelegate->HandleStopState(currentOperationalState, currentErrState);
 
     // set operational error
     SetOperationalState(currentOperationalState);
 
     // copy current operational error
-    operationalError = currentErrState;
+    mOperationalError = currentErrState;
 
     // return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel.SetNonNull(operationalError.ErrorStateLabel,
-                                                             strlen(operationalError.ErrorStateLabel));
-    response.commandResponseState.errorStateDetails.Emplace(operationalError.ErrorStateDetails,
-                                                            strlen(operationalError.ErrorStateDetails));
+    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
+    response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel,
+                                                             strlen(mOperationalError.ErrorStateLabel));
+    response.commandResponseState.errorStateDetails.Emplace(mOperationalError.ErrorStateDetails,
+                                                            strlen(mOperationalError.ErrorStateDetails));
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -264,7 +264,7 @@ void OperationalStateServer::HandleCommand(HandlerContext & handlerContext, Func
 
 CHIP_ERROR OperationalStateServer::GetOperationalStateList(OperationalStateStructDynamicList ** operationalStateList, size_t & size)
 {
-    return mOperationalStateDataProvider.LoadOperationalStateList(endpointId, clusterId, operationalStateList, size);
+    return mOperationalStateDataProvider.LoadOperationalStateList(mEndpointId, mClusterId, operationalStateList, size);
 }
 
 void OperationalStateServer::ReleaseOperationalStateList(OperationalStateStructDynamicList * operationalStateList)
@@ -274,17 +274,17 @@ void OperationalStateServer::ReleaseOperationalStateList(OperationalStateStructD
 
 CHIP_ERROR OperationalStateServer::ClearOperationalStateList()
 {
-    return mOperationalStateDataProvider.ClearOperationalStateList(endpointId, clusterId);
+    return mOperationalStateDataProvider.ClearOperationalStateList(mEndpointId, mClusterId);
 }
 
 CHIP_ERROR OperationalStateServer::SetPhaseList(const PhaseList & phaseList)
 {
-    return mOperationalStateDataProvider.StorePhaseList(endpointId, clusterId, phaseList);
+    return mOperationalStateDataProvider.StorePhaseList(mEndpointId, mClusterId, phaseList);
 }
 
 CHIP_ERROR OperationalStateServer::GetPhaseList(PhaseListCharSpan ** phaseList, size_t & size)
 {
-    return mOperationalStateDataProvider.LoadPhaseList(endpointId, clusterId, phaseList, size);
+    return mOperationalStateDataProvider.LoadPhaseList(mEndpointId, mClusterId, phaseList, size);
 }
 
 void OperationalStateServer::ReleasePhaseList(PhaseListCharSpan * phaseList)
@@ -294,7 +294,7 @@ void OperationalStateServer::ReleasePhaseList(PhaseListCharSpan * phaseList)
 
 CHIP_ERROR OperationalStateServer::ClearPhaseStateList()
 {
-    return mOperationalStateDataProvider.ClearPhaseStateList(endpointId, clusterId);
+    return mOperationalStateDataProvider.ClearPhaseStateList(mEndpointId, mClusterId);
 }
 
 CHIP_ERROR OperationalStateServer::SetOperationalState(OperationalStateStruct & opState)
@@ -303,33 +303,33 @@ CHIP_ERROR OperationalStateServer::SetOperationalState(OperationalStateStruct & 
 
     op.operationalStateID = static_cast<Clusters::OperationalState::OperationalStateEnum>(opState.OperationalStateID);
 
-    ReturnErrorOnFailure(mOperationalStateDataProvider.UseOpStateIDGetOpStateStruct(endpointId, clusterId, op));
+    ReturnErrorOnFailure(mOperationalStateDataProvider.UseOpStateIDGetOpStateStruct(mEndpointId, mClusterId, op));
 
-    if (&operationalState != &opState)
+    if (&mOperationalState != &opState)
     {
-        char * dest = const_cast<char *>(operationalState.OperationalStateLabel);
+        char * dest = const_cast<char *>(mOperationalState.OperationalStateLabel);
         size_t len  = op.operationalStateLabel.size();
-        memset(dest, 0, sizeof(operationalState.OperationalStateLabel));
+        memset(dest, 0, sizeof(mOperationalState.OperationalStateLabel));
         memcpy(dest, op.operationalStateLabel.data(), len);
-        operationalState.OperationalStateID = static_cast<uint8_t>(op.operationalStateID);
+        mOperationalState.OperationalStateID = static_cast<uint8_t>(op.operationalStateID);
     }
     return CHIP_NO_ERROR;
 }
 
 OperationalStateStruct & OperationalStateServer::GetOperationalState()
 {
-    return operationalState;
+    return mOperationalState;
 }
 
 CHIP_ERROR OperationalStateServer::SetOperationalError(OperationalErrorStateStruct & op)
 {
 
-    operationalError.ErrorStateID = op.ErrorStateID;
+    mOperationalError.ErrorStateID = op.ErrorStateID;
 
-    memset(operationalError.ErrorStateLabel, 0, sizeof(operationalError.ErrorStateLabel));
-    memset(operationalError.ErrorStateDetails, 0, sizeof(operationalError.ErrorStateDetails));
-    memcpy(operationalError.ErrorStateLabel, op.ErrorStateLabel, sizeof(op.ErrorStateLabel));
-    memcpy(operationalError.ErrorStateDetails, op.ErrorStateDetails, sizeof(op.ErrorStateDetails));
+    memset(mOperationalError.ErrorStateLabel, 0, sizeof(mOperationalError.ErrorStateLabel));
+    memset(mOperationalError.ErrorStateDetails, 0, sizeof(mOperationalError.ErrorStateDetails));
+    memcpy(mOperationalError.ErrorStateLabel, op.ErrorStateLabel, sizeof(op.ErrorStateLabel));
+    memcpy(mOperationalError.ErrorStateDetails, op.ErrorStateDetails, sizeof(op.ErrorStateDetails));
 
     return CHIP_NO_ERROR;
 }
@@ -366,8 +366,8 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     case OperationalState::Attributes::OperationalState::Id: {
         OperationalState::Structs::OperationalStateStruct::Type opState;
 
-        opState.operationalStateID    = static_cast<OperationalState::OperationalStateEnum>(operationalState.OperationalStateID);
-        opState.operationalStateLabel = CharSpan::fromCharString(operationalState.OperationalStateLabel);
+        opState.operationalStateID    = static_cast<OperationalState::OperationalStateEnum>(mOperationalState.OperationalStateID);
+        opState.operationalStateLabel = CharSpan::fromCharString(mOperationalState.OperationalStateLabel);
 
         return aEncoder.Encode(opState);
     }
@@ -377,9 +377,9 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
         OperationalState::Structs::ErrorStateStruct::Type opError;
 
-        opError.errorStateID = static_cast<OperationalState::ErrorStateEnum>(operationalError.ErrorStateID);
-        opError.errorStateLabel.SetNonNull(operationalError.ErrorStateLabel, strlen(operationalError.ErrorStateLabel));
-        opError.errorStateDetails.Emplace(operationalError.ErrorStateDetails, strlen(operationalError.ErrorStateDetails));
+        opError.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
+        opError.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, strlen(mOperationalError.ErrorStateLabel));
+        opError.errorStateDetails.Emplace(mOperationalError.ErrorStateDetails, strlen(mOperationalError.ErrorStateDetails));
 
         return aEncoder.Encode(opError);
     }
