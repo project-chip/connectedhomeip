@@ -16,9 +16,10 @@
 #
 
 import ipaddress
+from datetime import timedelta
+
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from datetime import timedelta
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, utc_time_in_matter_epoch
 from mobly import asserts
 
