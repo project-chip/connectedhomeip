@@ -167,7 +167,7 @@ class LintRulesContext:
     def RequireAttribute(self, r: AttributeRequirement):
         self._required_attributes_rule.RequireAttribute(r)
 
-    def FindClusterCode(self, name: str) -> Optionarl[Tuple[str, int]]:
+    def FindClusterCode(self, name: str) -> Optional[Tuple[str, int]]:
         if name not in self._cluster_codes:
             # Name may be a number. If this can be parsed as a number, accept it anyway
             try:
