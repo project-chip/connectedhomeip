@@ -87,9 +87,8 @@ namespace {
 using Test_P256Keypair                  = P256Keypair;
 using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
 using TestPBKDF2_sha256                 = PBKDF2_sha256;
-using TestHKDF_sha = HKDF_shaHSM;
-using TestHMAC_sha = HMAC_shaHSM;
-using TestHMAC_sha                      = HMAC_sha;
+using TestHKDF_sha = HKDF_sha;
+using TestHMAC_sha = HMAC_sha;
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
 #if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
