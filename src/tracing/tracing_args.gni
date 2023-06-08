@@ -12,29 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
-
-import("${chip_root}/src/tracing/tracing_args.gni")
-
-config("tracing_enabled") {
-  defines = [ "MATTER_TRACING_ENABLED" ]
-}
-
-static_library("tracing") {
-  sources = [
-    "backend.h",
-    "log_declares.h",
-    "macros.h",
-    "registry.cpp",
-    "registry.h",
-    "scope.h",
-    "scopes.h",
-  ]
-
-  public_deps = [ "${chip_root}/src/lib/support" ]
-
-  if (matter_enable_tracing_support) {
-    public_configs = [ ":tracing_enabled" ]
-  }
+declare_args() {
+  # Tracing can have a non-zero size impact to binaries. We try to make
+  # the impact minimal (the backends themselves add some size), however
+  # for now tracing is opt-in
+  matter_enable_tracing_support = false
 }

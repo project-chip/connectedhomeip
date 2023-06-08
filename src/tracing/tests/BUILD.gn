@@ -16,7 +16,10 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
+import("${chip_root}/src/tracing/tracing_args.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
+
+if (matter_enable_tracing_support) {
 
 chip_test_suite("tests") {
   output_name = "libTracingTests"
@@ -30,4 +33,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/tracing",
     "${nlunit_test_root}:nlunit-test",
   ]
+}
+
 }
