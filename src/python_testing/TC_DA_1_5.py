@@ -170,7 +170,7 @@ class TC_DA_1_5(MatterBaseTest):
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
         TH2 = new_fabric_admin.NewController(nodeId=112233)
 
-        success, _ = TH2.CommissionOnNetwork(
+        success = TH2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=pin,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
         asserts.assert_true(success, 'Commissioning on TH2 did not complete successfully')

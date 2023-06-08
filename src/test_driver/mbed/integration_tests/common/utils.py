@@ -207,9 +207,10 @@ def connect_device_over_ble(devCtrl, discriminator, pinCode, nodeId=None):
     if nodeId == None:
         nodeId = random.randint(1, 1000000)
 
-    res, err = devCtrl.ConnectBLE(int(discriminator), int(pinCode), int(nodeId))
-    if not res:
-        log.error("Connect device over BLE failed: {}".format(str(err)))
+    try:
+        devCtrl.ConnectBLE(int(discriminator), int(pinCode), int(nodeId))
+    except exceptions.ChipStackException as ex:
+        log.error("Connect device over BLE failed: {}".format(str(ex)))
         return None
 
     return nodeId

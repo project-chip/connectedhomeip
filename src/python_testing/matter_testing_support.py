@@ -46,7 +46,6 @@ import chip.logging
 import chip.native
 from chip.ChipStack import ChipStack
 from chip.interaction_model import InteractionModelError, Status
-from chip.native import PyChipError
 from chip.storage import PersistentStorage
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
@@ -819,11 +818,10 @@ class CommissionDeviceTest(MatterBaseTest):
                          (conf.root_of_trust_index, conf.fabric_id, conf.dut_node_id[i]))
             logging.info("Commissioning method: %s" % conf.commissioning_method)
 
-            res, err = self._commission_device(i)
-            if not res:
-                raise signals.TestAbortAll(f"Failed to commission node: {str(err)}")
+            if not self._commission_device(i):
+                raise signals.TestAbortAll("Failed to commission node")
 
-    def _commission_device(self, i) -> Tuple[bool, PyChipError]:
+    def _commission_device(self, i) -> bool:
         dev_ctrl = self.default_controller
         conf = self.matter_test_config
 

@@ -278,8 +278,7 @@ class BaseTestHelper:
     def TestCommissionOnly(self, nodeid: int):
         self.logger.info(
             "Commissioning device with id {}".format(nodeid))
-        res, err = self.devCtrl.Commission(nodeid)
-        if not res:
+        if not self.devCtrl.Commission(nodeid):
             self.logger.info(
                 "Failed to commission device with id {}".format(str(nodeid)))
             return False
@@ -290,8 +289,7 @@ class BaseTestHelper:
     def TestKeyExchangeBLE(self, discriminator: int, setuppin: int, nodeid: int):
         self.logger.info(
             "Conducting key exchange with device {}".format(discriminator))
-        res, err = self.devCtrl.ConnectBLE(discriminator, setuppin, nodeid)
-        if not res:
+        if not self.devCtrl.ConnectBLE(discriminator, setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(discriminator))
             return False
@@ -323,8 +321,7 @@ class BaseTestHelper:
 
     def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Commissioning device {}".format(ip))
-        res, err = self.devCtrl.CommissionIP(ip, setuppin, nodeid)
-        if not res:
+        if not self.devCtrl.CommissionIP(ip, setuppin, nodeid):
             self.logger.info(
                 "Failed to finish commissioning device {}".format(ip))
             return False
@@ -333,8 +330,7 @@ class BaseTestHelper:
 
     def TestCommissioningWithSetupPayload(self, setupPayload: str, nodeid: int):
         self.logger.info("Commissioning device with setup payload {}".format(setupPayload))
-        res, err = self.devCtrl.CommissionWithCode(setupPayload, nodeid)
-        if not res:
+        if not self.devCtrl.CommissionWithCode(setupPayload, nodeid):
             self.logger.info(
                 "Failed to finish commissioning device {}".format(setupPayload))
             return False
@@ -779,8 +775,7 @@ class BaseTestHelper:
         self.devCtrl2 = self.fabricAdmin2.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
 
-        res, err = self.devCtrl2.CommissionIP(ip, setuppin, nodeid)
-        if not res:
+        if not self.devCtrl2.CommissionIP(ip, setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(ip))
             return False
