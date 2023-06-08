@@ -17,10 +17,7 @@
  */
 #pragma once
 
-#include <lib/support/CHIPMemString.h>
-
-#include <stdlib.h>
-#include <string.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 
@@ -39,7 +36,7 @@ namespace chip {
 class StringSplitter
 {
 public:
-    StringSplitter(char * s, char separator) : mNext(s), mSeparator(separator)
+    StringSplitter(const char * s, char separator) : mNext(s), mSeparator(separator)
     {
         if ((mNext != nullptr) && (*mNext == '\0'))
         {
@@ -47,90 +44,45 @@ public:
         }
     }
 
-    // returns null when no more items available
-    const char * Next()
+    /// Returns the next character san
+    ///
+    /// out - contains the next element or a nullptr/0 sized span if
+    ///       no elements available
+    ///
+    /// Returns true if an element is available, false otherwise.
+    bool Next(CharSpan &out)
     {
-        char * current = mNext;
-        if (current == nullptr)
+        if (mNext == nullptr)
         {
-            return nullptr; // nothing left
+            out = CharSpan();
+            return false; // nothing left
         }
 
-        char * comma = strchr(current, mSeparator);
+        const char *end = mNext;
+        while ((*end != '\0') && (*end != mSeparator)) {
+            end++;
+        }
 
-        if (comma != nullptr)
+        if (*end != '\0')
         {
-            mNext  = comma + 1;
-            *comma = '\0';
+            // intermediate element
+            out = CharSpan(mNext, end - mNext);
+            mNext  = end + 1;
         }
         else
         {
-            // last element, position on the final 0
+            // last element
+            out = CharSpan::fromCharString(mNext);
             mNext = nullptr;
         }
 
-        return current;
+        return true;
     }
 
 protected:
-    char * mNext; // next element to return by calling Next()
+    const char * mNext; // start of next element to return by Next()
     const char mSeparator;
 };
 
-/// A string splitter that works on a copy of the given string
-/// using strdup()
-class StrdupStringSplitter : public StringSplitter
-{
-public:
-    StrdupStringSplitter(const char * s, char separator) : StringSplitter(nullptr, separator)
-    {
-        if ((s != nullptr) && (*s != '\0'))
-        {
-            mData = strdup(s);
-            VerifyOrDie(mData != nullptr);
-            mNext = mData;
-        }
-        else
-        {
-            mData = nullptr;
-        }
-    }
-
-    ~StrdupStringSplitter()
-    {
-        if (mData != nullptr)
-        {
-            free(mData);
-        }
-    }
-
-private:
-    char * mData;
-};
-
-/// StringSplitter working on a locally allocated buffer copy
-///
-/// If input is larger than the internal size, it will be truncated.
-template <size_t N>
-class FixedStringSplitter : public StringSplitter
-{
-public:
-    FixedStringSplitter(const char * s, char separator) : StringSplitter(nullptr, separator)
-    {
-        if (s != nullptr)
-        {
-            chip::Platform::CopyString(mData, s);
-            mNext = mData;
-        }
-        else
-        {
-            mData[0] = '\0';
-            mNext    = nullptr;
-        }
-    }
-
-private:
-    char mData[N];
-};
 
 } // namespace chip

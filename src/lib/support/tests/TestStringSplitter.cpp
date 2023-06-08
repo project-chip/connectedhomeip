@@ -25,125 +25,103 @@ using namespace chip;
 
 void TestStrdupSplitter(nlTestSuite * inSuite, void * inContext)
 {
+    CharSpan out;
+
     // empty string handling
     {
-        StrdupStringSplitter splitter("", ',');
+        StringSplitter splitter("", ',');
 
         // next stays at nullptr
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+        NL_TEST_ASSERT(inSuite, !splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data() == nullptr);
+        NL_TEST_ASSERT(inSuite, !splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data() == nullptr);
+        NL_TEST_ASSERT(inSuite, !splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data() == nullptr);
     }
 
     // single item
     {
-        StrdupStringSplitter splitter("single", ',');
+        StringSplitter splitter("single", ',');
 
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "single") == 0);
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("single")));
 
         // next stays at nullptr also after valid data
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+        NL_TEST_ASSERT(inSuite, !splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data() == nullptr);
+        NL_TEST_ASSERT(inSuite, !splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data() == nullptr);
     }
 
     // multi-item
     {
-        StrdupStringSplitter splitter("one,two,three", ',');
+        StringSplitter splitter("one,two,three", ',');
 
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "one") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "two") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "three") == 0);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("one")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("two")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("three")));
+        NL_TEST_ASSERT(inSuite, !splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data() == nullptr);
     }
 
     // mixed
     {
-        StrdupStringSplitter splitter("a**bc*d,e*f", '*');
+        StringSplitter splitter("a**bc*d,e*f", '*');
 
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "a") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "bc") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "d,e") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "f") == 0);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("a")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("bc")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("d,e")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("f")));
+        NL_TEST_ASSERT(inSuite, !splitter.Next(out));
     }
 
     // some edge cases
     {
-        StrdupStringSplitter splitter(",", ',');
+        StringSplitter splitter(",", ',');
         // Note that even though "" is nullptr right away, "," becomes two empty strings
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, !splitter.Next(out));
     }
     {
-        StrdupStringSplitter splitter("log,", ',');
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "log") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+        StringSplitter splitter("log,", ',');
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("log")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, !splitter.Next(out));
     }
     {
-        StrdupStringSplitter splitter(",log", ',');
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "log") == 0);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
-    }
-}
-
-void TestFixedStringSplitter(nlTestSuite * inSuite, void * inContext)
-{
-    {
-        FixedStringSplitter<128> splitter("a,b,c", ',');
-
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "a") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "b") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "c") == 0);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
-    }
-
-    {
-        FixedStringSplitter<128> splitter(",a", ',');
-
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "a") == 0);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+        StringSplitter splitter(",log", ',');
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("log")));
+        NL_TEST_ASSERT(inSuite, !splitter.Next(out));
     }
     {
-        FixedStringSplitter<128> splitter("a,", ',');
-
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "a") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
-    }
-    {
-        FixedStringSplitter<128> splitter(",,,", ',');
-
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "") == 0);
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
-    }
-
-    // overflow
-    {
-        FixedStringSplitter<4> splitter("a,b,c,d", ',');
-
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "a") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "b") == 0);
-        // out of space
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
-    }
-
-    // overflow
-    {
-        FixedStringSplitter<7> splitter("one,two,three", ',');
-
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "one") == 0);
-        NL_TEST_ASSERT(inSuite, strcmp(splitter.Next(), "tw") == 0);
-        // out of space
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+        StringSplitter splitter(",,,", ',');
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, splitter.Next(out));
+        NL_TEST_ASSERT(inSuite, out.data_equal(CharSpan::fromCharString("")));
+        NL_TEST_ASSERT(inSuite, !splitter.Next(out));
     }
 }
 
@@ -151,23 +129,15 @@ void TestNullResilience(nlTestSuite * inSuite, void * inContext)
 {
     {
         StringSplitter splitter(nullptr, ',');
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
+        CharSpan span;
+        NL_TEST_ASSERT(inSuite, !splitter.Next(span));
+        NL_TEST_ASSERT(inSuite, span.data() == nullptr);
     }
 
-    {
-        StrdupStringSplitter splitter(nullptr, ',');
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
-    }
-
-    {
-        FixedStringSplitter<32> splitter(nullptr, ',');
-        NL_TEST_ASSERT(inSuite, splitter.Next() == nullptr);
-    }
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestStrdupSplitter", TestStrdupSplitter),           //
-    NL_TEST_DEF("TestFixedStringSplitter", TestFixedStringSplitter), //
+    NL_TEST_DEF("TestSplitter", TestStrdupSplitter),           //
     NL_TEST_DEF("TestNullResilience", TestNullResilience),           //
     NL_TEST_SENTINEL()                                               //
 };
