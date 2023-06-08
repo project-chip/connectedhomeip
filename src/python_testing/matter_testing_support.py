@@ -195,45 +195,48 @@ def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None
 
 @dataclass
 class MatterTestConfig:
-    storage_path: pathlib.Path = None
-    logs_path: pathlib.Path = None
-    paa_trust_store_path: pathlib.Path = None
-    ble_interface_id: int = None
+    storage_path: pathlib.Path = pathlib.Path(".")
+    logs_path: pathlib.Path = pathlib.Path(".")
+    paa_trust_store_path: Optional[pathlib.Path] = None
+    ble_interface_id: Optional[int] = None
     commission_only: bool = False
 
     admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
-    case_admin_subject: int = None
+    case_admin_subject: Optional[int] = None
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
     tests: List[str] = field(default_factory=list)
 
-    commissioning_method: str = None
-    discriminator: List[int] = None
-    setup_passcode: List[int] = None
-    commissionee_ip_address_just_for_testing: str = None
+    commissioning_method: Optional[str] = None
+    discriminators: Optional[List[int]] = None
+    setup_passcodes: Optional[List[int]] = None
+    commissionee_ip_address_just_for_testing: Optional[str] = None
     maximize_cert_chains: bool = False
 
-    qr_code_content: str = None
-    manual_code: str = None
+    qr_code_content: Optional[str] = None
+    manual_code: Optional[str] = None
 
-    wifi_ssid: str = None
-    wifi_passphrase: str = None
-    thread_operational_dataset: str = None
+    wifi_ssid: Optional[str] = None
+    wifi_passphrase: Optional[str] = None
+    thread_operational_dataset: Optional[str] = None
+
+    pics: dict[bool, str] = field(default_factory=dict)
 
     # Node ID for basic DUT
-    dut_node_id: List[int] = None
+    dut_node_ids: Optional[List[int]] = None
     # Node ID to use for controller/commissioner
     controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
     # CAT Tags for default controller/commissioner
     controller_cat_tags: List[int] = field(default_factory=list)
 
     # Fabric ID which to use
-    fabric_id: int = None
+    fabric_id: int = 1
+
     # "Alpha" by default
     root_of_trust_index: int = _DEFAULT_TRUST_ROOT_INDEX
 
     # If this is set, we will reuse root of trust keys at that location
-    chip_tool_credentials_path: pathlib.Path = None
+    chip_tool_credentials_path: Optional[pathlib.Path] = None
 
 
 class MatterStackState:
@@ -340,7 +343,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     @property
     def dut_node_id(self) -> int:
-        return self.matter_test_config.dut_node_id[0]
+        return self.matter_test_config.dut_node_ids[0]
 
     def check_pics(self, pics_key: str) -> bool:
         picsd = self.matter_test_config.pics
@@ -400,8 +403,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
         return result
 
-    def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
-        logging.info('***** Test Step {} : {}'.format(stepnum, title))
+    def print_step(self, stepnum: int, title: str) -> None:
+        logging.info('***** Test Step %d : %s', stepnum, title)
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
@@ -456,6 +459,7 @@ def byte_string_from_hex(s: str) -> bytes:
 
 
 def int_from_manual_code(s: str) -> int:
+    s = s.replace('-', '')
     regex = r"^([0-9]{11}|[0-9]{21})$"
     match = re.match(regex, s)
     if not match:
@@ -560,57 +564,6 @@ def root_index(s: str) -> int:
 
 
 def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConfig) -> bool:
-    config.dut_node_id = args.dut_node_id
-
-    if args.commissioning_method is None:
-        return True
-
-    config.commissioning_method = args.commissioning_method
-    config.commission_only = args.commission_only
-
-    if args.dut_node_id is None:
-        print("error: When --commissioning-method present, --dut-node-id is mandatory!")
-        return False
-
-    if args.discriminator is None and (args.qr_code is None and args.manual_code is None):
-        print("error: Missing --discriminator when no --qr-code/--manual-code present!")
-        return False
-    config.discriminator = args.discriminator
-
-    if args.passcode is None and (args.qr_code is None and args.manual_code is None):
-        print("error: Missing --passcode when no --qr-code/--manual-code present!")
-        return False
-    config.setup_passcode = args.passcode
-
-    if args.qr_code is not None and args.manual_code is not None:
-        print("error: Cannot have both --qr-code and --manual-code present!")
-        return False
-
-    if len(config.discriminator) != len(config.setup_passcode):
-        print("error: supplied number of discriminators does not match number of passcodes")
-        return False
-
-    if len(config.dut_node_id) > len(config.discriminator):
-        print("error: More node IDs provided than discriminators")
-        return False
-
-    if len(config.dut_node_id) < len(config.discriminator):
-        missing = len(config.discriminator) - len(config.dut_node_id)
-        for i in range(missing):
-            config.dut_node_id.append(config.dut_node_id[-1] + 1)
-
-    if len(config.dut_node_id) != len(set(config.dut_node_id)):
-        print("error: Duplicate values in node id list")
-        return False
-
-    if len(config.discriminator) != len(set(config.discriminator)):
-        print("error: Duplicate value in discriminator list")
-        return False
-
-    # TODO: this should also allow multiple once QR and manual codes are supported.
-    config.qr_code_content = args.qr_code
-    config.manual_code = args.manual_code
-
     config.root_of_trust_index = args.root_index
     # Follow root of trust index if ID not provided to have same behavior as legacy
     # chip-tool that fabricID == commissioner_name == root of trust index
@@ -620,6 +573,61 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
         print("error: chip-tool credentials path %s doesn't exist!" % args.chip_tool_credentials_path)
         return False
     config.chip_tool_credentials_path = args.chip_tool_credentials_path
+
+    if args.dut_node_ids is None:
+        print("error: --dut-node-id is mandatory!")
+        return False
+    config.dut_node_ids = args.dut_node_ids
+
+    config.commissioning_method = args.commissioning_method
+    config.commission_only = args.commission_only
+
+    # TODO: this should also allow multiple once QR and manual codes are supported.
+    config.qr_code_content = args.qr_code
+    if args.manual_code:
+        config.manual_code = "%d" % args.manual_code
+    else:
+        config.manual_code = None
+
+    if args.commissioning_method is None:
+        return True
+
+    if args.discriminators is None and (args.qr_code is None and args.manual_code is None):
+        print("error: Missing --discriminator when no --qr-code/--manual-code present!")
+        return False
+    config.discriminators = args.discriminators
+
+    if args.passcodes is None and (args.qr_code is None and args.manual_code is None):
+        print("error: Missing --passcode when no --qr-code/--manual-code present!")
+        return False
+    config.setup_passcodes = args.passcodes
+
+    if args.qr_code is not None and args.manual_code is not None:
+        print("error: Cannot have both --qr-code and --manual-code present!")
+        return False
+
+    if len(config.discriminators) != len(config.setup_passcodes):
+        print("error: supplied number of discriminators does not match number of passcodes")
+        return False
+
+    if len(config.dut_node_ids) > len(config.discriminators):
+        print("error: More node IDs provided than discriminators")
+        return False
+
+    if len(config.dut_node_ids) < len(config.discriminators):
+        missing = len(config.discriminators) - len(config.dut_node_ids)
+        # We generate new node IDs sequentially from the last one seen for all
+        # missing NodeIDs when commissioning many nodes at once.
+        for i in range(missing):
+            config.dut_node_ids.append(config.dut_node_ids[-1] + 1)
+
+    if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
+        print("error: Duplicate values in node id list")
+        return False
+
+    if len(config.discriminators) != len(set(config.discriminators)):
+        print("error: Duplicate value in discriminator list")
+        return False
 
     if config.commissioning_method == "ble-wifi":
         if args.wifi_ssid is None:
@@ -711,7 +719,7 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                              default=_DEFAULT_CONTROLLER_NODE_ID,
                              help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
     basic_group.add_argument('-n', '--dut-node-id', type=int_decimal_or_hex,
-                             metavar='NODE_ID', default=[_DEFAULT_DUT_NODE_ID],
+                             metavar='NODE_ID', dest='dut_node_ids', default=[_DEFAULT_DUT_NODE_ID],
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
@@ -724,9 +732,13 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                                   help='Name of commissioning method to use')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
+                                  dest='discriminators',
+                                  default=[],
                                   help='Discriminator to use for commissioning', nargs="+")
     commission_group.add_argument('-p', '--passcode', type=int_decimal_or_hex,
                                   metavar='PASSCODE',
+                                  dest='passcodes',
+                                  default=[],
                                   help='PAKE passcode to use', nargs="+")
     commission_group.add_argument('-i', '--ip-addr', type=str,
                                   metavar='RAW_IP_ADDRESS',
@@ -813,12 +825,12 @@ class CommissionDeviceTest(MatterBaseTest):
 
     def test_run_commissioning(self):
         conf = self.matter_test_config
-        for i in range(len(conf.dut_node_id)):
+        for commission_idx, node_id in enumerate(conf.dut_node_ids):
             logging.info("Starting commissioning for root index %d, fabric ID 0x%016X, node ID 0x%016X" %
-                         (conf.root_of_trust_index, conf.fabric_id, conf.dut_node_id[i]))
+                         (conf.root_of_trust_index, conf.fabric_id, node_id))
             logging.info("Commissioning method: %s" % conf.commissioning_method)
 
-            if not self._commission_device(i):
+            if not self._commission_device(commission_idx):
                 raise signals.TestAbortAll("Failed to commission node")
 
     def _commission_device(self, i) -> bool:
@@ -829,31 +841,31 @@ class CommissionDeviceTest(MatterBaseTest):
 
         if conf.commissioning_method == "on-network":
             return dev_ctrl.CommissionOnNetwork(
-                nodeId=conf.dut_node_id[i],
-                setupPinCode=conf.setup_passcode[i],
+                nodeId=conf.dut_node_ids[i],
+                setupPinCode=conf.setup_passcodes[i],
                 filterType=DiscoveryFilterType.LONG_DISCRIMINATOR,
-                filter=conf.discriminator[i]
+                filter=conf.discriminators[i]
             )
         elif conf.commissioning_method == "ble-wifi":
             return dev_ctrl.CommissionWiFi(
-                conf.discriminator[i],
-                conf.setup_passcode[i],
-                conf.dut_node_id[i],
+                conf.discriminators[i],
+                conf.setup_passcodes[i],
+                conf.dut_node_ids[i],
                 conf.wifi_ssid,
                 conf.wifi_passphrase
             )
         elif conf.commissioning_method == "ble-thread":
             return dev_ctrl.CommissionThread(
-                conf.discriminator[i],
-                conf.setup_passcode[i],
-                conf.dut_node_id[i],
+                conf.discriminators[i],
+                conf.setup_passcodes[i],
+                conf.dut_node_ids[i],
                 conf.thread_operational_dataset
             )
         elif conf.commissioning_method == "on-network-ip":
             logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
             return dev_ctrl.CommissionIP(
                 ipaddr=conf.commissionee_ip_address_just_for_testing,
-                setupPinCode=conf.setup_passcode[i], nodeid=conf.dut_node_id[i]
+                setupPinCode=conf.setup_passcodes[i], nodeid=conf.dut_node_ids[i]
             )
         else:
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)

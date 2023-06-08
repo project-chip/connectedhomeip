@@ -505,7 +505,7 @@ class SubscriptionTransaction:
 
     def GetReportingIntervalsSeconds(self) -> Tuple[int, int]:
         '''
-        Retrieve the reporting intervals associated with an active subscription. 
+        Retrieve the reporting intervals associated with an active subscription.
         This should only be called if we're of subscription interaction type and after a subscription has been established.
         '''
         handle = chip.native.GetLibraryHandle()
@@ -650,8 +650,9 @@ def _BuildEventIndex():
 class AsyncReadTransaction:
     @dataclass
     class ReadResponse:
-        attributes: AttributeCache = None
-        events: List[ClusterEvent] = None
+        attributes: dict[Any, Any]
+        events: list[ClusterEvent]
+        tlvAttributes: dict[int, Any]
 
     def __init__(self, future: Future, eventLoop, devCtrl, returnClusterObject: bool):
         self._event_loop = eventLoop
@@ -796,7 +797,7 @@ class AsyncReadTransaction:
                     self._future.set_exception(chip.exceptions.ChipStackError(self._resultError))
             else:
                 self._future.set_result(AsyncReadTransaction.ReadResponse(
-                    attributes=self._cache.attributeCache, events=self._events))
+                    attributes=self._cache.attributeCache, events=self._events, tlvAttributes=self._cache.attributeTLVCache))
 
         #
         # Decrement the ref on ourselves to match the increment that happened at allocation.
