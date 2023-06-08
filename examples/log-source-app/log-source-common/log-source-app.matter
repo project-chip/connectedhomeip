@@ -18,20 +18,9 @@ struct ApplicationStruct {
     char_string applicationID = 1;
 }
 
-struct ErrorStateStruct {
-    ErrorStateEnum errorStateID = 0;
-    nullable char_string<64> errorStateLabel = 1;
-    optional char_string<64> errorStateDetails = 2;
-}
-
 struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
-}
-
-struct OperationalStateStruct {
-    OperationalStateEnum operationalStateID = 0;
-    char_string<64> operationalStateLabel = 1;
 }
 
 /** The Access Control Cluster exposes a data model view of a
