@@ -16,9 +16,6 @@
 #
 
 import ipaddress
-import logging
-import time
-import typing
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from datetime import timedelta
@@ -35,9 +32,6 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
     async def test_TC_TIMESYNC_2_1(self):
 
         endpoint = self.user_params.get("endpoint", 0)
-
-        time_cluster = Clusters.Objects.TimeSynchronization
-        th = self.default_controller
 
         self.print_step(1, "Commissioning, already done")
         attributes = Clusters.TimeSynchronization.Attributes
@@ -60,7 +54,8 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
 
         self.print_step(4, "Read TrustedTimeSource")
         if self.check_pics("TIMESYNC.S.A0003"):
-            trusted_time_source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TrustedTimeSource)
+            trusted_time_source = await self.read_ts_attribute_expect_success(endpoint=endpoint,
+                                                                              attribute=attributes.TrustedTimeSource)
             if trusted_time_source is not NullValue:
                 asserts.assert_less_equal(trusted_time_source.fabricIndex, 0xFE,
                                           "FabricIndex for the TrustedTimeSource is out of range")
@@ -108,19 +103,19 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
             dst_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.DSTOffset)
             last_valid_until = -1
             last_valid_starting = -1
-            for l in dst_dut:
-                asserts.assert_greater(l.validStarting, last_valid_starting, "DSTOffset list must be sorted by ValidStarting time")
-                last_valid_starting = l.validStarting
-                asserts.assert_greater_equal(l.validStarting, last_valid_until,
+            for dst in dst_dut:
+                asserts.assert_greater(dst.validStarting, last_valid_starting,
+                                       "DSTOffset list must be sorted by ValidStarting time")
+                last_valid_starting = dst.validStarting
+                asserts.assert_greater_equal(dst.validStarting, last_valid_until,
                                              "DSTOffset list must have every ValidStarting > ValidUntil of the previous entry")
-                last_valid_until = l.validUntil
-                if l.validUntil is NullValue or l.validUntil is None:
-                    asserts.assert_equal(l, dst_dut[-1], "DSTOffset list must have Null ValidUntil at the end")
+                last_valid_until = dst.validUntil
+                if dst.validUntil is NullValue or dst.validUntil is None:
+                    asserts.assert_equal(dst, dst_dut[-1], "DSTOffset list must have Null ValidUntil at the end")
         elif self.check_pics("TIMESYNC.S.F00"):
             asserts.assert_true(False, "DSTOffset is mandatory if the TZ (TIMESYNC.S.F00) feature is supported")
 
         self.print_step(8, "Read UTCTime")
-        utc_th = utc_time_in_matter_epoch()
         if self.check_pics("TIMESYNC.S.A0000"):
             utc_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.UTCTime)
             if utc_dut is NullValue:
