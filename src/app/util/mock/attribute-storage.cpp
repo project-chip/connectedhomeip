@@ -116,7 +116,7 @@ uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint)
     return UINT16_MAX;
 }
 
-uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
+uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint)
 {
     for (size_t i = 0; i < ArraySize(endpoints); i++)
     {
@@ -126,6 +126,11 @@ uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
         }
     }
     return 0;
+}
+
+uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
+{
+    return emberAfGetClusterCountForEndpoint(endpoint);
 }
 
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
