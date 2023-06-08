@@ -357,6 +357,8 @@ DCONF
 DCONFIG
 debianutils
 debugText
+decrypt
+decrypted
 DEDEDEDE
 deepnote
 DefaultOTAProviders
@@ -1151,6 +1153,7 @@ RPC
 RPCs
 RPi
 RPis
+RSA
 rsn
 RSSI
 RST

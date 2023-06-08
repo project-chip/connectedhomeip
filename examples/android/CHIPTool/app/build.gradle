@@ -5,6 +5,8 @@ apply plugin: 'kotlin-parcelize'
 android {
     compileSdkVersion 31
 
+    ndkVersion "23.2.8568313"
+
     defaultConfig {
         applicationId "com.google.chip.chiptool"
         minSdkVersion 24

@@ -447,6 +447,14 @@ private:
         SubscriptionActive,        ///< The client is maintaining subscription
     };
 
+    enum class ReportType
+    {
+        // kUnsolicited reports are the first message in an exchange.
+        kUnsolicited,
+        // kContinuingTransaction reports are responses to a message we sent.
+        kContinuingTransaction
+    };
+
     bool IsMatchingSubscriptionId(SubscriptionId aSubscriptionId)
     {
         return aSubscriptionId == mSubscriptionId && mInteractionType == InteractionType::Subscribe;
@@ -486,7 +494,7 @@ private:
     void CancelResubscribeTimer();
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
-    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload, ReportType aReportType);
     const char * GetStateStr() const;
 
     /*

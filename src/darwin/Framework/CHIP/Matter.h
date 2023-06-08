@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
+#import <Matter/MTRBackwardsCompatShims.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRCSRInfo.h>

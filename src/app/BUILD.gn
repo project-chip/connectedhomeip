@@ -18,6 +18,7 @@ import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("common_flags.gni")
+import("icd/icd.gni")
 
 declare_args() {
   # Enable strict schema checks.
@@ -209,6 +210,10 @@ static_library("app") {
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
+
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd:server-srcs" ]
+  }
 
   cflags = [ "-Wconversion" ]
 
