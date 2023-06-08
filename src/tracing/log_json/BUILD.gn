@@ -14,23 +14,17 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
 
-import("${chip_root}/build/chip/chip_test_suite.gni")
-import("${chip_root}/src/tracing/tracing_args.gni")
+# As this uses std::string, this library is NOT for use
+# for embedded devices.
+static_library("log_json") {
+  sources = [
+    "log_json_tracing.cpp",
+    "log_json_tracing.h",
+  ]
 
-if (matter_enable_tracing_support) {
-  chip_test_suite("tests") {
-    output_name = "libTracingTests"
-
-    test_sources = [ "TestTracing.cpp" ]
-    sources = []
-
-    public_deps = [
-      "${chip_root}/src/lib/support:testing",
-      "${chip_root}/src/platform",
-      "${chip_root}/src/tracing",
-      "${nlunit_test_root}:nlunit-test",
-    ]
-  }
+  public_deps = [
+    "${chip_root}/src/tracing",
+    "${chip_root}/third_party/jsoncpp",
+  ]
 }

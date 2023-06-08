@@ -12,25 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
-
-import("${chip_root}/build/chip/chip_test_suite.gni")
-import("${chip_root}/src/tracing/tracing_args.gni")
-
-if (matter_enable_tracing_support) {
-  chip_test_suite("tests") {
-    output_name = "libTracingTests"
-
-    test_sources = [ "TestTracing.cpp" ]
-    sources = []
-
-    public_deps = [
-      "${chip_root}/src/lib/support:testing",
-      "${chip_root}/src/platform",
-      "${chip_root}/src/tracing",
-      "${nlunit_test_root}:nlunit-test",
-    ]
-  }
+declare_args() {
+  # Tracing can have a non-zero size impact to binaries. We try to make
+  # the impact minimal (the backends themselves add some size), however
+  # for now tracing is opt-in
+  matter_enable_tracing_support = target_os == "linux"
 }
