@@ -36,7 +36,8 @@ public:
                                const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> & mask);
 
     // When State changes we are generating Notify event
-    EmberAfStatus SetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
+    EmberAfStatus SetStateValue(chip::EndpointId endpoint,
+                                chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
 
 private:
     static RefrigeratorAlarmServer instance;
