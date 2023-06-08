@@ -31,6 +31,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/qpg/OTAImageProcessorImpl.h>
 
 using namespace chip;
@@ -52,9 +53,21 @@ OTAImageProcessorImpl gImageProcessor;
 
 bool OtaHeaderValidationCb(qvCHIP_Ota_ImageHeader_t imageHeader)
 {
+
+    uint16_t vendorId  = 0;
+    uint16_t productId = 0;
+
+    if (GetDeviceInstanceInfoProvider()->GetVendorId(vendorId) != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+    if (GetDeviceInstanceInfoProvider()->GetProductId(productId) != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+
     // Check that the image matches vendor and product ID and that the version is higher than what we currently have
-    if (imageHeader.vendorId != CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID ||
-        imageHeader.productId != CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID ||
+    if (imageHeader.vendorId != vendorId || imageHeader.productId != productId ||
         imageHeader.softwareVersion <= CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION)
     {
         return false;
