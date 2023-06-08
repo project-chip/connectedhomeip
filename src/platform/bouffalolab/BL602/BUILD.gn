@@ -34,11 +34,9 @@ static_library("BL602") {
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../common/BLConfig.cpp",
-    "../common/BLEManagerImpl.cpp",
     "../common/ConfigurationManagerImpl.cpp",
     "../common/DiagnosticDataProviderImpl.cpp",
     "../common/Logging.cpp",
-    "../common/OTAImageProcessorImpl.cpp",
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.cpp",
 
@@ -47,8 +45,20 @@ static_library("BL602") {
     "../common/FactoryDataProvider.cpp",
     "../common/FactoryDataProvider.h",
   ]
-#    "../common/CHIPmemory.cpp",
 
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "../common/OTAImageProcessorImpl.cpp",
+      "../common/OTAImageProcessorImpl.h",
+    ]
+  }
+  
+  if (chip_enable_ble) {
+    sources += [
+      "../common/BLEManagerImpl.cpp",
+      "../common/BLEManagerImpl.h",
+    ]
+  }
   sources += common_sources
 
   deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
