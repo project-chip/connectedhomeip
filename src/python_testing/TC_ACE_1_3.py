@@ -61,6 +61,8 @@ class TC_ACE_1_3(MatterBaseTest):
 
         self.print_step(1, "Commissioning, already done")
 
+        fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
+
         TH0_nodeid = self.matter_test_config.controller_node_id
         TH1_nodeid = self.matter_test_config.controller_node_id + 1
         TH2_nodeid = self.matter_test_config.controller_node_id + 2
