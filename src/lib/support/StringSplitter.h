@@ -74,7 +74,7 @@ public:
 
 protected:
     char * mNext; // next element to return by calling Next()
-    char mSeparator;
+    const char mSeparator;
 };
 
 /// A string splitter that works on a copy of the given string
