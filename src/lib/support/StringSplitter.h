@@ -39,8 +39,10 @@ namespace chip {
 class StringSplitter
 {
 public:
-    StringSplitter(char * s, char separator) : mNext(s), mSeparator(separator) {
-        if ((mNext != nullptr) && (*mNext == '\0')) {
+    StringSplitter(char * s, char separator) : mNext(s), mSeparator(separator)
+    {
+        if ((mNext != nullptr) && (*mNext == '\0'))
+        {
             mNext = nullptr; // end of string right away
         }
     }
@@ -123,7 +125,7 @@ public:
         else
         {
             mData[0] = '\0';
-            mNext = nullptr;
+            mNext    = nullptr;
         }
     }
 
