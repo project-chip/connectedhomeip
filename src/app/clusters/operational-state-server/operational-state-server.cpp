@@ -411,7 +411,3 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OperationalStateServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    return CHIP_NO_ERROR;
-}
