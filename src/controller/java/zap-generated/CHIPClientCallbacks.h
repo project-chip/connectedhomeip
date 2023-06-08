@@ -500,6 +500,16 @@ typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectEventListLis
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*RefrigeratorAndTemperatureControlledCabinetModeSelectAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*WasherControlsSpinSpeedsListAttributeCallback)(void * context,
+                                                              const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
+typedef void (*WasherControlsGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*WasherControlsAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*WasherControlsEventListListAttributeCallback)(void * context,
+                                                             const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*WasherControlsAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*RvcRunModeSelectSupportedModesListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType> &
@@ -525,9 +535,7 @@ typedef void (*RvcCleanModeSelectEventListListAttributeCallback)(void * context,
 typedef void (*RvcCleanModeSelectAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*TemperatureControlSupportedTemperatureLevelsListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::DecodableType> & data);
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
 typedef void (*TemperatureControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*TemperatureControlAcceptedCommandListListAttributeCallback)(

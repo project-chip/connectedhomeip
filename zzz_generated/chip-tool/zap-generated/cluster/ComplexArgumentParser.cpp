@@ -1904,38 +1904,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::IcdManagement::Structs
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("TemperatureLevelStruct.label", "label", value.isMember("label")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TemperatureLevelStruct.temperatureLevel", "temperatureLevel",
-                                                                  value.isMember("temperatureLevel")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "label");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.label, value["label"]));
-    valueCopy.removeMember("label");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "temperatureLevel");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.temperatureLevel, value["temperatureLevel"]));
-    valueCopy.removeMember("temperatureLevel");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::TemperatureControl::Structs::TemperatureLevelStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.label);
-    ComplexArgumentParser::Finalize(request.temperatureLevel);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request,
                                         Json::Value & value)
 {
