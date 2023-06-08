@@ -2445,6 +2445,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::WasherControls::Id: {
+        using namespace app::Clusters::WasherControls;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::RvcRunModeSelect::Id: {
         using namespace app::Clusters::RvcRunModeSelect;
         switch (aPath.mEventId)

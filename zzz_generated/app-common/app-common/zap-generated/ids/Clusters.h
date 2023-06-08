@@ -157,6 +157,9 @@ static constexpr ClusterId Id = 0x00000051;
 namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
 static constexpr ClusterId Id = 0x00000052;
 } // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
+namespace WasherControls {
+static constexpr ClusterId Id = 0x00000053;
+} // namespace WasherControls
 namespace RvcRunModeSelect {
 static constexpr ClusterId Id = 0x00000054;
 } // namespace RvcRunModeSelect

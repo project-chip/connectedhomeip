@@ -102,6 +102,9 @@ public:
         uint8_t finalHue;
         uint16_t stepsRemaining;
         uint16_t stepsTotal;
+        // The amount of time remaining until the transition completes. Measured in tenths of a second.
+        // When the transition repeats indefinitely, this will hold the maximum value possible.
+        uint16_t timeRemaining;
         uint16_t initialEnhancedHue;
         uint16_t currentEnhancedHue;
         uint16_t finalEnhancedHue;
@@ -118,6 +121,8 @@ public:
         uint16_t finalValue;
         uint16_t stepsRemaining;
         uint16_t stepsTotal;
+        // The amount of time remaining until the transition completes. Measured in tenths of a second.
+        uint16_t timeRemaining;
         uint16_t lowLimit;
         uint16_t highLimit;
         chip::EndpointId endpoint;

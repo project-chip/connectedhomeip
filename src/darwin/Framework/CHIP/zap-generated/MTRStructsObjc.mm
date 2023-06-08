@@ -2626,8 +2626,6 @@ NS_ASSUME_NONNULL_BEGIN
         _mfgCode = nil;
 
         _value = @(0);
-
-        _tagName = nil;
     }
     return self;
 }
@@ -2638,18 +2636,20 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
-    other.tagName = self.tagName;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: mfgCode:%@; value:%@; tagName:%@; >", NSStringFromClass([self class]), _mfgCode, _value, _tagName];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRModeSelectClusterSemanticTag : MTRModeSelectClusterModeTagStruct
 @end
 
 @implementation MTRModeSelectClusterModeOptionStruct
@@ -2684,35 +2684,14 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
-@end
-
-@implementation MTRTemperatureControlClusterTemperatureLevelStruct
-- (instancetype)init
+- (void)setSemanticTags:(NSArray * _Nonnull)semanticTags
 {
-    if (self = [super init]) {
-
-        _label = @"";
-
-        _temperatureLevel = @(0);
-    }
-    return self;
+    self.modeTags = semanticTags;
 }
 
-- (id)copyWithZone:(NSZone * _Nullable)zone
+- (NSArray * _Nonnull)semanticTags
 {
-    auto other = [[MTRTemperatureControlClusterTemperatureLevelStruct alloc] init];
-
-    other.label = self.label;
-    other.temperatureLevel = self.temperatureLevel;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: label:%@; temperatureLevel:%@; >", NSStringFromClass([self class]), _label, _temperatureLevel];
-    return descriptionString;
+    return self.modeTags;
 }
 
 @end
