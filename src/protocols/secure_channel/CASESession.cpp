@@ -1670,17 +1670,8 @@ CHIP_ERROR CASESession::HandleSigma3b(HandleSigma3Data & data, bool & cancel)
     //        current flow of code, a malicious node can trigger a DoS style attack on the device.
     //        The same change should be made in Sigma2 processing.
     // Step 7 - Validate Signature
-#ifdef ENABLE_HSM_ECDSA_VERIFY
-    {
-        P256PublicKeyHSM initiatorPublicKeyHSM;
-        memcpy(Uint8::to_uchar(initiatorPublicKeyHSM), initiatorPublicKey.Bytes(), initiatorPublicKey.Length());
-        ReturnErrorOnFailure(initiatorPublicKeyHSM.ECDSA_validate_msg_signature(data.msg_R3_Signed.Get(), data.msg_r3_signed_len,
-                                                                                data.tbsData3Signature));
-    }
-#else
     ReturnErrorOnFailure(
         initiatorPublicKey.ECDSA_validate_msg_signature(data.msg_R3_Signed.Get(), data.msg_r3_signed_len, data.tbsData3Signature));
-#endif
 
     return CHIP_NO_ERROR;
 }

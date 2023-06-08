@@ -1060,7 +1060,9 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
         error  = CHIP_ERROR_CERT_NOT_TRUSTED;
         break;
     default:
-        SuccessOrExit((result = CertificateChainValidationResult::kInternalFrameworkError, error = CHIP_ERROR_INTERNAL));
+        result = CertificateChainValidationResult::kInternalFrameworkError;
+        error  = CHIP_ERROR_INTERNAL;
+        break;
     }
 
 exit:

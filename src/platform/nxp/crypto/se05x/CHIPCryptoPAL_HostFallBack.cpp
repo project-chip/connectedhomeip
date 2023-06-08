@@ -248,7 +248,7 @@ CHIP_ERROR ECDH_derive_secret_H(P256KeypairContext * mKeypair, const P256PublicK
 
     result = mbedtls_mpi_write_binary(&mpi_secret, out_secret.Bytes()/*Uint8::to_uchar(out_secret)*/, secret_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-    SuccessOrExit(out_secret.SetLength(secret_length));
+    out_secret.SetLength(secret_length);
 
 exit:
     keypair = nullptr;
