@@ -135,9 +135,9 @@ public:
     /**
      * Get operational state.
      * @param void.
-     * @return the reference of operational state.
+     * @return the const reference of operational state.
      */
-    OperationalStateStruct & GetOperationalState();
+    const OperationalStateStruct & GetOperationalState();
 
     /**
      * Set operational error.

@@ -316,7 +316,7 @@ CHIP_ERROR OperationalStateServer::SetOperationalState(OperationalStateStruct & 
     return CHIP_NO_ERROR;
 }
 
-OperationalStateStruct & OperationalStateServer::GetOperationalState()
+const OperationalStateStruct & OperationalStateServer::GetOperationalState()
 {
     return mOperationalState;
 }
