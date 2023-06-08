@@ -227,7 +227,8 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         chip::StringSplitter splitter(argValue, ',');
         chip::CharSpan value;
 
-        while (splitter.Next(value)) {
+        while (splitter.Next(value))
+        {
             vectorArgument.push_back(std::string(value.data(), value.size()));
         }
 
