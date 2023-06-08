@@ -230,7 +230,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
             vectorArgument.push_back(value);
         }
 
-        if (arg.flags != Argument::kOptional)
+        if (arg.flags == Argument::kOptional)
         {
             auto argument = static_cast<chip::Optional<std::vector<std::string>> *>(arg.value);
             argument->SetValue(vectorArgument);
