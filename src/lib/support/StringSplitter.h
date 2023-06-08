@@ -75,6 +75,8 @@ public:
             mData = strdup(s);
             VerifyOrDie(mData != nullptr);
             mNext = mData;
+        } else {
+            mData = nullptr;
         }
     }
 
