@@ -28,7 +28,7 @@ static OperationalErrorStateStruct & setOperationalNoError(OperationalErrorState
     char opNoError[64]        = "No Error";
     char opNoErrorDetails[64] = "No Error Details";
 
-    error.ErrorStateID = static_cast<uint8_t>(ErrorStateEnum::kNoError);
+    error.ErrorStateID = chip::to_underlying(ErrorStateEnum::kNoError);
     memset(error.ErrorStateLabel, 0, sizeof(error.ErrorStateLabel));
     memset(error.ErrorStateDetails, 0, sizeof(error.ErrorStateDetails));
     memcpy(error.ErrorStateLabel, opNoError, sizeof(opNoError));
@@ -46,27 +46,27 @@ CHIP_ERROR OperationalStateDelegate::Init()
 void OperationalStateDelegate::HandlePauseState(OperationalStateStruct & state, OperationalErrorStateStruct & error)
 {
     ChipLogDetail(Zcl, "Op: HandlePauseState");
-    state.OperationalStateID = static_cast<uint8_t>(OperationalStateEnum::kPaused);
+    state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kPaused);
     setOperationalNoError(error);
 }
 
 void OperationalStateDelegate::HandleResumeState(OperationalStateStruct & state, OperationalErrorStateStruct & error)
 {
     ChipLogDetail(Zcl, "Op: HandleResumeState");
-    state.OperationalStateID = static_cast<uint8_t>(OperationalStateEnum::kRunning);
+    state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kRunning);
     setOperationalNoError(error);
 }
 
 void OperationalStateDelegate::HandleStartState(OperationalStateStruct & state, OperationalErrorStateStruct & error)
 {
     ChipLogDetail(Zcl, "Op: HandleStartState");
-    state.OperationalStateID = static_cast<uint8_t>(OperationalStateEnum::kRunning);
+    state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kRunning);
     setOperationalNoError(error);
 }
 
 void OperationalStateDelegate::HandleStopState(OperationalStateStruct & state, OperationalErrorStateStruct & error)
 {
     ChipLogDetail(Zcl, "Op: HandleStopState");
-    state.OperationalStateID = static_cast<uint8_t>(OperationalStateEnum::kStopped);
+    state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kStopped);
     setOperationalNoError(error);
 }
