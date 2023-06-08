@@ -21,6 +21,7 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -45,19 +46,25 @@ AdapterIterator::~AdapterIterator()
     }
 }
 
-void AdapterIterator::Initialize()
+CHIP_ERROR AdapterIterator::Initialize(AdapterIterator * self)
 {
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     GError * error = nullptr;
 
-    mManager = g_dbus_object_manager_client_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE,
-                                                             BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
-                                                             nullptr /* unused user data in the Proxy Type Func */,
-                                                             nullptr /*destroy notify */, nullptr /* cancellable */, &error);
+    self->mManager = g_dbus_object_manager_client_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE,
+                                                                   BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
+                                                                   nullptr /* unused user data in the Proxy Type Func */,
+                                                                   nullptr /*destroy notify */, nullptr /* cancellable */, &error);
 
-    VerifyOrExit(mManager != nullptr, ChipLogError(DeviceLayer, "Failed to get DBUS object manager for listing adapters."));
+    VerifyOrExit(self->mManager != nullptr, ChipLogError(DeviceLayer, "Failed to get DBUS object manager for listing adapters.");
+                 err = CHIP_ERROR_INTERNAL);
 
-    mObjectList      = g_dbus_object_manager_get_objects(mManager);
-    mCurrentListItem = mObjectList;
+    self->mObjectList      = g_dbus_object_manager_get_objects(self->mManager);
+    self->mCurrentListItem = self->mObjectList;
 
 exit:
     if (error != nullptr)
@@ -65,6 +72,8 @@ exit:
         ChipLogError(DeviceLayer, "DBus error: %s", error->message);
         g_error_free(error);
     }
+
+    return err;
 }
 
 bool AdapterIterator::Advance()
@@ -120,7 +129,8 @@ bool AdapterIterator::Next()
 {
     if (mManager == nullptr)
     {
-        Initialize();
+        CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(Initialize, this);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, false, ChipLogError(DeviceLayer, "Failed to initialize adapter iterator"));
     }
 
     return Advance();

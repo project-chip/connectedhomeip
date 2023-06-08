@@ -136,6 +136,53 @@ private:
     uint16_t mLastDisconnectedReason;
 };
 
+class ESPEthernetDriver : public EthernetDriver
+{
+public:
+    class EthernetNetworkIterator final : public NetworkIterator
+    {
+    public:
+        EthernetNetworkIterator(ESPEthernetDriver * aDriver) : mDriver(aDriver) {}
+        size_t Count() { return 1; }
+        bool Next(Network & item) override
+        {
+            if (exhausted)
+            {
+                return false;
+            }
+            exhausted = true;
+            memcpy(item.networkID, interfaceName, interfaceNameLen);
+            item.networkIDLen = interfaceNameLen;
+            item.connected    = true;
+            return true;
+        }
+        void Release() override { delete this; }
+        ~EthernetNetworkIterator() = default;
+
+        uint8_t interfaceName[kMaxNetworkIDLen];
+        uint8_t interfaceNameLen = 0;
+        bool exhausted           = false;
+
+    private:
+        ESPEthernetDriver * mDriver;
+    };
+
+    // BaseDriver
+    NetworkIterator * GetNetworks() override { return new EthernetNetworkIterator(this); }
+    uint8_t GetMaxNetworks() { return 1; }
+    CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
+    void Shutdown()
+    {
+        // TODO: This method can be implemented if Ethernet is used along with Wifi/Thread.
+    }
+
+    static ESPEthernetDriver & GetInstance()
+    {
+        static ESPEthernetDriver instance;
+        return instance;
+    }
+};
+
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip

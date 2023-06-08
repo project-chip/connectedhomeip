@@ -20,6 +20,7 @@ import os
 
 import pytest
 from chip.clusters.Objects import DoorLock
+from chip.clusters.Types import NullValue
 from common.utils import connect_device, disconnect_device, discover_device, get_setup_payload, read_zcl_attribute, send_zcl_command
 
 log = logging.getLogger(__name__)
@@ -33,11 +34,21 @@ def binaryPath(request, rootDir):
         return os.path.join(rootDir, 'examples/lock-app/openiotsdk/build/chip-openiotsdk-lock-app-example.elf')
 
 
+@pytest.fixture(scope="session")
+def controllerConfig(request):
+    config = {
+        'vendorId': 0xFFF1,
+        'fabricId': 1,
+        'persistentStoragePath': '/tmp/openiotsdk-test-storage.json'
+    }
+    return config
+
+
 @pytest.mark.smoketest
 def test_smoke_test(device):
     ret = device.wait_for_output("Open IoT SDK lock-app example application start")
     assert ret is not None and len(ret) > 0
-    ret = device.wait_for_output("Open IoT SDK lock-app example application run")
+    ret = device.wait_for_output("Open IoT SDK lock-app example application run", timeout=30)
     assert ret is not None and len(ret) > 0
 
 
@@ -45,6 +56,9 @@ def test_smoke_test(device):
 def test_commissioning(device, controller):
     assert controller is not None
     devCtrl = controller
+
+    ret = device.wait_for_output("Open IoT SDK lock-app example application start")
+    assert ret is not None and len(ret) > 0
 
     setupPayload = get_setup_payload(device)
     assert setupPayload is not None
@@ -56,7 +70,7 @@ def test_commissioning(device, controller):
     assert commissionable_device.productId == int(setupPayload.attributes['ProductID'])
     assert commissionable_device.addresses[0] is not None
 
-    nodeId = connect_device(setupPayload, commissionable_device)
+    nodeId = connect_device(devCtrl, setupPayload, commissionable_device)
     assert nodeId is not None
     log.info("Device {} connected".format(commissionable_device.addresses[0]))
 
@@ -66,7 +80,7 @@ def test_commissioning(device, controller):
     assert disconnect_device(devCtrl, nodeId)
 
 
-LOCK_CTRL_TEST_PIN_CODE = 12345
+LOCK_CTRL_TEST_PIN_CODE = b"123456"
 LOCK_CTRL_TEST_USER_INDEX = 1
 LOCK_CTRL_TEST_ENDPOINT_ID = 1
 LOCK_CTRL_TEST_USER_NAME = 'testUser'
@@ -78,28 +92,30 @@ def test_lock_ctrl(device, controller):
     assert controller is not None
     devCtrl = controller
 
+    ret = device.wait_for_output("Open IoT SDK lock-app example application start")
+    assert ret is not None and len(ret) > 0
+
     setupPayload = get_setup_payload(device)
     assert setupPayload is not None
 
     commissionable_device = discover_device(devCtrl, setupPayload)
     assert commissionable_device is not None
 
-    nodeId = connect_device(setupPayload, commissionable_device)
+    nodeId = connect_device(devCtrl, setupPayload, commissionable_device)
     assert nodeId is not None
 
     ret = device.wait_for_output("Commissioning completed successfully", timeout=30)
     assert ret is not None and len(ret) > 0
 
-    err, res = send_zcl_command(
-        devCtrl, "DoorLock SetUser {} {} operationType={} userIndex={} userName={} userUniqueId={} "
-        "userStatus={} userType={} credentialRule={}".format(nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
-                                                             DoorLock.Enums.DlDataOperationType.kAdd,
-                                                             LOCK_CTRL_TEST_USER_INDEX,
-                                                             LOCK_CTRL_TEST_USER_NAME,
-                                                             LOCK_CTRL_TEST_USER_INDEX,
-                                                             DoorLock.Enums.DlUserStatus.kOccupiedEnabled,
-                                                             DoorLock.Enums.DlUserType.kUnrestrictedUser,
-                                                             DoorLock.Enums.DlCredentialRule.kSingle), requestTimeoutMs=1000)
+    err, res = send_zcl_command(devCtrl, "DoorLock", "SetUser", nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
+                                dict(operationType=DoorLock.Enums.DataOperationTypeEnum.kAdd,
+                                     userIndex=LOCK_CTRL_TEST_USER_INDEX,
+                                     userName=LOCK_CTRL_TEST_USER_NAME,
+                                     userUniqueID=LOCK_CTRL_TEST_USER_INDEX,
+                                     userStatus=DoorLock.Enums.UserStatusEnum.kOccupiedEnabled,
+                                     userType=DoorLock.Enums.UserTypeEnum.kUnrestrictedUser,
+                                     credentialRule=DoorLock.Enums.CredentialRuleEnum.kSingle),
+                                requestTimeoutMs=1000)
     assert err == 0
 
     ret = device.wait_for_output("Successfully set the user [mEndpointId={},index={},adjustedIndex=0]".format(
@@ -107,28 +123,26 @@ def test_lock_ctrl(device, controller):
         LOCK_CTRL_TEST_USER_INDEX))
     assert ret is not None and len(ret) > 0
 
-    err, res = send_zcl_command(
-        devCtrl, "DoorLock GetUser {} {} userIndex={}".format(nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
-                                                              LOCK_CTRL_TEST_USER_INDEX))
+    err, res = send_zcl_command(devCtrl, "DoorLock", "GetUser", nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
+                                dict(userIndex=LOCK_CTRL_TEST_USER_INDEX),
+                                requestTimeoutMs=1000)
     assert err == 0
     assert res.userIndex == LOCK_CTRL_TEST_USER_INDEX
     assert res.userName == LOCK_CTRL_TEST_USER_NAME
     assert res.userUniqueID == LOCK_CTRL_TEST_USER_INDEX
-    assert res.userStatus == DoorLock.Enums.DlUserStatus.kOccupiedEnabled
-    assert res.userType == DoorLock.Enums.DlUserType.kUnrestrictedUser
-    assert res.credentialRule == DoorLock.Enums.DlCredentialRule.kSingle
+    assert res.userStatus == DoorLock.Enums.UserStatusEnum.kOccupiedEnabled
+    assert res.userType == DoorLock.Enums.UserTypeEnum.kUnrestrictedUser
+    assert res.credentialRule == DoorLock.Enums.CredentialRuleEnum.kSingle
 
-    err, res = send_zcl_command(
-        devCtrl, "DoorLock SetCredential {} {} operationType={} "
-        "credential=struct:DlCredential(credentialType={},credentialIndex={}) credentialData=str:{} "
-        "userIndex={} userStatus={} userType={}".format(nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
-                                                        DoorLock.Enums.DlDataOperationType.kAdd,
-                                                        DoorLock.Enums.DlCredentialType.kPin,
-                                                        LOCK_CTRL_TEST_CREDENTIAL_INDEX,
-                                                        LOCK_CTRL_TEST_PIN_CODE,
-                                                        LOCK_CTRL_TEST_USER_INDEX,
-                                                        DoorLock.Enums.DlUserStatus.kOccupiedEnabled,
-                                                        DoorLock.Enums.DlUserType.kUnrestrictedUser), requestTimeoutMs=1000)
+    err, res = send_zcl_command(devCtrl, "DoorLock", "SetCredential", nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
+                                dict(operationType=DoorLock.Enums.DataOperationTypeEnum.kAdd,
+                                     credential=DoorLock.Structs.CredentialStruct(
+                                         credentialType=DoorLock.Enums.CredentialTypeEnum.kPin, credentialIndex=LOCK_CTRL_TEST_CREDENTIAL_INDEX),
+                                     credentialData=LOCK_CTRL_TEST_PIN_CODE,
+                                     userIndex=LOCK_CTRL_TEST_USER_INDEX,
+                                     userStatus=NullValue,
+                                     userType=NullValue),
+                                requestTimeoutMs=1000)
     assert err == 0
     assert res.status == DoorLock.Enums.DlStatus.kSuccess
 
@@ -136,42 +150,39 @@ def test_lock_ctrl(device, controller):
                                  "credentialType={},creator=1,modifier=1]".format(
                                      LOCK_CTRL_TEST_ENDPOINT_ID,
                                      LOCK_CTRL_TEST_USER_INDEX,
-                                     DoorLock.Enums.DlCredentialType.kPin
+                                     DoorLock.Enums.CredentialTypeEnum.kPin
                                  ))
     assert ret is not None and len(ret) > 0
 
-    err, res = send_zcl_command(
-        devCtrl, "DoorLock GetCredentialStatus {} {} credential=struct:DlCredential(credentialType={},"
-        "credentialIndex={})".format(nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
-                                     DoorLock.Enums.DlCredentialType.kPin,
-                                     LOCK_CTRL_TEST_CREDENTIAL_INDEX), requestTimeoutMs=1000)
+    err, res = send_zcl_command(devCtrl, "DoorLock", "GetCredentialStatus", nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
+                                dict(credential=DoorLock.Structs.CredentialStruct(
+                                    credentialType=DoorLock.Enums.CredentialTypeEnum.kPin, credentialIndex=LOCK_CTRL_TEST_CREDENTIAL_INDEX)),
+                                requestTimeoutMs=1000)
     assert err == 0
     assert res.credentialExists
     assert res.userIndex == LOCK_CTRL_TEST_USER_INDEX
 
-    err, res = send_zcl_command(
-        devCtrl, "DoorLock LockDoor {} {} pinCode=str:{}".format(nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
-                                                                 LOCK_CTRL_TEST_PIN_CODE), requestTimeoutMs=1000)
+    err, res = send_zcl_command(devCtrl, "DoorLock", "LockDoor",  nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
+                                dict(PINCode=LOCK_CTRL_TEST_PIN_CODE),
+                                requestTimeoutMs=1000)
     assert err == 0
 
-    ret = device.wait_for_output("Setting door lock state to \"Locked\" [endpointId={}]".format(LOCK_CTRL_TEST_ENDPOINT_ID))
+    ret = device.wait_for_output("setting door lock state to \"Locked\"")
     assert ret is not None and len(ret) > 0
 
-    err, res = read_zcl_attribute(
-        devCtrl, "DoorLock LockState {} {}".format(nodeId, LOCK_CTRL_TEST_ENDPOINT_ID))
+    err, res = read_zcl_attribute(devCtrl, "DoorLock", "LockState", nodeId, LOCK_CTRL_TEST_ENDPOINT_ID)
     assert err == 0
     assert res.value == DoorLock.Enums.DlLockState.kLocked
 
-    err, res = send_zcl_command(
-        devCtrl, "DoorLock UnlockDoor {} {} pinCode=str:{}".format(nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
-                                                                   LOCK_CTRL_TEST_PIN_CODE), requestTimeoutMs=1000)
+    err, res = send_zcl_command(devCtrl, "DoorLock", "UnlockDoor",  nodeId, LOCK_CTRL_TEST_ENDPOINT_ID,
+                                dict(PINCode=LOCK_CTRL_TEST_PIN_CODE),
+                                requestTimeoutMs=1000)
     assert err == 0
 
-    ret = device.wait_for_output("Setting door lock state to \"Unlocked\" [endpointId={}]".format(LOCK_CTRL_TEST_ENDPOINT_ID))
+    ret = device.wait_for_output("setting door lock state to \"Unlocked\"")
     assert ret is not None and len(ret) > 0
 
-    err, res = read_zcl_attribute(
-        devCtrl, "DoorLock LockState {} {}".format(nodeId, LOCK_CTRL_TEST_ENDPOINT_ID))
+    err, res = read_zcl_attribute(devCtrl, "DoorLock", "LockState", nodeId, LOCK_CTRL_TEST_ENDPOINT_ID)
     assert err == 0
     assert res.value == DoorLock.Enums.DlLockState.kUnlocked
 

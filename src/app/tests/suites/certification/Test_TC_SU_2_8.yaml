@@ -51,7 +51,7 @@ tests:
       verification: |
           ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 3735928559, "endpoint": 0}]' 0x0000001234567890 0
 
-          ./chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]' 0x858 0 --commissioner-name beta
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 2, "providerNodeID": 1, "endpoint": 0}]' 0x858 0 --commissioner-name beta
 
           Kill Default OTA Provider for fabric index 1 before DUT sends a query
 

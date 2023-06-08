@@ -20,15 +20,16 @@
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
 #include "include/tv-callbacks.h"
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
+#include <app/att-storage.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemPacketBuffer.h>
@@ -76,17 +77,17 @@ void OnTriggerEffect(::Identify * identify)
 {
     switch (identify->mCurrentEffectIdentifier)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
         break;
     default:
         ChipLogProgress(Zcl, "No identifier effect");
@@ -95,11 +96,13 @@ void OnTriggerEffect(::Identify * identify)
 }
 
 static Identify gIdentify0 = {
-    chip::EndpointId{ 0 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
+    chip::EndpointId{ 0 }, OnIdentifyStart, OnIdentifyStop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    OnTriggerEffect,
 };
 
 static Identify gIdentify1 = {
-    chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
+    chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    OnTriggerEffect,
 };
 
 // Network commissioning
@@ -138,6 +141,61 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetw
 #endif
 
 Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
+
+class ExampleDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
+{
+public:
+    void Init(DeviceInstanceInfoProvider * defaultProvider) { mDefaultProvider = defaultProvider; }
+
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return mDefaultProvider->GetVendorName(buf, bufSize); }
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return mDefaultProvider->GetVendorId(vendorId); }
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductName(buf, bufSize); }
+    CHIP_ERROR GetProductId(uint16_t & productId) override { return mDefaultProvider->GetProductId(productId); }
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
+    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductLabel(buf, bufSize); }
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetSerialNumber(buf, bufSize); }
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override
+    {
+        return mDefaultProvider->GetManufacturingDate(year, month, day);
+    }
+    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override
+    {
+        return mDefaultProvider->GetHardwareVersion(hardwareVersion);
+    }
+    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override
+    {
+        return mDefaultProvider->GetHardwareVersionString(buf, bufSize);
+    }
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override
+    {
+        return mDefaultProvider->GetRotatingDeviceIdUniqueId(uniqueIdSpan);
+    }
+    CHIP_ERROR GetProductFinish(Clusters::BasicInformation::ProductFinishEnum * finish) override;
+    CHIP_ERROR GetProductPrimaryColor(Clusters::BasicInformation::ColorEnum * primaryColor) override;
+
+private:
+    DeviceInstanceInfoProvider * mDefaultProvider;
+};
+
+CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductFinish(Clusters::BasicInformation::ProductFinishEnum * finish)
+{
+    // Our example device claims to have a Satin finish for now.  We can make
+    // this configurable as needed.
+    *finish = Clusters::BasicInformation::ProductFinishEnum::kSatin;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    // Our example device claims to have a nice purple color for now.  We can
+    // make this configurable as needed.
+    *primaryColor = Clusters::BasicInformation::ColorEnum::kPurple;
+    return CHIP_NO_ERROR;
+}
+
+ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
+
 } // namespace
 
 void ApplicationInit()
@@ -200,6 +258,13 @@ void ApplicationInit()
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
+    }
+
+    auto * defaultProvider = GetDeviceInstanceInfoProvider();
+    if (defaultProvider != &gExampleDeviceInstanceInfoProvider)
+    {
+        gExampleDeviceInstanceInfoProvider.Init(defaultProvider);
+        SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
     }
 }
 

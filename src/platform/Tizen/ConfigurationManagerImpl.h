@@ -46,6 +46,11 @@ public:
     CHIP_ERROR StoreVendorId(uint16_t vendorId);
     CHIP_ERROR StoreProductId(uint16_t productId);
 
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
+
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
 

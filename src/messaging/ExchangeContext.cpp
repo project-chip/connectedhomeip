@@ -156,6 +156,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     bool reliableTransmissionRequested =
         GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
 
+    bool startedResponseTimer = false;
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
     {
@@ -177,6 +178,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
                 SetResponseExpected(false);
                 return err;
             }
+            startedResponseTimer = true;
         }
     }
 
@@ -201,6 +203,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             return CHIP_ERROR_MISSING_SECURE_SESSION;
         }
 
+        SessionHandle session = GetSessionHandle();
         CHIP_ERROR err;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -211,17 +214,29 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         else
         {
 #endif
-            err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Get().Value(), mExchangeId, IsInitiator(),
+            err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), session, mExchangeId, IsInitiator(),
                                         GetReliableMessageContext(), reliableTransmissionRequested, protocolId, msgType,
                                         std::move(msgBuf));
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         }
 #endif
-
-        if (err != CHIP_NO_ERROR && IsResponseExpected())
+        if (err != CHIP_NO_ERROR)
         {
-            CancelResponseTimer();
-            SetResponseExpected(false);
+            // We should only cancel the response timer if the ExchangeContext fails to send the message that starts the response
+            // timer.
+            if (startedResponseTimer)
+            {
+                CancelResponseTimer();
+                SetResponseExpected(false);
+            }
+
+            // If we can't even send a message (send failed with a non-transient
+            // error), mark the session as defunct, just like we would if we
+            // thought we sent the message and never got a response.
+            if (session->IsSecureSession() && session->AsSecureSession()->IsCASESession())
+            {
+                session->AsSecureSession()->MarkAsDefunct();
+            }
         }
 
         // Standalone acks are not application-level message sends.
@@ -267,8 +282,11 @@ void ExchangeContext::DoClose(bool clearRetransTable)
         mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
     }
 
-    // Cancel the response timer.
-    CancelResponseTimer();
+    if (IsResponseExpected())
+    {
+        // Cancel the response timer.
+        CancelResponseTimer();
+    }
 }
 
 /**
@@ -590,12 +608,15 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    // Since we got the response, cancel the response timer.
-    CancelResponseTimer();
+    if (IsResponseExpected())
+    {
+        // Since we got the response, cancel the response timer.
+        CancelResponseTimer();
 
-    // If the context was expecting a response to a previously sent message, this message
-    // is implicitly that response.
-    SetResponseExpected(false);
+        // If the context was expecting a response to a previously sent message, this message
+        // is implicitly that response.
+        SetResponseExpected(false);
+    }
 
     // Don't send messages on to our delegate if our dispatch does not allow
     // those messages.

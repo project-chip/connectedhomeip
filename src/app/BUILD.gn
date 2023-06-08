@@ -18,6 +18,7 @@ import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("common_flags.gni")
+import("icd/icd.gni")
 
 declare_args() {
   # Enable strict schema checks.
@@ -41,7 +42,7 @@ declare_args() {
   # By default, the resources used by each fabric is unlimited if they are allocated on heap. This flag is for checking the resource usage even when they are allocated on heap to increase code coverage in integration tests.
   chip_im_force_fabric_quota_check = false
 
-  enable_eventlist_attribute = false
+  enable_eventlist_attribute = true
 }
 
 buildconfig_header("app_buildconfig") {
@@ -209,6 +210,10 @@ static_library("app") {
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
+
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd:server-srcs" ]
+  }
 
   cflags = [ "-Wconversion" ]
 

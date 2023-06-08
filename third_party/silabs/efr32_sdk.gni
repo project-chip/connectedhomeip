@@ -45,7 +45,10 @@ declare_args() {
   # Enable Segger System View
   use_system_view = false
 
-  sleep_time_ms = 30000  # 30 seconds sleep
+  # ICD Configuration flags
+  sl_ot_idle_interval_ms = 30000  # 30s Idle Intervals
+  sl_ot_active_interval_ms = 200  # 500ms Active Intervals
+  sl_active_mode_threshold = 1000  # 1s Active mode threshold
 
   silabs_log_enabled = true
 
@@ -176,7 +179,7 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen",
     ]
 
-    if (slc_generate || slc_reuse_files) {
+    if (slc_generate || slc_reuse_files || silabs_family == "mgm24") {
       _include_dirs +=
           [ "${efr32_sdk_root}/hardware/driver/configuration_over_swo/inc/" ]
     }
@@ -190,6 +193,7 @@ template("efr32_sdk") {
 
     if (chip_enable_ble_rs911x) {
       _include_dirs += [ "${wifi_sapi_root}/sapi/include" ]
+      _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
     }
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
@@ -274,7 +278,7 @@ template("efr32_sdk") {
       }
 
       if (use_wf200 || use_rs9116 || use_SiWx917) {
-        import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
+        import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
         defines += [ "LWIP_NETIF_API=1" ]
         if (chip_enable_wifi_ipv4) {
@@ -337,11 +341,18 @@ template("efr32_sdk") {
         "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
         "SL_CATALOG_POWER_MANAGER_PRESENT",
         "SL_CATALOG_SLEEPTIMER_PRESENT",
-        "SL_SLEEP_TIME_MS=${sleep_time_ms}",
-
-        # Used for wifi devices to get packet details
-        "WIFI_DEBUG_ENABLED=1",
+        "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
+        "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
+        "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold}",
       ]
+
+      if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
+        defines += [
+          # Used for wifi devices to get packet details
+          # TODO: Remove this flag, once the communication is fixed
+          "WIFI_DEBUG_ENABLED=1",
+        ]
+      }
     }
 
     if (chip_build_libshell) {  # matter shell
@@ -504,8 +515,10 @@ template("efr32_sdk") {
       "-Wno-shadow",
 
       # see https://github.com/project-chip/connectedhomeip/issues/26058
-      # Uncomment this cflag when pigweed update is done and GCC 12.2 is used.
-      # "-Wno-error=array-parameter",
+      "-Wno-error=array-parameter",
+
+      # see https://github.com/project-chip/connectedhomeip/issues/26170
+      "-Wno-error=array-bounds",
     ]
 
     if (silabs_family == "efr32mg24" || silabs_family == "mgm24") {
@@ -527,6 +540,7 @@ template("efr32_sdk") {
       "${chip_root}/src/platform/silabs/efr32/psa_crypto_config.h",
     ]
 
+    public_configs = [ "${chip_root}/src:includes" ]
     public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
   }
 
@@ -709,7 +723,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (slc_generate || slc_reuse_files) {
+    if (slc_generate || slc_reuse_files || silabs_family == "mgm24") {
       sources += [
         "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
         "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",

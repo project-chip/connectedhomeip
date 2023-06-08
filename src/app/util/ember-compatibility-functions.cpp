@@ -27,6 +27,7 @@
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
+#include <app/att-storage.h>
 #include <app/reporting/Engine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
@@ -45,7 +46,6 @@
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/Constants.h>
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-type.h>
 
 #include <zap-generated/endpoint_config.h>
@@ -73,6 +73,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_FABRIC_IDX_ATTRIBUTE_TYPE: // Fabric Index
     case ZCL_BITMAP8_ATTRIBUTE_TYPE:    // 8-bit bitmap
     case ZCL_ENUM8_ATTRIBUTE_TYPE:      // 8-bit enumeration
+    case ZCL_STATUS_ATTRIBUTE_TYPE:     // Status Code
     case ZCL_PERCENT_ATTRIBUTE_TYPE:    // Percentage
         static_assert(std::is_same<chip::Percent, uint8_t>::value,
                       "chip::Percent is expected to be uint8_t, change this when necessary");
@@ -83,7 +84,6 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_VENDOR_ID_ATTRIBUTE_TYPE:     // Vendor Id
     case ZCL_ENUM16_ATTRIBUTE_TYPE:        // 16-bit enumeration
     case ZCL_BITMAP16_ATTRIBUTE_TYPE:      // 16-bit bitmap
-    case ZCL_STATUS_ATTRIBUTE_TYPE:        // Status Code
     case ZCL_PERCENT100THS_ATTRIBUTE_TYPE: // 100ths of a percent
         static_assert(std::is_same<chip::EndpointId, uint16_t>::value,
                       "chip::EndpointId is expected to be uint16_t, change this when necessary");
@@ -103,6 +103,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_DATA_VER_ATTRIBUTE_TYPE:   // Data Version
     case ZCL_BITMAP32_ATTRIBUTE_TYPE:   // 32-bit bitmap
     case ZCL_EPOCH_S_ATTRIBUTE_TYPE:    // Epoch Seconds
+    case ZCL_ELAPSED_S_ATTRIBUTE_TYPE:  // Elapsed Seconds
         static_assert(std::is_same<chip::ClusterId, uint32_t>::value,
                       "chip::Cluster is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::AttributeId, uint32_t>::value,
@@ -121,11 +122,14 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::DataVersion is expected to be uint32_t, change this when necessary");
         return ZCL_INT32U_ATTRIBUTE_TYPE;
 
-    case ZCL_EVENT_NO_ATTRIBUTE_TYPE:  // Event Number
-    case ZCL_FABRIC_ID_ATTRIBUTE_TYPE: // Fabric Id
-    case ZCL_NODE_ID_ATTRIBUTE_TYPE:   // Node Id
-    case ZCL_BITMAP64_ATTRIBUTE_TYPE:  // 64-bit bitmap
-    case ZCL_EPOCH_US_ATTRIBUTE_TYPE:  // Epoch Microseconds
+    case ZCL_EVENT_NO_ATTRIBUTE_TYPE:   // Event Number
+    case ZCL_FABRIC_ID_ATTRIBUTE_TYPE:  // Fabric Id
+    case ZCL_NODE_ID_ATTRIBUTE_TYPE:    // Node Id
+    case ZCL_BITMAP64_ATTRIBUTE_TYPE:   // 64-bit bitmap
+    case ZCL_EPOCH_US_ATTRIBUTE_TYPE:   // Epoch Microseconds
+    case ZCL_POSIX_MS_ATTRIBUTE_TYPE:   // POSIX Milliseconds
+    case ZCL_SYSTIME_MS_ATTRIBUTE_TYPE: // System time Milliseconds
+    case ZCL_SYSTIME_US_ATTRIBUTE_TYPE: // System time Microseconds
         static_assert(std::is_same<chip::EventNumber, uint64_t>::value,
                       "chip::EventNumber is expected to be uint64_t, change this when necessary");
         static_assert(std::is_same<chip::FabricId, uint64_t>::value,
@@ -133,6 +137,9 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
         static_assert(std::is_same<chip::NodeId, uint64_t>::value,
                       "chip::NodeId is expected to be uint64_t, change this when necessary");
         return ZCL_INT64U_ATTRIBUTE_TYPE;
+
+    case ZCL_TEMPERATURE_ATTRIBUTE_TYPE: // Temperature
+        return ZCL_INT16S_ATTRIBUTE_TYPE;
 
     default:
         return type;
@@ -275,8 +282,8 @@ void IncreaseClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPath
 
 CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, AttributeDataIB::Builder & aAttributeDataIBBuilder)
 {
-    ReturnErrorOnFailure(aAttributeDataIBBuilder.EndOfAttributeDataIB().GetError());
-    return aAttributeReport.EndOfAttributeReportIB().GetError();
+    ReturnErrorOnFailure(aAttributeDataIBBuilder.EndOfAttributeDataIB());
+    return aAttributeReport.EndOfAttributeReportIB();
 }
 
 CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
@@ -591,11 +598,11 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     AttributePathIB::Builder & attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
-        .Cluster(aPath.mClusterId)
-        .Attribute(aPath.mAttributeId)
-        .EndOfAttributePathIB();
-    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
+    CHIP_ERROR err = attributePathIBBuilder.Endpoint(aPath.mEndpointId)
+                         .Cluster(aPath.mClusterId)
+                         .Attribute(aPath.mAttributeId)
+                         .EndOfAttributePathIB();
+    ReturnErrorOnFailure(err);
 
     EmberAfAttributeSearchRecord record;
     record.endpoint           = aPath.mEndpointId;

@@ -190,22 +190,24 @@ CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
 {
-    int ret = wlan_get_current_network(&sta_network);
-    uint8_t macAddress[6];
+    constexpr size_t bssIdSize = 6;
+    VerifyOrReturnError(value.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    if (ret == WM_SUCCESS)
+    int ret = wlan_get_current_network(&sta_network);
+
+    if (ret != WM_SUCCESS)
     {
-        memcpy(macAddress, sta_network.bssid, 6);
+        ChipLogProgress(DeviceLayer, "GetWiFiBssId failed: %d", ret);
+        return CHIP_ERROR_READ_FAILED;
     }
-    else
-    {
-        memset(macAddress, 0, 6);
-    }
-    ChipLogProgress(DeviceLayer, "GetWiFiBssId: %02x:%02x:%02x:%02x:%02x:%02x", macAddress[0], macAddress[1], macAddress[2],
-                    macAddress[3], macAddress[4], macAddress[5]);
-    value = ByteSpan(macAddress, 6);
+
+    memcpy(value.data(), sta_network.bssid, bssIdSize);
+    value.reduce_size(bssIdSize);
+
+    ChipLogProgress(DeviceLayer, "GetWiFiBssId: %02x:%02x:%02x:%02x:%02x:%02x", value.data()[0], value.data()[1], value.data()[2],
+                    value.data()[3], value.data()[4], value.data()[5]);
     return CHIP_NO_ERROR;
 }
 
@@ -365,7 +367,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const uint8_t sid, NetworkCommissionin
     // => rssi
     result.rssi = static_cast<int8_t>(0 - res.rssi);
     // => band, mw320 only works in 2.4G
-    result.wiFiBand = app::Clusters::NetworkCommissioning::WiFiBand::k2g4;
+    result.wiFiBand = app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4;
     // => channel
     result.channel = res.channel;
     // => security

@@ -81,7 +81,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
         return error;
     }
 
-    if (!ParseFactoryData(factoryData, factoryDataSize, &mFactoryData))
+    if (!ParseFactoryData(factoryData, static_cast<uint16_t>(factoryDataSize), &mFactoryData))
     {
         ChipLogError(DeviceLayer, "Failed to parse factory data");
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -323,6 +323,8 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetRotatingDeviceIdUniqueId(Mu
 
     memcpy(uniqueIdSpan.data(), mFactoryData.rd_uid.data, mFactoryData.rd_uid.len);
 
+    uniqueIdSpan.reduce_size(mFactoryData.rd_uid.len);
+
     return CHIP_NO_ERROR;
 }
 
@@ -335,6 +337,27 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetEnableKey(MutableByteSpan &
     memcpy(enableKey.data(), mFactoryData.enable_key.data, mFactoryData.enable_key.len);
 
     enableKey.reduce_size(mFactoryData.enable_key.len);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
+{
+    ReturnErrorCodeIf(!finish, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!mFactoryData.productFinishPresent, CHIP_ERROR_NOT_IMPLEMENTED);
+    *finish = static_cast<app::Clusters::BasicInformation::ProductFinishEnum>(mFactoryData.product_finish);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
+{
+    ReturnErrorCodeIf(!primaryColor, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!mFactoryData.primaryColorPresent, CHIP_ERROR_NOT_IMPLEMENTED);
+
+    *primaryColor = static_cast<app::Clusters::BasicInformation::ColorEnum>(mFactoryData.primary_color);
 
     return CHIP_NO_ERROR;
 }

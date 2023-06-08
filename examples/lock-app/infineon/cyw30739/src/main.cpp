@@ -51,6 +51,7 @@ using chip::app::Clusters::DoorLock::OperationErrorEnum;
 using chip::app::Clusters::DoorLock::OperationSourceEnum;
 
 using namespace chip;
+using namespace chip::app;
 using namespace ::chip::DeviceLayer::Internal;
 
 using namespace ::chip::Credentials;
@@ -92,7 +93,7 @@ static Identify gIdentify = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
 };
 
 APPLICATION_START()
@@ -141,10 +142,18 @@ APPLICATION_START()
     }
 #endif
 
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#else // !CHIP_DEVICE_CONFIG_THREAD_FTD
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#else  /* !CHIP_DEVICE_CONFIG_ENABLE_SED */
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+#endif // CHIP_DEVICE_CONFIG_THREAD_FTD
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "ERROR SetThreadDeviceType %ld", err.AsInteger());
+        printf("ERROR SetThreadDeviceType %ld\n", err.AsInteger());
     }
 
     ChipLogProgress(Zcl, "Starting event loop task");

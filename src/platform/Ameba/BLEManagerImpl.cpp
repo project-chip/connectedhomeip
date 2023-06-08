@@ -292,7 +292,12 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(uint16_t conn_id, uint16_t disc_c
         disconReason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
         break;
     }
-    HandleConnectionError(conn_id, disconReason);
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kCHIPoBLEConnectionError;
+    event.CHIPoBLEConnectionError.ConId  = conn_id;
+    event.CHIPoBLEConnectionError.Reason = disconReason;
+    PlatformMgr().PostEventOrDie(&event);
 
     // Force a reconfiguration of advertising in case we switched to non-connectable mode when
     // the BLE connection was established.

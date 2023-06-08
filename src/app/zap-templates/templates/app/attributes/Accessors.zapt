@@ -23,8 +23,7 @@ namespace {{asUpperCamelCase parent.label}} {
 namespace Attributes {
 
 {{/first}}
-{{#if_is_struct type}}
-{{else if (canHaveSimpleAccessors this)}}
+{{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
 namespace {{asUpperCamelCase label}} {
 EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value); // {{type}}
 EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value);
@@ -34,7 +33,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectTy
 {{/if}}
 } // namespace {{asUpperCamelCase label}}
 
-{{/if_is_struct}}
+{{/unless}}
 {{#last}}
 } // namespace Attributes
 } // {{asUpperCamelCase parent.label}}

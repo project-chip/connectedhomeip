@@ -137,7 +137,7 @@ public:
     void StartWiFiManagement();
     bool IsWiFiManagementStarted();
     int32_t GetDisconnectReason();
-    CHIP_ERROR GetWiFiBssId(ByteSpan & value);
+    CHIP_ERROR GetWiFiBssId(MutableByteSpan & value);
     CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
     CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);

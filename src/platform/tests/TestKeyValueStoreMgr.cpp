@@ -353,7 +353,7 @@ int TestKeyValueStoreMgr()
 {
     nlTestSuite theSuite = { "KeyValueStoreMgr tests", &sTests[0], TestKeyValueStoreMgr_Setup, TestKeyValueStoreMgr_Teardown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

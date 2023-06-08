@@ -18,6 +18,7 @@
 import re
 import string
 from abc import ABC, abstractmethod
+from typing import List
 
 from .errors import TestStepError
 
@@ -114,6 +115,11 @@ class ConstraintNotValueError(ConstraintCheckError):
         super().__init__(context, 'notValue', reason)
 
 
+class ConstraintAnyOfError(ConstraintCheckError):
+    def __init__(self, context, reason):
+        super().__init__(context, 'anyOf', reason)
+
+
 class BaseConstraint(ABC):
     '''Constraint Interface'''
 
@@ -185,6 +191,8 @@ class BaseConstraint(ABC):
             raise ConstraintMaxValueError(self._context, reason)
         elif isinstance(self, _ConstraintNotValue):
             raise ConstraintNotValueError(self._context, reason)
+        elif isinstance(self, _ConstraintAnyOf):
+            raise ConstraintAnyOfError(self._context, reason)
         else:
             # This should not happens.
             raise ConstraintParseError(f'Unknown constraint instance.')
@@ -223,6 +231,8 @@ class _ConstraintType(BaseConstraint):
     def check_response(self, value, value_type_name) -> bool:
         success = False
         if self._type == 'boolean' and type(value) is bool:
+            success = True
+        elif self._type == 'struct' and type(value) is dict:
             success = True
         elif self._type == 'list' and type(value) is list:
             success = True
@@ -359,6 +369,8 @@ class _ConstraintType(BaseConstraint):
 
         if type(value) is bool:
             types.append('boolean')
+        elif type(value) is dict:
+            types.append('struct')
         elif type(value) is list:
             types.append('list')
         elif type(value) is str:
@@ -582,7 +594,9 @@ class _ConstraintIsUpperCase(BaseConstraint):
         self._is_upper_case = is_upper_case
 
     def check_response(self, value, value_type_name) -> bool:
-        return value.isupper() == self._is_upper_case
+        # Make sure we don't have any lowercase characters.
+        hasLower = any(c.islower() for c in value)
+        return hasLower != self._is_upper_case
 
     def get_reason(self, value, value_type_name) -> str:
         if self._is_upper_case:
@@ -608,7 +622,9 @@ class _ConstraintIsLowerCase(BaseConstraint):
         self._is_lower_case = is_lower_case
 
     def check_response(self, value, value_type_name) -> bool:
-        return value.islower() == self._is_lower_case
+        # Make sure we don't have any uppercase characters.
+        hasUpper = any(c.isupper() for c in value)
+        return hasUpper != self._is_lower_case
 
     def get_reason(self, value, value_type_name) -> str:
         if self._is_lower_case:
@@ -736,7 +752,19 @@ class _ConstraintNotValue(BaseConstraint):
         return f'The response value "{value}" should differs from the constraint.'
 
 
-def get_constraints(constraints: dict) -> list[BaseConstraint]:
+class _ConstraintAnyOf(BaseConstraint):
+    def __init__(self, context, any_of):
+        super().__init__(context, types=[], is_null_allowed=True)
+        self._any_of = any_of
+
+    def check_response(self, value, value_type_name) -> bool:
+        return value in self._any_of
+
+    def get_reason(self, value, value_type_name) -> str:
+        return f'The response value "{value}" is not a value from {self._any_of}.'
+
+
+def get_constraints(constraints: dict) -> List[BaseConstraint]:
     _constraints = []
     context = constraints
 
@@ -788,6 +816,9 @@ def get_constraints(constraints: dict) -> list[BaseConstraint]:
         elif 'notValue' == constraint:
             _constraints.append(_ConstraintNotValue(
                 context, constraint_value))
+        elif 'anyOf' == constraint:
+            _constraints.append(_ConstraintAnyOf(
+                context, constraint_value))
         else:
             raise ConstraintParseError(f'Unknown constraint type:{constraint}')
 
@@ -812,6 +843,7 @@ def is_typed_constraint(constraint: str):
         'hasMasksSet': False,
         'hasMasksClear': False,
         'notValue': True,
+        'anyOf': True,
     }
 
     is_typed = constraints.get(constraint)

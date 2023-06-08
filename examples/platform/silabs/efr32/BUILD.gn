@@ -48,7 +48,7 @@ chip_persist_subscriptions = enable_sleepy_device
 
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
-import("${silabs_common_plat_dir}/efr32/args.gni")
+import("${silabs_common_plat_dir}/args.gni")
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
@@ -58,7 +58,7 @@ assert(!(use_wf200 && chip_enable_openthread))
 
 if (chip_enable_wifi) {
   assert(use_rs9116 || use_wf200 || use_SiWx917)
-  import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
+  import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
   if (use_rs9116) {
     wiseconnect_sdk_root =
@@ -179,10 +179,10 @@ source_set("efr32-attestation-credentials") {
   public_configs = [ ":attestation-credentials-config" ]
 }
 
-source_set("efr32-factory-data-provider") {
+source_set("silabs-factory-data-provider") {
   sources = [
-    "EFR32DeviceDataProvider.cpp",
-    "EFR32DeviceDataProvider.h",
+    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.cpp",
+    "${silabs_common_plat_dir}/SilabsDeviceDataProvider.h",
   ]
 
   public_deps = [
@@ -211,7 +211,7 @@ config("efr32-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
 
   if (!disable_lcd) {
-    include_dirs = [ "display" ]
+    include_dirs = [ "${silabs_common_plat_dir}/display" ]
 
     defines += [ "DISPLAY_ENABLED" ]
   }
@@ -221,16 +221,14 @@ config("efr32-common-config") {
   }
 
   if (chip_enable_ota_requestor) {
-    defines += [ "EFR32_OTA_ENABLED" ]
+    defines += [ "SILABS_OTA_ENABLED" ]
   }
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  # Do not warn for LOAD segment with RWX permissions
-  # Uncomment this cflag when pigweed update is done and GCC 12.2 is used.
-  #ldflags = [ "-Wl,--no-warn-rwx-segment" ]
+  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
 config("silabs-wifi-config") {
@@ -282,9 +280,10 @@ source_set("efr32-common") {
   include_dirs = [ "." ]
 
   sources = [
+    "${silabs_common_plat_dir}/LEDWidget.cpp",
     "${silabs_common_plat_dir}/heap_4_silabs.c",
+    "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
-    "efr32_utils.cpp",
     "init_efrPlatform.cpp",
     "matter_config.cpp",
   ]
@@ -293,30 +292,26 @@ source_set("efr32-common") {
     sources += [ "BaseApplication.cpp" ]
   }
 
-  if (use_wstk_leds) {
-    sources += [ "LEDWidget.cpp" ]
-  }
-
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
     sources += [ "uart.cpp" ]
   }
 
   if (chip_enable_ota_requestor) {
-    sources += [ "OTAConfig.cpp" ]
+    sources += [ "${silabs_common_plat_dir}/OTAConfig.cpp" ]
   }
 
   if (!disable_lcd) {
     sources += [
-      "display/demo-ui.c",
-      "display/lcd.cpp",
+      "${silabs_common_plat_dir}/display/demo-ui.c",
+      "${silabs_common_plat_dir}/display/lcd.cpp",
     ]
 
-    include_dirs += [ "display" ]
+    include_dirs += [ "${silabs_common_plat_dir}/display" ]
     public_deps += [ "${chip_root}/examples/common/QRCode" ]
   }
 
   if (enable_heap_monitoring) {
-    sources += [ "MemMonitoring.cpp" ]
+    sources += [ "${silabs_common_plat_dir}/MemMonitoring.cpp" ]
   }
 
   # OpenThread Settings
@@ -356,7 +351,7 @@ source_set("efr32-common") {
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
-    public_deps += [ ":efr32-factory-data-provider" ]
+    public_deps += [ ":silabs-factory-data-provider" ]
   }
 
   if (chip_config_use_icd_subscription_callbacks) {

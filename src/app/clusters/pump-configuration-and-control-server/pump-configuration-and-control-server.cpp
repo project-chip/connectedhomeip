@@ -228,7 +228,7 @@ static void setEffectiveModes(EndpointId endpoint)
     }
 }
 
-bool HasFeature(EndpointId endpoint, PumpConfigurationAndControlFeature feature)
+bool HasFeature(EndpointId endpoint, Feature feature)
 {
     bool hasFeature;
     uint32_t featureMap;
@@ -246,14 +246,14 @@ bool HasFeature(EndpointId endpoint, PumpConfigurationAndControlFeature feature)
 
 void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endpoint)
 {
-    emberAfDebugPrintln("Initialize PCC Server Cluster [EP:%d]", endpoint);
+    ChipLogProgress(Zcl, "Initialize PCC Server Cluster [EP:%d]", endpoint);
 }
 
 chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClusterServerPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    emberAfDebugPrintln("PCC Server Cluster Attribute Pre-changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
-                        (unsigned int) attributePath.mAttributeId);
+    ChipLogProgress(Zcl, "PCC Server Cluster Attribute Pre-changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
+                    (unsigned int) attributePath.mAttributeId);
 
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
 
@@ -267,37 +267,37 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
         switch (controlMode)
         {
         case ControlModeEnum::kConstantFlow:
-            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantFlow))
+            if (!HasFeature(attributePath.mEndpointId, Feature::kConstantFlow))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case ControlModeEnum::kConstantPressure:
-            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantPressure))
+            if (!HasFeature(attributePath.mEndpointId, Feature::kConstantPressure))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case ControlModeEnum::kConstantSpeed:
-            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantSpeed))
+            if (!HasFeature(attributePath.mEndpointId, Feature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case ControlModeEnum::kConstantTemperature:
-            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantTemperature))
+            if (!HasFeature(attributePath.mEndpointId, Feature::kConstantTemperature))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case ControlModeEnum::kProportionalPressure:
-            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kCompensatedPressure))
+            if (!HasFeature(attributePath.mEndpointId, Feature::kCompensatedPressure))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case ControlModeEnum::kAutomatic:
-            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kAutomatic))
+            if (!HasFeature(attributePath.mEndpointId, Feature::kAutomatic))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
@@ -318,19 +318,19 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
         switch (operationMode)
         {
         case OperationModeEnum::kMinimum:
-            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantSpeed))
+            if (!HasFeature(attributePath.mEndpointId, Feature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case OperationModeEnum::kMaximum:
-            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantSpeed))
+            if (!HasFeature(attributePath.mEndpointId, Feature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case OperationModeEnum::kLocal:
-            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kLocalOperation))
+            if (!HasFeature(attributePath.mEndpointId, Feature::kLocalOperation))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
@@ -353,8 +353,8 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
 
 void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    emberAfDebugPrintln("PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
-                        (unsigned int) attributePath.mAttributeId);
+    ChipLogProgress(Zcl, "PCC Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
+                    (unsigned int) attributePath.mAttributeId);
 
     switch (attributePath.mAttributeId)
     {
@@ -363,7 +363,7 @@ void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(cons
         setEffectiveModes(attributePath.mEndpointId);
         break;
     default:
-        emberAfDebugPrintln("PCC Server: unhandled attribute ID");
+        ChipLogProgress(Zcl, "PCC Server: unhandled attribute ID");
     }
 }
 

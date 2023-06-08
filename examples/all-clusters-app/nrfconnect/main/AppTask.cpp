@@ -71,7 +71,7 @@ k_timer sFunctionTimer;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 Identify sIdentify = { kIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
-                       EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED };
+                       Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator };
 
 LEDWidget sStatusLED;
 LEDWidget sIdentifyLED;
@@ -190,6 +190,7 @@ CHIP_ERROR AppTask::Init()
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
     }
 #else
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
@@ -357,7 +358,7 @@ void AppTask::FunctionHandler(const AppEvent & event)
             Instance().CancelTimer();
             Instance().mFunction = FunctionEvent::NoneSelected;
 
-#ifdef CONFIG_MCUMGR_SMP_BT
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
             GetDFUOverSMP().StartServer();
 #else
             LOG_INF("Software update is disabled");

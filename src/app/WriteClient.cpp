@@ -118,7 +118,7 @@ CHIP_ERROR WriteClient::PrepareAttributeIB(const ConcreteDataAttributePath & aPa
             return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         }
     }
-    ReturnErrorOnFailure(path.EndOfAttributePathIB().GetError());
+    ReturnErrorOnFailure(path.EndOfAttributePathIB());
 
     return CHIP_NO_ERROR;
 }
@@ -126,8 +126,7 @@ CHIP_ERROR WriteClient::PrepareAttributeIB(const ConcreteDataAttributePath & aPa
 CHIP_ERROR WriteClient::FinishAttributeIB()
 {
     AttributeDataIB::Builder & attributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
-    attributeDataIB.EndOfAttributeDataIB();
-    ReturnErrorOnFailure(attributeDataIB.GetError());
+    ReturnErrorOnFailure(attributeDataIB.EndOfAttributeDataIB());
     MoveToState(State::AddAttribute);
     return CHIP_NO_ERROR;
 }
@@ -146,11 +145,9 @@ CHIP_ERROR WriteClient::FinalizeMessage(bool aHasMoreChunks)
     ReturnErrorCodeIf(writer == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForTLVEncodingOverhead));
 
-    AttributeDataIBs::Builder & attributeDataIBsBuilder = mWriteRequestBuilder.GetWriteRequests().EndOfAttributeDataIBs();
-    ReturnErrorOnFailure(attributeDataIBsBuilder.GetError());
+    ReturnErrorOnFailure(mWriteRequestBuilder.GetWriteRequests().EndOfAttributeDataIBs());
 
-    mWriteRequestBuilder.MoreChunkedMessages(aHasMoreChunks).EndOfWriteRequestMessage();
-    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
+    ReturnErrorOnFailure(mWriteRequestBuilder.MoreChunkedMessages(aHasMoreChunks).EndOfWriteRequestMessage());
     ReturnErrorOnFailure(mMessageWriter.Finalize(&packet));
     mChunks.AddToEnd(std::move(packet));
     return CHIP_NO_ERROR;
@@ -243,7 +240,6 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
     {
         // If it failed with no memory, then we create a new chunk for it.
         mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
-        mWriteRequestBuilder.GetWriteRequests().ResetError();
         ReturnErrorOnFailure(StartNewMessage());
         err = TryPutSinglePreencodedAttributeWritePayload(attributePath, data);
         // Since we have created a new chunk for this element, the encode is expected to succeed.
@@ -460,7 +456,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
         if (!mChunks.IsNull())
         {
             // Send the next chunk.
-            SuccessOrExit(SendWriteRequest());
+            SuccessOrExit(err = SendWriteRequest());
         }
     }
     else if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))

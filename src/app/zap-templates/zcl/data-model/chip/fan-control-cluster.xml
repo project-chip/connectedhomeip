@@ -17,12 +17,14 @@ limitations under the License.
 <configurator>
   <domain name="HVAC"/>
 
-  <bitmap name="FanControlFeature" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0202" />
     <field name="Multi-Speed" mask="0x01" />
     <field name="Auto" mask="0x02" />
     <field name="Rocking" mask="0x04" />
     <field name="Wind" mask="0x08" />
+    <field name="Step" mask="0x10" />
+    <field name="Airflow Direction" mask="0x20" />
   </bitmap>
 
   <enum name="FanModeType" type="ENUM8">
@@ -65,6 +67,18 @@ limitations under the License.
     <field name="Natural Wind" mask="0x02" />
   </bitmap>
 
+  <enum name="DirectionEnum" type="ENUM8">
+    <cluster code="0x0202"/>
+    <item name="Increase" value="0x00"/>
+    <item name="Decrease" value="0x01"/>
+  </enum>
+
+  <enum name="AirflowDirectionEnum" type="ENUM8">
+    <cluster code="0x0202"/>
+    <item name="Forward" value="0x00"/>
+    <item name="Reverse" value="0x01"/>
+  </enum>
+
   <cluster>
     <name>Fan Control</name>
     <domain>HVAC</domain>
@@ -86,5 +100,14 @@ limitations under the License.
     <attribute side="server" code="0x0008" define="ROCK_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">RockSetting</attribute>
     <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">WindSupport</attribute>
     <attribute side="server" code="0x000A" define="WIND_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">WindSetting</attribute>
+    <attribute side="server" code="0x000B" define="AIRFLOW_DIRECTION" type="AirflowDirectionEnum" writable="true" default="0" optional="true">AirflowDirection</attribute>
+  
+    <command source="client" code="0x00" name="Step" optional="true">
+      <description>The Step command speeds up or slows down the fan, in steps.</description>
+      <arg name="Direction" type="DirectionEnum"/>
+      <arg name="Wrap" type="boolean" optional="true"/>
+      <arg name="LowestOff" type="boolean" optional="true"/>
+    </command>
+
   </cluster>
 </configurator>

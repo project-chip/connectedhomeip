@@ -175,6 +175,35 @@ public class ChipDeviceController {
         deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce);
   }
 
+  /**
+   * Pair a device connected using the scanned QR code or manual entry code.
+   *
+   * @param deviceId the node ID to assign to the device
+   * @param setupCode the scanned QR code or manual entry code
+   * @param discoverOnce the flag to enable/disable PASE auto retry mechanism
+   * @param useOnlyOnNetworkDiscovery the flag to indicate the commissionable device is available on
+   *     the network
+   * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
+   *     generated CSR nonce.
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   */
+  public void pairDeviceWithCode(
+      long deviceId,
+      String setupCode,
+      boolean discoverOnce,
+      boolean useOnlyOnNetworkDiscovery,
+      @Nullable byte[] csrNonce,
+      @Nullable NetworkCredentials networkCredentials) {
+    pairDeviceWithCode(
+        deviceControllerPtr,
+        deviceId,
+        setupCode,
+        discoverOnce,
+        useOnlyOnNetworkDiscovery,
+        csrNonce,
+        networkCredentials);
+  }
+
   public void establishPaseConnection(long deviceId, int connId, long setupPincode) {
     if (connectionId == 0) {
       connectionId = connId;
@@ -359,9 +388,9 @@ public class ChipDeviceController {
   public void onScanNetworksSuccess(
       Integer networkingStatus,
       Optional<String> debugText,
-      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>>
           wiFiScanResults,
-      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>>
           threadScanResults) {
     if (scanNetworksListener != null) {
       scanNetworksListener.onScanNetworksSuccess(
@@ -996,6 +1025,15 @@ public class ChipDeviceController {
       long pinCode,
       @Nullable byte[] csrNonce);
 
+  private native void pairDeviceWithCode(
+      long deviceControllerPtr,
+      long deviceId,
+      String setupCode,
+      boolean discoverOnce,
+      boolean useOnlyOnNetworkDiscovery,
+      @Nullable byte[] csrNonce,
+      @Nullable NetworkCredentials networkCredentials);
+
   private native void establishPaseConnection(
       long deviceControllerPtr, long deviceId, int connId, long setupPincode);
 
@@ -1136,9 +1174,9 @@ public class ChipDeviceController {
     void onScanNetworksSuccess(
         Integer networkingStatus,
         Optional<String> debugText,
-        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>>
             wiFiScanResults,
-        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>>
             threadScanResults);
   }
 

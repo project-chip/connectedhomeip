@@ -56,6 +56,11 @@ static void TestByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s2.data_equal(s2));
     NL_TEST_ASSERT(inSuite, !s2.data_equal(s1));
     NL_TEST_ASSERT(inSuite, IsSpanUsable(s2) == true);
+    NL_TEST_ASSERT(inSuite, s2.front() == 1);
+    NL_TEST_ASSERT(inSuite, s2.back() == 3);
+    NL_TEST_ASSERT(inSuite, s2[0] == 1);
+    NL_TEST_ASSERT(inSuite, s2[1] == 2);
+    NL_TEST_ASSERT(inSuite, s2[2] == 3);
 
     ByteSpan s3 = s2;
     NL_TEST_ASSERT(inSuite, s3.data() == arr);
@@ -175,6 +180,11 @@ static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s2.data()[2] == 3);
     NL_TEST_ASSERT(inSuite, !s2.empty());
     NL_TEST_ASSERT(inSuite, s2.data_equal(s2));
+    NL_TEST_ASSERT(inSuite, s2.front() == 1);
+    NL_TEST_ASSERT(inSuite, s2.back() == 3);
+    NL_TEST_ASSERT(inSuite, s2[0] == 1);
+    NL_TEST_ASSERT(inSuite, s2[1] == 2);
+    NL_TEST_ASSERT(inSuite, s2[2] == 3);
 
     FixedByteSpan<3> s3 = s2;
     NL_TEST_ASSERT(inSuite, s3.data() == arr);
@@ -292,14 +302,48 @@ static void TestFromCharString(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s1.data_equal(CharSpan(str, 3)));
 }
 
+static void TestConversionConstructors(nlTestSuite * inSuite, void * inContext)
+{
+    struct Foo
+    {
+        int member = 0;
+    };
+    struct Bar : public Foo
+    {
+    };
+
+    Bar objects[2];
+
+    // Check that various things here compile.
+    Span<Foo> span1(objects);
+    Span<Foo> span2(&objects[0], 1);
+    FixedSpan<Foo, 2> span3(objects);
+    FixedSpan<Foo, 1> span4(objects);
+
+    Span<Bar> testSpan1(objects);
+    FixedSpan<Bar, 2> testSpan2(objects);
+
+    Span<Foo> span5(testSpan1);
+    Span<Foo> span6(testSpan2);
+
+    FixedSpan<Foo, 2> span7(testSpan2);
+}
+
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestByteSpan),       NL_TEST_DEF_FN(TestMutableByteSpan),
-                                 NL_TEST_DEF_FN(TestFixedByteSpan),  NL_TEST_DEF_FN(TestSpanOfPointers),
-                                 NL_TEST_DEF_FN(TestSubSpan),        NL_TEST_DEF_FN(TestFromZclString),
-                                 NL_TEST_DEF_FN(TestFromCharString), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = {
+    NL_TEST_DEF_FN(TestByteSpan),
+    NL_TEST_DEF_FN(TestMutableByteSpan),
+    NL_TEST_DEF_FN(TestFixedByteSpan),
+    NL_TEST_DEF_FN(TestSpanOfPointers),
+    NL_TEST_DEF_FN(TestSubSpan),
+    NL_TEST_DEF_FN(TestFromZclString),
+    NL_TEST_DEF_FN(TestFromCharString),
+    NL_TEST_DEF_FN(TestConversionConstructors),
+    NL_TEST_SENTINEL(),
+};
 
 int TestSpan()
 {

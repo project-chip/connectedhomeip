@@ -198,7 +198,11 @@ $ out/debug/chip-tool pairing onnetwork 12345 20202021
 
 Note: In order to commission an ethernet device, from all-clusters-app enable
 these config options: select `ESP32-Ethernet-Kit` under `Demo->Device Type` and
-select `On-Network` rendezvous mode under `Demo->Rendezvous Mode`
+select `On-Network` rendezvous mode under `Demo->Rendezvous Mode`. Currently
+default ethernet board supported is IP101, if you want to use other types of
+ethernet board then you can extend the `ESPEthernetDriver` class in your
+application and override the current implementation under
+`ESPEthernetDriver::Init`
 
 #### Commissioning Parameters
 

@@ -135,9 +135,9 @@ void PumpManager::TimerEventHandler(k_timer * timer)
     GetAppTask().PostEvent(&event);
 }
 
-void PumpManager::AutoRestartTimerEventHandler(const AppEvent & aEvent)
+void PumpManager::AutoRestartTimerEventHandler(AppEvent * aEvent)
 {
-    PumpManager * pump = static_cast<PumpManager *>(aEvent.TimerEvent.Context);
+    PumpManager * pump = static_cast<PumpManager *>(aEvent->TimerEvent.Context);
     int32_t actor      = 0;
 
     // Make sure auto start timer is still armed.
@@ -151,11 +151,11 @@ void PumpManager::AutoRestartTimerEventHandler(const AppEvent & aEvent)
     pump->InitiateAction(actor, START_ACTION);
 }
 
-void PumpManager::PumpStartTimerEventHandler(const AppEvent & aEvent)
+void PumpManager::PumpStartTimerEventHandler(AppEvent * aEvent)
 {
     Action_t actionCompleted = INVALID_ACTION;
 
-    PumpManager * pump = static_cast<PumpManager *>(aEvent.TimerEvent.Context);
+    PumpManager * pump = static_cast<PumpManager *>(aEvent->TimerEvent.Context);
 
     if (pump->mState == kState_StartInitiated)
     {

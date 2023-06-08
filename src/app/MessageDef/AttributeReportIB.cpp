@@ -118,10 +118,10 @@ AttributeDataIB::Builder & AttributeReportIB::Builder::CreateAttributeData()
     return mAttributeData;
 }
 
-AttributeReportIB::Builder & AttributeReportIB::Builder::EndOfAttributeReportIB()
+CHIP_ERROR AttributeReportIB::Builder::EndOfAttributeReportIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

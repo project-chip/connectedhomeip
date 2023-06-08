@@ -180,6 +180,39 @@ public:
         VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
         return snprintf(key, size, "fl-v/%x/%x", endpoint, index) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
     }
+
+    // Supported modes
+
+    static CHIP_ERROR SupportedModesCount(char * key, size_t size, uint16_t endpoint)
+    {
+        VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
+        return snprintf(key, size, "sm-sz/%x", endpoint) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    }
+    static CHIP_ERROR SupportedModesLabel(char * key, size_t size, uint16_t endpoint, uint16_t index)
+    {
+        VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
+        return snprintf(key, size, "sm-label/%x/%x", endpoint, index) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    }
+    static CHIP_ERROR SupportedModesValue(char * key, size_t size, uint16_t endpoint, uint16_t index)
+    {
+        VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
+        return snprintf(key, size, "sm-mode/%x/%x", endpoint, index) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    }
+    static CHIP_ERROR ModeTagsCount(char * key, size_t size, uint16_t endpoint, uint16_t index)
+    {
+        VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
+        return snprintf(key, size, "sm-st-sz/%x/%x", endpoint, index) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    }
+    static CHIP_ERROR ModeTagValue(char * key, size_t size, uint16_t endpoint, uint16_t index, uint16_t ind)
+    {
+        VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
+        return snprintf(key, size, "st-v/%x/%x/%x", endpoint, index, ind) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    }
+    static CHIP_ERROR ModeTagMfgCode(char * key, size_t size, uint16_t endpoint, uint16_t index, uint16_t ind)
+    {
+        VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
+        return snprintf(key, size, "st-mfg/%x/%x/%x", endpoint, index, ind) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+    }
 };
 
 } // namespace Internal

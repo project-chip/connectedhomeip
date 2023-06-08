@@ -19,7 +19,7 @@
 #include "BoltLockManager.h"
 
 #include "AppConfig.h"
-#include "AppEvent.h"
+#include "AppEventCommon.h"
 #include "AppTask.h"
 #include <cstring>
 

@@ -22,7 +22,7 @@
 
 #include <cstdint>
 
-#include "AppEvent.h"
+#include "AppEventCommon.h"
 
 struct k_timer;
 
@@ -86,9 +86,9 @@ private:
     void StartTimer(uint32_t aTimeoutMs);
 
     static void TimerEventHandler(k_timer * timer);
-    static void AutoRestartTimerEventHandler(const AppEvent & aEvent);
+    static void AutoRestartTimerEventHandler(AppEvent * aEvent);
 
-    static void PumpStartTimerEventHandler(const AppEvent & aEvent);
+    static void PumpStartTimerEventHandler(AppEvent * aEvent);
 
     static PumpManager sPump;
 };

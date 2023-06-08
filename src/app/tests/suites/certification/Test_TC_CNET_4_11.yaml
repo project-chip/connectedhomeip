@@ -99,7 +99,7 @@ tests:
 
     - label:
           "TH reads Networks attribute from the DUT and saves the number of
-          entries as NumNetworks"
+          entries as 'NumNetworks'"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
@@ -115,7 +115,8 @@ tests:
 
     - label:
           "TH finds the index of the Networks list entry with NetworkID for
-          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and saves it as Userwifi_netidx"
+          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and saves it as
+          'Userwifi_netidx'"
       verification: |
 
       disabled: true
@@ -163,7 +164,7 @@ tests:
           [1657288838.208068][2455:2460] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH reads  Networks  attribute from the  DUT"
+    - label: "TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
@@ -209,8 +210,8 @@ tests:
       disabled: true
 
     - label:
-          "TH discovers and  connects to DUT  on
-          the  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_SSID operational  network"
+          "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_
+          2ND_ACCESSPOIN T_SSID operational network"
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
@@ -225,8 +226,8 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcrumb attribute from
-          the  General  Commissioning  cluster of the DUT"
+          "TH reads Breadcrumb attribute from the General Commissioning cluster
+          of the DUT"
       PICS: CNET.S.C06.Rsp
       verification: |
           ./chip-tool generalcommissioning read breadcrumb 1 0
@@ -238,10 +239,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  ArmFailSafe  command to the  DUT
-          with  ExpiryLengthSeco  nds set to 0. This  forcibly disarms  the
-          fail-safe and is  expected to cause  the changes of  configuration
-          to  NetworkCommissi  oning cluster done  so far to be  reverted."
+          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
+          to 0. This forcibly disarms the fail-safe and is expected to cause the
+          changes of configuration to NetworkCommissi oning cluster done so far
+          to be reverted."
       verification: |
           Mark as not applicable and proceed to next step
 
@@ -258,8 +259,8 @@ tests:
       disabled: true
 
     - label:
-          "TH changes its  WiFi connection
-          to  PIXIT.CNET.WIFI_  1ST_ACCESSPOINT  _SSID"
+          "TH changes its WiFi connection to PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT
+          _SSID"
       verification: |
           Mark as not applicable and proceed to next step
       disabled: true
@@ -280,8 +281,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  ArmFailSafe  command to the  DUT
-          with  ExpiryLengthSeco  nds set to 900"
+          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
+          to 900"
       verification: |
           Mark as not applicable and proceed to next step
 
@@ -298,9 +299,8 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  RemoveNetwork  Command to the  DUT with  NetworkID
-          field  set to  PIXIT.CNET.WIFI_  1ST_ACCESSPOINT  _SSID
-          and  Breadcrumb field  set to 1"
+          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
+          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
           Mark as not applicable and proceed to next step
@@ -321,11 +321,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  AddOrUpdateWiFi  Network  command to the  DUT with
-          SSID  field set
-          to  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_SSID,  Credentials field  set
-          to  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_CREDENTIALS  and
-          Breadcrumb  field set to 1"
+          "TH sends AddOrUpdateWiFi Network command to the DUT with SSID field
+          set to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID, Credentials field set
+          to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_CREDENTIALS and Breadcrumb field
+          set to 1"
       PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
           Mark as not applicable and proceed to next step
@@ -345,9 +344,9 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  ConnectNetwork  command to the  DUT with  NetworkID
-          field  set to  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_SSID
-          and  Breadcrumb field  set to 3"
+          "TH sends ConnectNetwork command to the DUT with NetworkID field set
+          to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID and Breadcrumb field set to
+          3"
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
@@ -363,15 +362,15 @@ tests:
       disabled: true
 
     - label:
-          "TH changes its  WiFi connection
-          to  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_SSID"
+          "TH changes its WiFi connection to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN
+          T_SSID"
       verification: |
 
       disabled: true
 
     - label:
-          "TH discovers and  connects to DUT  on
-          the  PIXIT.CNET.WIFI_  2ND_ACCESSPOIN  T_SSID operational  network"
+          "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_
+          2ND_ACCESSPOIN T_SSID operational network"
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
@@ -385,7 +384,7 @@ tests:
       disabled: true
 
     - label:
-          "TH reads Breadcrumb attribute from the  General Commissioning cluster
+          "TH reads Breadcrumb attribute from the General Commissioning cluster
           of the DUT"
       PICS: CNET.S.C06.Rsp
       verification: |
@@ -398,7 +397,7 @@ tests:
           [1657734757.740140][7793:7798] CHIP:TOO:   Breadcrumb: 3
       disabled: true
 
-    - label: "TH sends the  CommissioningCo  mplete command  to the DUT"
+    - label: "TH sends the CommissioningCo mplete command to the DUT"
       verification: |
           ./chip-tool generalcommissioning commissioning-complete 1 0
 
@@ -411,7 +410,7 @@ tests:
           [1657734803.411356][7802:7808] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH reads  Networks  attribute from the  DUT"
+    - label: "TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0

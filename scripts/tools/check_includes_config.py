@@ -51,6 +51,7 @@ IGNORE: Set[str] = {
     '/platform/bouffalolab/BL602',
     '/platform/webos/',
     '/platform/mt793x/',
+    '/platform/ASR/',
     r'POSIX\.h$',
 }
 

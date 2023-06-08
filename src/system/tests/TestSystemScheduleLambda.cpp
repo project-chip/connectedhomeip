@@ -67,9 +67,10 @@ static nlTestSuite kTheSuite =
  */
 static int TestSetup(void * aContext)
 {
+    if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
+        return FAILURE;
     if (chip::DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
         return FAILURE;
-
     return (SUCCESS);
 }
 
@@ -80,6 +81,7 @@ static int TestSetup(void * aContext)
 static int TestTeardown(void * aContext)
 {
     chip::DeviceLayer::PlatformMgr().Shutdown();
+    chip::Platform::MemoryShutdown();
     return (SUCCESS);
 }
 

@@ -94,41 +94,37 @@ void Instance::InvokeCommand(HandlerContext & ctxt)
     switch (ctxt.mRequestPath.mCommandId)
     {
     case Commands::ScanNetworks::Id:
-        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
-                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
+        VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
         HandleCommand<Commands::ScanNetworks::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleScanNetworks(ctx, req); });
         return;
 
     case Commands::AddOrUpdateWiFiNetwork::Id:
-        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface));
+        VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface));
         HandleCommand<Commands::AddOrUpdateWiFiNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleAddOrUpdateWiFiNetwork(ctx, req); });
         return;
 
     case Commands::AddOrUpdateThreadNetwork::Id:
-        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
+        VerifyOrReturn(mFeatureFlags.Has(Feature::kThreadNetworkInterface));
         HandleCommand<Commands::AddOrUpdateThreadNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleAddOrUpdateThreadNetwork(ctx, req); });
         return;
 
     case Commands::RemoveNetwork::Id:
-        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
-                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
+        VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
         HandleCommand<Commands::RemoveNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleRemoveNetwork(ctx, req); });
         return;
 
     case Commands::ConnectNetwork::Id:
-        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
-                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
+        VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
         HandleCommand<Commands::ConnectNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleConnectNetwork(ctx, req); });
         return;
 
     case Commands::ReorderNetwork::Id:
-        VerifyOrReturn(mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface) ||
-                       mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface));
+        VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
         HandleCommand<Commands::ReorderNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleReorderNetwork(ctx, req); });
         return;
@@ -146,7 +142,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.EncodeList([this](const auto & encoder) {
             auto networks  = mpBaseDriver->GetNetworks();
             CHIP_ERROR err = CHIP_NO_ERROR;
-            Structs::NetworkInfo::Type networkForEncode;
+            Structs::NetworkInfoStruct::Type networkForEncode;
             NetworkCommissioning::Network network;
             for (; networks != nullptr && networks->Next(network);)
             {
@@ -248,7 +244,7 @@ void Instance::OnNetworkingStatusChange(NetworkCommissioning::Status aCommission
 void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleScanNetwork", "NetworkCommissioning");
-    if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
+    if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
         ByteSpan ssid;
         if (req.ssid.HasValue())
@@ -275,7 +271,7 @@ void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetw
         ctx.mCommandHandler.FlushAcksRightAwayOnSlowCommand();
         mpDriver.Get<WiFiDriver *>()->ScanNetworks(ssid, this);
     }
-    else if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
+    else if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
     {
         mCurrentOperationBreadcrumb = req.breadcrumb;
         mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
@@ -296,7 +292,7 @@ void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & respon
     {
         response.debugText.SetValue(CharSpan(debugText.data(), debugText.size()));
     }
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
     {
         response.networkIndex.SetValue(networkIndex);
     }
@@ -369,7 +365,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
         mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -392,7 +388,7 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
         mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -428,7 +424,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
     response.networkingStatus = mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -464,7 +460,7 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
     response.networkingStatus = mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText);
     FillDebugTextAndNetworkIndex(response, debugText, req.networkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -504,7 +500,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     mLastNetworkingStatusValue.SetNonNull(commissioningError);
 
     commandHandle->AddResponse(mPath, response);
-    if (commissioningError == NetworkCommissioningStatus::kSuccess)
+    if (commissioningError == NetworkCommissioningStatusEnum::kSuccess)
     {
         CommitSavedBreadcrumb();
     }
@@ -590,7 +586,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
 
     for (size_t i = 0; i < scanResponseArrayLength; i++)
     {
-        Structs::ThreadInterfaceScanResult::Type result;
+        Structs::ThreadInterfaceScanResultStruct::Type result;
         Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponseArray[i].extendedAddress);
         result.panId           = scanResponseArray[i].panId;
         result.extendedPanId   = scanResponseArray[i].extendedPanId;
@@ -612,7 +608,7 @@ exit:
     {
         ChipLogError(Zcl, "Failed to encode response: %s", err.AsString());
     }
-    if (status == NetworkCommissioningStatus::kSuccess)
+    if (status == NetworkCommissioningStatusEnum::kSuccess)
     {
         CommitSavedBreadcrumb();
     }
@@ -655,7 +651,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
 
     for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse; networksEncoded++)
     {
-        Structs::WiFiInterfaceScanResult::Type result;
+        Structs::WiFiInterfaceScanResultStruct::Type result;
         result.security = scanResponse.security;
         result.ssid     = ByteSpan(scanResponse.ssid, scanResponse.ssidLen);
         result.bssid    = ByteSpan(scanResponse.bssid, sizeof(scanResponse.bssid));
@@ -673,7 +669,7 @@ exit:
     {
         ChipLogError(Zcl, "Failed to encode response: %s", err.AsString());
     }
-    if (status == NetworkCommissioningStatus::kSuccess)
+    if (status == NetworkCommissioningStatusEnum::kSuccess)
     {
         CommitSavedBreadcrumb();
     }
@@ -725,7 +721,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
         ScanNetworks::Id, AddOrUpdateThreadNetwork::Id, RemoveNetwork::Id, ConnectNetwork::Id, ReorderNetwork::Id,
     };
 
-    if (mFeatureFlags.Has(NetworkCommissioningFeature::kThreadNetworkInterface))
+    if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
     {
         for (const auto & cmd : acceptedCommandsListThread)
         {
@@ -738,7 +734,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
         return CHIP_NO_ERROR;
     }
 
-    if (mFeatureFlags.Has(NetworkCommissioningFeature::kWiFiNetworkInterface))
+    if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
         for (const auto & cmd : acceptedCommandsListWiFi)
         {
@@ -761,8 +757,7 @@ CHIP_ERROR Instance::EnumerateGeneratedCommands(const ConcreteClusterPath & clus
     constexpr CommandId generatedCommandsListWireless[] = { ScanNetworksResponse::Id, NetworkConfigResponse::Id,
                                                             ConnectNetworkResponse::Id };
 
-    if (mFeatureFlags.HasAny(NetworkCommissioningFeature::kWiFiNetworkInterface,
-                             NetworkCommissioningFeature::kThreadNetworkInterface))
+    if (mFeatureFlags.HasAny(Feature::kWiFiNetworkInterface, Feature::kThreadNetworkInterface))
     {
         for (const auto & cmd : generatedCommandsListWireless)
         {

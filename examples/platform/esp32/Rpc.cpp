@@ -204,8 +204,11 @@ public:
         size_t password_size = std::min(sizeof(password) - 1, static_cast<size_t>(request.secret.size));
         memcpy(password, request.secret.bytes, password_size);
         password[password_size] = '\0';
-        if (chip::DeviceLayer::NetworkCommissioning::ESPWiFiDriver::GetInstance().ConnectWiFiNetwork(
-                ssid, strlen(ssid), password, strlen(password)) != CHIP_NO_ERROR)
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
+        CHIP_ERROR error = chip::DeviceLayer::NetworkCommissioning::ESPWiFiDriver::GetInstance().ConnectWiFiNetwork(
+            ssid, strlen(ssid), password, strlen(password));
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        if (error != CHIP_NO_ERROR)
         {
             return pw::Status::Internal();
         }
@@ -214,8 +217,9 @@ public:
 
     pw::Status Disconnect(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
         chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
-        chip::DeviceLayer::ConnectivityMgr().SetWiFiStationMode(chip::DeviceLayer::ConnectivityManager::kWiFiStationMode_Disabled);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         return pw::OkStatus();
     }
 

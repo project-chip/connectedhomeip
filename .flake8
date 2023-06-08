@@ -9,7 +9,6 @@ exclude = third_party
           # TODO: Remove the paths below when all bugs are fixed
           src/tools/chip-cert/*
           src/test_driver/mbed/*
-          src/test_driver/linux-cirque/*
           build/chip/java/tests/*
           build/chip/linux/*
           build/config/linux/*

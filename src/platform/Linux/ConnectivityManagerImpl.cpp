@@ -444,7 +444,10 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                             }
                         });
 
-                        delegate->OnAssociationFailureDetected(associationFailureCause, status);
+                        if (delegate)
+                        {
+                            delegate->OnAssociationFailureDetected(associationFailureCause, status);
+                        }
                     }
 
                     DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
@@ -486,6 +489,10 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
 
 void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
     GError * err = nullptr;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -530,6 +537,10 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
 
 void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
     GError * err = nullptr;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -559,6 +570,10 @@ void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * source_object, GAsyn
 
 void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
     GError * err = nullptr;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -634,6 +649,10 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
 void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                                    gpointer user_data)
 {
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     if (mWpaSupplicant.interfacePath)
@@ -696,6 +715,10 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * pr
 
 void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
     GError * err = nullptr;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -730,10 +753,8 @@ void ConnectivityManagerImpl::StartWiFiManagement()
     mConnectivityFlag.ClearAll();
     mWpaSupplicant = GDBusWpaSupplicant{};
 
-    ChipLogProgress(DeviceLayer, "wpa_supplicant: Start WiFi management");
-
-    wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                kWpaSupplicantObjectPath, nullptr, _OnWpaProxyReady, nullptr);
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(_StartWiFiManagement, this);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start WiFi management"));
 }
 
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
@@ -1163,8 +1184,12 @@ CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
 {
+    constexpr size_t bssIdSize = 6;
+    static_assert(kMaxHardwareAddrSize >= bssIdSize, "We are assuming we can fit a BSSID in a buffer of size kMaxHardwareAddrSize");
+    VerifyOrReturnError(value.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
@@ -1176,23 +1201,22 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
     }
     else
     {
-        uint8_t macAddress[kMaxHardwareAddrSize];
-
         // Walk through linked list, maintaining head pointer so we can free list later.
         for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) ==
                 InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI)
             {
-                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, macAddress, kMaxHardwareAddrSize) != CHIP_NO_ERROR)
+                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, value.data(), kMaxHardwareAddrSize) !=
+                    CHIP_NO_ERROR)
                 {
                     ChipLogError(DeviceLayer, "Failed to get WiFi network hardware address");
                 }
                 else
                 {
                     // Set 48-bit IEEE MAC Address
-                    value = ByteSpan(macAddress, 6);
-                    err   = CHIP_NO_ERROR;
+                    value.reduce_size(bssIdSize);
+                    err = CHIP_NO_ERROR;
                     break;
                 }
             }
@@ -1276,6 +1300,11 @@ int32_t ConnectivityManagerImpl::GetDisconnectReason()
 
 CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::Network & network)
 {
+    // This function can be called without g_main_context_get_thread_default() being set.
+    // The network proxy object is created in a synchronous manner, so the D-Bus call will
+    // be completed before this function returns. Also, no external callbacks are registered
+    // with the proxy object.
+
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     std::unique_ptr<GError, GErrorDeleter> err;
 
@@ -1383,7 +1412,27 @@ namespace {
 std::pair<WiFiBand, uint16_t> GetBandAndChannelFromFrequency(uint32_t freq)
 {
     std::pair<WiFiBand, uint16_t> ret = std::make_pair(WiFiBand::k2g4, 0);
-    if (freq <= 2472)
+    if (freq <= 931)
+    {
+        ret.first = WiFiBand::k1g;
+        if (freq >= 916)
+        {
+            ret.second = ((freq - 916) * 2) - 1;
+        }
+        else if (freq >= 902)
+        {
+            ret.second = (freq - 902) * 2;
+        }
+        else if (freq >= 863)
+        {
+            ret.second = (freq - 863) * 2;
+        }
+        else
+        {
+            ret.second = 1;
+        }
+    }
+    else if (freq <= 2472)
     {
         ret.second = static_cast<uint16_t>((freq - 2412) / 5 + 1);
     }
@@ -1460,6 +1509,11 @@ std::pair<WiFiBand, uint16_t> GetBandAndChannelFromFrequency(uint32_t freq)
 
 bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result)
 {
+    // This function can be called without g_main_context_get_thread_default() being set.
+    // The BSS proxy object is created in a synchronous manner, so the D-Bus call will be
+    // completed before this function returns. Also, no external callbacks are registered
+    // with the proxy object.
+
     std::unique_ptr<GError, GErrorDeleter> err;
     std::unique_ptr<WpaFiW1Wpa_supplicant1BSS, GObjectDeleter> bss(
         wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
@@ -1671,6 +1725,19 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * source_object, G
     });
 
     g_strfreev(oldBsss);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement(ConnectivityManagerImpl * self)
+{
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
+    ChipLogProgress(DeviceLayer, "wpa_supplicant: Start WiFi management");
+    wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
+                                                kWpaSupplicantObjectPath, nullptr, self->_OnWpaProxyReady, nullptr);
+
+    return CHIP_NO_ERROR;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA

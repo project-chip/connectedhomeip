@@ -17,9 +17,7 @@ limitations under the License.
 
 import logging
 import os
-import pprint
 import sys
-import time
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
@@ -83,8 +81,11 @@ class TestCommissioningFailure(CHIPVirtualHome):
                    if device['type'] == 'MobileDevice']
 
         for server in server_ids:
-            self.execute_device_cmd(server, "CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex \"set pagination off\" -ex run -ex \"bt 25\" --args {} --thread --discriminator {}".format(
-                os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app"), TEST_DISCRIMINATOR))
+            self.execute_device_cmd(
+                server,
+                ("CHIPCirqueDaemon.py -- run gdb -return-child-result -q -ex \"set pagination off\" "
+                 "-ex run -ex \"bt 25\" --args {} --thread --discriminator {}").format(
+                    os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app"), TEST_DISCRIMINATOR))
 
         self.reset_thread_devices(server_ids)
 
@@ -97,7 +98,8 @@ class TestCommissioningFailure(CHIPVirtualHome):
         self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_repl-0.0-py3-none-any.whl")))
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -a {} --paa-trust-store-path {} --fail-on-report".format(
+        command = ("gdb -return-child-result -q -ex run -ex bt --args python3 "
+                   "{} -t 150 -a {} --paa-trust-store-path {} --fail-on-report").format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/commissioning_failure_test.py"),
             ethernet_ip, os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))

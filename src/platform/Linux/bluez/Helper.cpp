@@ -401,16 +401,6 @@ static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition a
     isSuccess = true;
 
 exit:
-    if (!isSuccess && (conn != nullptr))
-    {
-        // Returning G_SOURCE_REMOVE from the source callback removes the source object
-        // from the context. Unset self source ID tag, so we will not call g_source_remove()
-        // in BluezOTConnectionDestroy() on already removed source.
-        //
-        // TODO: Investigate whether there is a batter way to handle this.
-        conn->mC1Channel.mWatch = 0;
-    }
-
     return isSuccess ? G_SOURCE_CONTINUE : G_SOURCE_REMOVE;
 }
 
@@ -425,15 +415,8 @@ static void Bluez_gatt_characteristic1_complete_acquire_write_with_fd(GDBusMetho
                                                             fd_list);
 }
 
-static gboolean bluezCharacteristicDestroyFD(GIOChannel * aChannel, GIOCondition aCond, gpointer apClosure)
+static gboolean bluezCharacteristicDestroyFD(GIOChannel * aChannel, GIOCondition aCond, gpointer apEndpoint)
 {
-    BluezConnection * conn = static_cast<BluezConnection *>(apClosure);
-    // Returning G_SOURCE_REMOVE from the source callback removes the source object
-    // from the context. Unset self source ID tag, so we will not call g_source_remove()
-    // in BluezOTConnectionDestroy() on already removed source.
-    //
-    // TODO: Investigate whether there is a batter way to handle this.
-    conn->mC2Channel.mWatch = 0;
     return G_SOURCE_REMOVE;
 }
 
@@ -442,6 +425,7 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 {
     int fds[2] = { -1, -1 };
     GIOChannel * channel;
+    GSource * watchSource;
 #if CHIP_ERROR_LOGGING
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
@@ -485,10 +469,12 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
     g_io_channel_set_encoding(channel, nullptr, nullptr);
     g_io_channel_set_close_on_unref(channel, TRUE);
     g_io_channel_set_buffered(channel, FALSE);
-
     conn->mC1Channel.mpChannel = channel;
-    conn->mC1Channel.mWatch    = g_io_add_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_IN | G_IO_ERR | G_IO_NVAL),
-                                             BluezCharacteristicWriteFD, conn);
+
+    watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_IN | G_IO_ERR | G_IO_NVAL));
+    g_source_set_callback(watchSource, G_SOURCE_FUNC(BluezCharacteristicWriteFD), conn, nullptr);
+    PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
+    conn->mC1Channel.mWatchSource = watchSource;
 
     bluez_gatt_characteristic1_set_write_acquired(aChar, TRUE);
 
@@ -514,6 +500,7 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
 {
     int fds[2] = { -1, -1 };
     GIOChannel * channel;
+    GSource * watchSource;
 #if CHIP_ERROR_LOGGING
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
@@ -548,14 +535,17 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         goto exit;
     }
+
     channel = g_io_channel_unix_new(fds[0]);
     g_io_channel_set_encoding(channel, nullptr, nullptr);
     g_io_channel_set_close_on_unref(channel, TRUE);
     g_io_channel_set_buffered(channel, FALSE);
     conn->mC2Channel.mpChannel = channel;
-    conn->mC2Channel.mWatch =
-        g_io_add_watch_full(channel, G_PRIORITY_DEFAULT_IDLE, static_cast<GIOCondition>(G_IO_HUP | G_IO_ERR | G_IO_NVAL),
-                            bluezCharacteristicDestroyFD, conn, nullptr);
+
+    watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_ERR | G_IO_NVAL));
+    g_source_set_callback(watchSource, G_SOURCE_FUNC(bluezCharacteristicDestroyFD), conn, nullptr);
+    PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
+    conn->mC1Channel.mWatchSource = watchSource;
 
     bluez_gatt_characteristic1_set_notify_acquired(aChar, TRUE);
 
@@ -788,12 +778,18 @@ static void BluezOTConnectionDestroy(BluezConnection * aConn)
             g_object_unref(aConn->mpC2);
         if (aConn->mpPeerAddress)
             g_free(aConn->mpPeerAddress);
-        if (aConn->mC1Channel.mWatch > 0)
-            g_source_remove(aConn->mC1Channel.mWatch);
+        if (aConn->mC1Channel.mWatchSource)
+        {
+            g_source_destroy(aConn->mC1Channel.mWatchSource);
+            g_source_unref(aConn->mC1Channel.mWatchSource);
+        }
         if (aConn->mC1Channel.mpChannel)
             g_io_channel_unref(aConn->mC1Channel.mpChannel);
-        if (aConn->mC2Channel.mWatch > 0)
-            g_source_remove(aConn->mC2Channel.mWatch);
+        if (aConn->mC2Channel.mWatchSource)
+        {
+            g_source_destroy(aConn->mC2Channel.mWatchSource);
+            g_source_unref(aConn->mC2Channel.mWatchSource);
+        }
         if (aConn->mC2Channel.mpChannel)
             g_io_channel_unref(aConn->mC2Channel.mpChannel);
 

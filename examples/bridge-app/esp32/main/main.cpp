@@ -24,6 +24,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/reporting/reporting.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -361,6 +362,8 @@ const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_L
 
 static void InitServer(intptr_t context)
 {
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
+
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
     // Set starting endpoint id where dynamic endpoints will be assigned, which

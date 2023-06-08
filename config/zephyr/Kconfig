@@ -22,7 +22,7 @@ menuconfig CHIP
 	imply REQUIRES_FULL_LIBC
 	imply NEWLIB_LIBC_NANO
 	imply CBPRINTF_LIBC_SUBSTS
-	imply POSIX_API if !ARCH_POSIX
+	imply POSIX_API if !ARCH_POSIX && !CHIP_NRF_PLATFORM
 	imply EVENTFD if !ARCH_POSIX
 	imply REBOOT
 	imply ENTROPY_GENERATOR
@@ -30,6 +30,7 @@ menuconfig CHIP
 	imply NET_IPV6
 	imply NET_CONFIG_NEED_IPV6
 	imply NET_SOCKETS
+	imply NET_SOCKETS_POSIX_NAMES if !ARCH_POSIX && CHIP_NRF_PLATFORM
 	imply NETWORKING
 	imply HWINFO
 	imply FLASH
@@ -200,6 +201,23 @@ config CHIP_DEVICE_ENABLE_KEY
 	  must be provided in the TestEventTrigger command to trigger a requested
 	  test action. This value is used during certification tests, and should not
 	  be present on devices in production environment.
+
+config CHIP_DEVICE_PRODUCT_FINISH
+	string "Description of the product's external case finish method"
+	default "other"
+	help
+	  provides a description of the product's external case finish method.
+	  Possible values:
+	  other; matte; satin; polished; rugged; fabric
+
+config CHIP_DEVICE_PRODUCT_COLOR
+	string "Description of the product's primary color"
+	help
+	  provides a description of the product's primary color.
+	  Possible values:
+	  black; navy; green; teal; maroon; purple; olive; gray; blue; lime; 
+	  aqua; red; fuchsia; yellow; white; nickel; chrome; brass; cooper; 
+	  silver; gold.
 
 # Matter optional features and parameters
 

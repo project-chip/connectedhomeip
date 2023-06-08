@@ -37,7 +37,6 @@ static_library("BL702") {
     "../common/ConfigurationManagerImpl.cpp",
     "../common/DiagnosticDataProviderImpl.cpp",
     "../common/Logging.cpp",
-    "../common/OTAImageProcessorImpl.cpp",
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.cpp",
 
@@ -47,10 +46,20 @@ static_library("BL702") {
     "../common/FactoryDataProvider.h",
   ]
 
-  sources += common_sources
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "../common/OTAImageProcessorImpl.cpp",
+      "../common/OTAImageProcessorImpl.h",
+    ]
+  }
 
-  deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  if (chip_enable_ble) {
+    sources += [
+      "../common/BLEManagerImpl.cpp",
+      "../common/BLEManagerImpl.h",
+    ]
+  }
+  sources += common_sources
 
   if (chip_enable_openthread) {
     # needed for MTD/FTD
@@ -61,8 +70,17 @@ static_library("BL702") {
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
-      "../../OpenThread/DnssdImpl.cpp",
       "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
     ]
+
+    if (chip_mdns == "platform") {
+      sources += [
+        "../../OpenThread/DnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.h",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
   }
 }

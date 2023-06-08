@@ -57,9 +57,9 @@ public:
     /**
      *  @brief Mark the end of this DataVersionFilterIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    DataVersionFilterIBs::Builder & EndOfDataVersionFilterIBs();
+    CHIP_ERROR EndOfDataVersionFilterIBs();
 
 private:
     DataVersionFilterIB::Builder mDataVersionFilter;

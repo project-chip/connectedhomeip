@@ -8,7 +8,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_clusters}}
 {{#zcl_commands}}
 {{#*inline "completeDecl"}}
-{{#unless (wasRemoved cluster command=command)}}
+{{#if (isSupported cluster command=command isForCommandPayload=true)}}
 
 {{availability cluster command=command isForCommandPayload=true deprecationMessage="This command has been removed"}}
 @interface MTR{{cluster}}Cluster{{command}}Params : NSObject <NSCopying>
@@ -68,8 +68,23 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs {{availability "" api="Timed Invoke for server to client commands" deprecationMessage="Timed invoke does not make sense for server to client commands"}};
 {{/if}}
+{{#if (isStrEqual source "server")}}
+
+/**
+ * Initialize an MTR{{cluster}}Cluster{{command}}Params with a response-value dictionary
+ * of the sort that MTRDeviceResponseHandler would receive.
+ *
+ * Will return nil and hand out an error if the response-value dictionary is not
+ * a command data response or is not the right command response.
+ *
+ * Will return nil and hand out an error if the data response does not match the known
+ * schema for this command.
+ */
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+{{/if}}
 @end
-{{/unless}}
+{{/if}}
 {{/inline}}
 {{#*inline "oldNameDecl"}}
 
@@ -78,7 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 {{/inline}}
-{{#if (not (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true)))}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
 {{> completeDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                  command=(asUpperCamelCase name preserveAcronyms=true)
                  includeRenamedProperties=false}}

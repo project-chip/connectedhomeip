@@ -204,7 +204,6 @@ struct ResolveContext : public GenericContext
     void DispatchSuccess() override;
 
     CHIP_ERROR OnNewAddress(uint32_t interfaceId, const struct sockaddr * address);
-    CHIP_ERROR OnNewLocalOnlyAddress();
     bool HasAddress();
 
     void OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen,

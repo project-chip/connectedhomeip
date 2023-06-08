@@ -21,7 +21,7 @@
 #include "rsi_board.h"
 #include "rsi_pll.h"
 #include "rsi_rom_clks.h"
-#include "siwx917_utils.h"
+#include "silabs_utils.h"
 #include "system_RS1xxxx.h"
 
 #define SOC_PLL_REF_FREQUENCY 32000000 /* PLL input REFERENCE clock 32MHZ */

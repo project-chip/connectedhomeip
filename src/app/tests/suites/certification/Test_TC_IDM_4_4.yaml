@@ -34,7 +34,6 @@ tests:
           Here the command to enter interactive mode:--   ./chip-tool interactive start
 
 
-           ./chip-tool interactive start
           onoff subscribe on-time 10 100 1 1 --auto-resubscribe true
           Verify on the TH(chip-tool) that the Report data messages are sent from the DUT(Reference app) for subscription request action to the TH(chip-tool) with the correct attribute values.
 

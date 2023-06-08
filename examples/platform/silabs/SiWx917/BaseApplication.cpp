@@ -25,9 +25,7 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
@@ -36,10 +34,10 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include "SiWx917DeviceDataProvider.h"
+#include "SilabsDeviceDataProvider.h"
 #include "rsi_board.h"
 #include "rsi_chip.h"
-#include "siwx917_utils.h"
+#include "silabs_utils.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -48,6 +46,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
@@ -68,12 +68,12 @@
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
-#ifdef ENABLE_WSTK_LEDS
 #define APP_STATE_LED 0
-#endif // ENABLE_WSTK_LEDS
 
 using namespace chip;
+using namespace chip::app;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 
@@ -87,9 +87,7 @@ TimerHandle_t sLightTimer;
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-#ifdef ENABLE_WSTK_LEDS
 LEDWidget sStatusLED;
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef SL_WIFI
 app::Clusters::NetworkCommissioning::Instance
@@ -105,8 +103,6 @@ bool sHaveBLEConnections = false;
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
-EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 StaticQueue_t sAppEventQueueStruct;
 
@@ -116,12 +112,22 @@ StaticTask_t appTaskStruct;
 BaseApplication::Function_t mFunction;
 bool mFunctionTimerActive;
 
-Identify * gIdentifyptr = nullptr;
-
 #ifdef DISPLAY_ENABLED
 SilabsLCD slLCD;
 #endif
 
+#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+
+Identify gIdentify = {
+    chip::EndpointId{ 1 },
+    BaseApplication::OnIdentifyStart,
+    BaseApplication::OnIdentifyStop,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
+    BaseApplication::OnTriggerIdentifyEffect,
+};
+
+#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
 } // namespace
 
 /**********************************************************
@@ -148,17 +154,9 @@ CHIP_ERROR BaseApplication::StartAppTask(TaskFunction_t taskFunction)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
+CHIP_ERROR BaseApplication::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (identifyObj == nullptr)
-    {
-        SILABS_LOG("Invalid Identify Object!");
-        appError(CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    gIdentifyptr = identifyObj;
 
 #ifdef SL_WIFI
     /*
@@ -172,7 +170,10 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
     SILABS_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
 
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     sWiFiNetworkCommissioningInstance.Init();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
 #endif
 
     // Create FreeRTOS sw timer for Function Selection.
@@ -204,9 +205,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
     SILABS_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     SILABS_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
-#ifdef ENABLE_WSTK_LEDS
     sStatusLED.Init(APP_STATE_LED);
-#endif // ENABLE_WSTK_LEDS
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -214,7 +213,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
     char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan QRCode(qrCodeBuffer);
 
-    if (SIWx917::SIWx917DeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
+    if (Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
     {
         // Print setup info on LCD if available
 #ifdef QR_CODE_ENABLED
@@ -265,6 +264,87 @@ void BaseApplication::FunctionFactoryReset(void)
     chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
+bool BaseApplication::ActivateStatusLedPatterns()
+{
+    bool isPatternSet = false;
+#if defined(ENABLE_WSTK_LEDS) && defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+    if (gIdentify.mActive)
+    {
+        // Identify in progress
+        // Do a steady blink on the status led
+        sStatusLED.Blink(250, 250);
+        isPatternSet = true;
+    }
+    else if (sIdentifyEffect != Clusters::Identify::EffectIdentifierEnum::kStopEffect)
+    {
+        // Identify trigger effect received. Do some on/off patterns on the status led
+        if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kBlink)
+        {
+            // Fast blink
+            sStatusLED.Blink(50, 50);
+        }
+        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kBreathe)
+        {
+            // Slow blink
+            sStatusLED.Blink(1000, 1000);
+        }
+        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kOkay)
+        {
+            // Pulse effect
+            sStatusLED.Blink(300, 700);
+        }
+        else if (sIdentifyEffect == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
+        {
+            // Alternate between Short and Long pulses effect
+            static uint64_t mLastChangeTimeMS = 0;
+            static bool alternatePattern      = false;
+            uint32_t onTimeMS                 = alternatePattern ? 50 : 700;
+            uint32_t offTimeMS                = alternatePattern ? 950 : 300;
+
+            uint64_t nowMS = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+            if (nowMS >= mLastChangeTimeMS + 1000) // each pattern is done over a 1 second period
+            {
+                mLastChangeTimeMS = nowMS;
+                alternatePattern  = !alternatePattern;
+                sStatusLED.Blink(onTimeMS, offTimeMS);
+            }
+        }
+        isPatternSet = true;
+    }
+#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
+
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+    // Identify Patterns have priority over Status patterns
+    if (!isPatternSet)
+    {
+        // Apply different status feedbacks
+        if (sIsProvisioned && sIsEnabled)
+        {
+            if (sIsAttached)
+            {
+                sStatusLED.Set(true);
+            }
+            else
+            {
+                sStatusLED.Blink(950, 50);
+            }
+        }
+        else if (sHaveBLEConnections)
+        {
+            sStatusLED.Blink(100, 100);
+        }
+        else
+        {
+            sStatusLED.Blink(50, 950);
+        }
+        isPatternSet = true;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+#endif // ENABLE_WSTK_LEDS) && SL_CATALOG_SIMPLE_LED_LED1_PRESENT
+    return isPatternSet;
+}
+
 void BaseApplication::LightEventHandler()
 {
     // Collect connectivity and configuration state from the CHIP stack. Because
@@ -302,53 +382,11 @@ void BaseApplication::LightEventHandler()
     // the LEDs at an even rate of 100ms.
     //
     // Otherwise, blink the LED ON for a very short time.
-#ifdef ENABLE_WSTK_LEDS
     if (mFunction != kFunction_FactoryReset)
     {
-        if ((gIdentifyptr != nullptr) && (gIdentifyptr->mActive))
-        {
-            sStatusLED.Blink(250, 250);
-        }
-        else if (sIdentifyEffect != EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)
-        {
-            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)
-            {
-                sStatusLED.Blink(50, 50);
-            }
-            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)
-            {
-                sStatusLED.Blink(1000, 1000);
-            }
-            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)
-            {
-                sStatusLED.Blink(300, 700);
-            }
-        }
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
-        else if (sIsProvisioned && sIsEnabled)
-        {
-            if (sIsAttached)
-            {
-                sStatusLED.Set(true);
-            }
-            else
-            {
-                sStatusLED.Blink(950, 50);
-            }
-        }
-        else if (sHaveBLEConnections)
-        {
-            sStatusLED.Blink(100, 100);
-        }
-        else
-        {
-            sStatusLED.Blink(50, 950);
-        }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+        ActivateStatusLedPatterns();
     }
-
     sStatusLED.Animate();
-#endif // ENABLE_WSTK_LEDS
 }
 
 void BaseApplication::ButtonHandler(AppEvent * aEvent)
@@ -362,7 +400,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
     // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
     // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
+    if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         if ((!mFunctionTimerActive) && (mFunction == kFunction_NoneSelected))
         {
@@ -382,13 +420,10 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             break;
         }
 
-#ifdef ENABLE_WSTK_LEDS
         // Turn off status LED before starting blink to make sure blink is
         // co-ordinated.
         sStatusLED.Set(false);
         sStatusLED.Blink(500);
-#endif // ENABLE_WSTK_LEDS
-
         SILABS_LOG("Factory reset triggering in %d sec release button to cancel", count--);
 
         // Delay of 1sec before checking the button status again
@@ -397,9 +432,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
 
     if (count > 0)
     {
-#ifdef ENABLE_WSTK_LEDS
         sStatusLED.Set(false);
-#endif
         SILABS_LOG("Factory Reset has been Canceled"); // button held past Timeout wait till button is released
     }
 
@@ -467,9 +500,7 @@ void BaseApplication::StartStatusLEDTimer()
 
 void BaseApplication::StopStatusLEDTimer()
 {
-#ifdef ENABLE_WSTK_LEDS
     sStatusLED.Set(false);
-#endif // ENABLE_WSTK_LEDS
 
     if (xTimerStop(sLightTimer, pdMS_TO_TICKS(100)) != pdPASS)
     {
@@ -477,6 +508,75 @@ void BaseApplication::StopStatusLEDTimer()
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
+
+#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+void BaseApplication::OnIdentifyStart(Identify * identify)
+{
+    ChipLogProgress(Zcl, "onIdentifyStart");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    StartStatusLEDTimer();
+#endif
+}
+
+void BaseApplication::OnIdentifyStop(Identify * identify)
+{
+    ChipLogProgress(Zcl, "onIdentifyStop");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    StopStatusLEDTimer();
+#endif
+}
+
+void BaseApplication::OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
+{
+    ChipLogProgress(Zcl, "Trigger Identify Complete");
+    sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    StopStatusLEDTimer();
+#endif
+}
+
+void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
+{
+    sIdentifyEffect = identify->mCurrentEffectIdentifier;
+
+    if (identify->mEffectVariant != Clusters::Identify::EffectVariantEnum::kDefault)
+    {
+        ChipLogDetail(AppServer, "Identify Effect Variant unsupported. Using default");
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    StartStatusLEDTimer();
+#endif
+
+    switch (sIdentifyEffect)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
+                                                           identify);
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(10), OnTriggerIdentifyEffectCompleted,
+                                                           identify);
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
+        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
+                                                           identify);
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
+        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
+        break;
+    default:
+        sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
+        ChipLogProgress(Zcl, "No identifier effect");
+    }
+}
+#endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
 
 void BaseApplication::LightTimerEventHandler(TimerHandle_t xTimer)
 {

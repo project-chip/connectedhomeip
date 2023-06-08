@@ -227,9 +227,9 @@ public:
     /**
      *  @brief Mark the end of this AttributePathIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    AttributePathIB::Builder & EndOfAttributePathIB();
+    CHIP_ERROR EndOfAttributePathIB();
 
     CHIP_ERROR Encode(const AttributePathParams & aAttributePathParams);
     CHIP_ERROR Encode(const ConcreteDataAttributePath & aAttributePathParams);

@@ -24,13 +24,18 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+    # XXX: Workaround for https://github.com/actions/cache/issues/1141
+    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
+
 jobs:
     cirque:
         name: Cirque
         timeout-minutes: 90
 
         env:
-            DOCKER_RUN_VERSION: 0.7.0
+            DOCKER_RUN_VERSION: 0.7.3
             GITHUB_CACHE_PATH: /tmp/cirque-cache
 
         runs-on: ubuntu-latest
@@ -39,7 +44,7 @@ jobs:
         # need to run with privilege, which isn't supported by job.XXX.contaner
         #  https://github.com/actions/container-action/issues/2
         #         container:
-        #             image: connectedhomeip/chip-build-cirque:0.7.0
+        #             image: connectedhomeip/chip-build-cirque:0.7.3
         #             volumes:
         #                 - "/tmp:/tmp"
         #                 - "/dev/pts:/dev/pts"
@@ -75,7 +80,7 @@ jobs:
                   integrations/docker/images/chip-build-cirque/run.sh \
                     -- sh -c " \
                        git config --global --add safe.directory '*' \
-                       && scripts/build/gn_bootstrap.sh \
+                       && bash scripts/bootstrap.sh \
                        && chown -R $(id -u):$(id -g) .environment \
                     "
 

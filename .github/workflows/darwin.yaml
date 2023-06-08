@@ -24,6 +24,11 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+    # XXX: Workaround for https://github.com/actions/cache/issues/1141
+    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
+
 jobs:
     darwin:
         name: Build Darwin
@@ -56,7 +61,7 @@ jobs:
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
-              run: scripts/build/gn_bootstrap.sh
+              run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
@@ -131,7 +136,7 @@ jobs:
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
             - name: Run Framework Tests
-              timeout-minutes: 20
+              timeout-minutes: 30
               # For now disable unguarded-availability-new warnings because we
               # internally use APIs that we are annotating as only available on
               # new enough versions.  Maybe we should change out deployment
@@ -139,13 +144,18 @@ jobs:
               run: |
                   mkdir -p /tmp/darwin/framework-tests
                   ../../../out/debug/chip-all-clusters-app --interface-id -1 > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
-                  # Make each ota-requestor is using a different port, discriminator, and KVS from
+                  # Make sure each ota-requestor is using a different port, discriminator, and KVS from
                   # all-clusters-app and from other requestors.
                   #
                   # And a different port from the test harness too; the test harness uses port 5541.
                   ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5542 --discriminator 1111 --KVS /tmp/chip-ota-requestor-kvs1 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image1 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-1.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-1.log >&2) &
                   ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5543 --discriminator 1112 --KVS /tmp/chip-ota-requestor-kvs2 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image2 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-2.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-2.log >&2) &
-                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-incomplete-umbrella -Wno-unguarded-availability-new' > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
+                  # -enableUndefinedBehaviorSanitizer instruments the code in Matter.framework,
+                  # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_UBSAN=YES
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-incomplete-umbrella -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES > >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
+                  # -enableThreadSanitizer instruments the code in Matter.framework,
+                  # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_TSAN=YES
+                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-incomplete-umbrella -Wno-unguarded-availability-new' CHIP_IS_TSAN=YES > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
               working-directory: src/darwin/Framework
             - name: Uploading log files
               uses: actions/upload-artifact@v3

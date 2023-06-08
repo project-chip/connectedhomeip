@@ -23,8 +23,6 @@
  *          for Linux platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <ifaddrs.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
@@ -108,14 +106,14 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))
     {
-        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
         err               = WriteConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, location);
         SuccessOrExit(err);
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_LocationCapability))
     {
-        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor);
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor);
         err               = WriteConfigValue(PosixConfig::kConfigKey_LocationCapability, location);
         SuccessOrExit(err);
     }

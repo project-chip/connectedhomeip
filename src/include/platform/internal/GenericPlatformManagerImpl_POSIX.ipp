@@ -46,12 +46,14 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
 namespace {
 System::LayerSocketsLoop & SystemLayerSocketsLoop()
 {
     return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
 }
 } // anonymous namespace
+#endif
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
@@ -59,11 +61,16 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+
+    mShouldRunEventLoop.store(true, std::memory_order_relaxed);
+
     int ret = pthread_cond_init(&mEventQueueStoppedCond, nullptr);
     VerifyOrReturnError(ret == 0, CHIP_ERROR_POSIX(ret));
 
     ret = pthread_mutex_init(&mStateLock, nullptr);
     VerifyOrReturnError(ret == 0, CHIP_ERROR_POSIX(ret));
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -128,14 +135,43 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(System::
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+template <class ImplClass>
+void GenericPlatformManagerImpl_POSIX<ImplClass>::_DispatchEventViaScheduleWork(System::Layer * aLayer, void * appState)
+{
+    auto * event = static_cast<const ChipDeviceEvent *>(appState);
+    PlatformMgrImpl().DispatchEvent(event);
+    delete event;
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
+
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+    // Note: PostEvent() is documented to allow being called "from any thread".
+    //   In the libev mainloop case however, calling from another thread is NOT supported.
+    //   Introducing this restriction is OK because the very goal of using libev is to avoid
+    //   multiple threads by running matter and all application code in the same thread on the
+    //   libev mainloop. So getting called from another thread here is very likely a
+    //   application design error.
+    VerifyOrDieWithMsg(_IsChipStackLockedByCurrentThread(), DeviceLayer, "PostEvent() not allowed from outside chip stack lock");
+
+    // Schedule dispatching this event via System Layer's ScheduleWork
+    ChipDeviceEvent * eventCopyP = new ChipDeviceEvent;
+    VerifyOrDie(eventCopyP != nullptr);
+    *eventCopyP = *event;
+    SystemLayer().ScheduleWork(&_DispatchEventViaScheduleWork, eventCopyP);
+    return CHIP_NO_ERROR;
+#else
     mChipEventQueue.Push(*event);
 
     SystemLayerSocketsLoop().Signal(); // Trigger wake select on CHIP thread
     return CHIP_NO_ERROR;
+#endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
+
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::ProcessDeviceEvents()
@@ -150,6 +186,12 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::ProcessDeviceEvents()
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 {
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+
+    VerifyOrDieWithMsg(false, DeviceLayer, "libev based app should never try to run a separate event loop");
+
+#else
+
     pthread_mutex_lock(&mStateLock);
 
     //
@@ -161,6 +203,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     {
         mChipTask = pthread_self();
         mState.store(State::kRunning, std::memory_order_relaxed);
+        mShouldRunEventLoop.store(true, std::memory_order_relaxed);
     }
 
     pthread_mutex_unlock(&mStateLock);
@@ -200,6 +243,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     // Shutdown() method.
     //
     mState.store(State::kStopped, std::memory_order_relaxed);
+#endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
 
 template <class ImplClass>
@@ -210,9 +254,22 @@ void * GenericPlatformManagerImpl_POSIX<ImplClass>::EventLoopTaskMain(void * arg
     return nullptr;
 }
 
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
+
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
 {
+
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+    // Note: With libev, we dont need our own mainloop.
+    //   Still, we set State::kRunning to activate lock checking, because
+    //   calls to ScheduleWork and some System Layer methods may not
+    //   occur from other threads (which usually don't exist in a
+    //   libev app)
+    mState.store(State::kRunning, std::memory_order_relaxed);
+    return CHIP_NO_ERROR;
+#else
+
     int err;
     err = pthread_attr_init(&mChipTaskAttr);
     VerifyOrReturnError(err == 0, CHIP_ERROR_POSIX(err));
@@ -224,6 +281,8 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
     err = pthread_attr_setschedpolicy(&mChipTaskAttr, SCHED_RR);
     VerifyOrReturnError(err == 0, CHIP_ERROR_POSIX(err));
 #endif
+
+    mShouldRunEventLoop.store(true, std::memory_order_relaxed);
 
     //
     // We need to grab the lock here since we have to protect setting
@@ -242,11 +301,30 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
     pthread_mutex_unlock(&mStateLock);
 
     return CHIP_ERROR_POSIX(err);
+#endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
+
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+// fallback implementation
+void __attribute__((weak)) ExitExternalMainLoop()
+{
+    // FIXME: implement better exit
+    VerifyOrDieWithMsg(false, DeviceLayer, "Missing custom ExitExternalMainLoop() implementation for clean shutdown -> just die");
+}
+#endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
 {
+
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+    // with libev, the mainloop is set up and managed externally
+    mState.store(State::kStopping, std::memory_order_relaxed);
+    ExitExternalMainLoop(); // this callback needs to be implemented.
+    mState.store(State::kStopped, std::memory_order_relaxed);
+    return CHIP_NO_ERROR;
+#else
+
     int err = 0;
 
     //
@@ -299,6 +377,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
 
 exit:
     return CHIP_ERROR_POSIX(err);
+#endif // CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
 
 template <class ImplClass>
@@ -311,8 +390,10 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
     //
     VerifyOrDie(mState.load(std::memory_order_relaxed) == State::kStopped);
 
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
     pthread_mutex_destroy(&mStateLock);
     pthread_cond_destroy(&mEventQueueStoppedCond);
+#endif
 
     //
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization

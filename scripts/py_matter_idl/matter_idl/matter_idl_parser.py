@@ -2,30 +2,67 @@
 
 import functools
 import logging
+from typing import Optional
 
 from lark import Lark
+from lark.lexer import Token
 from lark.visitors import Transformer, v_args
 
 try:
-    from .matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                   AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
-                                   DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                   ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
-except ImportError:
+    from matter_idl.matter_idl_types import AccessPrivilege
+except ModuleNotFoundError:
     import os
     import sys
-    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+    sys.path.append(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))))
 
-    from matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                  AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
-                                  DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                  ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
+    from matter_idl.matter_idl_types import AccessPrivilege
+
+from matter_idl.matter_idl_types import (Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality, AttributeStorage,
+                                         Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType,
+                                         Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
+                                         ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
 
 
 def UnionOfAllFlags(flags_list):
     if not flags_list:
         return None
     return functools.reduce(lambda a, b: a | b, flags_list)
+
+
+class PrefixCppDocComment:
+    def __init__(self, token):
+        self.start_pos = token.start_pos
+        # Assume CPP comments: /**...*/
+        self.value_len = len(token.value)  # includes /***/ AND whitespace
+        self.value = token.value[3:-2].strip()
+
+    def appply_to_idl(self, idl: Idl, content: str):
+        if self.start_pos is None:
+            return
+
+        actual_pos = self.start_pos + self.value_len
+        while content[actual_pos] in ' \t\n\r':
+            actual_pos += 1
+
+        # A doc comment will apply to any supported element assuming it immediately
+        # preceeds id (skipping whitespace)
+        for item in self.supported_types(idl):
+            meta = item.parse_meta
+            if meta and meta.start_pos == actual_pos:
+                item.description = self.value
+                return
+
+    def supported_types(self, idl: Idl):
+        """List all types supported by doc comments."""
+        for cluster in idl.clusters:
+            yield cluster
+
+            for command in cluster.commands:
+                yield command
+
+    def __repr__(self):
+        return ("PREFIXDoc: %r at %r" % (self.value, self.start_pos))
 
 
 class AddServerClusterToEndpointTransform:
@@ -86,11 +123,13 @@ class MatterIdlTransformer(Transformer):
       parsed input (as strings unless transformed) and interpret them.
 
       Actual parametes to the methods depend on the rules multiplicity and/or
-      optionality.
+      optionally.
     """
 
     def __init__(self, skip_meta):
         self.skip_meta = skip_meta
+        self.doc_comments = []
+        self._cluster_start_pos = None
 
     def positive_integer(self, tokens):
         """Numbers in the grammar are integers or hex numbers.
@@ -218,10 +257,14 @@ class MatterIdlTransformer(Transformer):
         field.qualities = UnionOfAllFlags(args[:-1]) or FieldQuality.NONE
         return field
 
-    def server_cluster(self, _):
+    @v_args(meta=True)
+    def server_cluster(self, meta, unused_args):
+        self._cluster_start_pos = meta and meta.start_pos
         return ClusterSide.SERVER
 
-    def client_cluster(self, _):
+    @v_args(meta=True, inline=True)
+    def client_cluster(self, meta, *unused_args):
+        self._cluster_start_pos = meta and meta.start_pos
         return ClusterSide.CLIENT
 
     def command_access(self, privilege):
@@ -239,17 +282,26 @@ class MatterIdlTransformer(Transformer):
 
         return init_args
 
-    def command(self, args):
+    # NOTE: awkward inline because the order of 'meta, children' vs 'children, meta' was flipped
+    #       between lark versions in https://github.com/lark-parser/lark/pull/993
+    @v_args(meta=True, inline=True)
+    def command(self, meta, *args):
         # The command takes 4 arguments if no input argument, 5 if input
         # argument is provided
+        args = list(args)  # convert from tuple
         if len(args) != 5:
             args.insert(2, None)
 
-        return Command(
+        meta = None if self.skip_meta else ParseMetaData(meta)
+
+        cmd = Command(
+            parse_meta=meta,
             qualities=args[0],
             input_param=args[2], output_param=args[3], code=args[4],
-            **args[1]
+            **args[1],
         )
+
+        return cmd
 
     def event_access(self, privilege):
         return privilege[0]
@@ -397,6 +449,10 @@ class MatterIdlTransformer(Transformer):
     def cluster(self, meta, side, name, code, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
 
+        # shift actual starting position where the doc comment would start
+        if meta and self._cluster_start_pos:
+            meta.start_pos = self._cluster_start_pos
+
         result = Cluster(parse_meta=meta, side=side, name=name, code=code)
 
         for item in content:
@@ -434,16 +490,41 @@ class MatterIdlTransformer(Transformer):
 
         return idl
 
+    def prefix_doc_comment(self):
+        print("TODO: prefix")
+
+    # Processing of (potential-doc)-comments:
+    def c_comment(self, token: Token):
+        """Processes comments starting with "/*" """
+        if token.value.startswith("/**"):
+            self.doc_comments.append(PrefixCppDocComment(token))
+
 
 class ParserWithLines:
-    def __init__(self, parser, skip_meta: bool):
-        self.parser = parser
-        self.skip_meta = skip_meta
+    def __init__(self, skip_meta: bool):
+        self.transformer = MatterIdlTransformer(skip_meta)
 
-    def parse(self, file, file_name: str = None):
-        idl = MatterIdlTransformer(self.skip_meta).transform(
-            self.parser.parse(file))
+        # NOTE: LALR parser is fast. While Earley could parse more ambigous grammars,
+        #       earley is much slower:
+        #    - 0.39s LALR parsing of all-clusters-app.matter
+        #    - 2.26s Earley parsing of the same thing.
+        # For this reason, every attempt should be made to make the grammar context free
+        self.parser = Lark.open(
+            'matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True,
+            # separate callbacks to ignore from regular parsing (no tokens)
+            # while still getting notified about them
+            lexer_callbacks={
+                'C_COMMENT': self.transformer.c_comment,
+            }
+        )
+
+    def parse(self, file: str, file_name: Optional[str] = None):
+        idl = self.transformer.transform(self.parser.parse(file))
         idl.parse_file_name = file_name
+
+        for comment in self.transformer.doc_comments:
+            comment.appply_to_idl(idl, file)
+
         return idl
 
 
@@ -451,14 +532,7 @@ def CreateParser(skip_meta: bool = False):
     """
     Generates a parser that will process a ".matter" file into a IDL
     """
-
-    # NOTE: LALR parser is fast. While Earley could parse more ambigous grammars,
-    #       earley is much slower:
-    #    - 0.39s LALR parsing of all-clusters-app.matter
-    #    - 2.26s Earley parsing of the same thing.
-    # For this reason, every attempt should be made to make the grammar context free
-    return ParserWithLines(Lark.open(
-        'matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True), skip_meta)
+    return ParserWithLines(skip_meta)
 
 
 if __name__ == '__main__':
@@ -467,7 +541,6 @@ if __name__ == '__main__':
     import pprint
 
     import click
-    import coloredlogs
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -482,12 +555,14 @@ if __name__ == '__main__':
     @click.option(
         '--log-level',
         default='INFO',
-        type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+        type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
         help='Determines the verbosity of script output.')
     @click.argument('filename')
     def main(log_level, filename=None):
-        coloredlogs.install(level=__LOG_LEVELS__[
-                            log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+        logging.basicConfig(
+            level=__LOG_LEVELS__[log_level],
+            format='%(asctime)s %(levelname)-7s %(message)s',
+        )
 
         logging.info("Starting to parse ...")
         data = CreateParser().parse(open(filename).read(), file_name=filename)

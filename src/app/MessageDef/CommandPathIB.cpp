@@ -144,10 +144,10 @@ CommandPathIB::Builder & CommandPathIB::Builder::CommandId(const chip::CommandId
     return *this;
 }
 
-CommandPathIB::Builder & CommandPathIB::Builder::EndOfCommandPathIB()
+CHIP_ERROR CommandPathIB::Builder::EndOfCommandPathIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 CHIP_ERROR CommandPathIB::Builder::Encode(const CommandPathParams & aCommandPathParams)
@@ -157,17 +157,15 @@ CHIP_ERROR CommandPathIB::Builder::Encode(const CommandPathParams & aCommandPath
         EndpointId(aCommandPathParams.mEndpointId);
     }
 
-    ClusterId(aCommandPathParams.mClusterId).CommandId(aCommandPathParams.mCommandId).EndOfCommandPathIB();
-    return GetError();
+    return ClusterId(aCommandPathParams.mClusterId).CommandId(aCommandPathParams.mCommandId).EndOfCommandPathIB();
 }
 
 CHIP_ERROR CommandPathIB::Builder::Encode(const ConcreteCommandPath & aConcreteCommandPath)
 {
-    EndpointId(aConcreteCommandPath.mEndpointId)
+    return EndpointId(aConcreteCommandPath.mEndpointId)
         .ClusterId(aConcreteCommandPath.mClusterId)
         .CommandId(aConcreteCommandPath.mCommandId)
         .EndOfCommandPathIB();
-    return GetError();
 }
 
 }; // namespace app

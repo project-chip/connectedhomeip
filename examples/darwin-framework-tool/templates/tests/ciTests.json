@@ -1,7 +1,7 @@
 {
     "include": "../../../../src/app/tests/suites/ciTests.json",
     "disable": [
-        "TestClientMonitoringCluster",
+        "TestIcdManagementCluster",
         "Test_TC_SC_4_2",
         "Test_TC_SC_5_2",
         "TestClusterComplexTypes",
@@ -31,6 +31,7 @@
         "Test_TC_ACL_2_8",
         "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10",
-        "DL_LockUnlock"
+        "DL_LockUnlock",
+        "Test_TC_TIMESYNC_1_1"
     ]
 }

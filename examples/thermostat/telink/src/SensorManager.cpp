@@ -18,7 +18,6 @@
 
 #include "SensorManager.h"
 #include "AppConfig.h"
-#include "AppEvent.h"
 #include "AppTask.h"
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -63,7 +62,7 @@ void SensorManager::SensorTimerEventHandler(AppEvent * aEvent)
 
     static uint8_t nbOfRepetition = 0;
     static uint8_t simulatedIndex = 0;
-    if (simulatedIndex >= sizeof(mSimulatedTemp))
+    if (simulatedIndex >= ArraySize(mSimulatedTemp))
     {
         simulatedIndex = 0;
     }

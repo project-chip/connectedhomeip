@@ -449,7 +449,6 @@ static void TestConfigurationMgr_GetProductId(nlTestSuite * inSuite, void * inCo
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = {
-
     NL_TEST_DEF("Test PlatformMgr::Init", TestPlatformMgr_Init),
 #if !defined(NDEBUG)
     NL_TEST_DEF("Test PlatformMgr::RunUnitTest", TestPlatformMgr_RunUnitTest),
@@ -466,8 +465,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::GetVendorId", TestConfigurationMgr_GetVendorId),
     NL_TEST_DEF("Test ConfigurationMgr::GetProductName", TestConfigurationMgr_GetProductName),
     NL_TEST_DEF("Test ConfigurationMgr::GetProductId", TestConfigurationMgr_GetProductId),
-    NL_TEST_SENTINEL()
-}; // namespace
+    NL_TEST_SENTINEL(),
+};
 
 /**
  *  Set up the test suite.
@@ -499,7 +498,7 @@ int TestConfigurationMgr()
 {
     nlTestSuite theSuite = { "ConfigurationMgr tests", &sTests[0], TestConfigurationMgr_Setup, TestConfigurationMgr_Teardown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

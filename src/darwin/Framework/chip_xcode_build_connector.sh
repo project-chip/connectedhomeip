@@ -58,6 +58,9 @@ for define in "${defines[@]}"; do
     esac
     target_defines+=,\"${define//\"/\\\"}\"
 done
+[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
+    target_defines+=,\"CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES=1\"
+}
 target_defines=[${target_defines:1}]
 
 declare target_arch=
@@ -95,6 +98,7 @@ declare -a args=(
     'chip_enable_wifi=false'
     'chip_log_message_max_size=4096' # might as well allow nice long log messages
     'chip_disable_platform_kvs=true'
+    'enable_fuzz_test_targets=false'
     "target_cpu=\"$target_cpu\""
     "target_defines=$target_defines"
     "target_cflags=[$target_cflags]"
@@ -120,6 +124,45 @@ declare -a args=(
 [[ $CHIP_INET_CONFIG_ENABLE_IPV4 == NO ]] && {
     args+=(
         'chip_inet_config_enable_ipv4=false'
+    )
+}
+
+[[ $CHIP_IS_ASAN == YES ]] && {
+    args+=(
+        'is_asan=true'
+    )
+}
+
+[[ $CHIP_IS_UBSAN == YES ]] && {
+    args+=(
+        'is_ubsan=true'
+    )
+}
+
+[[ $CHIP_IS_TSAN == YES ]] && {
+    args+=(
+        'is_tsan=true'
+        # The system stats stuff races on the stats in various ways,
+        # so just disable it when using TSan.
+        'chip_system_config_provide_statistics=false'
+    )
+}
+
+[[ $CHIP_IS_CLANG == YES ]] && {
+    args+=(
+        'is_clang=true'
+    )
+}
+
+[[ $CHIP_IS_BLE == NO ]] && {
+    args+=(
+        'chip_config_network_layer_ble=false'
+    )
+}
+
+[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
+    args+=(
+        'enable_encoding_sentinel_enum_values=true'
     )
 }
 

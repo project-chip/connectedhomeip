@@ -38,6 +38,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -53,7 +54,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_CONNECTION_ABORTED,
     CHIP_ERROR_INCORRECT_STATE,
     CHIP_ERROR_MESSAGE_TOO_LONG,
-    CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION,
+    CHIP_ERROR_RECURSION_DEPTH_LIMIT,
     CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS,
     CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER,
     CHIP_ERROR_NO_CONNECTION_HANDLER,
@@ -199,7 +200,7 @@ static void CheckCoreErrorStr(nlTestSuite * inSuite, void * inContext)
 #if CHIP_CONFIG_ERROR_SOURCE
         // GetFile() should be relative to ${chip_root}
         char const * const file = err.GetFile();
-        NL_TEST_ASSERT(inSuite, file != nullptr);
+        NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, file != nullptr);
         NL_TEST_ASSERT(inSuite, strstr(file, "src/lib/core/") == file);
 #endif // CHIP_CONFIG_ERROR_SOURCE
     }

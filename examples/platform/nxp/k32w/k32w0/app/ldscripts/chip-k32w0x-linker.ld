@@ -31,6 +31,61 @@
  *   GCC linker script for K32W061/K32W041.
  */
 
+/******************* Map of K32W0 internal flash ***********************************
+
+             0x000A_0000
+    - - - +---------------+ - - - - - - - -
+          |               |
+    8.5K  | Flash config  |
+          |   RESERVED    | 0x0009_DE00
+    - - - +---------------+ - - - - - - - -
+          |               |
+     2K   | Factory data  |
+          |               | 0x0009_D600
+    - - - +---------------+ - - - - - - - -
+          |               |
+     1K   | App metadata  |
+          |               | 0x0009_D200
+    - - - +---------------+ - - - - - - - -
+          |               |
+   612.5K |  Application  |
+          |               | 0x0000_4000
+    - - - +---------------+ - - - - - - - -
+          |               |
+     8K   |  SSBL update  |
+          |               | 0x0000_2000
+    - - - +---------------+ - - - - - - - -
+          |               |
+     8K   |     SSBL      |
+          |               | 0x0000_0000
+    - - - +---------------+ - - - - - - - -
+             0x0000_0000
+
+* - If OTA is disabled, SSBL and SSBL updated region are not present.
+  - The only address range that changes is the application, which will span from
+    0x0000_0000 to 0x0009_D200, having 628.5K max size.
+ *****************************************************************************/
+
+/******************* Map of DK6 external flash ***********************************
+
+             0x0010_0000
+    - - - +---------------+ - - - - - - - -
+          |               |
+    252K  |   PDM area    |
+          |               | 0x000C_1000
+    - - - +---------------+ - - - - - - - -
+          |               |
+     4K   |   OTA entry   |
+          |               | 0x000C_0000
+    - - - +---------------+ - - - - - - - -
+          |               |
+    768K  |   OTA area    |
+          |               |
+    - - - +---------------+ - - - - - - - -
+             0x0000_0000
+
+ *****************************************************************************/
+
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 
 /*
@@ -81,10 +136,11 @@ MEMORY
 }
 
 /* Define a symbol for the top of each memory region */
-__top_RAM1      = MEM_RAM1_BASE + MEM_RAM1_SIZE; /* 64K bytes */
+__top_RAM1 = MEM_RAM1_BASE + MEM_RAM1_SIZE; /* 64K bytes */
 
-/* To be improved. At this moment the second RAM bank is dedicated entirely to heap + stack. */
-HEAP_SIZE = DEFINED(HEAP_SIZE) ? HEAP_SIZE : 0x10000;
+/* The second RAM bank is dedicated entirely to heap + stack. */
+HEAP_SIZE = MEM_RAM1_SIZE - STACK_SIZE;
+ASSERT(((HEAP_SIZE + STACK_SIZE) == MEM_RAM1_SIZE), "Heap size + stack size should total RAM1 size.");
 
 /* set external flash properties - external flash is present on the DK6 board */
 m_ext_flash_size          = 0x00100000;
@@ -376,9 +432,10 @@ SECTIONS
 
     __StackLimit = _vStackTop - STACK_SIZE;
 
-     __FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
-     __FACTORY_DATA_SIZE = m_factory_data_size;
+    __FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
+    __FACTORY_DATA_SIZE = m_factory_data_size;
      
-     ASSERT(((m_app_start + m_app_size + m_app_meta_data + m_factory_data_size + m_flash_config_size) <= m_int_flash_size),
-              "Internal flash capacity exceeded")
+    ASSERT(((m_app_start + m_app_size + m_app_meta_data + m_factory_data_size + m_flash_config_size) <= m_int_flash_size),
+            "Internal flash capacity exceeded")
+
 }

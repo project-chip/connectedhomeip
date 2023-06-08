@@ -17,7 +17,7 @@ import dataclasses
 import enum
 import logging
 import os
-from typing import List, Set, Union
+from typing import List, Optional, Set
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
@@ -57,24 +57,22 @@ _GLOBAL_TYPES = [
 ]
 
 
-def _UnderlyingType(field: Field, context: TypeLookupContext) -> Union[str, None]:
+def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
     actual = ParseDataType(field.data_type, context)
-    if type(actual) == IdlEnumType:
-        actual = actual.base_type
-    elif type(actual) == IdlBitmapType:
+    if isinstance(actual, (IdlEnumType, IdlBitmapType)):
         actual = actual.base_type
 
-    if type(actual) == BasicString:
+    if isinstance(actual, BasicString):
         if actual.is_binary:
             return 'OctetString'
         else:
             return 'CharString'
-    elif type(actual) == BasicInteger:
+    elif isinstance(actual, BasicInteger):
         if actual.is_signed:
             return "Int{}s".format(actual.power_of_two_bits)
         else:
             return "Int{}u".format(actual.power_of_two_bits)
-    elif type(actual) == FundamentalType:
+    elif isinstance(actual, FundamentalType):
         if actual == FundamentalType.BOOL:
             return 'Boolean'
         elif actual == FundamentalType.FLOAT:
@@ -87,7 +85,7 @@ def _UnderlyingType(field: Field, context: TypeLookupContext) -> Union[str, None
     return None
 
 
-def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, None]:
+def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Optional[str]:
     """Global names are used for generic callbacks shared across
     all clusters (e.g. for bool/float/uint32 and similar)
     """
@@ -132,7 +130,7 @@ _KNOWN_DECODABLE_TYPES = {
 }
 
 
-def _CppType(field: Field, context: TypeLookupContext) -> Union[str, None]:
+def _CppType(field: Field, context: TypeLookupContext) -> str:
     if field.data_type.name.lower() in _KNOWN_DECODABLE_TYPES:
         return _KNOWN_DECODABLE_TYPES[field.data_type.name.lower()]
 
@@ -168,11 +166,17 @@ def _CppType(field: Field, context: TypeLookupContext) -> Union[str, None]:
 def DecodableJniType(field: Field, context: TypeLookupContext) -> str:
     actual = _CppType(field, context)
 
+    needsConstRef = False
     if field.is_list:
-        return f"const chip::app::DataModel::DecodableList<{actual}> &"
+        needsConstRef = True
+        actual = f"chip::app::DataModel::DecodableList<{actual}>"
 
     if field.is_nullable:
-        return f"const chip::app::DataModel::Nullable<{actual}> &"
+        needsConstRef = True
+        actual = f"chip::app::DataModel::Nullable<{actual}>"
+
+    if needsConstRef:
+        actual = f"const {actual} &"
 
     return actual
 
@@ -246,7 +250,7 @@ def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
         # except non-list structures
         if not attr.definition.is_list:
             underlying = ParseDataType(attr.definition.data_type, context)
-            if type(underlying) == IdlType:
+            if isinstance(underlying, IdlType):
                 continue
 
         yield attr
@@ -383,7 +387,11 @@ class EncodableValue:
 
     @property
     def is_bitmap(self):
-        self.context.is_bitmap_type(self.data_type.name)
+        return self.context.is_bitmap_type(self.data_type.name)
+
+    @property
+    def is_untyped_bitmap(self):
+        return self.context.is_untyped_bitmap_type(self.data_type.name)
 
     def clone(self):
         return EncodableValue(self.context, self.data_type, self.attrs)
@@ -419,7 +427,7 @@ class EncodableValue:
     def boxed_java_type(self):
         t = ParseDataType(self.data_type, self.context)
 
-        if type(t) == FundamentalType:
+        if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Boolean"
             elif t == FundamentalType.FLOAT:
@@ -428,23 +436,23 @@ class EncodableValue:
                 return "Double"
             else:
                 raise Exception("Unknown fundamental type")
-        elif type(t) == BasicInteger:
+        elif isinstance(t, BasicInteger):
             # the >= 3 will include int24_t to be considered "long"
             if t.byte_count >= 3:
                 return "Long"
             else:
                 return "Integer"
-        elif type(t) == BasicString:
+        elif isinstance(t, BasicString):
             if t.is_binary:
                 return "byte[]"
             else:
                 return "String"
-        elif type(t) == IdlEnumType:
+        elif isinstance(t, IdlEnumType):
             if t.base_type.byte_count >= 3:
                 return "Long"
             else:
                 return "Integer"
-        elif type(t) == IdlBitmapType:
+        elif isinstance(t, IdlBitmapType):
             if t.base_type.byte_count >= 3:
                 return "Long"
             else:
@@ -463,7 +471,7 @@ class EncodableValue:
 
         t = ParseDataType(self.data_type, self.context)
 
-        if type(t) == FundamentalType:
+        if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Ljava/lang/Boolean;"
             elif t == FundamentalType.FLOAT:
@@ -472,22 +480,22 @@ class EncodableValue:
                 return "Ljava/lang/Double;"
             else:
                 raise Exception("Unknown fundamental type")
-        elif type(t) == BasicInteger:
+        elif isinstance(t, BasicInteger):
             if t.byte_count >= 3:
                 return "Ljava/lang/Long;"
             else:
                 return "Ljava/lang/Integer;"
-        elif type(t) == BasicString:
+        elif isinstance(t, BasicString):
             if t.is_binary:
                 return "[B"
             else:
                 return "Ljava/lang/String;"
-        elif type(t) == IdlEnumType:
+        elif isinstance(t, IdlEnumType):
             if t.base_type.byte_count >= 3:
                 return "Ljava/lang/Long;"
             else:
                 return "Ljava/lang/Integer;"
-        elif type(t) == IdlBitmapType:
+        elif isinstance(t, IdlBitmapType):
             if t.base_type.byte_count >= 3:
                 return "Ljava/lang/Long;"
             else:
@@ -669,6 +677,15 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ClusterWriteMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterWriteMapping.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ClusterIDMapping.jinja",
+            output_file_name="java/chip/devicecontroller/ClusterIDMapping.java",
             vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,

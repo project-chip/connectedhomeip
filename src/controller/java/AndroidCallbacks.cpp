@@ -16,6 +16,7 @@
  */
 #include "AndroidCallbacks.h"
 #include <controller/java/AndroidClusterExceptions.h>
+#include <controller/java/AndroidControllerExceptions.h>
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
 #include <controller/java/CHIPEventTLVValueDecoder.h>
 #include <jni.h>
@@ -105,16 +106,14 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
     JniReferences::GetInstance().FindMethod(env, javaCallback, "onConnectionFailure", "(JLjava/lang/Exception;)V", &failureMethod);
     VerifyOrReturn(failureMethod != nullptr, ChipLogError(Controller, "Could not find onConnectionFailure method"));
 
-    // Create the exception to return.
-    jclass controllerExceptionCls;
-    CHIP_ERROR err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipDeviceControllerException",
-                                                              controllerExceptionCls);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find exception type for onConnectionFailure"));
-    JniClass controllerExceptionJniCls(controllerExceptionCls);
-
-    jmethodID exceptionConstructor = env->GetMethodID(controllerExceptionCls, "<init>", "(ILjava/lang/String;)V");
-    jobject exception =
-        env->NewObject(controllerExceptionCls, exceptionConstructor, error.AsInteger(), env->NewStringUTF(ErrorStr(error)));
+    jthrowable exception;
+    CHIP_ERROR err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, ErrorStr(error),
+                                                                                                 error.AsInteger(), exception);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        ChipLogError(Controller,
+                     "Unable to create AndroidControllerException on GetConnectedDeviceCallback::OnDeviceConnectionFailureFn: %s",
+                     ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(javaCallback, failureMethod, peerId.GetNodeId(), exception);
@@ -334,10 +333,10 @@ void ReportCallback::UpdateClusterDataVersion()
 
     // SetDataVersion to NodeState
     jmethodID setDataVersionMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "setDataVersion", "(IJI)V", &setDataVersionMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "setDataVersion", "(IJJ)V", &setDataVersionMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find setDataVersion method"));
     env->CallVoidMethod(mNodeStateObj, setDataVersionMethod, static_cast<jint>(lastConcreteClusterPath.mEndpointId),
-                        static_cast<jlong>(lastConcreteClusterPath.mClusterId), static_cast<jint>(committedDataVersion.Value()));
+                        static_cast<jlong>(lastConcreteClusterPath.mClusterId), static_cast<jlong>(committedDataVersion.Value()));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
@@ -428,11 +427,11 @@ CHIP_ERROR CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath,
     JniClass attributePathJniCls(attributePathCls);
 
     jmethodID attributePathCtor =
-        env->GetStaticMethodID(attributePathCls, "newInstance", "(JJJ)Lchip/devicecontroller/model/ChipAttributePath;");
+        env->GetStaticMethodID(attributePathCls, "newInstance", "(IJJ)Lchip/devicecontroller/model/ChipAttributePath;");
     VerifyOrReturnError(attributePathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outObj =
-        env->CallStaticObjectMethod(attributePathCls, attributePathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+    outObj = env->CallStaticObjectMethod(attributePathCls, attributePathCtor, static_cast<jint>(aPath.mEndpointId),
+                                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId));
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     return err;
@@ -449,7 +448,7 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & 
     JniClass invokeElementJniCls(invokeElementCls);
 
     jmethodID invokeElementCtor = env->GetStaticMethodID(invokeElementCls, "newInstance",
-                                                         "(JJJ[BLjava/lang/String;)Lchip/devicecontroller/model/InvokeElement;");
+                                                         "(IJJ[BLjava/lang/String;)Lchip/devicecontroller/model/InvokeElement;");
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
     VerifyOrReturnError(invokeElementCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
@@ -480,13 +479,15 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & 
         ReturnErrorOnFailure(err);
 
         UtfString jsonString(env, JsonToString(json).c_str());
-        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, aPath.mEndpointId, aPath.mClusterId,
-                                             aPath.mCommandId, jniByteArray.jniValue(), jsonString.jniValue());
+        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, static_cast<jint>(aPath.mEndpointId),
+                                             static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mCommandId),
+                                             jniByteArray.jniValue(), jsonString.jniValue());
     }
     else
     {
-        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, aPath.mEndpointId, aPath.mClusterId,
-                                             aPath.mCommandId, nullptr, nullptr);
+        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, static_cast<jint>(aPath.mEndpointId),
+                                             static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mCommandId), nullptr,
+                                             nullptr);
     }
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
@@ -504,10 +505,11 @@ CHIP_ERROR ReportCallback::CreateChipEventPath(const app::ConcreteEventPath & aP
     JniClass eventPathJniCls(eventPathCls);
 
     jmethodID eventPathCtor =
-        env->GetStaticMethodID(eventPathCls, "newInstance", "(JJJ)Lchip/devicecontroller/model/ChipEventPath;");
+        env->GetStaticMethodID(eventPathCls, "newInstance", "(IJJ)Lchip/devicecontroller/model/ChipEventPath;");
     VerifyOrReturnError(eventPathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mEventId);
+    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, static_cast<jint>(aPath.mEndpointId),
+                                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mEventId));
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     return err;
@@ -555,11 +557,12 @@ CHIP_ERROR ReportCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient
 
     jmethodID onResubscriptionAttemptMethod;
     ReturnLogErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, mResubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(II)V", &onResubscriptionAttemptMethod));
+        env, mResubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(JJ)V", &onResubscriptionAttemptMethod));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod, aTerminationCause.AsInteger(),
-                        apReadClient->ComputeTimeTillNextSubscription());
+    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod,
+                        static_cast<jlong>(aTerminationCause.AsInteger()),
+                        static_cast<jlong>(apReadClient->ComputeTimeTillNextSubscription()));
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
     return CHIP_NO_ERROR;
 }
@@ -581,8 +584,10 @@ void ReportCallback::ReportError(jobject attributePath, jobject eventPath, const
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jthrowable exception;
-    err = AndroidClusterExceptions::GetInstance().CreateIllegalStateException(env, message, errorCode, exception);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create IllegalStateException: %s", ErrorStr(err)));
+    err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        ChipLogError(Controller, "Unable to create AndroidControllerException on ReportCallback::ReportError: %s", ErrorStr(err)));
 
     jmethodID onErrorMethod;
     err = JniReferences::GetInstance().FindMethod(
@@ -763,10 +768,11 @@ CHIP_ERROR ReportEventCallback::CreateChipEventPath(const app::ConcreteEventPath
     JniClass eventPathJniCls(eventPathCls);
 
     jmethodID eventPathCtor =
-        env->GetStaticMethodID(eventPathCls, "newInstance", "(JJJ)Lchip/devicecontroller/model/ChipEventPath;");
+        env->GetStaticMethodID(eventPathCls, "newInstance", "(IJJ)Lchip/devicecontroller/model/ChipEventPath;");
     VerifyOrReturnError(eventPathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mEventId);
+    outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, static_cast<jint>(aPath.mEndpointId),
+                                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mEventId));
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     return err;
@@ -808,11 +814,12 @@ CHIP_ERROR ReportEventCallback::OnResubscriptionNeeded(app::ReadClient * apReadC
 
     jmethodID onResubscriptionAttemptMethod;
     ReturnLogErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, mResubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(II)V", &onResubscriptionAttemptMethod));
+        env, mResubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(JJ)V", &onResubscriptionAttemptMethod));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod, aTerminationCause.AsInteger(),
-                        apReadClient->ComputeTimeTillNextSubscription());
+    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod,
+                        static_cast<jlong>(aTerminationCause.AsInteger()),
+                        static_cast<jlong>(apReadClient->ComputeTimeTillNextSubscription()));
 
     return CHIP_NO_ERROR;
 }
@@ -833,8 +840,10 @@ void ReportEventCallback::ReportError(jobject eventPath, const char * message, C
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jthrowable exception;
-    err = AndroidClusterExceptions::GetInstance().CreateIllegalStateException(env, message, errorCode, exception);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create IllegalStateException: %s", ErrorStr(err)));
+    err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Unable to create AndroidControllerException: %s on eportEventCallback::ReportError",
+                                ErrorStr(err)));
 
     jmethodID onErrorMethod;
     err = JniReferences::GetInstance().FindMethod(
@@ -937,8 +946,11 @@ void WriteAttributesCallback::ReportError(jobject attributePath, const char * me
 
     ChipLogError(Controller, "WriteAttributesCallback ReportError is called");
     jthrowable exception;
-    err = AndroidClusterExceptions::GetInstance().CreateIllegalStateException(env, message, errorCode, exception);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create IllegalStateException: %s", ErrorStr(err)));
+    err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(Controller,
+                                "Unable to create AndroidControllerException on WriteAttributesCallback::ReportError: %s",
+                                ErrorStr(err)));
 
     jmethodID onErrorMethod;
     err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onError",
@@ -996,8 +1008,7 @@ void InvokeCallback::OnResponse(app::CommandSender * apCommandSender, const app:
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj,
-                        static_cast<std::underlying_type_t<Protocols::InteractionModel::Status>>(aStatusIB.mStatus));
+    env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj, static_cast<jlong>(aStatusIB.mStatus));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
@@ -1038,8 +1049,10 @@ void InvokeCallback::ReportError(const char * message, ChipError::StorageType er
 
     ChipLogError(Controller, "InvokeCallback ReportError is called");
     jthrowable exception;
-    err = AndroidClusterExceptions::GetInstance().CreateIllegalStateException(env, message, errorCode, exception);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create IllegalStateException: %s", ErrorStr(err)));
+    err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        ChipLogError(Controller, "Unable to create AndroidControllerException: %s on InvokeCallback::ReportError", ErrorStr(err)));
 
     jmethodID onErrorMethod;
     err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onError", "(Ljava/lang/Exception;)V", &onErrorMethod);

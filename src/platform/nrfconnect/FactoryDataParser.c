@@ -18,14 +18,11 @@
 #include "FactoryDataParser.h"
 
 #include <zcbor_decode.h>
-#include <zephyr/logging/log.h>
 
 #include <ctype.h>
 #include <string.h>
 
-#define MAX_FACTORY_DATA_NESTING_LEVEL 3
-
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+#define MAX_FACTORY_DATA_NESTING_LEVEL 4
 
 static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
 {
@@ -34,6 +31,19 @@ static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
     if (zcbor_uint32_decode(states, &u32))
     {
         *value = (uint16_t) u32;
+        return true;
+    }
+
+    return false;
+}
+
+static inline bool uint8_decode(zcbor_state_t * states, uint8_t * value)
+{
+    uint32_t u32;
+
+    if (zcbor_uint32_decode(states, &u32))
+    {
+        *value = (uint8_t) u32;
         return true;
     }
 
@@ -174,14 +184,14 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
                 isdigit(date.value[3]) && date.value[4] == '-' && isdigit(date.value[5]) && isdigit(date.value[6]) &&
                 date.value[7] == '-' && isdigit(date.value[8]) && isdigit(date.value[9]))
             {
-                factoryData->date_year =
-                    1000 * (date.value[0] - '0') + 100 * (date.value[1] - '0') + 10 * (date.value[2] - '0') + date.value[3] - '0';
-                factoryData->date_month = 10 * (date.value[5] - '0') + date.value[6] - '0';
-                factoryData->date_day   = 10 * (date.value[8] - '0') + date.value[9] - '0';
+                factoryData->date_year = (uint16_t)(1000 * (uint16_t)(date.value[0] - '0') + 100 * (uint16_t)(date.value[1] - '0') +
+                                                    10 * (uint16_t)(date.value[2] - '0') + (uint16_t)(date.value[3] - '0'));
+                factoryData->date_month = (uint8_t)(10 * (uint16_t)(date.value[5] - '0') + (uint16_t)(date.value[6] - '0'));
+                factoryData->date_day   = (uint8_t)(10 * (uint16_t)(date.value[8] - '0') + (uint16_t)(date.value[9] - '0'));
             }
             else
             {
-                LOG_ERR("Parsing error - wrong date format");
+                res = false;
             }
         }
         else if (strncmp("hw_ver_str", (const char *) currentString.value, currentString.len) == 0)
@@ -236,11 +246,21 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->enable_key);
         }
+        else if (strncmp("product_finish", (const char *) currentString.value, currentString.len) == 0)
+        {
+            res                               = res && uint8_decode(states, &factoryData->product_finish);
+            factoryData->productFinishPresent = res;
+        }
+        else if (strncmp("primary_color", (const char *) currentString.value, currentString.len) == 0)
+        {
+            res                              = res && uint8_decode(states, &factoryData->primary_color);
+            factoryData->primaryColorPresent = res;
+        }
         else if (strncmp("user", (const char *) currentString.value, currentString.len) == 0)
         {
             factoryData->user.data = (void *) states->payload;
             res                    = res && zcbor_any_skip(states, NULL);
-            factoryData->user.len  = (void *) states->payload - factoryData->user.data;
+            factoryData->user.len  = (size_t)((void *) states->payload - factoryData->user.data);
         }
         else
         {

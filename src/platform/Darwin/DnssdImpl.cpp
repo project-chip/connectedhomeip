@@ -328,12 +328,6 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
     if (kDNSServiceErr_NoError == err)
     {
         sdCtx->OnNewInterface(interfaceId, fullname, hostname, port, txtLen, txtRecord);
-        if (kDNSServiceInterfaceIndexLocalOnly == interfaceId)
-        {
-            sdCtx->OnNewLocalOnlyAddress();
-            sdCtx->Finalize();
-            return;
-        }
     }
 
     if (!(flags & kDNSServiceFlagsMoreComing))

@@ -59,6 +59,7 @@ target_include_directories(app PRIVATE
                            include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/thermostat
+                           ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
 
@@ -70,8 +71,9 @@ target_sources(app PRIVATE
                src/AppTask.cpp
                src/SensorManager.cpp
                src/TemperatureManager.cpp
-               src/main.cpp
                src/ZclCallbacks.cpp
+               ${TELINK_COMMON}/common/src/mainCommon.cpp
+               ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp

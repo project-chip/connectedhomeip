@@ -159,7 +159,7 @@ class NetworkCommissioningTests:
             interactionTimeoutMs=interactionTimeoutMs
         )
         logger.info(f"Received response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         await self.must_verify_breadcrumb()
 
@@ -184,7 +184,7 @@ class NetworkCommissioningTests:
                 networkID=networkList[0].networkID, breadcrumb=self.with_breadcrumb())
             res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
             logger.info(f"Received response: {res}")
-            if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+            if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
                 raise AssertionError(
                     f"Unexpected result: {res.networkingStatus}")
             await self.must_verify_breadcrumb()
@@ -195,7 +195,7 @@ class NetworkCommissioningTests:
             ssid=TEST_WIFI_SSID.encode(), credentials=TEST_WIFI_PASS.encode(), breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         if res.networkIndex != 0:
             raise AssertionError(
@@ -228,7 +228,7 @@ class NetworkCommissioningTests:
             interactionTimeoutMs=interactionTimeoutMs
         )
         logger.info(f"Got response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         logger.info("Device connected to a network.")
         await self.must_verify_breadcrumb()
@@ -317,7 +317,7 @@ class NetworkCommissioningTests:
                                               payload=req,
                                               interactionTimeoutMs=interactionTimeoutMs)
         logger.info(f"Received response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         await self.must_verify_breadcrumb()
 
@@ -342,7 +342,7 @@ class NetworkCommissioningTests:
                 networkID=networkList[0].networkID, breadcrumb=self.with_breadcrumb())
             res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
             logger.info(f"Received response: {res}")
-            if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+            if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
                 raise AssertionError(
                     f"Unexpected result: {res.networkingStatus}")
             await self.must_verify_breadcrumb()
@@ -353,7 +353,7 @@ class NetworkCommissioningTests:
             operationalDataset=TEST_THREAD_NETWORK_DATASET_TLVS[0], breadcrumb=self.with_breadcrumb())
         res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
         logger.info(f"Received response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         if res.networkIndex != 0:
             raise AssertionError(
@@ -384,7 +384,7 @@ class NetworkCommissioningTests:
                                               payload=req,
                                               interactionTimeoutMs=interactionTimeoutMs)
         logger.info(f"Got response: {res}")
-        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
+        if res.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess:
             raise AssertionError(f"Unexpected result: {res.networkingStatus}")
         logger.info("Device connected to a network.")
         await self.must_verify_breadcrumb()

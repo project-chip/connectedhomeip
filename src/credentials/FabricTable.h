@@ -114,7 +114,7 @@ public:
 
     friend class FabricTable;
 
-protected:
+private:
     struct InitParams
     {
         NodeId nodeId                         = kUndefinedNodeId;
@@ -718,6 +718,14 @@ public:
     bool HasOperationalKeyForFabric(FabricIndex fabricIndex) const;
 
     /**
+     * @brief Returns the operational keystore. This is used for
+     *        CASE and the only way the keystore should be used.
+     *
+     * @return The operational keystore, nullptr otherwise.
+     */
+    const Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
+
+    /**
      * @brief Add a pending trusted root certificate for the next fabric created with `AddNewPendingFabric*` methods.
      *
      * The root only becomes actually pending when the `AddNewPendingFabric*` is called afterwards. It is reverted
@@ -1090,7 +1098,7 @@ private:
      */
     const FabricInfo * GetShadowPendingFabricEntry() const { return HasPendingFabricUpdate() ? &mPendingFabric : nullptr; }
 
-    // Returns true if we have a shadow entry pending for a fabruc update.
+    // Returns true if we have a shadow entry pending for a fabric update.
     bool HasPendingFabricUpdate() const
     {
         return mPendingFabric.IsInitialized() &&

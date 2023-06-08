@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<configurator>
+    <domain name="CHIP" />
+
+    <bitmap name="Feature" type="BITMAP32">
+        <cluster code="0x0046"/>
+        <field name="CheckInProtocolSupport" mask="0x1"/>
+    </bitmap>
+
+    <struct name = "MonitoringRegistrationStruct" isFabricScoped="true">
+        <cluster code="0x0046"/>
+        <item fieldId="1" name="CheckInNodeID" type="node_id" isFabricSensitive="true"/>
+        <item fieldId="2" name="MonitoredSubject" type="INT64U" isFabricSensitive="true"/>
+        <item fieldId="3" name="Key" type="OCTET_STRING" length="16" isFabricSensitive="true"/>
+    </struct>
+
+    <cluster>
+        <domain>General</domain>
+        <name>ICD Management</name>
+        <code>0x0046</code>
+        <define>ICD_MANAGEMENT_CLUSTER</define>
+        <description>Allows servers to ensure that listed clients are notified when a server is available for communication.</description>
+
+        <!-- Cluster feature map -->
+        <globalAttribute side="server" code="0xFFFC" value="0x0000"/>
+        <!-- Current cluster version -->
+        <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+        <attribute side="server" code="0x00" define="IDLE_MODE_INTERVAL" type="INT32U" min="500" max="86400000" default="500" writable="false" optional="false" isNullable="false">IdleModeInterval</attribute>
+        <attribute side="server" code="0x01" define="ACTIVE_MODE_INTERVAL" type="INT32U" min="300" default="300" writable="false" optional="false" isNullable="false">ActiveModeInterval</attribute>
+        <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="INT16U" min="300" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
+        <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="ARRAY" entryType="MonitoringRegistrationStruct" writable="false" optional="true" isNullable="false">
+            <description>RegisteredClients</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x04" define="ICD_COUNTER" type="INT32U" writable="false" default="0" optional="true" isNullable="false">
+            <description>ICDCounter</description>
+            <access op="read" privilege="administer"/>
+        </attribute>
+        <attribute side="server" code="0x05" define="CLIENTS_SUPPORTED_PER_FABRIC" type="INT16U" min="1" default="1" writable="false" optional="true" isNullable="false">ClientsSupportedPerFabric</attribute>
+
+        <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
+            <description> Register a client to the end device </description>
+            <arg name="CheckInNodeID" type="node_id" optional="false"/>
+            <arg name="MonitoredSubject" type="INT64U" optional="false"/>
+            <arg name="Key" type="OCTET_STRING" length="16" optional="false"/>
+            <arg name="VerificationKey" type="OCTET_STRING" length="16" optional="true"/>
+            <access op="invoke" privilege="manage"/>
+        </command>
+
+        <command source="server" code="0x01" name="RegisterClientResponse" optional="false" disableDefaultResponse="true">
+            <description> RegisterClient response command </description>
+            <arg name="ICDCounter" type="INT32U" isNullable="false"/>
+        </command>
+
+        <command source="client" code="0x02" name="UnregisterClient" isFabricScoped="true" optional="true">
+            <description> Unregister a client from an end device </description>
+            <arg name="CheckInNodeID" type="node_id"/>
+            <arg name="Key" type="OCTET_STRING" length="16" optional="true"/>
+            <access op="invoke" privilege="manage"/>
+        </command>
+
+        <command source="client" code="0x03" name="StayActiveRequest" optional="true">
+            <description>Request the end device to stay in Active Mode for an additional ActiveModeThreshold</description>
+            <access op="invoke" privilege="manage"/>
+        </command>
+    </cluster>
+</configurator>

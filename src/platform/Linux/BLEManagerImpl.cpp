@@ -796,7 +796,11 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
     }
 
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, mpEndpoint);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
     mDeviceScanner->StopScan();
 
     ConnectDevice(device, mpEndpoint);
@@ -821,6 +825,7 @@ void BLEManagerImpl::OnScanComplete()
 
 void BLEManagerImpl::OnScanError(CHIP_ERROR err)
 {
+    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
     ChipLogError(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 

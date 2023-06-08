@@ -14,6 +14,7 @@ FROM connectedhomeip/chip-build-imx:${VERSION} AS imx
 FROM connectedhomeip/chip-build-ti:${VERSION} AS ti
 FROM connectedhomeip/chip-build-openiotsdk:${VERSION} AS openiotsdk
 FROM connectedhomeip/chip-build-bouffalolab:${VERSION} AS bouffalolab
+FROM connectedhomeip/chip-build-asr:${VERSION} AS asr
 FROM connectedhomeip/chip-build:${VERSION}
 
 # qemu-src copied over because qemu directory contains symlinks to the src
@@ -39,7 +40,7 @@ COPY --from=telink /opt/telink/zephyr-sdk-0.15.2 /opt/telink/zephyr-sdk-0.15.2
 
 COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 
-COPY --from=crosscompile /opt/ubuntu-21.04-aarch64-sysroot /opt/ubuntu-21.04-aarch64-sysroot
+COPY --from=crosscompile /opt/ubuntu-22.04.1-aarch64-sysroot /opt/ubuntu-22.04.1-aarch64-sysroot
 
 COPY --from=ameba /opt/ameba /opt/ameba
 
@@ -47,12 +48,13 @@ COPY --from=k32w /opt/sdk /opt/k32w_sdk
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
-COPY --from=ti /opt/ti/sysconfig_1.13.0 /opt/ti/sysconfig_1.13.0
+COPY --from=ti /opt/ti/sysconfig_1.15.0 /opt/ti/sysconfig_1.15.0
 
-COPY --from=openiotsdk /opt/gcc-arm-none-eabi-10.3-2021.10/ /opt/gcc-arm-none-eabi-10.3-2021.10/
 COPY --from=openiotsdk /opt/FVP_Corstone_SSE-300/ /opt/FVP_Corstone_SSE-300/
 
 COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
+
+COPY --from=asr /opt/asr /opt/asr
 
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
@@ -96,13 +98,14 @@ ENV SILABS_BOARD=BRD4161A
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
 ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.15-kirkstone/
+ENV JAVA_PATH=/usr/lib/jvm/java-8-openjdk-amd64
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
 ENV NXP_K32W0_SDK_ROOT=/opt/k32w_sdk
 ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
-ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
+ENV SYSROOT_AARCH64=/opt/ubuntu-22.04.1-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.15.2
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.13.0
@@ -115,5 +118,5 @@ ENV TIZEN_SDK_TOOLCHAIN $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
 ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core
 
 ENV FVP_CORSTONE_300_PATH=/opt/FVP_Corstone_SSE-300
-ENV ARM_GCC_TOOLCHAIN_PATH=/opt/gcc-arm-none-eabi-10.3-2021.10
 ENV BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk
+ENV ASR_TOOLCHAIN_PATH=/opt/asr/Tools/toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/

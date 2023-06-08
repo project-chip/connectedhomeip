@@ -59,7 +59,8 @@ public:
 
 #if CHIP_TOOL_DEVICE_SCANNER_USE_BLE
     /////////// BleScannerDelegate Interface /////////
-    void OnBleScanResult(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnBleScanAdd(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnBleScanRemove(BLE_CONNECTION_OBJECT connObj) override;
 #endif // CHIP_TOOL_DEVICE_SCANNER_USE_BLE
 
 private:

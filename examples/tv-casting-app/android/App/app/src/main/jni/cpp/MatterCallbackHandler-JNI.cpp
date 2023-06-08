@@ -31,7 +31,10 @@ CHIP_ERROR CallbackBaseJNI::SetUp(JNIEnv * env, jobject inHandler)
     mClazz = env->GetObjectClass(mObject);
     VerifyOrExit(mClazz != nullptr, ChipLogError(AppServer, "Failed to get handler Java class"));
 
-    mMethod = env->GetMethodID(mClazz, "handleInternal", mMethodSignature);
+    mSuperClazz = env->GetSuperclass(mClazz);
+    VerifyOrExit(mSuperClazz != nullptr, ChipLogError(AppServer, "Failed to get handler's parent's Java class"));
+
+    mMethod = env->GetMethodID(mSuperClazz, "handleInternal", mMethodSignature);
     if (mMethod == nullptr)
     {
         ChipLogError(AppServer, "Failed to access 'handleInternal' method with signature %s", mMethodSignature);

@@ -79,6 +79,7 @@ exclude:
     - "src/darwin/Framework/CHIP/zap-generated/*" # already clang-formatted by our zap tooling
     - "zzz_generated/**/*" # already clang-formatted by our zap tooling
     - "src/controller/java/generated/java/**/*" # not formatted: generated files
+    - "src/controller/java/zap-generated/**/*" # not formatted: generated files
 
 
 changed_paths:

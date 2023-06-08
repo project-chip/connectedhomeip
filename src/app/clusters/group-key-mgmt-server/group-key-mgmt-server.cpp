@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/MessageDef/StatusIB.h>
+#include <app/att-storage.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -109,6 +109,9 @@ public:
     // Register for the GroupKeyManagement cluster on all endpoints.
     GroupKeyManagementAttributeAccess() : AttributeAccessInterface(Optional<EndpointId>(0), GroupKeyManagement::Id) {}
 
+    // TODO: Once there is MCSP support, this may need to change.
+    static constexpr bool IsMCSPSupported() { return false; }
+
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
     {
         VerifyOrDie(aPath.mClusterId == GroupKeyManagement::Id);
@@ -117,8 +120,15 @@ public:
         {
         case GroupKeyManagement::Attributes::ClusterRevision::Id:
             return ReadClusterRevision(aPath.mEndpointId, aEncoder);
-        case Attributes::FeatureMap::Id:
-            return aEncoder.Encode(static_cast<uint32_t>(0));
+        case Attributes::FeatureMap::Id: {
+            uint32_t features = 0;
+            if (IsMCSPSupported())
+            {
+                // TODO: Once there is MCSP support, this will need to add the
+                // right feature bit.
+            }
+            return aEncoder.Encode(features);
+        }
         case GroupKeyManagement::Attributes::GroupKeyMap::Id:
             return ReadGroupKeyMap(aPath.mEndpointId, aEncoder);
         case GroupKeyManagement::Attributes::GroupTable::Id:
@@ -296,29 +306,32 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData)
 {
-    auto provider = GetGroupDataProvider();
-    auto fabric   = Server::GetInstance().GetFabricTable().FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
-
-    if (nullptr == provider || nullptr == fabric)
-    {
-        commandObj->AddStatus(commandPath, Status::Failure);
-        return true;
-    }
-
-    uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
-    MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
-    CHIP_ERROR err = fabric->GetCompressedFabricIdBytes(compressed_fabric_id);
-    if (CHIP_NO_ERROR != err)
-    {
-        commandObj->AddStatus(commandPath, Status::Failure);
-        return true;
-    }
-
     if (commandData.groupKeySet.epochKey0.IsNull() || commandData.groupKeySet.epochStartTime0.IsNull() ||
         commandData.groupKeySet.epochKey0.Value().empty() || (0 == commandData.groupKeySet.epochStartTime0.Value()))
     {
         // If the EpochKey0 field is null or its associated EpochStartTime0 field is null,
         // then this command SHALL fail with an INVALID_COMMAND
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
+
+    if (commandData.groupKeySet.groupKeySecurityPolicy == GroupKeySecurityPolicyEnum::kUnknownEnumValue)
+    {
+        // If a client indicates an enumeration value to the server, that is not
+        // supported by the server, because it is ... a new value unrecognized
+        // by a legacy server, then the server SHALL generate a general
+        // constraint error
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    if (!GroupKeyManagementAttributeAccess::IsMCSPSupported() &&
+        commandData.groupKeySet.groupKeySecurityPolicy == GroupKeySecurityPolicyEnum::kCacheAndSync)
+    {
+        // When CacheAndSync is not supported in the FeatureMap of this cluster,
+        // any action attempting to set CacheAndSync in the
+        // GroupKeySecurityPolicy field SHALL fail with an INVALID_COMMAND
+        // error.
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
@@ -364,6 +377,24 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         memcpy(keyset.epoch_keys[2].key, commandData.groupKeySet.epochKey2.Value().data(),
                GroupDataProvider::EpochKey::kLengthBytes);
         keyset.num_keys_used++;
+    }
+
+    auto provider = GetGroupDataProvider();
+    auto fabric   = Server::GetInstance().GetFabricTable().FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
+
+    if (nullptr == provider || nullptr == fabric)
+    {
+        commandObj->AddStatus(commandPath, Status::Failure);
+        return true;
+    }
+
+    uint8_t compressed_fabric_id_buffer[sizeof(uint64_t)];
+    MutableByteSpan compressed_fabric_id(compressed_fabric_id_buffer);
+    CHIP_ERROR err = fabric->GetCompressedFabricIdBytes(compressed_fabric_id);
+    if (CHIP_NO_ERROR != err)
+    {
+        commandObj->AddStatus(commandPath, Status::Failure);
+        return true;
     }
 
     // Set KeySet

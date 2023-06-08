@@ -260,11 +260,18 @@ public:
 
     bool IsInteractive() { return mIsInteractive; }
 
-    CHIP_ERROR RunAsInteractive()
+    CHIP_ERROR RunAsInteractive(const chip::Optional<char *> & interactiveStorageDirectory)
     {
-        mIsInteractive = true;
+        mStorageDirectory = interactiveStorageDirectory;
+        mIsInteractive    = true;
         return Run();
     }
+
+    const chip::Optional<char *> & GetStorageDirectory() const { return mStorageDirectory; }
+
+protected:
+    // mStorageDirectory lives here so we can just set it in RunAsInteractive.
+    chip::Optional<char *> mStorageDirectory;
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);

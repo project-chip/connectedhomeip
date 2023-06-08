@@ -61,6 +61,15 @@ extern "C" {
 
 #include "AppTask.h"
 
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+
+#if CONFIG_ENABLE_CHIP_SHELL
+using namespace chip::Shell;
+#endif
+
 namespace {
 
 #if defined(BL706_NIGHT_LIGHT) || defined(BL602_NIGHT_LIGHT)
@@ -73,19 +82,10 @@ Identify sIdentify = {
     APP_LIGHT_ENDPOINT_ID,
     AppTask::IdentifyStartHandler,
     AppTask::IdentifyStopHandler,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LIGHT,
+    Clusters::Identify::IdentifyTypeEnum::kLightOutput,
 };
 
 } // namespace
-
-using namespace ::chip;
-using namespace ::chip::app;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
-
-#if CONFIG_ENABLE_CHIP_SHELL
-using namespace chip::Shell;
-#endif
 
 AppTask AppTask::sAppTask;
 StackType_t AppTask::appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];

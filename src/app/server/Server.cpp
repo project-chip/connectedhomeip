@@ -128,7 +128,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mOperationalKeystore           = initParams.operationalKeystore;
     mOpCertStore                   = initParams.opCertStore;
 
-    mCertificateValidityPolicy = initParams.certificateValidityPolicy;
+    if (initParams.certificateValidityPolicy)
+    {
+        mCertificateValidityPolicy.Init(initParams.certificateValidityPolicy);
+    }
+    else
+    {
+        mCertificateValidityPolicy.Init(&sDefaultCertValidityPolicy);
+    }
 
 #if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT)
     VerifyOrDie(chip::audit::ExecutePersistentStorageApiAudit(*mDeviceStorage));
@@ -140,7 +147,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     // Set up attribute persistence before we try to bring up the data model
     // handler.
-    SuccessOrExit(mAttributePersister.Init(mDeviceStorage));
+    SuccessOrExit(err = mAttributePersister.Init(mDeviceStorage));
     SetAttributePersistenceProvider(&mAttributePersister);
 
     {
@@ -240,6 +247,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
+#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
+    mICDEventManager.Init(&mICDManager);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler();
 
@@ -286,7 +297,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         .sessionInitParams =  {
             .sessionManager    = &mSessions,
             .sessionResumptionStorage = mSessionResumptionStorage,
-            .certificateValidityPolicy = mCertificateValidityPolicy,
+            .certificateValidityPolicy = &mCertificateValidityPolicy,
             .exchangeMgr       = &mExchangeMgr,
             .fabricTable       = &mFabrics,
             .groupDataProvider = mGroupsProvider,
@@ -300,7 +311,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
-                                                    mCertificateValidityPolicy, mGroupsProvider);
+                                                    &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager,
@@ -398,7 +409,7 @@ void Server::CheckServerReadyEvent()
     // are ready, and emit the 'server ready' event if so.
     if (mIsDnssdReady)
     {
-        ChipLogError(AppServer, "Server initialization complete");
+        ChipLogProgress(AppServer, "Server initialization complete");
 
         ChipDeviceEvent event = { .Type = DeviceEventType::kServerReady };
         PlatformMgr().PostEventOrDie(&event);
@@ -477,6 +488,9 @@ void Server::Shutdown()
     mAccessControl.Finish();
     Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
+#ifdef CHIP_CONFIG_ENABLE_ICD_SERVER
+    mICDEventManager.Shutdown();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
@@ -531,11 +545,12 @@ void Server::ResumeSubscriptions()
 }
 #endif
 
+Credentials::IgnoreCertificateValidityPeriodPolicy Server::sDefaultCertValidityPolicy;
+
 KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
 PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
 Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
 Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
-IgnoreCertificateValidityPolicy CommonCaseDeviceServerInitParams::sDefaultCertValidityPolicy;
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
 SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
 #endif

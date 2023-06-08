@@ -92,9 +92,10 @@ void IRQ021_Handler(void)
         btn1 = 0;
         sl_button_on_change(1, 1);
     }
-    if (RSI_NPSSGPIO_GetPin(NPSS_GPIO_0))
+    if (RSI_NPSSGPIO_GetPin(NPSS_GPIO_0) && (!btn0))
     {
         btn0 = 1;
+        sl_button_on_change(0, 0);
     }
     if (!RSI_NPSSGPIO_GetPin(NPSS_GPIO_0) && btn0)
     {
