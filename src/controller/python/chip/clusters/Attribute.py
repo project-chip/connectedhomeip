@@ -266,6 +266,7 @@ EventReadRequest = EventDescriptorWithEndpoint
 @dataclass
 class AttributeReadResult(AttributeStatus):
     Data: Any = None
+    DataVersion: int = 0
 
 
 @dataclass
