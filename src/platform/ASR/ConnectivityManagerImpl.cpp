@@ -42,10 +42,9 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/BLEManager.h>
 
+#include "lega_wlan_api.h"
 #include "lwip/opt.h"
 #include <platform/ASR/NetworkCommissioningDriver.h>
-// asr wifi
-#include "lega_wlan_api.h"
 #if !CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #error "WiFi Station support must be enabled when building for ASR"
 #endif

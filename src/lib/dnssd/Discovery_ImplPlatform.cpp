@@ -48,38 +48,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     }
 
     DiscoveredNodeData nodeData;
-
-    Platform::CopyString(nodeData.resolutionData.hostName, result->mHostName);
-    Platform::CopyString(nodeData.commissionData.instanceName, result->mName);
-
-    nodeData.resolutionData.interfaceId = result->mInterface;
-
-    IPAddressSorter::Sort(addresses, result->mInterface);
-
-    size_t addressesFound = 0;
-    for (auto & ip : addresses)
-    {
-        if (addressesFound == ArraySize(nodeData.resolutionData.ipAddress))
-        {
-            // Out of space.
-            ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
-            break;
-        }
-        nodeData.resolutionData.ipAddress[addressesFound] = ip;
-        ++addressesFound;
-    }
-
-    nodeData.resolutionData.numIPs = addressesFound;
-
-    nodeData.resolutionData.port = result->mPort;
-
-    for (size_t i = 0; i < result->mTextEntrySize; ++i)
-    {
-        ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
-        ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, nodeData.resolutionData);
-        FillNodeDataFromTxt(key, val, nodeData.commissionData);
-    }
+    result->ToDiscoveredNodeData(addresses, nodeData);
 
     nodeData.LogDetail();
     proxy->OnNodeDiscovered(nodeData);
@@ -353,6 +322,42 @@ CHIP_ERROR AddTxtRecord(TxtFieldKey key, TextEntry * entries, size_t & entriesCo
 }
 
 } // namespace
+
+void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
+{
+    auto & resolutionData = nodeData.resolutionData;
+    auto & commissionData = nodeData.commissionData;
+
+    Platform::CopyString(resolutionData.hostName, mHostName);
+    Platform::CopyString(commissionData.instanceName, mName);
+
+    IPAddressSorter::Sort(addresses, mInterface);
+
+    size_t addressesFound = 0;
+    for (auto & ip : addresses)
+    {
+        if (addressesFound == ArraySize(resolutionData.ipAddress))
+        {
+            // Out of space.
+            ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
+            break;
+        }
+        resolutionData.ipAddress[addressesFound] = ip;
+        ++addressesFound;
+    }
+
+    resolutionData.interfaceId = mInterface;
+    resolutionData.numIPs      = addressesFound;
+    resolutionData.port        = mPort;
+
+    for (size_t i = 0; i < mTextEntrySize; ++i)
+    {
+        ByteSpan key(reinterpret_cast<const uint8_t *>(mTextEntries[i].mKey), strlen(mTextEntries[i].mKey));
+        ByteSpan val(mTextEntries[i].mData, mTextEntries[i].mDataSize);
+        FillNodeDataFromTxt(key, val, resolutionData);
+        FillNodeDataFromTxt(key, val, commissionData);
+    }
+}
 
 DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
 

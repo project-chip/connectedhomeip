@@ -19,7 +19,7 @@
 
 #ifndef MATTER_TRACING_ENABLED
 
-#define _MATTER_TRACE_DISABLE                                                                                                      \
+#define _MATTER_TRACE_DISABLE(...)                                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
     } while (false)

@@ -26,6 +26,9 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
 
+#include <tracing/log_json/log_json_tracing.h>
+#include <tracing/registry.h>
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceDecoder.h"
 #include "TraceHandlers.h"
@@ -48,6 +51,7 @@ const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = null
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 
 namespace {
+
 CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::Credentials::AttestationTrustStore ** trustStore)
 {
     if (paaTrustStorePath == nullptr)
@@ -77,6 +81,16 @@ CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::
     *trustStore = &attestationTrustStore;
     return CHIP_NO_ERROR;
 }
+
+using ::chip::Tracing::ScopedRegistration;
+using ::chip::Tracing::LogJson::LogJsonBackend;
+
+LogJsonBackend log_json_backend;
+
+// ScopedRegistration ensures register/unregister is met, as long
+// as the vector is cleared (and we do so when stopping tracing).
+std::vector<std::unique_ptr<ScopedRegistration>> tracing_backends;
+
 } // namespace
 
 CHIP_ERROR CHIPCommand::MaybeSetUpStack()
@@ -240,6 +254,24 @@ CHIP_ERROR CHIPCommand::Run()
 
 void CHIPCommand::StartTracing()
 {
+    if (mTraceTo.HasValue())
+    {
+        for (const auto & destination : mTraceTo.Value())
+        {
+            if (destination == "log")
+            {
+                if (!log_json_backend.IsInList())
+                {
+                    tracing_backends.push_back(std::make_unique<ScopedRegistration>(log_json_backend));
+                }
+            }
+            else
+            {
+                ChipLogError(AppServer, "Unknown trace destination: '%s'", destination.c_str());
+            }
+        }
+    }
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::InitTrace();
 
@@ -266,6 +298,8 @@ void CHIPCommand::StartTracing()
 
 void CHIPCommand::StopTracing()
 {
+    tracing_backends.clear();
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::DeInitTrace();
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
