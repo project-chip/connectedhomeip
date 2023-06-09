@@ -99,13 +99,17 @@ public:
      * Create a root (self-signed) X.509 DER encoded certificate that has the
      * right fields to be a valid Matter root certificate.
      */
-    static CHIP_ERROR GenerateRootCertificate(Crypto::P256Keypair & keypair, uint64_t issuerId, Optional<FabricId> fabricId, uint32_t validityStart, uint32_t validityEnd, MutableByteSpan & rcac);
+    static CHIP_ERROR GenerateRootCertificate(Crypto::P256Keypair & keypair, uint64_t issuerId, Optional<FabricId> fabricId,
+                                              uint32_t validityStart, uint32_t validityEnd, MutableByteSpan & rcac);
 
     /**
      * Create an intermediate X.509 DER encoded certificate that has the
      * right fields to be a valid Matter intermediate certificate.
      */
-    static CHIP_ERROR GenerateIntermediateCertificate(Crypto::P256Keypair & rootKeypair, const ByteSpan & rcac, const Crypto::P256PublicKey & intermediatePublicKey, uint64_t issuerId, Optional<FabricId> fabricId, uint32_t validityStart, uint32_t validityEnd, MutableByteSpan & icac);
+    static CHIP_ERROR GenerateIntermediateCertificate(Crypto::P256Keypair & rootKeypair, const ByteSpan & rcac,
+                                                      const Crypto::P256PublicKey & intermediatePublicKey, uint64_t issuerId,
+                                                      Optional<FabricId> fabricId, uint32_t validityStart, uint32_t validityEnd,
+                                                      MutableByteSpan & icac);
 
     /**
      * Create an X.509 DER encoded certificate that has the
@@ -119,7 +123,10 @@ public:
      * 3 numbers, which are expected to be 32-bit unsigned Case Authenticated Tag
      * values.
      */
-    static CHIP_ERROR GenerateOperationalCertificate(Crypto::P256Keypair & signingKeypair, const ByteSpan & signingCertificate, const Crypto::P256PublicKey & operationalPublicKey, FabricId fabricId, NodeId nodeId, const chip::CATValues & cats, uint32_t validityStart, uint32_t validityEnd, MutableByteSpan & noc);
+    static CHIP_ERROR GenerateOperationalCertificate(Crypto::P256Keypair & signingKeypair, const ByteSpan & signingCertificate,
+                                                     const Crypto::P256PublicKey & operationalPublicKey, FabricId fabricId,
+                                                     NodeId nodeId, const chip::CATValues & cats, uint32_t validityStart,
+                                                     uint32_t validityEnd, MutableByteSpan & noc);
 
 private:
     CHIP_ERROR CallbackGenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,

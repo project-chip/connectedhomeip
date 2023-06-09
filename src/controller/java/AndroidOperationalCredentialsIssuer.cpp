@@ -390,7 +390,9 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateRootCertificate(Crypto::P256Keypair & keypair, uint64_t issuerId, Optional<FabricId> fabricId, uint32_t validityStart, uint32_t validityEnd, MutableByteSpan & rcac)
+CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateRootCertificate(Crypto::P256Keypair & keypair, uint64_t issuerId,
+                                                                        Optional<FabricId> fabricId, uint32_t validityStart,
+                                                                        uint32_t validityEnd, MutableByteSpan & rcac)
 {
     ChipDN rcac_dn;
     ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(issuerId));
@@ -411,7 +413,9 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateRootCertificate(Crypto::
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateIntermediateCertificate(Crypto::P256Keypair & rootKeypair, const ByteSpan & rcac, const Crypto::P256PublicKey & intermediatePublicKey, uint64_t issuerId, Optional<FabricId> fabricId, uint32_t validityStart, uint32_t validityEnd, MutableByteSpan & icac)
+CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateIntermediateCertificate(
+    Crypto::P256Keypair & rootKeypair, const ByteSpan & rcac, const Crypto::P256PublicKey & intermediatePublicKey,
+    uint64_t issuerId, Optional<FabricId> fabricId, uint32_t validityStart, uint32_t validityEnd, MutableByteSpan & icac)
 {
     ChipDN rcac_dn;
     ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
@@ -435,7 +439,12 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateIntermediateCertificate(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateOperationalCertificate(Crypto::P256Keypair & signingKeypair, const ByteSpan & signingCertificate, const Crypto::P256PublicKey & operationalPublicKey, FabricId fabricId, NodeId nodeId, const chip::CATValues & cats, uint32_t validityStart, uint32_t validityEnd, MutableByteSpan & noc)
+CHIP_ERROR AndroidOperationalCredentialsIssuer::GenerateOperationalCertificate(Crypto::P256Keypair & signingKeypair,
+                                                                               const ByteSpan & signingCertificate,
+                                                                               const Crypto::P256PublicKey & operationalPublicKey,
+                                                                               FabricId fabricId, NodeId nodeId,
+                                                                               const chip::CATValues & cats, uint32_t validityStart,
+                                                                               uint32_t validityEnd, MutableByteSpan & noc)
 {
     ChipDN rcac_dn;
     ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(signingCertificate, rcac_dn));
