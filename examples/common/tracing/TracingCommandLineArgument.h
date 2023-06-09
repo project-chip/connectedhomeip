@@ -24,7 +24,6 @@
 namespace chip {
 namespace CommandLineApp {
 
-
 /// Enable tracing based on the given command line argument
 /// like "log" or "log,perfetto" or similar
 ///
