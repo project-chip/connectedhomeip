@@ -18,7 +18,9 @@
 
 #include <tracing/log_json/log_json_tracing.h>
 
+#include <lib/support/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
+#include <lib/address_resolve/TracingStructs.h>
 
 #include <json/json.h>
 
@@ -257,10 +259,16 @@ void LogJsonBackend::LogMessageReceived(MessageReceiveInfo &)
     LogJsonValue(value);
 }
 
-void LogJsonBackend::LogNodeLookup(NodeLookupInfo &)
+void LogJsonBackend::LogNodeLookup(NodeLookupInfo &info)
 {
     Json::Value value;
-    value["TODO"] = "LogNodeLookup";
+
+    value["event"] = "LogNodeLookup";
+    value["node_id"] = info.request->GetPeerId().GetNodeId();
+    value["compressed_fabric_id"] = info.request->GetPeerId().GetCompressedFabricId();
+    value["min_lookup_time_ms"] = info.request->GetMinLookupTime().count();
+    value["max_lookup_time_ms"] = info.request->GetMaxLookupTime().count();
+
     LogJsonValue(value);
 }
 
@@ -271,10 +279,15 @@ void LogJsonBackend::LogNodeDiscovered(NodeDiscoveredInfo &)
     LogJsonValue(value);
 }
 
-void LogJsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &)
+void LogJsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &info)
 {
     Json::Value value;
-    value["TODO"] = "LogNodeDiscoveryFailed";
+
+    value["event"] = "LogNodeDiscoveryFailed";
+    value["node_id"] = info.peerId->GetNodeId();
+    value["compressed_fabric_id"] = info.peerId->GetCompressedFabricId();
+    value["error"] = chip::ErrorStr(info.error);
+
     LogJsonValue(value);
 }
 

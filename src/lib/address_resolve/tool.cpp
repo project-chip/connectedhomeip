@@ -96,6 +96,7 @@ CHIP_ERROR Initialize()
 
 void Shutdown()
 {
+    chip::AddressResolve::Resolver::Instance().Shutdown();
     Dnssd::Resolver::Instance().Shutdown();
     DeviceLayer::PlatformMgr().Shutdown();
 }
@@ -141,11 +142,19 @@ bool Cmd_Node(int argc, const char ** argv)
     return true;
 }
 
+void StopSignalHandler(int signal)
+{
+    DeviceLayer::PlatformMgr().StopEventLoopTask();
+}
+
 } // namespace
 
 extern "C" int main(int argc, const char ** argv)
 {
     Platform::MemoryInit();
+
+    signal(SIGTERM, StopSignalHandler);
+    signal(SIGINT, StopSignalHandler);
 
     // skip binary name
     argc--;
