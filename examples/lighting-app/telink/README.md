@@ -251,7 +251,7 @@ Usage of OTA:
 -   Use the chip-tool to announce the ota-provider-app to start the OTA process
 
     ```
-    ./chip-tool otasoftwareupdaterequestor announce-ota-provider ${OTA_PROVIDER_NODE_ID} 0 0 0 ${DEVICE_NODE_ID} 0
+    ./chip-tool otasoftwareupdaterequestor announce-otaprovider ${OTA_PROVIDER_NODE_ID} 0 0 0 ${DEVICE_NODE_ID} 0
     ```
 
     here:
