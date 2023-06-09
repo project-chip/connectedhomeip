@@ -95,7 +95,7 @@ jobs:
                         --copy-artifacts-to out/artifacts \
                      "
             - name: Build Matter SDK library
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   config/qpg/chip-gn/build.sh
 

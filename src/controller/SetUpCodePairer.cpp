@@ -37,9 +37,13 @@ namespace chip {
 namespace Controller {
 
 CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
-                                       DiscoveryType discoveryType)
+                                       DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
 {
     VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (resolutionData.HasValue())
+    {
+        VerifyOrReturnError(discoveryType != DiscoveryType::kAll, CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     SetupPayload payload;
     mConnectionType = commission;
@@ -62,12 +66,16 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
 
     ResetDiscoveryState();
 
-    ReturnErrorOnFailure(Connect(payload));
+    if (resolutionData.HasValue())
+    {
+        NotifyCommissionableDeviceDiscovered(resolutionData.Value());
+        return CHIP_NO_ERROR;
+    }
 
+    ReturnErrorOnFailure(Connect(payload));
     return mSystemLayer->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout), OnDeviceDiscoveredTimeoutCallback,
                                     this);
 }
-
 CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -358,20 +366,23 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
 
     ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
 
-    auto & resolutionData = nodeData.resolutionData;
+    NotifyCommissionableDeviceDiscovered(nodeData.resolutionData);
+}
 
+void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonResolutionData & resolutionData)
+{
     if (mDiscoveryType == DiscoveryType::kDiscoveryNetworkOnlyWithoutPASEAutoRetry)
     {
         // If the discovery type does not want the PASE auto retry mechanism, we will just store
         // a single IP. So the discovery process is stopped as it won't be of any help anymore.
         StopConnectOverIP();
-        mDiscoveredParameters.emplace_back(nodeData.resolutionData, 0);
+        mDiscoveredParameters.emplace_back(resolutionData, 0);
     }
     else
     {
         for (size_t i = 0; i < resolutionData.numIPs; i++)
         {
-            mDiscoveredParameters.emplace_back(nodeData.resolutionData, i);
+            mDiscoveredParameters.emplace_back(resolutionData, i);
         }
     }
 

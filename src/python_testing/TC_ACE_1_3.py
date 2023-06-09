@@ -60,9 +60,7 @@ class TC_ACE_1_3(MatterBaseTest):
         logging.info('cat1v1 0x%x', cat1v1)
 
         self.print_step(1, "Commissioning, already done")
-        TH0 = self.default_controller
-        # _ = TH0 Hack for flake8 F841 local variable 'TH0' is assigned to but never used
-        _ = TH0
+
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
 
         TH0_nodeid = self.matter_test_config.controller_node_id
@@ -343,7 +341,13 @@ class TC_ACE_1_3(MatterBaseTest):
 
         self.print_step(58, "TH0 writes ACL back to default")
 
-        acl = [TH0_admin_acl]
+        full_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[TH0_nodeid],
+            targets=[])
+
+        acl = [full_acl]
         await self.write_acl(acl)
 
 

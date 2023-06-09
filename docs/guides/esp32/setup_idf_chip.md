@@ -69,6 +69,17 @@ source scripts/bootstrap.sh
 Whenever Matter environment is out of date, it can be updated by running above
 command.
 
+In IDF v4.4.x, `esptool` is part of the esp-idf repository, but in IDF v5.x, it
+is moved out as a Python package which can be installed using pip.
+
+If you are using IDF v5.x or later, please install `esptool` using the command
+below:
+
+```
+# Please make sure to run this command in the Matter Python environment
+python3 -m pip install esptool
+```
+
 For MacOS, `gdbgui` python package will not be installed using `bootstrap.sh`
 script as it is restricted only for x64 Linux platforms. It is restricted
 because, building wheels for `gevent` (dependency of `gdbgui`) fails on MacOS.

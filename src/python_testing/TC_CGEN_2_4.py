@@ -33,7 +33,7 @@ class TC_CGEN_2_4(MatterBaseTest):
     def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
             params = self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.matter_test_config.discriminator[0], option=1)
+                nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.matter_test_config.discriminators[0], option=1)
             time.sleep(5)
             return params
 
@@ -52,7 +52,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         self.th2.SetTestCommissionerPrematureCompleteAfter(stage)
         success, errcode = self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminator[0])
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminators[0])
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(success, errcode))
         asserts.assert_false(success, 'Commissioning complete did not error as expected')
         asserts.assert_true(errcode.sdk_part == expectedErrorPart, 'Unexpected error type returned from CommissioningComplete')
@@ -92,7 +92,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         self.th2.ResetTestCommissioner()
         success, errcode = self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminator[0])
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminators[0])
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(success, errcode))
 
         logging.info('Step 17 - TH1 sends an arm failsafe')
