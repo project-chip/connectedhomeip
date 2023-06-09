@@ -60,6 +60,7 @@ class ASRBuilder(GnBuilder):
                  chip_build_libshell: bool = False,
                  chip_logging: bool = True,
                  enable_factory: bool = False,
+                 enable_rotating_device_id: bool = False,
                  enable_ota_requestor: bool = False):
         super(ASRBuilder, self).__init__(
             root=app.BuildRoot(root),
@@ -103,6 +104,10 @@ class ASRBuilder(GnBuilder):
         if enable_factory:
             self.extra_gn_options.append('chip_use_transitional_commissionable_data_provider=false')
             self.extra_gn_options.append('chip_enable_factory_data=true')
+
+        if enable_rotating_device_id:
+            self.extra_gn_options.append('chip_enable_additional_data_advertising=true')
+            self.extra_gn_options.append('chip_enable_rotating_device_id=true')
 
         self.extra_gn_options.append('asr_toolchain_root="%s"' % os.environ['ASR_TOOLCHAIN_PATH'])
 

@@ -425,6 +425,8 @@ def BuildASRTarget():
     target.AppendModifier('ota', enable_ota_requestor=True)
     target.AppendModifier('shell', chip_build_libshell=True)
     target.AppendModifier('no_logging', chip_logging=False)
+    target.AppendModifier('factory', enable_factory=True)
+    target.AppendModifier('rotating_id', enable_rotating_device_id=True)
 
     return target
 

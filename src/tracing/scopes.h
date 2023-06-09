@@ -95,6 +95,7 @@ enum class Scope
     PASESession_SendPBKDFParamRequest                                  = 66,
     PASESession_SendPBKDFParamResponse                                 = 67,
     PASESession_SetupSpake2p                                           = 68,
+    Resolve_IncrementalRecordParse                                     = 69,
 };
 
 /// An event that happened at an instant (like a zero sized scope)

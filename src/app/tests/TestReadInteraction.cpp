@@ -468,7 +468,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     ctx.DrainAndServiceIO();
 
     GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
-    err = readClient.ProcessReportData(std::move(buf));
+    err = readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -494,7 +494,7 @@ void TestReadInteraction::TestReadUnexpectedSubscriptionId(nlTestSuite * apSuite
     // For read, we don't expect there is subscription id in report data.
     GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/,
                        true /*aHasSubscriptionId*/);
-    err = readClient.ProcessReportData(std::move(buf));
+    err = readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -637,7 +637,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
 
-    err = readClient.ProcessReportData(std::move(buf));
+    err = readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
 }
 

@@ -104,7 +104,7 @@ menu "CHIP Core"
 
         config BUILD_CHIP_TESTS
             bool "Build CHIP tests"
-            default "y"
+            default n
             help
                 Build CHIP test binaries.
 
