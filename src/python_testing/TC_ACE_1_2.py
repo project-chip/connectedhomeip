@@ -19,7 +19,6 @@ import logging
 import queue
 
 import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
 from chip.clusters import ClusterObjects as ClustersObjects
 from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath, EventReadResult
 from chip.exceptions import ChipStackError
@@ -157,8 +156,6 @@ class TC_ACE_1_2(MatterBaseTest):
         ace_queue = queue.Queue()
         ace_cb = EventChangeCallback(Clusters.AccessControl.Events.AccessControlEntryChanged, ace_queue)
         subscription_ace.SetEventUpdateCallback(ace_cb)
-        resubscription_cb = ResubscriptionCallback()
-        subscription_ace.SetResubscriptionAttemptedCallback(callback=resubscription_cb, isAsync=False)
 
         self.print_step(6, "TH1 writes ACL attribute")
         acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
