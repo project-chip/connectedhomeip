@@ -22,8 +22,8 @@ config("default_config") {
 
 source_set("commandline") {
   sources = [
-    "TracingCommandLineArgument.h",
     "TracingCommandLineArgument.cpp",
+    "TracingCommandLineArgument.h",
   ]
 
   deps = [
@@ -46,7 +46,6 @@ source_set("trace_handlers") {
 
   cflags = [ "-Wconversion" ]
 }
-
 
 source_set("trace_handlers_decoder") {
   sources = [
