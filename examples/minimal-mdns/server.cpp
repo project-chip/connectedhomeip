@@ -109,7 +109,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        instance name to advertise.\n"
                              "  -t <dest>\n"
                              "  --trace-to <dest>\n"
-                             "        trace to the given destination.\n"
+                             "        trace to the given destination (supported: " SUPPORTED_COMMAND_LINE_TRACING_TARGETS ").\n"
                              "\n" };
 
 HelpOptions helpOptions("minimal-mdns-server", "Usage: minimal-mdns-server [options]", "1.0");

@@ -45,7 +45,7 @@ const char * const sHelp =
     "Usage: address-resolve-tool [<options...>] <command> [ <args...> ]\n"
     "\n"
     "Options:\n"
-    "   --trace-to <dest> -- Trace to the given destination\n"
+    "   --trace-to <dest> -- Trace to the given destination (" SUPPORTED_COMMAND_LINE_TRACING_TARGETS ")\n"
     "Commands:\n"
     "\n"
     "    node <nodeid> <compressed_fabricid> -- Find the node for the given node/fabric.\n"

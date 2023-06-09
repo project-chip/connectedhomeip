@@ -170,7 +170,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  --multicast-reply\n"
                              "        Do not request unicast replies\n"
                              "  --trace-to <dest>\n"
-                             "        trace to the given destination.\n"
+                             "        trace to the given destination (supported: " SUPPORTED_COMMAND_LINE_TRACING_TARGETS ").\n"
                              "\n" };
 
 HelpOptions helpOptions("minimal-mdns-client", "Usage: minimal-mdns-client [options]", "1.0");

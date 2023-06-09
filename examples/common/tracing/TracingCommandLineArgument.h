@@ -17,8 +17,13 @@
  */
 #pragma once
 
+/// A string with supported command line tracing targets
+/// to be pretty-printed in help strings if needed
+#define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "log"
+
 namespace chip {
 namespace CommandLineApp {
+
 
 /// Enable tracing based on the given command line argument
 /// like "log" or "log,perfetto" or similar
