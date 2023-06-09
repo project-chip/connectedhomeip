@@ -35,6 +35,7 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
 #include <trace/trace.h>
+#include <tracing/scope.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -155,6 +156,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("ArmFailSafe", "GeneralCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::GeneralCommissioning_ArmFailSafe);
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
 
@@ -217,6 +219,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     const Commands::CommissioningComplete::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("CommissioningComplete", "GeneralCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::GeneralCommissioning_CommissioningComplete);
 
     DeviceControlServer * devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     auto & failSafe               = Server::GetInstance().GetFailSafeContext();
@@ -284,6 +287,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
                                                                    const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::GeneralCommissioning_SetRegulatoryConfig);
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     Commands::SetRegulatoryConfigResponse::Type response;
 

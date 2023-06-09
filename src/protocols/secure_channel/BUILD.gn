@@ -37,5 +37,6 @@ static_library("secure_channel") {
     "${chip_root}/src/messaging",
     "${chip_root}/src/system",
     "${chip_root}/src/trace",
+    "${chip_root}/src/tracing",
   ]
 }
