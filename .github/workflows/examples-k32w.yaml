@@ -91,7 +91,6 @@ jobs:
                       --target k32w-lock-crypto-platform-low-power-nologs \
                       --target k32w-contact-crypto-platform-tokenizer \
                       --target k32w-contact-crypto-platform-low-power-nologs \
-                      --target k32w-shell-crypto-platform \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
