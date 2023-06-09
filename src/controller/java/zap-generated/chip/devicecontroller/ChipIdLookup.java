@@ -156,6 +156,9 @@ public final class ChipIdLookup {
     if (clusterId == 82L) {
       return "RefrigeratorAndTemperatureControlledCabinetModeSelect";
     }
+    if (clusterId == 83L) {
+      return "WasherControls";
+    }
     if (clusterId == 84L) {
       return "RvcRunModeSelect";
     }
@@ -2240,6 +2243,39 @@ public final class ChipIdLookup {
       }
       return "";
     }
+    if (clusterId == 83L) {
+      if (attributeId == 0L) {
+        return "SpinSpeeds";
+      }
+      if (attributeId == 1L) {
+        return "SpinSpeedCurrent";
+      }
+      if (attributeId == 2L) {
+        return "NumberOfRinses";
+      }
+      if (attributeId == 3L) {
+        return "MaxRinses";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
     if (clusterId == 84L) {
       if (attributeId == 0L) {
         return "Description";
@@ -2326,7 +2362,7 @@ public final class ChipIdLookup {
         return "Step";
       }
       if (attributeId == 4L) {
-        return "CurrentTemperatureLevelIndex";
+        return "SelectedTemperatureLevel";
       }
       if (attributeId == 5L) {
         return "SupportedTemperatureLevels";
@@ -7259,6 +7295,9 @@ public final class ChipIdLookup {
       return "";
     }
     if (clusterId == 82L) {
+      return "";
+    }
+    if (clusterId == 83L) {
       return "";
     }
     if (clusterId == 84L) {
