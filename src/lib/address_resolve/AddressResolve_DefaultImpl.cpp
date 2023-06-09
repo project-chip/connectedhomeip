@@ -38,7 +38,7 @@ void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLo
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
 {
-    MATTER_LOG_NODE_DISCOVERED(chip::Tracing::DiscoveryInfoType::kIntermediateResult, &GetRequest().GetPeerId(), &result);
+    MATTER_LOG_NODE_DISCOVERED(Tracing::DiscoveryInfoType::kIntermediateResult, &GetRequest().GetPeerId(), &result);
 
     auto score = Dnssd::IPAddressSorter::ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface());
     [[maybe_unused]] bool success = mResults.UpdateResults(result, score);
@@ -201,7 +201,7 @@ CHIP_ERROR Resolver::TryNextResult(Impl::NodeLookupHandle & handle)
     auto peerId   = handle.GetRequest().GetPeerId();
     auto result   = handle.TakeLookupResult();
 
-    MATTER_LOG_NODE_DISCOVERED(chip::Tracing::DiscoveryInfoType::kRetryDifferent, &peerId, &result);
+    MATTER_LOG_NODE_DISCOVERED(Tracing::DiscoveryInfoType::kRetryDifferent, &peerId, &result);
 
     listener->OnNodeAddressResolved(peerId, result);
     return CHIP_NO_ERROR;
@@ -333,7 +333,7 @@ void Resolver::HandleAction(IntrusiveList<NodeLookupHandle>::Iterator & current)
         listener->OnNodeAddressResolutionFailed(peerId, action.ErrorResult());
         break;
     case NodeLookupResult::kLookupSuccess:
-        MATTER_LOG_NODE_DISCOVERED(chip::Tracing::DiscoveryInfoType::kResolutionDone, &peerId, &action.ResolveResult());
+        MATTER_LOG_NODE_DISCOVERED(Tracing::DiscoveryInfoType::kResolutionDone, &peerId, &action.ResolveResult());
         listener->OnNodeAddressResolved(peerId, action.ResolveResult());
         break;
     default:
