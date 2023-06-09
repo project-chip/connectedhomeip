@@ -19,7 +19,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -28,11 +27,11 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/clusters/washer-controls-server/washer-controls-delegate.h>
 #include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
-#include <app/clusters/washer-controls-server/washer-controls-delegate.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -42,8 +41,7 @@ using namespace chip::app::Clusters::WasherControls::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kWasherControlsDelegateTableSize =
-     EMBER_AF_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
+    EMBER_AF_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -60,8 +58,8 @@ namespace WasherControls {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ContentLauncher::Id,
-                                                       EMBER_AF_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, ContentLauncher::Id, EMBER_AF_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kWasherControlsDelegateTableSize)
     {
@@ -79,8 +77,8 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 namespace {
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ContentLauncher::Id,
-                                                       EMBER_AF_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, ContentLauncher::Id, EMBER_AF_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kWasherControlsDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -94,8 +92,6 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
     return false;
 }
 
-
-
 class WasherControlsAttrAccess : public AttributeAccessInterface
 {
 public:
@@ -103,13 +99,13 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    CHIP_ERROR ReadSpinSpeeds(AttributeValueEncoder & aEncoder, Delegate *delegate);
+    CHIP_ERROR ReadSpinSpeeds(AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadSpinSpeedCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadNumberOfRinses(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxRinses(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
 
-CHIP_ERROR WasherControlsAttrAccess::ReadSpinSpeeds(AttributeValueEncoder & aEncoder, Delegate *delegate)
+CHIP_ERROR WasherControlsAttrAccess::ReadSpinSpeeds(AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
     return delegate->HandleGetSpinSpeedsList(aEncoder);
 }
@@ -142,7 +138,7 @@ CHIP_ERROR WasherControlsAttrAccess::ReadNumberOfRinses(EndpointId endpoint, Att
 
 CHIP_ERROR WasherControlsAttrAccess::ReadMaxRinses(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    uint8_t maxRinses=0;
+    uint8_t maxRinses = 0;
     MaxRinses::Get(endpoint, &maxRinses);
     return aEncoder.Encode(maxRinses);
 }
@@ -150,7 +146,7 @@ CHIP_ERROR WasherControlsAttrAccess::ReadMaxRinses(EndpointId endpoint, Attribut
 CHIP_ERROR WasherControlsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     EndpointId endpoint = aPath.mEndpointId;
-    Delegate *delegate = GetDelegate(endpoint);
+    Delegate * delegate = GetDelegate(endpoint);
 
     if (aPath.mClusterId != WasherControls::Id)
     {
@@ -159,23 +155,24 @@ CHIP_ERROR WasherControlsAttrAccess::Read(const ConcreteReadAttributePath & aPat
     }
     switch (aPath.mAttributeId)
     {
-        case Attributes::SpinSpeeds::Id:
-	    if (isDelegateNull(delegate, endpoint)) {
-                return aEncoder.EncodeEmptyList();
-	    }
-            return ReadSpinSpeeds(aEncoder, delegate);
-        case Attributes::SpinSpeedCurrent::Id:
-            return ReadSpinSpeedCurrent(endpoint, aEncoder);
-        case Attributes::NumberOfRinses::Id:
-            return ReadNumberOfRinses(endpoint, aEncoder);
-        case Attributes::MaxRinses::Id:
-            return ReadMaxRinses(endpoint, aEncoder);
-        default:
-            break;
+    case Attributes::SpinSpeeds::Id:
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+        return ReadSpinSpeeds(aEncoder, delegate);
+    case Attributes::SpinSpeedCurrent::Id:
+        return ReadSpinSpeedCurrent(endpoint, aEncoder);
+    case Attributes::NumberOfRinses::Id:
+        return ReadNumberOfRinses(endpoint, aEncoder);
+    case Attributes::MaxRinses::Id:
+        return ReadMaxRinses(endpoint, aEncoder);
+    default:
+        break;
     }
     return CHIP_NO_ERROR;
 }
-}
+} // namespace
 
 void emberAfWasherControlsClusterInitCallback(chip::EndpointId endpoint)
 {

@@ -28,8 +28,7 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace WasherControls{
-
+namespace WasherControls {
 
 /** @brief
  *    Defines methods for implementing application-specific logic for the Washer Controls Cluster.
@@ -38,7 +37,7 @@ class Delegate
 {
 public:
     virtual CHIP_ERROR HandleGetSpinSpeedsList(app::AttributeValueEncoder & aEncoder) = 0;
-    virtual ~Delegate() = default;
+    virtual ~Delegate()                                                               = default;
 };
 
 } // namespace WasherControls
