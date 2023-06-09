@@ -243,6 +243,11 @@ HelpOptions helpOptions("advertiser", "Usage: advertiser [options]", "1.0");
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
+void StopSignalHandler(int signal)
+{
+    DeviceLayer::PlatformMgr().StopEventLoopTask();
+}
+
 } // namespace
 
 int main(int argc, char ** args)
@@ -325,8 +330,13 @@ int main(int argc, char ** args)
         return 1;
     }
 
+    signal(SIGTERM, StopSignalHandler);
+    signal(SIGINT, StopSignalHandler);
+
     DeviceLayer::PlatformMgr().RunEventLoop();
+
     CommandLineApp::StopTracing();
+    Dnssd::Resolver::Instance().Shutdown();
     DeviceLayer::PlatformMgr().Shutdown();
 
     printf("Done...\n");
