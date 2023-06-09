@@ -204,4 +204,3 @@ void MatterWasherControlsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }
-
