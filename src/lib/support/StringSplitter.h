@@ -44,7 +44,7 @@ public:
         }
     }
 
-    /// Returns the next character san
+    /// Returns the next character span
     ///
     /// out - contains the next element or a nullptr/0 sized span if
     ///       no elements available
