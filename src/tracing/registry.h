@@ -54,6 +54,18 @@ private:
     Backend * mBackend;
 };
 
+/// Convenience class to create and register a backend directly
+template <class BACKEND, typename... Args>
+class ScopedBackendRegistration
+{
+  public:
+    ScopedBackendRegistration(Args&&... args): mBackend(std::forward(args)...), mRegistration(mBackend) {}
+
+  private:
+    BACKEND mBackend;
+    ScopedRegistration mRegistration;
+};
+
 #ifdef MATTER_TRACING_ENABLED
 
 // Internal calls, that will delegate to appropriate backends as needed

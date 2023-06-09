@@ -25,8 +25,12 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <tracing/registry.h>
+#include <tracing/log_json/log_json_tracing.h>
 
 using namespace chip;
+using chip::Tracing::ScopedBackendRegistration;
+using chip::Tracing::LogJson::LogJsonBackend;
 
 namespace {
 
@@ -260,6 +264,8 @@ int main(int argc, char ** args)
         fprintf(stderr, "FAILED to start MDNS advertisement\n");
         return 1;
     }
+
+    ScopedBackendRegistration<LogJsonBackend> log_json_tracing;
 
     CHIP_ERROR err;
 

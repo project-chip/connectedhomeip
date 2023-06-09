@@ -37,10 +37,14 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
+#include <tracing/registry.h>
+#include <tracing/log_json/log_json_tracing.h>
 
 #include "PacketReporter.h"
 
 using namespace chip;
+using chip::Tracing::ScopedBackendRegistration;
+using chip::Tracing::LogJson::LogJsonBackend;
 
 namespace {
 
@@ -198,6 +202,8 @@ int main(int argc, char ** args)
     {
         return 1;
     }
+
+    ScopedBackendRegistration<LogJsonBackend> log_json_tracing;
 
     // This forces the global MDNS instance to be loaded in, effectively setting
     // built in policies for addresses.

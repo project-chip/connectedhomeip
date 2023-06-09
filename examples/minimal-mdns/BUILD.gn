@@ -38,6 +38,8 @@ executable("minimal-mdns-client") {
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/dnssd/minimal_mdns",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing/log_json",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -53,6 +55,8 @@ executable("minimal-mdns-server") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/dnssd/minimal_mdns",
     "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing/log_json",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -67,6 +71,8 @@ executable("mdns-advertiser") {
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/dnssd",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing/log_json",
   ]
 
   cflags = [ "-Wconversion" ]
