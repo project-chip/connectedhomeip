@@ -33,12 +33,11 @@ using namespace chip;
 using chip::Inet::InterfaceId;
 using chip::Transport::PeerAddress;
 
-class AutoStopTracing {
-  public:
+class AutoStopTracing
+{
+public:
     AutoStopTracing() {}
-    ~AutoStopTracing() {
-        chip::CommandLineApp::StopTracing();
-    }
+    ~AutoStopTracing() { chip::CommandLineApp::StopTracing(); }
 };
 
 // clang-format off
@@ -162,20 +161,29 @@ extern "C" int main(int argc, const char ** argv)
 
     AutoStopTracing auto_stop_tracing;
 
-    while (argc > 0) {
-        if (strcasecmp(argv[0], "--help") == 0 || strcasecmp(argv[0], "-h") == 0) {
+    while (argc > 0)
+    {
+        if (strcasecmp(argv[0], "--help") == 0 || strcasecmp(argv[0], "-h") == 0)
+        {
             fputs(sHelp, stdout);
             return 0;
-        } else if (strcasecmp(argv[0], "--trace-to") == 0) {
-            if (argc > 1) {
+        }
+        else if (strcasecmp(argv[0], "--trace-to") == 0)
+        {
+            if (argc > 1)
+            {
                 chip::CommandLineApp::EnableTracingFor(argv[1]);
                 argc -= 2;
                 argv += 2;
-            } else {
+            }
+            else
+            {
                 ChipLogError(NotSpecified, "Missing trace to argument.");
                 return -1;
             }
-        } else {
+        }
+        else
+        {
             break;
         }
     }

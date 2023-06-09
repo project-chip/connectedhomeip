@@ -82,7 +82,7 @@ constexpr uint16_t kOptionCommissioningRotatingId         = 0x700;
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
-constexpr uint16_t kOptionTraceTo      = 't';
+constexpr uint16_t kOptionTraceTo             = 't';
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {

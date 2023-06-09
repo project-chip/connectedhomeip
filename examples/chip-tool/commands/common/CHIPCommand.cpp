@@ -18,6 +18,7 @@
 
 #include "CHIPCommand.h"
 
+#include <TracingCommandLineArgument.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <core/CHIPBuildConfig.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
@@ -25,7 +26,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
-#include <TracingCommandLineArgument.h>
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceDecoder.h"

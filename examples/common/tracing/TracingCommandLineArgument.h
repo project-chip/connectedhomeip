@@ -27,7 +27,7 @@ namespace CommandLineApp {
 ///
 /// Calling this method multiple times is ok and will enable each of
 /// the given tracing modules if not already enabled.
-void EnableTracingFor(const char *cliArg);
+void EnableTracingFor(const char * cliArg);
 
 /// If EnableTracingFor is called, this MUST be called as well
 /// to unregister tracing backends

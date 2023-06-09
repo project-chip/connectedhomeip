@@ -17,14 +17,14 @@
  */
 #include <TracingCommandLineArgument.h>
 
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/StringSplitter.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <tracing/log_json/log_json_tracing.h>
 #include <tracing/registry.h>
 
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace chip {
 namespace CommandLineApp {
@@ -40,15 +40,17 @@ LogJsonBackend log_json_backend;
 // as the vector is cleared (and we do so when stopping tracing).
 std::vector<std::unique_ptr<ScopedRegistration>> tracing_backends;
 
-}
+} // namespace
 
-void EnableTracingFor(const char *cliArg) {
+void EnableTracingFor(const char * cliArg)
+{
     chip::StringSplitter splitter(cliArg, ',');
     chip::CharSpan value;
 
     while (splitter.Next(value))
     {
-        if (value.data_equal(CharSpan::fromCharString("log"))) {
+        if (value.data_equal(CharSpan::fromCharString("log")))
+        {
             if (!log_json_backend.IsInList())
             {
                 tracing_backends.push_back(std::make_unique<ScopedRegistration>(log_json_backend));
@@ -61,7 +63,8 @@ void EnableTracingFor(const char *cliArg) {
     }
 }
 
-void StopTracing() {
+void StopTracing()
+{
     tracing_backends.clear();
 }
 
