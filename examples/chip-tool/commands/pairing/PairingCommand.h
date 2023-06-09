@@ -36,6 +36,7 @@ enum class PairingMode
     SoftAP,
     AlreadyDiscovered,
     AlreadyDiscoveredByIndex,
+    AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
 };
 
@@ -122,6 +123,12 @@ public:
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
+        case PairingMode::AlreadyDiscoveredByIndexWithCode:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("payload", &mOnboardingPayload);
+            AddArgument("index", 0, UINT16_MAX, &mIndex);
+            AddArgument("pase-only", 0, 1, &mPaseOnly);
+            break;
         }
 
         switch (filterType)
@@ -180,6 +187,7 @@ private:
     CHIP_ERROR PairWithCode(NodeId remoteId);
     CHIP_ERROR PaseWithCode(NodeId remoteId);
     CHIP_ERROR PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t index);
+    CHIP_ERROR PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uint16_t index);
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
 
