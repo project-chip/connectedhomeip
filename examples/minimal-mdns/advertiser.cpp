@@ -20,17 +20,14 @@
 #include <arpa/inet.h>
 #include <strings.h>
 
+#include <TracingCommandLineArgument.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <tracing/registry.h>
-#include <tracing/log_json/log_json_tracing.h>
 
 using namespace chip;
-using chip::Tracing::ScopedBackendRegistration;
-using chip::Tracing::LogJson::LogJsonBackend;
 
 namespace {
 
@@ -85,6 +82,7 @@ constexpr uint16_t kOptionCommissioningRotatingId         = 0x700;
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
+constexpr uint16_t kOptionTraceTo      = 't';
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -93,6 +91,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     {
     case kOptionEnableIpV4:
         gOptions.enableIpV4 = true;
+        return true;
+    case kOptionTraceTo:
+        CommandLineApp::EnableTracingFor(aValue);
         return true;
     case kOptionAdvertisingMode:
         if (strcmp(aValue, "operational") == 0)
@@ -191,6 +192,7 @@ OptionDef cmdLineOptionsDef[] = {
 
     { "fabric-id", kArgumentRequired, kOptionOperationalFabricId },
     { "node-id", kArgumentRequired, kOptionOperationalNodeId },
+    { "trace-to", kArgumentRequired, kOptionTraceTo },
     {},
 };
 
@@ -232,6 +234,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  --node-id <value>\n"
                              "  -n <value>\n"
                              "        Operational node id.\n"
+                             "  -t <dest>\n"
+                             "  --trace-to <dest>\n"
+                             "        trace to the given destination.\n"
                              "\n" };
 
 HelpOptions helpOptions("advertiser", "Usage: advertiser [options]", "1.0");
@@ -264,8 +269,6 @@ int main(int argc, char ** args)
         fprintf(stderr, "FAILED to start MDNS advertisement\n");
         return 1;
     }
-
-    ScopedBackendRegistration<LogJsonBackend> log_json_tracing;
 
     CHIP_ERROR err;
 
@@ -323,6 +326,8 @@ int main(int argc, char ** args)
     }
 
     DeviceLayer::PlatformMgr().RunEventLoop();
+    CommandLineApp::StopTracing();
+    DeviceLayer::PlatformMgr().Shutdown();
 
     printf("Done...\n");
     return 0;

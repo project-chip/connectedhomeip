@@ -20,6 +20,23 @@ config("default_config") {
   include_dirs = [ "." ]
 }
 
+source_set("commandline") {
+  sources = [
+    "TracingCommandLineArgument.h",
+    "TracingCommandLineArgument.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing/log_json",
+  ]
+
+  public_configs = [ ":default_config" ]
+
+  cflags = [ "-Wconversion" ]
+}
+
 source_set("trace_handlers") {
   sources = [ "TraceHandlers.cpp" ]
 
@@ -29,6 +46,7 @@ source_set("trace_handlers") {
 
   cflags = [ "-Wconversion" ]
 }
+
 
 source_set("trace_handlers_decoder") {
   sources = [

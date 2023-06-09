@@ -20,6 +20,7 @@
 
 #include <arpa/inet.h>
 
+#include <TracingCommandLineArgument.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
@@ -37,16 +38,12 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
-#include <tracing/registry.h>
-#include <tracing/log_json/log_json_tracing.h>
 
 #include "PacketReporter.h"
 
-using namespace chip;
-using chip::Tracing::ScopedBackendRegistration;
-using chip::Tracing::LogJson::LogJsonBackend;
-
 namespace {
+
+using namespace chip;
 
 struct Options
 {
@@ -60,6 +57,7 @@ using namespace ArgParser;
 constexpr uint16_t kOptionEnableIpV4   = '4';
 constexpr uint16_t kOptionListenPort   = 'p';
 constexpr uint16_t kOptionInstanceName = 'i';
+constexpr uint16_t kOptionTraceTo      = 't';
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -71,6 +69,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 
     case kOptionInstanceName:
         gOptions.instanceName = aValue;
+        return true;
+
+    case kOptionTraceTo:
+        CommandLineApp::EnableTracingFor(aValue);
         return true;
 
     case kOptionListenPort:
@@ -91,6 +93,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "listen-port", kArgumentRequired, kOptionListenPort },
     { "enable-ip-v4", kNoArgument, kOptionEnableIpV4 },
     { "instance-name", kArgumentRequired, kOptionInstanceName },
+    { "trace-to", kArgumentRequired, kOptionTraceTo },
     {},
 };
 
@@ -104,6 +107,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -i <name>\n"
                              "  --instance-name <name>\n"
                              "        instance name to advertise.\n"
+                             "  -t <dest>\n"
+                             "  --trace-to <dest>\n"
+                             "        trace to the given destination.\n"
                              "\n" };
 
 HelpOptions helpOptions("minimal-mdns-server", "Usage: minimal-mdns-server [options]", "1.0");
@@ -179,7 +185,6 @@ void StopSignalHandler(int signal)
     gMdnsServer.Shutdown();
 
     DeviceLayer::PlatformMgr().StopEventLoopTask();
-    DeviceLayer::PlatformMgr().Shutdown();
 }
 
 } // namespace
@@ -203,8 +208,6 @@ int main(int argc, char ** args)
         return 1;
     }
 
-    ScopedBackendRegistration<LogJsonBackend> log_json_tracing;
-
     // This forces the global MDNS instance to be loaded in, effectively setting
     // built in policies for addresses.
     (void) chip::Dnssd::GlobalMinimalMdnsServer::Instance();
@@ -214,11 +217,11 @@ int main(int argc, char ** args)
     mdns::Minimal::QueryResponder<16 /* maxRecords */> queryResponder;
 
     mdns::Minimal::QNamePart tcpServiceName[]       = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol,
-                                                  Dnssd::kLocalDomain };
+                                                        Dnssd::kLocalDomain };
     mdns::Minimal::QNamePart tcpServerServiceName[] = { gOptions.instanceName, Dnssd::kOperationalServiceName,
                                                         Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
     mdns::Minimal::QNamePart udpServiceName[]       = { Dnssd::kCommissionableServiceName, Dnssd::kCommissionProtocol,
-                                                  Dnssd::kLocalDomain };
+                                                        Dnssd::kLocalDomain };
     mdns::Minimal::QNamePart udpServerServiceName[] = { gOptions.instanceName, Dnssd::kCommissionableServiceName,
                                                         Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
 
@@ -289,6 +292,8 @@ int main(int argc, char ** args)
     signal(SIGINT, StopSignalHandler);
 
     DeviceLayer::PlatformMgr().RunEventLoop();
+    CommandLineApp::StopTracing();
+    DeviceLayer::PlatformMgr().Shutdown();
 
     printf("Done...\n");
     return 0;

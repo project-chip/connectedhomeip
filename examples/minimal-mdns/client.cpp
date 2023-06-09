@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include <TracingCommandLineArgument.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
@@ -31,14 +32,10 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
-#include <tracing/registry.h>
-#include <tracing/log_json/log_json_tracing.h>
 
 #include "PacketReporter.h"
 
 using namespace chip;
-using chip::Tracing::ScopedBackendRegistration;
-using chip::Tracing::LogJson::LogJsonBackend;
 
 namespace {
 
@@ -65,6 +62,7 @@ constexpr uint16_t kOptionListenPort       = 0x100;
 constexpr uint16_t kOptionQueryPort        = 0x101;
 constexpr uint16_t kOptionRuntimeMs        = 0x102;
 constexpr uint16_t kOptionMulticastReplies = 0x103;
+constexpr uint16_t kOptionTraceTo          = 0x104;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -79,6 +77,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         return true;
     case kOptionQuery:
         gOptions.query = aValue;
+        return true;
+    case kOptionTraceTo:
+        CommandLineApp::EnableTracingFor(aValue);
         return true;
     case kOptionType:
         if (strcasecmp(aValue, "ANY") == 0)
@@ -149,6 +150,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "query-port", kArgumentRequired, kOptionQueryPort },
     { "timeout-ms", kArgumentRequired, kOptionRuntimeMs },
     { "multicast-reply", kNoArgument, kOptionMulticastReplies },
+    { "trace-to", kArgumentRequired, kOptionTraceTo },
     {},
 };
 
@@ -167,6 +169,8 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        How long to wait for replies\n"
                              "  --multicast-reply\n"
                              "        Do not request unicast replies\n"
+                             "  --trace-to <dest>\n"
+                             "        trace to the given destination.\n"
                              "\n" };
 
 HelpOptions helpOptions("minimal-mdns-client", "Usage: minimal-mdns-client [options]", "1.0");
@@ -314,8 +318,6 @@ int main(int argc, char ** args)
         return 1;
     }
 
-    ScopedBackendRegistration<LogJsonBackend> log_json_tracing;
-
     printf("Running...\n");
 
     ReportDelegate reporter;
@@ -357,6 +359,7 @@ int main(int argc, char ** args)
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 
+    CommandLineApp::StopTracing();
     DeviceLayer::PlatformMgr().Shutdown();
     Platform::MemoryShutdown();
 
