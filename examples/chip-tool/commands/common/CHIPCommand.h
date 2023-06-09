@@ -24,7 +24,7 @@
 
 #include "Command.h"
 
-#include <TracingCommandLinArgument.h>
+#include <TracingCommandLineArgument.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
 #include <credentials/GroupDataProviderImpl.h>
