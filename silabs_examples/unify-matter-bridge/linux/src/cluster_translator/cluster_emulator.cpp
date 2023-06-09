@@ -25,6 +25,8 @@
 
 #include <app-common/zap-generated/callback.h>
 
+using namespace chip::app;
+
 /**
  * @brief Use default values for external attribute storage, this functions overrides a _weak_ symbol on the ember framework.
  *
@@ -62,16 +64,16 @@ void OnTriggerEffect(::Identify * identify)
 {
     switch (identify->mCurrentEffectIdentifier)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
         sl_log_debug(LOG_TAG, "Blink\n");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
         sl_log_debug(LOG_TAG, "Breathe\n");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
         sl_log_debug(LOG_TAG, "Okay\n");
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
         sl_log_debug(LOG_TAG, "Channel Change\n");
         break;
     default:
@@ -81,7 +83,7 @@ void OnTriggerEffect(::Identify * identify)
 }
 
 static Identify gIdentify1 = {
-    chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
+    chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, OnTriggerEffect,
 };
 
 namespace unify::matter_bridge {
@@ -90,7 +92,6 @@ namespace unify::matter_bridge {
 #define LEVEL_ONOFF_DEPENDENCY_FEATURE_MAP_MASK 0x01
 #define LEVEL_LIGHTING_FEATURE_MAP_MASK 0x02
 
-using namespace chip::app;
 using namespace chip::app::Clusters;
 
 ClusterEmulator::ClusterEmulator()

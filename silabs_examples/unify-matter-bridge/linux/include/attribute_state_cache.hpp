@@ -75,7 +75,7 @@ public:
         }
         else if constexpr (unify::matter_bridge::is_nullable<T>::value)
         {
-            if (data.HasValidValue())
+            if (data.ExistingValueInEncodableRange())
             {
                 set(attributePath, data.Value());
             }

@@ -73,6 +73,14 @@ function unifyBitmapValName(n) {
   }
 }
 
+function unifyMatchStringValue(n, value) {
+  if(n.label === value) {
+    return true;
+  } else {
+    return false;
+  }
+}
+  
 
 function unifyTypeExists(matter_name) {
   var matter_type_that_dont_exits_in_unify = ["OnOffDelayedAllOffEffectVariant"];
@@ -122,6 +130,7 @@ exports.unifySupportedClusterAttribute = unifySupportedClusterAttribute
 exports.unifyClusterAttributeName = unifyClusterAttributeName
 exports.unifyEnumValName = unifyEnumValName
 exports.unifyBitmapValName = unifyBitmapValName
+exports.unifyMatchStringValue = unifyMatchStringValue
 exports.unifyClusterCommandArgument = unifyClusterCommandArgument
 exports.unifyTypeExists = unifyTypeExists
 exports.unifyCanPassThroughEnumValue = unifyCanPassThroughEnumValue

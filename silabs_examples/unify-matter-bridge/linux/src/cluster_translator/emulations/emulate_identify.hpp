@@ -58,7 +58,7 @@ public:
         // IdentifyType is a mandatory attribute we default it to None
         if (aPath.mAttributeId == Identify::Attributes::IdentifyType::Id)
         {
-            return aEncoder.Encode(Identify::IdentifyIdentifyType::EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE);
+            return aEncoder.Encode(Identify::IdentifyTypeEnum::kNone);
         }
 
         return CHIP_ERROR_INVALID_ARGUMENT;

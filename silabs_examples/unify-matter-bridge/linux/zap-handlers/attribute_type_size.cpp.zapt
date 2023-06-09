@@ -43,8 +43,13 @@ constexpr uint8_t ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE = 254;
 {{#if (unifySupportedCluster code)}}
 
 {{#zcl_bitmaps}}
+{{#if (unifyMatchStringValue this "Feature")}}
+constexpr uint8_t ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE  = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
+{{else}}
 constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE  = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
+{{/if}}
 {{/zcl_bitmaps}}
 
 {{#zcl_enums}}

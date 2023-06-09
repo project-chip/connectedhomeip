@@ -42,7 +42,7 @@ nlohmann::json inline to_json(const chip::app::DataModel::DecodableList<T>& valu
 template <typename T>
 nlohmann::json inline to_json(chip::app::DataModel::Nullable<T>& value)
 {
-    if ((!value.IsNull()) && value.HasValidValue()) {
+    if ((!value.IsNull()) && value.ExistingValueInEncodableRange()) {
         return to_json(value.Value());
     }
     return nlohmann::json::value_t::null;
