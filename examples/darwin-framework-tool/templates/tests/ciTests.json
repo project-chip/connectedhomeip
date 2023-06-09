@@ -32,6 +32,7 @@
         "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10",
         "DL_LockUnlock",
-        "Test_TC_TIMESYNC_1_1"
+        "Test_TC_TIMESYNC_1_1",
+        "Test_TC_TIMESYNC_2_3"
     ]
 }
