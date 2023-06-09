@@ -40,7 +40,7 @@ jobs:
               if: ${{ !env.ACT }}
               name: Checkout
               with:
-                  action: actions/checkout@v3.5.2
+                  action: actions/checkout@v3.5.3
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3
@@ -51,7 +51,7 @@ jobs:
             # Note you likely still need to have non submodules setup for the
             # local machine, like:
             #   git submodule deinit --all
-            - uses: actions/checkout@v3.5.2
+            - uses: actions/checkout@v3.5.3
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
 

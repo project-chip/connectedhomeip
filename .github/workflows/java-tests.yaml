@@ -49,7 +49,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3.5.2
+              uses: actions/checkout@v3.5.3
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
