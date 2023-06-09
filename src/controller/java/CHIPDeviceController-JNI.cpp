@@ -868,7 +868,9 @@ CHIP_ERROR GetEpochTime(JNIEnv * env, jobject calendar, uint32_t & epochTime)
 
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, calendar, "get", "(I)I", &getMethod));
 
-    universalTime.Year   = static_cast<uint16_t>(env->CallIntMethod(calendar, getMethod, yearID));
+    universalTime.Year = static_cast<uint16_t>(env->CallIntMethod(calendar, getMethod, yearID));
+    // The first month of the year in the Gregorian and Julian calendars is JANUARY which is 0. See detailed in
+    // https://docs.oracle.com/javase/8/docs/api/java/util/Calendar.html#MONTH
     universalTime.Month  = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, monthID)) + 1;
     universalTime.Day    = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, dayID));
     universalTime.Hour   = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, hourID));

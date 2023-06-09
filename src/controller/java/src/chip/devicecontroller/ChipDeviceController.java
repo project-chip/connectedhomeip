@@ -929,8 +929,10 @@ public class ChipDeviceController {
   /** Create a root (self-signed) X.509 DER encoded certificate */
   public static byte[] createRootCertificate(
       KeypairDelegate keypair, long issuerId, @Nullable Long fabricId) {
+    // current time
     Calendar start = Calendar.getInstance();
     Calendar end = Calendar.getInstance();
+    // current time + 10 years
     end.add(Calendar.YEAR, 10);
     return createRootCertificate(keypair, issuerId, fabricId, start, end);
   }
@@ -949,7 +951,9 @@ public class ChipDeviceController {
       byte[] intermediatePublicKey,
       long issuerId,
       @Nullable Long fabricId) {
+    // current time
     Calendar start = Calendar.getInstance();
+    // current time + 10 years
     Calendar end = Calendar.getInstance();
     end.add(Calendar.YEAR, 10);
     return createIntermediateCertificate(
@@ -983,7 +987,9 @@ public class ChipDeviceController {
       long fabricId,
       long nodeId,
       List<Integer> caseAuthenticatedTags) {
+    // current time
     Calendar start = Calendar.getInstance();
+    // current time + 10 years
     Calendar end = Calendar.getInstance();
     end.add(Calendar.YEAR, 10);
     return createOperationalCertificate(
