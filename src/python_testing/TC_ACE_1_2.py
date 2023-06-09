@@ -20,7 +20,7 @@ import queue
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClustersObjects
-from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath, EventReadResult
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
