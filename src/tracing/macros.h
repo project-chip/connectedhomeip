@@ -63,21 +63,21 @@
 #define MATTER_LOG_NODE_LOOKUP(...)                                                                                                \
     do                                                                                                                             \
     {                                                                                                                              \
-        ::chip::Tracing::NodeLookupInfo _trace_data(__VA_ARGS__);                                                                  \
+        ::chip::Tracing::NodeLookupInfo _trace_data{__VA_ARGS__};                                                                  \
         ::chip::Tracing::Internal::LogNodeLookup(_trace_data);                                                                     \
     } while (false)
 
 #define MATTER_LOG_NODE_DISCOVERED(...)                                                                                            \
     do                                                                                                                             \
     {                                                                                                                              \
-        ::chip::Tracing::NodeDiscoveredInfo _trace_data(__VA_ARGS__);                                                              \
+        ::chip::Tracing::NodeDiscoveredInfo _trace_data{__VA_ARGS__};                                                              \
         ::chip::Tracing::Internal::LogNodeDiscovered(_trace_data);                                                                 \
     } while (false)
 
 #define MATTER_LOG_NODE_DISCOVERY_FAILED(...)                                                                                      \
     do                                                                                                                             \
     {                                                                                                                              \
-        ::chip::Tracing::NodeDiscoveryFailedInfo _trace_data(__VA_ARGS__);                                                         \
+        ::chip::Tracing::NodeDiscoveryFailedInfo _trace_data{__VA_ARGS__};                                                         \
         ::chip::Tracing::Internal::LogNodeDiscoveryFailed(_trace_data);                                                            \
     } while (false)
 
