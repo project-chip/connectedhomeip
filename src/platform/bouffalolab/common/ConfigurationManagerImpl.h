@@ -67,6 +67,5 @@ private:
     static void DoFactoryReset(intptr_t arg);
 };
 
-
 } // namespace DeviceLayer
 } // namespace chip

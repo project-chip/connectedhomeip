@@ -23,8 +23,8 @@
 #include "BLEManagerImpl.h"
 
 #include <ble/CHIPBleServiceData.h>
-#include <lib/support/CodeUtils.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING

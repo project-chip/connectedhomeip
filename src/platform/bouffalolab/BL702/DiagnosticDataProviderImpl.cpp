@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 extern "C" {
 #include <bl_sys.h>
@@ -45,7 +45,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
     {
         bootReason = BootReasonType::kSoftwareReset;
     }
-    else {
+    else
+    {
         bootReason = BootReasonType::kUnspecified;
     }
     return CHIP_NO_ERROR;

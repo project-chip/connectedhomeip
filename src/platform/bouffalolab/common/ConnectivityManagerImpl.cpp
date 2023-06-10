@@ -71,7 +71,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     return CHIP_NO_ERROR;
 }
 
-
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     // Forward the event to the generic base classes as needed.

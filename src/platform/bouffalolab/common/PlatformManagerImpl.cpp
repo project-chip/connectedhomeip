@@ -21,7 +21,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
-
 namespace chip {
 namespace DeviceLayer {
 

@@ -38,9 +38,9 @@
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
 #include <utils_list.h>
 #endif
 

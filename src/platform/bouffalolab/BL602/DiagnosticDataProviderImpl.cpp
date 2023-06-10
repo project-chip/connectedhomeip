@@ -16,15 +16,15 @@
  */
 
 #include <lib/support/CHIPMemString.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lwip/tcpip.h>
 
 extern "C" {
-#include <bl_sys.h>
 #include <bl_efuse.h>
+#include <bl_sys.h>
 
 #include <bl60x_fw_api.h>
 #include <bl60x_wifi_driver/bl_main.h>
@@ -56,10 +56,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
     {
         bootReason = BootReasonType::kSoftwareReset;
     }
-    else {
+    else
+    {
         bootReason = BootReasonType::kUnspecified;
     }
-    
+
     return CHIP_NO_ERROR;
 }
 

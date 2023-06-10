@@ -20,31 +20,29 @@ import("${chip_root}/src/platform/device.gni")
 assert(chip_device_platform == "bl602")
 
 static_library("BL602") {
-
   sources = [
+    "ConfigurationManagerImpl.cpp",
     "ConnectivityManagerImpl.cpp",
+    "DiagnosticDataProviderImpl.cpp",
     "NetworkCommissioningDriver.cpp",
     "PlatformManagerImpl.cpp",
     "wifi_mgmr_portable.c",
-    "ConfigurationManagerImpl.cpp",
-    "DiagnosticDataProviderImpl.cpp",
   ]
 
   common_sources = [
+    "${chip_root}/src/credentials/CHIPCert.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../common/BLConfig.cpp",
     "../common/ConfigurationManagerImpl.cpp",
-    "../common/DiagnosticDataProviderImpl.cpp",
-    "../common/Logging.cpp",
-    "../common/KeyValueStoreManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.cpp",
-    "../common/PlatformManagerImpl.cpp",
-
-    "${chip_root}/src/credentials/CHIPCert.h",
-    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "../common/DiagnosticDataProviderImpl.cpp",
     "../common/FactoryDataProvider.cpp",
     "../common/FactoryDataProvider.h",
+    "../common/KeyValueStoreManagerImpl.cpp",
+    "../common/Logging.cpp",
+    "../common/PlatformManagerImpl.cpp",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -53,7 +51,7 @@ static_library("BL602") {
       "../common/OTAImageProcessorImpl.h",
     ]
   }
-  
+
   if (chip_enable_ble) {
     sources += [
       "../common/BLEManagerImpl.cpp",

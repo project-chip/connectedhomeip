@@ -34,15 +34,15 @@ static_library("BL702") {
     "../../SingletonConfigurationManager.cpp",
     "../common/BLConfig.cpp",
     "../common/ConfigurationManagerImpl.cpp",
-    "../common/DiagnosticDataProviderImpl.cpp",
-    "../common/Logging.cpp",
-    "../common/KeyValueStoreManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.cpp",
+    "../common/DiagnosticDataProviderImpl.cpp",
+    "../common/KeyValueStoreManagerImpl.cpp",
+    "../common/Logging.cpp",
     "../common/PlatformManagerImpl.cpp",
 
     # "${chip_root}/src/credentials/CHIPCert.h",
     # "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
-    
+
     # "../common/FactoryDataProvider.cpp",
     # "../common/FactoryDataProvider.h",
   ]
