@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               git submodule update --init --recursive
       id: Submodules
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "connectedhomeip/chip-build-vscode:0.7.16"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
