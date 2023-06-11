@@ -82,8 +82,8 @@ namespace {
 using Test_P256Keypair                  = P256Keypair;
 using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
 using TestPBKDF2_sha256                 = PBKDF2_sha256;
-using TestHKDF_sha = HKDF_sha;
-using TestHMAC_sha = HMAC_sha;
+using TestHKDF_sha                      = HKDF_sha;
+using TestHMAC_sha                      = HMAC_sha;
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
 #if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
@@ -1624,8 +1624,7 @@ static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inCon
 
 // We need to "generate" specific field elements
 // to do so we need to override the specific method
-class Test_Spake2p_P256_SHA256_HKDF_HMAC :
-    public Spake2p_P256_SHA256_HKDF_HMAC
+class Test_Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p_P256_SHA256_HKDF_HMAC
 {
 public:
     CHIP_ERROR TestSetFE(const uint8_t * fe_in, size_t fe_in_len)

@@ -108,7 +108,6 @@ static bool _isValidTagLength(size_t tag_length)
     return false;
 }
 
-
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
                            const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
@@ -145,7 +144,6 @@ exit:
     mbedtls_ccm_free(&context);
     return error;
 }
-
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, const uint8_t * aad, size_t aad_len,
                            const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,

@@ -30,7 +30,7 @@ namespace Crypto {
 
 CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
-    //TODO - Add rollback
+    // TODO - Add rollback
     sss_status_t status;
     sss_rng_context_t ctx_rng = { 0 };
 

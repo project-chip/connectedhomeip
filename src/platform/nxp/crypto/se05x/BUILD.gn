@@ -14,9 +14,9 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/nxp/crypto/se05x/args.gni")
-import("${chip_root}/build/chip/buildconfig_header.gni")
 
 if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
@@ -39,13 +39,13 @@ source_set("public_headers") {
 static_library("nxp_crypto_lib") {
   sources = [
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHost.cpp",
-    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp",
-    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_rng.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_hkdf.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_hmac.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_p256.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_pbkdf.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_rng.cpp",
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_utils.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp",
   ]
 
   public_deps = [ ":public_headers" ]

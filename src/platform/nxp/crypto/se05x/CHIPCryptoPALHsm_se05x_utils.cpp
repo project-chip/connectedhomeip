@@ -86,8 +86,8 @@ CHIP_ERROR se05x_sessionOpen(void)
 
     memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
 
-    char * portName = nullptr;
-    sss_status_t status   = ex_sss_boot_connectstring(0, NULL, &portName);
+    char * portName     = nullptr;
+    sss_status_t status = ex_sss_boot_connectstring(0, NULL, &portName);
     if (kStatus_SSS_Success != status)
     {
         ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_boot_connectstring failed");
@@ -118,7 +118,8 @@ void se05x_delete_key(uint32_t keyid)
     smStatus_t smstatus   = SM_NOT_OK;
     SE05x_Result_t exists = kSE05x_Result_NA;
 
-    if (se05x_sessionOpen() != CHIP_NO_ERROR){
+    if (se05x_sessionOpen() != CHIP_NO_ERROR)
+    {
         ChipLogError(Crypto, "se05x error: %s\n", "Error in session open");
         return;
     }

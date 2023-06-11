@@ -246,7 +246,7 @@ CHIP_ERROR ECDH_derive_secret_H(P256KeypairContext * mKeypair, const P256PublicK
         mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &keypair->CHIP_CRYPTO_PAL_PRIVATE(d), CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_mpi_write_binary(&mpi_secret, out_secret.Bytes()/*Uint8::to_uchar(out_secret)*/, secret_length);
+    result = mbedtls_mpi_write_binary(&mpi_secret, out_secret.Bytes() /*Uint8::to_uchar(out_secret)*/, secret_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
     out_secret.SetLength(secret_length);
 
@@ -454,7 +454,7 @@ CHIP_ERROR Deserialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256Keypa
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     {
-        const uint8_t * privkey = input.ConstBytes()/*Uint8::to_const_uchar(input)*/ + mPublicKey->Length();
+        const uint8_t * privkey = input.ConstBytes() /*Uint8::to_const_uchar(input)*/ + mPublicKey->Length();
 
         result = mbedtls_mpi_read_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(d), privkey, kP256_PrivateKey_Length);
         VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -493,8 +493,8 @@ CHIP_ERROR HKDF_SHA256_H(const uint8_t * secret, const size_t secret_length, con
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR pbkdf2_sha256_h(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
-                                        unsigned int iteration_count, uint32_t key_length, uint8_t * output)
+CHIP_ERROR pbkdf2_sha256_h(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
+                           uint32_t key_length, uint8_t * output)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -538,7 +538,7 @@ exit:
 }
 
 CHIP_ERROR HMAC_SHA256_h(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
-                                 uint8_t * out_buffer, size_t out_length)
+                         uint8_t * out_buffer, size_t out_length)
 {
     VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(key_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -558,7 +558,6 @@ CHIP_ERROR HMAC_SHA256_h(const uint8_t * key, size_t key_length, const uint8_t *
 
     return CHIP_NO_ERROR;
 }
-
 
 } // namespace Crypto
 } // namespace chip

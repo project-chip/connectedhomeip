@@ -19,8 +19,8 @@
 
 #include <string.h>
 
-#include <crypto/CHIPCryptoPAL.h>
 #include <CHIPCryptoPAL_se05x.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <type_traits>
 
 #include <CHIPCryptoPALHsm_se05x_config.h>

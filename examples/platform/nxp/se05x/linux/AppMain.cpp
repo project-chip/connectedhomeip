@@ -77,8 +77,8 @@
 #include "AppMain.h"
 #include "CommissionableInit.h"
 
-#include <CHIPCryptoPALHsm_se05x_config.h>
 #include "DeviceAttestationSe05xCredsExample.h"
+#include <CHIPCryptoPALHsm_se05x_config.h>
 
 using namespace chip;
 using namespace chip::ArgParser;

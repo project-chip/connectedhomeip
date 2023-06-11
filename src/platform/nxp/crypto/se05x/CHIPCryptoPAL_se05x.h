@@ -37,14 +37,12 @@ typedef struct hsm_pake_context_s
 namespace chip {
 namespace Crypto {
 
-
 #define NXP_CRYPTO_KEY_MAGIC                                                                                                       \
     {                                                                                                                              \
         0xA5, 0xA6, 0xB5, 0xB6, 0xA5, 0xA6, 0xB5, 0xB6                                                                             \
     }
 
 static const uint8_t se05x_magic_no[] = NXP_CRYPTO_KEY_MAGIC;
-
 
 #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
 /* Spake HSM class */

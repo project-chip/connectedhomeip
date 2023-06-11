@@ -16,10 +16,10 @@
  */
 #include "DeviceAttestationSe05xCredsExample.h"
 
+#include <CHIPCryptoPAL_se05x.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <CHIPCryptoPAL_se05x.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
@@ -138,7 +138,6 @@ CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan 
     VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-
     // Add public key + reference private key (ref to key inside SE)
 
     serialized_keypair.SetLength(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length);
@@ -155,7 +154,6 @@ CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan 
         (DEV_ATTESTATION_KEY_SE05X_ID & 0x000000FF) >> (8 * 0);
 
     ReturnErrorOnFailure(keypair.Deserialize(serialized_keypair));
-
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(message_to_sign.data(), message_to_sign.size(), signature));
 

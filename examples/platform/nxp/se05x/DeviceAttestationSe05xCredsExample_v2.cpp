@@ -17,18 +17,16 @@
 
 #include "DeviceAttestationSe05xCredsExample.h"
 
+#include <CHIPCryptoPAL_se05x.h>
 #include <credentials/examples/ExampleDACs.h>
 #include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <CHIPCryptoPAL_se05x.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/Span.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
-#include <lib/support/Span.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/Span.h>
 
 /* Device attestation key ids */
 #define DEV_ATTESTATION_KEY_SE05X_ID 0x7D300000

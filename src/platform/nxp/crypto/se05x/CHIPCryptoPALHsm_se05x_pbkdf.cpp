@@ -29,10 +29,10 @@ namespace chip {
 namespace Crypto {
 
 extern CHIP_ERROR pbkdf2_sha256_h(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
-                                        unsigned int iteration_count, uint32_t key_length, uint8_t * output);
+                                  unsigned int iteration_count, uint32_t key_length, uint8_t * output);
 
 CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
-                                           unsigned int iteration_count, uint32_t key_length, uint8_t * output)
+                                        unsigned int iteration_count, uint32_t key_length, uint8_t * output)
 {
 #if !ENABLE_SE05X_PBKDF2_SHA256
     return pbkdf2_sha256_h(password, plen, salt, slen, iteration_count, key_length, output);
@@ -102,7 +102,7 @@ exit:
 
     return error;
 
-#endif //ENABLE_SE05X_PBKDF2_SHA256
+#endif // ENABLE_SE05X_PBKDF2_SHA256
 }
 
 } // namespace Crypto
