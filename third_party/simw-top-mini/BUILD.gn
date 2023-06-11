@@ -15,10 +15,10 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 
-import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/crypto/crypto.gni")
-import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 
 config("se05x_config") {
   defines = [ "SSS_USE_FTR_FILE" ]
@@ -53,16 +53,13 @@ config("se05x_config") {
     "repo/hostlib/hostLib/platform/inc",
     "repo/hostlib/hostLib/libCommon/smCom",
   ]
-  include_dirs += [
-    "repo/hostlib/hostLib/libCommon/smCom/T1oI2C",
-  ]
+  include_dirs += [ "repo/hostlib/hostLib/libCommon/smCom/T1oI2C" ]
   if (chip_device_platform == "k32w0") {
     include_dirs += [
       "repo/demos/ksdk/common/boards/DK6/wireless_examples/chip",
       "repo/demos/ksdk/common/freertos/boards/DK6",
     ]
   }
-
 }
 
 static_library("se05x") {
