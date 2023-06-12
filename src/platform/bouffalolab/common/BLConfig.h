@@ -25,14 +25,13 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-#define KCONFIG_SECT_PSV "PSV"
 /**
- * Provides functions and definitions for accessing device configuration information on the BL702 platform.
+ * Provides functions and definitions for accessing device configuration information on the Bouffalo Lab platform.
  *
  * This class is designed to be mixed-in to concrete implementation classes as a means to
  * provide access to configuration information to generic base classes.
  */
-class BL702Config
+class BLConfig
 {
 public:
     using Key = const char *;
@@ -107,14 +106,6 @@ public:
     static CHIP_ERROR ReadKVS(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset_bytes);
     static CHIP_ERROR WriteKVS(const char * key, const void * value, size_t value_size);
     static CHIP_ERROR ClearKVS(const char * key);
-
-#ifdef CFG_USE_PSRAM
-    static bool isPsramRegion(void * paddr);
-#endif
-    static CHIP_ERROR WriteWiFiInfo(const char * ssid, const char * password);
-    static CHIP_ERROR ReadWiFiInfo(const char * ssid, uint32_t ssid_size, const char * passwd, uint32_t passwd_size);
-    static bool isWiFiInfoSaved();
-    static CHIP_ERROR ClearWiFiInfo(void);
 };
 
 } // namespace Internal

@@ -35,9 +35,6 @@ namespace chip {
 namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
-
-/** Singleton instance of the ConfigurationManager implementation object.
- */
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
     static ConfigurationManagerImpl sInstance;
@@ -50,42 +47,25 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     bool failSafeArmed;
     uint32_t rebootCount = 0;
 
-    err = Internal::GenericConfigurationManagerImpl<BL702Config>::Init();
+    err = Internal::GenericConfigurationManagerImpl<BLConfig>::Init();
+    SuccessOrExit(err);
 
-    BL_RST_REASON_E bootCause = bl_sys_rstinfo_get();
-    mBootReason               = to_underlying(BootReasonType::kUnspecified);
-    if (BL_RST_POR == bootCause)
+    if (BLConfig::ConfigValueExists(BLConfig::kCounterKey_RebootCount))
     {
-        mBootReason = to_underlying(BootReasonType::kPowerOnReboot);
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
     }
-    else if (BL_RST_BOR == bootCause)
+    else
     {
-        mBootReason = to_underlying(BootReasonType::kBrownOutReset);
+        rebootCount = 0;
     }
-    else if (BL_RST_WDT == bootCause)
-    {
-        mBootReason = to_underlying(BootReasonType::kHardwareWatchdogReset);
-    }
-    // else if (BL_RST_HBN == bootCause) {
-    //     mBootReason = BootReasonType::SoftwareReset;
-    // }
-    else if (BL_RST_SOFTWARE == bootCause)
-    {
-        mBootReason = to_underlying(BootReasonType::kSoftwareReset);
-    }
+    err = StoreRebootCount(rebootCount + 1);
+    SuccessOrExit(err);
 
-    if (BL_RST_HBN != bootCause)
+    if (!BLConfig::ConfigValueExists(BLConfig::kCounterKey_TotalOperationalHours))
     {
-        if (CHIP_NO_ERROR == ReadConfigValue(BL702Config::kCounterKey_RebootCount, rebootCount))
-        {
-            rebootCount += 1;
-        }
-        WriteConfigValue(BL702Config::kCounterKey_RebootCount, rebootCount + 1);
-    }
-
-    if (!BL702Config::ConfigValueExists(BL702Config::kCounterKey_TotalOperationalHours))
-    {
-        ReturnErrorOnFailure(StoreTotalOperationalHours(0));
+        err = StoreTotalOperationalHours(0);
+        SuccessOrExit(err);
     }
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
@@ -96,6 +76,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     }
     err = CHIP_NO_ERROR;
 
+exit:
     return err;
 }
 
@@ -110,13 +91,31 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return BLConfig::ReadConfigValue(BLConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return BLConfig::WriteConfigValue(BLConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(BLConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(BLConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    char keyname[sizeof(KCONFIG_SECT_PSV) + 10];
+    BLConfig::Key configKey{ key };
 
-    sprintf(keyname, "%s_%x", KCONFIG_SECT_PSV, key);
-
-    CHIP_ERROR err = ReadConfigValue(keyname, value);
+    CHIP_ERROR err = ReadConfigValue(configKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -126,97 +125,68 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
 
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    char keyname[sizeof(KCONFIG_SECT_PSV) + 10];
-
-    sprintf(keyname, "%s_%d", KCONFIG_SECT_PSV, key);
-
-    return WriteConfigValue(keyname, value);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
-{
-    return ReadConfigValue(BL702Config::kCounterKey_RebootCount, rebootCount);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
-{
-    return WriteConfigValue(BL702Config::kCounterKey_RebootCount, rebootCount);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
-{
-    return ReadConfigValue(BL702Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
-{
-    return WriteConfigValue(BL702Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
-{
-    bootReason = mBootReason;
-    return CHIP_NO_ERROR;
+    BLConfig::Key configKey{ key };
+    return WriteConfigValue(configKey, value);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
 {
-    return BL702Config::ReadConfigValue(key, val);
+    return BLConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
-    return BL702Config::ReadConfigValue(key, val);
+    return BLConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint64_t & val)
 {
-    return BL702Config::ReadConfigValue(key, val);
+    return BLConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return BL702Config::ReadConfigValueStr(key, buf, bufSize, outLen);
+    return BLConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    return BL702Config::ReadConfigValueBin(key, buf, bufSize, outLen);
+    return BLConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
 {
-    return BL702Config::WriteConfigValue(key, val);
+    return BLConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint32_t val)
 {
-    return BL702Config::WriteConfigValue(key, val);
+    return BLConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint64_t val)
 {
-    return BL702Config::WriteConfigValue(key, val);
+    return BLConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str)
 {
-    return BL702Config::WriteConfigValueStr(key, str);
+    return BLConfig::WriteConfigValueStr(key, str);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    return BL702Config::WriteConfigValueStr(key, str, strLen);
+    return BLConfig::WriteConfigValueStr(key, str, strLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    return BL702Config::WriteConfigValueBin(key, data, dataLen);
+    return BLConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
 void ConfigurationManagerImpl::RunConfigUnitTest(void)
 {
-    BL702Config::RunConfigUnitTest();
+    BLConfig::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
@@ -225,7 +195,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = BL702Config::FactoryResetConfig();
+    err = BLConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
@@ -240,6 +210,5 @@ ConfigurationManager & ConfigurationMgrImpl()
 {
     return ConfigurationManagerImpl::GetDefaultInstance();
 }
-
 } // namespace DeviceLayer
 } // namespace chip
