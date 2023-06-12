@@ -37,8 +37,8 @@ protected:
     ~Uncopyable() {}
 
 private:
-    Uncopyable(const Uncopyable &);
-    Uncopyable & operator=(const Uncopyable &);
+    Uncopyable(const Uncopyable &) = delete;
+    Uncopyable & operator=(const Uncopyable &) = delete;
 };
 
 class OperationalStateServer : public CommandHandlerInterface, public AttributeAccessInterface, public Uncopyable
