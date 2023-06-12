@@ -28,7 +28,7 @@ CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId end
     uint8_t buffer[kOperationalStateMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     size           = 0;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
     ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::OperationalStateOpStateList(endpoint, clusterId).KeyName(), bufferSpan));
 
@@ -45,11 +45,15 @@ CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId end
         OperationalStateStructDynamicList * state = chip::Platform::New<OperationalStateStructDynamicList>();
         if (state == nullptr)
         {
-            ChipLogProgress(Zcl, "Malloc error");
-            break;
+            err = CHIP_ERROR_NO_MEMORY;
+            ExitNow();
         }
         OperationalStateStructType operationalState;
-        ReturnErrorOnFailure(operationalState.Decode(reader));
+        err = operationalState.Decode(reader);
+        if(err != CHIP_NO_ERROR)
+        {
+            ExitNow();
+        }
 
         state->Next               = nullptr;
         state->operationalStateID = operationalState.operationalStateID;
@@ -86,10 +90,18 @@ CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId end
         }
     }
 
-    ReturnErrorOnFailure(reader.ExitContainer(outerType));
+    err = reader.ExitContainer(outerType);
+    if(err != CHIP_NO_ERROR)
+    {
+        ExitNow();
+    }
+
     size                  = i;
     *operationalStateList = head;
-
+    err = CHIP_NO_ERROR;
+    return err;
+exit:
+    ReleaseOperationalStateList(head);
     return err;
 }
 
@@ -169,7 +181,7 @@ CHIP_ERROR OperationalStateDataProvider::LoadPhaseList(EndpointId endpoint, Clus
     uint8_t buffer[kOperationalStateMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     size           = 0;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
     ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::OperationalStatePhaseList(endpoint, clusterId).KeyName(), bufferSpan));
 
@@ -186,13 +198,17 @@ CHIP_ERROR OperationalStateDataProvider::LoadPhaseList(EndpointId endpoint, Clus
         PhaseListCharSpan * newPhase = chip::Platform::New<PhaseListCharSpan>();
         if (newPhase == nullptr)
         {
-            ChipLogProgress(Zcl, "Malloc error");
-            break;
+            err = CHIP_ERROR_NO_MEMORY;
+            ExitNow();
         }
         newPhase->Next = nullptr;
 
         CharSpan readPhase;
-        ReturnErrorOnFailure(reader.Get(readPhase));
+        err = reader.Get(readPhase);
+        if(err != CHIP_NO_ERROR)
+        {
+            ExitNow();
+        }
 
         if (readPhase.size())
         {
@@ -229,10 +245,18 @@ CHIP_ERROR OperationalStateDataProvider::LoadPhaseList(EndpointId endpoint, Clus
         }
     }
 
-    ReturnErrorOnFailure(reader.ExitContainer(outerType));
+    err = reader.ExitContainer(outerType);
+    if(err != CHIP_NO_ERROR)
+    {
+        ExitNow();
+    }
+
     size       = i;
     *phaseList = head;
-
+    err = CHIP_NO_ERROR;
+    return err;
+exit:
+    ReleasePhaseList(head);
     return err;
 }
 
