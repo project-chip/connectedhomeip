@@ -103,7 +103,7 @@ public:
     CHIP_ERROR ClearOperationalStateList(EndpointId endpoint, ClusterId clusterId);
 
     /**
-     * Rlease OperationalStateStructDynamicList
+     * Release OperationalStateStructDynamicList
      * @param operationalStateList The pointer for which to clear the OperationalStateStructDynamicList.
      * @return void
      */
