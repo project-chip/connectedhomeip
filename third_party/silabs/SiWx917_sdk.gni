@@ -150,10 +150,7 @@ template("siwx917_sdk") {
 
     # Enabling led interface
     if (use_wstk_leds) {
-      defines += [
-        "ENABLE_WSTK_LEDS",
-        "SL_CATALOG_SIMPLE_LED_LED1_PRESENT",
-      ]
+      defines += [ "ENABLE_WSTK_LEDS" ]
     }
 
     if (defined(invoker.enable_sleepy_device)) {
