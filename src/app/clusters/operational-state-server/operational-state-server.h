@@ -129,29 +129,29 @@ public:
      * @param opState The operational state for which to save.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR SetOperationalState(OperationalStateStruct & opState);
+    CHIP_ERROR SetOperationalState(GenericOperationalState & opState);
 
     /**
      * Get operational state.
      * @param void.
      * @return the const reference of operational state.
      */
-    const OperationalStateStruct & GetOperationalState();
+    const GenericOperationalState & GetOperationalState();
 
     /**
      * Set operational error.
      * @param the reference of operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR SetOperationalError(OperationalErrorStateStruct & opErrState);
+    CHIP_ERROR SetOperationalError(GenericOperationalErrorState & opErrState);
 
 private:
     EndpointId mEndpointId;
     ClusterId mClusterId;
     Delegate * mDelegate;
     OperationalStateDataProvider mOperationalStateDataProvider;
-    OperationalStateStruct mOperationalState;
-    OperationalErrorStateStruct mOperationalError;
+    GenericOperationalState mOperationalState;
+    GenericOperationalErrorState mOperationalError;
 
     /**
      * Handle Command: Pause.

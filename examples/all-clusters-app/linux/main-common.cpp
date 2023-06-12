@@ -299,8 +299,8 @@ void ApplicationInit()
             makeOperationalStateStructType(Clusters::OperationalState::OperationalStateEnum::kPaused, opPaused, sizeof(opPaused))
         };
         OperationalStateStructTypeList opL(opS);
-        Clusters::OperationalState::OperationalStateStruct op;
-        Clusters::OperationalState::OperationalErrorStateStruct opErr;
+        Clusters::OperationalState::GenericOperationalState op;
+        Clusters::OperationalState::GenericOperationalErrorState opErr;
 
         operationalstateServer.Init();
         // set operational state list

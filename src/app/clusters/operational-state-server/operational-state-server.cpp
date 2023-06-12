@@ -116,8 +116,8 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
 {
     ChipLogDetail(Zcl, "OperationalState: HandlePauseState");
     Commands::OperationalCommandResponse::Type response;
-    OperationalErrorStateStruct currentErrState;
-    OperationalStateStruct currentOperationalState;
+    GenericOperationalErrorState currentErrState;
+    GenericOperationalState currentOperationalState;
 
     // copy current operational state
     currentOperationalState = mOperationalState;
@@ -147,8 +147,8 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
 {
     ChipLogDetail(Zcl, "OperationalState: HandleResumeState");
     Commands::OperationalCommandResponse::Type response;
-    OperationalErrorStateStruct currentErrState;
-    OperationalStateStruct currentOperationalState;
+    GenericOperationalErrorState currentErrState;
+    GenericOperationalState currentOperationalState;
 
     // copy current operational state
     currentOperationalState = mOperationalState;
@@ -178,8 +178,8 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
 {
     ChipLogDetail(Zcl, "OperationalState: HandleStartState");
     Commands::OperationalCommandResponse::Type response;
-    OperationalErrorStateStruct currentErrState;
-    OperationalStateStruct currentOperationalState;
+    GenericOperationalErrorState currentErrState;
+    GenericOperationalState currentOperationalState;
 
     // copy current operational state
     currentOperationalState = mOperationalState;
@@ -209,8 +209,8 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
 {
     ChipLogDetail(Zcl, "OperationalState: HandleStopState");
     Commands::OperationalCommandResponse::Type response;
-    OperationalErrorStateStruct currentErrState;
-    OperationalStateStruct currentOperationalState;
+    GenericOperationalErrorState currentErrState;
+    GenericOperationalState currentOperationalState;
 
     // copy current operational state
     currentOperationalState = mOperationalState;
@@ -297,7 +297,7 @@ CHIP_ERROR OperationalStateServer::ClearPhaseStateList()
     return mOperationalStateDataProvider.ClearPhaseStateList(mEndpointId, mClusterId);
 }
 
-CHIP_ERROR OperationalStateServer::SetOperationalState(OperationalStateStruct & opState)
+CHIP_ERROR OperationalStateServer::SetOperationalState(GenericOperationalState & opState)
 {
     OperationalStateStructDynamicList op;
 
@@ -316,12 +316,12 @@ CHIP_ERROR OperationalStateServer::SetOperationalState(OperationalStateStruct & 
     return CHIP_NO_ERROR;
 }
 
-const OperationalStateStruct & OperationalStateServer::GetOperationalState()
+const GenericOperationalState & OperationalStateServer::GetOperationalState()
 {
     return mOperationalState;
 }
 
-CHIP_ERROR OperationalStateServer::SetOperationalError(OperationalErrorStateStruct & op)
+CHIP_ERROR OperationalStateServer::SetOperationalError(GenericOperationalErrorState & op)
 {
 
     mOperationalError.ErrorStateID = op.ErrorStateID;

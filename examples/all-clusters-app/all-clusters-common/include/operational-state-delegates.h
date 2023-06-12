@@ -43,7 +43,7 @@ public:
      * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    void HandlePauseState(OperationalStateStruct & state, OperationalErrorStateStruct & error) override;
+    void HandlePauseState(GenericOperationalState & state, GenericOperationalErrorState & error) override;
 
     /**
      * Handle Command Callback: Resume
@@ -53,7 +53,7 @@ public:
      * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    void HandleResumeState(OperationalStateStruct & state, OperationalErrorStateStruct & error) override;
+    void HandleResumeState(GenericOperationalState & state, GenericOperationalErrorState & error) override;
 
     /**
      * Handle Command Callback: Start
@@ -63,7 +63,7 @@ public:
      * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    void HandleStartState(OperationalStateStruct & state, OperationalErrorStateStruct & error) override;
+    void HandleStartState(GenericOperationalState & state, GenericOperationalErrorState & error) override;
 
     /**
      * Handle Command Callback: Stop
@@ -73,7 +73,7 @@ public:
      * @param[in,out] error make a copy of the operational error.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    void HandleStopState(OperationalStateStruct & state, OperationalErrorStateStruct & error) override;
+    void HandleStopState(GenericOperationalState & state, GenericOperationalErrorState & error) override;
 
     ~OperationalStateDelegate() override = default;
 };

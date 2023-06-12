@@ -23,7 +23,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 using chip::Protocols::InteractionModel::Status;
 
-static OperationalErrorStateStruct & setOperationalNoError(OperationalErrorStateStruct & error)
+static GenericOperationalErrorState & setOperationalNoError(GenericOperationalErrorState & error)
 {
     char opNoError[64]        = "No Error";
     char opNoErrorDetails[64] = "No Error Details";
@@ -43,28 +43,28 @@ CHIP_ERROR OperationalStateDelegate::Init()
     return CHIP_NO_ERROR;
 }
 
-void OperationalStateDelegate::HandlePauseState(OperationalStateStruct & state, OperationalErrorStateStruct & error)
+void OperationalStateDelegate::HandlePauseState(GenericOperationalState & state, GenericOperationalErrorState & error)
 {
     ChipLogDetail(Zcl, "Op: HandlePauseState");
     state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kPaused);
     setOperationalNoError(error);
 }
 
-void OperationalStateDelegate::HandleResumeState(OperationalStateStruct & state, OperationalErrorStateStruct & error)
+void OperationalStateDelegate::HandleResumeState(GenericOperationalState & state, GenericOperationalErrorState & error)
 {
     ChipLogDetail(Zcl, "Op: HandleResumeState");
     state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kRunning);
     setOperationalNoError(error);
 }
 
-void OperationalStateDelegate::HandleStartState(OperationalStateStruct & state, OperationalErrorStateStruct & error)
+void OperationalStateDelegate::HandleStartState(GenericOperationalState & state, GenericOperationalErrorState & error)
 {
     ChipLogDetail(Zcl, "Op: HandleStartState");
     state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kRunning);
     setOperationalNoError(error);
 }
 
-void OperationalStateDelegate::HandleStopState(OperationalStateStruct & state, OperationalErrorStateStruct & error)
+void OperationalStateDelegate::HandleStopState(GenericOperationalState & state, GenericOperationalErrorState & error)
 {
     ChipLogDetail(Zcl, "Op: HandleStopState");
     state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kStopped);
