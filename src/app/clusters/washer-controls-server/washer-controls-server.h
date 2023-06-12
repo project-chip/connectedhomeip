@@ -1,7 +1,6 @@
-/*
+/**
  *
  *    Copyright (c) 2023 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,25 +16,19 @@
  */
 
 #pragma once
+
+#include "washer-controls-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace WasherControls {
 
-/** @brief
- *    Defines methods for implementing application-specific logic for the Washer Controls Cluster.
- */
-class Delegate
-{
-public:
-    virtual CHIP_ERROR HandleGetSpinSpeedsList(app::AttributeValueEncoder & aEncoder) = 0;
-    virtual ~Delegate()                                                               = default;
-};
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
 } // namespace WasherControls
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+

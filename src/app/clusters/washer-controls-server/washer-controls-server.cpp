@@ -30,6 +30,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/clusters/washer-controls-server/washer-controls-delegate.h>
+#include <app/clusters/washer-controls-server/washer-controls-server.h>
 #include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
@@ -59,7 +60,7 @@ namespace WasherControls {
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, ContentLauncher::Id, EMBER_AF_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, WasherControls::Id, EMBER_AF_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kWasherControlsDelegateTableSize)
     {
@@ -78,7 +79,7 @@ namespace {
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, ContentLauncher::Id, EMBER_AF_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, WasherControls::Id, EMBER_AF_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kWasherControlsDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
