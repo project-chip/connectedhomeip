@@ -78,8 +78,8 @@ public:
 
     /**
      * Get operational state list.
-     * @param operationalStateList The pointer to save operational state list.
-     * @param size The number of operational state list's item.
+     * @param[out] operationalStateList The pointer to load operational state list.
+     * @param[out] size The number of operational state list's item.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     CHIP_ERROR GetOperationalStateList(OperationalStateStructDynamicList ** operationalStateList, size_t & size);
@@ -107,8 +107,8 @@ public:
 
     /**
      * Get phase list.
-     * @param phaseList The pointer to load phase list.
-     * @param size The number of phase list's item.
+     * @param[out] phaseList The pointer to load phase list.
+     * @param[out] size The number of phase list's item.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     CHIP_ERROR GetPhaseList(PhaseListCharSpan ** phaseList, size_t & size);
