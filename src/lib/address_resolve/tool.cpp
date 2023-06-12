@@ -141,7 +141,7 @@ bool Cmd_Node(int argc, const char ** argv)
     return true;
 }
 
-void StopSignalHandler(int signal)
+extern "C" void StopSignalHandler(int signal)
 {
     DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
@@ -168,7 +168,8 @@ extern "C" int main(int argc, const char ** argv)
             fputs(sHelp, stdout);
             return 0;
         }
-        else if (strcasecmp(argv[0], "--trace-to") == 0)
+
+        if (strcasecmp(argv[0], "--trace-to") == 0)
         {
             if (argc > 1)
             {
