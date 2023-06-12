@@ -98,6 +98,7 @@
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
         "wake-on-lan-cluster.xml",
+        "washer-controls-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
         "matter-devices.xml",

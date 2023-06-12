@@ -1,0 +1,70 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 165.2.1. [TC-IONFREMON-2.1] Attributes with server as DUT
+
+PICS:
+    - IONFREMON.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Ionizing Filter Monitoring"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH reads from the DUT the Condition attribute."
+      PICS: IONFREMON.S.A0000
+      command: "readAttribute"
+      attribute: "Condition"
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 100
+
+    - label: "TH reads from the DUT the DegradationDirection attribute.."
+      PICS: IONFREMON.S.A0001
+      command: "readAttribute"
+      attribute: "DegradationDirection"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 1
+
+    - label: "TH reads from the DUT the ChangeIndication attribute."
+      PICS: IONFREMON.S.A0002
+      command: "readAttribute"
+      attribute: "ChangeIndication"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "TH reads from the DUT the InPlaceIndicator attribute"
+      PICS: IONFREMON.S.A0003
+      command: "readAttribute"
+      attribute: "InPlaceIndicator"
+      response:
+          constraints:
+              type: boolean

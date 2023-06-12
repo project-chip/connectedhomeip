@@ -21,6 +21,7 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 declare_args() {
   # Build monolithic test library.
@@ -94,9 +95,12 @@ if (chip_build_tests) {
         "${chip_root}/src/lib/support/tests",
         "${chip_root}/src/protocols/secure_channel/tests",
         "${chip_root}/src/system/tests",
-        "${chip_root}/src/tracing/tests",
         "${chip_root}/src/transport/tests",
       ]
+
+      if (matter_enable_tracing_support) {
+        deps += [ "${chip_root}/src/tracing/tests" ]
+      }
     }
 
     if (chip_device_platform != "none") {

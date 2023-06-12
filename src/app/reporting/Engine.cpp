@@ -298,7 +298,7 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
     CHIP_ERROR err = CHIP_NO_ERROR;
     for (auto current = apReadHandler->mpEventPathList; current != nullptr;)
     {
-        if (current->mValue.HasEventWildcard())
+        if (current->mValue.IsWildcardPath())
         {
             current = current->mpNext;
             continue;
