@@ -98,7 +98,7 @@ class DefaultSceneTableImpl : public SceneTable<scenes::ExtensionFieldSetsImpl>
 public:
     DefaultSceneTableImpl() {}
 
-    ~DefaultSceneTableImpl() override {}
+    ~DefaultSceneTableImpl() override { Finish(); }
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage) override;
     void Finish() override;

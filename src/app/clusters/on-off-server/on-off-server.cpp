@@ -53,7 +53,11 @@ static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
 }
 #endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
+static constexpr size_t kOnOffMaxEnpointCount =
+    EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
 #ifdef EMBER_AF_PLUGIN_SCENES
+static EmberEventControl sceneHandlerEventControls[kOnOffMaxEnpointCount];
 static void sceneOnOffCallback(EndpointId endpoint);
 
 class DefaultOnOffSceneHandler : public scenes::DefaultSceneHandlerImpl
@@ -144,7 +148,7 @@ public:
         }
 
         uint16_t mPairCount;
-        EndpointStatePair mStatePairBuffer[MAX_ENDPOINT_COUNT];
+        EndpointStatePair mStatePairBuffer[kOnOffMaxEnpointCount];
     };
 
     StatePairBuffer mSceneEndpointStatePairs;
@@ -181,7 +185,6 @@ public:
         using AttributeValuePair = Scenes::Structs::AttributeValuePair::Type;
 
         bool currentValue;
-
         // read current on/off value
         EmberAfStatus status = Attributes::OnOff::Get(endpoint, &currentValue);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -191,23 +194,13 @@ public:
         }
 
         AttributeValuePair Pairs[scenableAttributeCount];
+
         Pairs[0].attributeID.SetValue(Attributes::OnOff::Id);
         Pairs[0].attributeValue = currentValue;
 
-        app::DataModel::List<const AttributeValuePair> attributeValueList(Pairs);
+        app::DataModel::List<AttributeValuePair> attributeValueList(Pairs);
 
-        TLV::TLVWriter writer;
-        TLV::TLVType outer;
-        // Serialize Extension Field sets in a way consistent with the default Deserialize method from SceneTableImpl.h
-        writer.Init(serializedBytes);
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
-        ReturnErrorOnFailure(app::DataModel::Encode(
-            writer, TLV::ContextTag(to_underlying(Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
-            attributeValueList));
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-        serializedBytes.reduce_size(writer.GetLengthWritten());
-
-        return CHIP_NO_ERROR;
+        return EncodeAttributeValueList(attributeValueList, serializedBytes);
     }
 
     /// @brief Default EFS interaction when applying scene to the OnOff Cluster
@@ -221,21 +214,11 @@ public:
     {
         app::DataModel::DecodableList<Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
 
-        TLV::TLVReader reader;
-        TLV::TLVType outer;
-
-        size_t attributeCount = 0;
-
         VerifyOrReturnError(cluster == OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
 
-        reader.Init(serializedBytes);
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-        ReturnErrorOnFailure(reader.EnterContainer(outer));
-        ReturnErrorOnFailure(reader.Next(
-            TLV::kTLVType_Array, TLV::ContextTag(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)));
-        ReturnErrorOnFailure(attributeValueList.Decode(reader));
-        ReturnErrorOnFailure(reader.ExitContainer(outer));
+        ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
+        size_t attributeCount = 0;
         ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
         VerifyOrReturnError(attributeCount <= scenableAttributeCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -252,7 +235,12 @@ public:
                 mSceneEndpointStatePairs.InsertPair(EndpointStatePair(endpoint, static_cast<bool>(decodePair.attributeValue))));
         }
         // Verify that the EFS was completely read
-        ReturnErrorOnFailure(pair_iterator.GetStatus());
+        CHIP_ERROR err = pair_iterator.GetStatus();
+        if (CHIP_NO_ERROR != err)
+        {
+            mSceneEndpointStatePairs.RemovePair(endpoint);
+            return err;
+        }
 
         OnOffServer::Instance().scheduleTimerCallbackMs(sceneEventControl(endpoint), timeMs);
 
@@ -268,7 +256,8 @@ private:
      */
     EmberEventControl * sceneEventControl(EndpointId endpoint)
     {
-        EmberEventControl * controller = OnOffServer::Instance().getEventControl(endpoint);
+        EmberEventControl * controller =
+            OnOffServer::Instance().getEventControl(endpoint, sceneHandlerEventControls, ArraySize(sceneHandlerEventControls));
         VerifyOrReturnValue(controller != nullptr, nullptr);
 
         controller->endpoint = endpoint;
@@ -295,9 +284,6 @@ static void sceneOnOffCallback(EndpointId endpoint)
 
 static OnOffEffect * firstEffect = nullptr;
 OnOffServer OnOffServer::instance;
-
-static constexpr size_t kOnOffMaxEnpointCount =
-    EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static EmberEventControl gEventControls[kOnOffMaxEnpointCount];
 
 /**********************************************************
@@ -333,7 +319,7 @@ void OnOffServer::cancelEndpointTimerCallback(EmberEventControl * control)
 
 void OnOffServer::cancelEndpointTimerCallback(EndpointId endpoint)
 {
-    auto control = OnOffServer::getEventControl(endpoint);
+    auto control = OnOffServer::getEventControl(endpoint, gEventControls, ArraySize(gEventControls));
     if (control)
     {
         cancelEndpointTimerCallback(control);
@@ -440,7 +426,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
                 Attributes::OffWaitTime::Set(endpoint, 0);
 
                 // Stop timer on the endpoint
-                EmberEventControl * event = getEventControl(endpoint);
+                EmberEventControl * event = getEventControl(endpoint, gEventControls, ArraySize(gEventControls));
                 if (event != nullptr)
                 {
                     cancelEndpointTimerCallback(event);
@@ -881,7 +867,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
             ChipLogProgress(Zcl, "Timer  Callback - wait Off Time cycle finished");
 
             // Stop timer on the endpoint
-            cancelEndpointTimerCallback(getEventControl(endpoint));
+            cancelEndpointTimerCallback(getEventControl(endpoint, gEventControls, ArraySize(gEventControls)));
         }
     }
 }
@@ -897,17 +883,20 @@ bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint
 /**
  * @brief event control object for an endpoint
  *
- * @param[in] endpoint
+ * @param[in] endpoint target endpoint
+ * @param[in] eventControlArray Array where to find the event control
+ * @param[in] eventControlArraySize Size of the event control array
  * @return EmberEventControl* configured event control
  */
-EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
+EmberEventControl * OnOffServer::getEventControl(chip::EndpointId endpoint, EmberEventControl * eventControlArray,
+                                                 size_t eventControlArraySize)
 {
     uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, OnOff::Id, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (index >= ArraySize(gEventControls))
+    if (index >= eventControlArraySize)
     {
         return nullptr;
     }
-    return &gEventControls[index];
+    return &eventControlArray[index];
 }
 
 /**
@@ -918,7 +907,7 @@ EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
  */
 EmberEventControl * OnOffServer::configureEventControl(EndpointId endpoint)
 {
-    EmberEventControl * controller = getEventControl(endpoint);
+    EmberEventControl * controller = getEventControl(endpoint, gEventControls, ArraySize(gEventControls));
     VerifyOrReturnError(controller != nullptr, nullptr);
 
     controller->endpoint = endpoint;

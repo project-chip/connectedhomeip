@@ -56,7 +56,7 @@ public:
 
 private:
     ScenesServer() : CommandHandlerInterface(Optional<EndpointId>(), Id), AttributeAccessInterface(Optional<EndpointId>(), Id) {}
-    ~ScenesServer() {}
+    ~ScenesServer() { Shutdown(); }
 
     bool mIsInitialized = false;
 

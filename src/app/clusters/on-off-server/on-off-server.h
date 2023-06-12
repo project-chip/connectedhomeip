@@ -79,7 +79,8 @@ private:
 #ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
     bool areStartUpOnOffServerAttributesNonVolatile(chip::EndpointId endpoint);
 #endif
-    EmberEventControl * getEventControl(chip::EndpointId endpoint);
+    EmberEventControl * getEventControl(chip::EndpointId endpoint, EmberEventControl * eventControlArray,
+                                        size_t eventControlArraySize);
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);
 
     uint32_t calculateNextWaitTimeMS(void);
