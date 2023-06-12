@@ -46,7 +46,7 @@ EmberAfStatus RefrigeratorAlarmServer::GetMaskValue(EndpointId endpoint, BitMask
     EmberAfStatus status = Attributes::Mask::Get(endpoint, mask);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  mask %x", status);
+        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  mask, err:0x%x", status);
         return status;
     }
 
@@ -60,7 +60,7 @@ EmberAfStatus RefrigeratorAlarmServer::GetStateValue(EndpointId endpoint, BitMas
     EmberAfStatus status = Attributes::State::Get(endpoint, state);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading state %x", status);
+        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading state, err:0x%x", status);
         return status;
     }
 
@@ -69,18 +69,31 @@ EmberAfStatus RefrigeratorAlarmServer::GetStateValue(EndpointId endpoint, BitMas
     return status;
 }
 
-EmberAfStatus RefrigeratorAlarmServer::SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> & mask)
+EmberAfStatus RefrigeratorAlarmServer::SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     status               = Attributes::Mask::Set(endpoint, mask);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: writing  mask %x", status);
+        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: writing  mask, err:0x%x", status);
         return status;
     }
 
     ChipLogProgress(Zcl, "Refrigerator Alarm: Mask ep%d value: %" PRIu32 "", endpoint, mask.Raw());
 
+    // Whenever there is change in Mask, State should change accordingly.
+    BitMask<AlarmMap> state;
+    status = GetStateValue(endpoint, &state);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (state != (mask & state))
+    {
+        state  = mask & state;
+        status = SetStateValue(endpoint, state);
+    }
     return status;
 }
 
@@ -92,14 +105,14 @@ EmberAfStatus RefrigeratorAlarmServer::SetStateValue(EndpointId endpoint, BitMas
     status = Attributes::State::Get(endpoint, &currentState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  state %x", status);
+        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  state, err:0x%x", status);
         return status;
     }
 
     status = Attributes::State::Set(endpoint, newState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: writing  state %x", status);
+        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: writing  state, err:0x%x", status);
         return status;
     }
 

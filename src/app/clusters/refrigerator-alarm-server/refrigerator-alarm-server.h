@@ -32,10 +32,11 @@ public:
     EmberAfStatus GetMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
     EmberAfStatus GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
 
+    // Whenever there is change on Mask we should change State accordingly.
     EmberAfStatus SetMaskValue(chip::EndpointId endpoint,
-                               const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> & mask);
+                               const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
 
-    // When State changes we are generating Notify event
+    // When State changes we are generating Notify event.
     EmberAfStatus SetStateValue(chip::EndpointId endpoint,
                                 chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
 
