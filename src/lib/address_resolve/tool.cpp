@@ -143,6 +143,7 @@ bool Cmd_Node(int argc, const char ** argv)
 
 extern "C" void StopSignalHandler(int signal)
 {
+    // no lint below because StopEventLoopTask is assumed to be async safe.
     DeviceLayer::PlatformMgr().StopEventLoopTask(); // NOLINT(bugprone-signal-handler)
 }
 
