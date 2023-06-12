@@ -41,7 +41,6 @@ public:
      * Output the param to save the result after handle business logic.
      * @param[in,out] state make a copy of the operational state.
      * @param[in,out] error make a copy of the operational error.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     void HandlePauseState(GenericOperationalState & state, GenericOperationalErrorState & error) override;
 
@@ -51,7 +50,6 @@ public:
      * Output the param to save the result after handle business logic.
      * @param[in,out] state make a copy of the operational state.
      * @param[in,out] error make a copy of the operational error.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     void HandleResumeState(GenericOperationalState & state, GenericOperationalErrorState & error) override;
 
@@ -61,7 +59,6 @@ public:
      * Output the param to save the result after handle business logic.
      * @param[in,out] state make a copy of the operational state.
      * @param[in,out] error make a copy of the operational error.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     void HandleStartState(GenericOperationalState & state, GenericOperationalErrorState & error) override;
 
@@ -71,7 +68,6 @@ public:
      * Output the param to save the result after handle business logic.
      * @param[in,out] state make a copy of the operational state.
      * @param[in,out] error make a copy of the operational error.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     void HandleStopState(GenericOperationalState & state, GenericOperationalErrorState & error) override;
 
