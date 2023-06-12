@@ -257,7 +257,7 @@ CHIP_ERROR OperationalStateDataProvider::Load(const char * key, MutableByteSpan 
     uint16_t size = static_cast<uint16_t>(buffer.size());
     ReturnErrorOnFailure(mPersistentStorage->SyncGetKeyValue(key, buffer.data(), size));
 
-    buffer = MutableByteSpan(buffer.data(), size);
+    buffer.reduce_size(size);
     return CHIP_NO_ERROR;
 }
 
