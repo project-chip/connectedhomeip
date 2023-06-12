@@ -343,8 +343,8 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     case OperationalState::Attributes::OperationalStateList::Id: {
         OperationalStateStructDynamicList * pOpList = nullptr;
         size_t size                                 = 0;
-        GetOperationalStateList(&pOpList, size);
-        if (size == 0)
+        err = GetOperationalStateList(&pOpList, size);
+        if (err != CHIP_NO_ERROR)
         {
             err = aEncoder.EncodeNull();
         }
@@ -388,8 +388,8 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     case OperationalState::Attributes::PhaseList::Id: {
         PhaseListCharSpan * phaseList = nullptr;
         size_t size                   = 0;
-        GetPhaseList(&phaseList, size);
-        if (size == 0)
+        err = GetPhaseList(&phaseList, size);
+        if (err != CHIP_NO_ERROR)
         {
             err = aEncoder.EncodeNull();
         }
@@ -410,4 +410,3 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     }
     return CHIP_NO_ERROR;
 }
-
