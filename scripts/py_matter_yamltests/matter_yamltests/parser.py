@@ -24,6 +24,18 @@ from .errors import TestStepError, TestStepKeyError, TestStepValueNameError
 from .pics_checker import PICSChecker
 from .yaml_loader import YamlLoader
 
+ANY_COMMANDS_CLUSTER_NAME = 'AnyCommands'
+ANY_COMMANDS_LIST = [
+    'CommandById',
+    'ReadById',
+    'WriteById',
+    'SubscribeById',
+    'ReadEventById',
+    'SubscribeEventById',
+    'ReadAll',
+    'SubscribeAll',
+]
+
 
 class UnknownPathQualifierError(TestStepError):
     """Raise when an attribute/command/event name is not found in the definitions."""
@@ -180,6 +192,7 @@ class _TestStepWithPlaceholders:
         self.attribute = _value_or_none(test, 'attribute')
         self.event = _value_or_none(test, 'event')
         self.endpoint = _value_or_config(test, 'endpoint', config)
+        self.pics = _value_or_none(test, 'PICS')
         self.is_pics_enabled = pics_checker.check(_value_or_none(test, 'PICS'))
 
         self.identity = _value_or_none(test, 'identity')
@@ -191,6 +204,7 @@ class _TestStepWithPlaceholders:
         self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
         self.wait_for = _value_or_none(test, 'wait')
         self.event_number = _value_or_none(test, 'eventNumber')
+        self.run_if = _value_or_none(test, 'runIf')
 
         self.is_attribute = self.__is_attribute_command()
         self.is_event = self.__is_event_command()
@@ -233,7 +247,7 @@ class _TestStepWithPlaceholders:
 
     def _update_mappings(self, test: dict, definitions: SpecDefinitions):
         cluster_name = self.cluster
-        if definitions is None or not definitions.has_cluster_by_name(cluster_name):
+        if definitions is None or not definitions.has_cluster_by_name(cluster_name) or cluster_name == ANY_COMMANDS_CLUSTER_NAME or self.command in ANY_COMMANDS_LIST:
             self.argument_mapping = None
             self.response_mapping = None
             self.response_mapping_name = None
@@ -476,8 +490,20 @@ class TestStep:
             self._update_placeholder_values(self.responses)
             self._test.node_id = self._config_variable_substitution(
                 self._test.node_id)
+            self._test.run_if = self._config_variable_substitution(
+                self._test.run_if)
             self._test.event_number = self._config_variable_substitution(
                 self._test.event_number)
+            self._test.cluster = self._config_variable_substitution(
+                self._test.cluster)
+            self._test.command = self._config_variable_substitution(
+                self._test.command)
+            self._test.attribute = self._config_variable_substitution(
+                self._test.attribute)
+            self._test.event = self._config_variable_substitution(
+                self._test.event)
+            self._test.endpoint = self._config_variable_substitution(
+                self._test.endpoint)
             test.update_arguments(self.arguments)
             test.update_responses(self.responses)
 
@@ -491,7 +517,7 @@ class TestStep:
 
     @property
     def is_pics_enabled(self):
-        return self._test.is_pics_enabled
+        return self._test.is_pics_enabled and (self._test.run_if is None or self._test.run_if)
 
     @property
     def is_attribute(self):
@@ -564,6 +590,10 @@ class TestStep:
     @property
     def event_number(self):
         return self._test.event_number
+
+    @property
+    def pics(self):
+        return self._test.pics
 
     def post_process_response(self, received_responses):
         result = PostProcessResponseResult()
@@ -738,7 +768,7 @@ class TestStep:
                 break
 
             received_value = received_response.get('value')
-            if not self.is_attribute and not self.is_event:
+            if not self.is_attribute and not self.is_event and not (self.command in ANY_COMMANDS_LIST):
                 expected_name = value.get('name')
                 if expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
@@ -955,11 +985,12 @@ class TestParserConfig:
 class TestParser:
     def __init__(self, test_file: str, parser_config: TestParserConfig = TestParserConfig()):
         yaml_loader = YamlLoader()
-        name, pics, config, tests = yaml_loader.load(test_file)
+        filename, name, pics, config, tests = yaml_loader.load(test_file)
 
-        self.__apply_config_override(config, parser_config.config_override)
         self.__apply_legacy_config(config)
+        self.__apply_config_override(config, parser_config.config_override)
 
+        self.filename = filename
         self.name = name
         self.PICS = pics
         self.tests = YamlTests(
@@ -968,11 +999,23 @@ class TestParser:
             PICSChecker(parser_config.pics),
             tests
         )
+        self.timeout = config['timeout']
 
     def __apply_config_override(self, config, config_override):
         for key, value in config_override.items():
-            if value is None:
+            if value is None or not key in config:
                 continue
+
+            is_node_id = key == 'nodeId' or (isinstance(
+                config[key], dict) and config[key].get('type') == 'node_id')
+
+            if type(value) is str:
+                if key == 'timeout' or key == 'endpoint':
+                    value = int(value)
+                elif is_node_id and value.startswith('0x'):
+                    value = int(value, 16)
+                elif is_node_id:
+                    value = int(value)
 
             if isinstance(config[key], dict) and 'defaultValue' in config[key]:
                 config[key]['defaultValue'] = value

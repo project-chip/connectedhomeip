@@ -13,7 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from typing import Union
+from typing import Tuple, Union
 
 from .errors import (TestStepError, TestStepGroupResponseError, TestStepInvalidTypeError, TestStepKeyError,
                      TestStepNodeIdAndGroupIdError, TestStepValueAndValuesError, TestStepVerificationStandaloneError,
@@ -25,19 +25,23 @@ try:
 except:
     from yaml import SafeLoader
 
+import os
+
 import yaml
 
 
 class YamlLoader:
     """This class loads a file from the disk and validates that the content is a well formed yaml test."""
 
-    def load(self, yaml_file: str) -> tuple[str, Union[list, str], dict, list]:
+    def load(self, yaml_file: str) -> Tuple[str, Union[list, str], dict, list]:
+        filename = ''
         name = ''
         pics = None
         config = {}
         tests = []
 
         if yaml_file:
+            filename = os.path.splitext(os.path.basename(yaml_file))[0]
             with open(yaml_file) as f:
                 loader = SafeLoader
                 add_yaml_support_for_scientific_notation_without_dot(loader)
@@ -50,7 +54,7 @@ class YamlLoader:
                 config = content.get('config', {})
                 tests = content.get('tests', [])
 
-        return (name, pics, config, tests)
+        return (filename, name, pics, config, tests)
 
     def __check_content(self, content):
         schema = {
@@ -84,8 +88,9 @@ class YamlLoader:
             'label': str,
             'identity': str,
             'nodeId': int,
+            'runIf': str,  # Should be a variable.
             'groupId': int,
-            'endpoint': int,
+            'endpoint': (int, str),  # Can be a variable
             'cluster': str,
             'attribute': str,
             'command': str,
@@ -190,7 +195,8 @@ class YamlLoader:
             'excludes': list,
             'hasMasksSet': list,
             'hasMasksClear': list,
-            'notValue': (type(None), bool, str, int, float, list, dict)
+            'notValue': (type(None), bool, str, int, float, list, dict),
+            'anyOf': list
         }
 
         self.__check(content, schema)

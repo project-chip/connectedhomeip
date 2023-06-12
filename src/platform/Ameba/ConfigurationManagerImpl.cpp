@@ -82,15 +82,16 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!AmebaConfig::ConfigValueExists(AmebaConfig::kConfigKey_RegulatoryLocation))
     {
-        uint32_t regulatoryLocation = to_underlying(app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        uint32_t regulatoryLocation = to_underlying(app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
         err                         = WriteConfigValue(AmebaConfig::kConfigKey_RegulatoryLocation, regulatoryLocation);
         SuccessOrExit(err);
     }
 
     if (!AmebaConfig::ConfigValueExists(AmebaConfig::kConfigKey_LocationCapability))
     {
-        uint32_t locationCapability = to_underlying(app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor);
-        err                         = WriteConfigValue(AmebaConfig::kConfigKey_LocationCapability, locationCapability);
+        uint32_t locationCapability =
+            to_underlying(app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor);
+        err = WriteConfigValue(AmebaConfig::kConfigKey_LocationCapability, locationCapability);
         SuccessOrExit(err);
     }
 

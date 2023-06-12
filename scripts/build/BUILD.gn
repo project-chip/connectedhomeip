@@ -43,6 +43,7 @@ pw_python_package("build_examples") {
     "builders/__init__.py",
     "builders/ameba.py",
     "builders/android.py",
+    "builders/asr.py",
     "builders/bouffalolab.py",
     "builders/builder.py",
     "builders/efr32.py",

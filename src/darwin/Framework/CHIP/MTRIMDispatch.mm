@@ -18,7 +18,6 @@
 #import <Foundation/Foundation.h>
 
 #include <access/SubjectDescriptor.h>
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -32,6 +31,7 @@
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
+#include <app/att-storage.h>
 #include <app/data-model/Decode.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -230,9 +230,9 @@ namespace app {
  * Called by the OTA provider cluster server to determine an index
  * into its array.
  */
-uint16_t emberAfFindClusterServerEndpointIndex(EndpointId endpoint, ClusterId clusterId)
+uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
 {
-    if (endpoint == kSupportedEndpoint && clusterId == OtaSoftwareUpdateProvider::Id) {
+    if (endpoint == kSupportedEndpoint && cluster == OtaSoftwareUpdateProvider::Id) {
         return 0;
     }
 

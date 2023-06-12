@@ -13,14 +13,14 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <enum name="NetworkFault" type="ENUM8">
+  <enum name="NetworkFaultEnum" type="ENUM8">
     <cluster code="0x0035"/>
     <item name="Unspecified" value="0x00"/>
     <item name="LinkDown" value="0x01"/>
     <item name="HardwareFailure" value="0x02"/>
     <item name="NetworkJammed" value="0x03"/>
   </enum>
-  <enum name="RoutingRole" type="ENUM8">
+  <enum name="RoutingRoleEnum" type="ENUM8">
     <cluster code="0x0035"/>
     <item name="Unspecified" value="0x00"/>
     <item name="Unassigned" value="0x01"/>
@@ -35,7 +35,7 @@ limitations under the License.
     <item name="Connected" value="0x00"/>
     <item name="NotConnected" value="0x01"/>
   </enum>  
-  <struct name="NeighborTable">
+  <struct name="NeighborTableStruct">
     <cluster code="0x0035"/>
     <item name="ExtAddress" type="INT64U"/>
     <item name="Age" type="INT32U"/>
@@ -52,7 +52,7 @@ limitations under the License.
     <item name="FullNetworkData" type="BOOLEAN"/>
     <item name="IsChild" type="BOOLEAN"/>
   </struct>
-  <struct name="RouteTable">
+  <struct name="RouteTableStruct">
     <cluster code="0x0035"/>
     <item name="ExtAddress" type="INT64U"/>
     <item name="Rloc16" type="INT16U"/>
@@ -92,14 +92,14 @@ limitations under the License.
     <define>THREAD_NETWORK_DIAGNOSTICS_CLUSTER</define>
     <description>The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems</description>
     <attribute side="server" code="0x00" define="CHANNEL" type="INT16U" min="0x00" max="0xFFFF" writable="false" isNullable="true" optional="false">Channel</attribute>
-    <attribute side="server" code="0x01" define="ROUTING_ROLE" type="RoutingRole" writable="false" isNullable="true" optional="false">RoutingRole</attribute>
+    <attribute side="server" code="0x01" define="ROUTING_ROLE" type="RoutingRoleEnum" writable="false" isNullable="true" optional="false">RoutingRole</attribute>
     <attribute side="server" code="0x02" define="NETWORK_NAME" type="CHAR_STRING" length="16" writable="false" default="" isNullable="true" optional="false">NetworkName</attribute>
     <attribute side="server" code="0x03" define="DIAG_PAN_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" isNullable="true" optional="false">PanId</attribute>
     <attribute side="server" code="0x04" define="DIAG_EXTENDED_PAN_ID" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" isNullable="true" optional="false">ExtendedPanId</attribute>
     <attribute side="server" code="0x05" define="MESH_LOCAL_PREFIX" type="OCTET_STRING" length="17" writable="false" isNullable="true" optional="false">MeshLocalPrefix</attribute>
     <attribute side="server" code="0x06" define="DIAG_OVERRUN_COUNT" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">OverrunCount</attribute>
-    <attribute side="server" code="0x07" define="NEIGHBOR_TABLE" type="ARRAY" entryType="NeighborTable" length="254" writable="false" optional="false">NeighborTable</attribute>
-    <attribute side="server" code="0x08" define="ROUTE_TABLE" type="ARRAY" entryType="RouteTable" length="254" writable="false" optional="false">RouteTable</attribute>
+    <attribute side="server" code="0x07" define="NEIGHBOR_TABLE" type="ARRAY" entryType="NeighborTableStruct" length="254" writable="false" optional="false">NeighborTable</attribute>
+    <attribute side="server" code="0x08" define="ROUTE_TABLE" type="ARRAY" entryType="RouteTableStruct" length="254" writable="false" optional="false">RouteTable</attribute>
     <attribute side="server" code="0x09" define="PARTITION_ID" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" isNullable="true" optional="false">PartitionId</attribute>
     <attribute side="server" code="0x0A" define="WEIGHTING" type="INT8U" min="0x00" max="0xFF" writable="false"  isNullable="true" optional="false">Weighting</attribute>
     <attribute side="server" code="0x0B" define="DATA_VERSION" type="INT8U" min="0x00" max="0xFF" writable="false"  isNullable="true" optional="false">DataVersion</attribute>
@@ -153,7 +153,7 @@ limitations under the License.
     <attribute side="server" code="0x3B" define="SECURITY_POLICY" type="SecurityPolicy" writable="false" isNullable="true" optional="false">SecurityPolicy</attribute>
     <attribute side="server" code="0x3C" define="DIAG_CHANNEL_MASK" type="OCTET_STRING" length="4" writable="false" isNullable="true" optional="false">ChannelPage0Mask</attribute>
     <attribute side="server" code="0x3D" define="OPERATIONAL_DATASET_COMPONENTS" type="OperationalDatasetComponents" writable="false" isNullable="true" optional="false">OperationalDatasetComponents</attribute>
-    <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFault" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
+    <attribute side="server" code="0x3E" define="ACTIVE_THREAD_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFaultEnum" length="4" writable="false" optional="false">ActiveNetworkFaultsList</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip thread_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the OverrunCount attributes to 0</description>
     </command>
@@ -163,11 +163,11 @@ limitations under the License.
     </event>
     <event side="server" code="0x01" name="NetworkFaultChange" priority="info" optional="true">
       <description>Indicate a change in the set of network faults currently detected by the Node</description>
-      <field id="0" name="Current" type="NetworkFault" array="true"/>
-      <field id="1" name="Previous" type="NetworkFault" array="true"/>
+      <field id="0" name="Current" type="NetworkFaultEnum" array="true"/>
+      <field id="1" name="Previous" type="NetworkFaultEnum" array="true"/>
     </event>    
   </cluster>
-  <bitmap name="ThreadNetworkDiagnosticsFeature" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x0035"/>
     <field name="PacketCounts" mask="0x1"/>
     <field name="ErrorCounts" mask="0x2"/>

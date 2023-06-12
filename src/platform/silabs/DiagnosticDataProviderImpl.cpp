@@ -234,9 +234,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRa
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
 {
 #if CHIP_CONFIG_TEST
-    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE));
-    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED));
-    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_ENUM_CONNECTION_FAILED));
+    ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kHardwareFailure)));
+    ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kNetworkJammed)));
+    ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kConnectionFailed)));
 #endif
 
     return CHIP_NO_ERROR;
@@ -346,15 +346,17 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 }
 
 #if SL_WIFI
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
+    constexpr size_t bssIdSize = 6;
+    VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     wfx_wifi_scan_result_t ap;
     int32_t err = wfx_get_ap_info(&ap);
-    static uint8_t bssid[6];
     if (err == 0)
     {
-        memcpy(bssid, ap.bssid, 6);
-        BssId = ByteSpan(bssid, 6);
+        memcpy(BssId.data(), ap.bssid, bssIdSize);
+        BssId.reduce_size(bssIdSize);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

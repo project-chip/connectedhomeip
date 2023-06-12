@@ -78,7 +78,7 @@ private:
     void OnCommissioningComplete();
     void OnFailSafeTimerExpired();
 
-    const BitFlags<NetworkCommissioningFeature> mFeatureFlags;
+    const BitFlags<Feature> mFeatureFlags;
 
     DeviceLayer::NetworkCommissioning::Internal::WirelessDriver * const mpWirelessDriver;
     DeviceLayer::NetworkCommissioning::Internal::BaseDriver * const mpBaseDriver;
@@ -93,7 +93,7 @@ private:
     // Setting these values don't have to care about parallel requests, since we will reject other requests when there is another
     // request ongoing.
     // These values can be updated via OnNetworkingStatusChange callback, ScanCallback::OnFinished and ConnectCallback::OnResult.
-    DataModel::Nullable<NetworkCommissioningStatus> mLastNetworkingStatusValue;
+    DataModel::Nullable<NetworkCommissioningStatusEnum> mLastNetworkingStatusValue;
     Attributes::LastConnectErrorValue::TypeInfo::Type mLastConnectErrorValue;
     uint8_t mConnectingNetworkID[DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen];
     uint8_t mConnectingNetworkIDLen = 0;
@@ -120,24 +120,24 @@ private:
 public:
     Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * apDelegate) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
-        mFeatureFlags(NetworkCommissioningFeature::kWiFiNetworkInterface), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mFeatureFlags(Feature::kWiFiNetworkInterface),
+        mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
     {
         mpDriver.Set<DeviceLayer::NetworkCommissioning::WiFiDriver *>(apDelegate);
     }
 
     Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * apDelegate) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
-        mFeatureFlags(NetworkCommissioningFeature::kThreadNetworkInterface), mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mFeatureFlags(Feature::kThreadNetworkInterface),
+        mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
     {
         mpDriver.Set<DeviceLayer::NetworkCommissioning::ThreadDriver *>(apDelegate);
     }
 
     Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * apDelegate) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id),
-        mFeatureFlags(NetworkCommissioningFeature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mFeatureFlags(Feature::kEthernetNetworkInterface),
+        mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
     {}
 
     virtual ~Instance() = default;

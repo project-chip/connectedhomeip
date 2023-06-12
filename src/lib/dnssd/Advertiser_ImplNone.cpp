@@ -32,6 +32,8 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
+    bool IsInitialized() override { return false; }
+
     void Shutdown() override {}
 
     CHIP_ERROR RemoveServices() override

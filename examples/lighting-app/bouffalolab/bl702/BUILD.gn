@@ -41,7 +41,10 @@ declare_args() {
   chip_print_memory_usage = true
 
   # OTA periodic query timeout in seconds
-  ota_periodic_query_timeout = 86400
+  ota_periodic_query_timeout_seconds = 86400
+
+  # reboot delay in seconds to apply new OTA image
+  ota_auto_reboot_delay_seconds = 5
 
   config_cache_size = 8192
 
@@ -69,7 +72,8 @@ bl_iot_sdk("sdk") {
     "INCLUDE_xSemaphoreGetMutexHolder=1",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
-    "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout}",
+    "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_seconds}",
+    "OTA_AUTO_REBOOT_DELAY=${ota_auto_reboot_delay_seconds}",
     "OPENTHREAD_CONFIG_PLATFORM_XTAL_ACCURACY=40",
     "PRINT_DEBUG=0",
   ]

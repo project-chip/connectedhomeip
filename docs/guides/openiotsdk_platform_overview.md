@@ -68,16 +68,41 @@ Configuration of Mbed TLS is in
 
 Storage in Open IoT SDK is provided by
 [TDBStore](https://gitlab.arm.com/iot/open-iot-sdk/storage) which is a simple
-Key-Value Storage over a block device.
+key-value storage over a block device.
+
+If the application uses
+[Trusted Firmware-M](https://tf-m-user-guide.trustedfirmware.org) then
+[TF-M Protected Storage Service](https://tf-m-user-guide.trustedfirmware.org/integration_guide/services/tfm_ps_integration_guide.html)
+can be used as an alternative for persistence in secure memory.
 
 ---
 
 **NOTE**
 
-On the Corstone targets this currently is implemented as a RAM memory region
-emulating a Flash device. This does not offer persistence between launches.
+On `FVP` Corstone targets, memory content is lost after the program exits. To
+achieve persistence memory regions used for the key-value storage must be saved
+when the execution ends.
 
 ---
+
+### Fast model persistent memory via files
+
+Two command lines options can be used to achieve persistence of a specific
+memory regions:
+
+-   `--dump` store the content of a memory region into a file when the model
+    ends its execution
+-   `--data` load the content of a file into a specific memory region at startup
+
+Use the `--list-memory` flag to see the list of instances and memory spaces for
+your `FVP` model.
+
+Visit the
+[FVP command line documentation](https://developer.arm.com/documentation/100966/1116/Getting-Started-with-Fixed-Virtual-Platforms/FVP-command-line-options)
+for more details about these flags.
+
+Depending on your application, choose the right memory instance, memory space,
+address and size.
 
 ## Clocks
 

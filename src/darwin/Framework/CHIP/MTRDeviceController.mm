@@ -31,6 +31,7 @@
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRSetupPayload.h"
 #import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
 #import <zap-generated/MTRBaseClusters.h>
@@ -463,6 +464,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         if (commissioningParams.threadOperationalDataset) {
             params.SetThreadOperationalDataset(AsByteSpan(commissioningParams.threadOperationalDataset));
         }
+        params.SetSkipCommissioningComplete(commissioningParams.skipCommissioningComplete);
         if (commissioningParams.wifiSSID) {
             chip::ByteSpan ssid = AsByteSpan(commissioningParams.wifiSSID);
             chip::ByteSpan credentials;
@@ -490,6 +492,9 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             self->_deviceAttestationDelegateBridge = new MTRDeviceAttestationDelegateBridge(
                 self, commissioningParams.deviceAttestationDelegate, timeoutSecs, shouldWaitAfterDeviceAttestation);
             params.SetDeviceAttestationDelegate(self->_deviceAttestationDelegateBridge);
+        }
+        if (commissioningParams.countryCode != nil) {
+            params.SetCountryCode(AsCharSpan(commissioningParams.countryCode));
         }
 
         chip::NodeId deviceId = [nodeID unsignedLongLongValue];
@@ -548,7 +553,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
-        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error], nil);
+        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:error], nil);
 
         return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
     };

@@ -61,7 +61,6 @@ static_library("chip-tool-utils") {
     "commands/common/Commands.cpp",
     "commands/common/Commands.h",
     "commands/common/CredentialIssuerCommands.h",
-    "commands/common/DeviceScanner.cpp",
     "commands/common/HexConversion.h",
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
@@ -70,8 +69,6 @@ static_library("chip-tool-utils") {
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
-    "commands/pairing/CloseSessionCommand.cpp",
-    "commands/pairing/CloseSessionCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
@@ -80,6 +77,8 @@ static_library("chip-tool-utils") {
     "commands/payload/SetupPayloadGenerateCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/payload/SetupPayloadVerhoeff.cpp",
+    "commands/session-management/CloseSessionCommand.cpp",
+    "commands/session-management/CloseSessionCommand.h",
     "commands/storage/StorageManagementCommand.cpp",
   ]
 
@@ -97,6 +96,10 @@ static_library("chip-tool-utils") {
     sources += [ "commands/tests/TestCommand.cpp" ]
   }
 
+  if (chip_device_platform == "darwin") {
+    sources += [ "commands/common/DeviceScanner.cpp" ]
+  }
+
   public_deps = [
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/commands/commissioner",
@@ -111,6 +114,8 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing/log_json",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
   ]

@@ -23,6 +23,10 @@
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32SecureCertDACProvider.h>
 
+#if CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#include <platform/ESP32/ESP32CHIPCryptoPAL.h>
+#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+
 #define TAG "dac_provider"
 
 #if CONFIG_SEC_CERT_DAC_PROVIDER
@@ -111,20 +115,62 @@ CHIP_ERROR ESP32SecureCertDACProvider ::GetProductAttestationIntermediateCert(Mu
 CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteSpan & messageToSign,
                                                                      MutableByteSpan & outSignBuffer)
 {
+    esp_err_t esp_err;
+    esp_secure_cert_key_type_t keyType;
+
+    CHIP_ERROR chipError;
     Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
-    char * sc_keypair       = NULL;
-    uint32_t sc_keypair_len = 0;
 
     VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    esp_err_t err = esp_secure_cert_get_priv_key(&sc_keypair, &sc_keypair_len);
-    if (err == ESP_OK && sc_keypair != NULL && sc_keypair_len != 0)
+    esp_err = esp_secure_cert_get_priv_key_type(&keyType);
+    VerifyOrReturnError(esp_err == ESP_OK, CHIP_ERROR_INCORRECT_STATE,
+                        ESP_LOGE(TAG, "Failed to get the type of private key from secure cert partition, esp_err:%d", esp_err));
+
+    VerifyOrReturnError(keyType != ESP_SECURE_CERT_INVALID_KEY, CHIP_ERROR_INCORRECT_STATE,
+                        ESP_LOGE(TAG, "Private key type in secure cert partition is invalid"));
+
+    // This flow is for devices supporting ECDSA peripheral
+    if (keyType == ESP_SECURE_CERT_ECDSA_PERIPHERAL_KEY)
     {
-        ESP_FAULT_ASSERT(err == ESP_OK && sc_keypair != NULL && sc_keypair_len != 0);
-        CHIP_ERROR chipError =
+#if CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+        Crypto::ESP32P256Keypair keypair;
+        uint8_t efuseBlockId;
+
+        esp_err = esp_secure_cert_get_priv_key_efuse_id(&efuseBlockId);
+        VerifyOrReturnError(esp_err == ESP_OK, CHIP_ERROR_INVALID_KEY_ID,
+                            ESP_LOGE(TAG, "Failed to get the private key efuse block id, esp_err:%d", esp_err));
+
+        ESP_LOGD(TAG, "efuse block id:%u", efuseBlockId);
+
+        chipError = keypair.Initialize(chip::Crypto::ECPKeyTarget::ECDSA, efuseBlockId);
+        VerifyOrReturnError(chipError == CHIP_NO_ERROR, chipError,
+                            ESP_LOGE(TAG, "Failed to initialize the keypair err:%" CHIP_ERROR_FORMAT, chipError.Format()));
+
+        chipError = keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature);
+        VerifyOrReturnError(
+            chipError == CHIP_NO_ERROR, chipError,
+            ESP_LOGE(TAG, "Failed to sign with device attestation key, err:%" CHIP_ERROR_FORMAT, chipError.Format()));
+#else
+        return CHIP_ERROR_INCORRECT_STATE;
+#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+    }
+    else // This flow is for devices which do not support ECDSA peripheral
+    {
+#if !CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+        Crypto::P256Keypair keypair;
+        char * sc_keypair       = NULL;
+        uint32_t sc_keypair_len = 0;
+
+        esp_err = esp_secure_cert_get_priv_key(&sc_keypair, &sc_keypair_len);
+        VerifyOrReturnError(esp_err == ESP_OK && sc_keypair != NULL && sc_keypair_len != 0, CHIP_ERROR_INCORRECT_STATE,
+                            ESP_LOGE(TAG, "esp_secure_cert_get_priv_key failed esp_err:%d", esp_err));
+
+        ESP_FAULT_ASSERT(esp_err == ESP_OK && sc_keypair != NULL && sc_keypair_len != 0);
+
+        chipError =
             LoadKeypairFromRaw(ByteSpan(reinterpret_cast<const uint8_t *>(sc_keypair + kPrivKeyOffset), kDACPrivateKeySize),
                                ByteSpan(reinterpret_cast<const uint8_t *>(sc_keypair + kPubKeyOffset), kDACPublicKeySize), keypair);
         VerifyOrReturnError(chipError == CHIP_NO_ERROR, chipError, esp_secure_cert_free_priv_key(sc_keypair));
@@ -133,12 +179,11 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
         VerifyOrReturnError(chipError == CHIP_NO_ERROR, chipError, esp_secure_cert_free_priv_key(sc_keypair));
 
         esp_secure_cert_free_priv_key(sc_keypair);
-        chipError = CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
-        return chipError;
+#else
+        return CHIP_ERROR_INCORRECT_STATE;
+#endif // !CONFIG_USE_ESP32_ECDSA_PERIPHERAL
     }
-
-    ESP_LOGE(TAG, "esp_secure_cert_get_priv_key failed err:%d", err);
-    return CHIP_ERROR_INCORRECT_STATE;
+    return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
 }
 
 } // namespace DeviceLayer

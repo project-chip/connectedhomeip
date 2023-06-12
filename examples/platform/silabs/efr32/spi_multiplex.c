@@ -38,6 +38,11 @@
  *****************************************************************************/
 void spi_drv_reinit(uint32_t baudrate)
 {
+    if (USART_BaudrateGet(USART0) == baudrate)
+    {
+        // USART synced to baudrate already
+        return;
+    }
     // USART is used in MG24 + WF200 combination
     USART_InitSync_TypeDef usartInit = USART_INITSYNC_DEFAULT;
     usartInit.msbf                   = true;
@@ -48,29 +53,6 @@ void spi_drv_reinit(uint32_t baudrate)
     usartInit.autoCsEnable           = true;
 
     USART_InitSync(USART0, &usartInit);
-}
-
-/****************************************************************************
- * @fn  void set_spi_baudrate()
- * @brief
- *     Setting the appropriate SPI baudrate
- * @param[in] None
- * @return returns void
- *****************************************************************************/
-void set_spi_baudrate(peripheraltype_t pr_type)
-{
-    if (pr_type == LCD)
-    {
-        spi_drv_reinit(LCD_BIT_RATE);
-    }
-    else if (pr_type == EXP_HDR)
-    {
-        spi_drv_reinit(EXP_HDR_BIT_RATE);
-    }
-    else if (pr_type == EXT_SPIFLASH)
-    {
-        spi_drv_reinit(SPI_FLASH_BIT_RATE);
-    }
 }
 
 /****************************************************************************
@@ -111,13 +93,9 @@ void pre_bootloader_spi_transfer(void)
         return;
     }
     /*
-     * CS for Expansion header controlled within GSDK,
-     * however we need to ensure CS for Expansion header is High/disabled before use of EXT SPI Flash
-     */
-    sl_wfx_host_spi_cs_deassert();
-    /*
      * Assert CS pin for EXT SPI Flash
      */
+    spi_drv_reinit(SL_BIT_RATE_SPI_FLASH);
     spiflash_cs_assert();
 }
 
@@ -150,11 +128,7 @@ void pre_lcd_spi_transfer(void)
     {
         return;
     }
-    if (pr_type != LCD)
-    {
-        pr_type = LCD;
-        set_spi_baudrate(pr_type);
-    }
+    spi_drv_reinit(SL_BIT_RATE_LCD);
     /*LCD CS is handled as part of LCD gsdk*/
 }
 
@@ -208,7 +182,6 @@ void post_uart_transfer(void)
         return;
     }
     GPIO_PinModeSet(gpioPortA, 8, gpioModeInputPull, 1);
-    set_spi_baudrate(EXP_HDR);
     xSemaphoreGive(spi_sem_sync_hdl);
     sl_wfx_host_enable_platform_interrupt();
     sl_wfx_enable_irq();

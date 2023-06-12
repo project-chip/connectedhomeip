@@ -96,7 +96,7 @@ CHIP_ERROR GetMACAddressFromInterfaces(io_iterator_t primaryInterfaceIterator, u
 
     kern_return_t kernResult;
     io_object_t interfaceService;
-    io_object_t controllerService;
+    io_object_t controllerService = 0;
 
     while ((interfaceService = IOIteratorNext(primaryInterfaceIterator)))
     {
@@ -191,13 +191,13 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))
     {
-        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
         ReturnErrorOnFailure(WriteConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, location));
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_LocationCapability))
     {
-        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
         ReturnErrorOnFailure(WriteConfigValue(PosixConfig::kConfigKey_LocationCapability, location));
     }
 

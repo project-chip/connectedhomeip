@@ -79,7 +79,7 @@ class PairOnNetworkLongImInvokeCommand(
     tlvWriter.endStructure()
 
     val element: InvokeElement = InvokeElement.newInstance( /* endpointId= */
-      0L, CLUSTER_ID_IDENTIFY, IDENTIFY_COMMAND, tlvWriter.getEncoded(), null
+      0, CLUSTER_ID_IDENTIFY, IDENTIFY_COMMAND, tlvWriter.getEncoded(), null
     )
 
     currentCommissioner()

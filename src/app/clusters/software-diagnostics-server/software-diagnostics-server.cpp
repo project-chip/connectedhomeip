@@ -88,11 +88,11 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & 
     case ThreadMetrics::Id:
         return ReadThreadMetrics(aEncoder);
     case Clusters::Globals::Attributes::FeatureMap::Id: {
-        BitFlags<SoftwareDiagnosticsFeature> features;
+        BitFlags<Feature> features;
 
         if (DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
         {
-            features.Set(SoftwareDiagnosticsFeature::kWaterMarks);
+            features.Set(Feature::kWaterMarks);
         }
 
         return aEncoder.Encode(features);

@@ -75,7 +75,7 @@ public:
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 
-    CHIP_ERROR GetWiFiBssId(ByteSpan & BssId) override;
+    CHIP_ERROR GetWiFiBssId(MutableByteSpan & BssId) override;
     CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion) override;
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
@@ -110,7 +110,6 @@ public:
     uint32_t mPacketUnicastRxCount   = 0;
     uint32_t mPacketUnicastTxCount   = 0;
     uint64_t mOverrunCount           = 0;
-    uint8_t mWiFiMacAddress[CY_WCM_MAC_ADDR_LEN];
     app::DataModel::Nullable<bool> mipv4_offpremise;
     app::DataModel::Nullable<bool> mipv6_offpremise;
 };

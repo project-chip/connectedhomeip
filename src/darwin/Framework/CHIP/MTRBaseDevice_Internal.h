@@ -18,11 +18,15 @@
 #import "MTRBaseDevice.h"
 #import <Foundation/Foundation.h>
 
+#include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/DeviceProxy.h>
+#include <app/EventHeader.h>
 #include <app/EventLoggingTypes.h>
+#include <app/EventPathParams.h>
+#include <system/SystemPacketBuffer.h>
 
 @class MTRDeviceController;
 
@@ -73,6 +77,26 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
  */
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
+/**
+ * Create a report, suitable in including in the sort of data structure that
+ * gets passed to MTRDeviceResponseHandler, from a given event header and
+ * already-decoded event data.  The data is allowed to be nil in error cases
+ * (e.g. when TLV decoding failed).
+ */
++ (NSDictionary *)eventReportForHeader:(const chip::app::EventHeader &)header andData:(id _Nullable)data;
+
+/**
+ * Extract a data-value for the given response command from the given response-value
+ * dictionary, encode it to TLV, and return a System::PacketBufferHandle with
+ * the encoded data.
+ *
+ * Will return a null handle and an error if the given response-value does not represent a
+ * data command response or is the wrong response command, or if encoding to TLV fails.
+ */
++ (chip::System::PacketBufferHandle)_responseDataForCommand:(NSDictionary<NSString *, id> *)responseValue
+                                                  clusterID:(chip::ClusterId)clusterID
+                                                  commandID:(chip::CommandId)commandID
+                                                      error:(NSError * __autoreleasing *)error;
 @end
 
 @interface MTRClusterPath ()
@@ -98,12 +122,20 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 @end
 
 @interface MTREventReport ()
+- (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path error:(NSError *)error;
 - (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path
                  eventNumber:(NSNumber *)eventNumber
                     priority:(chip::app::PriorityLevel)priority
                    timestamp:(const chip::app::Timestamp &)timestamp
-                       value:(id _Nullable)value
-                       error:(NSError * _Nullable)error;
+                       value:(id)value;
+@end
+
+@interface MTRAttributeRequestPath ()
+- (void)convertToAttributePathParams:(chip::app::AttributePathParams &)params;
+@end
+
+@interface MTREventRequestPath ()
+- (void)convertToEventPathParams:(chip::app::EventPathParams &)params;
 @end
 
 // Exported utility function

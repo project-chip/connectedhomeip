@@ -159,10 +159,8 @@ void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCont
 CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferTLVWriter && aMessageWriter, System::PacketBufferHandle & packet)
 {
     VerifyOrReturnError(mState == State::AddStatus, CHIP_ERROR_INCORRECT_STATE);
-    AttributeStatusIBs::Builder & attributeStatusIBs = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
-    ReturnErrorOnFailure(attributeStatusIBs.GetError());
-    mWriteResponseBuilder.EndOfWriteResponseMessage();
-    ReturnErrorOnFailure(mWriteResponseBuilder.GetError());
+    ReturnErrorOnFailure(mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses());
+    ReturnErrorOnFailure(mWriteResponseBuilder.EndOfWriteResponseMessage());
     ReturnErrorOnFailure(aMessageWriter.Finalize(&packet));
     return CHIP_NO_ERROR;
 }
@@ -332,7 +330,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         MatterPreAttributeWriteCallback(dataAttributePath);
         TLV::TLVWriter backup;
         DataVersion version = 0;
-        mWriteResponseBuilder.Checkpoint(backup);
+        mWriteResponseBuilder.GetWriteResponses().Checkpoint(backup);
         err = element.GetDataVersion(&version);
         if (CHIP_NO_ERROR == err)
         {
@@ -346,7 +344,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, dataReader, this);
         if (err != CHIP_NO_ERROR)
         {
-            mWriteResponseBuilder.Rollback(backup);
+            mWriteResponseBuilder.GetWriteResponses().Rollback(backup);
             err = AddStatus(dataAttributePath, StatusIB(err));
         }
         MatterPostAttributeWriteCallback(dataAttributePath);
@@ -639,8 +637,7 @@ CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, cons
     ReturnErrorOnFailure(attributeStatusIB.GetError());
     statusIBBuilder.EncodeStatusIB(aStatus);
     ReturnErrorOnFailure(statusIBBuilder.GetError());
-    attributeStatusIB.EndOfAttributeStatusIB();
-    ReturnErrorOnFailure(attributeStatusIB.GetError());
+    ReturnErrorOnFailure(attributeStatusIB.EndOfAttributeStatusIB());
 
     MoveToState(State::AddStatus);
     return CHIP_NO_ERROR;

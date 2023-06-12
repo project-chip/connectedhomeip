@@ -29,6 +29,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #ifndef DOOR_LOCK_SERVER_ENDPOINT
@@ -43,7 +44,6 @@ using chip::app::Clusters::DoorLock::DataOperationTypeEnum;
 using chip::app::Clusters::DoorLock::DaysMaskMap;
 using chip::app::Clusters::DoorLock::DlLockState;
 using chip::app::Clusters::DoorLock::DlStatus;
-using chip::app::Clusters::DoorLock::DoorLockFeature;
 using chip::app::Clusters::DoorLock::DoorStateEnum;
 using chip::app::Clusters::DoorLock::LockDataTypeEnum;
 using chip::app::Clusters::DoorLock::LockOperationTypeEnum;
@@ -82,6 +82,8 @@ class DoorLockServer
 {
 public:
     static DoorLockServer & Instance();
+
+    using Feature = chip::app::Clusters::DoorLock::Feature;
 
     void InitServer(chip::EndpointId endpointId);
 
@@ -142,51 +144,49 @@ public:
 
     bool SendLockAlarmEvent(chip::EndpointId endpointId, AlarmCodeEnum alarmCode);
 
-    chip::BitFlags<DoorLockFeature> GetFeatures(chip::EndpointId endpointId);
+    chip::BitFlags<Feature> GetFeatures(chip::EndpointId endpointId);
 
-    inline bool SupportsPIN(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(DoorLockFeature::kPinCredential); }
+    inline bool SupportsPIN(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kPinCredential); }
 
-    inline bool SupportsRFID(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(DoorLockFeature::kRfidCredential); }
+    inline bool SupportsRFID(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kRfidCredential); }
 
-    inline bool SupportsFingers(chip::EndpointId endpointId)
-    {
-        return GetFeatures(endpointId).Has(DoorLockFeature::kFingerCredentials);
-    }
+    inline bool SupportsFingers(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kFingerCredentials); }
 
-    inline bool SupportsFace(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(DoorLockFeature::kFaceCredentials); }
+    inline bool SupportsFace(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kFaceCredentials); }
 
     inline bool SupportsWeekDaySchedules(chip::EndpointId endpointId)
     {
-        return GetFeatures(endpointId).Has(DoorLockFeature::kWeekDayAccessSchedules);
+        return GetFeatures(endpointId).Has(Feature::kWeekDayAccessSchedules);
     }
 
     inline bool SupportsYearDaySchedules(chip::EndpointId endpointId)
     {
-        return GetFeatures(endpointId).Has(DoorLockFeature::kYearDayAccessSchedules);
+        return GetFeatures(endpointId).Has(Feature::kYearDayAccessSchedules);
     }
 
     inline bool SupportsHolidaySchedules(chip::EndpointId endpointId)
     {
-        return GetFeatures(endpointId).Has(DoorLockFeature::kHolidaySchedules);
+        return GetFeatures(endpointId).Has(Feature::kHolidaySchedules);
     }
 
     inline bool SupportsAnyCredential(chip::EndpointId endpointId)
     {
         return GetFeatures(endpointId)
-            .HasAny(DoorLockFeature::kPinCredential, DoorLockFeature::kRfidCredential, DoorLockFeature::kFingerCredentials,
-                    DoorLockFeature::kFaceCredentials);
+            .HasAny(Feature::kPinCredential, Feature::kRfidCredential, Feature::kFingerCredentials, Feature::kFaceCredentials);
     }
 
     inline bool SupportsCredentialsOTA(chip::EndpointId endpointId)
     {
-        return GetFeatures(endpointId).Has(DoorLockFeature::kCredentialsOverTheAirAccess);
+        return GetFeatures(endpointId).Has(Feature::kCredentialsOverTheAirAccess);
     }
 
     inline bool SupportsUSR(chip::EndpointId endpointId)
     {
         // appclusters, 5.2.2: USR feature has conformance [PIN | RID | FGP | FACE]
-        return GetFeatures(endpointId).Has(DoorLockFeature::kUser) && SupportsAnyCredential(endpointId);
+        return GetFeatures(endpointId).Has(Feature::kUser) && SupportsAnyCredential(endpointId);
     }
+
+    inline bool SupportsUnbolt(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kUnbolt); }
 
     bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
@@ -493,6 +493,10 @@ private:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & commandData);
 
+    friend bool emberAfDoorLockClusterUnboltDoorCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::UnboltDoor::DecodableType & commandData);
+
     friend bool emberAfDoorLockClusterSetHolidayScheduleCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::DecodableType & commandData);
@@ -556,7 +560,11 @@ private:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
 
-    std::array<EmberAfDoorLockEndpointContext, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT> mEndpointCtx;
+    static constexpr size_t kDoorLockClusterServerMaxEndpointCount =
+        EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    static_assert(kDoorLockClusterServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "DoorLock Endpoint count error");
+
+    std::array<EmberAfDoorLockEndpointContext, kDoorLockClusterServerMaxEndpointCount> mEndpointCtx;
 
     static DoorLockServer instance;
 };
@@ -911,6 +919,19 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
  * @retval false if error happenned (err should be set to appropriate error code)
  */
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
+                                              OperationErrorEnum & err);
+
+/**
+ * @brief User handler for UnboltDoor command (server)
+ *
+ * @param   endpointId      endpoint for which UnboltDoor command is called
+ * @param   pinCode         PIN code (optional)
+ * @param   err             error code if door unbolting failed (set only if retval==false)
+ *
+ * @retval true on success
+ * @retval false if error happenned (err should be set to appropriate error code)
+ */
+bool emberAfPluginDoorLockOnDoorUnboltCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
                                               OperationErrorEnum & err);
 
 /**

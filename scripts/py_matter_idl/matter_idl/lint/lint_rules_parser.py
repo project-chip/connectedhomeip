@@ -4,24 +4,30 @@ import logging
 import os
 import xml.etree.ElementTree
 from dataclasses import dataclass
-from typing import List, Mapping
+from enum import Enum, auto
+from typing import List, MutableMapping, Optional, Tuple, Union
 
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
 
 try:
-    from .types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
-                        RequiredCommandsRule)
+    from .types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, ClusterValidationRule,
+                        RequiredAttributesRule, RequiredCommandsRule)
 except ImportError:
     import sys
 
     sys.path.append(os.path.join(os.path.abspath(
         os.path.dirname(__file__)), "..", ".."))
-    from matter_idl.lint.types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
-                                       RequiredCommandsRule)
+    from matter_idl.lint.types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, ClusterValidationRule,
+                                       RequiredAttributesRule, RequiredCommandsRule)
 
 
-def parseNumberString(n):
+class ElementNotFoundError(Exception):
+    def __init__(self, name):
+        super().__init__(f"Could not find {name}")
+
+
+def parseNumberString(n: str) -> int:
     if n.startswith('0x'):
         return int(n[2:], 16)
     else:
@@ -48,6 +54,17 @@ class DecodedCluster:
     required_commands: List[RequiredCommand]
 
 
+class ClusterActionEnum(Enum):
+    REQUIRE = auto()
+    REJECT = auto()
+
+
+@dataclass
+class ServerClusterRequirement:
+    action: ClusterActionEnum
+    id: Union[str, int]
+
+
 def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
     if element.tag != 'cluster':
         logging.error("Not a cluster element: %r" % element)
@@ -57,9 +74,12 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
     #  - name (general name for this cluster)
     #  - code (unique identifier, may be hex or numeric)
     #  - attribute with side, code and optional attributes
-
     try:
-        name = element.find('name').text.replace(' ', '')
+        name = element.find('name')
+        if name is None or not name.text:
+            raise ElementNotFoundError('name')
+
+        name = name.text.replace(' ', '')
         required_attributes = []
         required_commands = []
 
@@ -75,8 +95,9 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             # or
             # <attribute ...><description>myName</description><access .../>...</attribute>
             attr_name = attr.text
-            if attr.find('description') is not None:
-                attr_name = attr.find('description').text
+            description = attr.find('description')
+            if description is not None:
+                attr_name = description.text
 
             required_attributes.append(
                 RequiredAttribute(
@@ -94,9 +115,13 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             required_commands.append(RequiredCommand(
                 name=cmd.attrib["name"], code=parseNumberString(cmd.attrib['code'])))
 
+        code = element.find('code')
+        if code is None:
+            raise Exception("Failed to find cluster code")
+
         return DecodedCluster(
             name=name,
-            code=parseNumberString(element.find('code').text),
+            code=parseNumberString(code.text),
             required_attributes=required_attributes,
             required_commands=required_commands
         )
@@ -128,35 +153,58 @@ class LintRulesContext:
     def __init__(self):
         self._required_attributes_rule = RequiredAttributesRule(
             "Required attributes")
+        self._cluster_validation_rule = ClusterValidationRule(
+            "Cluster validation")
         self._required_commands_rule = RequiredCommandsRule(
             "Required commands")
 
         # Map cluster names to the underlying code
-        self._cluster_codes: Mapping[str, int] = {}
+        self._cluster_codes: MutableMapping[str, int] = {}
 
     def GetLinterRules(self):
-        return [self._required_attributes_rule, self._required_commands_rule]
+        return [self._required_attributes_rule, self._required_commands_rule, self._cluster_validation_rule]
 
     def RequireAttribute(self, r: AttributeRequirement):
         self._required_attributes_rule.RequireAttribute(r)
 
-    def RequireClusterInEndpoint(self, name: str, code: int):
-        """Mark that a specific cluster is always required in the given endpoint
-        """
+    def FindClusterCode(self, name: str) -> Optional[Tuple[str, int]]:
         if name not in self._cluster_codes:
             # Name may be a number. If this can be parsed as a number, accept it anyway
             try:
-                cluster_code = parseNumberString(name)
-                name = "ID_%s" % name
+                return "ID_%s" % name, parseNumberString(name)
             except ValueError:
                 logging.error("UNKNOWN cluster name %s" % name)
                 logging.error("Known names: %s" %
                               (",".join(self._cluster_codes.keys()), ))
-                return
+                return None
         else:
-            cluster_code = self._cluster_codes[name]
+            return name, self._cluster_codes[name]
 
-        self._required_attributes_rule.RequireClusterInEndpoint(ClusterRequirement(
+    def RequireClusterInEndpoint(self, name: str, code: int):
+        """Mark that a specific cluster is always required in the given endpoint
+        """
+        cluster_info = self.FindClusterCode(name)
+        if not cluster_info:
+            return
+
+        name, cluster_code = cluster_info
+
+        self._cluster_validation_rule.RequireClusterInEndpoint(ClusterRequirement(
+            endpoint_id=code,
+            cluster_code=cluster_code,
+            cluster_name=name,
+        ))
+
+    def RejectClusterInEndpoint(self, name: str, code: int):
+        """Mark that a specific cluster is always rejected in the given endpoint
+        """
+        cluster_info = self.FindClusterCode(name)
+        if not cluster_info:
+            return
+
+        name, cluster_code = cluster_info
+
+        self._cluster_validation_rule.RejectClusterInEndpoint(ClusterRequirement(
             endpoint_id=code,
             cluster_code=cluster_code,
             cluster_name=name,
@@ -252,14 +300,25 @@ class LintRulesTransformer(Transformer):
         return AttributeRequirement(code=code, name=name)
 
     @v_args(inline=True)
-    def specific_endpoint_rule(self, code, *names):
-        for name in names:
-            self.context.RequireClusterInEndpoint(name, code)
+    def specific_endpoint_rule(self, code, *requirements):
+        for requirement in requirements:
+            if requirement.action == ClusterActionEnum.REQUIRE:
+                self.context.RequireClusterInEndpoint(requirement.id, code)
+            elif requirement.action == ClusterActionEnum.REJECT:
+                self.context.RejectClusterInEndpoint(requirement.id, code)
+            else:
+                raise Exception("Unexpected requirement action %r" %
+                                requirement.action)
+
         return Discard
 
     @v_args(inline=True)
     def required_server_cluster(self, id):
-        return id
+        return ServerClusterRequirement(ClusterActionEnum.REQUIRE, id)
+
+    @v_args(inline=True)
+    def rejected_server_cluster(self, id):
+        return ServerClusterRequirement(ClusterActionEnum.REJECT, id)
 
 
 class Parser:
@@ -285,7 +344,6 @@ if __name__ == '__main__':
     # This Parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
     import click
-    import coloredlogs
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -300,12 +358,14 @@ if __name__ == '__main__':
     @click.option(
         '--log-level',
         default='INFO',
-        type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+        type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
         help='Determines the verbosity of script output.')
     @click.argument('filename')
     def main(log_level, filename=None):
-        coloredlogs.install(level=__LOG_LEVELS__[
-                            log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+        logging.basicConfig(
+            level=__LOG_LEVELS__[log_level],
+            format='%(asctime)s %(levelname)-7s %(message)s',
+        )
 
         logging.info("Starting to parse ...")
         data = CreateParser(filename).parse()

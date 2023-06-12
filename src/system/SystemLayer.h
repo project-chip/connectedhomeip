@@ -43,7 +43,9 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #include <dispatch/dispatch.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+#include <ev.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
 #include <utility>
 
@@ -96,7 +98,8 @@ public:
 
     /**
      * @brief
-     *   This method starts a one-shot timer.
+     *   This method starts a one-shot timer.  This method must be called while in the Matter context (from
+     *   the Matter event loop, or while holding the Matter stack lock).
      *
      *   @note
      *       Only a single timer is allowed to be started with the same @a aComplete and @a aAppState
@@ -114,8 +117,9 @@ public:
     virtual CHIP_ERROR StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
 
     /**
-     * @brief
-     *   This method cancels a one-shot timer, started earlier through @p StartTimer().
+     * @brief This method cancels a one-shot timer, started earlier through @p StartTimer().  This method must
+     *        be called while in the Matter context (from the Matter event loop, or while holding the Matter
+     *        stack lock).
      *
      *   @note
      *       The cancellation could fail silently if the timer specified by the combination of the callback
@@ -129,7 +133,9 @@ public:
 
     /**
      * @brief
-     *   Schedules a function with a signature identical to `OnCompleteFunct` to be run as soon as possible in the CHIP context.
+     *   Schedules a function with a signature identical to `OnCompleteFunct` to be run as soon as possible in the Matter context.
+     *   This must only be called when already in the Matter context (from the Matter event loop, or while holding the Matter
+     *   stack lock).
      *
      * @param[in] aComplete     A pointer to a callback function to be called when this timer fires.
      * @param[in] aAppState     A pointer to an application state object to be passed to the callback function as argument.
@@ -246,7 +252,10 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue) = 0;
     virtual dispatch_queue_t GetDispatchQueue()                   = 0;
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+    virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) = 0;
+    virtual struct ev_loop * GetLibEvLoop()                 = 0;
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 };
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

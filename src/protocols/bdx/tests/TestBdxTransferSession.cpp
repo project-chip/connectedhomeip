@@ -183,10 +183,16 @@ void SendAndVerifyTransferInit(nlTestSuite * inSuite, void * inContext, Transfer
         NL_TEST_ASSERT(inSuite, outEvent.transferInitData.MetadataLength == initData.MetadataLength);
         if (outEvent.transferInitData.MetadataLength == initData.MetadataLength)
         {
-            // Only check that metadata buffers match. The OutputEvent can still be inspected when this function returns to parse
-            // the metadata and verify that it matches.
-            NL_TEST_ASSERT(
-                inSuite, !memcmp(initData.Metadata, outEvent.transferInitData.Metadata, outEvent.transferInitData.MetadataLength));
+            // Even if initData.MetadataLength is 0, it is still technically undefined behaviour to call memcmp with a null
+            bool isNullAndLengthZero = initData.Metadata == nullptr && initData.MetadataLength == 0;
+            if (!isNullAndLengthZero)
+            {
+                // Only check that metadata buffers match. The OutputEvent can still be inspected when this function returns to
+                // parse the metadata and verify that it matches.
+                NL_TEST_ASSERT(
+                    inSuite,
+                    !memcmp(initData.Metadata, outEvent.transferInitData.Metadata, outEvent.transferInitData.MetadataLength));
+            }
         }
         else
         {
@@ -239,11 +245,16 @@ void SendAndVerifyAcceptMsg(nlTestSuite * inSuite, void * inContext, TransferSes
         NL_TEST_ASSERT(inSuite, outEvent.transferAcceptData.MetadataLength == acceptData.MetadataLength);
         if (outEvent.transferAcceptData.MetadataLength == acceptData.MetadataLength)
         {
-            // Only check that metadata buffers match. The OutputEvent can still be inspected when this function returns to parse
-            // the metadata and verify that it matches.
-            NL_TEST_ASSERT(
-                inSuite,
-                !memcmp(acceptData.Metadata, outEvent.transferAcceptData.Metadata, outEvent.transferAcceptData.MetadataLength));
+            // Even if acceptData.MetadataLength is 0, it is still technically undefined behaviour to call memcmp with a null
+            bool isNullAndLengthZero = acceptData.Metadata == nullptr && acceptData.MetadataLength == 0;
+            if (!isNullAndLengthZero)
+            {
+                // Only check that metadata buffers match. The OutputEvent can still be inspected when this function returns to
+                // parse the metadata and verify that it matches.
+                NL_TEST_ASSERT(
+                    inSuite,
+                    !memcmp(acceptData.Metadata, outEvent.transferAcceptData.Metadata, outEvent.transferAcceptData.MetadataLength));
+            }
         }
         else
         {

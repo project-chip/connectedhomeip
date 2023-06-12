@@ -141,6 +141,23 @@ class Argument {
         isValidArgument = numLong.toInt() >= minValue && numLong.toInt() <= maxValue
       }
 
+      ArgumentType.STRING -> {
+        val stringBuffer = this.value as StringBuffer
+        stringBuffer.append(value)
+        val str = stringBuffer.toString()
+        isValidArgument = value == str
+      }
+
+      ArgumentType.BOOL -> {
+        val atomicBoolean = this.value as AtomicBoolean
+        try {
+          atomicBoolean.set(value.toBoolean())
+          isValidArgument = true
+        } catch (e: Exception) {
+          isValidArgument = false
+        }
+      }
+
       ArgumentType.ADDRESS -> isValidArgument = try {
         val ipAddress = this.value as IPAddress
         ipAddress.setAddress(InetAddress.getByName(value))

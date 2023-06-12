@@ -16,6 +16,12 @@ limitations under the License.
 -->
 <configurator>
   <atomic>
+    <!--
+        The IDs here do not match the spec, but:
+        (1) They don't really have to (thought it would be nice)
+        (2) The spec is broken and has the same id for different types (so we
+            can't match it even if we wanted to).
+    -->
     <type id="0x00" description="No data"                 name="no_data"            size="0"                  />
     <!-- Base Data Types -->
     <type id="0x10" description="Boolean"                  name="boolean"           size="1"  discrete="true" />
@@ -55,7 +61,11 @@ limitations under the License.
     <type id="0xE1" description="Date"                     name="date"              size="4"  analog="true"   />
     <type id="0xE3" description="Epoch Microseconds"       name="epoch_us"          size="8"  analog="true"   />
     <type id="0xE4" description="Epoch Seconds"            name="epoch_s"           size="4"  analog="true"   />
+    <type id="0xD0" description="Posix Time Milliseconds"  name="posix_ms"          size="8"  analog="true"   />
     <type id="0xE5" description="System Time Microseconds" name="systime_us"        size="8"  analog="true"   />
+    <type id="0xD1" description="System Time Milliseconds" name="systime_ms"        size="8"  analog="true"   />
+    <type id="0xD2" description="Elapsed Time Seconds"     name="elapsed_s"         size="4"  analog="true"   />
+    <type id="0xDB" description="Temperature"              name="temperature"       size="2"  analog="true"     signed="true" />
     <type id="0xE6" description="Percentage units 1%"      name="percent"           size="1"  analog="true"   />
     <type id="0xE7" description="Percentage units 0.01%"   name="percent100ths"     size="2"  analog="true"   />
     <type id="0xE8" description="Cluster ID"               name="cluster_id"        size="4"  discrete="true" />
@@ -70,7 +80,7 @@ limitations under the License.
     <type id="0xF2" description="Device Type ID"           name="devtype_id"        size="4"  discrete="true" />
     <type id="0xF3" description="Fabric ID"                name="fabric_id"         size="8"  discrete="true" />
     <type id="0xF4" description="Group ID"                 name="group_id"          size="2"  discrete="true" />
-    <type id="0xF5" description="Status Code"              name="status"            size="2"  discrete="true" />
+    <type id="0xF5" description="Status Code"              name="status"            size="1"  discrete="true" />
     <type id="0xF6" description="Data Version"             name="data_ver"          size="4"  discrete="true" />
     <type id="0xF7" description="Event Number"             name="event_no"          size="8"  discrete="true" />
     <type id="0xF8" description="Endpoint Number"          name="endpoint_no"       size="2"  discrete="true" />

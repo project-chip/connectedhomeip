@@ -59,6 +59,23 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * into a fabric when it's already part of that fabric.
      */
     MTRErrorCodeFabricExists         = 11,
+    /**
+     * MTRErrorCodeUnknownSchema means the schema for the given cluster/attribute,
+     * cluster/event, or cluster/command combination is not known.
+     */
+    MTRErrorCodeUnknownSchema MTR_NEWLY_AVAILABLE = 12,
+    /**
+     * MTRErrorCodeSchemaMismatch means that provided data did not match the
+     * expected schema.
+     */
+    MTRErrorCodeSchemaMismatch MTR_NEWLY_AVAILABLE = 13,
+    /**
+     * MTRErrorCodeTLVDecodeFailed means that the TLV being decoded was malformed in
+     * some way.  This can include things like lengths running past the end of
+     * the buffer, strings that are not actually UTF-8, and various other
+     * TLV-level failures.
+     */
+    MTRErrorCodeTLVDecodeFailed MTR_NEWLY_AVAILABLE = 14,
 };
 // clang-format on
 

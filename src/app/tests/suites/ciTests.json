@@ -14,7 +14,10 @@
     "AccessControlEnforcement": ["Test_TC_ACE_1_1", "Test_TC_ACE_1_5"],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
     "Binding": ["Test_TC_BIND_1_1"],
-    "BridgedDeviceBasicInformation": [],
+    "BridgedDeviceBasicInformation": [
+        "Test_TC_BRBINFO_1_1",
+        "Test_TC_BRBINFO_2_1"
+    ],
     "Actions": ["Test_TC_ACT_1_1"],
     "ColorControl": [
         "Test_TC_CC_1_1",
@@ -34,9 +37,12 @@
         "Test_TC_CC_7_2",
         "Test_TC_CC_7_3",
         "Test_TC_CC_7_4",
-        "Test_TC_CC_8_1"
+        "Test_TC_CC_8_1",
+        "TestColorControl_9_1",
+        "TestColorControl_9_2"
     ],
     "DeviceManagement": [
+        "TestIcdManagementCluster",
         "Test_TC_OPCREDS_1_2",
         "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",
@@ -98,7 +104,6 @@
         "Test_TC_MEDIAPLAYBACK_1_7",
         "Test_TC_AUDIOOUTPUT_1_8",
         "Test_TC_TGTNAV_1_9",
-        "Test_TC_TGTNAV_8_2",
         "Test_TC_APBSC_1_10",
         "Test_TC_CONTENTLAUNCHER_1_11",
         "Test_TC_ALOGIN_1_12",
@@ -125,7 +130,9 @@
         "Test_TC_AUDIOOUTPUT_7_2",
         "Test_TC_TGTNAV_8_1",
         "Test_TC_APBSC_9_1",
-        "Test_TC_CONTENTLAUNCHER_10_1"
+        "Test_TC_CONTENTLAUNCHER_10_1",
+        "Test_TC_WAKEONLAN_4_1",
+        "Test_TC_ALOGIN_12_1"
     ],
     "ModeSelect": ["Test_TC_MOD_1_1"],
     "MultipleFabrics": [],
@@ -171,6 +178,7 @@
         "Test_TC_DGTHREAD_2_3",
         "Test_TC_DGTHREAD_2_4"
     ],
+    "TimeSynchronization": ["Test_TC_TIMESYNC_1_1"],
     "WiFiNetworkDiagnostics": [
         "Test_TC_DGWIFI_1_1",
         "Test_TC_DGWIFI_2_1",
@@ -236,8 +244,7 @@
         "TestAccessControlConstraints",
         "TestLevelControlWithOnOffDependency",
         "TestCommissioningWindow",
-        "TestCommissionerNodeId",
-        "TestClientMonitoringCluster"
+        "TestCommissionerNodeId"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
@@ -266,9 +273,38 @@
         "Test_TC_G_1_1",
         "Test_TC_G_2_1"
     ],
+    "Scenes": ["Test_TC_S_1_1"],
+    "ReplaceableMonitoring": [
+        "Test_TC_ACFREMON_1_1",
+        "Test_TC_ACFREMON_2_1",
+        "Test_TC_CFREMON_1_1",
+        "Test_TC_CFREMON_2_1",
+        "Test_TC_ESFREMON_1_1",
+        "Test_TC_ESFREMON_2_1",
+        "Test_TC_FTREMON_1_1",
+        "Test_TC_FTREMON_2_1",
+        "Test_TC_HEPAFREMON_1_1",
+        "Test_TC_HEPAFREMON_2_1",
+        "Test_TC_INKCREMON_1_1",
+        "Test_TC_INKCREMON_2_1",
+        "Test_TC_IONFREMON_1_1",
+        "Test_TC_IONFREMON_2_1",
+        "Test_TC_OZFREMON_1_1",
+        "Test_TC_OZFREMON_2_1",
+        "Test_TC_TCREMON_1_1",
+        "Test_TC_TCREMON_2_1",
+        "Test_TC_UVFREMON_1_1",
+        "Test_TC_UVFREMON_2_1",
+        "Test_TC_WTREMON_1_1",
+        "Test_TC_WTREMON_2_1",
+        "Test_TC_ZEOFREMON_1_1",
+        "Test_TC_ZEOFREMON_2_1"
+    ],
+    "AirQuality": ["Test_TC_AIRQUAL_1_1", "Test_TC_AIRQUAL_2_1"],
     "collection": [
         "AccessControl",
         "AccessControlEnforcement",
+        "AirQuality",
         "BooleanState",
         "BridgedDeviceBasicInformation",
         "Actions",
@@ -305,6 +341,7 @@
         "Thermostat",
         "ThermostatUserConfiguration",
         "ThreadNetworkDiagnostics",
+        "TimeSynchronization",
         "UserLabel",
         "WiFiNetworkDiagnostics",
         "WindowCovering",
@@ -314,6 +351,7 @@
         "SoftwareDiagnostics",
         "Subscriptions",
         "DoorLock",
-        "Groups"
+        "Groups",
+        "ReplaceableMonitoring"
     ]
 }

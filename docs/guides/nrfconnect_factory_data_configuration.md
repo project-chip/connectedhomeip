@@ -30,27 +30,29 @@ data secure by applying hardware write protection.
 
 <hr>
 
--   [Overview](#overview)
-    -   [Factory data component table](#factory-data-component-table)
-    -   [Factory data format](#factory-data-format)
--   [Enabling factory data support](#enabling-factory-data-support)
--   [Generating factory data](#generating-factory-data)
-    -   [Creating the factory data JSON file with the first script](#creating-the-factory-data-json-file-with-the-first-script)
-    -   [How to set user data](#how-to-set-user-data)
-        -   [How to handle user data](#how-to-handle-user-data)
-    -   [Verifying using the JSON Schema tool](#verifying-using-the-json-schema-tool)
-        -   [Option 1: Using the php-json-schema tool](#option-1-using-the-php-json-schema-tool)
-        -   [Option 2: Using a website validator](#option-2-using-a-website-validator)
-        -   [Option 3: Using the nRF Connect Python script](#option-3-using-the-nrf-connect-python-script)
-    -   [Generating onboarding codes](#generating-onboarding-codes)
-        -   [Enabling onboarding codes generation within the build system](#enabling-onboarding-codes-generation-within-the-build-system)
-    -   [Preparing factory data partition on a device](#preparing-factory-data-partition-on-a-device)
-    -   [Creating a factory data partition with the second script](#creating-a-factory-data-partition-with-the-second-script)
--   [Building an example with factory data](#building-an-example-with-factory-data)
-    -   [Providing factory data parameters as a build argument list](#providing-factory-data-parameters-as-a-build-argument-list)
-    -   [Setting factory data parameters using interactive Kconfig interfaces](#setting-factory-data-parameters-using-interactive-kconfig-interfaces)
--   [Programming factory data](#programming-factory-data)
--   [Using own factory data implementation](#using-own-factory-data-implementation)
+-   [Configuring factory data for the nRF Connect examples](#configuring-factory-data-for-the-nrf-connect-examples)
+    -   [Overview](#overview)
+        -   [Factory data component table](#factory-data-component-table)
+        -   [Factory data format](#factory-data-format)
+            -   [Appearance field description](#appearance-field-description)
+    -   [Enabling factory data support](#enabling-factory-data-support)
+    -   [Generating factory data](#generating-factory-data)
+        -   [Creating the factory data JSON file with the first script](#creating-the-factory-data-json-file-with-the-first-script)
+        -   [How to set user data](#how-to-set-user-data)
+            -   [How to handle user data](#how-to-handle-user-data)
+        -   [Verifying using the JSON Schema tool](#verifying-using-the-json-schema-tool)
+            -   [Option 1: Using the php-json-schema tool](#option-1-using-the-php-json-schema-tool)
+            -   [Option 2: Using a website validator](#option-2-using-a-website-validator)
+            -   [Option 3: Using the nRF Connect Python script](#option-3-using-the-nrf-connect-python-script)
+        -   [Generating onboarding codes](#generating-onboarding-codes)
+            -   [Enabling onboarding codes generation within the build system](#enabling-onboarding-codes-generation-within-the-build-system)
+        -   [Preparing factory data partition on a device](#preparing-factory-data-partition-on-a-device)
+        -   [Creating a factory data partition with the second script](#creating-a-factory-data-partition-with-the-second-script)
+    -   [Building an example with factory data](#building-an-example-with-factory-data)
+        -   [Providing factory data parameters as a build argument list](#providing-factory-data-parameters-as-a-build-argument-list)
+        -   [Setting factory data parameters using interactive Kconfig interfaces](#setting-factory-data-parameters-using-interactive-kconfig-interfaces)
+    -   [Programming factory data](#programming-factory-data)
+    -   [Using own factory data implementation](#using-own-factory-data-implementation)
 
 <hr>
 
@@ -87,27 +89,28 @@ about
 
 The following table lists the parameters of a factory data set:
 
-|     Key name      |              Full name               |   Length   |    Format    | Conformance |                                                                                                                                                                                                            Description                                                                                                                                                                                                             |
-| :---------------: | :----------------------------------: | :--------: | :----------: | :---------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|     `version`     |         factory data version         |    2 B     |    uint16    |  mandatory  |                                                                                                                                A version of the current factory data set. It cannot be changed by a user and it must be coherent with current version of the Factory Data Provider on device side.                                                                                                                                 |
-|       `sn`        |            serial number             | <1, 32> B  | ASCII string |  mandatory  |                                                                                                                                                A serial number parameter defines an unique number of manufactured device. The maximum length of the serial number is 32 characters.                                                                                                                                                |
-|    `vendor_id`    |              vendor ID               |    2 B     |    uint16    |  mandatory  |                                                                                                                                                                            A CSA-assigned ID for the organization responsible for producing the device.                                                                                                                                                                            |
-|   `product_id`    |              product ID              |    2 B     |    uint16    |  mandatory  |                                                                                                                                       A unique ID assigned by the device vendor to identify the product. It defaults to a CSA-assigned ID that designates a non-production or test product.                                                                                                                                        |
-|   `vendor_name`   |             vendor name              | <1, 32> B  | ASCII string |  mandatory  |                                                                                                                                       A human-readable vendor name that provides a simple string containing identification of device's vendor for the application and Matter stack purposes.                                                                                                                                       |
-|  `product_name`   |             product name             | <1, 32> B  | ASCII string |  mandatory  |                                                                                                                                      A human-readable product name that provides a simple string containing identification of the product for the application and the Matter stack purposes.                                                                                                                                       |
-|      `date`       |          manufacturing date          | <8, 10> B  |   ISO 8601   |  mandatory  |                                                                                                                                               A manufacturing date specifies the date that the device was manufactured. The date format used is ISO 8601, for example `YYYY-MM-DD`.                                                                                                                                                |
-|     `hw_ver`      |           hardware version           |    2 B     |    uint16    |  mandatory  |                                                                                                                                  A hardware version number that specifies the version number of the hardware of the device. The value meaning and the versioning scheme is defined by the vendor.                                                                                                                                  |
-|   `hw_ver_str`    |       hardware version string        | <1, 64> B  |    uint16    |  mandatory  |                                                                                    A hardware version string parameter that specifies the version of the hardware of the device as a more user-friendly value than that presented by the hardware version integer value. The value meaning and the versioning scheme is defined by the vendor.                                                                                     |
-|     `rd_uid`      |     rotating device ID unique ID     | <16, 32> B | byte string  |  mandatory  |                                                                      The unique ID for rotating device ID, which consists of a randomly-generated 128-bit (or longer) octet string. This parameter should be protected against reading or writing over-the-air after initial introduction into the device, and stay fixed during the lifetime of the device.                                                                       |
-|    `dac_cert`     | (DAC) Device Attestation Certificate | <1, 602> B | byte string  |  mandatory  |                                                                    The Device Attestation Certificate (DAC) and the corresponding private key are unique to each Matter device. The DAC is used for the Device Attestation process and to perform commissioning into a fabric. The DAC is a DER-encoded X.509v3-compliant certificate, as defined in RFC 5280.                                                                     |
-|     `dac_key`     |           DAC private key            |    68 B    | byte string  |  mandatory  |                                                                                                                The private key associated with the Device Attestation Certificate (DAC). This key should be encrypted and maximum security should be guaranteed while generating and providing it to factory data.                                                                                                                 |
-|    `pai_cert`     |   Product Attestation Intermediate   | <1, 602> B | byte string  |  mandatory  |                                                                     An intermediate certificate is an X.509 certificate, which has been signed by the root certificate. The last intermediate certificate in a chain is used to sign the leaf (the Matter device) certificate. The PAI is a DER-encoded X.509v3-compliant certificate as defined in RFC 5280.                                                                      |  |
-|    `spake2_it`    |      SPAKE2+ iteration counter       |    4 B     |    uint32    |  mandatory  |                                                                                                                                  A SPAKE2+ iteration counter is the amount of PBKDF2 (a key derivation function) interactions in a cryptographic process used during SPAKE2+ Verifier generation.                                                                                                                                  |
-|   `spake2_salt`   |             SPAKE2+ salt             | <32, 64> B | byte string  |  mandatory  |                                                                                                 The SPAKE2+ salt is a random piece of data, at least 32 byte long. It is used as an additional input to a one-way function that performs the cryptographic operations. A new salt should be randomly generated for each password.                                                                                                  |
-| `spake2_verifier` |           SPAKE2+ verifier           |    97 B    | byte string  |  mandatory  |                                                                                                                                                                        The SPAKE2+ verifier generated using SPAKE2+ salt, iteration counter, and passcode.                                                                                                                                                                         |
-|  `discriminator`  |            Discriminator             |    2 B     |    uint16    |  mandatory  |                                                                                                                                                   A 12-bit value matching the field of the same name in the setup code. The discriminator is used during the discovery process.                                                                                                                                                    |
-|    `passcode`     |            SPAKE passcode            |    4 B     |    uint32    |  optional   | A pairing passcode is a 27-bit unsigned integer which serves as a proof of possession during the commissioning. Its value must be restricted to the values from `0x0000001` to `0x5F5E0FE` (`00000001` to `99999998` in decimal), excluding the following invalid passcode values: `00000000`, `11111111`, `22222222`, `33333333`, `44444444`, `55555555`, `66666666`, `77777777`, `88888888`, `99999999`, `12345678`, `87654321`. |
-|      `user`       |              User data               |  variable  | JSON string  | max 1024 B  |                             The user data is provided in the JSON format. This parameter is optional and depends on device manufacturer's purpose. It is provided as a CBOR map type from persistent storage and should be parsed in the user application. This data is not used by the Matter stack. To learn how to work with user data, see [How to set user data](#how-to-set-user-data) section.                              |
+|       Key name       |              Full name               |        Length        |    Format    | Conformance |                                                                                                                                                                                                            Description                                                                                                                                                                                                             |
+| :------------------: | :----------------------------------: | :------------------: | :----------: | :---------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|      `version`       |         factory data version         |         2 B          |    uint16    |  mandatory  |                                                                                                                                A version of the current factory data set. It cannot be changed by a user and it must be coherent with current version of the Factory Data Provider on device side.                                                                                                                                 |
+|         `sn`         |            serial number             |      <1, 32> B       | ASCII string |  mandatory  |                                                                                                                                                A serial number parameter defines an unique number of manufactured device. The maximum length of the serial number is 32 characters.                                                                                                                                                |
+|     `vendor_id`      |              vendor ID               |         2 B          |    uint16    |  mandatory  |                                                                                                                                                                            A CSA-assigned ID for the organization responsible for producing the device.                                                                                                                                                                            |
+|     `product_id`     |              product ID              |         2 B          |    uint16    |  mandatory  |                                                                                                                                       A unique ID assigned by the device vendor to identify the product. It defaults to a CSA-assigned ID that designates a non-production or test product.                                                                                                                                        |
+|    `vendor_name`     |             vendor name              |      <1, 32> B       | ASCII string |  mandatory  |                                                                                                                                       A human-readable vendor name that provides a simple string containing identification of device's vendor for the application and Matter stack purposes.                                                                                                                                       |
+|    `product_name`    |             product name             |      <1, 32> B       | ASCII string |  mandatory  |                                                                                                                                      A human-readable product name that provides a simple string containing identification of the product for the application and the Matter stack purposes.                                                                                                                                       |
+|        `date`        |          manufacturing date          |      <8, 10> B       |   ISO 8601   |  mandatory  |                                                                                                                                               A manufacturing date specifies the date that the device was manufactured. The date format used is ISO 8601, for example `YYYY-MM-DD`.                                                                                                                                                |
+|       `hw_ver`       |           hardware version           |         2 B          |    uint16    |  mandatory  |                                                                                                                                  A hardware version number that specifies the version number of the hardware of the device. The value meaning and the versioning scheme is defined by the vendor.                                                                                                                                  |
+|     `hw_ver_str`     |       hardware version string        |      <1, 64> B       |    uint16    |  mandatory  |                                                                                    A hardware version string parameter that specifies the version of the hardware of the device as a more user-friendly value than that presented by the hardware version integer value. The value meaning and the versioning scheme is defined by the vendor.                                                                                     |
+|       `rd_uid`       |     rotating device ID unique ID     |      <16, 32> B      | byte string  |  mandatory  |                                                                      The unique ID for rotating device ID, which consists of a randomly-generated 128-bit (or longer) octet string. This parameter should be protected against reading or writing over-the-air after initial introduction into the device, and stay fixed during the lifetime of the device.                                                                       |
+|      `dac_cert`      | (DAC) Device Attestation Certificate |      <1, 602> B      | byte string  |  mandatory  |                                                                    The Device Attestation Certificate (DAC) and the corresponding private key are unique to each Matter device. The DAC is used for the Device Attestation process and to perform commissioning into a fabric. The DAC is a DER-encoded X.509v3-compliant certificate, as defined in RFC 5280.                                                                     |
+|      `dac_key`       |           DAC private key            |         68 B         | byte string  |  mandatory  |                                                                                                                The private key associated with the Device Attestation Certificate (DAC). This key should be encrypted and maximum security should be guaranteed while generating and providing it to factory data.                                                                                                                 |
+|      `pai_cert`      |   Product Attestation Intermediate   |      <1, 602> B      | byte string  |  mandatory  |                                                                     An intermediate certificate is an X.509 certificate, which has been signed by the root certificate. The last intermediate certificate in a chain is used to sign the leaf (the Matter device) certificate. The PAI is a DER-encoded X.509v3-compliant certificate as defined in RFC 5280.                                                                      |  |
+|     `spake2_it`      |      SPAKE2+ iteration counter       |         4 B          |    uint32    |  mandatory  |                                                                                                                                  A SPAKE2+ iteration counter is the amount of PBKDF2 (a key derivation function) interactions in a cryptographic process used during SPAKE2+ Verifier generation.                                                                                                                                  |
+|    `spake2_salt`     |             SPAKE2+ salt             |      <32, 64> B      | byte string  |  mandatory  |                                                                                                 The SPAKE2+ salt is a random piece of data, at least 32 byte long. It is used as an additional input to a one-way function that performs the cryptographic operations. A new salt should be randomly generated for each password.                                                                                                  |
+|  `spake2_verifier`   |           SPAKE2+ verifier           |         97 B         | byte string  |  mandatory  |                                                                                                                                                                        The SPAKE2+ verifier generated using SPAKE2+ salt, iteration counter, and passcode.                                                                                                                                                                         |
+|   `discriminator`    |            Discriminator             |         2 B          |    uint16    |  mandatory  |                                                                                                                                                   A 12-bit value matching the field of the same name in the setup code. The discriminator is used during the discovery process.                                                                                                                                                    |
+|      `passcode`      |            SPAKE passcode            |         4 B          |    uint32    |  optional   | A pairing passcode is a 27-bit unsigned integer which serves as a proof of possession during the commissioning. Its value must be restricted to the values from `0x0000001` to `0x5F5E0FE` (`00000001` to `99999998` in decimal), excluding the following invalid passcode values: `00000000`, `11111111`, `22222222`, `33333333`, `44444444`, `55555555`, `66666666`, `77777777`, `88888888`, `99999999`, `12345678`, `87654321`. |
+| `product_appearance` |      Product visible appearance      |         2 B          |   CBOR map   |  optional   |                                                          The appearance field is a structure that describes the visible appearance of the product. This field is provided in a CBOR map and consists of two attributes: `finish` (1 B), `primary_color` (1 B). See the [Appearance field description](#appearance-field-description) to learn how to set all attributes.                                                           |
+|        `user`        |              User data               | variable, max 1024 B |   CBOR map   |  optional   |                         The user data is provided in the JSON format. This parameter is optional and depends on the device manufacturer's purpose. It is provided as a CBOR map type from persistent storage and should be parsed in the user application. This data is not used by the Matter stack. To learn how to work with user data, see the [How to set user data](#how-to-set-user-data) section.                          |
 
 ### Factory data format
 
@@ -131,10 +134,10 @@ All parameters of the factory data set are either mandatory or optional:
 
 In the factory data set, the following formats are used:
 
--   uint16 and uint32 -- These are the numeric formats representing,
-    respectively, two-bytes length unsigned integer and four-bytes length
-    unsigned integer. This value is stored in a HEX file in the big-endian
-    order.
+-   uint8, uint16, and uint32 -- These are the numeric formats representing,
+    respectively, one-byte length unsigned integer, two-bytes length unsigned
+    integer, and four-bytes length unsigned integer. This value is stored in a
+    HEX file in the big-endian order.
 -   Byte string - This parameter represents the sequence of integers between `0`
     and `255`(inclusive), without any encoding. Because the JSON format does not
     allow to use of byte strings, the `hex:` prefix is added to a parameter, and
@@ -149,6 +152,37 @@ In the factory data set, the following formats are used:
     represents a date provided in the `YYYY-MM-DD` or `YYYYMMDD` format.
 -   All certificates stored in factory data are provided in the
     [X.509](https://www.itu.int/rec/T-REC-X.509-201910-I/en) format.
+
+#### Appearance field description
+
+The `appearance` field in the factory data set describes the device's visible
+appearance.
+
+-   `finish` - A string name that indicates the visible exterior finish of the
+    product. It refers to the `ProductFinishEnum` enum, and currently, you can
+    choose one of the following names:
+
+|    Name    | Enum value |
+| :--------: | :--------: |
+|  `matte`   |     0      |
+|  `satin`   |     1      |
+| `polished` |     2      |
+|  `rugged`  |     3      |
+|  `fabric`  |     4      |
+|  `other`   |    255     |
+
+-   `primary_color` - A string name that represents the RGB color space of the
+    device's case color, which is the most representative. It refers to the
+    `ColorEnum` enum, and currently, you can choose one of the following names:
+
+(Enum value) color name (`RGB value`)
+
+| (0) $$\color{black} \color{black}{black}$$ (`#000000`) | (1) $$\color{#000080}{navy}$$ (`#000080`)    | (2) $$\color{#008000}{green}$$ (`#008000`)    | (3) $$\color{#008080}{teal}$$ (`#008080`)    | (4) $$\color{#800080}{maroon}$$ (`#800080`)             |
+| ------------------------------------------------------ | -------------------------------------------- | --------------------------------------------- | -------------------------------------------- | ------------------------------------------------------- |
+| (5) $$\color{#800080}{purple}$$ (`#800080`)            | (6) $$\color{#808000}{olive}$$ (`#800080`)   | (7) $$\color{#808080}{gray}$$ (`#800080`)     | (8) $$\color{blue}{blue}$$ (`#0000FF`)       | (9) $$\color{lime}{lime}$$ (`#00FF00`)                  |
+| (10) $$\color{aqua}{aqua}$$ (`#00FFFF`)                | (11) $$\color{red}{red}$$ (`#FF0000`)        | (12) $$\color{fuchsia}{fuchsia}$$ (`#FF00FF`) | (13) $$\color{yellow}{yellow}$$ (`#FFFF00`)  | (14) $$\color{white} \color{white}{white}$$ (`#800080`) |
+| (15) $$\color{#727472}{nickel}$$ (`#727472`)           | (16) $$\color{#a8a9ad}{chrome}$$ (`#a8a9ad`) | (17) $$\color{#E1C16E}{brass}$$ (`#E1C16E`)   | (18) $$\color{#B87333}{copper}$$ (`#B87333`) | (19) $$\color{#C0C0C0}{silver}$$ (`#C0C0C0`)            |
+| (20) $$\color{gold}{gold}$$ (`#FFD700`)                |
 
 <hr>
 
@@ -287,6 +321,13 @@ To use this script, complete the following steps:
     --overwrite
     ```
 
+    i. (optional) Add the appearance of the product:
+
+    ```
+    --product_finish <finish>
+    --product_color <color>
+    ```
+
 4. Run the script using the prepared list of arguments:
 
     ```
@@ -314,7 +355,9 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py \
 --discriminator 0xF00 \
 --generate_rd_uid \
 --passcode 20202021 \
---out "build.json" \
+--product_finish "matte" \
+--product_color "black" \
+--out "build.json"' \
 --schema "scripts/tools/nrfconnect/nrfconnect_factory_data.schema"
 ```
 

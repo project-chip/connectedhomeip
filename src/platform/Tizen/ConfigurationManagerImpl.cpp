@@ -29,13 +29,15 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/Tizen/PosixConfig.h>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-#include "PosixConfig.h"
 #include "WiFiManager.h"
-#include "platform/internal/GenericConfigurationManagerImpl.ipp"
 
 namespace chip {
 namespace DeviceLayer {
+
+using namespace ::chip::DeviceLayer::Internal;
 
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
@@ -173,6 +175,26 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
 void ConfigurationManagerImpl::RunConfigUnitTest()
 {
     Internal::PosixConfig::RunConfigUnitTest();
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
+{
+    return ReadConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
+{
+    return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

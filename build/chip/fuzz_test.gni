@@ -15,10 +15,11 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/build/chip/tests.gni")
 
 declare_args() {
-  enable_fuzz_test_targets =
-      is_clang && (current_os == "linux" || current_os == "mac")
+  enable_fuzz_test_targets = is_clang && chip_build_tests &&
+                             (current_os == "linux" || current_os == "mac")
 }
 
 # Define a fuzz target for chip.

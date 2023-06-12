@@ -60,16 +60,16 @@ namespace {
 
 void ServiceEvents(TestContext & ctx)
 {
-    // Service any messages
-    ctx.DrainAndServiceIO();
+    // Takes a few rounds of this because handling IO messages may schedule work,
+    // and scheduled work may queue messages for sending...
+    for (int i = 0; i < 3; ++i)
+    {
+        ctx.DrainAndServiceIO();
 
-    // Messages may have scheduled work, so service them
-    chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); },
-                                                  (intptr_t) nullptr);
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-
-    // Work may have sent messages, so service them
-    ctx.DrainAndServiceIO();
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
+        chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    }
 }
 
 class TemporarySessionManager

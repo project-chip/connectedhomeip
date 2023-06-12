@@ -500,7 +500,16 @@ public:
     CHIP_ERROR GetLastReportDataPath(ConcreteClusterPath & aPath);
 
 private:
-    using AttributeState = Variant<Platform::ScopedMemoryBufferWithSize<uint8_t>, StatusIB>;
+    // An attribute state can be one of three things:
+    // * If we got a path-specific error for the attribute, the corresponding
+    //   status.
+    // * If we got data for the attribute and we are storing data ourselves, the
+    //   data.
+    // * If we got data for the attribute and we are not storing data
+    //   oureselves, the size of the data, so we can still prioritize sending
+    //   DataVersions correctly.
+    using AttributeData  = Platform::ScopedMemoryBufferWithSize<uint8_t>;
+    using AttributeState = Variant<StatusIB, AttributeData, size_t>;
     // mPendingDataVersion represents a tentative data version for a cluster that we have gotten some reports for.
     //
     // mCurrentDataVersion represents a known data version for a cluster.  In order for this to have a
@@ -632,7 +641,7 @@ private:
     std::map<ConcreteEventPath, StatusIB> mEventStatusCache;
     BufferedReadCallback mBufferedReader;
     ConcreteClusterPath mLastReportDataPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
-    bool mCacheData                         = true;
+    const bool mCacheData                   = true;
 };
 
 }; // namespace app

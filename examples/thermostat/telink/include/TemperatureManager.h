@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "AppEvent.h"
+#include "AppEventCommon.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 

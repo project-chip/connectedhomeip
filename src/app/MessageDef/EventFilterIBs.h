@@ -57,9 +57,9 @@ public:
     /**
      *  @brief Mark the end of this EventFilterIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    EventFilterIBs::Builder & EndOfEventFilters();
+    CHIP_ERROR EndOfEventFilters();
 
     /**
      *  @brief Generate single event filter

@@ -16,10 +16,12 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 declare_args() {
   # Build monolithic test library.
@@ -95,6 +97,10 @@ if (chip_build_tests) {
         "${chip_root}/src/system/tests",
         "${chip_root}/src/transport/tests",
       ]
+
+      if (matter_enable_tracing_support) {
+        deps += [ "${chip_root}/src/tracing/tests" ]
+      }
     }
 
     if (chip_device_platform != "none") {
@@ -146,5 +152,11 @@ if (chip_build_tests) {
       "${chip_root}/src/credentials/tests",
       "${chip_root}/src/crypto/tests",
     ]
+  }
+
+  if (matter_enable_java_compilation) {
+    group("java_controller_tests") {
+      deps = [ "${chip_root}/src/controller/java:unit_tests" ]
+    }
   }
 }

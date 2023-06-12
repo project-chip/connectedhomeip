@@ -42,7 +42,7 @@ tests:
               type: int16u
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: " !MEDIAINPUT.S.NU "
+      PICS: " !MEDIAINPUT.S.F00 "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -50,8 +50,9 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given MEDIAINPUT.S.NU ensure featuremap has the correct bit set"
-      PICS: MEDIAINPUT.S.NU
+    - label:
+          "Given MEDIAINPUT.S.F00(NU) ensure featuremap has the correct bit set"
+      PICS: MEDIAINPUT.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -65,7 +66,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [65528, 65529, 65531, 65532, 65533]
+              contains: [65528, 65529, 65530, 65531, 65532, 65533]
 
     - label: "Read the optional attribute(InputList) in AttributeList"
       PICS: MEDIAINPUT.S.A0000
@@ -100,18 +101,11 @@ tests:
           value: []
           constraints:
               type: list
-    #Commenting out the step EventList attribute which is out of scope for matter V1.0
-    #- label:
-    #      "Read EventList attribute from the DUT and Verify that the DUT
-    #      response provides a list of supported events."
-    #  verification: |
-    #      Not implemented in chip-tool
-    #  cluster: "LogCommands"
-    #  command: "UserPrompt"
-    #  PICS: PICS_USER_PROMPT
-    #  arguments:
-    #      values:
-    #          - name: "message"
-    #            value: "Please enter 'y' for success"
-    #          - name: "expectedValue"
-    #            value: "y"
+
+    - label: "Read the global attribute: EventList"
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list

@@ -43,6 +43,64 @@ namespace Clusters {
 namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
+namespace ModeTagStruct {
+enum class Fields : uint8_t
+{
+    kMfgCode = 0,
+    kValue   = 1,
+    kTagName = 2,
+};
+
+struct Type
+{
+public:
+    Optional<chip::VendorId> mfgCode;
+    uint16_t value = static_cast<uint16_t>(0);
+    Optional<chip::CharSpan> tagName;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ModeTagStruct
+namespace ModeOptionStruct {
+enum class Fields : uint8_t
+{
+    kLabel    = 0,
+    kMode     = 1,
+    kModeTags = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan label;
+    uint8_t mode = static_cast<uint8_t>(0);
+    DataModel::List<const Structs::ModeTagStruct::Type> modeTags;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    chip::CharSpan label;
+    uint8_t mode = static_cast<uint8_t>(0);
+    DataModel::DecodableList<Structs::ModeTagStruct::DecodableType> modeTags;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace ModeOptionStruct
 namespace ApplicationStruct {
 enum class Fields : uint8_t
 {
@@ -233,8 +291,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TriggerEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
-    IdentifyEffectIdentifier effectIdentifier = static_cast<IdentifyEffectIdentifier>(0);
-    IdentifyEffectVariant effectVariant       = static_cast<IdentifyEffectVariant>(0);
+    EffectIdentifierEnum effectIdentifier = static_cast<EffectIdentifierEnum>(0);
+    EffectVariantEnum effectVariant       = static_cast<EffectVariantEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -249,8 +307,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TriggerEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
 
-    IdentifyEffectIdentifier effectIdentifier = static_cast<IdentifyEffectIdentifier>(0);
-    IdentifyEffectVariant effectVariant       = static_cast<IdentifyEffectVariant>(0);
+    EffectIdentifierEnum effectIdentifier = static_cast<EffectIdentifierEnum>(0);
+    EffectVariantEnum effectVariant       = static_cast<EffectVariantEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TriggerEffect
@@ -273,9 +331,9 @@ struct TypeInfo
 namespace IdentifyType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Identify::IdentifyTypeEnum;
+    using DecodableType    = chip::app::Clusters::Identify::IdentifyTypeEnum;
+    using DecodableArgType = chip::app::Clusters::Identify::IdentifyTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IdentifyType::Id; }
@@ -328,7 +386,8 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::IdentifyTime::TypeInfo::DecodableType identifyTime = static_cast<uint16_t>(0);
-        Attributes::IdentifyType::TypeInfo::DecodableType identifyType = static_cast<uint8_t>(0);
+        Attributes::IdentifyType::TypeInfo::DecodableType identifyType =
+            static_cast<chip::app::Clusters::Identify::IdentifyTypeEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -741,9 +800,9 @@ namespace Attributes {
 namespace NameSupport {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
@@ -795,7 +854,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::NameSupport::TypeInfo::DecodableType nameSupport = static_cast<uint8_t>(0);
+        Attributes::NameSupport::TypeInfo::DecodableType nameSupport =
+            static_cast<chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -819,23 +879,16 @@ struct Type
 {
 public:
     Optional<chip::AttributeId> attributeID;
-    DataModel::List<const uint8_t> attributeValue;
+    uint32_t attributeValue = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
 
-struct DecodableType
-{
-public:
-    Optional<chip::AttributeId> attributeID;
-    DataModel::DecodableList<uint8_t> attributeValue;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace AttributeValuePair
 namespace ExtensionFieldSet {
@@ -1781,6 +1834,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastConfiguredBy
+namespace SceneTableSize {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SceneTableSize::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SceneTableSize
+namespace RemainingCapacity {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RemainingCapacity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace RemainingCapacity
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -1832,6 +1909,8 @@ struct TypeInfo
         Attributes::SceneValid::TypeInfo::DecodableType sceneValid     = static_cast<bool>(0);
         Attributes::NameSupport::TypeInfo::DecodableType nameSupport   = static_cast<uint8_t>(0);
         Attributes::LastConfiguredBy::TypeInfo::DecodableType lastConfiguredBy;
+        Attributes::SceneTableSize::TypeInfo::DecodableType sceneTableSize       = static_cast<uint16_t>(0);
+        Attributes::RemainingCapacity::TypeInfo::DecodableType remainingCapacity = static_cast<uint8_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -3413,7 +3492,7 @@ struct TypeInfo
 } // namespace Binding
 namespace AccessControl {
 namespace Structs {
-namespace Target {
+namespace AccessControlTargetStruct {
 enum class Fields : uint8_t
 {
     kCluster    = 0,
@@ -3437,7 +3516,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace Target
+} // namespace AccessControlTargetStruct
 namespace AccessControlEntryStruct {
 enum class Fields : uint8_t
 {
@@ -3454,7 +3533,7 @@ public:
     AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
     AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
     DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
-    DataModel::Nullable<DataModel::List<const Structs::Target::Type>> targets;
+    DataModel::Nullable<DataModel::List<const Structs::AccessControlTargetStruct::Type>> targets;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     static constexpr bool kIsFabricScoped = true;
@@ -3476,7 +3555,7 @@ public:
     AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
     AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
-    DataModel::Nullable<DataModel::DecodableList<Structs::Target::DecodableType>> targets;
+    DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlTargetStruct::DecodableType>> targets;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4526,6 +4605,29 @@ public:
 using DecodableType = Type;
 
 } // namespace CapabilityMinimaStruct
+namespace ProductAppearanceStruct {
+enum class Fields : uint8_t
+{
+    kFinish       = 0,
+    kPrimaryColor = 1,
+};
+
+struct Type
+{
+public:
+    ProductFinishEnum finish = static_cast<ProductFinishEnum>(0);
+    DataModel::Nullable<ColorEnum> primaryColor;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ProductAppearanceStruct
 } // namespace Structs
 
 namespace Commands {
@@ -4823,6 +4925,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CapabilityMinima
+namespace ProductAppearance {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::Type;
+    using DecodableType    = chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductAppearance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ProductAppearance
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -4888,6 +5002,7 @@ struct TypeInfo
         Attributes::Reachable::TypeInfo::DecodableType reachable                     = static_cast<bool>(0);
         Attributes::UniqueID::TypeInfo::DecodableType uniqueID;
         Attributes::CapabilityMinima::TypeInfo::DecodableType capabilityMinima;
+        Attributes::ProductAppearance::TypeInfo::DecodableType productAppearance;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -6777,7 +6892,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ArmFailSafeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -6793,7 +6908,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ArmFailSafeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6813,7 +6928,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    RegulatoryLocationType newRegulatoryConfig = static_cast<RegulatoryLocationType>(0);
+    RegulatoryLocationTypeEnum newRegulatoryConfig = static_cast<RegulatoryLocationTypeEnum>(0);
     chip::CharSpan countryCode;
     uint64_t breadcrumb = static_cast<uint64_t>(0);
 
@@ -6830,7 +6945,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    RegulatoryLocationType newRegulatoryConfig = static_cast<RegulatoryLocationType>(0);
+    RegulatoryLocationTypeEnum newRegulatoryConfig = static_cast<RegulatoryLocationTypeEnum>(0);
     chip::CharSpan countryCode;
     uint64_t breadcrumb = static_cast<uint64_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6850,7 +6965,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -6866,7 +6981,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetRegulatoryConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6913,7 +7028,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissioningCompleteResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -6929,7 +7044,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CommissioningCompleteResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
 
-    CommissioningError errorCode = static_cast<CommissioningError>(0);
+    CommissioningErrorEnum errorCode = static_cast<CommissioningErrorEnum>(0);
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6965,9 +7080,9 @@ struct TypeInfo
 namespace RegulatoryConfig {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
-    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
-    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
+    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
+    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RegulatoryConfig::Id; }
@@ -6977,9 +7092,9 @@ struct TypeInfo
 namespace LocationCapability {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
-    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
-    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType;
+    using Type             = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
+    using DecodableType    = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
+    using DecodableArgType = chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocationCapability::Id; }
@@ -7046,9 +7161,9 @@ struct TypeInfo
         Attributes::Breadcrumb::TypeInfo::DecodableType breadcrumb = static_cast<uint64_t>(0);
         Attributes::BasicCommissioningInfo::TypeInfo::DecodableType basicCommissioningInfo;
         Attributes::RegulatoryConfig::TypeInfo::DecodableType regulatoryConfig =
-            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType>(0);
+            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum>(0);
         Attributes::LocationCapability::TypeInfo::DecodableType locationCapability =
-            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType>(0);
+            static_cast<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum>(0);
         Attributes::SupportsConcurrentConnection::TypeInfo::DecodableType supportsConcurrentConnection = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
@@ -7062,7 +7177,7 @@ struct TypeInfo
 } // namespace GeneralCommissioning
 namespace NetworkCommissioning {
 namespace Structs {
-namespace NetworkInfo {
+namespace NetworkInfoStruct {
 enum class Fields : uint8_t
 {
     kNetworkID = 0,
@@ -7084,8 +7199,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace NetworkInfo
-namespace ThreadInterfaceScanResult {
+} // namespace NetworkInfoStruct
+namespace ThreadInterfaceScanResultStruct {
 enum class Fields : uint8_t
 {
     kPanId           = 0,
@@ -7119,8 +7234,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ThreadInterfaceScanResult
-namespace WiFiInterfaceScanResult {
+} // namespace ThreadInterfaceScanResultStruct
+namespace WiFiInterfaceScanResultStruct {
 enum class Fields : uint8_t
 {
     kSecurity = 0,
@@ -7134,12 +7249,12 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    chip::BitMask<WiFiSecurity> security = static_cast<chip::BitMask<WiFiSecurity>>(0);
+    chip::BitMask<WiFiSecurityBitmap> security = static_cast<chip::BitMask<WiFiSecurityBitmap>>(0);
     chip::ByteSpan ssid;
     chip::ByteSpan bssid;
-    uint16_t channel  = static_cast<uint16_t>(0);
-    WiFiBand wiFiBand = static_cast<WiFiBand>(0);
-    int8_t rssi       = static_cast<int8_t>(0);
+    uint16_t channel      = static_cast<uint16_t>(0);
+    WiFiBandEnum wiFiBand = static_cast<WiFiBandEnum>(0);
+    int8_t rssi           = static_cast<int8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -7150,7 +7265,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace WiFiInterfaceScanResult
+} // namespace WiFiInterfaceScanResultStruct
 } // namespace Structs
 
 namespace Commands {
@@ -7255,10 +7370,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
-    Optional<DataModel::List<const Structs::WiFiInterfaceScanResult::Type>> wiFiScanResults;
-    Optional<DataModel::List<const Structs::ThreadInterfaceScanResult::Type>> threadScanResults;
+    Optional<DataModel::List<const Structs::WiFiInterfaceScanResultStruct::Type>> wiFiScanResults;
+    Optional<DataModel::List<const Structs::ThreadInterfaceScanResultStruct::Type>> threadScanResults;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -7273,10 +7388,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
-    Optional<DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType>> wiFiScanResults;
-    Optional<DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType>> threadScanResults;
+    Optional<DataModel::DecodableList<Structs::WiFiInterfaceScanResultStruct::DecodableType>> wiFiScanResults;
+    Optional<DataModel::DecodableList<Structs::ThreadInterfaceScanResultStruct::DecodableType>> threadScanResults;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ScanNetworksResponse
@@ -7403,7 +7518,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NetworkConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     Optional<uint8_t> networkIndex;
 
@@ -7420,7 +7535,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NetworkConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     Optional<uint8_t> networkIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -7476,7 +7591,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ConnectNetworkResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     DataModel::Nullable<int32_t> errorValue;
 
@@ -7493,7 +7608,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ConnectNetworkResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    NetworkCommissioningStatus networkingStatus = static_cast<NetworkCommissioningStatus>(0);
+    NetworkCommissioningStatusEnum networkingStatus = static_cast<NetworkCommissioningStatusEnum>(0);
     Optional<chip::CharSpan> debugText;
     DataModel::Nullable<int32_t> errorValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -7556,11 +7671,11 @@ struct TypeInfo
 namespace Networks {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Networks::Id; }
@@ -7606,10 +7721,10 @@ struct TypeInfo
 namespace LastNetworkingStatus {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>;
-    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum>;
     using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> &;
+        const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastNetworkingStatus::Id; }
@@ -8509,7 +8624,7 @@ public:
 } // namespace SoftwareDiagnostics
 namespace ThreadNetworkDiagnostics {
 namespace Structs {
-namespace NeighborTable {
+namespace NeighborTableStruct {
 enum class Fields : uint8_t
 {
     kExtAddress       = 0,
@@ -8555,7 +8670,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace NeighborTable
+} // namespace NeighborTableStruct
 namespace OperationalDatasetComponents {
 enum class Fields : uint8_t
 {
@@ -8599,7 +8714,7 @@ public:
 using DecodableType = Type;
 
 } // namespace OperationalDatasetComponents
-namespace RouteTable {
+namespace RouteTableStruct {
 enum class Fields : uint8_t
 {
     kExtAddress      = 0,
@@ -8637,7 +8752,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace RouteTable
+} // namespace RouteTableStruct
 namespace SecurityPolicy {
 enum class Fields : uint8_t
 {
@@ -8721,9 +8836,9 @@ struct TypeInfo
 namespace RoutingRole {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RoutingRole::Id; }
@@ -8795,11 +8910,12 @@ struct TypeInfo
 namespace NeighborTable {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType>;
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::DecodableType>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> &;
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NeighborTable::Id; }
@@ -8809,11 +8925,11 @@ struct TypeInfo
 namespace RouteTable {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::DecodableType>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &;
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RouteTable::Id; }
@@ -9465,10 +9581,10 @@ struct TypeInfo
 namespace ActiveNetworkFaultsList {
 struct TypeInfo
 {
-    using Type          = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault>;
-    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault>;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaultsList::Id; }
@@ -9644,8 +9760,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const NetworkFault> current;
-    DataModel::List<const NetworkFault> previous;
+    DataModel::List<const NetworkFaultEnum> current;
+    DataModel::List<const NetworkFaultEnum> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -9657,8 +9773,8 @@ public:
     static constexpr EventId GetEventId() { return Events::NetworkFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 
-    DataModel::DecodableList<NetworkFault> current;
-    DataModel::DecodableList<NetworkFault> previous;
+    DataModel::DecodableList<NetworkFaultEnum> current;
+    DataModel::DecodableList<NetworkFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -10271,7 +10387,7 @@ struct Type
 public:
     int32_t offset         = static_cast<int32_t>(0);
     uint64_t validStarting = static_cast<uint64_t>(0);
-    uint64_t validUntil    = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> validUntil;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -10283,6 +10399,29 @@ public:
 using DecodableType = Type;
 
 } // namespace DSTOffsetStruct
+namespace FabricScopedTrustedTimeSourceStruct {
+enum class Fields : uint8_t
+{
+    kNodeID   = 0,
+    kEndpoint = 1,
+};
+
+struct Type
+{
+public:
+    chip::NodeId nodeID       = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpoint = static_cast<chip::EndpointId>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace FabricScopedTrustedTimeSourceStruct
 namespace TimeZoneStruct {
 enum class Fields : uint8_t
 {
@@ -10308,23 +10447,73 @@ public:
 using DecodableType = Type;
 
 } // namespace TimeZoneStruct
+namespace TrustedTimeSourceStruct {
+enum class Fields : uint8_t
+{
+    kFabricIndex = 0,
+    kNodeID      = 1,
+    kEndpoint    = 2,
+};
+
+struct Type
+{
+public:
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::NodeId nodeID           = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpoint     = static_cast<chip::EndpointId>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TrustedTimeSourceStruct
 } // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace SetUtcTime {
+namespace SetUTCTime {
 struct Type;
 struct DecodableType;
-} // namespace SetUtcTime
+} // namespace SetUTCTime
+
+namespace SetTrustedTimeSource {
+struct Type;
+struct DecodableType;
+} // namespace SetTrustedTimeSource
+
+namespace SetTimeZone {
+struct Type;
+struct DecodableType;
+} // namespace SetTimeZone
+
+namespace SetTimeZoneResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetTimeZoneResponse
+
+namespace SetDSTOffset {
+struct Type;
+struct DecodableType;
+} // namespace SetDSTOffset
+
+namespace SetDefaultNTP {
+struct Type;
+struct DecodableType;
+} // namespace SetDefaultNTP
 
 } // namespace Commands
 
 namespace Commands {
-namespace SetUtcTime {
+namespace SetUTCTime {
 enum class Fields : uint8_t
 {
-    kUtcTime     = 0,
+    kUTCTime     = 0,
     kGranularity = 1,
     kTimeSource  = 2,
 };
@@ -10333,10 +10522,10 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetUtcTime::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUTCTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
 
-    uint64_t utcTime            = static_cast<uint64_t>(0);
+    uint64_t UTCTime            = static_cast<uint64_t>(0);
     GranularityEnum granularity = static_cast<GranularityEnum>(0);
     Optional<TimeSourceEnum> timeSource;
 
@@ -10350,15 +10539,175 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SetUtcTime::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUTCTime::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
 
-    uint64_t utcTime            = static_cast<uint64_t>(0);
+    uint64_t UTCTime            = static_cast<uint64_t>(0);
     GranularityEnum granularity = static_cast<GranularityEnum>(0);
     Optional<TimeSourceEnum> timeSource;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SetUtcTime
+}; // namespace SetUTCTime
+namespace SetTrustedTimeSource {
+enum class Fields : uint8_t
+{
+    kTrustedTimeSource = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetTrustedTimeSource::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    DataModel::Nullable<Structs::FabricScopedTrustedTimeSourceStruct::Type> trustedTimeSource;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetTrustedTimeSource::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    DataModel::Nullable<Structs::FabricScopedTrustedTimeSourceStruct::DecodableType> trustedTimeSource;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetTrustedTimeSource
+namespace SetTimeZone {
+enum class Fields : uint8_t
+{
+    kTimeZone = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetTimeZone::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    DataModel::List<const Structs::TimeZoneStruct::Type> timeZone;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetTimeZone::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    DataModel::DecodableList<Structs::TimeZoneStruct::DecodableType> timeZone;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetTimeZone
+namespace SetTimeZoneResponse {
+enum class Fields : uint8_t
+{
+    kDSTOffsetRequired = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetTimeZoneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    bool DSTOffsetRequired = static_cast<bool>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetTimeZoneResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    bool DSTOffsetRequired = static_cast<bool>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetTimeZoneResponse
+namespace SetDSTOffset {
+enum class Fields : uint8_t
+{
+    kDSTOffset = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetDSTOffset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    DataModel::List<const Structs::DSTOffsetStruct::Type> DSTOffset;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetDSTOffset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    DataModel::DecodableList<Structs::DSTOffsetStruct::DecodableType> DSTOffset;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetDSTOffset
+namespace SetDefaultNTP {
+enum class Fields : uint8_t
+{
+    kDefaultNTP = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetDefaultNTP::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    DataModel::Nullable<chip::CharSpan> defaultNTP;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetDefaultNTP::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    DataModel::Nullable<chip::CharSpan> defaultNTP;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetDefaultNTP
 } // namespace Commands
 
 namespace Attributes {
@@ -10399,19 +10748,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TimeSource
-namespace TrustedTimeNodeId {
+namespace TrustedTimeSource {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::NodeId>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::NodeId>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::NodeId> &;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TrustedTimeNodeId::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TrustedTimeSource::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace TrustedTimeNodeId
-namespace DefaultNtp {
+} // namespace TrustedTimeSource
+namespace DefaultNTP {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
@@ -10419,11 +10770,11 @@ struct TypeInfo
     using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultNtp::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultNTP::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
     static constexpr size_t MaxLength() { return 128; }
 };
-} // namespace DefaultNtp
+} // namespace DefaultNTP
 namespace TimeZone {
 struct TypeInfo
 {
@@ -10467,27 +10818,63 @@ struct TypeInfo
 namespace TimeZoneDatabase {
 struct TypeInfo
 {
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
+    using Type             = chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum;
+    using DecodableType    = chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum;
+    using DecodableArgType = chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeZoneDatabase::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TimeZoneDatabase
-namespace NtpServerPort {
+namespace NTPServerAvailable {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NtpServerPort::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NTPServerAvailable::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NtpServerPort
+} // namespace NTPServerAvailable
+namespace TimeZoneListMaxSize {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimeZoneListMaxSize::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TimeZoneListMaxSize
+namespace DSTOffsetListMaxSize {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DSTOffsetListMaxSize::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DSTOffsetListMaxSize
+namespace SupportsDNSResolve {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportsDNSResolve::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportsDNSResolve
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -10538,13 +10925,17 @@ struct TypeInfo
             static_cast<chip::app::Clusters::TimeSynchronization::GranularityEnum>(0);
         Attributes::TimeSource::TypeInfo::DecodableType timeSource =
             static_cast<chip::app::Clusters::TimeSynchronization::TimeSourceEnum>(0);
-        Attributes::TrustedTimeNodeId::TypeInfo::DecodableType trustedTimeNodeId;
-        Attributes::DefaultNtp::TypeInfo::DecodableType defaultNtp;
+        Attributes::TrustedTimeSource::TypeInfo::DecodableType trustedTimeSource;
+        Attributes::DefaultNTP::TypeInfo::DecodableType defaultNTP;
         Attributes::TimeZone::TypeInfo::DecodableType timeZone;
         Attributes::DSTOffset::TypeInfo::DecodableType DSTOffset;
         Attributes::LocalTime::TypeInfo::DecodableType localTime;
-        Attributes::TimeZoneDatabase::TypeInfo::DecodableType timeZoneDatabase = static_cast<bool>(0);
-        Attributes::NtpServerPort::TypeInfo::DecodableType ntpServerPort;
+        Attributes::TimeZoneDatabase::TypeInfo::DecodableType timeZoneDatabase =
+            static_cast<chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum>(0);
+        Attributes::NTPServerAvailable::TypeInfo::DecodableType NTPServerAvailable     = static_cast<bool>(0);
+        Attributes::TimeZoneListMaxSize::TypeInfo::DecodableType timeZoneListMaxSize   = static_cast<uint8_t>(0);
+        Attributes::DSTOffsetListMaxSize::TypeInfo::DecodableType DSTOffsetListMaxSize = static_cast<uint8_t>(0);
+        Attributes::SupportsDNSResolve::TypeInfo::DecodableType supportsDNSResolve     = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -10554,8 +10945,188 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace DSTTableEmpty {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::DSTTableEmpty::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::DSTTableEmpty::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace DSTTableEmpty
+namespace DSTStatus {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kDSTOffsetActive = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::DSTStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    bool DSTOffsetActive = static_cast<bool>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::DSTStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    bool DSTOffsetActive = static_cast<bool>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace DSTStatus
+namespace TimeZoneStatus {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kOffset = 0,
+    kName   = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::TimeZoneStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    int32_t offset = static_cast<int32_t>(0);
+    Optional<chip::CharSpan> name;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::TimeZoneStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    int32_t offset = static_cast<int32_t>(0);
+    Optional<chip::CharSpan> name;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace TimeZoneStatus
+namespace TimeFailure {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::TimeFailure::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::TimeFailure::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace TimeFailure
+namespace MissingTrustedTimeSource {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MissingTrustedTimeSource::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MissingTrustedTimeSource::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace MissingTrustedTimeSource
+} // namespace Events
 } // namespace TimeSynchronization
 namespace BridgedDeviceBasicInformation {
+namespace Structs {
+namespace ProductAppearanceStruct {
+enum class Fields : uint8_t
+{
+    kFinish       = 0,
+    kPrimaryColor = 1,
+};
+
+struct Type
+{
+public:
+    ProductFinishEnum finish = static_cast<ProductFinishEnum>(0);
+    DataModel::Nullable<ColorEnum> primaryColor;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ProductAppearanceStruct
+} // namespace Structs
 
 namespace Attributes {
 
@@ -10750,6 +11321,19 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 32; }
 };
 } // namespace UniqueID
+namespace ProductAppearance {
+struct TypeInfo
+{
+    using Type          = chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type;
+    using DecodableType = chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::DecodableType;
+    using DecodableArgType =
+        const chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductAppearance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ProductAppearance
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -10810,6 +11394,7 @@ struct TypeInfo
         Attributes::SerialNumber::TypeInfo::DecodableType serialNumber;
         Attributes::Reachable::TypeInfo::DecodableType reachable = static_cast<bool>(0);
         Attributes::UniqueID::TypeInfo::DecodableType uniqueID;
+        Attributes::ProductAppearance::TypeInfo::DecodableType productAppearance;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -12492,7 +13077,6 @@ public:
 namespace KeySetReadAllIndices {
 enum class Fields : uint8_t
 {
-    kGroupKeySetIDs = 0,
 };
 
 struct Type
@@ -12501,8 +13085,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-
-    DataModel::List<const uint16_t> groupKeySetIDs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -12517,7 +13099,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    DataModel::DecodableList<uint16_t> groupKeySetIDs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeySetReadAllIndices
@@ -13104,64 +13685,350 @@ public:
 } // namespace StateChange
 } // namespace Events
 } // namespace BooleanState
-namespace ModeSelect {
+namespace IcdManagement {
 namespace Structs {
-namespace SemanticTagStruct {
+namespace MonitoringRegistrationStruct {
 enum class Fields : uint8_t
 {
-    kMfgCode = 0,
-    kValue   = 1,
+    kCheckInNodeID    = 1,
+    kMonitoredSubject = 2,
+    kKey              = 3,
+    kFabricIndex      = 254,
 };
 
 struct Type
 {
 public:
-    chip::VendorId mfgCode = static_cast<chip::VendorId>(0);
-    uint16_t value         = static_cast<uint16_t>(0);
+    chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
+    uint64_t monitoredSubject  = static_cast<uint64_t>(0);
+    chip::ByteSpan key;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const;
 };
 
 using DecodableType = Type;
 
-} // namespace SemanticTagStruct
-namespace ModeOptionStruct {
+} // namespace MonitoringRegistrationStruct
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace RegisterClient {
+struct Type;
+struct DecodableType;
+} // namespace RegisterClient
+
+namespace RegisterClientResponse {
+struct Type;
+struct DecodableType;
+} // namespace RegisterClientResponse
+
+namespace UnregisterClient {
+struct Type;
+struct DecodableType;
+} // namespace UnregisterClient
+
+namespace StayActiveRequest {
+struct Type;
+struct DecodableType;
+} // namespace StayActiveRequest
+
+} // namespace Commands
+
+namespace Commands {
+namespace RegisterClient {
 enum class Fields : uint8_t
 {
-    kLabel        = 0,
-    kMode         = 1,
-    kSemanticTags = 2,
+    kCheckInNodeID    = 0,
+    kMonitoredSubject = 1,
+    kKey              = 2,
+    kVerificationKey  = 3,
 };
 
 struct Type
 {
 public:
-    chip::CharSpan label;
-    uint8_t mode = static_cast<uint8_t>(0);
-    DataModel::List<const Structs::SemanticTagStruct::Type> semanticTags;
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RegisterClient::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
 
-    static constexpr bool kIsFabricScoped = false;
+    chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
+    uint64_t monitoredSubject  = static_cast<uint64_t>(0);
+    chip::ByteSpan key;
+    Optional<chip::ByteSpan> verificationKey;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
 {
 public:
-    chip::CharSpan label;
-    uint8_t mode = static_cast<uint8_t>(0);
-    DataModel::DecodableList<Structs::SemanticTagStruct::DecodableType> semanticTags;
+    static constexpr CommandId GetCommandId() { return Commands::RegisterClient::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
 
+    chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
+    uint64_t monitoredSubject  = static_cast<uint64_t>(0);
+    chip::ByteSpan key;
+    Optional<chip::ByteSpan> verificationKey;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
+};
+}; // namespace RegisterClient
+namespace RegisterClientResponse {
+enum class Fields : uint8_t
+{
+    kICDCounter = 0,
 };
 
-} // namespace ModeOptionStruct
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RegisterClientResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    uint32_t ICDCounter = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RegisterClientResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    uint32_t ICDCounter = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RegisterClientResponse
+namespace UnregisterClient {
+enum class Fields : uint8_t
+{
+    kCheckInNodeID = 0,
+    kKey           = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UnregisterClient::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
+    Optional<chip::ByteSpan> key;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UnregisterClient::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
+    Optional<chip::ByteSpan> key;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UnregisterClient
+namespace StayActiveRequest {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StayActiveRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StayActiveRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StayActiveRequest
+} // namespace Commands
+
+namespace Attributes {
+
+namespace IdleModeInterval {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IdleModeInterval::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace IdleModeInterval
+namespace ActiveModeInterval {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveModeInterval::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActiveModeInterval
+namespace ActiveModeThreshold {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveModeThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActiveModeThreshold
+namespace RegisteredClients {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RegisteredClients::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace RegisteredClients
+namespace ICDCounter {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ICDCounter::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ICDCounter
+namespace ClientsSupportedPerFabric {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClientsSupportedPerFabric::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClientsSupportedPerFabric
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::IdleModeInterval::TypeInfo::DecodableType idleModeInterval       = static_cast<uint32_t>(0);
+        Attributes::ActiveModeInterval::TypeInfo::DecodableType activeModeInterval   = static_cast<uint32_t>(0);
+        Attributes::ActiveModeThreshold::TypeInfo::DecodableType activeModeThreshold = static_cast<uint16_t>(0);
+        Attributes::RegisteredClients::TypeInfo::DecodableType registeredClients;
+        Attributes::ICDCounter::TypeInfo::DecodableType ICDCounter                               = static_cast<uint32_t>(0);
+        Attributes::ClientsSupportedPerFabric::TypeInfo::DecodableType clientsSupportedPerFabric = static_cast<uint16_t>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace IcdManagement
+namespace ModeSelect {
+namespace Structs {
+namespace ModeTagStruct    = Clusters::detail::Structs::ModeTagStruct;
+namespace ModeOptionStruct = Clusters::detail::Structs::ModeOptionStruct;
 } // namespace Structs
 
 namespace Commands {
@@ -13171,6 +14038,16 @@ namespace ChangeToMode {
 struct Type;
 struct DecodableType;
 } // namespace ChangeToMode
+
+namespace ChangeToModeWithStatus {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeResponse
 
 } // namespace Commands
 
@@ -13207,6 +14084,73 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeToMode
+namespace ChangeToModeWithStatus {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeWithStatus
+namespace ChangeToModeResponse {
+enum class Fields : uint8_t
+{
+    kStatus     = 0,
+    kStatusText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -13221,7 +14165,7 @@ struct TypeInfo
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 32; }
+    static constexpr size_t MaxLength() { return 64; }
 };
 } // namespace Description
 namespace StandardNamespace {
@@ -13347,6 +14291,4636 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ModeSelect
+namespace LaundryWasherModeSelect {
+namespace Structs {
+namespace ModeTagStruct    = Clusters::detail::Structs::ModeTagStruct;
+namespace ModeOptionStruct = Clusters::detail::Structs::ModeOptionStruct;
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ChangeToMode {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToMode
+
+namespace ChangeToModeWithStatus {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace ChangeToMode {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToMode
+namespace ChangeToModeWithStatus {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeWithStatus
+namespace ChangeToModeResponse {
+enum class Fields : uint8_t
+{
+    kStatus     = 0,
+    kStatusText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Description {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 64; }
+};
+} // namespace Description
+namespace SupportedModes {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::LaundryWasherModeSelect::Structs::ModeOptionStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedModes
+namespace CurrentMode {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentMode
+namespace StartUpMode {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace StartUpMode
+namespace OnMode {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OnMode
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherModeSelect::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Description::TypeInfo::DecodableType description;
+        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
+        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
+        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
+        Attributes::OnMode::TypeInfo::DecodableType onMode;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace LaundryWasherModeSelect
+namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
+namespace Structs {
+namespace ModeTagStruct    = Clusters::detail::Structs::ModeTagStruct;
+namespace ModeOptionStruct = Clusters::detail::Structs::ModeOptionStruct;
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ChangeToMode {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToMode
+
+namespace ChangeToModeWithStatus {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace ChangeToMode {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToMode
+namespace ChangeToModeWithStatus {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType =
+        Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::ChangeToModeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeWithStatus
+namespace ChangeToModeResponse {
+enum class Fields : uint8_t
+{
+    kStatus     = 0,
+    kStatusText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Description {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 64; }
+};
+} // namespace Description
+namespace SupportedModes {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<
+        const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Structs::ModeOptionStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedModes
+namespace CurrentMode {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentMode
+namespace StartUpMode {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace StartUpMode
+namespace OnMode {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OnMode
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Description::TypeInfo::DecodableType description;
+        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
+        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
+        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
+        Attributes::OnMode::TypeInfo::DecodableType onMode;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
+namespace WasherControls {
+
+namespace Attributes {
+
+namespace SpinSpeeds {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SpinSpeeds::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SpinSpeeds
+namespace SpinSpeedCurrent {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SpinSpeedCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SpinSpeedCurrent
+namespace NumberOfRinses {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfRinses::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfRinses
+namespace MaxRinses {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxRinses::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxRinses
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::SpinSpeeds::TypeInfo::DecodableType spinSpeeds;
+        Attributes::SpinSpeedCurrent::TypeInfo::DecodableType spinSpeedCurrent;
+        Attributes::NumberOfRinses::TypeInfo::DecodableType numberOfRinses;
+        Attributes::MaxRinses::TypeInfo::DecodableType maxRinses = static_cast<uint8_t>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace WasherControls
+namespace RvcRunModeSelect {
+namespace Structs {
+namespace ModeTagStruct    = Clusters::detail::Structs::ModeTagStruct;
+namespace ModeOptionStruct = Clusters::detail::Structs::ModeOptionStruct;
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ChangeToMode {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToMode
+
+namespace ChangeToModeWithStatus {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace ChangeToMode {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToMode
+namespace ChangeToModeWithStatus {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeWithStatus
+namespace ChangeToModeResponse {
+enum class Fields : uint8_t
+{
+    kStatus     = 0,
+    kStatusText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Description {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 64; }
+};
+} // namespace Description
+namespace SupportedModes {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::RvcRunModeSelect::Structs::ModeOptionStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedModes
+namespace CurrentMode {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentMode
+namespace StartUpMode {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace StartUpMode
+namespace OnMode {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OnMode
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::RvcRunModeSelect::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Description::TypeInfo::DecodableType description;
+        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
+        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
+        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
+        Attributes::OnMode::TypeInfo::DecodableType onMode;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace RvcRunModeSelect
+namespace RvcCleanModeSelect {
+namespace Structs {
+namespace ModeTagStruct    = Clusters::detail::Structs::ModeTagStruct;
+namespace ModeOptionStruct = Clusters::detail::Structs::ModeOptionStruct;
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ChangeToMode {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToMode
+
+namespace ChangeToModeWithStatus {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace ChangeToMode {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToMode
+namespace ChangeToModeWithStatus {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeWithStatus
+namespace ChangeToModeResponse {
+enum class Fields : uint8_t
+{
+    kStatus     = 0,
+    kStatusText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Description {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 64; }
+};
+} // namespace Description
+namespace SupportedModes {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::RvcCleanModeSelect::Structs::ModeOptionStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedModes
+namespace CurrentMode {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentMode
+namespace StartUpMode {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace StartUpMode
+namespace OnMode {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OnMode
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanModeSelect::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Description::TypeInfo::DecodableType description;
+        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
+        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
+        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
+        Attributes::OnMode::TypeInfo::DecodableType onMode;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace RvcCleanModeSelect
+namespace TemperatureControl {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SetTemperature {
+struct Type;
+struct DecodableType;
+} // namespace SetTemperature
+
+} // namespace Commands
+
+namespace Commands {
+namespace SetTemperature {
+enum class Fields : uint8_t
+{
+    kTargetTemperature      = 0,
+    kTargetTemperatureLevel = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+
+    Optional<int16_t> targetTemperature;
+    Optional<uint8_t> targetTemperatureLevel;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetTemperature::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+
+    Optional<int16_t> targetTemperature;
+    Optional<uint8_t> targetTemperatureLevel;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetTemperature
+} // namespace Commands
+
+namespace Attributes {
+
+namespace TemperatureSetpoint {
+struct TypeInfo
+{
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpoint::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TemperatureSetpoint
+namespace MinTemperature {
+struct TypeInfo
+{
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinTemperature::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinTemperature
+namespace MaxTemperature {
+struct TypeInfo
+{
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxTemperature::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxTemperature
+namespace Step {
+struct TypeInfo
+{
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Step::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Step
+namespace SelectedTemperatureLevel {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SelectedTemperatureLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SelectedTemperatureLevel
+namespace SupportedTemperatureLevels {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedTemperatureLevels::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedTemperatureLevels
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::TemperatureControl::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::TemperatureSetpoint::TypeInfo::DecodableType temperatureSetpoint           = static_cast<int16_t>(0);
+        Attributes::MinTemperature::TypeInfo::DecodableType minTemperature                     = static_cast<int16_t>(0);
+        Attributes::MaxTemperature::TypeInfo::DecodableType maxTemperature                     = static_cast<int16_t>(0);
+        Attributes::Step::TypeInfo::DecodableType step                                         = static_cast<int16_t>(0);
+        Attributes::SelectedTemperatureLevel::TypeInfo::DecodableType selectedTemperatureLevel = static_cast<uint8_t>(0);
+        Attributes::SupportedTemperatureLevels::TypeInfo::DecodableType supportedTemperatureLevels;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace TemperatureControl
+namespace RefrigeratorAlarm {
+
+namespace Attributes {
+
+namespace Mask {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Mask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Mask
+namespace State {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::State::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace State
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Mask::TypeInfo::DecodableType mask =
+            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>(0);
+        Attributes::State::TypeInfo::DecodableType state =
+            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace Notify {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kActive   = 0,
+    kInactive = 1,
+    kState    = 2,
+    kMask     = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::Notify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    chip::BitMask<AlarmMap> active   = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> inactive = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::Notify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
+
+    chip::BitMask<AlarmMap> active   = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> inactive = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace Notify
+} // namespace Events
+} // namespace RefrigeratorAlarm
+namespace DishwasherModeSelect {
+namespace Structs {
+namespace ModeTagStruct    = Clusters::detail::Structs::ModeTagStruct;
+namespace ModeOptionStruct = Clusters::detail::Structs::ModeOptionStruct;
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ChangeToMode {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToMode
+
+namespace ChangeToModeWithStatus {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeWithStatus
+
+namespace ChangeToModeResponse {
+struct Type;
+struct DecodableType;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace ChangeToMode {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToMode
+namespace ChangeToModeWithStatus {
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeWithStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeWithStatus
+namespace ChangeToModeResponse {
+enum class Fields : uint8_t
+{
+    kStatus     = 0,
+    kStatusText = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Description {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 64; }
+};
+} // namespace Description
+namespace SupportedModes {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::DishwasherModeSelect::Structs::ModeOptionStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedModes
+namespace CurrentMode {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentMode
+namespace StartUpMode {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace StartUpMode
+namespace OnMode {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OnMode
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::DishwasherModeSelect::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Description::TypeInfo::DecodableType description;
+        Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
+        Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
+        Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
+        Attributes::OnMode::TypeInfo::DecodableType onMode;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace DishwasherModeSelect
+namespace AirQuality {
+
+namespace Attributes {
+
+namespace AirQuality {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::AirQuality::AirQualityEnum;
+    using DecodableType    = chip::app::Clusters::AirQuality::AirQualityEnum;
+    using DecodableArgType = chip::app::Clusters::AirQuality::AirQualityEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AirQuality::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AirQuality
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::AirQuality::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::AirQuality::TypeInfo::DecodableType airQuality =
+            static_cast<chip::app::Clusters::AirQuality::AirQualityEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace AirQuality
+namespace SmokeCoAlarm {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace SelfTestRequest {
+struct Type;
+struct DecodableType;
+} // namespace SelfTestRequest
+
+} // namespace Commands
+
+namespace Commands {
+namespace SelfTestRequest {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SelfTestRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SelfTestRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SelfTestRequest
+} // namespace Commands
+
+namespace Attributes {
+
+namespace ExpressedState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ExpressedState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ExpressedState
+namespace SmokeState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SmokeState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SmokeState
+namespace COState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::COState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace COState
+namespace BatteryAlert {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlert::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace BatteryAlert
+namespace DeviceMuted {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::MuteStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::MuteStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::MuteStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceMuted::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DeviceMuted
+namespace TestInProgress {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TestInProgress::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TestInProgress
+namespace HardwareFaultAlert {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HardwareFaultAlert::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HardwareFaultAlert
+namespace EndOfServiceAlert {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EndOfServiceAlert::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace EndOfServiceAlert
+namespace InterconnectSmokeAlarm {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InterconnectSmokeAlarm::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InterconnectSmokeAlarm
+namespace InterconnectCOAlarm {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InterconnectCOAlarm::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InterconnectCOAlarm
+namespace ContaminationState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ContaminationState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ContaminationState
+namespace SensitivityLevel {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
+    using DecodableType    = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
+    using DecodableArgType = chip::app::Clusters::SmokeCoAlarm::SensitivityEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SensitivityLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SensitivityLevel
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::ExpressedState::TypeInfo::DecodableType expressedState =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum>(0);
+        Attributes::SmokeState::TypeInfo::DecodableType smokeState =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
+        Attributes::COState::TypeInfo::DecodableType COState = static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
+        Attributes::BatteryAlert::TypeInfo::DecodableType batteryAlert =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
+        Attributes::DeviceMuted::TypeInfo::DecodableType deviceMuted =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum>(0);
+        Attributes::TestInProgress::TypeInfo::DecodableType testInProgress         = static_cast<bool>(0);
+        Attributes::HardwareFaultAlert::TypeInfo::DecodableType hardwareFaultAlert = static_cast<bool>(0);
+        Attributes::EndOfServiceAlert::TypeInfo::DecodableType endOfServiceAlert =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum>(0);
+        Attributes::InterconnectSmokeAlarm::TypeInfo::DecodableType interconnectSmokeAlarm =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
+        Attributes::InterconnectCOAlarm::TypeInfo::DecodableType interconnectCOAlarm =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum>(0);
+        Attributes::ContaminationState::TypeInfo::DecodableType contaminationState =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>(0);
+        Attributes::SensitivityLevel::TypeInfo::DecodableType sensitivityLevel =
+            static_cast<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace SmokeAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SmokeAlarm
+namespace COAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::COAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::COAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace COAlarm
+namespace LowBattery {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::LowBattery::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::LowBattery::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace LowBattery
+namespace HardwareFault {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::HardwareFault::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::HardwareFault::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace HardwareFault
+namespace EndOfService {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EndOfService::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::EndOfService::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace EndOfService
+namespace SelfTestComplete {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SelfTestComplete::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::SelfTestComplete::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace SelfTestComplete
+namespace AlarmMuted {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AlarmMuted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AlarmMuted::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AlarmMuted
+namespace MuteEnded {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MuteEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MuteEnded::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace MuteEnded
+namespace InterconnectSmokeAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectSmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectSmokeAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace InterconnectSmokeAlarm
+namespace InterconnectCOAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectCOAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::InterconnectCOAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace InterconnectCOAlarm
+namespace AllClear {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AllClear::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::AllClear::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AllClear
+} // namespace Events
+} // namespace SmokeCoAlarm
+namespace OperationalState {
+namespace Structs {
+namespace ErrorStateStruct {
+enum class Fields : uint8_t
+{
+    kErrorStateID      = 0,
+    kErrorStateLabel   = 1,
+    kErrorStateDetails = 2,
+};
+
+struct Type
+{
+public:
+    ErrorStateEnum errorStateID = static_cast<ErrorStateEnum>(0);
+    DataModel::Nullable<chip::CharSpan> errorStateLabel;
+    Optional<chip::CharSpan> errorStateDetails;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ErrorStateStruct
+namespace OperationalStateStruct {
+enum class Fields : uint8_t
+{
+    kOperationalStateID    = 0,
+    kOperationalStateLabel = 1,
+};
+
+struct Type
+{
+public:
+    OperationalStateEnum operationalStateID = static_cast<OperationalStateEnum>(0);
+    chip::CharSpan operationalStateLabel;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace OperationalStateStruct
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Pause {
+struct Type;
+struct DecodableType;
+} // namespace Pause
+
+namespace Stop {
+struct Type;
+struct DecodableType;
+} // namespace Stop
+
+namespace Start {
+struct Type;
+struct DecodableType;
+} // namespace Start
+
+namespace Resume {
+struct Type;
+struct DecodableType;
+} // namespace Resume
+
+namespace OperationalCommandResponse {
+struct Type;
+struct DecodableType;
+} // namespace OperationalCommandResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace Pause {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Pause::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Pause::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Pause
+namespace Stop {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Stop
+namespace Start {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Start::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Start::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Start
+namespace Resume {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Resume::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Resume::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Resume
+namespace OperationalCommandResponse {
+enum class Fields : uint8_t
+{
+    kCommandResponseState = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::OperationalCommandResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    Structs::ErrorStateStruct::Type commandResponseState;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::OperationalCommandResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    Structs::ErrorStateStruct::DecodableType commandResponseState;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OperationalCommandResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace PhaseList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::CharSpan>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PhaseList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PhaseList
+namespace CurrentPhase {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPhase::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentPhase
+namespace CountdownTime {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CountdownTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CountdownTime
+namespace OperationalStateList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OperationalStateList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OperationalStateList
+namespace OperationalState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::Type;
+    using DecodableType    = chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OperationalState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OperationalState
+namespace OperationalError {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type;
+    using DecodableType    = chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OperationalError::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OperationalError
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::PhaseList::TypeInfo::DecodableType phaseList;
+        Attributes::CurrentPhase::TypeInfo::DecodableType currentPhase;
+        Attributes::CountdownTime::TypeInfo::DecodableType countdownTime;
+        Attributes::OperationalStateList::TypeInfo::DecodableType operationalStateList;
+        Attributes::OperationalState::TypeInfo::DecodableType operationalState;
+        Attributes::OperationalError::TypeInfo::DecodableType operationalError;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace OperationalError {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+
+enum class Fields : uint8_t
+{
+    kErrorState = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Structs::ErrorStateStruct::Type errorState;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OperationalError::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    Structs::ErrorStateStruct::DecodableType errorState;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace OperationalError
+namespace OperationCompletion {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kCompletionErrorCode  = 0,
+    kTotalOperationalTime = 1,
+    kPausedTime           = 2,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OperationCompletion::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    ErrorStateEnum completionErrorCode = static_cast<ErrorStateEnum>(0);
+    Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
+    Optional<DataModel::Nullable<uint32_t>> pausedTime;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OperationCompletion::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
+
+    ErrorStateEnum completionErrorCode = static_cast<ErrorStateEnum>(0);
+    Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
+    Optional<DataModel::Nullable<uint32_t>> pausedTime;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace OperationCompletion
+} // namespace Events
+} // namespace OperationalState
+namespace HepaFilterMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::HepaFilterMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace HepaFilterMonitoring
+namespace ActivatedCarbonFilterMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ActivatedCarbonFilterMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace ActivatedCarbonFilterMonitoring
+namespace CeramicFilterMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CeramicFilterMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::CeramicFilterMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::CeramicFilterMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CeramicFilterMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::CeramicFilterMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::CeramicFilterMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CeramicFilterMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::CeramicFilterMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::CeramicFilterMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace CeramicFilterMonitoring
+namespace ElectrostaticFilterMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ElectrostaticFilterMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::ElectrostaticFilterMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::ElectrostaticFilterMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ElectrostaticFilterMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::ElectrostaticFilterMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::ElectrostaticFilterMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ElectrostaticFilterMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::ElectrostaticFilterMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::ElectrostaticFilterMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace ElectrostaticFilterMonitoring
+namespace UvFilterMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::UvFilterMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::UvFilterMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::UvFilterMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::UvFilterMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::UvFilterMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::UvFilterMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::UvFilterMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::UvFilterMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::UvFilterMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace UvFilterMonitoring
+namespace IonizingFilterMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::IonizingFilterMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::IonizingFilterMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::IonizingFilterMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::IonizingFilterMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::IonizingFilterMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::IonizingFilterMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::IonizingFilterMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::IonizingFilterMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::IonizingFilterMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace IonizingFilterMonitoring
+namespace ZeoliteFilterMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ZeoliteFilterMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::ZeoliteFilterMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::ZeoliteFilterMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ZeoliteFilterMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::ZeoliteFilterMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::ZeoliteFilterMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ZeoliteFilterMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::ZeoliteFilterMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::ZeoliteFilterMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace ZeoliteFilterMonitoring
+namespace OzoneFilterMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OzoneFilterMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::OzoneFilterMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::OzoneFilterMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OzoneFilterMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::OzoneFilterMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::OzoneFilterMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::OzoneFilterMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::OzoneFilterMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::OzoneFilterMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace OzoneFilterMonitoring
+namespace WaterTankMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::WaterTankMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::WaterTankMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::WaterTankMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::WaterTankMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::WaterTankMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::WaterTankMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::WaterTankMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::WaterTankMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::WaterTankMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace WaterTankMonitoring
+namespace FuelTankMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FuelTankMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::FuelTankMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::FuelTankMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FuelTankMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::FuelTankMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::FuelTankMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::FuelTankMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::FuelTankMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::FuelTankMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace FuelTankMonitoring
+namespace InkCartridgeMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::InkCartridgeMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::InkCartridgeMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::InkCartridgeMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::InkCartridgeMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::InkCartridgeMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::InkCartridgeMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::InkCartridgeMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::InkCartridgeMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::InkCartridgeMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace InkCartridgeMonitoring
+namespace TonerCartridgeMonitoring {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ResetCondition {
+struct Type;
+struct DecodableType;
+} // namespace ResetCondition
+
+} // namespace Commands
+
+namespace Commands {
+namespace ResetCondition {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ResetCondition::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ResetCondition
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Condition {
+struct TypeInfo
+{
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Condition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Condition
+namespace DegradationDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TonerCartridgeMonitoring::DegradationDirectionEnum;
+    using DecodableType    = chip::app::Clusters::TonerCartridgeMonitoring::DegradationDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::TonerCartridgeMonitoring::DegradationDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TonerCartridgeMonitoring::ChangeIndicationEnum;
+    using DecodableType    = chip::app::Clusters::TonerCartridgeMonitoring::ChangeIndicationEnum;
+    using DecodableArgType = chip::app::Clusters::TonerCartridgeMonitoring::ChangeIndicationEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InPlaceIndicator::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InPlaceIndicator
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::TonerCartridgeMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Condition::TypeInfo::DecodableType condition = static_cast<chip::Percent>(0);
+        Attributes::DegradationDirection::TypeInfo::DecodableType degradationDirection =
+            static_cast<chip::app::Clusters::TonerCartridgeMonitoring::DegradationDirectionEnum>(0);
+        Attributes::ChangeIndication::TypeInfo::DecodableType changeIndication =
+            static_cast<chip::app::Clusters::TonerCartridgeMonitoring::ChangeIndicationEnum>(0);
+        Attributes::InPlaceIndicator::TypeInfo::DecodableType inPlaceIndicator = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace TonerCartridgeMonitoring
 namespace DoorLock {
 namespace Structs {
 namespace CredentialStruct {
@@ -13496,6 +19070,11 @@ namespace ClearCredential {
 struct Type;
 struct DecodableType;
 } // namespace ClearCredential
+
+namespace UnboltDoor {
+struct Type;
+struct DecodableType;
+} // namespace UnboltDoor
 
 } // namespace Commands
 
@@ -14442,6 +20021,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearCredential
+namespace UnboltDoor {
+enum class Fields : uint8_t
+{
+    kPINCode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UnboltDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    Optional<chip::ByteSpan> PINCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UnboltDoor::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    Optional<chip::ByteSpan> PINCode;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UnboltDoor
 } // namespace Commands
 
 namespace Attributes {
@@ -17849,6 +23460,57 @@ struct TypeInfo
 } // namespace Thermostat
 namespace FanControl {
 
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Step {
+struct Type;
+struct DecodableType;
+} // namespace Step
+
+} // namespace Commands
+
+namespace Commands {
+namespace Step {
+enum class Fields : uint8_t
+{
+    kDirection = 0,
+    kWrap      = 1,
+    kLowestOff = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+
+    DirectionEnum direction = static_cast<DirectionEnum>(0);
+    Optional<bool> wrap;
+    Optional<bool> lowestOff;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+
+    DirectionEnum direction = static_cast<DirectionEnum>(0);
+    Optional<bool> wrap;
+    Optional<bool> lowestOff;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Step
+} // namespace Commands
+
 namespace Attributes {
 
 namespace FanMode {
@@ -17983,6 +23645,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WindSetting
+namespace AirflowDirection {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FanControl::AirflowDirectionEnum;
+    using DecodableType    = chip::app::Clusters::FanControl::AirflowDirectionEnum;
+    using DecodableArgType = chip::app::Clusters::FanControl::AirflowDirectionEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AirflowDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AirflowDirection
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -18040,6 +23714,8 @@ struct TypeInfo
         Attributes::RockSetting::TypeInfo::DecodableType rockSetting   = static_cast<uint8_t>(0);
         Attributes::WindSupport::TypeInfo::DecodableType windSupport   = static_cast<uint8_t>(0);
         Attributes::WindSetting::TypeInfo::DecodableType windSetting   = static_cast<uint8_t>(0);
+        Attributes::AirflowDirection::TypeInfo::DecodableType airflowDirection =
+            static_cast<chip::app::Clusters::FanControl::AirflowDirectionEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -20110,9 +25786,10 @@ struct TypeInfo
 namespace LightSensorType {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LightSensorType::Id; }
@@ -20913,6 +26590,7386 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace OccupancySensing
+namespace CarbonMonoxideConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace CarbonMonoxideConcentrationMeasurement
+namespace CarbonDioxideConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace CarbonDioxideConcentrationMeasurement
+namespace EthyleneConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::EthyleneConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::EthyleneConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::EthyleneConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace EthyleneConcentrationMeasurement
+namespace EthyleneOxideConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::EthyleneOxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::EthyleneOxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::EthyleneOxideConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::EthyleneOxideConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::EthyleneOxideConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace EthyleneOxideConcentrationMeasurement
+namespace HydrogenConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HydrogenConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::HydrogenConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::HydrogenConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace HydrogenConcentrationMeasurement
+namespace HydrogenSulfideConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulfideConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::HydrogenSulfideConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace HydrogenSulfideConcentrationMeasurement
+namespace NitricOxideConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::NitricOxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::NitricOxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::NitricOxideConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::NitricOxideConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::NitricOxideConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace NitricOxideConcentrationMeasurement
+namespace NitrogenDioxideConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace NitrogenDioxideConcentrationMeasurement
+namespace OxygenConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OxygenConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::OxygenConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::OxygenConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::OxygenConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::OxygenConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace OxygenConcentrationMeasurement
+namespace OzoneConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace OzoneConcentrationMeasurement
+namespace SulfurDioxideConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SulfurDioxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::SulfurDioxideConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::SulfurDioxideConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::SulfurDioxideConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::SulfurDioxideConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace SulfurDioxideConcentrationMeasurement
+namespace DissolvedOxygenConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::DissolvedOxygenConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace DissolvedOxygenConcentrationMeasurement
+namespace BromateConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::BromateConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::BromateConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::BromateConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::BromateConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::BromateConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::BromateConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::BromateConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::BromateConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::BromateConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::BromateConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::BromateConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::BromateConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace BromateConcentrationMeasurement
+namespace ChloraminesConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChloraminesConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::ChloraminesConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::ChloraminesConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::ChloraminesConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::ChloraminesConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace ChloraminesConcentrationMeasurement
+namespace ChlorineConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChlorineConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::ChlorineConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorineConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::ChlorineConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::ChlorineConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace ChlorineConcentrationMeasurement
+namespace FecalColiformEColiConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformEColiConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::FecalColiformEColiConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace FecalColiformEColiConcentrationMeasurement
+namespace FluorideConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FluorideConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::FluorideConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::FluorideConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::FluorideConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::FluorideConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace FluorideConcentrationMeasurement
+namespace HaloaceticAcidsConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::HaloaceticAcidsConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace HaloaceticAcidsConcentrationMeasurement
+namespace TotalTrihalomethanesConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::TotalTrihalomethanesConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace TotalTrihalomethanesConcentrationMeasurement
+namespace TotalColiformBacteriaConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::TotalColiformBacteriaConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace TotalColiformBacteriaConcentrationMeasurement
+namespace TurbidityConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TurbidityConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::TurbidityConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::TurbidityConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::TurbidityConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::TurbidityConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace TurbidityConcentrationMeasurement
+namespace CopperConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CopperConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::CopperConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::CopperConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CopperConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::CopperConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::CopperConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CopperConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::CopperConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::CopperConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::CopperConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::CopperConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::CopperConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace CopperConcentrationMeasurement
+namespace LeadConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::LeadConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::LeadConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::LeadConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::LeadConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::LeadConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::LeadConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::LeadConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::LeadConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::LeadConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::LeadConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::LeadConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::LeadConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace LeadConcentrationMeasurement
+namespace ManganeseConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ManganeseConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::ManganeseConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::ManganeseConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::ManganeseConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::ManganeseConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace ManganeseConcentrationMeasurement
+namespace SulfateConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SulfateConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::SulfateConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::SulfateConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::SulfateConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::SulfateConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace SulfateConcentrationMeasurement
+namespace BromodichloromethaneConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::BromodichloromethaneConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace BromodichloromethaneConcentrationMeasurement
+namespace BromoformConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::BromoformConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::BromoformConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::BromoformConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::BromoformConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::BromoformConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace BromoformConcentrationMeasurement
+namespace ChlorodibromomethaneConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::ChlorodibromomethaneConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace ChlorodibromomethaneConcentrationMeasurement
+namespace ChloroformConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ChloroformConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::ChloroformConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::ChloroformConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::ChloroformConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::ChloroformConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace ChloroformConcentrationMeasurement
+namespace SodiumConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::SodiumConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::SodiumConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::SodiumConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::SodiumConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::SodiumConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace SodiumConcentrationMeasurement
+namespace Pm25ConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::Pm25ConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace Pm25ConcentrationMeasurement
+namespace FormaldehydeConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::FormaldehydeConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace FormaldehydeConcentrationMeasurement
+namespace Pm1ConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::Pm1ConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace Pm1ConcentrationMeasurement
+namespace Pm10ConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::Pm10ConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace Pm10ConcentrationMeasurement
+namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
+namespace RadonConcentrationMeasurement {
+
+namespace Attributes {
+
+namespace MeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PeakMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AverageMeasuredValueWindow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Uncertainty::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Uncertainty
+namespace MeasurementUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableType    = chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum;
+    using DecodableArgType = chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableType    = chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum;
+    using DecodableArgType = chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementMedium::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementMedium
+namespace LevelValue {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum;
+    using DecodableType    = chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum;
+    using DecodableArgType = chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LevelValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LevelValue
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::RadonConcentrationMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
+        Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
+        Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
+        Attributes::PeakMeasuredValue::TypeInfo::DecodableType peakMeasuredValue;
+        Attributes::PeakMeasuredValueWindow::TypeInfo::DecodableType peakMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::AverageMeasuredValue::TypeInfo::DecodableType averageMeasuredValue;
+        Attributes::AverageMeasuredValueWindow::TypeInfo::DecodableType averageMeasuredValueWindow = static_cast<uint32_t>(0);
+        Attributes::Uncertainty::TypeInfo::DecodableType uncertainty                               = static_cast<float>(0);
+        Attributes::MeasurementUnit::TypeInfo::DecodableType measurementUnit =
+            static_cast<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum>(0);
+        Attributes::MeasurementMedium::TypeInfo::DecodableType measurementMedium =
+            static_cast<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum>(0);
+        Attributes::LevelValue::TypeInfo::DecodableType levelValue =
+            static_cast<chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace RadonConcentrationMeasurement
 namespace WakeOnLan {
 
 namespace Attributes {
@@ -21187,7 +34244,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    uint16_t count = static_cast<uint16_t>(0);
+    int16_t count = static_cast<int16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -21202,7 +34259,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    uint16_t count = static_cast<uint16_t>(0);
+    int16_t count = static_cast<int16_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SkipChannel
@@ -25782,275 +38839,6 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ElectricalMeasurement
-namespace ClientMonitoring {
-namespace Structs {
-namespace MonitoringRegistration {
-enum class Fields : uint8_t
-{
-    kClientNodeId = 1,
-    kICid         = 2,
-    kFabricIndex  = 254,
-};
-
-struct Type
-{
-public:
-    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
-    uint64_t ICid                 = static_cast<uint64_t>(0);
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const;
-};
-
-using DecodableType = Type;
-
-} // namespace MonitoringRegistration
-} // namespace Structs
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace RegisterClientMonitoring {
-struct Type;
-struct DecodableType;
-} // namespace RegisterClientMonitoring
-
-namespace UnregisterClientMonitoring {
-struct Type;
-struct DecodableType;
-} // namespace UnregisterClientMonitoring
-
-namespace StayAwakeRequest {
-struct Type;
-struct DecodableType;
-} // namespace StayAwakeRequest
-
-} // namespace Commands
-
-namespace Commands {
-namespace RegisterClientMonitoring {
-enum class Fields : uint8_t
-{
-    kClientNodeId = 0,
-    kICid         = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::RegisterClientMonitoring::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-
-    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
-    uint64_t ICid             = static_cast<uint64_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::RegisterClientMonitoring::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-
-    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
-    uint64_t ICid             = static_cast<uint64_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace RegisterClientMonitoring
-namespace UnregisterClientMonitoring {
-enum class Fields : uint8_t
-{
-    kClientNodeId = 0,
-    kICid         = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::UnregisterClientMonitoring::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-
-    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
-    uint64_t ICid             = static_cast<uint64_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::UnregisterClientMonitoring::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-
-    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
-    uint64_t ICid             = static_cast<uint64_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace UnregisterClientMonitoring
-namespace StayAwakeRequest {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::StayAwakeRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::StayAwakeRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace StayAwakeRequest
-} // namespace Commands
-
-namespace Attributes {
-
-namespace IdleModeInterval {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::IdleModeInterval::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace IdleModeInterval
-namespace ActiveModeInterval {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveModeInterval::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActiveModeInterval
-namespace ActiveModeThreshold {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveModeThreshold::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActiveModeThreshold
-namespace ExpectedClients {
-struct TypeInfo
-{
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::DecodableType> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ExpectedClients::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ExpectedClients
-namespace GeneratedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-};
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-};
-} // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-};
-} // namespace EventList
-namespace AttributeList {
-struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-};
-} // namespace AttributeList
-namespace FeatureMap {
-struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-};
-} // namespace ClusterRevision
-
-struct TypeInfo
-{
-    struct DecodableType
-    {
-        static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
-
-        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
-
-        Attributes::IdleModeInterval::TypeInfo::DecodableType idleModeInterval       = static_cast<uint32_t>(0);
-        Attributes::ActiveModeInterval::TypeInfo::DecodableType activeModeInterval   = static_cast<uint32_t>(0);
-        Attributes::ActiveModeThreshold::TypeInfo::DecodableType activeModeThreshold = static_cast<uint16_t>(0);
-        Attributes::ExpectedClients::TypeInfo::DecodableType expectedClients;
-        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
-        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
-        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
-        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
-    };
-};
-} // namespace Attributes
-} // namespace ClientMonitoring
 namespace UnitTesting {
 namespace Structs {
 namespace SimpleStruct {

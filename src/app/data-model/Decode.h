@@ -170,7 +170,7 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
 
     // We have a value; decode it.
     ReturnErrorOnFailure(Decode(reader, x.SetNonNull()));
-    if (!x.HasValidValue())
+    if (!x.ExistingValueInEncodableRange())
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }

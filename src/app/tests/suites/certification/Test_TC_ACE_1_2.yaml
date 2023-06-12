@@ -37,8 +37,14 @@ tests:
 
     - label: "TH1 commissions DUT"
       verification: |
-          DUT is commissioned on TH1 fabric
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+          ./chip-all-clusters-app
 
+          Once DUT reach the  commissionable state pls send below mentioned command on TH1.  Pls use equivalent command on the respective DUT
+          ./chip-tool pairing onnetwork 1 20202021
+
+          Please use Interactive mode to Verify this test case
+          Here the command to enter interactive mode:--   ./chip-tool interactive start
       disabled: true
 
     - label:
@@ -47,70 +53,50 @@ tests:
           Administer (5) AuthMode field: CASE (2) Subjects field: [N1, N2]
           Targets field: [{Endpoint: 0}]"
       verification: |
-          Pls run this test in chip tool interactive mode  using the command  ./chip-tool interactive start
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]' 1 0   --commissioner-nodeid 0x1
 
-          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{ "cluster": null, "endpoint": 0, "deviceType": null }]}]' 1 0
-          On TH(Chiptool)1,Verify successfully  ACL attribute with a list of AccessControlEntryStruct entries containing 1 element.
-          [1659508250.468539][10228:10233] CHIP:EM: Removed CHIP MessageCounter:188603873 from RetransTable on exchange 14900i
-          [1659508250.468582][10228:10233] CHIP:DMG: WriteClient moving to [ResponseRe]
-          [1659508250.468646][10228:10233] CHIP:DMG: WriteResponseMessage =
-          [1659508250.468679][10228:10233] CHIP:DMG: {
-          [1659508250.468706][10228:10233] CHIP:DMG:      AttributeStatusIBs =
-          [1659508250.468745][10228:10233] CHIP:DMG:      [
-          [1659508250.468775][10228:10233] CHIP:DMG:              AttributeStatusIB =
-          [1659508250.468809][10228:10233] CHIP:DMG:              {
-          [1659508250.468841][10228:10233] CHIP:DMG:                      AttributePathIB =
-          [1659508250.468881][10228:10233] CHIP:DMG:                      {
-          [1659508250.468922][10228:10233] CHIP:DMG:                              Endpoint = 0x0,
-          [1659508250.468964][10228:10233] CHIP:DMG:                              Cluster = 0x1f,
-          [1659508250.469005][10228:10233] CHIP:DMG:                              Attribute = 0x0000_0000,
-          [1659508250.469044][10228:10233] CHIP:DMG:                      }
-          [1659508250.469087][10228:10233] CHIP:DMG:
-          [1659508250.469124][10228:10233] CHIP:DMG:                      StatusIB =
-          [1659508250.469163][10228:10233] CHIP:DMG:                      {
-          [1659508250.469202][10228:10233] CHIP:DMG:                              status = 0x00 (SUCCESS),
-          [1659508250.469240][10228:10233] CHIP:DMG:                      },
-          [1659508250.469279][10228:10233] CHIP:DMG:
-          [1659508250.469310][10228:10233] CHIP:DMG:              },
-          [1659508250.469354][10228:10233] CHIP:DMG:
-          [1659508250.469384][10228:10233] CHIP:DMG:              AttributeStatusIB =
-          [1659508250.469417][10228:10233] CHIP:DMG:              {
-          [1659508250.469448][10228:10233] CHIP:DMG:                      AttributePathIB =
-          [1659508250.469485][10228:10233] CHIP:DMG:                      {
-          [1659508250.469523][10228:10233] CHIP:DMG:                              Endpoint = 0x0,
-          [1659508250.469564][10228:10233] CHIP:DMG:                              Cluster = 0x1f,
-          [1659508250.469604][10228:10233] CHIP:DMG:                              Attribute = 0x0000_0000,
-          [1659508250.469644][10228:10233] CHIP:DMG:                              ListIndex = Null,
-          [1659508250.469682][10228:10233] CHIP:DMG:                      }
-          [1659508250.469723][10228:10233] CHIP:DMG:
-          [1659508250.469759][10228:10233] CHIP:DMG:                      StatusIB =
-          [1659508250.469796][10228:10233] CHIP:DMG:                      {
-          [1659508250.469834][10228:10233] CHIP:DMG:                              status = 0x00 (SUCCESS),
-          [1659508250.469873][10228:10233] CHIP:DMG:                      },
-          [1659508250.469912][10228:10233] CHIP:DMG:
-          [1659508250.469943][10228:10233] CHIP:DMG:              },
-          [1659508250.469979][10228:10233] CHIP:DMG:
-          [1659508250.470007][10228:10233] CHIP:DMG:      ],
-          [1659508250.470048][10228:10233] CHIP:DMG:
-          [1659508250.470077][10228:10233] CHIP:DMG:      InteractionModelRevision = 1
-          [1659508250.470105][10228:10233] CHIP:DMG: }
-          [1659508250.470228][10228:10233] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1659508250.470299][10228:10233] CHIP:EM: Sending Standalone Ack for MessageCounter:48929405 on exchange 14900i
-          [1659508250.470380][10228:10233] CHIP:IN: Prepared secure message 0xffff994999e8 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 14900i with MessageCounter:188603874.
-          [1659508250.470426][10228:10233] CHIP:IN: Sending encrypted msg 0xffff994999e8 with MessageCounter:188603874 to 0x0000000000000001 (1) at monotonic time: 000000000598DDBE msec
-          [1659508250.470575][10228:10233] CHIP:EM: Flushed pending ack for MessageCounter:48929405 on exchange 14900i
-          [1659508250.470779][10228:10228] CHIP:CTL: Shutting down the commissioner
-          [1659508250.470818][10228:10228] CHIP:CTL: Stopping commissioning discovery over DNS-SD
-          [1659508250.470842][10228:10228] CHIP:CTL: Shutting down the controller
-          [1659508250.470874][10228:10228] CHIP:IN: Expiring all sessions for fabric 0x1!!
-          [1659508250.470904][10228:10228] CHIP:IN: SecureSession[0xffff84001930]: MarkForEviction Type:2 LSID:16459
-          [1659508250.470931][10228:10228] CHIP:SC: SecureSession[0xffff84001930]: Moving from state "kActive" --> "kPendingEviction"
-          [1659508250.470959][10228:10228] CHIP:IN: SecureSession[0xffff84001930]: Released - Type:2 LSID:16459
-          [1659508250.470990][10228:10228] CHIP:FP: Forgetting fabric 0x1
-          [1659508250.471029][10228:10228] CHIP:TS: Pending Last Known Good Time: 2022-08-01T09:44:35
-          [1659508250.471248][10228:10228] CHIP:TS: Previous Last Known Good Time: 2022-08-01T09:44:35
-          [1659508250.471279][10228:10228] CHIP:TS: Reverted Last Known Good Time to previous value
-          [1659508250.471327][10228:10228] CHIP:CTL: Shutting down the commissioner
+          [1675235747.672953][1933:1935] CHIP:DMG: WriteResponseMessage =
+          [1675235747.673017][1933:1935] CHIP:DMG: {
+          [1675235747.673072][1933:1935] CHIP:DMG:         AttributeStatusIBs =
+          [1675235747.673150][1933:1935] CHIP:DMG:         [
+          [1675235747.673212][1933:1935] CHIP:DMG:                 AttributeStatusIB =
+          [1675235747.673293][1933:1935] CHIP:DMG:                 {
+          [1675235747.673359][1933:1935] CHIP:DMG:                         AttributePathIB =
+          [1675235747.673447][1933:1935] CHIP:DMG:                         {
+          [1675235747.673528][1933:1935] CHIP:DMG:                                 Endpoint = 0x0,
+          [1675235747.673613][1933:1935] CHIP:DMG:                                 Cluster = 0x1f,
+          [1675235747.673705][1933:1935] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1675235747.673783][1933:1935] CHIP:DMG:                         }
+          [1675235747.673872][1933:1935] CHIP:DMG:
+          [1675235747.673949][1933:1935] CHIP:DMG:                         StatusIB =
+          [1675235747.674035][1933:1935] CHIP:DMG:                         {
+          [1675235747.674117][1933:1935] CHIP:DMG:                                 status = 0x7e (UNSUPPORTED_ACCESS),
+          [1675235747.674197][1933:1935] CHIP:DMG:                         },
+          [1675235747.674277][1933:1935] CHIP:DMG:
+          [1675235747.674346][1933:1935] CHIP:DMG:                 },
+          [1675235747.674441][1933:1935] CHIP:DMG:
+          [1675235747.674502][1933:1935] CHIP:DMG:                 AttributeStatusIB =
+          [1675235747.674575][1933:1935] CHIP:DMG:                 {
+          [1675235747.674645][1933:1935] CHIP:DMG:                         AttributePathIB =
+          [1675235747.674722][1933:1935] CHIP:DMG:                         {
+          [1675235747.674802][1933:1935] CHIP:DMG:                                 Endpoint = 0x0,
+          [1675235747.674886][1933:1935] CHIP:DMG:                                 Cluster = 0x1f,
+          [1675235747.675034][1933:1935] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1675235747.675125][1933:1935] CHIP:DMG:                                 ListIndex = Null,
+          [1675235747.675203][1933:1935] CHIP:DMG:                         }
+          [1675235747.675289][1933:1935] CHIP:DMG:
+          [1675235747.675365][1933:1935] CHIP:DMG:                         StatusIB =
+          [1675235747.675437][1933:1935] CHIP:DMG:                         {
+          [1675235747.675501][1933:1935] CHIP:DMG:                                 status = 0x7e (UNSUPPORTED_ACCESS),
+          [1675235747.675587][1933:1935] CHIP:DMG:                         },
+          [1675235747.675663][1933:1935] CHIP:DMG:
+          [1675235747.675732][1933:1935] CHIP:DMG:                 },
+          [1675235747.675811][1933:1935] CHIP:DMG:
+          [1675235747.675871][1933:1935] CHIP:DMG:         ],
+          [1675235747.675954][1933:1935] CHIP:DMG:
+          [1675235747.676015][1933:1935] CHIP:DMG:         InteractionModelRevision = 1
+          [1675235747.676074][1933:1935] CHIP:DMG: }
+          [1675235747.676309][1933:1935] CHIP:DMG: WriteClient moving to [AwaitingDe]
       disabled: true
 
     - label:

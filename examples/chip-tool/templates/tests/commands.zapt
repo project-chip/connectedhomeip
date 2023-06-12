@@ -18,7 +18,7 @@ public:
     TestList() : Command("list") {};
     CHIP_ERROR Run() override
     {
-        {{#chip_tests "../../../../src/app/tests/suites/ciTests.json"}}printf("{{filename}}\n");{{/chip_tests}}
+        {{#chip_tests "../../../../src/app/tests/suites/ciTests.json" includeAllClusters=true}}printf("{{filename}}\n");{{/chip_tests}}
 
         return CHIP_NO_ERROR;
     }
@@ -30,7 +30,7 @@ public:
     ManualTestList() : Command("list-manual") {};
     CHIP_ERROR Run() override
     {
-        {{#chip_tests "../../../../src/app/tests/suites/manualTests.json"}}printf("{{filename}}\n");{{/chip_tests}}
+        {{#chip_tests "../../../../src/app/tests/suites/manualTests.json" includeAllClusters=true}}printf("{{filename}}\n");{{/chip_tests}}
 
         return CHIP_NO_ERROR;
     }
@@ -49,10 +49,10 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
 #if CONFIG_ENABLE_YAML_TESTS
         make_unique<TestList>(),
         make_unique<ManualTestList>(),
-      {{#chip_tests "../../../../src/app/tests/suites/ciTests.json"}}
+      {{#chip_tests "../../../../src/app/tests/suites/ciTests.json" includeAllClusters=true}}
         make_unique<{{filename}}Suite>(credsIssuerConfig),
       {{/chip_tests}}
-      {{#chip_tests "../../../../src/app/tests/suites/manualTests.json"}}
+      {{#chip_tests "../../../../src/app/tests/suites/manualTests.json" includeAllClusters=true}}
         make_unique<{{filename}}Suite>(credsIssuerConfig),
       {{/chip_tests}}
 #endif // CONFIG_ENABLE_YAML_TESTS

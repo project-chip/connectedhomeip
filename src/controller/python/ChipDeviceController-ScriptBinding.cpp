@@ -48,6 +48,7 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/CommissioningWindowOpener.h>
+#include <controller/CurrentFabricRemover.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 
 #include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
@@ -89,6 +90,7 @@ typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataL
 typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
 typedef void (*DeviceAvailableFunc)(DeviceProxy * device, PyChipError err);
 typedef void (*ChipThreadTaskRunnerFunct)(intptr_t context);
+typedef void (*DeviceUnpairingCompleteFunct)(uint64_t nodeId, PyChipError error);
 }
 
 namespace {
@@ -131,6 +133,8 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
                                                     chip::NodeId nodeid);
+PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId remoteDeviceId,
+                                                 DeviceUnpairingCompleteFunct callback);
 PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
 PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
 PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
@@ -194,6 +198,7 @@ PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommission
 PyChipError pychip_FreeOperationalDeviceProxy(chip::OperationalDeviceProxy * deviceProxy);
 PyChipError pychip_GetLocalSessionId(chip::OperationalDeviceProxy * deviceProxy, uint16_t * localSessionId);
 PyChipError pychip_GetNumSessionsToPeer(chip::OperationalDeviceProxy * deviceProxy, uint32_t * numSessions);
+PyChipError pychip_GetAttestationChallenge(chip::OperationalDeviceProxy * deviceProxy, uint8_t * buf, size_t * size);
 PyChipError pychip_GetDeviceBeingCommissioned(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                               CommissioneeDeviceProxy ** proxy);
 PyChipError pychip_ExpireSessions(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId);
@@ -384,6 +389,46 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
 {
     sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters));
+}
+
+namespace {
+struct UnpairDeviceCallback
+{
+    UnpairDeviceCallback(DeviceUnpairingCompleteFunct callback, chip::Controller::CurrentFabricRemover * remover) :
+        mOnCurrentFabricRemove(OnCurrentFabricRemoveFn, this), mCallback(callback), mRemover(remover)
+    {}
+
+    static void OnCurrentFabricRemoveFn(void * context, chip::NodeId nodeId, CHIP_ERROR error)
+    {
+        auto * self = static_cast<UnpairDeviceCallback *>(context);
+        self->mCallback(nodeId, ToPyChipError(error));
+        delete self->mRemover;
+        delete self;
+    }
+
+    Callback::Callback<OnCurrentFabricRemove> mOnCurrentFabricRemove;
+    DeviceUnpairingCompleteFunct mCallback;
+    chip::Controller::CurrentFabricRemover * mRemover;
+};
+} // anonymous namespace
+
+PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid,
+                                                 DeviceUnpairingCompleteFunct callback)
+{
+    // Create a new CurrentFabricRemover instance
+    auto * fabricRemover = new chip::Controller::CurrentFabricRemover(devCtrl);
+
+    auto * callbacks = new UnpairDeviceCallback(callback, fabricRemover);
+
+    // Pass the callback and nodeid to the RemoveCurrentFabric function
+    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
+    if (err != CHIP_NO_ERROR)
+    {
+        delete fabricRemover;
+        delete callbacks;
+    }
+    // Else will clean up when the callback is called.
+    return ToPyChipError(err);
 }
 
 PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
@@ -665,6 +710,19 @@ PyChipError pychip_GetNumSessionsToPeer(chip::OperationalDeviceProxy * devicePro
     *numSessions = 0;
     deviceProxy->GetExchangeManager()->GetSessionManager()->ForEachMatchingSession(
         deviceProxy->GetPeerScopedNodeId(), [numSessions](auto * session) { (*numSessions)++; });
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_GetAttestationChallenge(chip::OperationalDeviceProxy * deviceProxy, uint8_t * buf, size_t * size)
+{
+    VerifyOrReturnError(deviceProxy->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
+    VerifyOrReturnError(buf != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    ByteSpan challenge = deviceProxy->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
+    VerifyOrReturnError(challenge.size() <= *size, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    memcpy(buf, challenge.data(), challenge.size());
+    *size = challenge.size();
 
     return ToPyChipError(CHIP_NO_ERROR);
 }

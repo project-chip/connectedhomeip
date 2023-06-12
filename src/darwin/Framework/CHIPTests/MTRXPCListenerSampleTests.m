@@ -33,6 +33,7 @@
 
 // system dependencies
 #import <XCTest/XCTest.h>
+#import <os/lock.h>
 
 static uint16_t kTestVendorId = 0xFFF1u;
 
@@ -73,6 +74,8 @@ static MTRDeviceController * sController = nil;
 @property (nonatomic, readonly, strong)
     NSMutableDictionary<NSNumber *, MTRClusterStateCacheContainer *> * clusterStateCacheDictionary;
 
+// serversLock controls access to _servers.
+@property (nonatomic, readonly) os_unfair_lock serversLock;
 @end
 
 @implementation MTRXPCListenerSample
@@ -86,6 +89,7 @@ static MTRDeviceController * sController = nil;
         _clusterStateCacheDictionary = [NSMutableDictionary dictionary];
         _xpcListener = [NSXPCListener anonymousListener];
         [_xpcListener setDelegate:(id<NSXPCListenerDelegate>) self];
+        _serversLock = OS_UNFAIR_LOCK_INIT;
     }
     return self;
 }
@@ -113,10 +117,16 @@ static MTRDeviceController * sController = nil;
     __auto_type newServer = [[MTRDeviceControllerServerSample alloc] initWithClientProxy:[newConnection remoteObjectProxy]
                                                              clusterStateCacheDictionary:_clusterStateCacheDictionary];
     newConnection.exportedObject = newServer;
+
+    os_unfair_lock_lock(&_serversLock);
     [_servers setObject:newServer forKey:newServer.identifier];
+    os_unfair_lock_unlock(&_serversLock);
+
     newConnection.invalidationHandler = ^{
         NSLog(@"XPC connection disconnected");
+        os_unfair_lock_lock(&self->_serversLock);
         [self.servers removeObjectForKey:newServer.identifier];
+        os_unfair_lock_unlock(&self->_serversLock);
     };
     [newConnection resume];
     return YES;
@@ -883,8 +893,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test008_SubscribeFailure
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
-
     // Set up expectation for report
     XCTestExpectation * errorReportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
@@ -916,11 +924,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }
         subscriptionEstablished:^{
             NSLog(@"subscribe attribute: OnOff established");
-            [expectation fulfill];
+            XCTFail("Should not have a subscriptionEstablished for an error case");
         }];
 
     // Wait till establishment and error report
-    [self waitForExpectations:[NSArray arrayWithObjects:expectation, errorReportExpectation, nil] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ errorReportExpectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test009_ReadAttributeWithParams

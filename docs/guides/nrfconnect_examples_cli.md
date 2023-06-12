@@ -83,7 +83,7 @@ available options for the given command.
 are accessible from the shell, but they must preceded by `ot`. For example:
 
 ```shell
-uart:~$ ot masterkey
+uart:~$ ot networkkey
 00112233445566778899aabbccddeeff
 Done
 ```

@@ -53,9 +53,9 @@ public:
     /**
      *  @brief Mark the end of this AttributePathIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    AttributePathIBs::Builder & EndOfAttributePathIBs();
+    CHIP_ERROR EndOfAttributePathIBs();
 
 private:
     AttributePathIB::Builder mAttributePath;

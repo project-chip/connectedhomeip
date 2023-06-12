@@ -48,38 +48,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
     }
 
     DiscoveredNodeData nodeData;
-
-    Platform::CopyString(nodeData.resolutionData.hostName, result->mHostName);
-    Platform::CopyString(nodeData.commissionData.instanceName, result->mName);
-
-    nodeData.resolutionData.interfaceId = result->mInterface;
-
-    IPAddressSorter::Sort(addresses, result->mInterface);
-
-    size_t addressesFound = 0;
-    for (auto & ip : addresses)
-    {
-        if (addressesFound == ArraySize(nodeData.resolutionData.ipAddress))
-        {
-            // Out of space.
-            ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
-            break;
-        }
-        nodeData.resolutionData.ipAddress[addressesFound] = ip;
-        ++addressesFound;
-    }
-
-    nodeData.resolutionData.numIPs = addressesFound;
-
-    nodeData.resolutionData.port = result->mPort;
-
-    for (size_t i = 0; i < result->mTextEntrySize; ++i)
-    {
-        ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
-        ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, nodeData.resolutionData);
-        FillNodeDataFromTxt(key, val, nodeData.commissionData);
-    }
+    result->ToDiscoveredNodeData(addresses, nodeData);
 
     nodeData.LogDetail();
     proxy->OnNodeDiscovered(nodeData);
@@ -172,7 +141,9 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
     {
         proxy->Retain();
         // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
-        if (!services[i].mAddress.HasValue())
+
+        // Check if SRV, TXT and AAAA records were received in DNS responses
+        if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !services[i].mAddress.HasValue())
         {
             ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
         }
@@ -352,6 +323,42 @@ CHIP_ERROR AddTxtRecord(TxtFieldKey key, TextEntry * entries, size_t & entriesCo
 
 } // namespace
 
+void DnssdService::ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData)
+{
+    auto & resolutionData = nodeData.resolutionData;
+    auto & commissionData = nodeData.commissionData;
+
+    Platform::CopyString(resolutionData.hostName, mHostName);
+    Platform::CopyString(commissionData.instanceName, mName);
+
+    IPAddressSorter::Sort(addresses, mInterface);
+
+    size_t addressesFound = 0;
+    for (auto & ip : addresses)
+    {
+        if (addressesFound == ArraySize(resolutionData.ipAddress))
+        {
+            // Out of space.
+            ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
+            break;
+        }
+        resolutionData.ipAddress[addressesFound] = ip;
+        ++addressesFound;
+    }
+
+    resolutionData.interfaceId = mInterface;
+    resolutionData.numIPs      = addressesFound;
+    resolutionData.port        = mPort;
+
+    for (size_t i = 0; i < mTextEntrySize; ++i)
+    {
+        ByteSpan key(reinterpret_cast<const uint8_t *>(mTextEntries[i].mKey), strlen(mTextEntries[i].mKey));
+        ByteSpan val(mTextEntries[i].mData, mTextEntries[i].mDataSize);
+        FillNodeDataFromTxt(key, val, resolutionData);
+        FillNodeDataFromTxt(key, val, commissionData);
+    }
+}
+
 DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
 
 DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
@@ -486,8 +493,6 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                                                  Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
                                                  DnssdServiceProtocol protocol, PeerId peerId)
 {
-    VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
-
     DnssdService service;
     ReturnErrorOnFailure(MakeHostName(service.mHostName, sizeof(service.mHostName), mac));
     ReturnErrorOnFailure(protocol == DnssdServiceProtocol::kDnssdProtocolTcp
@@ -525,6 +530,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
 }
 
 #define PREPARE_RECORDS(Type)                                                                                                      \
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);                                                              \
     TextEntry textEntries[Type##AdvertisingParameters::kTxtMaxNumber];                                                             \
     size_t textEntrySize = 0;                                                                                                      \
     const char * subTypes[Type::kSubTypeMaxNumber];                                                                                \
@@ -593,6 +599,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
 CHIP_ERROR DiscoveryImplPlatform::RemoveServices()
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(ChipDnssdRemoveServices());
 
     return CHIP_NO_ERROR;
@@ -600,6 +607,7 @@ CHIP_ERROR DiscoveryImplPlatform::RemoveServices()
 
 CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return ChipDnssdFinalizeServiceUpdate();
 }
 

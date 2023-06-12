@@ -32,6 +32,10 @@ NS_ASSUME_NONNULL_BEGIN
  * Prepare to initialize a controller given a keypair to use for signing
  * operational certificates.
  *
+ * A controller created from MTRDeviceControllerStartupParams initialized with
+ * this method will be able to issue operational certificates to devices it
+ * commissions, using nocSigner to sign them.
+
  * @param ipk The Identity Protection Key, must be 16 bytes in length
  * @param fabricID The fabric identifier, must be non-zero.
  */
@@ -40,17 +44,20 @@ NS_ASSUME_NONNULL_BEGIN
                   nocSigner:(id<MTRKeypair>)nocSigner API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
- * Prepare to initialize a controller with a complete operational certificate
- * chain.  This initialization method should be used when none of the
- * certificate-signing private keys are available locally.
+ * Prepare to initialize a controller that is not able to sign operational
+ * certificates itself, and therefore needs to be provided with a complete
+ * operational certificate chain.  This initialization method should be used
+ * when none of the certificate-signing private keys are available locally.
  *
- * The fabric id and node id to use will be derived from the provided
+ * A controller created from MTRDeviceControllerStartupParams initialized with
+ * this method will not be able to commission devices unless
+ * operationalCertificateIssuer and operationalCertificateIssuerQueue are set.
+ *
+ * The fabric id and node id to use for the controller will be derived from the provided
  * operationalCertificate.
  *
  * @param ipk The Identity Protection Key, must be 16 bytes in length
  * @param intermediateCertificate may be nil if operationalCertificate is directly signed by rootCertificate.
- *
- * ipk must be 16 bytes in length.
  */
 - (instancetype)initWithIPK:(NSData *)ipk
          operationalKeypair:(id<MTRKeypair>)operationalKeypair

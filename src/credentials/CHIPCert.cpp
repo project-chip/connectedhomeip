@@ -431,26 +431,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     }
     else
     {
-        switch (validityResult)
-        {
-        case CertificateValidityResult::kValid:
-        case CertificateValidityResult::kNotExpiredAtLastKnownGoodTime:
-        // By default, we do not enforce certificate validity based upon a Last
-        // Known Good Time source.  However, implementations may always inject a
-        // policy that does enforce based upon this.
-        case CertificateValidityResult::kExpiredAtLastKnownGoodTime:
-        case CertificateValidityResult::kTimeUnknown:
-            break;
-        case CertificateValidityResult::kNotYetValid:
-            ExitNow(err = CHIP_ERROR_CERT_NOT_VALID_YET);
-            break;
-        case CertificateValidityResult::kExpired:
-            ExitNow(err = CHIP_ERROR_CERT_EXPIRED);
-            break;
-        default:
-            ExitNow(err = CHIP_ERROR_INTERNAL);
-            break;
-        }
+        SuccessOrExit(err = CertificateValidityPolicy::ApplyDefaultPolicy(cert, depth, validityResult));
     }
 
     // If the certificate itself is trusted, then it is implicitly valid.  Record this certificate as the trust
@@ -1142,7 +1123,7 @@ DLL_EXPORT CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1Un
     // times, which in consuming code can create a conversion from CHIP epoch 0 seconds to 99991231235959Z
     // for NotBefore, which is not conventional.
     //
-    // If an original X509 certificate encloses a NotBefore time that this the CHIP Epoch itself, 2000-01-01
+    // If an original X509 certificate encloses a NotBefore time that is the CHIP Epoch itself, 2000-01-01
     // 00:00:00, the resultant X509 certificate in a conversion back from CHIP TLV format using this time
     // conversion method will instead enclose the NotBefore time 99991231235959Z, which will invalidiate the
     // TBS signature.  Thus, certificates with this specific attribute are not usable with this code.
@@ -1503,6 +1484,31 @@ CHIP_ERROR ExtractSubjectDNFromX509Cert(const ByteSpan & x509Cert, ChipDN & dn)
 
 exit:
     return err;
+}
+
+CHIP_ERROR CertificateValidityPolicy::ApplyDefaultPolicy(const ChipCertificateData * cert, uint8_t depth,
+                                                         CertificateValidityResult result)
+{
+    switch (result)
+    {
+    case CertificateValidityResult::kValid:
+    case CertificateValidityResult::kNotExpiredAtLastKnownGoodTime:
+    // By default, we do not enforce certificate validity based upon a Last
+    // Known Good Time source.  However, implementations may always inject a
+    // policy that does enforce based upon this.
+    case CertificateValidityResult::kExpiredAtLastKnownGoodTime:
+    case CertificateValidityResult::kTimeUnknown:
+        return CHIP_NO_ERROR;
+
+    case CertificateValidityResult::kNotYetValid:
+        return CHIP_ERROR_CERT_NOT_VALID_YET;
+
+    case CertificateValidityResult::kExpired:
+        return CHIP_ERROR_CERT_EXPIRED;
+
+    default:
+        return CHIP_ERROR_INTERNAL;
+    }
 }
 
 } // namespace Credentials

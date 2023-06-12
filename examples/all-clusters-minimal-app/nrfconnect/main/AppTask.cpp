@@ -144,6 +144,7 @@ CHIP_ERROR AppTask::Init()
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
     SetCommissionableDataProvider(&mFactoryDataProvider);
 #else
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
@@ -278,7 +279,7 @@ void AppTask::FunctionHandler(const AppEvent & event)
         {
             Instance().CancelTimer();
 
-#ifdef CONFIG_MCUMGR_SMP_BT
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
             GetDFUOverSMP().StartServer();
 #else
             LOG_INF("Software update is disabled");

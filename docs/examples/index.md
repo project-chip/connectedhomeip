@@ -69,15 +69,6 @@ chip-tool/README
 darwin-framework-tool/README
 ```
 
-## Dynamic bridge example
-
-```{toctree}
-:glob:
-:maxdepth: 1
-
-dynamic-bridge-app/**/README
-```
-
 ## Java matter controller example
 
 ```{toctree}
@@ -132,15 +123,6 @@ log-source-app/**/README
 :maxdepth: 1
 
 minimal-mdns/README
-```
-
-## Open IoT SDK examples
-
-```{toctree}
-:glob:
-:maxdepth: 1
-
-openiotsdk_examples
 ```
 
 ## OTA Provider example
@@ -209,6 +191,15 @@ pump-controller-app/cc13x2x7_26x2x7/doc/programming*
 
 shell/README*
 shell/**/README
+```
+
+## Smoke CO Alarm example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+smoke-co-alarm-app/**/README
 ```
 
 ## Temperature measurement example

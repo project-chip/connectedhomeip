@@ -17,9 +17,14 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
-  <bitmap name="GroupsFeature" type="BITMAP32">
+  <bitmap name="Feature" type="BITMAP32">
       <cluster code="0x0004"/>
       <field name="GroupNames" mask="0x1"/>
+  </bitmap>
+
+  <bitmap name="NameSupportBitmap" type="BITMAP8">
+      <cluster code="0x0004"/>
+      <field name="GroupNames" mask="0x80"/>
   </bitmap>
 
   <cluster>
@@ -34,7 +39,7 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
-    <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">NameSupport</attribute>
+    <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="NameSupportBitmap" min="0x00" max="0x80" writable="false" optional="false">NameSupport</attribute>
 
     <!-- NAME_SUPPORT -->
     <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups add">

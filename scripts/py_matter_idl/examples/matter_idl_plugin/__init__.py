@@ -200,6 +200,10 @@ class CustomGenerator(CodeGenerator):
         """
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
 
+        if 'package' not in kargs:
+            raise Exception('Please provide a "--option package:<name>" argument')
+        self.package = kargs['package']
+
         # String helpers
         self.jinja_env.filters['toLowerSnakeCase'] = toLowerSnakeCase
         self.jinja_env.filters['toUpperSnakeCase'] = toUpperSnakeCase
@@ -238,5 +242,6 @@ class CustomGenerator(CodeGenerator):
                 output_file_name=filename,
                 vars={
                     'cluster': cluster,
+                    'package': self.package,
                 }
             )

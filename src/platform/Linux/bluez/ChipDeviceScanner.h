@@ -66,10 +66,16 @@ public:
     ~ChipDeviceScanner();
 
     /// Initiate a scan for devices, with the given timeout
+    ///
+    /// This method must be called while in the Matter context (from the Matter event
+    /// loop, or while holding the Matter stack lock).
     CHIP_ERROR StartScan(System::Clock::Timeout timeout);
 
     /// Stop any currently running scan
     CHIP_ERROR StopScan();
+
+    /// Should only be called by TimerExpiredCallback.
+    void MarkTimerExpired() { mTimerExpired = true; }
 
     /// Create a new device scanner
     ///
@@ -79,8 +85,8 @@ public:
 
 private:
     static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
-    static int MainLoopStartScan(ChipDeviceScanner * self);
-    static int MainLoopStopScan(ChipDeviceScanner * self);
+    static CHIP_ERROR MainLoopStartScan(ChipDeviceScanner * self);
+    static CHIP_ERROR MainLoopStopScan(ChipDeviceScanner * self);
     static void SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self);
     static void SignalInterfaceChanged(GDBusObjectManagerClient * manager, GDBusObjectProxy * object, GDBusProxy * aInterface,
                                        GVariant * aChangedProperties, const gchar * const * aInvalidatedProps,
@@ -101,6 +107,8 @@ private:
     gulong mInterfaceChangedSignal        = 0;
     bool mIsScanning                      = false;
     bool mIsStopping                      = false;
+    /// Used to track if timer has alread expired and doesn't need to be canceled.
+    bool mTimerExpired = false;
 };
 
 } // namespace Internal

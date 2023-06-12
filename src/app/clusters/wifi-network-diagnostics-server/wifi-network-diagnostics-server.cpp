@@ -79,15 +79,16 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataP
 CHIP_ERROR WiFiDiagosticsAttrAccess::ReadWiFiBssId(AttributeValueEncoder & aEncoder)
 {
     Attributes::Bssid::TypeInfo::Type bssid;
-    ByteSpan value;
 
-    if (DeviceLayer::GetDiagnosticDataProvider().GetWiFiBssId(value) == CHIP_NO_ERROR)
+    uint8_t bssidBytes[chip::DeviceLayer::kMaxHardwareAddrSize];
+    MutableByteSpan bssidSpan(bssidBytes);
+    if (DeviceLayer::GetDiagnosticDataProvider().GetWiFiBssId(bssidSpan) == CHIP_NO_ERROR)
     {
-        if (!value.empty())
+        if (!bssidSpan.empty())
         {
-            bssid.SetNonNull(value);
+            bssid.SetNonNull(bssidSpan);
             ChipLogProgress(Zcl, "Node is currently connected to Wi-Fi network with BSSID:");
-            ChipLogByteSpan(Zcl, value);
+            ChipLogByteSpan(Zcl, bssidSpan);
         }
     }
     else

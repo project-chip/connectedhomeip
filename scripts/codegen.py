@@ -68,12 +68,16 @@ __LOG_LEVELS__ = {
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output')
 @click.option(
-    '--generator',
+    '--generator', '-g',
     default='java-jni',
     help='What code generator to run.  The choices are: '+'|'.join(GENERATORS.keys())+'. ' +
          'When using custom, provide the plugin path using `--generator custom:<path_to_plugin>:<plugin_module_name>` syntax. ' +
-    'For example, `--generator custom:./my_plugin:my_plugin_module` will load `./my_plugin/my_plugin_module/__init.py__` ' +
+         'For example, `--generator custom:./my_plugin:my_plugin_module` will load `./my_plugin/my_plugin_module/__init.py__` ' +
          'that defines a subclass of CodeGenerator named CustomGenerator.')
+@click.option(
+    '--option',
+    multiple=True,
+    help="Extra generator options, of the form: --option key:value")
 @click.option(
     '--output-dir',
     type=click.Path(exists=False),
@@ -97,7 +101,7 @@ __LOG_LEVELS__ = {
 @click.argument(
     'idl_path',
     type=click.Path(exists=True))
-def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs, idl_path):
+def main(log_level, generator, option, output_dir, dry_run, name_only, expected_outputs, idl_path):
     """
     Parses MATTER IDL files (.matter) and performs SDK code generation
     as set up by the program arguments.
@@ -121,19 +125,28 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
     idl_tree = CreateParser().parse(open(idl_path, "rt").read())
 
     plugin_module = None
-    if generator.startswith('custom'):
+    if generator.startswith('custom:'):
         # check that the plugin path is provided
-        if ':' not in generator:
-            logging.fatal("Custom generator plugin path not provided. Use --generator custom:<path_to_plugin>")
-            sys.exit(1)
         custom_params = generator.split(':')
+        if len(custom_params) != 3:
+            logging.fatal("Custom generator format not valid. Please use --generator custom:<path>:<module>")
+            sys.exit(1)
         (generator, plugin_path, plugin_module) = custom_params
+
         logging.info("Using CustomGenerator at plugin path %s.%s" % (plugin_path, plugin_module))
         sys.path.append(plugin_path)
         generator = 'CUSTOM'
 
+    extra_args = {}
+    for o in option:
+        if ':' not in o:
+            logging.fatal("Please specify options as '<key>:<value>'. %r is not valid. " % o)
+            sys.exit(1)
+        key, value = o.split(':')
+        extra_args[key] = value
+
     logging.info("Running code generator %s" % generator)
-    generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree, plugin_module=plugin_module)
+    generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree, plugin_module=plugin_module, **extra_args)
     generator.render(dry_run)
 
     if expected_outputs:

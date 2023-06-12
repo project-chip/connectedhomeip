@@ -15,7 +15,7 @@
 name: 19.3.3. [TC-KEYPADINPUT-3.3] Number Keys Verification
 
 PICS:
-    - KEYPADINPUT.S.NK
+    - KEYPADINPUT.S.F02
 
 config:
     nodeId: 0x12344321
@@ -32,7 +32,7 @@ tests:
                 value: nodeId
 
     - label: "Send Numbers1"
-      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
           values:
@@ -44,7 +44,7 @@ tests:
                 value: 0
 
     - label: "Send Numbers2"
-      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
           values:
@@ -56,7 +56,7 @@ tests:
                 value: 0
 
     - label: "Send Numbers3"
-      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
           values:
@@ -68,7 +68,7 @@ tests:
                 value: 0
 
     - label: "Send Numbers4"
-      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
           values:
@@ -80,7 +80,7 @@ tests:
                 value: 0
 
     - label: "Send Numbers5"
-      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
           values:
@@ -92,7 +92,7 @@ tests:
                 value: 0
 
     - label: "Send Numbers6"
-      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
           values:
@@ -104,7 +104,7 @@ tests:
                 value: 0
 
     - label: "Send Numbers7"
-      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
           values:
@@ -116,7 +116,7 @@ tests:
                 value: 0
 
     - label: "Send Numbers8"
-      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
           values:
@@ -128,7 +128,7 @@ tests:
                 value: 0
 
     - label: "Send Numbers9"
-      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.NK
+      PICS: KEYPADINPUT.S.C00.Rsp && KEYPADINPUT.S.F02
       command: "SendKey"
       arguments:
           values:

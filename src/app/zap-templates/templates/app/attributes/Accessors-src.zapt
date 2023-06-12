@@ -13,6 +13,7 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/odd-sized-integers.h>
+#include <lib/core/CHIPEncoding.h>
 
 namespace chip {
 namespace app {
@@ -25,8 +26,10 @@ namespace {{asUpperCamelCase parent.label}} {
 namespace Attributes {
 
 {{/first}}
+{{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
 {{#if_is_struct type}}
-{{else if (canHaveSimpleAccessors this)}}
+#error Attribute "{{name}}" in cluster "{{../name}}" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
+{{/if_is_struct}}
 namespace {{asUpperCamelCase label}} {
 
 {{#*inline "clusterId"}}Clusters::{{asUpperCamelCase parent.label}}::Id{{/inline}}
@@ -90,7 +93,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectTy
                   "value.size() might be too big");
     VerifyOrReturnError(value.size() <= {{maxLength}}, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[{{maxLength}} + {{>sizingBytes}}];
-    emberAfCopyInt{{#if (isShortString type)}}8{{else}}16{{/if}}u(zclString, 0, static_cast<{{>lengthType}}>(value.size()));
+    auto length = static_cast<{{>lengthType}}>(value.size());
+    {{#if (isShortString type)}}
+      Encoding::Put8(zclString, length);
+    {{else}}
+      Encoding::LittleEndian::Put16(zclString, length);
+    {{/if}}
     memcpy(&zclString[{{>sizingBytes}}], value.data(), value.size());
     return emberAfWriteAttribute(endpoint, {{>clusterId}}, Id, zclString, ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE);
     {{else}}
@@ -133,7 +141,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectTy
 
 } // namespace {{asUpperCamelCase label}}
 
-{{/if_is_struct}}
+{{/unless}}
 {{#last}}
 } // namespace Attributes
 } // {{asUpperCamelCase parent.label}}

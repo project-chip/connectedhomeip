@@ -23,6 +23,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import traceback
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
@@ -113,7 +114,7 @@ def runArgumentsParser() -> CmdLineArgs:
     #
     # All the rest of the files (app-templates.json) are generally built at
     # compile time.
-    default_templates = 'src/app/zap-templates/matter-idl.json'
+    default_templates = 'src/app/zap-templates/matter-idl-server.json'
 
     parser = argparse.ArgumentParser(
         description='Generate artifacts from .zapt templates')
@@ -216,6 +217,59 @@ def runGeneration(cmdLineArgs):
     extractGeneratedIdl(output_dir, zap_file)
 
 
+def getClangFormatBinaryChoices():
+    """
+    Returns an ordered list of paths that may be suitable clang-format versions
+    """
+    PW_CLANG_FORMAT_PATH = 'cipd/packages/pigweed/bin/clang-format'
+
+    if 'PW_ENVIRONMENT_ROOT' in os.environ:
+        yield os.path.join(os.environ["PW_ENVIRONMENT_ROOT"], PW_CLANG_FORMAT_PATH)
+
+    dot_name = os.path.join(CHIP_ROOT_DIR, '.environment', PW_CLANG_FORMAT_PATH)
+    if os.path.exists(dot_name):
+        yield dot_name
+
+    os_name = shutil.which('clang-format')
+    if os_name:
+        yield os_name
+
+
+def getClangFormatBinary():
+    """Fetches the clang-format binary that is to be used for formatting.
+
+    Tries to figure out where the pigweed-provided binary is (via cipd)
+    """
+    for binary in getClangFormatBinaryChoices():
+        # Running the binary with `--version` yields a string of the form:
+        # "Fuchsia clang-format version 17.0.0 (https://llvm.googlesource.com/llvm-project 6d667d4b261e81f325756fdfd5bb43b3b3d2451d)"
+        #
+        # the SHA at the end generally should match pigweed version
+
+        try:
+            version_string = subprocess.check_output([binary, '--version']).decode('utf8')
+
+            pigweed_config = json.load(
+                open(os.path.join(CHIP_ROOT_DIR, 'third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json')))
+            clang_config = [p for p in pigweed_config['packages'] if p['path'].startswith('fuchsia/third_party/clang/')][0]
+
+            # Tags should be like:
+            #   ['git_revision:895b55537870cdaf6e4c304a09f4bf01954ccbd6']
+            prefix, sha = clang_config['tags'][0].split(':')
+
+            if sha not in version_string:
+                print('WARNING: clang-format may not be the right version:')
+                print('   PIGWEED TAG:    %s' % clang_config['tags'][0])
+                print('   ACTUAL VERSION: %s' % version_string)
+        except:
+            print("Failed to validate clang version.")
+            traceback.print_last()
+
+        return binary
+
+    raise Exception('Could not find a suitable clang-format')
+
+
 def runClangPrettifier(templates_file, output_dir):
     listOfSupportedFileExtensions = [
         '.js', '.h', '.c', '.hpp', '.cpp', '.m', '.mm']
@@ -228,57 +282,19 @@ def runClangPrettifier(templates_file, output_dir):
             filepath)[1] in listOfSupportedFileExtensions, outputs))
 
         if len(clangOutputs) > 0:
-            # NOTE: clang-format may differ in time. Currently pigweed comes
-            #       with clang-format 15. CI may have clang-format-10 installed
-            #       on linux.
-            #
-            #       We generally want consistent formatting, so
-            #       at this point attempt to use clang-format 15.
-            clang_formats = ['clang-format-15', 'clang-format']
-            for clang_format in clang_formats:
-                args = [clang_format, '-i']
-                args.extend(clangOutputs)
-                try:
-                    subprocess.check_call(args)
-                    err = None
-                    print('Formatted using %s (%s)' % (clang_format, subprocess.check_output([clang_format, '--version'])))
-                    for outputName in clangOutputs:
-                        print('  - %s' % outputName)
-                    break
-                except Exception as thrown:
-                    err = thrown
-                    # Press on to the next binary name
-            if err is not None:
-                raise err
+            # NOTE: clang-format differs output in time. We generally would be
+            #       compatible only with pigweed provided clang-format (which is
+            #       tracking non-released clang).
+            clang_format = getClangFormatBinary()
+            args = [clang_format, '-i']
+            args.extend(clangOutputs)
+            subprocess.check_call(args)
+            err = None
+            print('Formatted using %s (%s)' % (clang_format, subprocess.check_output([clang_format, '--version'])))
+            for outputName in clangOutputs:
+                print('  - %s' % outputName)
     except Exception as err:
         print('clang-format error:', err)
-
-
-def runJavaPrettifier(templates_file, output_dir):
-    try:
-        jsonData = json.loads(Path(templates_file).read_text())
-        outputs = [(os.path.join(output_dir, template['output']))
-                   for template in jsonData['templates']]
-        javaOutputs = list(
-            filter(lambda filepath: os.path.splitext(filepath)[1] == ".java", outputs))
-
-        if len(javaOutputs) > 0:
-            # Keep this version in sync with what restyler uses (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml).
-            google_java_format_version = "1.6"
-            google_java_format_url = 'https://github.com/google/google-java-format/releases/download/google-java-format-' + \
-                google_java_format_version + '/'
-            google_java_format_jar = 'google-java-format-' + \
-                google_java_format_version + '-all-deps.jar'
-            jar_url = google_java_format_url + google_java_format_jar
-
-            home = str(Path.home())
-            path, http_message = urllib.request.urlretrieve(
-                jar_url, home + '/' + google_java_format_jar)
-            args = ['java', '-jar', path, '--replace']
-            args.extend(javaOutputs)
-            subprocess.check_call(args)
-    except Exception as err:
-        print('google-java-format error:', err)
 
 
 class LockFileSerializer:
@@ -329,7 +345,6 @@ def main():
     if cmdLineArgs.prettify_output:
         prettifiers = [
             runClangPrettifier,
-            runJavaPrettifier,
         ]
 
         for prettifier in prettifiers:

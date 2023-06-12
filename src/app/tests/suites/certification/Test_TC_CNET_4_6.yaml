@@ -45,8 +45,8 @@ tests:
 
     - label:
           "TH sends the AddOrUpdateThreadNetwork command to the DUT with the
-          following argument: OperationalDataset argument value as Userth_op
-          Breadcrumb argument value as 1"
+          following fields: 1. OperationalDataset field set to PIXIT.CNET.THREAD
+          _1ST_OPERATIONAL DATASET 2. Breadcrumb field set to 1"
       PICS: CNET.S.C03.Rsp
       verification: |
           ./chip-tool networkcommissioning add-or-update-thread-network-network hex:<your network id in hex> 1 0

@@ -44,17 +44,17 @@ class Efr32App(Enum):
 
     def AppNamePrefix(self):
         if self == Efr32App.LIGHT:
-            return 'chip-efr32-lighting-example'
+            return 'matter-silabs-lighting-example'
         elif self == Efr32App.LOCK:
-            return 'chip-efr32-lock-example'
+            return 'matter-silabs-lock-example'
         elif self == Efr32App.SWITCH:
-            return 'chip-efr32-light-switch-example'
+            return 'matter-silabs-light-switch-example'
         elif self == Efr32App.WINDOW_COVERING:
-            return 'chip-efr32-window-example'
+            return 'matter-silabs-window-example'
         elif self == Efr32App.THERMOSTAT:
-            return 'chip-efr32-thermostat-example'
+            return 'matter-silabs-thermostat-example'
         elif self == Efr32App.UNIT_TEST:
-            return 'chip-efr32-device_tests'
+            return 'matter-silabs-device_tests'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -78,7 +78,7 @@ class Efr32App(Enum):
         if self == Efr32App.UNIT_TEST:
             return os.path.join(root, 'src', 'test_driver', 'efr32')
         else:
-            return os.path.join(root, 'examples', self.ExampleName(), 'silabs/efr32')
+            return os.path.join(root, 'examples', self.ExampleName(), 'silabs')
 
 
 class Efr32Board(Enum):
@@ -216,7 +216,7 @@ class Efr32Builder(GnBuilder):
                 ['git', 'describe', '--always', '--dirty', '--exclude', '*']).decode('ascii').strip()
             branchName = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('ascii').strip()
             self.extra_gn_options.append(
-                'sl_matter_version_str="v1.0-%s-%s"' % (branchName, shortCommitSha))
+                'sl_matter_version_str="v1.1-%s-%s"' % (branchName, shortCommitSha))
 
         if "GSDK_ROOT" in os.environ:
             # EFR32 SDK is very large. If the SDK path is already known (the

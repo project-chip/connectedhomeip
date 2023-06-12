@@ -33,6 +33,7 @@ enum class ContextType
 {
     Register,
     Browse,
+    BrowseWithDelegate,
     Resolve,
 };
 
@@ -44,11 +45,17 @@ struct GenericContext
 
     virtual ~GenericContext() {}
 
+    CHIP_ERROR Finalize(CHIP_ERROR err);
     CHIP_ERROR Finalize(DNSServiceErrorType err = kDNSServiceErr_NoError);
-    virtual void DispatchFailure(DNSServiceErrorType err) = 0;
-    virtual void DispatchSuccess()                        = 0;
+
+    virtual void DispatchFailure(const char * errorStr, CHIP_ERROR err) = 0;
+    virtual void DispatchSuccess()                                      = 0;
+
+private:
+    CHIP_ERROR FinalizeInternal(const char * errorStr, CHIP_ERROR err);
 };
 
+struct BrowseWithDelegateContext;
 struct RegisterContext;
 struct ResolveContext;
 
@@ -87,6 +94,12 @@ public:
      * instanceName, if any.  Returns nullptr if there are none.
      */
     ResolveContext * GetExistingResolveForInstanceName(const char * instanceName);
+
+    /**
+     * Return a pointer to an existing BrowserWithDelegateContext for the given
+     * delegate, if any.  Returns nullptr if there are none.
+     */
+    BrowseWithDelegateContext * GetExistingBrowseForDelegate(DnssdBrowseDelegate * delegate);
 
     /**
      * Remove context from the list, if it's present in the list.  Return
@@ -130,26 +143,40 @@ struct RegisterContext : public GenericContext
     RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext);
     virtual ~RegisterContext() { mHostNameRegistrar.Unregister(); }
 
-    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
     bool matches(const char * sType) { return mType.compare(sType) == 0; }
 };
 
-struct BrowseContext : public GenericContext
+struct BrowseHandler : public GenericContext
+{
+    virtual ~BrowseHandler() {}
+
+    DnssdServiceProtocol protocol;
+
+    virtual void OnBrowse(DNSServiceFlags flags, const char * name, const char * type, const char * domain,
+                          uint32_t interfaceId)                                                                  = 0;
+    virtual void OnBrowseAdd(const char * name, const char * type, const char * domain, uint32_t interfaceId)    = 0;
+    virtual void OnBrowseRemove(const char * name, const char * type, const char * domain, uint32_t interfaceId) = 0;
+};
+
+struct BrowseContext : public BrowseHandler
 {
     DnssdBrowseCallback callback;
     std::vector<DnssdService> services;
-    DnssdServiceProtocol protocol;
 
     BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol);
-    virtual ~BrowseContext() {}
 
-    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
     // Dispatch what we have found so far, but don't stop browsing.
     void DispatchPartialSuccess();
+
+    void OnBrowse(DNSServiceFlags flags, const char * name, const char * type, const char * domain, uint32_t interfaceId) override;
+    void OnBrowseAdd(const char * name, const char * type, const char * domain, uint32_t interfaceId) override;
+    void OnBrowseRemove(const char * name, const char * type, const char * domain, uint32_t interfaceId) override;
 
     // While we are dispatching partial success, sContextDispatchingSuccess will
     // be set to the BrowseContext doing the dispatch.  This allows resolves
@@ -164,6 +191,20 @@ struct BrowseContext : public GenericContext
     // TODO: Consider fixing the higher-level APIs to make it possible to pass
     // in multiple IPs for a successful browse result.
     static BrowseContext * sContextDispatchingSuccess;
+};
+
+struct BrowseWithDelegateContext : public BrowseHandler
+{
+    BrowseWithDelegateContext(DnssdBrowseDelegate * delegate, DnssdServiceProtocol cbContextProtocol);
+
+    void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
+    void DispatchSuccess() override;
+
+    void OnBrowse(DNSServiceFlags flags, const char * name, const char * type, const char * domain, uint32_t interfaceId) override;
+    void OnBrowseAdd(const char * name, const char * type, const char * domain, uint32_t interfaceId) override;
+    void OnBrowseRemove(const char * name, const char * type, const char * domain, uint32_t interfaceId) override;
+
+    bool Matches(DnssdBrowseDelegate * otherDelegate) const { return context == otherDelegate; }
 };
 
 struct InterfaceInfo
@@ -193,13 +234,14 @@ struct ResolveContext : public GenericContext
     ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
                    const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
                    std::shared_ptr<uint32_t> && consumerCounterToUse);
+    ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
+                   const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse);
     virtual ~ResolveContext();
 
-    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
     CHIP_ERROR OnNewAddress(uint32_t interfaceId, const struct sockaddr * address);
-    CHIP_ERROR OnNewLocalOnlyAddress();
     bool HasAddress();
 
     void OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen,
