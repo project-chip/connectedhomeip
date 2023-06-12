@@ -52,6 +52,7 @@ CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId end
         err = operationalState.Decode(reader);
         if(err != CHIP_NO_ERROR)
         {
+            chip::Platform::Delete(state);
             ExitNow();
         }
 
@@ -69,10 +70,14 @@ CHIP_ERROR OperationalStateDataProvider::LoadOperationalStateList(EndpointId end
             else
             {
                 err = CHIP_ERROR_BUFFER_TOO_SMALL;
+                chip::Platform::Delete(state);
+                ExitNow();
             }
         }
         else
         {
+            chip::Platform::Delete(state);
+            continue;
         }
         i++;
         if (head == nullptr)
@@ -207,6 +212,7 @@ CHIP_ERROR OperationalStateDataProvider::LoadPhaseList(EndpointId endpoint, Clus
         err = reader.Get(readPhase);
         if(err != CHIP_NO_ERROR)
         {
+            chip::Platform::Delete(newPhase);
             ExitNow();
         }
 
@@ -222,6 +228,8 @@ CHIP_ERROR OperationalStateDataProvider::LoadPhaseList(EndpointId endpoint, Clus
             else
             {
                 err = CHIP_ERROR_BUFFER_TOO_SMALL;
+                chip::Platform::Delete(newPhase);
+                ExitNow();
             }
         }
         else
