@@ -33,6 +33,7 @@ static GenericOperationalErrorState & setOperationalNoError(GenericOperationalEr
     memset(error.ErrorStateDetails, 0, sizeof(error.ErrorStateDetails));
     memcpy(error.ErrorStateLabel, opNoError, sizeof(opNoError));
     memcpy(error.ErrorStateDetails, opNoErrorDetails, sizeof(opNoErrorDetails));
+    error.ErrorStateDetailsHasValue = true;
 
     return error;
 }

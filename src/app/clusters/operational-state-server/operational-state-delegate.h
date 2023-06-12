@@ -44,6 +44,7 @@ struct GenericOperationalErrorState
     uint8_t ErrorStateID;
     char ErrorStateLabel[kErrorStateLabelMaxSize];
     char ErrorStateDetails[kErrorStateDetailsMaxSize];
+    bool ErrorStateDetailsHasValue = false;
 };
 
 struct GenericOperationalState

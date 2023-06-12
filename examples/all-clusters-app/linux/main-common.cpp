@@ -315,6 +315,7 @@ void ApplicationInit()
         opErr.ErrorStateID        = static_cast<uint8_t>(ErrorStateEnum::kNoError);
         memcpy(opErr.ErrorStateLabel, opNoError, sizeof(opNoError));
         memcpy(opErr.ErrorStateDetails, opNoErrorDetails, sizeof(opNoErrorDetails));
+        opErr.ErrorStateDetailsHasValue = true;
         operationalstateServer.SetOperationalError(opErr);
 
         // set phase list
