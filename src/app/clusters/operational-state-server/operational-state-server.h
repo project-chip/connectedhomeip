@@ -68,8 +68,9 @@ public:
 
     /**
      * Set operational state list.
-     * @param operationalStateList The operational state list for which to save.
-     *  Template for save operational state alias cluster
+     * @param operationalStateList The operational state list for which to save into Storage.
+     *  Template for save operational state alias cluster.
+     *  Before Reading the operational state list, it will reduce the use of RAM.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     template <typename T>
@@ -98,7 +99,8 @@ public:
 
     /**
      * Set phase list.
-     * @param phaseList The phase list for which to save.
+     * @param phaseList The phase list for which to save into Storage.
+     *  Before Reading the phase list, it will reduce the use of RAM.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     CHIP_ERROR SetPhaseList(const PhaseList & phaseList);
