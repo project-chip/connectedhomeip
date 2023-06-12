@@ -23470,7 +23470,7 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="minSetpointDeadBand", Tag=0x00000019, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="remoteSensing", Tag=0x0000001A, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="controlSequenceOfOperation", Tag=0x0000001B, Type=Thermostat.Enums.ThermostatControlSequence),
-                ClusterObjectFieldDescriptor(Label="systemMode", Tag=0x0000001C, Type=uint),
+                ClusterObjectFieldDescriptor(Label="systemMode", Tag=0x0000001C, Type=Thermostat.Enums.ThermostatSystemModeEnum),
                 ClusterObjectFieldDescriptor(Label="thermostatRunningMode", Tag=0x0000001E, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="startOfWeek", Tag=0x00000020, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="numberOfWeeklyTransitions", Tag=0x00000021, Type=typing.Optional[uint]),
@@ -23527,7 +23527,7 @@ class Thermostat(Cluster):
     minSetpointDeadBand: 'typing.Optional[int]' = None
     remoteSensing: 'typing.Optional[uint]' = None
     controlSequenceOfOperation: 'Thermostat.Enums.ThermostatControlSequence' = None
-    systemMode: 'uint' = None
+    systemMode: 'Thermostat.Enums.ThermostatSystemModeEnum' = None
     thermostatRunningMode: 'typing.Optional[uint]' = None
     startOfWeek: 'typing.Optional[uint]' = None
     numberOfWeeklyTransitions: 'typing.Optional[uint]' = None
@@ -23595,7 +23595,7 @@ class Thermostat(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 1,
 
-        class ThermostatSystemMode(MatterIntEnum):
+        class ThermostatSystemModeEnum(MatterIntEnum):
             kOff = 0x00
             kAuto = 0x01
             kCool = 0x03
@@ -24110,9 +24110,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=Thermostat.Enums.ThermostatSystemModeEnum)
 
-            value: 'uint' = 0
+            value: 'Thermostat.Enums.ThermostatSystemModeEnum' = 0
 
         @dataclass
         class ThermostatRunningMode(ClusterAttributeDescriptor):

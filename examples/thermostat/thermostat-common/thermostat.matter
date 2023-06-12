@@ -1677,7 +1677,7 @@ server cluster Thermostat = 513 {
     kHeat = 4;
   }
 
-  enum ThermostatSystemMode : ENUM8 {
+  enum ThermostatSystemModeEnum : ENUM8 {
     kOff = 0;
     kAuto = 1;
     kCool = 3;
@@ -1734,7 +1734,7 @@ server cluster Thermostat = 513 {
   attribute access(write: manage) int16s maxCoolSetpointLimit = 24;
   attribute access(write: manage) int8s minSetpointDeadBand = 25;
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
-  attribute access(write: manage) enum8 systemMode = 28;
+  attribute access(write: manage) ThermostatSystemModeEnum systemMode = 28;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

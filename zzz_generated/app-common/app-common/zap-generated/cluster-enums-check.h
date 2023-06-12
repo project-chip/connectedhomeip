@@ -2060,9 +2060,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ThermostatR
         return static_cast<EnumType>(1);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ThermostatSystemMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ThermostatSystemModeEnum val)
 {
-    using EnumType = Thermostat::ThermostatSystemMode;
+    using EnumType = Thermostat::ThermostatSystemModeEnum;
     switch (val)
     {
     case EnumType::kOff:

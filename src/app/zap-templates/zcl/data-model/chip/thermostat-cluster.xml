@@ -46,7 +46,7 @@ limitations under the License.
     <field name="CoolSetpointPresent" mask="0x02"/>
   </bitmap>
 
-  <enum name="ThermostatSystemMode" type="ENUM8">
+  <enum name="ThermostatSystemModeEnum" type="ENUM8">
     <cluster code="0x0201"/>
     <item name="Off" value="0x0"/>
     <item name="Auto" value="0x1"/>
@@ -174,7 +174,7 @@ limitations under the License.
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x001C" define="SYSTEM_MODE" type="ENUM8" min="0x00" max="0x07" writable="true" default="0x01" optional="false">
+    <attribute side="server" code="0x001C" define="SYSTEM_MODE" type="ThermostatSystemModeEnum" min="0x00" max="0x07" writable="true" default="0x01" optional="false">
       <description>SystemMode</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>

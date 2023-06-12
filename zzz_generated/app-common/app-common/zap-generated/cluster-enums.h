@@ -2689,8 +2689,8 @@ enum class ThermostatRunningMode : uint8_t
     kUnknownEnumValue = 1,
 };
 
-// Enum for ThermostatSystemMode
-enum class ThermostatSystemMode : uint8_t
+// Enum for ThermostatSystemModeEnum
+enum class ThermostatSystemModeEnum : uint8_t
 {
     kOff           = 0x00,
     kAuto          = 0x01,

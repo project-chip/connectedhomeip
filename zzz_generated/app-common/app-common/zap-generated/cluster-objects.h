@@ -22065,9 +22065,9 @@ struct TypeInfo
 namespace SystemMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum;
+    using DecodableType    = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum;
+    using DecodableArgType = chip::app::Clusters::Thermostat::ThermostatSystemModeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SystemMode::Id; }
@@ -22454,7 +22454,8 @@ struct TypeInfo
         Attributes::RemoteSensing::TypeInfo::DecodableType remoteSensing                             = static_cast<uint8_t>(0);
         Attributes::ControlSequenceOfOperation::TypeInfo::DecodableType controlSequenceOfOperation =
             static_cast<chip::app::Clusters::Thermostat::ThermostatControlSequence>(0);
-        Attributes::SystemMode::TypeInfo::DecodableType systemMode                               = static_cast<uint8_t>(0);
+        Attributes::SystemMode::TypeInfo::DecodableType systemMode =
+            static_cast<chip::app::Clusters::Thermostat::ThermostatSystemModeEnum>(0);
         Attributes::ThermostatRunningMode::TypeInfo::DecodableType thermostatRunningMode         = static_cast<uint8_t>(0);
         Attributes::StartOfWeek::TypeInfo::DecodableType startOfWeek                             = static_cast<uint8_t>(0);
         Attributes::NumberOfWeeklyTransitions::TypeInfo::DecodableType numberOfWeeklyTransitions = static_cast<uint8_t>(0);

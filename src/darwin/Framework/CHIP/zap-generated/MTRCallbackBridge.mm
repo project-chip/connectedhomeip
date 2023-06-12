@@ -26279,15 +26279,15 @@ void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscript
     }
 }
 
-void MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Thermostat::ThermostatSystemMode value)
+void MTRThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Thermostat::ThermostatSystemModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRThermostatClusterThermostatSystemModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -26302,8 +26302,8 @@ void MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> & value)
+void MTRNullableThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26314,7 +26314,7 @@ void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableThermostatClusterThermostatSystemModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

@@ -4181,7 +4181,7 @@ client cluster Thermostat = 513 {
     kHeat = 4;
   }
 
-  enum ThermostatSystemMode : ENUM8 {
+  enum ThermostatSystemModeEnum : ENUM8 {
     kOff = 0;
     kAuto = 1;
     kCool = 3;
@@ -4247,7 +4247,7 @@ client cluster Thermostat = 513 {
   attribute access(write: manage) optional int8s minSetpointDeadBand = 25;
   attribute access(write: manage) optional bitmap8 remoteSensing = 26;
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
-  attribute access(write: manage) enum8 systemMode = 28;
+  attribute access(write: manage) ThermostatSystemModeEnum systemMode = 28;
   readonly attribute optional enum8 thermostatRunningMode = 30;
   readonly attribute optional enum8 startOfWeek = 32;
   readonly attribute optional int8u numberOfWeeklyTransitions = 33;
@@ -4338,7 +4338,7 @@ server cluster Thermostat = 513 {
     kHeat = 4;
   }
 
-  enum ThermostatSystemMode : ENUM8 {
+  enum ThermostatSystemModeEnum : ENUM8 {
     kOff = 0;
     kAuto = 1;
     kCool = 3;
@@ -4404,7 +4404,7 @@ server cluster Thermostat = 513 {
   attribute access(write: manage) int8s minSetpointDeadBand = 25;
   attribute access(write: manage) bitmap8 remoteSensing = 26;
   attribute access(write: manage) ThermostatControlSequence controlSequenceOfOperation = 27;
-  attribute access(write: manage) enum8 systemMode = 28;
+  attribute access(write: manage) ThermostatSystemModeEnum systemMode = 28;
   readonly attribute enum8 thermostatRunningMode = 30;
   readonly attribute enum8 startOfWeek = 32;
   readonly attribute int8u numberOfWeeklyTransitions = 33;

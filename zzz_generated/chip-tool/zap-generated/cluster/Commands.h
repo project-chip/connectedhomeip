@@ -15521,8 +15521,8 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ThermostatControlSequence>>(
             Id, "control-sequence-of-operation", 0, UINT8_MAX, Attributes::ControlSequenceOfOperation::Id, WriteCommandType::kWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "system-mode", 0, UINT8_MAX, Attributes::SystemMode::Id, WriteCommandType::kWrite,
-                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ThermostatSystemModeEnum>>(
+            Id, "system-mode", 0, UINT8_MAX, Attributes::SystemMode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "thermostat-running-mode", 0, UINT8_MAX, Attributes::ThermostatRunningMode::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "start-of-week", 0, UINT8_MAX, Attributes::StartOfWeek::Id,

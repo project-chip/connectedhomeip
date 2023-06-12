@@ -580,10 +580,10 @@ typedef void (*ThermostatClusterThermostatRunningModeAttributeCallback)(void *,
                                                                         chip::app::Clusters::Thermostat::ThermostatRunningMode);
 typedef void (*NullableThermostatClusterThermostatRunningModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatRunningMode> &);
-typedef void (*ThermostatClusterThermostatSystemModeAttributeCallback)(void *,
-                                                                       chip::app::Clusters::Thermostat::ThermostatSystemMode);
-typedef void (*NullableThermostatClusterThermostatSystemModeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> &);
+typedef void (*ThermostatClusterThermostatSystemModeEnumAttributeCallback)(
+    void *, chip::app::Clusters::Thermostat::ThermostatSystemModeEnum);
+typedef void (*NullableThermostatClusterThermostatSystemModeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemModeEnum> &);
 typedef void (*FanControlClusterAirflowDirectionEnumAttributeCallback)(void *,
                                                                        chip::app::Clusters::FanControl::AirflowDirectionEnum);
 typedef void (*NullableFanControlClusterAirflowDirectionEnumAttributeCallback)(
@@ -27866,68 +27866,70 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge
-    : public MTRCallbackBridge<ThermostatClusterThermostatSystemModeAttributeCallback>
+class MTRThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<ThermostatClusterThermostatSystemModeEnumAttributeCallback>
 {
 public:
-    MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ThermostatClusterThermostatSystemModeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ThermostatClusterThermostatSystemModeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<ThermostatClusterThermostatSystemModeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<ThermostatClusterThermostatSystemModeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::Thermostat::ThermostatSystemMode value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::Thermostat::ThermostatSystemModeEnum value);
 };
 
-class MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge
-    : public MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge
+class MTRThermostatClusterThermostatSystemModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge
 {
 public:
-    MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge(
+    MTRThermostatClusterThermostatSystemModeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge(queue, handler, action),
+        MTRThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnDone;
+    using MTRThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableThermostatClusterThermostatSystemModeAttributeCallback>
+class MTRNullableThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableThermostatClusterThermostatSystemModeEnumAttributeCallback>
 {
 public:
-    MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableThermostatClusterThermostatSystemModeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableThermostatClusterThermostatSystemModeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            MTRActionBlock action) :
-        MTRCallbackBridge<NullableThermostatClusterThermostatSystemModeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<NullableThermostatClusterThermostatSystemModeEnumAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemModeEnum> & value);
 };
 
-class MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge
-    : public MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge
+class MTRNullableThermostatClusterThermostatSystemModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge(
+    MTRNullableThermostatClusterThermostatSystemModeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge(queue, handler, action),
+        MTRNullableThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnDone;
+    using MTRNullableThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableThermostatClusterThermostatSystemModeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

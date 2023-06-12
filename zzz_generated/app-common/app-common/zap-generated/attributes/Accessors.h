@@ -2438,8 +2438,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::Th
 } // namespace ControlSequenceOfOperation
 
 namespace SystemMode {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::Thermostat::ThermostatSystemModeEnum * value); // ThermostatSystemModeEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Thermostat::ThermostatSystemModeEnum value);
 } // namespace SystemMode
 
 namespace ThermostatRunningMode {

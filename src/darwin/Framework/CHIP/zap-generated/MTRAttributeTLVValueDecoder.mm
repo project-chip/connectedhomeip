@@ -15906,7 +15906,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     case Attributes::ThermostatRunningMode::Id: {

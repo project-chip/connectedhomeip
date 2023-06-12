@@ -9717,7 +9717,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ControlSequenceOfOperation", 1, value);
         }
         case Thermostat::Attributes::SystemMode::Id: {
-            uint8_t value;
+            chip::app::Clusters::Thermostat::ThermostatSystemModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SystemMode", 1, value);
         }
