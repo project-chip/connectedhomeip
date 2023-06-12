@@ -44,13 +44,15 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
 {
     switch (event->Type)
     {
-    case DeviceEventType::kChipSubscriptionSent:
+    case DeviceEventType::kSubcriptionEstablised:
         break;
+    case DeviceEventType::kSubscriptionTerminated:
+        break;
+    case DeviceEventType::kSubcriptionReportSent:
     case DeviceEventType::kChipMsgSentEvent:
-        break;
     case DeviceEventType::kChipMsgReceivedEvent:
-        break;
-    case DeviceEventType::kChipMsgReceivedEvent:
+    case DeviceEventType::kAppWakeUpEvent:
+        mICDManager.UpdateOperationStates(ActiveMode);
         break;
     default:
         break;

@@ -260,10 +260,12 @@ enum InternalEventTypes
     kCHIPoBLEIndicateConfirm,
     kCHIPoBLEConnectionError,
     kCHIPoBLENotifyConfirm,
+    kSubcriptionEstablised,
+    kSubscriptionTerminated,
     kSubcriptionReportSent,
     kChipMsgSentEvent,
     kChipMsgReceivedEvent,
-    kPhysicallyAwaken
+    kAppWakeUpEvent,
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
@@ -520,6 +522,11 @@ struct ChipDeviceEvent final
         {
             OtaState newState;
         } OtaStateChanged;
+
+        struct
+        {
+            uint64_t subjectId;
+        } SubscriptionChanged;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

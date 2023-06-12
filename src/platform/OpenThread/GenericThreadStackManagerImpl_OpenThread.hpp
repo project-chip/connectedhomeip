@@ -1736,8 +1736,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     ConnectivityManager::SEDIntervalsConfig sedIntervalsConfig;
     using namespace System::Clock::Literals;
-    sedIntervalsConfig.ActiveIntervalMS = CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL;
-    sedIntervalsConfig.IdleIntervalMS   = CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL;
+    sedIntervalsConfig.ActiveIntervalMS = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+    sedIntervalsConfig.IdleIntervalMS   = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
     err                                 = _SetSEDIntervalsConfig(sedIntervalsConfig);
     if (err != CHIP_NO_ERROR)
     {

@@ -217,6 +217,15 @@ InteractionModel::Status IcdManagementServer::UnregisterClient(chip::app::Comman
     return InteractionModel::Status::Success;
 }
 
+bool IcdManagementServer::HasFeature(Feature feature)
+{
+    bool success;
+    uint32_t featureMap;
+    success = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+
+    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
+}
+
 InteractionModel::Status IcdManagementServer::StayActiveRequest(const chip::app::ConcreteCommandPath & commandPath)
 {
 

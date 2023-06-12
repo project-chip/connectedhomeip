@@ -24,10 +24,33 @@ namespace app {
  */
 class ICDManager
 {
+    enum OperationalState : uint8_t
+    {
+        IdleMode,
+        ActiveMode,
+    };
+
+    enum ICDMode : uint8_t
+    {
+        SIT, // Short Interval Time ICD
+        LIT, // Long Interval Time ICD
+    };
+
 public:
     ICDManager();
+    void UpdateIcdMode();
+    void UpdateOperationStates(OperationalState state);
 
 private:
+    constexpr uint32_t kICDSitModePollingThreashold = 15000_ms32;
+    constexpr uint32_t kSlowPollingInterval         = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    constexpr uint32_t kFastPollingInterval         = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+
+    void OnIdleModeDone(System::Layer * aLayer, void * appState);
+    void OnActiveModeDone(System::Layer * aLayer, void * appState);
+
+    OperationalState mOperationalState = IdleMode;
+    ICDMode mIcdMode                   = SIT;
 };
 
 } // namespace app
