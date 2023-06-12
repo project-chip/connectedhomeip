@@ -1402,8 +1402,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
 
                 if (p != seqStart + len)
                 {
+                    // Failure to read will leave pathLen == -1
                     result = mbedtls_asn1_get_int(&p, end, &pathLen);
-                    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
                 }
             }
 
@@ -1417,7 +1417,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
             }
             else
             {
-                VerifyOrExit(isCA && (pathLen == -1 || pathLen == 0 || pathLen == 1), error = CHIP_ERROR_INTERNAL);
+                // For PAA, pathlen must be absent or equal to 1 (see Matter 1.1 spec 6.2.2.5)
+                VerifyOrExit(isCA && (pathLen == -1 || pathLen == 1), error = CHIP_ERROR_INTERNAL);
             }
         }
         else if (OID_CMP(sOID_Extension_KeyUsage, extOID))
