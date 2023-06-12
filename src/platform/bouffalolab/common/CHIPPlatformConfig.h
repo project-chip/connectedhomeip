@@ -1,7 +1,6 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,28 +15,11 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific configuration overrides for CHIP on
- *          Bouffalolab BL602 platforms.
- */
-
 #pragma once
 
 #include <stdint.h>
 
 // ==================== General Platform Adaptations ====================
-
-#define CHIP_CONFIG_ERROR_TYPE int32_t
-#define CHIP_CONFIG_NO_ERROR 0
-#define CHIP_CONFIG_ERROR_MIN 4000000
-#define CHIP_CONFIG_ERROR_MAX 4000999
-
-#define ASN1_CONFIG_ERROR_TYPE int32_t
-#define ASN1_CONFIG_NO_ERROR 0
-#define ASN1_CONFIG_ERROR_MIN 5000000
-#define ASN1_CONFIG_ERROR_MAX 5000999
-
 #define ChipDie() abort()
 
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE const char *
@@ -47,14 +29,8 @@
 #define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY 0x01
 
 // ==================== Security Adaptations ====================
-
-#define CHIP_CONFIG_USE_OPENSSL_ECC 0
-#define CHIP_CONFIG_USE_MICRO_ECC 0
-
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_OPENSSL 0
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_MINCRYPT 1
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_MBEDTLS 0
-#define CHIP_CONFIG_HASH_IMPLEMENTATION_PLATFORM 0
+//#define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(bl_sha_ctx_t)
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((1 + 5 + 18 + 16 + 16) * sizeof(unsigned int))
 
 #define CHIP_CONFIG_AES_IMPLEMENTATION_OPENSSL 0
 #define CHIP_CONFIG_AES_IMPLEMENTATION_AESNI 0
@@ -64,9 +40,6 @@
 #define CHIP_CONFIG_RNG_IMPLEMENTATION_OPENSSL 0
 #define CHIP_CONFIG_RNG_IMPLEMENTATION_CHIPDRBG 1
 #define CHIP_CONFIG_RNG_IMPLEMENTATION_PLATFORM 0
-
-//#define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(bl_sha_ctx_t)
-#define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((1 + 5 + 18 + 16 + 16) * sizeof(unsigned int))
 
 #define CHIP_CONFIG_ENABLE_PASE_INITIATOR 0
 #define CHIP_CONFIG_ENABLE_PASE_RESPONDER 1

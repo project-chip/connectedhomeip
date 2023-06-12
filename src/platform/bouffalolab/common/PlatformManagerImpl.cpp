@@ -17,76 +17,15 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
-
-#include <lwip/tcpip.h>
-
-#include <openthread_port.h>
-#include <utils_list.h>
-extern "C" {
-#include <bl_sec.h>
-}
 
 namespace chip {
 namespace DeviceLayer {
 
-extern "C" void bl_rand_stream(unsigned char *, int);
-
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
-{
-    bl_rand_stream(output, len);
-    if (olen)
-    {
-        *olen = len;
-    }
-
-    return 0;
-}
-
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
-{
-    CHIP_ERROR err;
-    TaskHandle_t backup_eventLoopTask;
-    otRadio_opt_t opt;
-
-    // Initialize the configuration system.
-    err = Internal::BLConfig::Init();
-    SuccessOrExit(err);
-
-    opt.byte            = 0;
-    opt.bf.isCoexEnable = true;
-
-    ot_alarmInit();
-    ot_radioInit(opt);
-
-    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
-
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
-    // Initialize LwIP.
-    tcpip_init(NULL, NULL);
-
-    err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
-    SuccessOrExit(err);
-
-    // Call _InitChipStack() on the generic implementation base class
-    // to finish the initialization process.
-    /** weiyin, backup mEventLoopTask which is reset in _InitChipStack */
-    backup_eventLoopTask = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask;
-    err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
-    SuccessOrExit(err);
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask = backup_eventLoopTask;
-
-exit:
-    return err;
-}
 void PlatformManagerImpl::_Shutdown()
 {
     uint64_t upTime = 0;

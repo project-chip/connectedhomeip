@@ -6915,7 +6915,7 @@ PICS:
       id: DGTHREAD.S.A0033
 
     - label:
-          "Does the DUT(server) support the RxErrInvalidScrAddrCount attribute?"
+          "Does the DUT(server) support the RxErrInvalidSrcAddrCount attribute?"
       id: DGTHREAD.S.A0034
 
     - label: "Does the DUT(server) support the RxErrSecCount attribute?"
@@ -7255,7 +7255,7 @@ PICS:
 
     - label:
           "Does the DUT(client) have access privileges for the
-          RxErrInvalidScrAddrCount attribute implemented on the server?"
+          RxErrInvalidSrcAddrCount attribute implemented on the server?"
       id: DGTHREAD.C.A0034
 
     - label:

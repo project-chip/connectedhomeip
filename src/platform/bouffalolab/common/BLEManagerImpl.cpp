@@ -696,8 +696,6 @@ bool BLEManagerImpl::SetSubscribed(bt_conn * conn)
     bool isSubscribed       = mSubscribedConns[index];
     mSubscribedConns[index] = true;
 
-    ChipLogError(DeviceLayer, "BLEManagerImpl::SetSubscribed %u", index);
-
     // If we were not subscribed previously, increment the reference counter of the connection.
     if (!isSubscribed)
     {
