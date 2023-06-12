@@ -37,6 +37,10 @@ constexpr size_t kOperationalStateLabelMaxSize = 64u;
 
 struct GenericOperationalErrorState
 {
+/*
+ * Since OperationalErrorStateStruct is shared across different clusters, it can't use a
+ * cluster-specific enum type for ErrorStateID.
+ */
     uint8_t ErrorStateID;
     char ErrorStateLabel[kErrorStateLabelMaxSize];
     char ErrorStateDetails[kErrorStateDetailsMaxSize];
