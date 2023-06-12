@@ -143,7 +143,7 @@ bool Cmd_Node(int argc, const char ** argv)
 
 extern "C" void StopSignalHandler(int signal)
 {
-    DeviceLayer::PlatformMgr().StopEventLoopTask();
+    DeviceLayer::PlatformMgr().StopEventLoopTask(); // NOLINT(bugprone-signal-handler)
 }
 
 } // namespace
