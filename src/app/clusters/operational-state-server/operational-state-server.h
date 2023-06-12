@@ -184,8 +184,8 @@ public:
      * @param aDelegate A pointer to a delegate that will handle application layer logic.
      */
     OperationalStateServer(EndpointId aEndpointId, ClusterId aClusterId, Delegate * aDelegate) :
-        CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId)
+        CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
+        AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId)
     {
 
         mEndpointId = aEndpointId;
