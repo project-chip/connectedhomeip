@@ -43,13 +43,16 @@ tests:
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: CDOCONC.S.Afffc && !CDOCONC.S.F00 && !CDOCONC.S.F01 && !CDOCONC.S.F02 && !CDOCONC.S.F03 && !CDOCONC.S.F04 && !CDOCONC.S.F05
+      PICS:
+          CDOCONC.S.Afffc && !CDOCONC.S.F00 && !CDOCONC.S.F01 && !CDOCONC.S.F02
+          && !CDOCONC.S.F03 && !CDOCONC.S.F04 && !CDOCONC.S.F05
       response:
           value: 0
           constraints:
               type: bitmap32
 
-    - label: "Given CDOCONC.S.F00(MEA) ensure featuremap has the correct bit set"
+    - label:
+          "Given CDOCONC.S.F00(MEA) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: CDOCONC.S.Afffc && CDOCONC.S.F00
@@ -58,7 +61,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given CDOCONC.S.F01(LEV) ensure featuremap has the correct bit set"
+    - label:
+          "Given CDOCONC.S.F01(LEV) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: CDOCONC.S.Afffc && CDOCONC.S.F01
@@ -67,7 +71,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Given CDOCONC.S.F02(MED) ensure featuremap has the correct bit set"
+    - label:
+          "Given CDOCONC.S.F02(MED) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: CDOCONC.S.Afffc && CDOCONC.S.F02
@@ -76,7 +81,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x4]
 
-    - label: "Given CDOCONC.S.F03(CRI) ensure featuremap has the correct bit set"
+    - label:
+          "Given CDOCONC.S.F03(CRI) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: CDOCONC.S.Afffc && CDOCONC.S.F03
@@ -85,7 +91,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x8]
 
-    - label: "Given CDOCONC.S.F04(PEA) ensure featuremap has the correct bit set"
+    - label:
+          "Given CDOCONC.S.F04(PEA) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: CDOCONC.S.Afffc && CDOCONC.S.F04
@@ -94,7 +101,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x10]
 
-    - label: "Given CDOCONC.S.F05(AVG) ensure featuremap has the correct bit set"
+    - label:
+          "Given CDOCONC.S.F05(AVG) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: CDOCONC.S.Afffc && CDOCONC.S.F05
@@ -121,7 +129,10 @@ tests:
               type: list
               contains: [7]
 
-    - label: "Read the optional, feature dependent attributes MeasuredValue, MinMeasuredValue, MaxMeasuredValue and Measurement Unit in AttributeList"
+    - label:
+          "Read the optional, feature dependent attributes MeasuredValue,
+          MinMeasuredValue, MaxMeasuredValue and Measurement Unit in
+          AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: CDOCONC.S.Afffb && CDOCONC.S.F00
@@ -130,7 +141,9 @@ tests:
               type: list
               contains: [0, 1, 2, 8]
 
-    - label: "Read the optional, feature dependent attributes PeakMeasuredValue & PeakMeasuredValueWindow in AttributeList"
+    - label:
+          "Read the optional, feature dependent attributes PeakMeasuredValue &
+          PeakMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: CDOCONC.S.Afffb && CDOCONC.S.F04
@@ -139,7 +152,9 @@ tests:
               type: list
               contains: [3, 4]
 
-    - label: "Read the optional, feature dependent attributes AverageMeasuredValue AverageMeasuredValueWindow in AttributeList"
+    - label:
+          "Read the optional, feature dependent attributes AverageMeasuredValue
+          AverageMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: CDOCONC.S.Afffb && CDOCONC.S.F05
@@ -148,7 +163,9 @@ tests:
               type: list
               contains: [5, 6]
 
-    - label: "Read the optional, feature dependent attribute LevelValue in AttributeList"
+    - label:
+          "Read the optional, feature dependent attribute LevelValue in
+          AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: CDOCONC.S.Afffb && CDOCONC.S.F01

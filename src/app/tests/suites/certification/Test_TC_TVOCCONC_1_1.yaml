@@ -43,13 +43,17 @@ tests:
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: TVOCCONC.S.Afffc && !TVOCCONC.S.F00 && !TVOCCONC.S.F01 && !TVOCCONC.S.F02 && !TVOCCONC.S.F03 && !TVOCCONC.S.F04 && !TVOCCONC.S.F05
+      PICS:
+          TVOCCONC.S.Afffc && !TVOCCONC.S.F00 && !TVOCCONC.S.F01 &&
+          !TVOCCONC.S.F02 && !TVOCCONC.S.F03 && !TVOCCONC.S.F04 &&
+          !TVOCCONC.S.F05
       response:
           value: 0
           constraints:
               type: bitmap32
 
-    - label: "Given TVOCCONC.S.F00(MEA) ensure featuremap has the correct bit set"
+    - label:
+          "Given TVOCCONC.S.F00(MEA) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: TVOCCONC.S.Afffc && TVOCCONC.S.F00
@@ -58,7 +62,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given TVOCCONC.S.F01(LEV) ensure featuremap has the correct bit set"
+    - label:
+          "Given TVOCCONC.S.F01(LEV) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: TVOCCONC.S.Afffc && TVOCCONC.S.F01
@@ -67,7 +72,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Given TVOCCONC.S.F02(MED) ensure featuremap has the correct bit set"
+    - label:
+          "Given TVOCCONC.S.F02(MED) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: TVOCCONC.S.Afffc && TVOCCONC.S.F02
@@ -76,7 +82,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x4]
 
-    - label: "Given TVOCCONC.S.F03(CRI) ensure featuremap has the correct bit set"
+    - label:
+          "Given TVOCCONC.S.F03(CRI) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: TVOCCONC.S.Afffc && TVOCCONC.S.F03
@@ -85,7 +92,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x8]
 
-    - label: "Given TVOCCONC.S.F04(PEA) ensure featuremap has the correct bit set"
+    - label:
+          "Given TVOCCONC.S.F04(PEA) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: TVOCCONC.S.Afffc && TVOCCONC.S.F04
@@ -94,7 +102,8 @@ tests:
               type: bitmap32
               hasMasksSet: [0x10]
 
-    - label: "Given TVOCCONC.S.F05(AVG) ensure featuremap has the correct bit set"
+    - label:
+          "Given TVOCCONC.S.F05(AVG) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: TVOCCONC.S.Afffc && TVOCCONC.S.F05
@@ -121,7 +130,10 @@ tests:
               type: list
               contains: [7]
 
-    - label: "Read the optional, feature dependent attributes MeasuredValue, MinMeasuredValue, MaxMeasuredValue and Measurement Unit in AttributeList"
+    - label:
+          "Read the optional, feature dependent attributes MeasuredValue,
+          MinMeasuredValue, MaxMeasuredValue and Measurement Unit in
+          AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: TVOCCONC.S.Afffb && TVOCCONC.S.F00
@@ -130,7 +142,9 @@ tests:
               type: list
               contains: [0, 1, 2, 8]
 
-    - label: "Read the optional, feature dependent attributes PeakMeasuredValue & PeakMeasuredValueWindow in AttributeList"
+    - label:
+          "Read the optional, feature dependent attributes PeakMeasuredValue &
+          PeakMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: TVOCCONC.S.Afffb && TVOCCONC.S.F04
@@ -139,7 +153,9 @@ tests:
               type: list
               contains: [3, 4]
 
-    - label: "Read the optional, feature dependent attributes AverageMeasuredValue AverageMeasuredValueWindow in AttributeList"
+    - label:
+          "Read the optional, feature dependent attributes AverageMeasuredValue
+          AverageMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: TVOCCONC.S.Afffb && TVOCCONC.S.F05
@@ -148,7 +164,9 @@ tests:
               type: list
               contains: [5, 6]
 
-    - label: "Read the optional, feature dependent attribute LevelValue in AttributeList"
+    - label:
+          "Read the optional, feature dependent attribute LevelValue in
+          AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: TVOCCONC.S.Afffb && TVOCCONC.S.F01

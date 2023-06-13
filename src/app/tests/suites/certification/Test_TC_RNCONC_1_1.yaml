@@ -43,7 +43,9 @@ tests:
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: RNCONC.S.Afffc && !RNCONC.S.F00 && !RNCONC.S.F01 && !RNCONC.S.F02 && !RNCONC.S.F03 && !RNCONC.S.F04 && !RNCONC.S.F05
+      PICS:
+          RNCONC.S.Afffc && !RNCONC.S.F00 && !RNCONC.S.F01 && !RNCONC.S.F02 &&
+          !RNCONC.S.F03 && !RNCONC.S.F04 && !RNCONC.S.F05
       response:
           value: 0
           constraints:
@@ -121,7 +123,10 @@ tests:
               type: list
               contains: [7]
 
-    - label: "Read the optional, feature dependent attributes MeasuredValue, MinMeasuredValue, MaxMeasuredValue and Measurement Unit in AttributeList"
+    - label:
+          "Read the optional, feature dependent attributes MeasuredValue,
+          MinMeasuredValue, MaxMeasuredValue and Measurement Unit in
+          AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: RNCONC.S.Afffb && RNCONC.S.F00
@@ -130,7 +135,9 @@ tests:
               type: list
               contains: [0, 1, 2, 8]
 
-    - label: "Read the optional, feature dependent attributes PeakMeasuredValue & PeakMeasuredValueWindow in AttributeList"
+    - label:
+          "Read the optional, feature dependent attributes PeakMeasuredValue &
+          PeakMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: RNCONC.S.Afffb && RNCONC.S.F04
@@ -139,7 +146,9 @@ tests:
               type: list
               contains: [3, 4]
 
-    - label: "Read the optional, feature dependent attributes AverageMeasuredValue AverageMeasuredValueWindow in AttributeList"
+    - label:
+          "Read the optional, feature dependent attributes AverageMeasuredValue
+          AverageMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: RNCONC.S.Afffb && RNCONC.S.F05
@@ -148,7 +157,9 @@ tests:
               type: list
               contains: [5, 6]
 
-    - label: "Read the optional, feature dependent attribute LevelValue in AttributeList"
+    - label:
+          "Read the optional, feature dependent attribute LevelValue in
+          AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       PICS: RNCONC.S.Afffb && RNCONC.S.F01
