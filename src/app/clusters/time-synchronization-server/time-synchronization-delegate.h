@@ -25,7 +25,6 @@ namespace app {
 namespace Clusters {
 namespace TimeSynchronization {
 
-using namespace chip::app::Clusters::TimeSynchronization;
 using TimeZoneList = DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>;
 
 /** @brief
@@ -41,12 +40,30 @@ public:
         return success ? (map & to_underlying(feature)) : false;
     }
 
-    virtual void HandleTimeZoneChanged(TimeZoneList timeZoneList) = 0;
-    virtual CHIP_ERROR HandleDSTOffsetLookup()                    = 0;
-    virtual bool HandleDSTOffsetAvailable(chip::CharSpan name)    = 0;
-    virtual CHIP_ERROR HandleGetDSTOffset()                       = 0;
-    virtual bool isNTPAddressValid(chip::CharSpan ntp)            = 0;
-    virtual bool isNTPAddressDomain(chip::CharSpan ntp)           = 0;
+    /**
+     * @brief Notifies through the delegate that time zone has changed.
+     *
+     * @param timeZoneList new time zone list
+     */
+    virtual void HandleTimeZoneChanged(const TimeZoneList timeZoneList) = 0;
+    /**
+     * @brief Give the delegate the chance to populate DNSOffset based on active time zone.
+     *
+     * @param name name of active time zone
+     */
+    virtual bool HandleUpdateDSTOffset(const chip::CharSpan name) = 0;
+    /**
+     * @brief Validate NTP address
+     *
+     * @param ntp NTP address
+     */
+    virtual bool IsNTPAddressValid(const chip::CharSpan ntp) = 0;
+    /**
+     * @brief Check if NTP address is domain
+     *
+     * @param ntp NTP address
+     */
+    virtual bool IsNTPAddressDomain(const chip::CharSpan ntp) = 0;
 
     virtual ~Delegate() = default;
 };

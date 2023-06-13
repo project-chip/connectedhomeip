@@ -35,12 +35,10 @@ public:
     using TimeZoneList = DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>;
 
     TimeSyncManager() : Delegate(){};
-    void HandleTimeZoneChanged(TimeZoneList timeZoneList) override;
-    CHIP_ERROR HandleDSTOffsetLookup() override;
-    bool HandleDSTOffsetAvailable(chip::CharSpan name) override;
-    CHIP_ERROR HandleGetDSTOffset() override;
-    bool isNTPAddressValid(chip::CharSpan ntp) override;
-    bool isNTPAddressDomain(chip::CharSpan ntp) override;
+    void HandleTimeZoneChanged(const TimeZoneList timeZoneList) override;
+    bool HandleUpdateDSTOffset(chip::CharSpan name) override;
+    bool IsNTPAddressValid(chip::CharSpan ntp) override;
+    bool IsNTPAddressDomain(chip::CharSpan ntp) override;
 };
 
 } // namespace TimeSynchronization

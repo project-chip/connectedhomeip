@@ -20,36 +20,25 @@
 
 using namespace chip::app::Clusters::TimeSynchronization;
 
-void TimeSyncManager::HandleTimeZoneChanged(TimeZoneList timeZoneList)
+void TimeSyncManager::HandleTimeZoneChanged(const TimeZoneList timeZoneList)
 {
-    // do nothing
-    ChipLogProgress(Zcl, "%s", __FUNCTION__);
+    // placeholder implementation
 }
 
-CHIP_ERROR TimeSyncManager::HandleDSTOffsetLookup()
+bool TimeSyncManager::HandleUpdateDSTOffset(chip::CharSpan name)
 {
-    ChipLogProgress(Zcl, "%s", __FUNCTION__);
-    return CHIP_NO_ERROR;
-}
-
-bool TimeSyncManager::HandleDSTOffsetAvailable(chip::CharSpan name)
-{
-    ChipLogProgress(Zcl, "%s", __FUNCTION__);
+    // placeholder implementation
     return false;
 }
 
-CHIP_ERROR TimeSyncManager::HandleGetDSTOffset()
+bool TimeSyncManager::IsNTPAddressValid(chip::CharSpan ntp)
 {
-    ChipLogProgress(Zcl, "%s", __FUNCTION__);
-    return CHIP_NO_ERROR;
-}
-
-bool TimeSyncManager::isNTPAddressValid(chip::CharSpan ntp)
-{
+    // placeholder implementation
     return true;
 }
 
-bool TimeSyncManager::isNTPAddressDomain(chip::CharSpan ntp)
+bool TimeSyncManager::IsNTPAddressDomain(chip::CharSpan ntp)
 {
+    // placeholder implementation
     return false;
 }

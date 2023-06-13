@@ -36,11 +36,6 @@ namespace app {
 namespace Clusters {
 namespace TimeSynchronization {
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::TimeSynchronization;
-using namespace chip::app::Clusters::TimeSynchronization::Attributes;
 using chip::TimeSyncDataProvider;
 using chip::Protocols::InteractionModel::Status;
 
@@ -49,14 +44,20 @@ struct timeZoneName
     char name[64];
 };
 
+/**
+ * @brief Describes the state of time zone and DSTOffset in use.
+ */
 enum class TimeState : uint8_t
 {
-    kInvalid = 0,
-    kActive  = 1,
-    kChanged = 2,
-    kStopped = 2,
+    kInvalid = 0, // No valid offset available
+    kActive  = 1, // An offset is currently being used
+    kChanged = 2, // An offset expired or changed to a new value
+    kStopped = 2, // Offset is 0
 };
 
+/**
+ * @brief Flags for tracking event types to emit.
+ */
 enum class TimeSyncEventFlag : uint8_t
 {
     kNone            = 0,
@@ -73,17 +74,17 @@ public:
     void Init();
 
     static TimeSynchronizationServer & Instance(void);
-    TimeSyncDataProvider GetDataProvider(void) { return mTimeSyncDataProvider; }
+    TimeSyncDataProvider & GetDataProvider(void) { return mTimeSyncDataProvider; }
 
-    CHIP_ERROR SetTrustedTimeSource(DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> tts);
-    CHIP_ERROR SetDefaultNTP(DataModel::Nullable<chip::CharSpan> & dntp);
+    CHIP_ERROR SetTrustedTimeSource(const DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & tts);
+    CHIP_ERROR SetDefaultNTP(const DataModel::Nullable<chip::CharSpan> & dntp);
     /**
      * @brief Sets TimeZone Attribute. Assumes the size of the list is already validated.
      *
      * @param tz TimeZone list
      * @return CHIP_ERROR
      */
-    CHIP_ERROR SetTimeZone(DataModel::DecodableList<TimeSynchronization::Structs::TimeZoneStruct::Type> tzL);
+    CHIP_ERROR SetTimeZone(const DataModel::DecodableList<Structs::TimeZoneStruct::Type> & tzL);
     /**
      * @brief Sets DstOffset Attribute. Assumes the size of the list is already validated.
      *
@@ -91,17 +92,16 @@ public:
      * @return CHIP_ERROR
      */
     CHIP_ERROR ClearTimeZone(void);
-    CHIP_ERROR SetDSTOffset(DataModel::DecodableList<TimeSynchronization::Structs::DSTOffsetStruct::Type> dstL);
+    CHIP_ERROR SetDSTOffset(const DataModel::DecodableList<Structs::DSTOffsetStruct::Type> & dstL);
     CHIP_ERROR ClearDSTOffset(void);
-    DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource(void);
-    DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type> GetTimeZone(void);
-    DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> GetDSTOffset(void);
+    DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource(void);
+    DataModel::List<Structs::TimeZoneStruct::Type> GetTimeZone(void);
+    DataModel::List<Structs::DSTOffsetStruct::Type> GetDSTOffset(void);
     CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp);
 
-    CHIP_ERROR SetUTCTime(chip::EndpointId ep, uint64_t utcTime, TimeSynchronization::GranularityEnum granularity,
-                          TimeSynchronization::TimeSourceEnum source);
+    CHIP_ERROR SetUTCTime(chip::EndpointId ep, uint64_t utcTime, GranularityEnum granularity, TimeSourceEnum source);
     CHIP_ERROR GetLocalTime(chip::EndpointId ep, uint64_t & localTime);
-    TimeSynchronization::GranularityEnum GetGranularity(void) { return mGranularity; }
+    GranularityEnum GetGranularity(void) { return mGranularity; }
 
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 
@@ -111,22 +111,20 @@ public:
     void ClearEventFlag(TimeSyncEventFlag flag);
 
 private:
-    DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
-    DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList =
-        DataModel::List<TimeSynchronization::Structs::TimeZoneStruct::Type>(mTz);
-    DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type> mDstOffsetList =
-        DataModel::List<TimeSynchronization::Structs::DSTOffsetStruct::Type>(mDst);
-    TimeSynchronization::GranularityEnum mGranularity;
+    DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
+    DataModel::List<Structs::TimeZoneStruct::Type> mTimeZoneList   = DataModel::List<Structs::TimeZoneStruct::Type>(mTz);
+    DataModel::List<Structs::DSTOffsetStruct::Type> mDstOffsetList = DataModel::List<Structs::DSTOffsetStruct::Type>(mDst);
+    GranularityEnum mGranularity;
 
     uint8_t mTimeZoneListSize  = 0;
     uint8_t mDstOffsetListSize = 0;
 
-    TimeSynchronization::Structs::TimeZoneStruct::Type mTz[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
+    Structs::TimeZoneStruct::Type mTz[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
     struct timeZoneName mNames[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
-    TimeSynchronization::Structs::DSTOffsetStruct::Type mDst[CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE];
+    Structs::DSTOffsetStruct::Type mDst[CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE];
 
     TimeSyncDataProvider mTimeSyncDataProvider;
-    static TimeSynchronizationServer mTimeSyncInstance;
+    static TimeSynchronizationServer sTimeSyncInstance;
     TimeSyncEventFlag mEventFlag = TimeSyncEventFlag::kNone;
 };
 
