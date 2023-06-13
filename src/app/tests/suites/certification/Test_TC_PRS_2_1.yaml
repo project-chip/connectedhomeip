@@ -60,23 +60,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: -32768
-              maxValue: 32767
-
-    - label:
-          "Verify that MeasuredValue value is null or PRSmin ≤ MeasuredValue ≤
-          PRSmax."
-      PICS: PRS.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          If MeasuredValue value is null or PRSmin ≤ MeasuredValue ≤ PRSmax. else fail the step.
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+              minValue: MinMeasuredValue
+              maxValue: MaxMeasuredValue
 
     - label: "Read the optional attribute: Tolerance"
       PICS: PRS.S.A0003
@@ -117,23 +102,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: -32768
-              maxValue: 32767
-
-    - label:
-          "Verify that ScaledValue value is null or PRS_Scaledmin ≤ ScaledValue
-          ≤ PRS_Scaledmax."
-      PICS: PRS.S.A0010 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          If ScaledValue value is null or PRS_Scaledmin ≤ ScaledValue ≤ PRS_Scaledmax. else fail the step.
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+              minValue: MinScaledValue
+              maxValue: MaxScaledValue
 
     - label: "Read the optional attribute: ScaledTolerance"
       PICS: PRS.S.A0013

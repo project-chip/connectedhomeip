@@ -60,23 +60,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: -27315
-              maxValue: 32767
-
-    - label:
-          "Verify that MeasuredValue value is null or TMPmin ≤ MeasuredValue ≤
-          TMPmax."
-      PICS: TMP.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          If MeasuredValue value is null or TMPmin ≤ MeasuredValue ≤ TMPmax. else fail the step.
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+              minValue: MinMeasuredValue
+              maxValue: MaxMeasuredValue
 
     - label: "Read the optional attribute: Tolerance"
       PICS: TMP.S.A0003

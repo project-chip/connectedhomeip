@@ -253,7 +253,6 @@
         "Test_TC_CC_9_3"
     ],
     "DoorLock": [
-        "Test_TC_DRLK_2_1",
         "Test_TC_DRLK_2_8",
         "Test_TC_DRLK_2_10",
         "Test_TC_DRLK_3_1",
