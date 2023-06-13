@@ -910,8 +910,7 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Discovery, "Failed to find a suitable IP address to advertise: %" CHIP_ERROR_FORMAT,
-                         err.Format());
+            ChipLogError(Discovery, "Failed to find a suitable IP address to advertise: %" CHIP_ERROR_FORMAT, err.Format());
             continue;
         }
 
