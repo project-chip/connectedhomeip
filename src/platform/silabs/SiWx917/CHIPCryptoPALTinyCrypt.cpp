@@ -1243,7 +1243,7 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
                 VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_INTERNAL);
 
                 // Missing pathLen optional tag will leave pathLen == -1.
-                bool hasPathLen = (p != (seqStart + len));
+                bool hasPathLen = (p <= (seqStart + len));
                 if (hasPathLen)
                 {
                     // Extract pathLen value, making sure it's a valid format.
