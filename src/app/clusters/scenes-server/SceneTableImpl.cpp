@@ -28,11 +28,8 @@ DefaultSceneHandlerImpl::EncodeAttributeValueList(
     MutableByteSpan & serializedBytes)
 {
     TLV::TLVWriter writer;
-    // TLV::TLVType outer;
     writer.Init(serializedBytes);
-    // ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), aVlist));
-    // ReturnErrorOnFailure(writer.EndContainer(outer));
     serializedBytes.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
@@ -43,14 +40,10 @@ CHIP_ERROR DefaultSceneHandlerImpl::DecodeAttributeValueList(
     app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> & aVlist)
 {
     TLV::TLVReader reader;
-    // TLV::TLVType outer;
 
     reader.Init(serializedBytes);
-    // ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag());
-    // ReturnErrorOnFailure(reader.EnterContainer(outer));
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(aVlist.Decode(reader));
-    // ReturnErrorOnFailure(reader.ExitContainer(outer));
 
     return CHIP_NO_ERROR;
 }
@@ -71,14 +64,11 @@ DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint,
     auto pair_iterator = extensionFieldSet.attributeValueList.begin();
     while (pair_iterator.Next())
     {
-        app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType aVPair = pair_iterator.GetValue();
-        aVPairs[pairCount].attributeID                                           = aVPair.attributeID;
-        aVPairs[pairCount].attributeValue                                        = aVPair.attributeValue;
+        aVPairs[pairCount] = pair_iterator.GetValue();
         pairCount++;
     }
     ReturnErrorOnFailure(pair_iterator.GetStatus());
-    app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList(aVPairs);
-    attributeValueList.reduce_size(pairCount);
+    app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList(aVPairs, pairCount);
 
     return EncodeAttributeValueList(attributeValueList, serializedBytes);
 }
@@ -99,9 +89,7 @@ CHIP_ERROR DefaultSceneHandlerImpl::Deserialize(EndpointId endpoint, ClusterId c
     auto pair_iterator = attributeValueList.begin();
     while (pair_iterator.Next())
     {
-        app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType decodePair = pair_iterator.GetValue();
-        mAVPairs[pairCount].attributeID                                              = decodePair.attributeID;
-        mAVPairs[pairCount].attributeValue                                           = decodePair.attributeValue;
+        mAVPairs[pairCount] = pair_iterator.GetValue();
         pairCount++;
     };
     ReturnErrorOnFailure(pair_iterator.GetStatus());

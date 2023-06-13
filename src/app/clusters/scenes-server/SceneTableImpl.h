@@ -56,7 +56,7 @@ public:
 
     /// @brief Decodes an attribute value list from a TLV structure and ensure it fits the member pair buffer
     /// @param serializedBytes [in] Buffer to read from
-    /// @param aVlist [out] Attribute value list to fill from the TLV structure
+    /// @param aVlist [out] Attribute value list to fill from the TLV structure.  Only valid while the buffer backing serializedBytes exists and its contents are not modified.
     /// @return CHIP_ERROR
     virtual CHIP_ERROR DecodeAttributeValueList(
         const ByteSpan & serializedBytes,
