@@ -135,8 +135,16 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
 
     // return operational error
     response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel,
-                                                             strlen(mOperationalError.ErrorStateLabel));
+
+    if (mOperationalError.ErrorStateLabelHasValue)
+    {
+        response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, sizeof(mOperationalError.ErrorStateLabel));
+    }
+    else
+    {
+        response.commandResponseState.errorStateLabel.SetNull();
+    }
+
     response.commandResponseState.errorStateDetails = mOperationalError.ErrorStateDetailsHasValue ? Optional<chip::CharSpan>::Value(mOperationalError.ErrorStateDetails) : Optional<chip::CharSpan>::Missing();
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -165,8 +173,15 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
 
     // return operational error
     response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel,
-                                                             strlen(mOperationalError.ErrorStateLabel));
+
+    if (mOperationalError.ErrorStateLabelHasValue)
+    {
+        response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, sizeof(mOperationalError.ErrorStateLabel));
+    }
+    else
+    {
+        response.commandResponseState.errorStateLabel.SetNull();
+    }
     response.commandResponseState.errorStateDetails = mOperationalError.ErrorStateDetailsHasValue ? Optional<chip::CharSpan>::Value(mOperationalError.ErrorStateDetails) : Optional<chip::CharSpan>::Missing();
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -195,8 +210,15 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
 
     // return operational error
     response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel,
-                                                             strlen(mOperationalError.ErrorStateLabel));
+
+    if (mOperationalError.ErrorStateLabelHasValue)
+    {
+        response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, sizeof(mOperationalError.ErrorStateLabel));
+    }
+    else
+    {
+        response.commandResponseState.errorStateLabel.SetNull();
+    }
     response.commandResponseState.errorStateDetails = mOperationalError.ErrorStateDetailsHasValue ? Optional<chip::CharSpan>::Value(mOperationalError.ErrorStateDetails) : Optional<chip::CharSpan>::Missing();
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -225,8 +247,15 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
 
     // return operational error
     response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
-    response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel,
-                                                             strlen(mOperationalError.ErrorStateLabel));
+
+    if (mOperationalError.ErrorStateLabelHasValue)
+    {
+        response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, sizeof(mOperationalError.ErrorStateLabel));
+    }
+    else
+    {
+        response.commandResponseState.errorStateLabel.SetNull();
+    }
     response.commandResponseState.errorStateDetails = mOperationalError.ErrorStateDetailsHasValue ? Optional<chip::CharSpan>::Value(mOperationalError.ErrorStateDetails) : Optional<chip::CharSpan>::Missing();
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -323,7 +352,16 @@ CHIP_ERROR OperationalStateServer::SetOperationalError(GenericOperationalErrorSt
 
     memset(mOperationalError.ErrorStateLabel, 0, sizeof(mOperationalError.ErrorStateLabel));
     memset(mOperationalError.ErrorStateDetails, 0, sizeof(mOperationalError.ErrorStateDetails));
-    memcpy(mOperationalError.ErrorStateLabel, op.ErrorStateLabel, sizeof(op.ErrorStateLabel));
+
+    if (op.ErrorStateLabelHasValue)
+    {
+        memcpy(mOperationalError.ErrorStateLabel, op.ErrorStateLabel, sizeof(op.ErrorStateLabel));
+        mOperationalError.ErrorStateLabelHasValue = true;
+    }
+    else
+    {
+        mOperationalError.ErrorStateLabelHasValue = false;
+    }
     if (op.ErrorStateDetailsHasValue)
     {
        memcpy(mOperationalError.ErrorStateDetails, op.ErrorStateDetails, sizeof(op.ErrorStateDetails));
@@ -380,7 +418,15 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         OperationalState::Structs::ErrorStateStruct::Type opError;
 
         opError.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
-        opError.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, strlen(mOperationalError.ErrorStateLabel));
+
+        if (mOperationalError.ErrorStateLabelHasValue)
+        {
+            opError.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, sizeof(mOperationalError.ErrorStateLabel));
+        }
+        else
+        {
+            opError.errorStateLabel.SetNull();
+        }
         opError.errorStateDetails = mOperationalError.ErrorStateDetailsHasValue ? Optional<chip::CharSpan>::Value(mOperationalError.ErrorStateDetails) : Optional<chip::CharSpan>::Missing();
         return aEncoder.Encode(opError);
     }

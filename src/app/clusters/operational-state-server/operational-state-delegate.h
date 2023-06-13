@@ -42,8 +42,25 @@ struct GenericOperationalErrorState
  * cluster-specific enum type for ErrorStateID.
  */
     uint8_t ErrorStateID;
+/*
+ * Since OperationalErrorStateStruct is shared across different clusters, it can't use a
+ * cluster-specific type for errorStateLabel.
+ */
     char ErrorStateLabel[kErrorStateLabelMaxSize];
+/*
+ * Since OperationalErrorStateStruct is shared across different clusters, it can't use a
+ * cluster-specific type for errorStateDetails.
+ */
     char ErrorStateDetails[kErrorStateDetailsMaxSize];
+/*
+ * If the ErrorStateLabel is null, set ErrorStateLabelHasValue to false; other then set
+ * ErrorStateLabelHasValue to true;
+ */
+    bool ErrorStateLabelHasValue = false;
+/*
+ * If the ErrorStateDetails is missing, set ErrorStateDetailsHasValue to false; other then set
+ * ErrorStateDetailsHasValue to true;
+ */
     bool ErrorStateDetailsHasValue = false;
 };
 
