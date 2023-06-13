@@ -8246,7 +8246,8 @@ PICS:
     - label: "Changes air quality significantly"
       id:
           AIRQUAL.M.AirQualityChange
-          # Carbon Dioxide Concentration Measurement Cluster Test Plan
+
+    # Carbon Dioxide Concentration Measurement Cluster Test Plan
     - label:
           "Does the device implement the Carbon Dioxide Concentration
           Measurement Cluster as a server?"
