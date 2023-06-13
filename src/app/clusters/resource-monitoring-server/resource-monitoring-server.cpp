@@ -45,7 +45,7 @@ EmberAfStatus Instance::GetFeature(uint32_t * value) const
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
-        emberAfReadAttribute(endpointId, clusterId, HepaFilterMonitoring::Attributes::FeatureMap::Id, readable, sizeof(temp));
+        emberAfReadAttribute(endpointId, clusterId, ResourceMonitoring::Attributes::FeatureMap::Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -65,7 +65,7 @@ EmberAfStatus Instance::SetFeatureMap(uint32_t value) const
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpointId, clusterId, HepaFilterMonitoring::Attributes::FeatureMap::Id, writable,
+    return emberAfWriteAttribute(endpointId, clusterId, ResourceMonitoring::Attributes::FeatureMap::Id, writable,
                                  ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
@@ -93,8 +93,6 @@ CHIP_ERROR Instance::Init()
     ReturnErrorOnFailure(delegate->Init());
 
     ResourceMonitoringAliasesInstanceMap[clusterId] = this;
-
-  
 
     return CHIP_NO_ERROR;
 }
@@ -126,7 +124,8 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
     }
 }
 
-void Instance::HandleResetCondition(HandlerContext & ctx, const HepaFilterMonitoring::Commands::ResetCondition::DecodableType & commandData)
+void Instance::HandleResetCondition(HandlerContext & ctx,
+                                    const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData)
 {
     // uint8_t newMode = commandData.newMode;
 
@@ -156,8 +155,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-
-bool Instance::HasFeature(HepaFilterMonitoring::Feature feature) const
+bool Instance::HasFeature(ResourceMonitoring::Feature feature) const
 {
     bool success;
     uint32_t featureMap;
