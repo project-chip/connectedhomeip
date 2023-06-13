@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 145.1.1. [TC-CDOCONC-1.1] Global Attributes with DUT as Server
+name: 145.1.1. [TC-PMKCONC-1.1] Global Attributes with DUT as Server
 
 PICS:
-    - CDOCONC.S
+    - PMKCONC.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Carbon Dioxide Concentration Measurement"
+    cluster: "PM10 Concentration Measurement"
     endpoint: 1
 
 tests:
@@ -34,7 +34,7 @@ tests:
     - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
-      PICS: CDOCONC.S.Afffd
+      PICS: PMKCONC.S.Afffd
       response:
           value: 1
           constraints:
@@ -43,61 +43,61 @@ tests:
     - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: CDOCONC.S.Afffc && !CDOCONC.S.F00 && !CDOCONC.S.F01 && !CDOCONC.S.F02 && !CDOCONC.S.F03 && !CDOCONC.S.F04 && !CDOCONC.S.F05
+      PICS: PMKCONC.S.Afffc && !PMKCONC.S.F00 && !PMKCONC.S.F01 && !PMKCONC.S.F02 && !PMKCONC.S.F03 && !PMKCONC.S.F04 && !PMKCONC.S.F05
       response:
           value: 0
           constraints:
               type: bitmap32
 
-    - label: "Given CDOCONC.S.F00(MEA) ensure featuremap has the correct bit set"
+    - label: "Given PMKCONC.S.F00(MEA) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: CDOCONC.S.Afffc && CDOCONC.S.F00
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F00
       response:
           constraints:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given CDOCONC.S.F01(LEV) ensure featuremap has the correct bit set"
+    - label: "Given PMKCONC.S.F01(LEV) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: CDOCONC.S.Afffc && CDOCONC.S.F01
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F01
       response:
           constraints:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Given CDOCONC.S.F02(MED) ensure featuremap has the correct bit set"
+    - label: "Given PMKCONC.S.F02(MED) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: CDOCONC.S.Afffc && CDOCONC.S.F02
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F02
       response:
           constraints:
               type: bitmap32
               hasMasksSet: [0x4]
 
-    - label: "Given CDOCONC.S.F03(CRI) ensure featuremap has the correct bit set"
+    - label: "Given PMKCONC.S.F03(CRI) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: CDOCONC.S.Afffc && CDOCONC.S.F03
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F03
       response:
           constraints:
               type: bitmap32
               hasMasksSet: [0x8]
 
-    - label: "Given CDOCONC.S.F04(PEA) ensure featuremap has the correct bit set"
+    - label: "Given PMKCONC.S.F04(PEA) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: CDOCONC.S.Afffc && CDOCONC.S.F04
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F04
       response:
           constraints:
               type: bitmap32
               hasMasksSet: [0x10]
 
-    - label: "Given CDOCONC.S.F05(AVG) ensure featuremap has the correct bit set"
+    - label: "Given PMKCONC.S.F05(AVG) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: CDOCONC.S.Afffc && CDOCONC.S.F05
+      PICS: PMKCONC.S.Afffc && PMKCONC.S.F05
       response:
           constraints:
               type: bitmap32
@@ -106,7 +106,7 @@ tests:
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: CDOCONC.S.Afffb
+      PICS: PMKCONC.S.Afffb
       response:
           constraints:
               type: list
@@ -115,7 +115,7 @@ tests:
     - label: "Read the optional attribute Uncertainty in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: CDOCONC.S.Afffb && CDOCONC.S.A0007 && CDOCONC.S.F00
+      PICS: PMKCONC.S.Afffb && PMKCONC.S.A0007 && PMKCONC.S.F00
       response:
           constraints:
               type: list
@@ -124,7 +124,7 @@ tests:
     - label: "Read the optional, feature dependent attributes MeasuredValue, MinMeasuredValue, MaxMeasuredValue and Measurement Unit in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: CDOCONC.S.Afffb && CDOCONC.S.F00
+      PICS: PMKCONC.S.Afffb && PMKCONC.S.F00
       response:
           constraints:
               type: list
@@ -133,7 +133,7 @@ tests:
     - label: "Read the optional, feature dependent attributes PeakMeasuredValue & PeakMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: CDOCONC.S.Afffb && CDOCONC.S.F04
+      PICS: PMKCONC.S.Afffb && PMKCONC.S.F04
       response:
           constraints:
               type: list
@@ -142,7 +142,7 @@ tests:
     - label: "Read the optional, feature dependent attributes AverageMeasuredValue AverageMeasuredValueWindow in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: CDOCONC.S.Afffb && CDOCONC.S.F05
+      PICS: PMKCONC.S.Afffb && PMKCONC.S.F05
       response:
           constraints:
               type: list
@@ -151,7 +151,7 @@ tests:
     - label: "Read the optional, feature dependent attribute LevelValue in AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: CDOCONC.S.Afffb && CDOCONC.S.F01
+      PICS: PMKCONC.S.Afffb && PMKCONC.S.F01
       response:
           constraints:
               type: list
@@ -160,7 +160,7 @@ tests:
     - label: "Read the global attribute: EventList"
       command: "readAttribute"
       attribute: "EventList"
-      PICS: CDOCONC.S.Afffa
+      PICS: PMKCONC.S.Afffa
       response:
           value: []
           constraints:
@@ -169,7 +169,7 @@ tests:
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
-      PICS: CDOCONC.S.Afff9
+      PICS: PMKCONC.S.Afff9
       response:
           value: []
           constraints:
@@ -178,7 +178,7 @@ tests:
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
-      PICS: CDOCONC.S.Afff8
+      PICS: PMKCONC.S.Afff8
       response:
           value: []
           constraints:
