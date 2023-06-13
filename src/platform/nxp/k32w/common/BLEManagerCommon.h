@@ -198,6 +198,7 @@ protected:
     BLEManagerCommon::ble_err_t blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data, uint32_t len);
 
     static void DriveBLEState(intptr_t arg);
+    static void StopAdvertisingPriorToSwitchingMode(intptr_t arg);
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     static void CancelBleAdvTimeoutTimer(void);
     static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
