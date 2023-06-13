@@ -135,7 +135,7 @@ tests:
           AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
-      PICS: CMOCONC.S.Afffb &&  && CMOCONC.S.F00
+      PICS: CMOCONC.S.Afffb && CMOCONC.S.F00
       response:
           constraints:
               type: list
