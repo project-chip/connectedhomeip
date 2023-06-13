@@ -24,6 +24,18 @@ from .errors import TestStepError, TestStepKeyError, TestStepValueNameError
 from .pics_checker import PICSChecker
 from .yaml_loader import YamlLoader
 
+ANY_COMMANDS_CLUSTER_NAME = 'AnyCommands'
+ANY_COMMANDS_LIST = [
+    'CommandById',
+    'ReadById',
+    'WriteById',
+    'SubscribeById',
+    'ReadEventById',
+    'SubscribeEventById',
+    'ReadAll',
+    'SubscribeAll',
+]
+
 
 class UnknownPathQualifierError(TestStepError):
     """Raise when an attribute/command/event name is not found in the definitions."""
@@ -235,7 +247,7 @@ class _TestStepWithPlaceholders:
 
     def _update_mappings(self, test: dict, definitions: SpecDefinitions):
         cluster_name = self.cluster
-        if definitions is None or not definitions.has_cluster_by_name(cluster_name):
+        if definitions is None or not definitions.has_cluster_by_name(cluster_name) or cluster_name == ANY_COMMANDS_CLUSTER_NAME or self.command in ANY_COMMANDS_LIST:
             self.argument_mapping = None
             self.response_mapping = None
             self.response_mapping_name = None
@@ -756,7 +768,7 @@ class TestStep:
                 break
 
             received_value = received_response.get('value')
-            if not self.is_attribute and not self.is_event:
+            if not self.is_attribute and not self.is_event and not (self.command in ANY_COMMANDS_LIST):
                 expected_name = value.get('name')
                 if expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(

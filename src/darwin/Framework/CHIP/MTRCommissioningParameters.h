@@ -88,6 +88,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign) BOOL skipCommissioningComplete MTR_NEWLY_AVAILABLE;
 
+/**
+ * The country code to provide to the device during commissioning.
+ *
+ * If not nil, this must be a 2-character ISO 3166-1 country code, which the
+ * device can use to decide on things like radio communications bands.
+ */
+@property (nonatomic, copy, nullable) NSString * countryCode MTR_NEWLY_AVAILABLE;
+
 @end
 
 @interface MTRCommissioningParameters (Deprecated)

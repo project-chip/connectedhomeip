@@ -221,7 +221,8 @@ def read_zcl_attribute(devCtrl, cluster: str, attribute: str, nodeId: int, endpo
             EndpointId=endpoint, Attribute=attributeObj)
 
         res = IM.AttributeReadResult(path=IM.AttributePath(nodeId=nodeId, endpointId=path.EndpointId, clusterId=path.ClusterId,
-                                     attributeId=path.AttributeId), status=0, value=result[endpoint][clusterObj][attributeObj])
+                                     attributeId=path.AttributeId), status=0, value=result[endpoint][clusterObj][attributeObj],
+                                     dataVersion=result[endpoint][clusterObj][ClusterAttribute.DataVersion])
 
     except exceptions.ChipStackException as ex:
         log.error("An exception occurred during processing ZCL attribute: {}".format(str(ex)))

@@ -56,7 +56,7 @@ jobs:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3
@@ -168,7 +168,7 @@ jobs:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3
@@ -242,7 +242,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Clang-tidy validation
-              timeout-minutes: 45
+              timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
@@ -340,7 +340,7 @@ jobs:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3
@@ -391,7 +391,7 @@ jobs:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3
@@ -462,7 +462,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Clang-tidy validation
-              timeout-minutes: 45
+              timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
@@ -499,7 +499,7 @@ jobs:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3

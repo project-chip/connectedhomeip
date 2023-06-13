@@ -20,7 +20,7 @@
 
 #include <system/SystemConfig.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <arpa/inet.h>
 
 #else // !CHIP_SYSTEM_CONFIG_USE_SOCKETS

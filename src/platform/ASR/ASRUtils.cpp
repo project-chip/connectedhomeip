@@ -288,9 +288,6 @@ CHIP_ERROR ASRUtils::asr_wifi_connect(void)
     strncpy((char *) conf.wifi_key, (char *) stationConfig.wifi_key, stationConfig.key_len);
     conf.security = stationConfig.security;
 
-    // before wlan open with sta mode, make sure the wlan is closed.
-    // lega_wlan_close();
-
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]\r\n", StringOrNullMarker(conf.wifi_ssid));
 
     lega_wlan_clear_pmk();

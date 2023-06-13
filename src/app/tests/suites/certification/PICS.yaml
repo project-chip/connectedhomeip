@@ -8211,12 +8211,14 @@ PICS:
     - label: "Does the DUT(server) support the SetTimeZoneResponse command?"
       id: TIMESYNC.S.C03.Tx
 
+    #####################################################################################
     # Air Quality Cluster Test Plan
     - label: "Does the device implement the Air Quality cluster as a server?"
       id: AIRQUAL.S
 
     - label: "Does the device implement the Air Quality cluster as a client?"
       id: AIRQUAL.C
+
     #
     # server / attributes
     #
@@ -8244,7 +8246,7 @@ PICS:
     - label: "Changes air quality significantly"
       id: AIRQUAL.M.AirQualityChange
 
-    # Carbon Dioxide Concentration Measurement Cluster Test Plan
+        # Carbon Dioxide Concentration Measurement Cluster Test Plan
     - label:
         "Does the device implement the Carbon Dioxide Concentration Measurement
           Cluster as a server?"
