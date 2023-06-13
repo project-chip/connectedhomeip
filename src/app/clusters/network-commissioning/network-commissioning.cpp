@@ -32,6 +32,7 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <trace/trace.h>
+#include <tracing/scope.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -142,7 +143,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.EncodeList([this](const auto & encoder) {
             auto networks  = mpBaseDriver->GetNetworks();
             CHIP_ERROR err = CHIP_NO_ERROR;
-            Structs::NetworkInfo::Type networkForEncode;
+            Structs::NetworkInfoStruct::Type networkForEncode;
             NetworkCommissioning::Network network;
             for (; networks != nullptr && networks->Next(network);)
             {
@@ -244,6 +245,7 @@ void Instance::OnNetworkingStatusChange(NetworkCommissioning::Status aCommission
 void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleScanNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleScanNetwork);
     if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
         ByteSpan ssid;
@@ -292,7 +294,7 @@ void FillDebugTextAndNetworkIndex(Commands::NetworkConfigResponse::Type & respon
     {
         response.debugText.SetValue(CharSpan(debugText.data(), debugText.size()));
     }
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
     {
         response.networkIndex.SetValue(networkIndex);
     }
@@ -316,6 +318,7 @@ bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
 void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleAddOrUpdateWiFiNetwork);
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
@@ -365,7 +368,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
         mpDriver.Get<WiFiDriver *>()->AddOrUpdateNetwork(req.ssid, req.credentials, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -374,6 +377,7 @@ void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleAddOrUpdateThreadNetwork);
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
@@ -388,7 +392,7 @@ void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Comman
         mpDriver.Get<ThreadDriver *>()->AddOrUpdateNetwork(req.operationalDataset, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -411,6 +415,7 @@ void Instance::CommitSavedBreadcrumb()
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleRemoveNetwork);
 
     VerifyOrReturn(CheckFailSafeArmed(ctx));
 
@@ -424,7 +429,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
     response.networkingStatus = mpWirelessDriver->RemoveNetwork(req.networkID, debugText, outNetworkIndex);
     FillDebugTextAndNetworkIndex(response, debugText, outNetworkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -433,6 +438,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleConnectNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleConnectNetwork);
     if (req.networkID.size() > DeviceLayer::NetworkCommissioning::kMaxNetworkIDLen)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidValue);
@@ -451,6 +457,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
 void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::ReorderNetwork::DecodableType & req)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
+    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::NetworkCommissioning_HandleReorderNetwork);
     Commands::NetworkConfigResponse::Type response;
     MutableCharSpan debugText;
 #if CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
@@ -460,7 +467,7 @@ void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::Reorde
     response.networkingStatus = mpWirelessDriver->ReorderNetwork(req.networkID, req.networkIndex, debugText);
     FillDebugTextAndNetworkIndex(response, debugText, req.networkIndex);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-    if (response.networkingStatus == NetworkCommissioningStatus::kSuccess)
+    if (response.networkingStatus == NetworkCommissioningStatusEnum::kSuccess)
     {
         UpdateBreadcrumb(req.breadcrumb);
     }
@@ -500,7 +507,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     mLastNetworkingStatusValue.SetNonNull(commissioningError);
 
     commandHandle->AddResponse(mPath, response);
-    if (commissioningError == NetworkCommissioningStatus::kSuccess)
+    if (commissioningError == NetworkCommissioningStatusEnum::kSuccess)
     {
         CommitSavedBreadcrumb();
     }
@@ -586,7 +593,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
 
     for (size_t i = 0; i < scanResponseArrayLength; i++)
     {
-        Structs::ThreadInterfaceScanResult::Type result;
+        Structs::ThreadInterfaceScanResultStruct::Type result;
         Encoding::BigEndian::Put64(extendedAddressBuffer, scanResponseArray[i].extendedAddress);
         result.panId           = scanResponseArray[i].panId;
         result.extendedPanId   = scanResponseArray[i].extendedPanId;
@@ -608,7 +615,7 @@ exit:
     {
         ChipLogError(Zcl, "Failed to encode response: %s", err.AsString());
     }
-    if (status == NetworkCommissioningStatus::kSuccess)
+    if (status == NetworkCommissioningStatusEnum::kSuccess)
     {
         CommitSavedBreadcrumb();
     }
@@ -651,7 +658,7 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
 
     for (; networks != nullptr && networks->Next(scanResponse) && networksEncoded < kMaxNetworksInScanResponse; networksEncoded++)
     {
-        Structs::WiFiInterfaceScanResult::Type result;
+        Structs::WiFiInterfaceScanResultStruct::Type result;
         result.security = scanResponse.security;
         result.ssid     = ByteSpan(scanResponse.ssid, scanResponse.ssidLen);
         result.bssid    = ByteSpan(scanResponse.bssid, sizeof(scanResponse.bssid));
@@ -669,7 +676,7 @@ exit:
     {
         ChipLogError(Zcl, "Failed to encode response: %s", err.AsString());
     }
-    if (status == NetworkCommissioningStatus::kSuccess)
+    if (status == NetworkCommissioningStatusEnum::kSuccess)
     {
         CommitSavedBreadcrumb();
     }

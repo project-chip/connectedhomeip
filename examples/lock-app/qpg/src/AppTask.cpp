@@ -105,11 +105,9 @@ void OnTriggerIdentifyEffect(Identify * identify)
 {
     sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
-    if (identify->mCurrentEffectIdentifier == Clusters::Identify::EffectIdentifierEnum::kChannelChange)
+    if (identify->mEffectVariant != Clusters::Identify::EffectVariantEnum::kDefault)
     {
-        ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect variant %d",
-                        to_underlying(identify->mEffectVariant));
-        sIdentifyEffect = static_cast<Clusters::Identify::EffectIdentifierEnum>(identify->mEffectVariant);
+        ChipLogDetail(AppServer, "Identify Effect Variant unsupported. Using default");
     }
 
     switch (sIdentifyEffect)
@@ -117,6 +115,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
     case Clusters::Identify::EffectIdentifierEnum::kBreathe:
     case Clusters::Identify::EffectIdentifierEnum::kOkay:
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
         SystemLayer().ScheduleLambda([identify] {
             (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
                                                                identify);
@@ -586,13 +585,24 @@ void AppTask::UpdateClusterState(void)
     auto newValue = BoltLockMgr().IsUnlocked() ? DoorLock::DlLockState::kUnlocked : DoorLock::DlLockState::kLocked;
 
     SystemLayer().ScheduleLambda([newValue] {
-        ChipLogProgress(NotSpecified, "UpdateClusterState");
+        chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> currentLockState;
+        chip::app::Clusters::DoorLock::Attributes::LockState::Get(QPG_LOCK_ENDPOINT_ID, currentLockState);
 
-        EmberAfStatus status = DoorLock::Attributes::LockState::Set(QPG_LOCK_ENDPOINT_ID, newValue);
-
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (currentLockState.IsNull())
         {
-            ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
+            EmberAfStatus status = DoorLock::Attributes::LockState::Set(QPG_LOCK_ENDPOINT_ID, newValue);
+            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
+            }
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Updating LockState attribute");
+            if (!DoorLockServer::Instance().SetLockState(QPG_LOCK_ENDPOINT_ID, newValue))
+            {
+                ChipLogError(NotSpecified, "ERR: updating DoorLock");
+            }
         }
     });
 }

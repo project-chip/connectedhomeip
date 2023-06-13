@@ -43,10 +43,6 @@
 #define EMBER_BINDING_TABLE_SIZE 10
 #endif // EMBER_BINDING_TABLE_SIZE
 
-// Legacy definition that we can remove once Scenes is no longer using the
-// Zigbee message-writing bits.
-#define EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH 1024
-
 /**
  * @brief CHIP uses millisecond ticks
  */

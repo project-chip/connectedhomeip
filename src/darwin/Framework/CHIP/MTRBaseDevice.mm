@@ -574,7 +574,7 @@ id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data
             chip::TLV::Tag tag = data->GetTag();
             id value = MTRDecodeDataValueDictionaryFromCHIPTLV(data);
             if (value == nullptr) {
-                MTR_LOG_ERROR("Error when decoding TLV container");
+                MTR_LOG_ERROR("Error when decoding TLV container of type %s", typeName.UTF8String);
                 return nil;
             }
             NSMutableDictionary * arrayElement = [NSMutableDictionary dictionary];

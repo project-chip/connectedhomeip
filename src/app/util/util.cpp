@@ -137,8 +137,29 @@ void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}
 void MatterFanControlPluginServerInitCallback() {}
+void MatterActivatedCarbonFilterMonitoringPluginServerInitCallback() {}
+void MatterCeramicFilterMonitoringPluginServerInitCallback() {}
+void MatterElectrostaticFilterMonitoringPluginServerInitCallback() {}
+void MatterFuelTankMonitoringPluginServerInitCallback() {}
+void MatterHepaFilterMonitoringPluginServerInitCallback() {}
+void MatterInkCartridgeMonitoringPluginServerInitCallback() {}
+void MatterIonizingFilterMonitoringPluginServerInitCallback() {}
+void MatterOzoneFilterMonitoringPluginServerInitCallback() {}
+void MatterTonerCartridgeMonitoringPluginServerInitCallback() {}
+void MatterUvFilterMonitoringPluginServerInitCallback() {}
+void MatterWaterTankMonitoringPluginServerInitCallback() {}
+void MatterZeoliteFilterMonitoringPluginServerInitCallback() {}
 void MatterAirQualityPluginServerInitCallback() {}
-
+void MatterCarbonMonoxideConcentrationMeasurementPluginServerInitCallback() {}
+void MatterCarbonDioxideConcentrationMeasurementPluginServerInitCallback() {}
+void MatterFormaldehydeConcentrationMeasurementPluginServerInitCallback() {}
+void MatterNitrogenDioxideConcentrationMeasurementPluginServerInitCallback() {}
+void MatterOzoneConcentrationMeasurementPluginServerInitCallback() {}
+void MatterPm10ConcentrationMeasurementPluginServerInitCallback() {}
+void MatterPm1ConcentrationMeasurementPluginServerInitCallback() {}
+void MatterPm25ConcentrationMeasurementPluginServerInitCallback() {}
+void MatterRadonConcentrationMeasurementPluginServerInitCallback() {}
+void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************
@@ -156,12 +177,6 @@ uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
         index++;
     }
     return 0xFFFF;
-}
-
-void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
-{
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
 }
 
 void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)

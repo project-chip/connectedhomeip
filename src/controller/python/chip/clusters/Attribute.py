@@ -266,6 +266,7 @@ EventReadRequest = EventDescriptorWithEndpoint
 @dataclass
 class AttributeReadResult(AttributeStatus):
     Data: Any = None
+    DataVersion: int = 0
 
 
 @dataclass
@@ -383,7 +384,7 @@ class AttributeCache:
 
         clusterCache[path.AttributeId] = data
 
-    def UpdateCachedData(self):
+    def UpdateCachedData(self, changedPathSet: set[AttributePath]):
         ''' This converts the raw TLV data into a cluster object format.
 
             Two formats are available:
@@ -401,68 +402,72 @@ class AttributeCache:
         tlvCache = self.attributeTLVCache
         attributeCache = self.attributeCache
 
-        for endpoint in tlvCache:
-            if (endpoint not in attributeCache):
-                attributeCache[endpoint] = {}
+        for attributePath in changedPathSet:
+            endpointId = attributePath.EndpointId
 
-            endpointCache = attributeCache[endpoint]
+            if endpointId not in attributeCache:
+                attributeCache[endpointId] = {}
 
-            for cluster in tlvCache[endpoint]:
-                if cluster not in _ClusterIndex:
+            endpointCache = attributeCache[endpointId]
+
+            clusterId = attributePath.ClusterId
+
+            if clusterId not in _ClusterIndex:
+                #
+                # #22599 tracks dealing with unknown clusters more
+                # gracefully so that clients can still access this data.
+                #
+                continue
+
+            clusterType = _ClusterIndex[clusterId]
+
+            if clusterType not in endpointCache:
+                endpointCache[clusterType] = {}
+
+            clusterCache = endpointCache[clusterType]
+            clusterDataVersion = self.versionList.get(
+                endpointId, {}).get(clusterId, None)
+
+            if self.returnClusterObject:
+                try:
+                    # Since the TLV data is already organized by attribute tags, we can trivially convert to a cluster object representation.
+                    endpointCache[clusterType] = clusterType.FromDict(
+                        data=clusterType.descriptor.TagDictToLabelDict([], tlvCache[endpointId][clusterId]))
+                    endpointCache[clusterType].SetDataVersion(
+                        clusterDataVersion)
+                except Exception as ex:
+                    decodedValue = ValueDecodeFailure(
+                        tlvCache[endpointId][clusterId], ex)
+                    endpointCache[clusterType] = decodedValue
+            else:
+                clusterCache[DataVersion] = clusterDataVersion
+
+                attributeId = attributePath.AttributeId
+
+                value = tlvCache[endpointId][clusterId][attributeId]
+
+                if (clusterId, attributeId) not in _AttributeIndex:
                     #
                     # #22599 tracks dealing with unknown clusters more
                     # gracefully so that clients can still access this data.
                     #
                     continue
 
-                clusterType = _ClusterIndex[cluster]
+                attributeType = _AttributeIndex[(clusterId, attributeId)][0]
 
-                if (clusterType not in endpointCache):
-                    endpointCache[clusterType] = {}
+                if attributeType not in clusterCache:
+                    clusterCache[attributeType] = {}
 
-                clusterCache = endpointCache[clusterType]
-                clusterDataVersion = self.versionList.get(
-                    endpoint, {}).get(cluster, None)
-
-                if (self.returnClusterObject):
-                    try:
-                        # Since the TLV data is already organized by attribute tags, we can trivially convert to a cluster object representation.
-                        endpointCache[clusterType] = clusterType.FromDict(
-                            data=clusterType.descriptor.TagDictToLabelDict([], tlvCache[endpoint][cluster]))
-                        endpointCache[clusterType].SetDataVersion(
-                            clusterDataVersion)
-                    except Exception as ex:
-                        decodedValue = ValueDecodeFailure(
-                            tlvCache[endpoint][cluster], ex)
-                        endpointCache[clusterType] = decodedValue
+                if isinstance(value, ValueDecodeFailure):
+                    clusterCache[attributeType] = value
                 else:
-                    clusterCache[DataVersion] = clusterDataVersion
-                    for attribute in tlvCache[endpoint][cluster]:
-                        value = tlvCache[endpoint][cluster][attribute]
+                    try:
+                        decodedValue = attributeType.FromTagDictOrRawValue(
+                            tlvCache[endpointId][clusterId][attributeId])
+                    except Exception as ex:
+                        decodedValue = ValueDecodeFailure(value, ex)
 
-                        if (cluster, attribute) not in _AttributeIndex:
-                            #
-                            # #22599 tracks dealing with unknown clusters more
-                            # gracefully so that clients can still access this data.
-                            #
-                            continue
-
-                        attributeType = _AttributeIndex[(
-                            cluster, attribute)][0]
-
-                        if (attributeType not in clusterCache):
-                            clusterCache[attributeType] = {}
-
-                        if (type(value) is ValueDecodeFailure):
-                            clusterCache[attributeType] = value
-                        else:
-                            try:
-                                decodedValue = attributeType.FromTagDictOrRawValue(
-                                    tlvCache[endpoint][cluster][attribute])
-                            except Exception as ex:
-                                decodedValue = ValueDecodeFailure(value, ex)
-
-                            clusterCache[attributeType] = decodedValue
+                    clusterCache[attributeType] = decodedValue
 
 
 class SubscriptionTransaction:
@@ -505,7 +510,7 @@ class SubscriptionTransaction:
 
     def GetReportingIntervalsSeconds(self) -> Tuple[int, int]:
         '''
-        Retrieve the reporting intervals associated with an active subscription. 
+        Retrieve the reporting intervals associated with an active subscription.
         This should only be called if we're of subscription interaction type and after a subscription has been established.
         '''
         handle = chip.native.GetLibraryHandle()
@@ -650,8 +655,9 @@ def _BuildEventIndex():
 class AsyncReadTransaction:
     @dataclass
     class ReadResponse:
-        attributes: AttributeCache = None
-        events: List[ClusterEvent] = None
+        attributes: dict[Any, Any]
+        events: list[ClusterEvent]
+        tlvAttributes: dict[int, Any]
 
     def __init__(self, future: Future, eventLoop, devCtrl, returnClusterObject: bool):
         self._event_loop = eventLoop
@@ -765,7 +771,7 @@ class AsyncReadTransaction:
         pass
 
     def _handleReportEnd(self):
-        self._cache.UpdateCachedData()
+        self._cache.UpdateCachedData(self._changedPathSet)
 
         if (self._subscription_handler is not None):
             for change in self._changedPathSet:
@@ -796,7 +802,7 @@ class AsyncReadTransaction:
                     self._future.set_exception(chip.exceptions.ChipStackError(self._resultError))
             else:
                 self._future.set_result(AsyncReadTransaction.ReadResponse(
-                    attributes=self._cache.attributeCache, events=self._events))
+                    attributes=self._cache.attributeCache, events=self._events, tlvAttributes=self._cache.attributeTLVCache))
 
         #
         # Decrement the ref on ourselves to match the increment that happened at allocation.

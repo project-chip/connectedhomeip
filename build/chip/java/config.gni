@@ -16,7 +16,7 @@ java_path = getenv("JAVA_PATH")
 declare_args() {
   java_matter_controller_dependent_paths = []
   matter_enable_java_compilation = false
-  if (java_path != "" && current_os != "android") {
+  if (java_path != "" && current_os == "linux") {
     java_matter_controller_dependent_paths += [ "${java_path}/include/" ]
 
     if (current_os == "mac") {
