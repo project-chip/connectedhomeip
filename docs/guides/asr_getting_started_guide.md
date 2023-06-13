@@ -14,6 +14,7 @@ platform that uses ASR FreeRTOS SDK.
         -   [IP mode](#ip-mode)
     -   [Shell](#shell)
     -   [OTA](#ota)
+    -   [Factory](#factory)
 
 ---
 
@@ -72,7 +73,8 @@ to speed up development. You can find them in the samples with `/asr` subfolder.
     `--target` when build the examples.
 
 -   After building the application, `DOGO` tool is used to flash it to the
-    board.
+    board, please refer to the
+    [DOGO Tool User Guide](https://asriot.readthedocs.io/en/latest/ASR550X/Download-Tool/ASR_IoT_DOGO_Tool_User_Guide.html).
 
 ## Commissioning
 
@@ -128,7 +130,18 @@ There are two commissioning modes supported by ASR platform:
 
 ## OTA
 
-To build the example with the Matter OTA Requestor functionality, exactly the
-same steps as above but add argument `-ota` when using the `build_examples.py`
-script. For example:
-`./scripts/build/build_examples.py --target asr-$ASR_BOARD-lighting-ota build`
+1. To build the example with the Matter OTA Requestor functionality, exactly the
+   same steps as above but add argument `-ota` when using the
+   `build_examples.py` script. For example:
+   `./scripts/build/build_examples.py --target asr-$ASR_BOARD-lighting-ota build`
+2. For more usage details, please refer to the
+   [OTA example](../../examples/ota-requestor-app/asr/README.md)
+
+## Factory
+
+1. To build the example with the ASR Factory Data Provider, exactly the same
+   steps as above but add argument `-factory` when using the `build_examples.py`
+   script. For example:
+   `./scripts/build/build_examples.py --target asr-$ASR_BOARD-lighting-factory build`
+2. For more usage details, please refer to the
+   [Factory Tool User Guide](https://github.com/asriot/Tools/blob/main/factory_tool/README.md)
