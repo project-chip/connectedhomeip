@@ -31,4 +31,3 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
