@@ -252,6 +252,11 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
     {
         bootReason = BootReasonType::kBrownOutReset;
     }
+    else if (rebootCause & RESET_WDT)
+    {
+        /* Reboot can be due to hardware or software watchdog */
+        bootReason = BootReasonType::kHardwareWatchdogReset;
+    }
     else if (rebootCause & RESET_SW_REQ)
     {
         if (K32WConfig::ConfigValueExists(K32WConfig::kConfigKey_SoftwareUpdateCompleted))
@@ -262,11 +267,6 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
         {
             bootReason = BootReasonType::kSoftwareReset;
         }
-    }
-    else if (rebootCause & RESET_WDT)
-    {
-        /* Reboot can be due to hardware or software watchdog */
-        bootReason = BootReasonType::kSoftwareWatchdogReset;
     }
 
     K32WConfig::ClearConfigValue(K32WConfig::kConfigKey_SoftwareUpdateCompleted);
