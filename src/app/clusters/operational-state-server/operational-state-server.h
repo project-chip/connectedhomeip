@@ -41,6 +41,11 @@ private:
     Uncopyable & operator=(const Uncopyable &) = delete;
 };
 
+/**
+ * OperationalStateServer is a class to manager the opertional state cluster.
+ * In order to impl class can be used for all operational state aliases so inherit the CommandHandlerInterface
+ * In order to overide the Read interface so inherit the AttributeAccessInterface
+ */
 class OperationalStateServer : public CommandHandlerInterface, public AttributeAccessInterface, public Uncopyable
 {
 
