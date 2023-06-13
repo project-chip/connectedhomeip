@@ -143,13 +143,13 @@ void Instance::HandleResetCondition(HandlerContext & ctx,
 // This function is called by the interaction model engine when a command destined for this instance is received.
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
-    ChipLogDetail(Zcl, "resourcemonitoring Instance::InvokeCommand");
+    ChipLogDetail(Zcl, "ResourceMonitoring Instance::InvokeCommand");
     switch (handlerContext.mRequestPath.mCommandId)
     {
-    case HepaFilterMonitoring::Commands::ResetCondition::Id:
-        ChipLogDetail(Zcl, "HepaFilterMonitoring::Commands::ResetCondition");
+    case ResourceMonitoring::Commands::ResetCondition::Id:
+        ChipLogDetail(Zcl, "ResourceMonitoring::Commands::ResetCondition");
 
-        HandleCommand<HepaFilterMonitoring::Commands::ResetCondition::DecodableType>(
+        HandleCommand<ResourceMonitoring::Commands::ResetCondition::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleResetCondition(ctx, commandData); });
         break;
     }
