@@ -10146,12 +10146,16 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(
                 auto & entry_0 = iter_0.GetValue();
                 MTROperationalStateClusterOperationalStateStruct * newElement_0;
                 newElement_0 = [MTROperationalStateClusterOperationalStateStruct new];
-                newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.operationalStateID)];
-                newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel);
-                if (newElement_0.operationalStateLabel == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
+                newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
+                if (entry_0.operationalStateLabel.HasValue()) {
+                    newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
+                    if (newElement_0.operationalStateLabel == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                } else {
+                    newElement_0.operationalStateLabel = nil;
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -10173,12 +10177,16 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(
         }
         MTROperationalStateClusterOperationalStateStruct * _Nonnull value;
         value = [MTROperationalStateClusterOperationalStateStruct new];
-        value.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.operationalStateID)];
-        value.operationalStateLabel = AsString(cppValue.operationalStateLabel);
-        if (value.operationalStateLabel == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            *aError = err;
-            return nil;
+        value.operationalStateID = [NSNumber numberWithUnsignedChar:cppValue.operationalStateID];
+        if (cppValue.operationalStateLabel.HasValue()) {
+            value.operationalStateLabel = AsString(cppValue.operationalStateLabel.Value());
+            if (value.operationalStateLabel == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
+        } else {
+            value.operationalStateLabel = nil;
         }
         return value;
     }
@@ -10191,16 +10199,16 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(
         }
         MTROperationalStateClusterErrorStateStruct * _Nonnull value;
         value = [MTROperationalStateClusterErrorStateStruct new];
-        value.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorStateID)];
-        if (cppValue.errorStateLabel.IsNull()) {
-            value.errorStateLabel = nil;
-        } else {
+        value.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorStateID];
+        if (cppValue.errorStateLabel.HasValue()) {
             value.errorStateLabel = AsString(cppValue.errorStateLabel.Value());
             if (value.errorStateLabel == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                 *aError = err;
                 return nil;
             }
+        } else {
+            value.errorStateLabel = nil;
         }
         if (cppValue.errorStateDetails.HasValue()) {
             value.errorStateDetails = AsString(cppValue.errorStateDetails.Value());
@@ -10433,12 +10441,16 @@ static id _Nullable DecodeAttributeValueForRoboticVacuumOperationalStateCluster(
                 auto & entry_0 = iter_0.GetValue();
                 MTRRoboticVacuumOperationalStateClusterOperationalStateStruct * newElement_0;
                 newElement_0 = [MTRRoboticVacuumOperationalStateClusterOperationalStateStruct new];
-                newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.operationalStateID)];
-                newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel);
-                if (newElement_0.operationalStateLabel == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
+                newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
+                if (entry_0.operationalStateLabel.HasValue()) {
+                    newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
+                    if (newElement_0.operationalStateLabel == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                } else {
+                    newElement_0.operationalStateLabel = nil;
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -10460,12 +10472,16 @@ static id _Nullable DecodeAttributeValueForRoboticVacuumOperationalStateCluster(
         }
         MTRRoboticVacuumOperationalStateClusterOperationalStateStruct * _Nonnull value;
         value = [MTRRoboticVacuumOperationalStateClusterOperationalStateStruct new];
-        value.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.operationalStateID)];
-        value.operationalStateLabel = AsString(cppValue.operationalStateLabel);
-        if (value.operationalStateLabel == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            *aError = err;
-            return nil;
+        value.operationalStateID = [NSNumber numberWithUnsignedChar:cppValue.operationalStateID];
+        if (cppValue.operationalStateLabel.HasValue()) {
+            value.operationalStateLabel = AsString(cppValue.operationalStateLabel.Value());
+            if (value.operationalStateLabel == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
+        } else {
+            value.operationalStateLabel = nil;
         }
         return value;
     }
@@ -10478,27 +10494,23 @@ static id _Nullable DecodeAttributeValueForRoboticVacuumOperationalStateCluster(
         }
         MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull value;
         value = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
-        value.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorStateID)];
-        if (cppValue.errorStateLabel.IsNull()) {
-            value.errorStateLabel = nil;
-        } else {
+        value.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorStateID];
+        if (cppValue.errorStateLabel.HasValue()) {
             value.errorStateLabel = AsString(cppValue.errorStateLabel.Value());
             if (value.errorStateLabel == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                 *aError = err;
                 return nil;
             }
+        } else {
+            value.errorStateLabel = nil;
         }
         if (cppValue.errorStateDetails.HasValue()) {
-            if (cppValue.errorStateDetails.Value().IsNull()) {
-                value.errorStateDetails = nil;
-            } else {
-                value.errorStateDetails = AsString(cppValue.errorStateDetails.Value().Value());
-                if (value.errorStateDetails == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
-                }
+            value.errorStateDetails = AsString(cppValue.errorStateDetails.Value());
+            if (value.errorStateDetails == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
             }
         } else {
             value.errorStateDetails = nil;

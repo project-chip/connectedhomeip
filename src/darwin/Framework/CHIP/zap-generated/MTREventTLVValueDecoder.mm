@@ -1771,16 +1771,16 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
         do {
             MTROperationalStateClusterErrorStateStruct * _Nonnull memberValue;
             memberValue = [MTROperationalStateClusterErrorStateStruct new];
-            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorState.errorStateID)];
-            if (cppValue.errorState.errorStateLabel.IsNull()) {
-                memberValue.errorStateLabel = nil;
-            } else {
+            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
+            if (cppValue.errorState.errorStateLabel.HasValue()) {
                 memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
                 if (memberValue.errorStateLabel == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;
                 }
+            } else {
+                memberValue.errorStateLabel = nil;
             }
             if (cppValue.errorState.errorStateDetails.HasValue()) {
                 memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value());
@@ -1808,7 +1808,7 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.completionErrorCode)];
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.completionErrorCode];
             value.completionErrorCode = memberValue;
         } while (0);
         do {
@@ -1865,27 +1865,23 @@ static id _Nullable DecodeEventPayloadForRoboticVacuumOperationalStateCluster(
         do {
             MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
             memberValue = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
-            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorState.errorStateID)];
-            if (cppValue.errorState.errorStateLabel.IsNull()) {
-                memberValue.errorStateLabel = nil;
-            } else {
+            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
+            if (cppValue.errorState.errorStateLabel.HasValue()) {
                 memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
                 if (memberValue.errorStateLabel == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;
                 }
+            } else {
+                memberValue.errorStateLabel = nil;
             }
             if (cppValue.errorState.errorStateDetails.HasValue()) {
-                if (cppValue.errorState.errorStateDetails.Value().IsNull()) {
-                    memberValue.errorStateDetails = nil;
-                } else {
-                    memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value().Value());
-                    if (memberValue.errorStateDetails == nil) {
-                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                        *aError = err;
-                        return nil;
-                    }
+                memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value());
+                if (memberValue.errorStateDetails == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
                 }
             } else {
                 memberValue.errorStateDetails = nil;
@@ -1906,7 +1902,7 @@ static id _Nullable DecodeEventPayloadForRoboticVacuumOperationalStateCluster(
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.completionErrorCode)];
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.completionErrorCode];
             value.completionErrorCode = memberValue;
         } while (0);
         do {

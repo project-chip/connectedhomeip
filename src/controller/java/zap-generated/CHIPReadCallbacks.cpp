@@ -25127,12 +25127,22 @@ void CHIPOperationalStateOperationalStateListAttributeCallback::CallbackFn(
         jobject newElement_0_operationalStateID;
         std::string newElement_0_operationalStateIDClassName     = "java/lang/Integer";
         std::string newElement_0_operationalStateIDCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-            newElement_0_operationalStateIDClassName.c_str(), newElement_0_operationalStateIDCtorSignature.c_str(),
-            static_cast<uint8_t>(entry_0.operationalStateID), newElement_0_operationalStateID);
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_operationalStateIDClassName.c_str(),
+                                                                      newElement_0_operationalStateIDCtorSignature.c_str(),
+                                                                      entry_0.operationalStateID, newElement_0_operationalStateID);
         jobject newElement_0_operationalStateLabel;
-        LogErrorOnFailure(
-            chip::JniReferences::GetInstance().CharToStringUTF(entry_0.operationalStateLabel, newElement_0_operationalStateLabel));
+        if (!entry_0.operationalStateLabel.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_operationalStateLabel);
+        }
+        else
+        {
+            jobject newElement_0_operationalStateLabelInsideOptional;
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.operationalStateLabel.Value(),
+                                                                                 newElement_0_operationalStateLabelInsideOptional));
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_operationalStateLabelInsideOptional,
+                                                              newElement_0_operationalStateLabel);
+        }
 
         jclass operationalStateStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
@@ -25144,7 +25154,7 @@ void CHIPOperationalStateOperationalStateListAttributeCallback::CallbackFn(
             return;
         }
         jmethodID operationalStateStructStructCtor_1 =
-            env->GetMethodID(operationalStateStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
+            env->GetMethodID(operationalStateStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
         if (operationalStateStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$OperationalStateClusterOperationalStateStruct constructor");
@@ -25719,12 +25729,22 @@ void CHIPRoboticVacuumOperationalStateOperationalStateListAttributeCallback::Cal
         jobject newElement_0_operationalStateID;
         std::string newElement_0_operationalStateIDClassName     = "java/lang/Integer";
         std::string newElement_0_operationalStateIDCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-            newElement_0_operationalStateIDClassName.c_str(), newElement_0_operationalStateIDCtorSignature.c_str(),
-            static_cast<uint8_t>(entry_0.operationalStateID), newElement_0_operationalStateID);
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_0_operationalStateIDClassName.c_str(),
+                                                                      newElement_0_operationalStateIDCtorSignature.c_str(),
+                                                                      entry_0.operationalStateID, newElement_0_operationalStateID);
         jobject newElement_0_operationalStateLabel;
-        LogErrorOnFailure(
-            chip::JniReferences::GetInstance().CharToStringUTF(entry_0.operationalStateLabel, newElement_0_operationalStateLabel));
+        if (!entry_0.operationalStateLabel.HasValue())
+        {
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_operationalStateLabel);
+        }
+        else
+        {
+            jobject newElement_0_operationalStateLabelInsideOptional;
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.operationalStateLabel.Value(),
+                                                                                 newElement_0_operationalStateLabelInsideOptional));
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_operationalStateLabelInsideOptional,
+                                                              newElement_0_operationalStateLabel);
+        }
 
         jclass operationalStateStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
@@ -25736,7 +25756,7 @@ void CHIPRoboticVacuumOperationalStateOperationalStateListAttributeCallback::Cal
             return;
         }
         jmethodID operationalStateStructStructCtor_1 =
-            env->GetMethodID(operationalStateStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
+            env->GetMethodID(operationalStateStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
         if (operationalStateStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$RoboticVacuumOperationalStateClusterOperationalStateStruct constructor");

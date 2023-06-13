@@ -8965,12 +8965,16 @@ void MTROperationalStateOperationalStateListListAttributeCallbackBridge::OnSucce
             auto & entry_0 = iter_0.GetValue();
             MTROperationalStateClusterOperationalStateStruct * newElement_0;
             newElement_0 = [MTROperationalStateClusterOperationalStateStruct new];
-            newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.operationalStateID)];
-            newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel);
-            if (newElement_0.operationalStateLabel == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                OnFailureFn(context, err);
-                return;
+            newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
+            if (entry_0.operationalStateLabel.HasValue()) {
+                newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
+                if (newElement_0.operationalStateLabel == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
+            } else {
+                newElement_0.operationalStateLabel = nil;
             }
             [array_0 addObject:newElement_0];
         }
@@ -9004,12 +9008,16 @@ void MTROperationalStateOperationalStateStructAttributeCallbackBridge::OnSuccess
 {
     MTROperationalStateClusterOperationalStateStruct * _Nonnull objCValue;
     objCValue = [MTROperationalStateClusterOperationalStateStruct new];
-    objCValue.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.operationalStateID)];
-    objCValue.operationalStateLabel = AsString(value.operationalStateLabel);
-    if (objCValue.operationalStateLabel == nil) {
-        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-        OnFailureFn(context, err);
-        return;
+    objCValue.operationalStateID = [NSNumber numberWithUnsignedChar:value.operationalStateID];
+    if (value.operationalStateLabel.HasValue()) {
+        objCValue.operationalStateLabel = AsString(value.operationalStateLabel.Value());
+        if (objCValue.operationalStateLabel == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
+    } else {
+        objCValue.operationalStateLabel = nil;
     }
     DispatchSuccess(context, objCValue);
 };
@@ -9034,16 +9042,16 @@ void MTROperationalStateOperationalErrorStructAttributeCallbackBridge::OnSuccess
 {
     MTROperationalStateClusterErrorStateStruct * _Nonnull objCValue;
     objCValue = [MTROperationalStateClusterErrorStateStruct new];
-    objCValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.errorStateID)];
-    if (value.errorStateLabel.IsNull()) {
-        objCValue.errorStateLabel = nil;
-    } else {
+    objCValue.errorStateID = [NSNumber numberWithUnsignedChar:value.errorStateID];
+    if (value.errorStateLabel.HasValue()) {
         objCValue.errorStateLabel = AsString(value.errorStateLabel.Value());
         if (objCValue.errorStateLabel == nil) {
             CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
             OnFailureFn(context, err);
             return;
         }
+    } else {
+        objCValue.errorStateLabel = nil;
     }
     if (value.errorStateDetails.HasValue()) {
         objCValue.errorStateDetails = AsString(value.errorStateDetails.Value());
@@ -9284,12 +9292,16 @@ void MTRRoboticVacuumOperationalStateOperationalStateListListAttributeCallbackBr
             auto & entry_0 = iter_0.GetValue();
             MTRRoboticVacuumOperationalStateClusterOperationalStateStruct * newElement_0;
             newElement_0 = [MTRRoboticVacuumOperationalStateClusterOperationalStateStruct new];
-            newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.operationalStateID)];
-            newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel);
-            if (newElement_0.operationalStateLabel == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                OnFailureFn(context, err);
-                return;
+            newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
+            if (entry_0.operationalStateLabel.HasValue()) {
+                newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
+                if (newElement_0.operationalStateLabel == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
+            } else {
+                newElement_0.operationalStateLabel = nil;
             }
             [array_0 addObject:newElement_0];
         }
@@ -9323,12 +9335,16 @@ void MTRRoboticVacuumOperationalStateOperationalStateStructAttributeCallbackBrid
 {
     MTRRoboticVacuumOperationalStateClusterOperationalStateStruct * _Nonnull objCValue;
     objCValue = [MTRRoboticVacuumOperationalStateClusterOperationalStateStruct new];
-    objCValue.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.operationalStateID)];
-    objCValue.operationalStateLabel = AsString(value.operationalStateLabel);
-    if (objCValue.operationalStateLabel == nil) {
-        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-        OnFailureFn(context, err);
-        return;
+    objCValue.operationalStateID = [NSNumber numberWithUnsignedChar:value.operationalStateID];
+    if (value.operationalStateLabel.HasValue()) {
+        objCValue.operationalStateLabel = AsString(value.operationalStateLabel.Value());
+        if (objCValue.operationalStateLabel == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
+    } else {
+        objCValue.operationalStateLabel = nil;
     }
     DispatchSuccess(context, objCValue);
 };
@@ -9353,27 +9369,23 @@ void MTRRoboticVacuumOperationalStateOperationalErrorStructAttributeCallbackBrid
 {
     MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull objCValue;
     objCValue = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
-    objCValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.errorStateID)];
-    if (value.errorStateLabel.IsNull()) {
-        objCValue.errorStateLabel = nil;
-    } else {
+    objCValue.errorStateID = [NSNumber numberWithUnsignedChar:value.errorStateID];
+    if (value.errorStateLabel.HasValue()) {
         objCValue.errorStateLabel = AsString(value.errorStateLabel.Value());
         if (objCValue.errorStateLabel == nil) {
             CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
             OnFailureFn(context, err);
             return;
         }
+    } else {
+        objCValue.errorStateLabel = nil;
     }
     if (value.errorStateDetails.HasValue()) {
-        if (value.errorStateDetails.Value().IsNull()) {
-            objCValue.errorStateDetails = nil;
-        } else {
-            objCValue.errorStateDetails = AsString(value.errorStateDetails.Value().Value());
-            if (objCValue.errorStateDetails == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                OnFailureFn(context, err);
-                return;
-            }
+        objCValue.errorStateDetails = AsString(value.errorStateDetails.Value());
+        if (objCValue.errorStateDetails == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
         }
     } else {
         objCValue.errorStateDetails = nil;

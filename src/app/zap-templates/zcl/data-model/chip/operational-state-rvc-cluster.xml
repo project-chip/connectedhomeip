@@ -19,10 +19,6 @@ limitations under the License.
 
   <enum name="OperationalStateEnum" type="ENUM8">
     <cluster code="0x0061"/>
-    <item name="Stopped"        value="0x00"/>
-    <item name="Running"        value="0x01"/>
-    <item name="Paused"         value="0x02"/>
-    <item name="Error"          value="0x03"/>
     <item name="SeekingCharger" value="0x40"/>
     <item name="Charging"       value="0x41"/>
     <item name="Docked"         value="0x42"/>
@@ -30,10 +26,6 @@ limitations under the License.
 
   <enum name="ErrorStateEnum" type="ENUM8">
     <cluster code="0x0061"/>
-    <item name="NoError"                    value="0x00"/>
-    <item name="UnableToStartOrResume"      value="0x01"/>
-    <item name="UnableToCompleteOperation"  value="0x02"/>
-    <item name="CommandInvalidInState"      value="0x03"/>
     <item name="FailedToFindChargingDock"   value="0x40"/>
     <item name="Stuck"                      value="0x41"/>
     <item name="DustBinMissing"             value="0x42"/>
@@ -46,13 +38,13 @@ limitations under the License.
 
   <struct name="OperationalStateStruct">
     <cluster code="0x0061"/>
-    <item name="OperationalStateID"    type="OperationalStateEnum" optional="false"/>
+    <item name="OperationalStateID"    type="ENUM8" optional="false"/>
     <item name="OperationalStateLabel" type="CHAR_STRING" optional="true" length="64"/>
   </struct>
 
   <struct name="ErrorStateStruct">
     <cluster code="0x0061"/>
-    <item name="ErrorStateID" type="ErrorStateEnum" optional="false" />
+    <item name="ErrorStateID" type="ENUM8" optional="false" />
     <item name="ErrorStateLabel" type="CHAR_STRING" optional="true" length="64" />
     <item name="ErrorStateDetails" type="CHAR_STRING" optional="true" length="64" />
   </struct>
@@ -70,7 +62,7 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="PHASE_LIST"              type="ARRAY" entryType="CHAR_STRING"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="INT8U"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
-    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0"    max="259200" writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
+    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0"    max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
     <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="ARRAY" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
     <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="OperationalStateStruct"                                            writable="false"                    optional="false">OperationalState</attribute>
     <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStateStruct"                                                  writable="false"                    optional="false">OperationalError</attribute>
@@ -103,7 +95,7 @@ limitations under the License.
 
      <event side="server" code="0x01" priority="info" name="OperationCompletion" optional="true">
       <description>OperationCompletion</description>
-      <field id="0" name="CompletionErrorCode"  type="ErrorStateEnum"                   optional="false"/>
+      <field id="0" name="CompletionErrorCode"  type="ENUM8"                            optional="false"/>
       <field id="1" name="TotalOperationalTime" type="elapsed_s"      isNullable="true" optional="true"/>
       <field id="2" name="PausedTime"           type="elapsed_s"      isNullable="true" optional="true"/>
     </event>

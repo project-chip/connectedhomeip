@@ -3357,14 +3357,14 @@ client cluster OperationalState = 96 {
   }
 
   struct ErrorStateStruct {
-    ErrorStateEnum errorStateID = 0;
-    nullable char_string<64> errorStateLabel = 1;
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
     optional char_string<64> errorStateDetails = 2;
   }
 
   struct OperationalStateStruct {
-    OperationalStateEnum operationalStateID = 0;
-    char_string<64> operationalStateLabel = 1;
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
   }
 
   critical event OperationalError = 0 {
@@ -3372,7 +3372,7 @@ client cluster OperationalState = 96 {
   }
 
   info event OperationCompletion = 1 {
-    ErrorStateEnum completionErrorCode = 0;
+    ENUM8 completionErrorCode = 0;
     optional nullable elapsed_s totalOperationalTime = 1;
     optional nullable elapsed_s pausedTime = 2;
   }
@@ -3407,10 +3407,6 @@ client cluster OperationalState = 96 {
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
 client cluster RoboticVacuumOperationalState = 97 {
   enum ErrorStateEnum : ENUM8 {
-    kNoError = 0;
-    kUnableToStartOrResume = 1;
-    kUnableToCompleteOperation = 2;
-    kCommandInvalidInState = 3;
     kFailedToFindChargingDock = 64;
     kStuck = 65;
     kDustBinMissing = 66;
@@ -3422,24 +3418,20 @@ client cluster RoboticVacuumOperationalState = 97 {
   }
 
   enum OperationalStateEnum : ENUM8 {
-    kStopped = 0;
-    kRunning = 1;
-    kPaused = 2;
-    kError = 3;
     kSeekingCharger = 64;
     kCharging = 65;
     kDocked = 66;
   }
 
   struct ErrorStateStruct {
-    ErrorStateEnum errorStateID = 0;
-    nullable char_string<64> errorStateLabel = 1;
-    optional nullable char_string<64> errorStateDetails = 2;
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
   }
 
   struct OperationalStateStruct {
-    OperationalStateEnum operationalStateID = 0;
-    char_string<64> operationalStateLabel = 1;
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
   }
 
   critical event OperationalError = 0 {
@@ -3447,7 +3439,7 @@ client cluster RoboticVacuumOperationalState = 97 {
   }
 
   info event OperationCompletion = 1 {
-    ErrorStateEnum completionErrorCode = 0;
+    ENUM8 completionErrorCode = 0;
     optional nullable elapsed_s totalOperationalTime = 1;
     optional nullable elapsed_s pausedTime = 2;
   }

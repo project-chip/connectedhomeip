@@ -3322,16 +3322,19 @@ void CHIPOperationalStateClusterOperationalCommandResponseCallback::CallbackFn(
     std::string CommandResponseState_errorStateIDCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
         CommandResponseState_errorStateIDClassName.c_str(), CommandResponseState_errorStateIDCtorSignature.c_str(),
-        static_cast<uint8_t>(dataResponse.commandResponseState.errorStateID), CommandResponseState_errorStateID);
+        dataResponse.commandResponseState.errorStateID, CommandResponseState_errorStateID);
     jobject CommandResponseState_errorStateLabel;
-    if (dataResponse.commandResponseState.errorStateLabel.IsNull())
+    if (!dataResponse.commandResponseState.errorStateLabel.HasValue())
     {
-        CommandResponseState_errorStateLabel = nullptr;
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, CommandResponseState_errorStateLabel);
     }
     else
     {
+        jobject CommandResponseState_errorStateLabelInsideOptional;
         LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-            dataResponse.commandResponseState.errorStateLabel.Value(), CommandResponseState_errorStateLabel));
+            dataResponse.commandResponseState.errorStateLabel.Value(), CommandResponseState_errorStateLabelInsideOptional));
+        chip::JniReferences::GetInstance().CreateOptional(CommandResponseState_errorStateLabelInsideOptional,
+                                                          CommandResponseState_errorStateLabel);
     }
     jobject CommandResponseState_errorStateDetails;
     if (!dataResponse.commandResponseState.errorStateDetails.HasValue())
@@ -3356,7 +3359,7 @@ void CHIPOperationalStateClusterOperationalCommandResponseCallback::CallbackFn(
         return;
     }
     jmethodID errorStateStructStructCtor_0 =
-        env->GetMethodID(errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;Ljava/util/Optional;)V");
+        env->GetMethodID(errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
     if (errorStateStructStructCtor_0 == nullptr)
     {
         ChipLogError(Zcl, "Could not find ChipStructs$OperationalStateClusterErrorStateStruct constructor");
@@ -3432,16 +3435,19 @@ void CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback:
     std::string CommandResponseState_errorStateIDCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
         CommandResponseState_errorStateIDClassName.c_str(), CommandResponseState_errorStateIDCtorSignature.c_str(),
-        static_cast<uint8_t>(dataResponse.commandResponseState.errorStateID), CommandResponseState_errorStateID);
+        dataResponse.commandResponseState.errorStateID, CommandResponseState_errorStateID);
     jobject CommandResponseState_errorStateLabel;
-    if (dataResponse.commandResponseState.errorStateLabel.IsNull())
+    if (!dataResponse.commandResponseState.errorStateLabel.HasValue())
     {
-        CommandResponseState_errorStateLabel = nullptr;
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, CommandResponseState_errorStateLabel);
     }
     else
     {
+        jobject CommandResponseState_errorStateLabelInsideOptional;
         LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-            dataResponse.commandResponseState.errorStateLabel.Value(), CommandResponseState_errorStateLabel));
+            dataResponse.commandResponseState.errorStateLabel.Value(), CommandResponseState_errorStateLabelInsideOptional));
+        chip::JniReferences::GetInstance().CreateOptional(CommandResponseState_errorStateLabelInsideOptional,
+                                                          CommandResponseState_errorStateLabel);
     }
     jobject CommandResponseState_errorStateDetails;
     if (!dataResponse.commandResponseState.errorStateDetails.HasValue())
@@ -3451,16 +3457,8 @@ void CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback:
     else
     {
         jobject CommandResponseState_errorStateDetailsInsideOptional;
-        if (dataResponse.commandResponseState.errorStateDetails.Value().IsNull())
-        {
-            CommandResponseState_errorStateDetailsInsideOptional = nullptr;
-        }
-        else
-        {
-            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                dataResponse.commandResponseState.errorStateDetails.Value().Value(),
-                CommandResponseState_errorStateDetailsInsideOptional));
-        }
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+            dataResponse.commandResponseState.errorStateDetails.Value(), CommandResponseState_errorStateDetailsInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(CommandResponseState_errorStateDetailsInsideOptional,
                                                           CommandResponseState_errorStateDetails);
     }
@@ -3475,7 +3473,7 @@ void CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback:
         return;
     }
     jmethodID errorStateStructStructCtor_0 =
-        env->GetMethodID(errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;Ljava/util/Optional;)V");
+        env->GetMethodID(errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
     if (errorStateStructStructCtor_0 == nullptr)
     {
         ChipLogError(Zcl, "Could not find ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct constructor");

@@ -16646,8 +16646,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    ErrorStateEnum errorStateID = static_cast<ErrorStateEnum>(0);
-    DataModel::Nullable<chip::CharSpan> errorStateLabel;
+    uint8_t errorStateID = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> errorStateLabel;
     Optional<chip::CharSpan> errorStateDetails;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -16670,8 +16670,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    OperationalStateEnum operationalStateID = static_cast<OperationalStateEnum>(0);
-    chip::CharSpan operationalStateLabel;
+    uint8_t operationalStateID = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> operationalStateLabel;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -17050,7 +17050,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    ErrorStateEnum completionErrorCode = static_cast<ErrorStateEnum>(0);
+    uint8_t completionErrorCode = static_cast<uint8_t>(0);
     Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
     Optional<DataModel::Nullable<uint32_t>> pausedTime;
 
@@ -17064,7 +17064,7 @@ public:
     static constexpr EventId GetEventId() { return Events::OperationCompletion::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalState::Id; }
 
-    ErrorStateEnum completionErrorCode = static_cast<ErrorStateEnum>(0);
+    uint8_t completionErrorCode = static_cast<uint8_t>(0);
     Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
     Optional<DataModel::Nullable<uint32_t>> pausedTime;
 
@@ -17086,9 +17086,9 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    ErrorStateEnum errorStateID = static_cast<ErrorStateEnum>(0);
-    DataModel::Nullable<chip::CharSpan> errorStateLabel;
-    Optional<DataModel::Nullable<chip::CharSpan>> errorStateDetails;
+    uint8_t errorStateID = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> errorStateLabel;
+    Optional<chip::CharSpan> errorStateDetails;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -17110,8 +17110,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    OperationalStateEnum operationalStateID = static_cast<OperationalStateEnum>(0);
-    chip::CharSpan operationalStateLabel;
+    uint8_t operationalStateID = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> operationalStateLabel;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -17492,7 +17492,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::RoboticVacuumOperationalState::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    ErrorStateEnum completionErrorCode = static_cast<ErrorStateEnum>(0);
+    uint8_t completionErrorCode = static_cast<uint8_t>(0);
     Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
     Optional<DataModel::Nullable<uint32_t>> pausedTime;
 
@@ -17506,7 +17506,7 @@ public:
     static constexpr EventId GetEventId() { return Events::OperationCompletion::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::RoboticVacuumOperationalState::Id; }
 
-    ErrorStateEnum completionErrorCode = static_cast<ErrorStateEnum>(0);
+    uint8_t completionErrorCode = static_cast<uint8_t>(0);
     Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
     Optional<DataModel::Nullable<uint32_t>> pausedTime;
 

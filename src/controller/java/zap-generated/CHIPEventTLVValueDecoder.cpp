@@ -2883,16 +2883,19 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             std::string value_errorState_errorStateIDCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                 value_errorState_errorStateIDClassName.c_str(), value_errorState_errorStateIDCtorSignature.c_str(),
-                static_cast<uint8_t>(cppValue.errorState.errorStateID), value_errorState_errorStateID);
+                cppValue.errorState.errorStateID, value_errorState_errorStateID);
             jobject value_errorState_errorStateLabel;
-            if (cppValue.errorState.errorStateLabel.IsNull())
+            if (!cppValue.errorState.errorStateLabel.HasValue())
             {
-                value_errorState_errorStateLabel = nullptr;
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_errorState_errorStateLabel);
             }
             else
             {
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorState.errorStateLabel.Value(),
-                                                                                     value_errorState_errorStateLabel));
+                jobject value_errorState_errorStateLabelInsideOptional;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                    cppValue.errorState.errorStateLabel.Value(), value_errorState_errorStateLabelInsideOptional));
+                chip::JniReferences::GetInstance().CreateOptional(value_errorState_errorStateLabelInsideOptional,
+                                                                  value_errorState_errorStateLabel);
             }
             jobject value_errorState_errorStateDetails;
             if (!cppValue.errorState.errorStateDetails.HasValue())
@@ -2917,7 +2920,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jmethodID errorStateStructStructCtor_0 = env->GetMethodID(
-                errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;Ljava/util/Optional;)V");
+                errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
             if (errorStateStructStructCtor_0 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$OperationalStateClusterErrorStateStruct constructor");
@@ -2960,9 +2963,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             jobject value_completionErrorCode;
             std::string value_completionErrorCodeClassName     = "java/lang/Integer";
             std::string value_completionErrorCodeCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                value_completionErrorCodeClassName.c_str(), value_completionErrorCodeCtorSignature.c_str(),
-                static_cast<uint8_t>(cppValue.completionErrorCode), value_completionErrorCode);
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_completionErrorCodeClassName.c_str(),
+                                                                          value_completionErrorCodeCtorSignature.c_str(),
+                                                                          cppValue.completionErrorCode, value_completionErrorCode);
 
             jobject value_totalOperationalTime;
             if (!cppValue.totalOperationalTime.HasValue())
@@ -3057,16 +3060,19 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             std::string value_errorState_errorStateIDCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                 value_errorState_errorStateIDClassName.c_str(), value_errorState_errorStateIDCtorSignature.c_str(),
-                static_cast<uint8_t>(cppValue.errorState.errorStateID), value_errorState_errorStateID);
+                cppValue.errorState.errorStateID, value_errorState_errorStateID);
             jobject value_errorState_errorStateLabel;
-            if (cppValue.errorState.errorStateLabel.IsNull())
+            if (!cppValue.errorState.errorStateLabel.HasValue())
             {
-                value_errorState_errorStateLabel = nullptr;
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_errorState_errorStateLabel);
             }
             else
             {
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorState.errorStateLabel.Value(),
-                                                                                     value_errorState_errorStateLabel));
+                jobject value_errorState_errorStateLabelInsideOptional;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                    cppValue.errorState.errorStateLabel.Value(), value_errorState_errorStateLabelInsideOptional));
+                chip::JniReferences::GetInstance().CreateOptional(value_errorState_errorStateLabelInsideOptional,
+                                                                  value_errorState_errorStateLabel);
             }
             jobject value_errorState_errorStateDetails;
             if (!cppValue.errorState.errorStateDetails.HasValue())
@@ -3076,15 +3082,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             else
             {
                 jobject value_errorState_errorStateDetailsInsideOptional;
-                if (cppValue.errorState.errorStateDetails.Value().IsNull())
-                {
-                    value_errorState_errorStateDetailsInsideOptional = nullptr;
-                }
-                else
-                {
-                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
-                        cppValue.errorState.errorStateDetails.Value().Value(), value_errorState_errorStateDetailsInsideOptional));
-                }
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                    cppValue.errorState.errorStateDetails.Value(), value_errorState_errorStateDetailsInsideOptional));
                 chip::JniReferences::GetInstance().CreateOptional(value_errorState_errorStateDetailsInsideOptional,
                                                                   value_errorState_errorStateDetails);
             }
@@ -3099,7 +3098,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jmethodID errorStateStructStructCtor_0 = env->GetMethodID(
-                errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;Ljava/util/Optional;)V");
+                errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
             if (errorStateStructStructCtor_0 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct constructor");
@@ -3144,9 +3143,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             jobject value_completionErrorCode;
             std::string value_completionErrorCodeClassName     = "java/lang/Integer";
             std::string value_completionErrorCodeCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                value_completionErrorCodeClassName.c_str(), value_completionErrorCodeCtorSignature.c_str(),
-                static_cast<uint8_t>(cppValue.completionErrorCode), value_completionErrorCode);
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_completionErrorCodeClassName.c_str(),
+                                                                          value_completionErrorCodeCtorSignature.c_str(),
+                                                                          cppValue.completionErrorCode, value_completionErrorCode);
 
             jobject value_totalOperationalTime;
             if (!cppValue.totalOperationalTime.HasValue())

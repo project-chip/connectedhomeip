@@ -18235,13 +18235,13 @@ class OperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=OperationalState.Enums.ErrorStateEnum),
-                        ClusterObjectFieldDescriptor(Label="errorStateLabel", Tag=1, Type=typing.Union[Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="errorStateLabel", Tag=1, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="errorStateDetails", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            errorStateID: 'OperationalState.Enums.ErrorStateEnum' = 0
-            errorStateLabel: 'typing.Union[Nullable, str]' = NullValue
+            errorStateID: 'uint' = 0
+            errorStateLabel: 'typing.Optional[str]' = None
             errorStateDetails: 'typing.Optional[str]' = None
 
         @dataclass
@@ -18250,12 +18250,12 @@ class OperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="operationalStateID", Tag=0, Type=OperationalState.Enums.OperationalStateEnum),
-                        ClusterObjectFieldDescriptor(Label="operationalStateLabel", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="operationalStateID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="operationalStateLabel", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            operationalStateID: 'OperationalState.Enums.OperationalStateEnum' = 0
-            operationalStateLabel: 'str' = ""
+            operationalStateID: 'uint' = 0
+            operationalStateLabel: 'typing.Optional[str]' = None
 
     class Commands:
         @dataclass
@@ -18553,12 +18553,12 @@ class OperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="completionErrorCode", Tag=0, Type=OperationalState.Enums.ErrorStateEnum),
+                        ClusterObjectFieldDescriptor(Label="completionErrorCode", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="totalOperationalTime", Tag=1, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="pausedTime", Tag=2, Type=typing.Union[None, Nullable, uint]),
                     ])
 
-            completionErrorCode: 'OperationalState.Enums.ErrorStateEnum' = 0
+            completionErrorCode: 'uint' = 0
             totalOperationalTime: 'typing.Union[None, Nullable, uint]' = None
             pausedTime: 'typing.Union[None, Nullable, uint]' = None
 
@@ -18600,10 +18600,6 @@ class RoboticVacuumOperationalState(Cluster):
 
     class Enums:
         class ErrorStateEnum(MatterIntEnum):
-            kNoError = 0x00
-            kUnableToStartOrResume = 0x01
-            kUnableToCompleteOperation = 0x02
-            kCommandInvalidInState = 0x03
             kFailedToFindChargingDock = 0x40
             kStuck = 0x41
             kDustBinMissing = 0x42
@@ -18616,13 +18612,9 @@ class RoboticVacuumOperationalState(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 0,
 
         class OperationalStateEnum(MatterIntEnum):
-            kStopped = 0x00
-            kRunning = 0x01
-            kPaused = 0x02
-            kError = 0x03
             kSeekingCharger = 0x40
             kCharging = 0x41
             kDocked = 0x42
@@ -18630,7 +18622,7 @@ class RoboticVacuumOperationalState(Cluster):
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 4,
+            kUnknownEnumValue = 0,
 
     class Structs:
         @dataclass
@@ -18639,14 +18631,14 @@ class RoboticVacuumOperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=RoboticVacuumOperationalState.Enums.ErrorStateEnum),
-                        ClusterObjectFieldDescriptor(Label="errorStateLabel", Tag=1, Type=typing.Union[Nullable, str]),
-                        ClusterObjectFieldDescriptor(Label="errorStateDetails", Tag=2, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="errorStateID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="errorStateLabel", Tag=1, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="errorStateDetails", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            errorStateID: 'RoboticVacuumOperationalState.Enums.ErrorStateEnum' = 0
-            errorStateLabel: 'typing.Union[Nullable, str]' = NullValue
-            errorStateDetails: 'typing.Union[None, Nullable, str]' = None
+            errorStateID: 'uint' = 0
+            errorStateLabel: 'typing.Optional[str]' = None
+            errorStateDetails: 'typing.Optional[str]' = None
 
         @dataclass
         class OperationalStateStruct(ClusterObject):
@@ -18654,12 +18646,12 @@ class RoboticVacuumOperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="operationalStateID", Tag=0, Type=RoboticVacuumOperationalState.Enums.OperationalStateEnum),
-                        ClusterObjectFieldDescriptor(Label="operationalStateLabel", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="operationalStateID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="operationalStateLabel", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            operationalStateID: 'RoboticVacuumOperationalState.Enums.OperationalStateEnum' = 0
-            operationalStateLabel: 'str' = ""
+            operationalStateID: 'uint' = 0
+            operationalStateLabel: 'typing.Optional[str]' = None
 
     class Commands:
         @dataclass
@@ -18957,12 +18949,12 @@ class RoboticVacuumOperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="completionErrorCode", Tag=0, Type=RoboticVacuumOperationalState.Enums.ErrorStateEnum),
+                        ClusterObjectFieldDescriptor(Label="completionErrorCode", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="totalOperationalTime", Tag=1, Type=typing.Union[None, Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="pausedTime", Tag=2, Type=typing.Union[None, Nullable, uint]),
                     ])
 
-            completionErrorCode: 'RoboticVacuumOperationalState.Enums.ErrorStateEnum' = 0
+            completionErrorCode: 'uint' = 0
             totalOperationalTime: 'typing.Union[None, Nullable, uint]' = None
             pausedTime: 'typing.Union[None, Nullable, uint]' = None
 

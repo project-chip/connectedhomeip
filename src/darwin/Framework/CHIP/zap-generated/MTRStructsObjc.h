@@ -768,7 +768,7 @@ MTR_NEWLY_AVAILABLE
 MTR_NEWLY_AVAILABLE
 @interface MTROperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nonnull operationalStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
@@ -793,7 +793,7 @@ MTR_NEWLY_AVAILABLE
 MTR_NEWLY_AVAILABLE
 @interface MTRRoboticVacuumOperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nonnull operationalStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE

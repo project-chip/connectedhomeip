@@ -16801,28 +16801,6 @@ public class ChipClusters {
       pause(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
 
-    public void stop(OperationalCommandResponseCallback callback
-      ) {
-      stop(chipClusterPtr, callback, null);
-    }
-
-    public void stop(OperationalCommandResponseCallback callback
-      
-      , int timedInvokeTimeoutMs) {
-      stop(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
-    public void start(OperationalCommandResponseCallback callback
-      ) {
-      start(chipClusterPtr, callback, null);
-    }
-
-    public void start(OperationalCommandResponseCallback callback
-      
-      , int timedInvokeTimeoutMs) {
-      start(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
     public void resume(OperationalCommandResponseCallback callback
       ) {
       resume(chipClusterPtr, callback, null);
@@ -16834,12 +16812,6 @@ public class ChipClusters {
       resume(chipClusterPtr, callback, timedInvokeTimeoutMs);
     }
     private native void pause(long chipClusterPtr, OperationalCommandResponseCallback Callback
-      
-      , @Nullable Integer timedInvokeTimeoutMs);
-    private native void stop(long chipClusterPtr, OperationalCommandResponseCallback Callback
-      
-      , @Nullable Integer timedInvokeTimeoutMs);
-    private native void start(long chipClusterPtr, OperationalCommandResponseCallback Callback
       
       , @Nullable Integer timedInvokeTimeoutMs);
     private native void resume(long chipClusterPtr, OperationalCommandResponseCallback Callback

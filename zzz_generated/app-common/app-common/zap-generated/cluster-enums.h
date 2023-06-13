@@ -1840,32 +1840,24 @@ namespace RoboticVacuumOperationalState {
 // Enum for ErrorStateEnum
 enum class ErrorStateEnum : uint8_t
 {
-    kNoError                   = 0x00,
-    kUnableToStartOrResume     = 0x01,
-    kUnableToCompleteOperation = 0x02,
-    kCommandInvalidInState     = 0x03,
-    kFailedToFindChargingDock  = 0x40,
-    kStuck                     = 0x41,
-    kDustBinMissing            = 0x42,
-    kDustBinFull               = 0x43,
-    kWaterTankEmpty            = 0x44,
-    kWaterTankMissing          = 0x45,
-    kWaterTankLidOpen          = 0x46,
-    kMopCleaningPadMissing     = 0x47,
+    kFailedToFindChargingDock = 0x40,
+    kStuck                    = 0x41,
+    kDustBinMissing           = 0x42,
+    kDustBinFull              = 0x43,
+    kWaterTankEmpty           = 0x44,
+    kWaterTankMissing         = 0x45,
+    kWaterTankLidOpen         = 0x46,
+    kMopCleaningPadMissing    = 0x47,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
+    kUnknownEnumValue = 0,
 };
 
 // Enum for OperationalStateEnum
 enum class OperationalStateEnum : uint8_t
 {
-    kStopped        = 0x00,
-    kRunning        = 0x01,
-    kPaused         = 0x02,
-    kError          = 0x03,
     kSeekingCharger = 0x40,
     kCharging       = 0x41,
     kDocked         = 0x42,
@@ -1873,7 +1865,7 @@ enum class OperationalStateEnum : uint8_t
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
+    kUnknownEnumValue = 0,
 };
 } // namespace RoboticVacuumOperationalState
 

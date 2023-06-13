@@ -3027,7 +3027,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationalStateID = @(0);
 
-        _operationalStateLabel = @"";
+        _operationalStateLabel = nil;
     }
     return self;
 }
@@ -3155,7 +3155,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationalStateID = @(0);
 
-        _operationalStateLabel = @"";
+        _operationalStateLabel = nil;
     }
     return self;
 }

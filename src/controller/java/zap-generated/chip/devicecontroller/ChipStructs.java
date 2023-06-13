@@ -1940,12 +1940,12 @@ public ArrayList<ChipStructs.DishwasherModeSelectClusterModeTagStruct> modeTags;
 
 public static class OperationalStateClusterErrorStateStruct {
 public Integer errorStateID;
-public @Nullable String errorStateLabel;
+public Optional<String> errorStateLabel;
 public Optional<String> errorStateDetails;
 
   public OperationalStateClusterErrorStateStruct(
     Integer errorStateID
-      , @Nullable String errorStateLabel
+      , Optional<String> errorStateLabel
       , Optional<String> errorStateDetails
   ) {
     this.errorStateID = errorStateID;
@@ -1973,11 +1973,11 @@ public Optional<String> errorStateDetails;
 
 public static class OperationalStateClusterOperationalStateStruct {
 public Integer operationalStateID;
-public String operationalStateLabel;
+public Optional<String> operationalStateLabel;
 
   public OperationalStateClusterOperationalStateStruct(
     Integer operationalStateID
-      , String operationalStateLabel
+      , Optional<String> operationalStateLabel
   ) {
     this.operationalStateID = operationalStateID;
     this.operationalStateLabel = operationalStateLabel;
@@ -2000,13 +2000,13 @@ public String operationalStateLabel;
 
 public static class RoboticVacuumOperationalStateClusterErrorStateStruct {
 public Integer errorStateID;
-public @Nullable String errorStateLabel;
-public @Nullable Optional<String> errorStateDetails;
+public Optional<String> errorStateLabel;
+public Optional<String> errorStateDetails;
 
   public RoboticVacuumOperationalStateClusterErrorStateStruct(
     Integer errorStateID
-      , @Nullable String errorStateLabel
-      , @Nullable Optional<String> errorStateDetails
+      , Optional<String> errorStateLabel
+      , Optional<String> errorStateDetails
   ) {
     this.errorStateID = errorStateID;
     this.errorStateLabel = errorStateLabel;
@@ -2033,11 +2033,11 @@ public @Nullable Optional<String> errorStateDetails;
 
 public static class RoboticVacuumOperationalStateClusterOperationalStateStruct {
 public Integer operationalStateID;
-public String operationalStateLabel;
+public Optional<String> operationalStateLabel;
 
   public RoboticVacuumOperationalStateClusterOperationalStateStruct(
     Integer operationalStateID
-      , String operationalStateLabel
+      , Optional<String> operationalStateLabel
   ) {
     this.operationalStateID = operationalStateID;
     this.operationalStateLabel = operationalStateLabel;
