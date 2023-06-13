@@ -1241,10 +1241,13 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
                 result = mbedtls_asn1_get_bool(&p, end, &isCA);
                 VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_INTERNAL);
 
-                if (p != seqStart + len)
+                // Missing pathLen optional tag will leave pathLen == -1.
+                bool hasPathLen = (p != (seqStart + len));
+                if (hasPathLen)
                 {
-                    // Failure to read will leave pathLen == -1
+                    // Extract pathLen value, making sure it's a valid format.
                     result = mbedtls_asn1_get_int(&p, end, &pathLen);
+                    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
                 }
             }
 
