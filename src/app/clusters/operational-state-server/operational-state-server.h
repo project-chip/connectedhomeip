@@ -52,6 +52,7 @@ public:
     using PhaseList                      = chip::app::DataModel::List<const chip::CharSpan>;
     /**
      * Init the operational state server.
+     * This function must be called after define a OperationalStateServer class object.
      * @param void
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
