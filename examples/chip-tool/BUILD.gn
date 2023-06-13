@@ -101,6 +101,7 @@ static_library("chip-tool-utils") {
   }
 
   public_deps = [
+    "${chip_root}/examples/common/tracing:commandline",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/commands/commissioner",
     "${chip_root}/src/app/tests/suites/commands/delay",
@@ -114,8 +115,6 @@ static_library("chip-tool-utils") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
-    "${chip_root}/src/tracing",
-    "${chip_root}/src/tracing/log_json",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
   ]
