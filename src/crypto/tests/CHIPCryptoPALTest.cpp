@@ -1972,7 +1972,8 @@ static void TestX509_VerifyAttestationCertificateFormat(nlTestSuite * inSuite, v
         CHIP_ERROR err = VerifyAttestationCertificateFormat(cert, testCase.type);
         if (err != testCase.expectedError)
         {
-            ChipLogError(Crypto, "Failed TestX509_VerifyAttestationCertificateFormat sub-case %d, err: %" CHIP_ERROR_FORMAT, case_idx, err.Format());
+            ChipLogError(Crypto, "Failed TestX509_VerifyAttestationCertificateFormat sub-case %d, err: %" CHIP_ERROR_FORMAT,
+                         case_idx, err.Format());
         }
         NL_TEST_ASSERT(inSuite, err == testCase.expectedError);
         ++case_idx;
