@@ -19,7 +19,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
-#include <app/clusters/on-off-server/on-off-server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -69,27 +68,28 @@ EmberAfStatus Instance::SetFeatureMap(uint32_t value) const
                                  ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
-std::map<uint32_t, Instance*> Instance::ResourceMonitoringAliasesInstanceMap;
+std::map<uint32_t, Instance *> Instance::ResourceMonitoringAliasesInstanceMap;
 
 CHIP_ERROR Instance::Init()
 {
     ChipLogError(Zcl, "ResourceMonitoring: Init");
     // Check that the cluster ID given is a valid mode select alias cluster ID.
-    if (!std::any_of(AliasedClusters.begin(), AliasedClusters.end(), [this](ClusterId i){return i == clusterId;}))
+    if (!std::any_of(AliasedClusters.begin(), AliasedClusters.end(), [this](ClusterId i) { return i == clusterId; }))
     {
         ChipLogError(Zcl, "ResourceMonitoring: The cluster with ID %lu is not a mode select alias.", long(clusterId));
-        return CHIP_ERROR_INVALID_ARGUMENT; 
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     // Check if the cluster has been selected in zap
-    if (!emberAfContainsServer(endpointId, clusterId)) {
+    if (!emberAfContainsServer(endpointId, clusterId))
+    {
         ChipLogError(Zcl, "ResourceMonitoring: The cluster with ID %lu was not enabled in zap.", long(clusterId));
-        return CHIP_ERROR_INVALID_ARGUMENT; 
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    ChipLogError(Zcl, "ResourceMonitoring: calling delegate->init()" );
+    ChipLogError(Zcl, "ResourceMonitoring: calling delegate->init()");
     ReturnErrorOnFailure(delegate->Init());
 
     ResourceMonitoringAliasesInstanceMap[clusterId] = this;
@@ -168,7 +168,7 @@ bool Instance::HasFeature(ResourceMonitoring::Feature feature) const
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
 {
-    ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");    
+    ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
     callback(HepaFilterMonitoring::Commands::ResetCondition::Id, context);
 
     return CHIP_NO_ERROR;
@@ -184,8 +184,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, AttributeValueDecoder & aDecoder)
 {
 
-        return CHIP_NO_ERROR;
-
+    return CHIP_NO_ERROR;
 }
 
 } // namespace ResourceMonitoring

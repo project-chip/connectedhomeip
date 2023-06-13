@@ -42,7 +42,7 @@ public:
     virtual CHIP_ERROR Init() = 0;
 
     /**
-     * 
+     *
      * This function is to be overridden by a user implemented function that makes this decision based on the application logic.
      * @param mode
      */
