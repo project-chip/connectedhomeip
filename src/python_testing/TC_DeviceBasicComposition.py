@@ -192,7 +192,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             else:
                 asserts.fail("Require either --qr-code or --manual-code to proceed with PASE needed for test.")
 
-            if setup_payload.short_discriminator != None:
+            if setup_payload.short_discriminator is not None:
                 filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
                 filter_value = setup_payload.short_discriminator
             else:
@@ -234,7 +234,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         logging.info("Start of actual tests")
         logging.info("###########################################################")
 
-        ########### State kept for use by all tests ###########
+        # ======= State kept for use by all tests =======
 
         # All endpoints in "full object" indexing format
         self.endpoints = wildcard_read.attributes
@@ -253,10 +253,10 @@ class TC_DeviceBasicComposition(MatterBaseTest):
         else:
             asserts.fail(msg)
 
-    ############## START OF ACTUAL TESTS ##############
+    # ======= START OF ACTUAL TESTS =======
     def test_endpoint_zero_present(self):
         logging.info("Validating that the Root Node endpoint is present (EP0)")
-        if not 0 in self.endpoints:
+        if 0 not in self.endpoints:
             self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
                               problem="Did not find Endpoint 0.", spec_location="Endpoint Composition")
             self.fail_current_test()
