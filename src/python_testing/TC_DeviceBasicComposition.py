@@ -17,26 +17,21 @@
 
 import base64
 import copy
-from dataclasses import dataclass
 import json
 import logging
 import pathlib
 import sys
+from dataclasses import dataclass
+from pprint import pprint
 from typing import Any, Callable, Optional
 
-from pprint import pprint
-
-from chip import discovery
 import chip.clusters as Clusters
-
-from chip.setup_payload import SetupPayload
+import chip.tlv
+from chip import discovery
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.exceptions import ChipStackError
-
-import chip.tlv
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from matter_testing_support import AttributePathLocation
-
+from chip.setup_payload import SetupPayload
+from matter_testing_support import AttributePathLocation, MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
