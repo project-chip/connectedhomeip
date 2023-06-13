@@ -82,6 +82,7 @@ public:
      * @param[out] operationalStateList The pointer to load operational state list.
      * @param[out] size The number of operational state list's item.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * After a successful return the caller is responsible for calling ReleaseOperationalStateList on the outparam.
      */
     CHIP_ERROR GetOperationalStateList(OperationalStateStructDynamicList ** operationalStateList, size_t & size);
 
