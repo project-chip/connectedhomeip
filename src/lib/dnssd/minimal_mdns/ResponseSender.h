@@ -105,7 +105,7 @@ private:
 class ResponseSender : public ResponderDelegate
 {
 public:
-    ResponseSender(ServerBase * server) : mServer(server) {}
+    ResponseSender(Server * server) : mServer(server) {}
 
     CHIP_ERROR AddQueryResponder(QueryResponderBase * queryResponder);
     CHIP_ERROR RemoveQueryResponder(QueryResponderBase * queryResponder);
@@ -118,13 +118,13 @@ public:
     // Implementation of ResponderDelegate
     void AddResponse(const ResourceRecord & record) override;
 
-    void SetServer(ServerBase * server) { mServer = server; }
+    void SetServer(Server * server) { mServer = server; }
 
 private:
     CHIP_ERROR FlushReply();
     CHIP_ERROR PrepareNewReplyPacket();
 
-    ServerBase * mServer;
+    Server * mServer;
     QueryResponderPtrPool mResponders = {};
 
     /// Current send state

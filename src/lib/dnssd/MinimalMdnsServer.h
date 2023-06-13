@@ -36,14 +36,12 @@ public:
 class GlobalMinimalMdnsServer : public mdns::Minimal::ServerDelegate
 {
 public:
-    static constexpr size_t kMaxEndPoints = 30;
-
-    using ServerType = mdns::Minimal::Server<kMaxEndPoints>;
+    using ServerType = mdns::Minimal::Server;
 
     GlobalMinimalMdnsServer();
 
     static GlobalMinimalMdnsServer & Instance();
-    static mdns::Minimal::ServerBase & Server()
+    static mdns::Minimal::Server & Server()
     {
         if (Instance().mReplacementServer != nullptr)
         {
@@ -77,13 +75,13 @@ public:
         }
     }
 
-    void SetReplacementServer(mdns::Minimal::ServerBase * server) { mReplacementServer = server; }
+    void SetReplacementServer(mdns::Minimal::Server * server) { mReplacementServer = server; }
 
 private:
     ServerType mServer;
-    mdns::Minimal::ServerBase * mReplacementServer = nullptr;
-    MdnsPacketDelegate * mQueryDelegate            = nullptr;
-    MdnsPacketDelegate * mResponseDelegate         = nullptr;
+    mdns::Minimal::Server * mReplacementServer = nullptr;
+    MdnsPacketDelegate * mQueryDelegate        = nullptr;
+    MdnsPacketDelegate * mResponseDelegate     = nullptr;
 };
 
 } // namespace Dnssd

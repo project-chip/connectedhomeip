@@ -206,9 +206,8 @@ private:
     /// removes all records by advertising a 0 TTL)
     void AdvertiseRecords(BroadcastAdvertiseType type);
 
-    /// Determine if advertisement on the specified interface/address is ok given the
-    /// interfaces on which the mDNS server is listening
-    bool ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr);
+    // Clears the internal broadcast throttle
+    void ResetBroadcastThrottle();
 
     FullQName GetCommissioningTxtEntries(const CommissionAdvertisingParameters & params);
     FullQName GetOperationalTxtEntries(OperationalQueryAllocator::Allocator * allocator,
@@ -299,6 +298,34 @@ private:
         "=",
     };
 };
+
+/// Finds the first ip address of the given address type on the given interface
+CHIP_ERROR GetFirstIpAddress(Inet::InterfaceId interfaceId, Inet::IPAddressType addressType, Inet::IPAddress & address)
+{
+    UniquePtr<IpAddressIterator> allIps = GetAddressPolicy()->GetIpAddressesForEndpoint(interfaceId, addressType);
+
+    if (!allIps)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    if (!allIps->Next(address))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void AdvertiserMinMdns::ResetBroadcastThrottle()
+{
+    for (auto & it : mOperationalResponders)
+    {
+        it.GetAllocator()->GetQueryResponder()->ClearBroadcastThrottle();
+    }
+    mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
+    mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
+}
 
 void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
@@ -856,35 +883,6 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
     return allocator->AllocateQNameFromArray(txtFields, numTxtFields);
 }
 
-bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr)
-{
-    auto & server = GlobalMinimalMdnsServer::Server();
-
-    bool result = false;
-
-    server.ForEachEndPoints([&](auto * info) {
-        if (info->mListenUdp == nullptr)
-        {
-            return chip::Loop::Continue;
-        }
-
-        if (info->mInterfaceId != id)
-        {
-            return chip::Loop::Continue;
-        }
-
-        if (info->mAddressType != addr.Type())
-        {
-            return chip::Loop::Continue;
-        }
-
-        result = true;
-        return chip::Loop::Break;
-    });
-
-    return result;
-}
-
 void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 {
     ResponseConfiguration responseConfiguration;
@@ -902,73 +900,62 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 
     while (allInterfaces->Next(&interfaceId, &addressType))
     {
-        UniquePtr<IpAddressIterator> allIps = GetAddressPolicy()->GetIpAddressesForEndpoint(interfaceId, addressType);
-        VerifyOrDieWithMsg(allIps != nullptr, Discovery, "Failed to allocate memory for ip addresses.");
+        chip::Inet::IPPacketInfo packetInfo;
 
-        Inet::IPAddress ipAddress;
-        while (allIps->Next(ipAddress))
+        packetInfo.Clear();
+
+        // Attempt to get a "Real" IP address since `Type()` on a broadcast address
+        // always returns IPAddressType::kAny
+        CHIP_ERROR err = GetFirstIpAddress(interfaceId, addressType, packetInfo.SrcAddress);
+
+        if (err != CHIP_NO_ERROR)
         {
-            if (!ShouldAdvertiseOn(interfaceId, ipAddress))
-            {
-                continue;
-            }
+            ChipLogError(Discovery, "Failed to find a suitable IP address to advertise: %" CHIP_ERROR_FORMAT,
+                         err.Format());
+            continue;
+        }
 
-            chip::Inet::IPPacketInfo packetInfo;
+        if (addressType != chip::Inet::IPAddressType::kIPv6)
+        {
+            BroadcastIpAddresses::GetIpv4Into(packetInfo.DestAddress);
+        }
+        else
+        {
+            BroadcastIpAddresses::GetIpv6Into(packetInfo.DestAddress);
+        }
+        packetInfo.SrcPort   = kMdnsPort;
+        packetInfo.DestPort  = kMdnsPort;
+        packetInfo.Interface = interfaceId;
 
-            packetInfo.Clear();
-            packetInfo.SrcAddress = ipAddress;
-            if (ipAddress.IsIPv4())
-            {
-                BroadcastIpAddresses::GetIpv4Into(packetInfo.DestAddress);
-            }
-            else
-            {
-                BroadcastIpAddresses::GetIpv6Into(packetInfo.DestAddress);
-            }
-            packetInfo.SrcPort   = kMdnsPort;
-            packetInfo.DestPort  = kMdnsPort;
-            packetInfo.Interface = interfaceId;
+        // Advertise all records
+        //
+        // TODO: Consider advertising delta changes.
+        //
+        // Current advertisement does not have a concept of "delta" to only
+        // advertise changes. Current implementation is to always
+        //    1. advertise TTL=0 (clear all caches)
+        //    2. advertise available records (with longer TTL)
+        //
+        // It would be nice if we could selectively advertise what changes, like
+        // send TTL=0 for anything removed/about to be removed (and only those),
+        // then only advertise new items added.
+        //
+        // This optimization likely will take more logic and state storage, so
+        // for now it is not done.
+        QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
+        queryData.SetIsInternalBroadcast(true);
 
-            // Advertise all records
-            //
-            // TODO: Consider advertising delta changes.
-            //
-            // Current advertisement does not have a concept of "delta" to only
-            // advertise changes. Current implementation is to always
-            //    1. advertise TTL=0 (clear all caches)
-            //    2. advertise available records (with longer TTL)
-            //
-            // It would be nice if we could selectively advertise what changes, like
-            // send TTL=0 for anything removed/about to be removed (and only those),
-            // then only advertise new items added.
-            //
-            // This optimization likely will take more logic and state storage, so
-            // for now it is not done.
-            QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
-            queryData.SetIsInternalBroadcast(true);
+        ResetBroadcastThrottle();
 
-            for (auto & it : mOperationalResponders)
-            {
-                it.GetAllocator()->GetQueryResponder()->ClearBroadcastThrottle();
-            }
-            mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
-            mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
-
-            CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo, responseConfiguration);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Discovery, "Failed to advertise records: %" CHIP_ERROR_FORMAT, err.Format());
-            }
+        err = mResponseSender.Respond(0, queryData, &packetInfo, responseConfiguration);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to advertise records: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
 
     // Once all automatic broadcasts are done, allow immediate replies once.
-    for (auto & it : mOperationalResponders)
-    {
-        it.GetAllocator()->GetQueryResponder()->ClearBroadcastThrottle();
-    }
-    mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
-    mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
+    ResetBroadcastThrottle();
 }
 
 AdvertiserMinMdns gAdvertiser;

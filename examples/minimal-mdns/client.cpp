@@ -253,7 +253,7 @@ private:
     std::vector<std::string> mStorage;
 };
 
-void BroadcastPacket(mdns::Minimal::ServerBase * server)
+void BroadcastPacket(mdns::Minimal::Server * server)
 {
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
     VerifyOrDie(!buffer.IsNull());
@@ -295,7 +295,7 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
     }
 }
 
-mdns::Minimal::Server<20> gMdnsServer;
+mdns::Minimal::Server gMdnsServer;
 
 } // namespace
 

@@ -206,7 +206,15 @@ CHIP_ERROR ResponseSender::FlushReply()
         else
         {
 #if CHIP_MINMDNS_HIGH_VERBOSITY
-            ChipLogDetail(Discovery, "Broadcasting mDns reply for query from %s", srcAddressString);
+            char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
+            mSendState.GetSourceInterfaceId().GetInterfaceName(interfaceName, sizeof(interfaceName));
+
+            const char * interfaceType = mSendState.GetSourceAddress().Type() == chip::Inet::IPAddressType::kIPv4
+                ? "IPv4"
+                : (mSendState.GetSourceAddress().Type() == chip::Inet::IPAddressType::kIPv6 ? "IPv6" : "???");
+
+            ChipLogDetail(Discovery, "Broadcasting mDns reply for query from %s to %s / %s", srcAddressString, interfaceName,
+                          interfaceType);
 #endif
             ReturnErrorOnFailure(mServer->BroadcastSend(mResponseBuilder.ReleasePacket(), kMdnsStandardPort,
                                                         mSendState.GetSourceInterfaceId(), mSendState.GetSourceAddress().Type()));

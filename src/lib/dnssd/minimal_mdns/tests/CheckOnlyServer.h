@@ -71,18 +71,11 @@ void MakePrintableName(char (&location)[N], FullQName name)
 
 } // namespace
 
-class CheckOnlyServer : private chip::PoolImpl<ServerBase::EndpointInfo, 0, chip::ObjectPoolMem::kInline,
-                                               ServerBase::EndpointInfoPoolType::Interface>,
-                        public ServerBase,
-                        public ParserDelegate,
-                        public TxtRecordDelegate
+class CheckOnlyServer : public Server, public ParserDelegate, public TxtRecordDelegate
 {
 public:
-    CheckOnlyServer(nlTestSuite * inSuite) : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)), mInSuite(inSuite)
-    {
-        Reset();
-    }
-    CheckOnlyServer() : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)), mInSuite(nullptr) { Reset(); }
+    CheckOnlyServer(nlTestSuite * inSuite) : mInSuite(inSuite) { Reset(); }
+    CheckOnlyServer() : mInSuite(nullptr) { Reset(); }
     ~CheckOnlyServer() {}
 
     // Parser delegates
@@ -225,7 +218,7 @@ public:
         return true;
     }
 
-    // ServerBase overrides
+    // Server overrides
     CHIP_ERROR
     DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                chip::Inet::InterfaceId interface) override

@@ -193,7 +193,7 @@ void TestDnssdBrowse(nlTestSuite * inSuite, void * inContext)
 
     mdns::Minimal::SetDefaultAddressPolicy();
 
-    mdns::Minimal::Server<10> server;
+    mdns::Minimal::Server server;
     mdns::Minimal::QNamePart serverName[] = { "resolve-tester", "_mock", chip::Dnssd::kCommissionProtocol,
                                               chip::Dnssd::kLocalDomain };
     mdns::Minimal::ResponseSender responseSender(&server);

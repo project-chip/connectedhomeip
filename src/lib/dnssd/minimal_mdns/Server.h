@@ -21,7 +21,6 @@
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/PoolWrapper.h>
 
 #include <lib/dnssd/minimal_mdns/ListenIterator.h>
 #include <lib/dnssd/minimal_mdns/core/BytesRange.h>
@@ -54,97 +53,23 @@ public:
 // Defines an mDNS server that listens on one or more interfaces.
 //
 // I can send and receive mDNS packets (requests/replies)
-class ServerBase
+class Server
 {
 public:
-    class EndpointInfo
-    {
-    public:
-        struct EndPointDeletor
-        {
-            void operator()(chip::Inet::UDPEndPoint * e) { e->Free(); }
-        };
-
-#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
-        EndpointInfo(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
-                     std::unique_ptr<chip::Inet::UDPEndPoint, EndPointDeletor> && listenUdp,
-                     std::unique_ptr<chip::Inet::UDPEndPoint, EndPointDeletor> && unicastQueryUdp) :
-            mInterfaceId(interfaceId),
-            mAddressType(addressType), mListenUdp(listenUdp.release()), mUnicastQueryUdp(unicastQueryUdp.release())
-        {}
-#else
-        EndpointInfo(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
-                     std::unique_ptr<chip::Inet::UDPEndPoint, EndPointDeletor> && listenUdp) :
-            mInterfaceId(interfaceId),
-            mAddressType(addressType), mListenUdp(listenUdp.release())
-        {}
-#endif
-
-        ~EndpointInfo()
-        {
-            if (mListenUdp != nullptr)
-            {
-                mListenUdp->Free();
-            }
-
-#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
-            if (mUnicastQueryUdp != nullptr)
-            {
-                mUnicastQueryUdp->Free();
-            }
-#endif
-        }
-
-        const chip::Inet::InterfaceId mInterfaceId;
-        const chip::Inet::IPAddressType mAddressType;
-        chip::Inet::UDPEndPoint * const mListenUdp;
-#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
-        chip::Inet::UDPEndPoint * const mUnicastQueryUdp;
-#endif
-    };
-
-    /**
-     * Helps implement a generic broadcast implementation:
-     *    - provides the ability to determine what udp endpoint to use  to broadcast
-     *      a packet for the given endpoint info
-     */
-    class BroadcastSendDelegate
-    {
-    public:
-        virtual ~BroadcastSendDelegate() = default;
-
-        /**
-         * Returns non-null UDPEndpoint IFF a broadcast should be performed for the given EndpointInfo
-         */
-        virtual chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) = 0;
-    };
-
-#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
-    using EndpointInfoPoolType = chip::PoolInterface<EndpointInfo, chip::Inet::InterfaceId, chip::Inet::IPAddressType,
-                                                     std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> &&,
-                                                     std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> &&>;
-#else
-    using EndpointInfoPoolType = chip::PoolInterface<EndpointInfo, chip::Inet::InterfaceId, chip::Inet::IPAddressType,
-                                                     std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> &&>;
-#endif
-
-    ServerBase(EndpointInfoPoolType & pool) : mEndpoints(pool)
+    Server()
     {
         BroadcastIpAddresses::GetIpv6Into(mIpv6BroadcastAddress);
-
 #if INET_CONFIG_ENABLE_IPV4
         BroadcastIpAddresses::GetIpv4Into(mIpv4BroadcastAddress);
 #endif
     }
-    virtual ~ServerBase();
+    virtual ~Server();
 
     /// Closes all currently open endpoints and resets the 'initialized' flag
     void Shutdown();
 
     void ShutdownEndpoints();
-    void ShutdownEndpoint(EndpointInfo & aEndpoint);
 
-    /// Listen on the given interfaces/address types.
     ///
     /// Since mDNS uses link-local addresses, one generally wants to listen on all
     /// non-loopback interfaces.
@@ -172,17 +97,10 @@ public:
     virtual CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface,
                                      chip::Inet::IPAddressType addressType);
 
-    ServerBase & SetDelegate(ServerDelegate * d)
+    Server & SetDelegate(ServerDelegate * d)
     {
         mDelegate = d;
         return *this;
-    }
-
-    /// Iterator through all Endpoints
-    template <typename Function>
-    chip::Loop ForEachEndPoints(Function && function)
-    {
-        return mEndpoints.ForEachActiveObject(std::forward<Function>(function));
     }
 
     /// A server is considered listening if any UDP endpoint is active.
@@ -193,13 +111,19 @@ public:
     bool IsListening() const;
 
 private:
-    CHIP_ERROR BroadcastImpl(chip::System::PacketBufferHandle && data, uint16_t port, BroadcastSendDelegate * delegate);
+    CHIP_ERROR BroadcastImpl(chip::System::PacketBufferHandle && data, uint16_t port,
+                             chip::Inet::InterfaceId interfaceId   = chip::Inet::InterfaceId::Null(),
+                             chip::Inet::IPAddressType addressType = chip::Inet::IPAddressType::kAny);
 
     static void OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::System::PacketBufferHandle && buffer,
                                     const chip::Inet::IPPacketInfo * info);
 
-    EndpointInfoPoolType & mEndpoints; // possible endpoints, to listen on multiple interfaces
     ServerDelegate * mDelegate = nullptr;
+
+    chip::Inet::UDPEndPoint * mIpv6Endpoint = nullptr; // listen on port 5353
+#if INET_CONFIG_ENABLE_IPV4
+    chip::Inet::UDPEndPoint * mIpv4Endpoint = nullptr; // listen on port 5353
+#endif
 
     // Broadcast IP addresses are cached to not require a string parse every time
     // Ideally we should be able to constexpr these
@@ -207,18 +131,8 @@ private:
 #if INET_CONFIG_ENABLE_IPV4
     chip::Inet::IPAddress mIpv4BroadcastAddress;
 #endif
-    bool mIsInitialized = false;
-};
 
-// The PoolImpl impl is used as a base class because its destructor must be called after ServerBase's destructor.
-template <size_t kCount>
-class Server : private chip::PoolImpl<ServerBase::EndpointInfo, kCount, chip::ObjectPoolMem::kInline,
-                                      ServerBase::EndpointInfoPoolType::Interface>,
-               public ServerBase
-{
-public:
-    Server() : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)) {}
-    ~Server() override {}
+    bool mIsInitialized = false;
 };
 
 } // namespace Minimal
