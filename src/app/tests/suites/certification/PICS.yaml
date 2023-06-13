@@ -8244,8 +8244,7 @@ PICS:
     # server / manual
     #
     - label: "Changes air quality significantly"
-      id:
-          AIRQUAL.M.AirQualityChange
+      id: AIRQUAL.M.AirQualityChange
 
     # Carbon Dioxide Concentration Measurement Cluster Test Plan
     - label:
