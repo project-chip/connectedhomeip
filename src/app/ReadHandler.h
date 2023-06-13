@@ -212,8 +212,11 @@ private:
 
     enum class ReadHandlerFlags : uint8_t
     {
-        // mHoldReport is used to prevent subscription data delivery while we are
-        // waiting for the min reporting interval to elapse.
+        // TODO : HoldReport flag is only used in the unit tests to emulate a minInterval wait time, could be removed if we accept
+        // to introduce further delays in our unit tests.
+
+        // mHoldReport is used to prevent subscription data delivery while we are waiting
+        // for the min reporting interval to elapse.
         HoldReport = (1 << 0),
 
         // mHoldSync is used to prevent subscription empty report delivery while we
@@ -284,6 +287,10 @@ private:
      */
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks);
 
+    /// @brief Checks if the current time is after the minimum interval to emit the next report.
+    /// @return
+    bool IsPastMinWakeUpTime() const { return System::SystemClock().GetMonotonicTimestamp() >= mNextMinWakeUpTime; }
+
     /**
      *  Returns whether this ReadHandler represents a subscription that was created by the other side of the provided exchange.
      */
@@ -295,7 +302,10 @@ private:
         // Important: Anything that changes the state IsReportable depends on in
         // a way that causes IsReportable to become true must call ScheduleRun
         // on the reporting engine.
-        return mState == HandlerState::GeneratingReports && !mFlags.Has(ReadHandlerFlags::HoldReport) &&
+
+        // Keeping the check for HoldReport allows test to explicitely clear the HoldReport flag without having to explicitely wait
+        // the min wake up time The HoldReport
+        return mState == HandlerState::GeneratingReports && (!mFlags.Has(ReadHandlerFlags::HoldReport) || IsPastMinWakeUpTime()) &&
             (IsDirty() || !mFlags.Has(ReadHandlerFlags::HoldSync));
     }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
@@ -396,9 +406,10 @@ private:
      */
     void Close(CloseOptions options = CloseOptions::kDropPersistedSubscription);
 
-    static void OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState);
-    static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
-    CHIP_ERROR RefreshSubscribeSyncTimer();
+    static void OnReportOnMinCallback(System::Layer * apSystemLayer, void * apAppState);
+    static void OnRefreshSubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState);
+    CHIP_ERROR RescheduleSubscribeTimer();
+    CHIP_ERROR RefreshSubscribeTimer();
     CHIP_ERROR SendSubscribeResponse();
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
@@ -470,6 +481,7 @@ private:
     SubscriptionId mSubscriptionId    = 0;
     uint16_t mMinIntervalFloorSeconds = 0;
     uint16_t mMaxInterval             = 0;
+    System::Clock::Timestamp mNextMinWakeUpTime;
 
     EventNumber mEventMin = 0;
 

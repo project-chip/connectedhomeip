@@ -1774,6 +1774,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
             }
             ctx.GetIOContext().DriveIO(); // at least one IO loop is guaranteed
         }
+
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
@@ -1783,12 +1784,11 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
 
-        // For our non-urgent subscription, we did not send anything, so we
-        // should not have a min interval timer running there.
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        // For our non-urgent subscription, we did not send anything, so we should not be dirty or reportable
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsReportable());
 
-        // Wait for the min interval timer to fire.
+        // Wait for the min interval time.
         startTime = System::SystemClock().GetMonotonicTimestamp();
         while (true)
         {
@@ -1803,15 +1803,12 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
-        // min-interval timer should have fired, and our handler should still
-        // not be dirty or even reportable.
-        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        // Our handler should still not be dirty or reportable.
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsReportable());
 
         // And the non-urgent one should not have changed state either, since
         // it's waiting for the max-interval.
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportable());
 

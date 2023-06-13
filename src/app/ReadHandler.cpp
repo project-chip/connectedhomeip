@@ -56,6 +56,8 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
     mExchangeMgr = apExchangeContext->GetExchangeMgr();
 #endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
 
+    // Sets the min wake up time to now, so that the read handler can be scheduled immediately.
+    mNextMinWakeUpTime          = System::SystemClock().GetMonotonicTimestamp();
     mInteractionType            = aInteractionType;
     mLastWrittenEventsBytes     = 0;
     mTransactionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
@@ -124,10 +126,9 @@ ReadHandler::~ReadHandler()
     if (IsType(InteractionType::Subscribe))
     {
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-            OnUnblockHoldReportCallback, this);
-
+            OnReportOnMinCallback, this);
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-            OnRefreshSubscribeTimerSyncCallback, this);
+            OnRefreshSubscribeTimerCallback, this);
     }
 
     if (IsAwaitingReportResponse())
@@ -319,10 +320,10 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 
         if (IsType(InteractionType::Subscribe) && !IsPriming())
         {
-            // Ignore the error from RefreshSubscribeSyncTimer.  If we've
+            // Ignore the error from RefreshSubscribeTimer.  If we've
             // successfully sent the message, we need to return success from
             // this method.
-            RefreshSubscribeSyncTimer();
+            RefreshSubscribeTimer();
         }
     }
     if (!aMoreChunks)
@@ -634,7 +635,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     ReturnErrorOnFailure(writer.Finalize(&packet));
     VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(RefreshSubscribeSyncTimer());
+    ReturnErrorOnFailure(RefreshSubscribeTimer());
 
     ClearStateFlag(ReadHandlerFlags::PrimingReports);
     return mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
@@ -753,42 +754,57 @@ void ReadHandler::PersistSubscription()
     }
 }
 
-void ReadHandler::OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState)
+void ReadHandler::OnReportOnMinCallback(System::Layer * apSystemLayer, void * apAppState)
 {
     VerifyOrReturn(apAppState != nullptr);
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
-    ChipLogDetail(DataManagement, "Unblock report hold after min %d seconds", readHandler->mMinIntervalFloorSeconds);
+    // This should wake after the minimal interval is expired, making this flag redundant. this is only kept to accomodate the unit
+    // test
     readHandler->ClearStateFlag(ReadHandlerFlags::HoldReport);
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        System::Clock::Seconds16(readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds),
-        OnRefreshSubscribeTimerSyncCallback, readHandler);
+    if (readHandler->IsReportable())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    }
+    ChipLogProgress(DataManagement, "Refresh subscribe timer after %d seconds", readHandler->mMinIntervalFloorSeconds);
 }
 
-void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState)
+void ReadHandler::OnRefreshSubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState)
 {
     VerifyOrReturn(apAppState != nullptr);
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
     readHandler->ClearStateFlag(ReadHandlerFlags::HoldSync);
-    ChipLogProgress(DataManagement, "Refresh subscribe timer sync after %d seconds",
-                    readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds);
+    ChipLogProgress(DataManagement, "Refresh subscribe timer after %d seconds", readHandler->mMaxInterval);
 }
 
-CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
+CHIP_ERROR ReadHandler::RescheduleSubscribeTimer()
 {
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-        OnUnblockHoldReportCallback, this);
+        OnRefreshSubscribeTimerCallback, this);
+
+    ChipLogProgress(DataManagement, "Reschedule Subscribe Timer with %" PRIu64 " miliseconds",
+                    mNextMinWakeUpTime.count() - System::SystemClock().GetMonotonicTimestamp().count());
+    ReturnErrorOnFailure(
+        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+            mNextMinWakeUpTime - System::SystemClock().GetMonotonicTimestamp(), OnReportOnMinCallback, this));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ReadHandler::RefreshSubscribeTimer()
+{
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-        OnRefreshSubscribeTimerSyncCallback, this);
+        OnRefreshSubscribeTimerCallback, this);
+    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
+        OnReportOnMinCallback, this);
 
     if (!IsChunkedReport())
     {
-        ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with min %d seconds and max %d seconds",
-                        mMinIntervalFloorSeconds, mMaxInterval);
+        ChipLogProgress(DataManagement, "Refresh Subscribe Timer with %d seconds", mMaxInterval);
         SetStateFlag(ReadHandlerFlags::HoldReport);
         SetStateFlag(ReadHandlerFlags::HoldSync);
+        mNextMinWakeUpTime = System::SystemClock().GetMonotonicTimestamp() + System::Clock::Seconds16(mMinIntervalFloorSeconds);
         ReturnErrorOnFailure(
             InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-                System::Clock::Seconds16(mMinIntervalFloorSeconds), OnUnblockHoldReportCallback, this));
+                System::Clock::Seconds16(mMaxInterval), OnRefreshSubscribeTimerCallback, this));
     }
 
     return CHIP_NO_ERROR;
@@ -833,6 +849,12 @@ void ReadHandler::SetDirty(const AttributePathParams & aAttributeChanged)
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
     }
+    else
+    {
+        // If we couldn't schedule a run because the SetDirty happened before the min Interval, we reschedule the subscription timer
+        // to expire on min interval
+        RescheduleSubscribeTimer();
+    }
 }
 
 Transport::SecureSession * ReadHandler::GetSession() const
@@ -847,6 +869,8 @@ Transport::SecureSession * ReadHandler::GetSession() const
 void ReadHandler::UnblockUrgentEventDelivery()
 {
     SetStateFlag(ReadHandlerFlags::ForceDirty);
+    // For urgent delivery, we schedule the subscription timer to expire on min interval
+    RescheduleSubscribeTimer();
 }
 
 void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
