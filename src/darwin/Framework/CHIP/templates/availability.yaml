@@ -8399,6 +8399,7 @@
           - RVCRunModeSelect
           - RVCCleanModeSelect
           - DishwasherModeSelect
+          - WasherControls
       commands:
           ModeSelect:
               # Still very in-flux.
