@@ -40,18 +40,20 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Read the global attribute: FeatureMap"
+    # TODO: Address this when C++ and Python hasMasksSet are aligned (issue #27248)
+    - label: "Read the global attribute: FeatureMap and check for either bit 0 or 1 set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS:
-          OZCONC.S.Afffc && !OZCONC.S.F00 && !OZCONC.S.F01 && !OZCONC.S.F02 &&
-          !OZCONC.S.F03 && !OZCONC.S.F04 && !OZCONC.S.F05
+          OZCONC.S.Afffc
       response:
-          value: 0
           constraints:
               type: bitmap32
+              hasMasksSet:: [0x03]
+      disabled: true
 
-    - label: "Given OZCONC.S.F00(MEA) ensure featuremap has the correct bit set"
+    - label:
+          "Given OZCONC.S.F00(MEA) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: OZCONC.S.Afffc && OZCONC.S.F00
@@ -60,7 +62,18 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given OZCONC.S.F01(LEV) ensure featuremap has the correct bit set"
+    - label:
+          "Given OZCONC.S.F00(MEA) is not set, ensure featuremap has the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: OZCONC.S.Afffc && !OZCONC.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
+
+    - label:
+          "Given OZCONC.S.F01(LEV) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: OZCONC.S.Afffc && OZCONC.S.F01
@@ -69,41 +82,95 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Given OZCONC.S.F02(MED) ensure featuremap has the correct bit set"
+    - label:
+          "Given OZCONC.S.F01(LEV) is not set, ensure featuremap has the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: OZCONC.S.Afffc && !OZCONC.S.F01
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x2]
+
+    - label:
+          "Given OZCONC.S.F02(MED) ensure featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: OZCONC.S.Afffc && OZCONC.S.F02
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x4]
+              hasMasksSet: [0x4, 0x2]
 
-    - label: "Given OZCONC.S.F03(CRI) ensure featuremap has the correct bit set"
+    - label:
+          "Given OZCONC.S.F02(MED) is not set, ensure featuremap has the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: OZCONC.S.Afffc && !OZCONC.S.F02
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x4]
+
+    - label:
+          "Given OZCONC.S.F03(CRI) ensure featuremap has the correct bits set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: OZCONC.S.Afffc && OZCONC.S.F03
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x8]
+              hasMasksSet: [0x8, 0x2]
 
-    - label: "Given OZCONC.S.F04(PEA) ensure featuremap has the correct bit set"
+    - label:
+          "Given OZCONC.S.F03(CRI) is not set, ensure featuremap has the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: OZCONC.S.Afffc && !OZCONC.S.F03
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x8]
+
+    - label:
+          "Given OZCONC.S.F04(PEA) ensure featuremap has the correct bits set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: OZCONC.S.Afffc && OZCONC.S.F04
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x10]
+              hasMasksSet: [0x10, 0x1]
 
-    - label: "Given OZCONC.S.F05(AVG) ensure featuremap has the correct bit set"
+    - label:
+          "Given OZCONC.S.F04(PEA) is not set, ensure featuremap has the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: OZCONC.S.Afffc && !OZCONC.S.F04
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x10]
+
+    - label:
+          "Given OZCONC.S.F05(AVG) ensure featuremap has the correct bits set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: OZCONC.S.Afffc && OZCONC.S.F05
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x20]
+              hasMasksSet: [0x20, 0x1]
+
+    - label:
+          "Given OZCONC.S.F05(AVG) is not set, ensure featuremap has the correct bit clear"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: OZCONC.S.Afffc && !OZCONC.S.F05
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x20]
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
@@ -123,6 +190,16 @@ tests:
               type: list
               contains: [7]
 
+    - label: "Check the optional attribute Uncertainty is excluded from AttributeList
+             when OZCONC.S.A0007 is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: OZCONC.S.Afffb && !OZCONC.S.A0007
+      response:
+          constraints:
+              type: list
+              excludes: [7]
+
     - label:
           "Read the optional, feature dependent attributes MeasuredValue,
           MinMeasuredValue, MaxMeasuredValue and Measurement Unit in
@@ -136,6 +213,18 @@ tests:
               contains: [0, 1, 2, 8]
 
     - label:
+          "Check that MeasuredValue, MinMeasuredValue, MaxMeasuredValue, Measurement Unit
+          and Uncertainty are excluded from AttributeList when OZCONC.S.F00 (MEA) is 
+          not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: OZCONC.S.Afffb && !OZCONC.S.F00
+      response:
+          constraints:
+              type: list
+              excludes: [0, 1, 2, 7, 8]
+
+    - label:
           "Read the optional, feature dependent attributes PeakMeasuredValue &
           PeakMeasuredValueWindow in AttributeList"
       command: "readAttribute"
@@ -145,6 +234,17 @@ tests:
           constraints:
               type: list
               contains: [3, 4]
+
+    - label:
+          "Check that PeakMeasuredValue & PeakMeasuredValueWindow are excluded from
+          AttributeList when OZCONC.S.F04 (PEA) is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: OZCONC.S.Afffb && !OZCONC.S.F04
+      response:
+          constraints:
+              type: list
+              excludes: [3, 4]
 
     - label:
           "Read the optional, feature dependent attributes AverageMeasuredValue
@@ -158,6 +258,17 @@ tests:
               contains: [5, 6]
 
     - label:
+          "Check that AverageMeasuredValue and AverageMeasuredValueWindow are excluded
+          from AttributeList when OZCONC.S.F05 (AVG) is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: OZCONC.S.Afffb && !OZCONC.S.F05
+      response:
+          constraints:
+              type: list
+              excludes: [5, 6]
+
+    - label:
           "Read the optional, feature dependent attribute LevelValue in
           AttributeList"
       command: "readAttribute"
@@ -167,6 +278,17 @@ tests:
           constraints:
               type: list
               contains: [10]
+
+    - label:
+          "Check that LevelValue is excluded from AttributeList when OZCONC.S.F01 (LEV)
+          is not set"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      PICS: OZCONC.S.Afffb && !OZCONC.S.F01
+      response:
+          constraints:
+              type: list
+              excludes: [10]
 
     - label: "Read the global attribute: EventList"
       command: "readAttribute"
