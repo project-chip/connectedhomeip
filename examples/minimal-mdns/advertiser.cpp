@@ -20,6 +20,7 @@
 #include <arpa/inet.h>
 #include <strings.h>
 
+#include <TracingCommandLineArgument.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
@@ -81,6 +82,7 @@ constexpr uint16_t kOptionCommissioningRotatingId         = 0x700;
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
+constexpr uint16_t kOptionTraceTo             = 't';
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -89,6 +91,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     {
     case kOptionEnableIpV4:
         gOptions.enableIpV4 = true;
+        return true;
+    case kOptionTraceTo:
+        CommandLineApp::EnableTracingFor(aValue);
         return true;
     case kOptionAdvertisingMode:
         if (strcmp(aValue, "operational") == 0)
@@ -187,6 +192,7 @@ OptionDef cmdLineOptionsDef[] = {
 
     { "fabric-id", kArgumentRequired, kOptionOperationalFabricId },
     { "node-id", kArgumentRequired, kOptionOperationalNodeId },
+    { "trace-to", kArgumentRequired, kOptionTraceTo },
     {},
 };
 
@@ -228,11 +234,19 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  --node-id <value>\n"
                              "  -n <value>\n"
                              "        Operational node id.\n"
+                             "  -t <dest>\n"
+                             "  --trace-to <dest>\n"
+                             "        trace to the given destination (supported: " SUPPORTED_COMMAND_LINE_TRACING_TARGETS ").\n"
                              "\n" };
 
 HelpOptions helpOptions("advertiser", "Usage: advertiser [options]", "1.0");
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
+
+void StopSignalHandler(int signal)
+{
+    DeviceLayer::PlatformMgr().StopEventLoopTask();
+}
 
 } // namespace
 
@@ -316,7 +330,14 @@ int main(int argc, char ** args)
         return 1;
     }
 
+    signal(SIGTERM, StopSignalHandler);
+    signal(SIGINT, StopSignalHandler);
+
     DeviceLayer::PlatformMgr().RunEventLoop();
+
+    CommandLineApp::StopTracing();
+    Dnssd::Resolver::Instance().Shutdown();
+    DeviceLayer::PlatformMgr().Shutdown();
 
     printf("Done...\n");
     return 0;

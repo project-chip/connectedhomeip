@@ -80,7 +80,8 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
 
     if (BoltLockMgr().ValidatePIN(pinCode, err))
     {
-        returnValue = BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+        BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+        returnValue = true;
     }
 
     return returnValue;
@@ -93,7 +94,8 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const
 
     if (BoltLockMgr().ValidatePIN(pinCode, err))
     {
-        returnValue = BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+        BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+        returnValue = true;
     }
 
     return returnValue;
@@ -113,11 +115,6 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     logOnFailure(DoorLock::Attributes::LockType::Set(endpoint, DlLockType::kDeadBolt), "type");
     logOnFailure(DoorLock::Attributes::NumberOfTotalUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS), "number of users");
     logOnFailure(DoorLock::Attributes::NumberOfPINUsersSupported::Set(endpoint, CONFIG_LOCK_NUM_USERS), "number of PIN users");
-    logOnFailure(DoorLock::Attributes::NumberOfRFIDUsersSupported::Set(endpoint, 0), "number of RFID users");
     logOnFailure(DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Set(endpoint, CONFIG_LOCK_NUM_CREDENTIALS_PER_USER),
                  "number of credentials per user");
-
-    // Set FeatureMap to (kUser|kPinCredential), default is:
-    // (kUser|kAccessSchedules|kRfidCredential|kPinCredential) 0x113
-    logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101), "feature map");
 }

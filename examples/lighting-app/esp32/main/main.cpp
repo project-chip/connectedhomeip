@@ -46,6 +46,11 @@
 #include "Rpc.h"
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <common/OpenthreadConfig.h>
+#include <platform/ESP32/OpenthreadLauncher.h>
+#endif
+
 #include "DeviceWithDisplay.h"
 
 #if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
@@ -158,6 +163,13 @@ extern "C" void app_main()
 
     SetDeviceAttestationCredentialsProvider(get_dac_provider());
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    esp_openthread_platform_config_t config = {
+        .radio_config = ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG(),
+        .host_config  = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
+        .port_config  = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
+    };
+    set_openthread_platform_config(&config);
+
     if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to initialize Thread stack");

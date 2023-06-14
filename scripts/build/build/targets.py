@@ -418,13 +418,23 @@ def BuildASRTarget():
 
     # apps
     target.AppendFixedTargets([
+        TargetPart('all-clusters', app=ASRApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', app=ASRApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('lighting', app=ASRApp.LIGHT),
+        TargetPart('light-switch', app=ASRApp.LIGHT_SWITCH),
+        TargetPart('lock', app=ASRApp.LOCK),
+        TargetPart('bridge', app=ASRApp.BRIDGE),
+        TargetPart('temperature-measurement', app=ASRApp.TEMPERATURE_MEASUREMENT),
+        TargetPart('thermostat', app=ASRApp.THERMOSTAT),
+        TargetPart('ota-requestor', app=ASRApp.OTA_REQUESTOR),
     ])
 
     # modifiers
     target.AppendModifier('ota', enable_ota_requestor=True)
     target.AppendModifier('shell', chip_build_libshell=True)
     target.AppendModifier('no_logging', chip_logging=False)
+    target.AppendModifier('factory', enable_factory=True)
+    target.AppendModifier('rotating_id', enable_rotating_device_id=True)
 
     return target
 
