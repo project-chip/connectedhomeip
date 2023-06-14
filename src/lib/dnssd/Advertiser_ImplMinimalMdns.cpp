@@ -914,11 +914,13 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
             continue;
         }
 
-        if (addressType != chip::Inet::IPAddressType::kIPv6)
+#if INET_CONFIG_ENABLE_IPV4
+        if (addressType == chip::Inet::IPAddressType::kIPv4)
         {
             BroadcastIpAddresses::GetIpv4Into(packetInfo.DestAddress);
         }
         else
+#endif // INET_CONFIG_ENABLE_IPV4
         {
             BroadcastIpAddresses::GetIpv6Into(packetInfo.DestAddress);
         }

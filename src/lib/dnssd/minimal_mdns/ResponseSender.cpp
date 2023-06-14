@@ -209,9 +209,13 @@ CHIP_ERROR ResponseSender::FlushReply()
             char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
             mSendState.GetSourceInterfaceId().GetInterfaceName(interfaceName, sizeof(interfaceName));
 
-            const char * interfaceType = mSendState.GetSourceAddress().Type() == chip::Inet::IPAddressType::kIPv4
+            const char * interfaceType =
+#if INET_CONFIG_ENABLE_IPV4
+                mSendState.GetSourceAddress().Type() == chip::Inet::IPAddressType::kIPv4
                 ? "IPv4"
-                : (mSendState.GetSourceAddress().Type() == chip::Inet::IPAddressType::kIPv6 ? "IPv6" : "???");
+                :
+#endif // INET_CONFIG_ENABLE_IPV4
+                (mSendState.GetSourceAddress().Type() == chip::Inet::IPAddressType::kIPv6 ? "IPv6" : "???");
 
             ChipLogDetail(Discovery, "Broadcasting mDns reply for query from %s to %s / %s", srcAddressString, interfaceName,
                           interfaceType);
