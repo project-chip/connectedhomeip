@@ -1648,26 +1648,15 @@ server cluster DoorLock = 257 {
   readonly attribute nullable DlLockState lockState = 0;
   readonly attribute DlLockType lockType = 1;
   readonly attribute boolean actuatorEnabled = 2;
-  readonly attribute nullable DoorStateEnum doorState = 3;
   readonly attribute int16u numberOfTotalUsersSupported = 17;
   readonly attribute int16u numberOfPINUsersSupported = 18;
-  readonly attribute int16u numberOfRFIDUsersSupported = 19;
-  readonly attribute int8u numberOfWeekDaySchedulesSupportedPerUser = 20;
-  readonly attribute int8u numberOfYearDaySchedulesSupportedPerUser = 21;
-  readonly attribute int8u numberOfHolidaySchedulesSupported = 22;
   readonly attribute int8u maxPINCodeLength = 23;
   readonly attribute int8u minPINCodeLength = 24;
-  readonly attribute int8u maxRFIDCodeLength = 25;
-  readonly attribute int8u minRFIDCodeLength = 26;
   readonly attribute DlCredentialRuleMask credentialRulesSupport = 27;
   readonly attribute int8u numberOfCredentialsSupportedPerUser = 28;
-  attribute access(write: manage) char_string<3> language = 33;
   attribute access(write: manage) int32u autoRelockTime = 35;
-  attribute access(write: manage) int8u soundVolume = 36;
   attribute access(write: manage) OperatingModeEnum operatingMode = 37;
   readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
-  attribute access(write: manage) boolean enableOneTouchLocking = 41;
-  attribute access(write: manage) boolean enablePrivacyModeButton = 43;
   attribute access(write: administer) int8u wrongCodeEntryLimit = 48;
   attribute access(write: administer) int8u userCodeTemporaryDisableTime = 49;
   attribute access(write: administer) boolean requirePINforRemoteOperation = 51;
@@ -1689,58 +1678,6 @@ server cluster DoorLock = 257 {
   request struct UnlockWithTimeoutRequest {
     INT16U timeout = 0;
     optional OCTET_STRING PINCode = 1;
-  }
-
-  request struct SetWeekDayScheduleRequest {
-    INT8U weekDayIndex = 0;
-    INT16U userIndex = 1;
-    DaysMaskMap daysMask = 2;
-    INT8U startHour = 3;
-    INT8U startMinute = 4;
-    INT8U endHour = 5;
-    INT8U endMinute = 6;
-  }
-
-  request struct GetWeekDayScheduleRequest {
-    INT8U weekDayIndex = 0;
-    INT16U userIndex = 1;
-  }
-
-  request struct ClearWeekDayScheduleRequest {
-    INT8U weekDayIndex = 0;
-    INT16U userIndex = 1;
-  }
-
-  request struct SetYearDayScheduleRequest {
-    INT8U yearDayIndex = 0;
-    INT16U userIndex = 1;
-    epoch_s localStartTime = 2;
-    epoch_s localEndTime = 3;
-  }
-
-  request struct GetYearDayScheduleRequest {
-    INT8U yearDayIndex = 0;
-    INT16U userIndex = 1;
-  }
-
-  request struct ClearYearDayScheduleRequest {
-    INT8U yearDayIndex = 0;
-    INT16U userIndex = 1;
-  }
-
-  request struct SetHolidayScheduleRequest {
-    INT8U holidayIndex = 0;
-    epoch_s localStartTime = 1;
-    epoch_s localEndTime = 2;
-    OperatingModeEnum operatingMode = 3;
-  }
-
-  request struct GetHolidayScheduleRequest {
-    INT8U holidayIndex = 0;
-  }
-
-  request struct ClearHolidayScheduleRequest {
-    INT8U holidayIndex = 0;
   }
 
   request struct SetUserRequest {
@@ -1778,33 +1715,6 @@ server cluster DoorLock = 257 {
     nullable CredentialStruct credential = 0;
   }
 
-  response struct GetWeekDayScheduleResponse = 12 {
-    INT8U weekDayIndex = 0;
-    INT16U userIndex = 1;
-    DlStatus status = 2;
-    optional DaysMaskMap daysMask = 3;
-    optional INT8U startHour = 4;
-    optional INT8U startMinute = 5;
-    optional INT8U endHour = 6;
-    optional INT8U endMinute = 7;
-  }
-
-  response struct GetYearDayScheduleResponse = 15 {
-    INT8U yearDayIndex = 0;
-    INT16U userIndex = 1;
-    DlStatus status = 2;
-    optional epoch_s localStartTime = 3;
-    optional epoch_s localEndTime = 4;
-  }
-
-  response struct GetHolidayScheduleResponse = 18 {
-    INT8U holidayIndex = 0;
-    DlStatus status = 1;
-    optional epoch_s localStartTime = 2;
-    optional epoch_s localEndTime = 3;
-    optional OperatingModeEnum operatingMode = 4;
-  }
-
   response struct GetUserResponse = 28 {
     INT16U userIndex = 0;
     nullable CHAR_STRING userName = 1;
@@ -1835,15 +1745,6 @@ server cluster DoorLock = 257 {
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
   timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
   timed command UnlockWithTimeout(UnlockWithTimeoutRequest): DefaultSuccess = 3;
-  command access(invoke: administer) SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
-  command access(invoke: administer) GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
-  command access(invoke: administer) ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
-  command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
-  command access(invoke: administer) GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
-  command access(invoke: administer) ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
-  command access(invoke: administer) SetHolidaySchedule(SetHolidayScheduleRequest): DefaultSuccess = 17;
-  command access(invoke: administer) GetHolidaySchedule(GetHolidayScheduleRequest): GetHolidayScheduleResponse = 18;
-  command access(invoke: administer) ClearHolidaySchedule(ClearHolidayScheduleRequest): DefaultSuccess = 19;
   timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
   command access(invoke: administer) GetUser(GetUserRequest): GetUserResponse = 27;
   timed command access(invoke: administer) ClearUser(ClearUserRequest): DefaultSuccess = 29;
@@ -2202,26 +2103,15 @@ endpoint 1 {
     persist  attribute lockState default = 1;
     ram      attribute lockType;
     ram      attribute actuatorEnabled;
-    ram      attribute doorState;
     ram      attribute numberOfTotalUsersSupported default = 10;
     ram      attribute numberOfPINUsersSupported default = 10;
-    ram      attribute numberOfRFIDUsersSupported default = 10;
-    ram      attribute numberOfWeekDaySchedulesSupportedPerUser default = 10;
-    ram      attribute numberOfYearDaySchedulesSupportedPerUser default = 10;
-    ram      attribute numberOfHolidaySchedulesSupported default = 10;
     ram      attribute maxPINCodeLength default = 8;
     ram      attribute minPINCodeLength default = 6;
-    ram      attribute maxRFIDCodeLength default = 20;
-    ram      attribute minRFIDCodeLength default = 10;
     ram      attribute credentialRulesSupport default = 1;
     ram      attribute numberOfCredentialsSupportedPerUser default = 5;
-    ram      attribute language default = "en";
     ram      attribute autoRelockTime default = 60;
-    ram      attribute soundVolume default = 0x00;
     ram      attribute operatingMode default = 0x00;
     ram      attribute supportedOperatingModes default = 0xFFF6;
-    ram      attribute enableOneTouchLocking default = 0x00;
-    ram      attribute enablePrivacyModeButton default = 0x00;
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute requirePINforRemoteOperation default = 0;
@@ -2229,7 +2119,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0xDB3;
+    ram      attribute featureMap default = 0x181;
     ram      attribute clusterRevision default = 6;
   }
 }
