@@ -55,17 +55,14 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
     }
 
     def ConvertValue(value) -> Any:
-        value_type = type(value)
-
-        if value_type == ValueDecodeFailure:
+        if isinstance(value, ValueDecodeFailure):
             raise ValueError(f"Bad Value: {str(value)}")
 
-        if value_type == bytes:
+        if isinstance(value, bytes):
             return base64.b64encode(value).decode("UTF-8")
-        elif value_type == list:
-            for idx, item in enumerate(value):
-                value[idx] = ConvertValue(item)
-        elif value_type == dict:
+        elif isinstance(value, list):
+            value = [ConvertValue(item) for item in value]
+        elif isinstance(value, dict):
             value = MatterTlvToJson(value)
 
         return value
@@ -76,15 +73,6 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
         element_type: str = key_type_mappings[value_type]
         sub_element_type = ""
-
-        new_key = ""
-        if element_type:
-            if sub_element_type:
-                new_key = f"{str(key)}:{element_type}-{sub_element_type}"
-            else:
-                new_key = f"{str(key)}:{element_type}"
-        else:
-            new_key = str(key)
 
         try:
             new_value = ConvertValue(value)
@@ -97,6 +85,15 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
                     sub_element_type = key_type_mappings[type(tlv_data[key][0])]
                 else:
                     sub_element_type = "?"
+
+        new_key = ""
+        if element_type:
+            if sub_element_type:
+                new_key = f"{str(key)}:{element_type}-{sub_element_type}"
+            else:
+                new_key = f"{str(key)}:{element_type}"
+        else:
+            new_key = str(key)
 
         matter_json_dict[new_key] = new_value
 
@@ -329,6 +326,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
 
         # Validate presence of claimed attributes
         if success:
+            # TODO: Also check the reverse: that each attribute appears in the AttributeList.
             logging.info(
                 "Validating that a wildcard read on each cluster provided all attributes claimed in AttributeList mandatory global attribute")
 
