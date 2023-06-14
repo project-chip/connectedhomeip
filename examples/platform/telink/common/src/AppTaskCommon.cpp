@@ -142,8 +142,8 @@ public:
     void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
     void OnCommissioningWindowClosed() override
     {
-        if (!isComissioningStarted)
-            chip::DeviceLayer::Internal::BLEMgr().Shutdown();
+        // if (!isComissioningStarted)
+            // chip::DeviceLayer::Internal::BLEMgr().Shutdown();
     }
 };
 
@@ -589,8 +589,8 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         // Switch context from BLE to Thread
-        Internal::BLEManagerImpl sInstance;
-        sInstance.SwitchToIeee802154();
+        // Internal::BLEManagerImpl sInstance;
+        // sInstance.SwitchToIeee802154();
         StartDefaultThreadNetwork();
     }
     else
