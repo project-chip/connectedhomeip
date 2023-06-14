@@ -152,7 +152,7 @@ enum PublicEventTypes
      *
      * Signals a change to the sleepy end device interval.
      */
-    kSEDIntervalChange,
+    kICDPollingIntervalChange,
 
     /**
      * CHIPoBLE Connection Established

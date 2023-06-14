@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <system/SystemClock.h>
+
 namespace chip {
 namespace app {
 
@@ -40,11 +42,18 @@ public:
     ICDManager();
     void UpdateIcdMode();
     void UpdateOperationStates(OperationalState state);
+    ICDMode GetIcdMode() { return mIcdMode; }
+    OperationalState GetOperationalState() { return mOperationalState; }
+
+    static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
+    static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
 
 private:
-    constexpr uint32_t kICDSitModePollingThreashold = 15000_ms32;
-    constexpr uint32_t kSlowPollingInterval         = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
-    constexpr uint32_t kFastPollingInterval         = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+    static constexpr System::Clock::Milliseconds32 kICDSitModePollingThreashold = 15000_ms32;
+
+    // TODO ICD should they be System::Clock::Milliseconds32
+    static constexpr System::Clock::Milliseconds32 kSlowPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    static constexpr System::Clock::Milliseconds32 kFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
     void OnIdleModeDone(System::Layer * aLayer, void * appState);
     void OnActiveModeDone(System::Layer * aLayer, void * appState);

@@ -184,6 +184,9 @@ private:
      */
     CHIP_ERROR RequestSEDActiveMode(bool onOff, bool delayIdle = false);
 #endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif
 
     bool HaveMeshConnectivity();
 
@@ -407,6 +410,13 @@ inline CHIP_ERROR ThreadStackManager::RequestSEDActiveMode(bool onOff, bool dela
     return static_cast<ImplClass *>(this)->_RequestSEDActiveMode(onOff, delayIdle);
 }
 #endif
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+inline CHIP_ERROR ThreadStackManager::SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+{
+    return static_cast<ImplClass *>(this)->_SetPollingInterval(pollingInterval);
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 inline bool ThreadStackManager::HaveMeshConnectivity()
 {

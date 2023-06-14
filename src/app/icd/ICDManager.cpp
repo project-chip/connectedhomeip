@@ -17,6 +17,7 @@
 
 #include <app/clusters/icd-management-server/icd-management-server.cpp>
 #include <app/icd/ICDManager.h>
+#include <platform/ConnectivityManager.h>
 
 #include
 namespace chip {
@@ -61,7 +62,7 @@ void ICDManager::UpdateIcdMode()
 
 void ICDManager::UpdateOperationStates(OperationalState state)
 {
-    // TODO Threadsafety
+    // TODO ICD Threadsafety
 
     if (mOperationalState == IdleMode && state == IdleMode)
     {
@@ -71,9 +72,13 @@ void ICDManager::UpdateOperationStates(OperationalState state)
 
     if (state == IdleMode)
     {
-        mOperationalState = IdleMode uint32_t idleModeInterval;
+        mOperationalState = IdleMode;
+        uint32_t idleModeInterval;
         IcdManagement::Attributes::IdleModeInterval::Get(kRootEndpointId, &idleModeInterval);
-        DeviceLayer::SystemLayer().StartTimer(idleModeInterval, OnIdleModeDone, this));
+        DeviceLayer::SystemLayer().StartTimer(idleModeInterval, OnIdleModeDone, this);
+
+        // TODO ICD What do we do if this fails?
+        DeviceLayer::ConnectivityMgr().SetPollingInterval(kSlowPollingInterval);
     }
     else if (state == ActiveMode)
     {
@@ -84,15 +89,19 @@ void ICDManager::UpdateOperationStates(OperationalState state)
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
             mOperationalState = ActiveMode;
+
             uint32_t activeModeInterval;
             IcdManagement::Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval);
-            DeviceLayer::SystemLayer().StartTimer(activeModeInterval, OnActiveModeDone, this));
+            DeviceLayer::SystemLayer().StartTimer(activeModeInterval, OnActiveModeDone, this);
+
+            // TODO ICD What do we do if this fails?
+            DeviceLayer::ConnectivityMgr().SetPollingInterval(kFastPollingInterval);
         }
         else
         {
             uint32_t activeModeThreshold;
             IcdManagement::Attributes::ActiveModeThreshold::Get(kRootEndpointId, &activeModeThreshold);
-            DeviceLayer::SystemLayer().ExtendTimerTo(activeModeThreshold, OnActiveModeDone, this));
+            DeviceLayer::SystemLayer().ExtendTimerTo(activeModeThreshold, OnActiveModeDone, this);
         }
     }
 }

@@ -225,6 +225,9 @@ public:
      */
     CHIP_ERROR RequestSEDActiveMode(bool onOff, bool delayIdle = false);
 #endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif
 
     // CHIPoBLE service methods
     Ble::BleLayer * GetBleLayer();

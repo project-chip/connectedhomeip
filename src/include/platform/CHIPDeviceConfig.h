@@ -137,22 +137,13 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_SED
- *
- * Enable support for sleepy end device behavior.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_SED
-#define CHIP_DEVICE_CONFIG_ENABLE_SED 0
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL
  *
  * The default amount of time in milliseconds that the sleepy end device will use as an idle interval.
  * This interval is used by the device to periodically wake up and poll the data in the idle mode.
  */
 #ifndef CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL
-#define CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL 5000_ms32
+#define CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL System::Clock::Milliseconds32(5000)
 #endif
 
 /**
@@ -162,7 +153,7 @@
  * This interval is used by the device to periodically wake up and poll the data in the active mode.
  */
 #ifndef CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
-#define CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL 200_ms32
+#define CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL System::Clock::Milliseconds32(200)
 #endif
 
 /**

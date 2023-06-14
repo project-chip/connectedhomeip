@@ -249,10 +249,12 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     uint32_t jitter = MRP_BACKOFF_JITTER_BASE + (computeMaxPossible ? UINT8_MAX : Crypto::GetRandU8());
     mrpBackoffTime  = mrpBackoffTime * jitter / MRP_BACKOFF_JITTER_BASE;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Implement:
     //   "A sleepy sender SHOULD increase t to also account for its own sleepy interval
     //   required to receive the acknowledgment"
+    mrpBackoffTime += app::ICDManager::GetFastPollingInterval();
+#elif CHIP_DEVICE_CONFIG_ENABLE_SED
     DeviceLayer::ConnectivityManager::SEDIntervalsConfig sedIntervals;
 
     if (DeviceLayer::ConnectivityMgr().GetSEDIntervalsConfig(sedIntervals) == CHIP_NO_ERROR)

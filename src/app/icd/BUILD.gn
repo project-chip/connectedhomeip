@@ -31,7 +31,7 @@ source_set("manager-srcs") {
 # ICD Server Configuration
 # All configurations necessary to the ICD Server featureset need to in this configuration
 config("server-config") {
-  defines = [ "CHIP_CONFIG_ENABLE_ICD_SERVER" ]
+  defines = [ "CHIP_CONFIG_ENABLE_ICD_SERVER=1" ]
 }
 
 # servers-srcs source-set contains all the sources and configurations necessary to build the ICD Server functionality
