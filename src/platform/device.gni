@@ -152,9 +152,9 @@ if (chip_device_platform == "cc13x2_26x2") {
 } else if (chip_device_platform == "ameba") {
   _chip_device_layer = "Ameba"
 } else if (chip_device_platform == "bl602") {
-  _chip_device_layer = "bouffalolab/BL602"
+  _chip_device_layer = "bouffalolab/common"
 } else if (chip_device_platform == "bl702") {
-  _chip_device_layer = "bouffalolab/BL702"
+  _chip_device_layer = "bouffalolab/common"
 } else if (chip_device_platform == "cyw30739") {
   _chip_device_layer = "Infineon/CYW30739"
 } else if (chip_device_platform == "webos") {

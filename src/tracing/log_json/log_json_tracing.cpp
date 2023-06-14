@@ -18,6 +18,8 @@
 
 #include <tracing/log_json/log_json_tracing.h>
 
+#include <lib/address_resolve/TracingStructs.h>
+#include <lib/support/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
 
 #include <json/json.h>
@@ -257,24 +259,68 @@ void LogJsonBackend::LogMessageReceived(MessageReceiveInfo &)
     LogJsonValue(value);
 }
 
-void LogJsonBackend::LogNodeLookup(NodeLookupInfo &)
+void LogJsonBackend::LogNodeLookup(NodeLookupInfo & info)
 {
     Json::Value value;
-    value["TODO"] = "LogNodeLookup";
+
+    value["event"]                = "LogNodeLookup";
+    value["node_id"]              = info.request->GetPeerId().GetNodeId();
+    value["compressed_fabric_id"] = info.request->GetPeerId().GetCompressedFabricId();
+    value["min_lookup_time_ms"]   = info.request->GetMinLookupTime().count();
+    value["max_lookup_time_ms"]   = info.request->GetMaxLookupTime().count();
+
     LogJsonValue(value);
 }
 
-void LogJsonBackend::LogNodeDiscovered(NodeDiscoveredInfo &)
+void LogJsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
 {
     Json::Value value;
-    value["TODO"] = "LogNodeDiscovered";
+    value["event"] = "LogNodeDiscovered";
+
+    value["node_id"]              = info.peerId->GetNodeId();
+    value["compressed_fabric_id"] = info.peerId->GetCompressedFabricId();
+
+    switch (info.type)
+    {
+    case chip::Tracing::DiscoveryInfoType::kIntermediateResult:
+        value["type"] = "intermediate";
+        break;
+    case chip::Tracing::DiscoveryInfoType::kResolutionDone:
+        value["type"] = "done";
+        break;
+    case chip::Tracing::DiscoveryInfoType::kRetryDifferent:
+        value["type"] = "retry-different";
+        break;
+    }
+
+    {
+        Json::Value result;
+
+        char address_buff[chip::Transport::PeerAddress::kMaxToStringSize];
+
+        info.result->address.ToString(address_buff);
+
+        result["supports_tcp"] = info.result->supportsTcp;
+        result["address"]      = address_buff;
+
+        result["mrp"]["idle_retransmit_timeout_ms"]   = info.result->mrpRemoteConfig.mIdleRetransTimeout.count();
+        result["mrp"]["active_retransmit_timeout_ms"] = info.result->mrpRemoteConfig.mActiveRetransTimeout.count();
+
+        value["result"] = result;
+    }
+
     LogJsonValue(value);
 }
 
-void LogJsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &)
+void LogJsonBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
 {
     Json::Value value;
-    value["TODO"] = "LogNodeDiscoveryFailed";
+
+    value["event"]                = "LogNodeDiscoveryFailed";
+    value["node_id"]              = info.peerId->GetNodeId();
+    value["compressed_fabric_id"] = info.peerId->GetCompressedFabricId();
+    value["error"]                = chip::ErrorStr(info.error);
+
     LogJsonValue(value);
 }
 

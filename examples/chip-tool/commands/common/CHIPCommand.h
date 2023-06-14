@@ -24,6 +24,7 @@
 
 #include "Command.h"
 
+#include <TracingCommandLineArgument.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -85,7 +86,7 @@ public:
         AddArgument("trace_log", 0, 1, &mTraceLog);
         AddArgument("trace_decode", 0, 1, &mTraceDecode);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-        AddArgument("trace-to", &mTraceTo, "Trace destinations, comma-separated (e.g. log)");
+        AddArgument("trace-to", &mTraceTo, "Trace destinations, comma-separated (" SUPPORTED_COMMAND_LINE_TRACING_TARGETS ")");
         AddArgument("ble-adapter", 0, UINT16_MAX, &mBleAdapterId);
         AddArgument("storage-directory", &mStorageDirectory,
                     "Directory to place chip-tool's storage files in.  Defaults to $TMPDIR, with fallback to /tmp");
