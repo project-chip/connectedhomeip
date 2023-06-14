@@ -30,7 +30,7 @@ from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from enum import StrEnum, auto
+from enum import Enum, auto
 from typing import List, Optional, Tuple, Union
 
 from chip.tlv import float32, uint
@@ -301,11 +301,13 @@ class CommandPathLocation:
     cluster_id: int
     command_id: int
 
-
-class ProblemSeverity(StrEnum):
-    NOTE = auto()
-    WARNING = auto()
-    ERROR = auto()
+# ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
+# appeared in 3.11. To make it JSON serializable easily, multiple inheritance
+# from `str` is used. See https://stackoverflow.com/a/51976841.
+class ProblemSeverity(str, Enum):
+    NOTE = "NOTE"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
 
 
 @dataclass
