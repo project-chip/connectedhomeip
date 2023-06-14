@@ -234,6 +234,16 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::Type & request,
                         Json::Value & value);
 

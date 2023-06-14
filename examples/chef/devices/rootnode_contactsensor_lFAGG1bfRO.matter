@@ -4,7 +4,6 @@
 struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
-    optional char_string<64> tagName = 2;
 }
 
 struct ModeOptionStruct {

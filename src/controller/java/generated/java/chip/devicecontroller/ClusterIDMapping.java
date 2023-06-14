@@ -154,20 +154,20 @@ public class ClusterIDMapping {
         if (clusterId == ModeSelect.ID) {
             return new ModeSelect();
         }
-        if (clusterId == LaundryWasherModeSelect.ID) {
-            return new LaundryWasherModeSelect();
+        if (clusterId == LaundryWasherMode.ID) {
+            return new LaundryWasherMode();
         }
-        if (clusterId == RefrigeratorAndTemperatureControlledCabinetModeSelect.ID) {
-            return new RefrigeratorAndTemperatureControlledCabinetModeSelect();
+        if (clusterId == RefrigeratorAndTemperatureControlledCabinetMode.ID) {
+            return new RefrigeratorAndTemperatureControlledCabinetMode();
         }
         if (clusterId == WasherControls.ID) {
             return new WasherControls();
         }
-        if (clusterId == RvcRunModeSelect.ID) {
-            return new RvcRunModeSelect();
+        if (clusterId == RvcRunMode.ID) {
+            return new RvcRunMode();
         }
-        if (clusterId == RvcCleanModeSelect.ID) {
-            return new RvcCleanModeSelect();
+        if (clusterId == RvcCleanMode.ID) {
+            return new RvcCleanMode();
         }
         if (clusterId == TemperatureControl.ID) {
             return new TemperatureControl();
@@ -175,8 +175,8 @@ public class ClusterIDMapping {
         if (clusterId == RefrigeratorAlarm.ID) {
             return new RefrigeratorAlarm();
         }
-        if (clusterId == DishwasherModeSelect.ID) {
-            return new DishwasherModeSelect();
+        if (clusterId == DishwasherMode.ID) {
+            return new DishwasherMode();
         }
         if (clusterId == AirQuality.ID) {
             return new AirQuality();
@@ -6250,8 +6250,7 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),
-            ChangeToModeWithStatus(1L),;
+            ChangeToMode(0L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -6280,23 +6279,6 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum ChangeToModeWithStatusCommandField {NewMode(0),;
-                    private final int id;
-                    ChangeToModeWithStatusCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static ChangeToModeWithStatusCommandField value(int id) throws NoSuchFieldError {
-                        for (ChangeToModeWithStatusCommandField field : ChangeToModeWithStatusCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -6333,7 +6315,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class LaundryWasherModeSelect implements BaseCluster {
+    public static class LaundryWasherMode implements BaseCluster {
         public static final long ID = 81L;
         public long getID() {
             return ID;
@@ -6341,10 +6323,10 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             Description(0L),
-            SupportedModes(2L),
-            CurrentMode(3L),
-            StartUpMode(4L),
-            OnMode(5L),
+            SupportedModes(1L),
+            CurrentMode(2L),
+            StartUpMode(3L),
+            OnMode(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -6391,8 +6373,7 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),
-            ChangeToModeWithStatus(1L),;
+            ChangeToMode(0L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -6421,23 +6402,6 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum ChangeToModeWithStatusCommandField {NewMode(0),;
-                    private final int id;
-                    ChangeToModeWithStatusCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static ChangeToModeWithStatusCommandField value(int id) throws NoSuchFieldError {
-                        for (ChangeToModeWithStatusCommandField field : ChangeToModeWithStatusCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -6474,7 +6438,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class RefrigeratorAndTemperatureControlledCabinetModeSelect implements BaseCluster {
+    public static class RefrigeratorAndTemperatureControlledCabinetMode implements BaseCluster {
         public static final long ID = 82L;
         public long getID() {
             return ID;
@@ -6482,10 +6446,10 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             Description(0L),
-            SupportedModes(2L),
-            CurrentMode(3L),
-            StartUpMode(4L),
-            OnMode(5L),
+            SupportedModes(1L),
+            CurrentMode(2L),
+            StartUpMode(3L),
+            OnMode(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -6532,8 +6496,7 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),
-            ChangeToModeWithStatus(1L),;
+            ChangeToMode(0L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -6562,23 +6525,6 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum ChangeToModeWithStatusCommandField {NewMode(0),;
-                    private final int id;
-                    ChangeToModeWithStatusCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static ChangeToModeWithStatusCommandField value(int id) throws NoSuchFieldError {
-                        for (ChangeToModeWithStatusCommandField field : ChangeToModeWithStatusCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -6719,7 +6665,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class RvcRunModeSelect implements BaseCluster {
+    public static class RvcRunMode implements BaseCluster {
         public static final long ID = 84L;
         public long getID() {
             return ID;
@@ -6727,10 +6673,10 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             Description(0L),
-            SupportedModes(2L),
-            CurrentMode(3L),
-            StartUpMode(4L),
-            OnMode(5L),
+            SupportedModes(1L),
+            CurrentMode(2L),
+            StartUpMode(3L),
+            OnMode(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -6777,8 +6723,7 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),
-            ChangeToModeWithStatus(1L),;
+            ChangeToMode(0L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -6807,23 +6752,6 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum ChangeToModeWithStatusCommandField {NewMode(0),;
-                    private final int id;
-                    ChangeToModeWithStatusCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static ChangeToModeWithStatusCommandField value(int id) throws NoSuchFieldError {
-                        for (ChangeToModeWithStatusCommandField field : ChangeToModeWithStatusCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -6860,7 +6788,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class RvcCleanModeSelect implements BaseCluster {
+    public static class RvcCleanMode implements BaseCluster {
         public static final long ID = 85L;
         public long getID() {
             return ID;
@@ -6868,10 +6796,10 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             Description(0L),
-            SupportedModes(2L),
-            CurrentMode(3L),
-            StartUpMode(4L),
-            OnMode(5L),
+            SupportedModes(1L),
+            CurrentMode(2L),
+            StartUpMode(3L),
+            OnMode(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -6918,8 +6846,7 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),
-            ChangeToModeWithStatus(1L),;
+            ChangeToMode(0L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -6948,23 +6875,6 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum ChangeToModeWithStatusCommandField {NewMode(0),;
-                    private final int id;
-                    ChangeToModeWithStatusCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static ChangeToModeWithStatusCommandField value(int id) throws NoSuchFieldError {
-                        for (ChangeToModeWithStatusCommandField field : ChangeToModeWithStatusCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -7228,7 +7138,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class DishwasherModeSelect implements BaseCluster {
+    public static class DishwasherMode implements BaseCluster {
         public static final long ID = 89L;
         public long getID() {
             return ID;
@@ -7236,10 +7146,10 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             Description(0L),
-            SupportedModes(2L),
-            CurrentMode(3L),
-            StartUpMode(4L),
-            OnMode(5L),
+            SupportedModes(1L),
+            CurrentMode(2L),
+            StartUpMode(3L),
+            OnMode(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -7286,8 +7196,7 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),
-            ChangeToModeWithStatus(1L),;
+            ChangeToMode(0L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -7316,23 +7225,6 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum ChangeToModeWithStatusCommandField {NewMode(0),;
-                    private final int id;
-                    ChangeToModeWithStatusCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static ChangeToModeWithStatusCommandField value(int id) throws NoSuchFieldError {
-                        for (ChangeToModeWithStatusCommandField field : ChangeToModeWithStatusCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
