@@ -48,7 +48,7 @@ jobs:
       - uses: Wandalen/wretry.action@v1.0.36
         name: Checkout
         with:
-          action: actions/checkout@v3
+          action: actions/checkout@v3.5.2
           with: |
             token: ${{ github.token }}
           attempt_limit: 3
