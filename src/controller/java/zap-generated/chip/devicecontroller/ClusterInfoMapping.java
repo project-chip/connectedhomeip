@@ -22555,6 +22555,30 @@ public class ClusterInfoMapping {
            roboticVacuumOperationalStatepauseCommandParams
        );
        roboticVacuumOperationalStateClusterInteractionInfoMap.put("pause", roboticVacuumOperationalStatepauseInteractionInfo);
+     Map<String, CommandParameterInfo> roboticVacuumOperationalStatestopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo roboticVacuumOperationalStatestopInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster)
+           .stop((ChipClusters.RoboticVacuumOperationalStateCluster.OperationalCommandResponseCallback) callback
+           
+           );
+         },
+         () -> new DelegatedRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback(),
+           roboticVacuumOperationalStatestopCommandParams
+       );
+       roboticVacuumOperationalStateClusterInteractionInfoMap.put("stop", roboticVacuumOperationalStatestopInteractionInfo);
+     Map<String, CommandParameterInfo> roboticVacuumOperationalStatestartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo roboticVacuumOperationalStatestartInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster)
+           .start((ChipClusters.RoboticVacuumOperationalStateCluster.OperationalCommandResponseCallback) callback
+           
+           );
+         },
+         () -> new DelegatedRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback(),
+           roboticVacuumOperationalStatestartCommandParams
+       );
+       roboticVacuumOperationalStateClusterInteractionInfoMap.put("start", roboticVacuumOperationalStatestartInteractionInfo);
      Map<String, CommandParameterInfo> roboticVacuumOperationalStateresumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        InteractionInfo roboticVacuumOperationalStateresumeInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
