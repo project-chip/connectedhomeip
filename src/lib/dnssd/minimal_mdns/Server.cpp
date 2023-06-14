@@ -127,7 +127,7 @@ void Server::Shutdown()
 {
     ShutdownEndpoints();
     mBroadcastDestinationCount = 0;
-    mIsInitialized = false;
+    mIsInitialized             = false;
 }
 
 void Server::ShutdownEndpoints()
