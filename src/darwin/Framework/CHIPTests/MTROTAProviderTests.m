@@ -765,6 +765,8 @@ static BOOL sNeedsStackShutdown = YES;
     XCTestExpectation * bdxEndExpectation = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
     XCTestExpectation * applyUpdateRequestExpectation =
         [self expectationWithDescription:@"handleApplyUpdateRequestForNodeID called"];
+    XCTestExpectation * notifyUpdateAppliedExpectation =
+        [self expectationWithDescription:@"handleNotifyUpdateAppliedForNodeID called"];
 
     NSData * updateToken = [sOTAProviderDelegate generateUpdateToken];
     
@@ -865,20 +867,34 @@ static BOOL sNeedsStackShutdown = YES;
         [sOTAProviderDelegate respondWithContinueToApplyUpdateRequestWithCompletion:completion];
         [applyUpdateRequestExpectation fulfill];
     };
+    sOTAProviderDelegate.notifyUpdateAppliedHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * params, MTRStatusCompletion completion) {
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertEqual(controller, sController);
+        XCTAssertEqualObjects(params.updateToken, updateToken);
+        XCTAssertEqualObjects(params.softwareVersion, kUpdatedSoftwareVersion);
+
+        sOTAProviderDelegate.notifyUpdateAppliedHandler = nil;
+        [sOTAProviderDelegate respondSuccess:completion];
+        [notifyUpdateAppliedExpectation fulfill];
+    };
 
     // Advertise ourselves as an OTA provider.
     XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
 
     // Make sure we get our callbacks in order.  Give it a bit more time, because
     // we want to allow time for the BDX download.
-    [self waitForExpectations:@[ queryExpectation, bdxBeginExpectation, bdxQueryExpectation ]
+    [self waitForExpectations:@[ queryExpectation, bdxBeginExpectation, bdxQueryExpectation, bdxEndExpectation ]
                       timeout:(kTimeoutWithUpdateInSeconds) enforceOrder:YES];
 
     // Nothing really defines the ordering of bdxEndExpectation and
-    // applyUpdateRequestExpectation with respect to each other, and nothing
-    // defines the ordering of announceResponseExpectation with respect to _any_
-    // of the above expectations.
-    [self waitForExpectations:@[ bdxEndExpectation, applyUpdateRequestExpectation, announceResponseExpectation ]
+    // applyUpdateRequestExpectation with respect to each other.
+    [self waitForExpectations:@[ applyUpdateRequestExpectation, notifyUpdateAppliedExpectation ]
+                      timeout:kTimeoutInSeconds enforceOrder:YES];
+
+    // Nothing defines the ordering of announceResponseExpectation with respect
+    // to _any_ of the above expectations.
+    [self waitForExpectations:@[ announceResponseExpectation ]
                       timeout:kTimeoutInSeconds];
 }
 
