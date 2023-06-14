@@ -1295,8 +1295,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
 
         if (OID_CMP(sOID_Extension_BasicConstraints, extOID))
         {
-            int isCA                 = 0;
-            int pathLen              = -1;
+            int isCA    = 0;
+            int pathLen = -1;
 
             VerifyOrExit(extCritical, error = CHIP_ERROR_INTERNAL);
             extBasicPresent = true;
@@ -1306,7 +1306,7 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
             if (len > 0)
             {
                 unsigned char * seqStart = p;
-                result = mbedtls_asn1_get_bool(&p, end, &isCA);
+                result                   = mbedtls_asn1_get_bool(&p, end, &isCA);
                 VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_INTERNAL);
 
                 // Check if pathLen is there by validating if the cursor didn't get to the end of
