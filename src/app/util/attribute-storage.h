@@ -22,6 +22,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -100,10 +101,6 @@ bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchReco
 bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
                         EmberAfAttributeSearchRecord * attRecord);
 
-// Returns endpoint type for the given endpoint id if there is an enabled
-// endpoint with that endpoint id.  Otherwise returns null.
-const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId);
-
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
 // mask = 0 -> find either client or server
@@ -147,9 +144,6 @@ chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint
 // Returns number of clusters put into the passed cluster list
 // for the given endpoint and client/server polarity
 uint8_t emberAfGetClustersFromEndpoint(chip::EndpointId endpoint, chip::ClusterId * clusterList, uint8_t listLen, bool server);
-
-// Returns server cluster within the endpoint, or NULL if it isn't there
-const EmberAfCluster * emberAfFindServerCluster(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 // Returns cluster within the endpoint; Does not ignore disabled endpoints
 const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(chip::EndpointId endpoint, chip::ClusterId clusterId,
