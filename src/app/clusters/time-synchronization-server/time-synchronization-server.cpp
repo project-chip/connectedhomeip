@@ -284,7 +284,7 @@ CHIP_ERROR TimeSynchronizationServer::SetDefaultNTP(const DataModel::Nullable<Ch
 CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList<Structs::TimeZoneStruct::Type> & tzL)
 {
     size_t items;
-    ReturnErrorOnFailure(tzL.ComputeSize(&items));
+    VerifyOrReturnError(CHIP_NO_ERROR == tzL.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
 
     if (items > CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE)
     {
@@ -352,7 +352,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     if (CHIP_NO_ERROR != newTzL.GetStatus())
     {
         mTimeSyncDataProvider.LoadTimeZone(mTimeZoneList, mTimeZoneListSize);
-        return newTzL.GetStatus();
+        return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
     }
     if (i == 0)
     {
@@ -382,7 +382,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
 CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableList<Structs::DSTOffsetStruct::Type> & dstL)
 {
     size_t items;
-    ReturnErrorOnFailure(dstL.ComputeSize(&items));
+    VerifyOrReturnError(CHIP_NO_ERROR == dstL.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
 
     if (items > CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE)
     {
@@ -401,7 +401,7 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
     if (CHIP_NO_ERROR != newDstL.GetStatus())
     {
         mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetList, mDstOffsetListSize);
-        return newDstL.GetStatus();
+        return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
     }
     if (i == 0)
     {
@@ -492,8 +492,10 @@ DataModel::List<Structs::DSTOffsetStruct::Type> TimeSynchronizationServer::GetDS
 void TimeSynchronizationServer::ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action,
                                                       void * aAppState)
 {
-    VerifyOrDie(SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState) ==
-                CHIP_NO_ERROR);
+    if (CHIP_NO_ERROR != SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, aAppState))
+    {
+        ChipLogError(Zcl, "Time Synchronization failed to schedule timer.");
+    }
 }
 
 CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime, GranularityEnum granularity,
@@ -501,7 +503,11 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
 {
     ReturnErrorOnFailure(UpdateUTCTime(utcTime));
     mGranularity = granularity;
-    TimeSource::Set(ep, source);
+    if (EMBER_ZCL_STATUS_SUCCESS != TimeSource::Set(ep, source))
+    {
+        ChipLogError(Zcl, "Writing TimeSource failed.");
+        return CHIP_IM_GLOBAL_STATUS(Failure);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -807,6 +813,10 @@ bool emberAfTimeSynchronizationClusterSetTimeZoneCallback(
         {
             commandObj->AddStatus(commandPath, Status::ResourceExhausted);
         }
+        else if (err == CHIP_IM_GLOBAL_STATUS(InvalidCommand))
+        {
+            commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        }
         else
         {
             commandObj->AddStatus(commandPath, Status::ConstraintError);
@@ -869,6 +879,10 @@ bool emberAfTimeSynchronizationClusterSetDSTOffsetCallback(
         if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
             commandObj->AddStatus(commandPath, Status::ResourceExhausted);
+        }
+        else if (err == CHIP_IM_GLOBAL_STATUS(InvalidCommand))
+        {
+            commandObj->AddStatus(commandPath, Status::InvalidCommand);
         }
         else
         {
