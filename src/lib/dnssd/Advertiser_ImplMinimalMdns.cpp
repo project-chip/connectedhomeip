@@ -906,6 +906,15 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
 
         // Attempt to get a "Real" IP address since `Type()` on a broadcast address
         // always returns IPAddressType::kAny
+        //
+        // Generally the "source" of a packet is not relevant below because we
+        // set `unicast` to false, so we will broadcast a reply rather than
+        // trying to reply to a specific IP.
+        //
+        // The first IP address covers the need of getting an address of the
+        // right type on that interface. This seemed more sane than just using
+        // 127.0.0.1 or ::1. Multicast addresses specifically are kAny so they
+        // do not work as explained above.
         CHIP_ERROR err = GetFirstIpAddress(interfaceId, addressType, packetInfo.SrcAddress);
 
         if (err != CHIP_NO_ERROR)
