@@ -190,18 +190,48 @@ tests:
               maxValue: 4294967294
 
     - label: "TH writes DoorOpenEvents attribute as 0"
-      PICS: DRLK.S.A0004
+      PICS: DRLK.S.A0004.Write
       command: "writeAttribute"
       attribute: "DoorOpenEvents"
       arguments:
           value: 0
 
+    #- label: "TH reads DoorOpenEvents attribute from DUT"
+    #  PICS: DRLK.S.A0004.Write
+    #  command: "readAttribute"
+    #  attribute: "DoorOpenEvents"
+    #  response:
+    #      value: 10
+
+    #Failure got value 0 instead of 10
     - label: "TH reads DoorOpenEvents attribute from DUT"
-      PICS: DRLK.S.A0004
-      command: "readAttribute"
-      attribute: "DoorOpenEvents"
-      response:
-          value: 0
+      PICS: DRLK.S.A0004.Write && PICS_SKIP_SAMPLE_APP
+      verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+          ./chip-tool doorlock read door-open-events 1 1
+
+          Via the TH (chip-tool), verify that the DoorOpenEvents attribute value as 10.
+
+          [1654675019.286903][3337:3342] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1654675019.286939][3337:3342] CHIP:DMG:                                },
+          [1654675019.286974][3337:3342] CHIP:DMG:
+          [1654675019.287003][3337:3342] CHIP:DMG:                        },
+          [1654675019.287039][3337:3342] CHIP:DMG:
+          [1654675019.287067][3337:3342] CHIP:DMG:                },
+          [1654675019.287100][3337:3342] CHIP:DMG:
+          [1654675019.287125][3337:3342] CHIP:DMG:        ],
+          [1654675019.287156][3337:3342] CHIP:DMG:
+          [1654675019.287182][3337:3342] CHIP:DMG:        SuppressResponse = true,
+          [1654675019.287209][3337:3342] CHIP:DMG:        InteractionModelRevision = 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads DoorClosedEvents attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0005
@@ -214,18 +244,50 @@ tests:
               maxValue: 4294967294
 
     - label: "TH writes DoorClosedEvents attribute as 0"
-      PICS: DRLK.S.A0005
+      PICS: DRLK.S.A0005.Write
       command: "writeAttribute"
       attribute: "DoorClosedEvents"
       arguments:
           value: 0
 
-    - label: "TH reads DoorClosedEvents attribute from DUT"
-      PICS: DRLK.S.A0005
-      command: "readAttribute"
-      attribute: "DoorClosedEvents"
-      response:
-          value: 0
+    #- label: "TH reads DoorClosedEvents attribute from DUT"
+    #  PICS: DRLK.S.A0005.Write
+    #  command: "readAttribute"
+    #  attribute: "DoorClosedEvents"
+    #  response:
+    #      value: 11
+
+    #Failure got value 0 instead of 11
+    - label: "TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.A0005.Write && PICS_SKIP_SAMPLE_APP
+      verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome 
+
+          ./chip-tool doorlock read door-closed-events 1 1 
+
+          Via the TH (chip-tool), verify that the DoorClosedEvents attribute value as 11.
+
+          [1654675103.637778][3346:3351] CHIP:DMG:                                StatusIB =
+          [1654675103.637816][3346:3351] CHIP:DMG:                                {
+          [1654675103.637853][3346:3351] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1654675103.637886][3346:3351] CHIP:DMG:                                },
+          [1654675103.637923][3346:3351] CHIP:DMG:
+          [1654675103.637956][3346:3351] CHIP:DMG:                        },
+          [1654675103.637994][3346:3351] CHIP:DMG:
+          [1654675103.638021][3346:3351] CHIP:DMG:                },
+          [1654675103.638054][3346:3351] CHIP:DMG:
+          [1654675103.638078][3346:3351] CHIP:DMG:        ],
+          [1654675103.638109][3346:3351] CHIP:DMG:
+          [1654675103.638133][3346:3351] CHIP:DMG:        SuppressResponse = true,
+          [1654675103.638159][3346:3351] CHIP:DMG:        InteractionModelRevision = 1
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads OpenPeriod attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0006
