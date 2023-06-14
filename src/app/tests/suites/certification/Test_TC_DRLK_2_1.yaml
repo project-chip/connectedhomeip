@@ -203,7 +203,7 @@ tests:
     #  response:
     #      value: 10
 
-    #Failure got value 0 instead of 10
+    #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
     - label: "TH reads DoorOpenEvents attribute from DUT"
       PICS: DRLK.S.A0004.Write && PICS_SKIP_SAMPLE_APP
       verification: |
@@ -257,7 +257,7 @@ tests:
     #  response:
     #      value: 11
 
-    #Failure got value 0 instead of 11
+    #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
     - label: "TH reads DoorOpenEvents attribute from DUT"
       PICS: DRLK.S.A0005.Write && PICS_SKIP_SAMPLE_APP
       verification: |

@@ -1467,6 +1467,10 @@ DRLK.S.A0032=1
 DRLK.S.A0033=1
 DRLK.S.A0035=0
 
+#ReadOnly attributes
+DRLK.S.A0028.ReadOnly=1
+DRLK.S.A002c.ReadOnly=1
+
 #write attributes
 DRLK.S.A0004.Write=0
 DRLK.S.A0005.Write=0
