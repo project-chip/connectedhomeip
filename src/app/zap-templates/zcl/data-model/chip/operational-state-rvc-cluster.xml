@@ -38,14 +38,14 @@ limitations under the License.
 
   <struct name="OperationalStateStruct">
     <cluster code="0x0061"/>
-    <item name="OperationalStateID"    type="ENUM8" optional="false"/>
+    <item name="OperationalStateID"    type="ENUM8"       optional="false"/>
     <item name="OperationalStateLabel" type="CHAR_STRING" optional="true" length="64"/>
   </struct>
 
   <struct name="ErrorStateStruct">
     <cluster code="0x0061"/>
-    <item name="ErrorStateID" type="ENUM8" optional="false" />
-    <item name="ErrorStateLabel" type="CHAR_STRING" optional="true" length="64" />
+    <item name="ErrorStateID"      type="ENUM8"       optional="false" />
+    <item name="ErrorStateLabel"   type="CHAR_STRING" optional="true" length="64" />
     <item name="ErrorStateDetails" type="CHAR_STRING" optional="true" length="64" />
   </struct>
 
