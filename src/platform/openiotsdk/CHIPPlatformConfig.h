@@ -34,6 +34,9 @@
 #define CHIP_CONFIG_MAX_FABRICS 5
 #endif
 
+#define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 1
+#define CHIP_CONFIG_ERROR_SOURCE 1
+
 // ==================== Security Adaptations ====================
 
 // ==================== General Configuration Overrides ====================
