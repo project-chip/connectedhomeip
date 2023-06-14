@@ -62,6 +62,7 @@ chip_test_suite("tests") {
     "TestOnOffCommandsHandler.cpp",
     "TestTemperatureMeasurement.cpp",
     "TestQRCodePublisher.cpp",
+    "TestIlluminanceMeasurement.cpp"
   ]
 
   cflags = [ "-Wconversion" ]
