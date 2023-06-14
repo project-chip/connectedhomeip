@@ -257,7 +257,8 @@ CHIP_ERROR Server::BroadcastImpl(chip::System::PacketBufferHandle && data, uint1
         VerifyOrReturnError(mIpv4Endpoint != nullptr, CHIP_ERROR_NOT_CONNECTED);
         return mIpv4Endpoint->SendTo(mIpv4BroadcastAddress, port, std::move(data), interfaceId);
     }
-    else if (addressType == chip::Inet::IPAddressType::kAny && (mIpv4Endpoint != nullptr))
+
+    if (addressType == chip::Inet::IPAddressType::kAny && (mIpv4Endpoint != nullptr))
     {
         // For "Any" we consider IPV4 optional, so only report errors
         //
