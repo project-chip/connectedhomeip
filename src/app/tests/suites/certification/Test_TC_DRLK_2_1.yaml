@@ -261,9 +261,9 @@ tests:
     - label: "TH reads DoorOpenEvents attribute from DUT"
       PICS: DRLK.S.A0005.Write && PICS_SKIP_SAMPLE_APP
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read door-closed-events 1 1 
+          ./chip-tool doorlock read door-closed-events 1 1
 
           Via the TH (chip-tool), verify that the DoorClosedEvents attribute value as 11.
 
