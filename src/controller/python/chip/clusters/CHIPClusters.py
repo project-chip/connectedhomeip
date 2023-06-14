@@ -4364,7 +4364,7 @@ class ChipClusters:
             },
         },
     }
-    _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO = {
+    _LAUNDRY_WASHER_MODE_CLUSTER_INFO = {
         "clusterName": "LaundryWasherModeSelect",
         "clusterId": 0x00000051,
         "commands": {
@@ -4454,7 +4454,7 @@ class ChipClusters:
             },
         },
     }
-    _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER_INFO = {
+    _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO = {
         "clusterName": "RefrigeratorAndTemperatureControlledCabinetModeSelect",
         "clusterId": 0x00000052,
         "commands": {
@@ -4614,7 +4614,7 @@ class ChipClusters:
             },
         },
     }
-    _RVC_RUN_MODE_SELECT_CLUSTER_INFO = {
+    _RVC_RUN_MODE_CLUSTER_INFO = {
         "clusterName": "RvcRunModeSelect",
         "clusterId": 0x00000054,
         "commands": {
@@ -4704,7 +4704,7 @@ class ChipClusters:
             },
         },
     }
-    _RVC_CLEAN_MODE_SELECT_CLUSTER_INFO = {
+    _RVC_CLEAN_MODE_CLUSTER_INFO = {
         "clusterName": "RvcCleanModeSelect",
         "clusterId": 0x00000055,
         "commands": {
@@ -4938,7 +4938,7 @@ class ChipClusters:
             },
         },
     }
-    _DISHWASHER_MODE_SELECT_CLUSTER_INFO = {
+    _DISHWASHER_MODE_CLUSTER_INFO = {
         "clusterName": "DishwasherModeSelect",
         "clusterId": 0x00000059,
         "commands": {
@@ -15580,14 +15580,14 @@ class ChipClusters:
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000046: _ICD_MANAGEMENT_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
-        0x00000051: _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO,
-        0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER_INFO,
+        0x00000051: _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
+        0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
         0x00000053: _WASHER_CONTROLS_CLUSTER_INFO,
-        0x00000054: _RVC_RUN_MODE_SELECT_CLUSTER_INFO,
-        0x00000055: _RVC_CLEAN_MODE_SELECT_CLUSTER_INFO,
+        0x00000054: _RVC_RUN_MODE_CLUSTER_INFO,
+        0x00000055: _RVC_CLEAN_MODE_CLUSTER_INFO,
         0x00000056: _TEMPERATURE_CONTROL_CLUSTER_INFO,
         0x00000057: _REFRIGERATOR_ALARM_CLUSTER_INFO,
-        0x00000059: _DISHWASHER_MODE_SELECT_CLUSTER_INFO,
+        0x00000059: _DISHWASHER_MODE_CLUSTER_INFO,
         0x0000005B: _AIR_QUALITY_CLUSTER_INFO,
         0x0000005C: _SMOKE_CO_ALARM_CLUSTER_INFO,
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
@@ -15714,14 +15714,14 @@ class ChipClusters:
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "IcdManagement": _ICD_MANAGEMENT_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
-        "LaundryWasherModeSelect": _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO,
-        "RefrigeratorAndTemperatureControlledCabinetModeSelect": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER_INFO,
+        "LaundryWasherModeSelect": _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
+        "RefrigeratorAndTemperatureControlledCabinetModeSelect": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
         "WasherControls": _WASHER_CONTROLS_CLUSTER_INFO,
-        "RvcRunModeSelect": _RVC_RUN_MODE_SELECT_CLUSTER_INFO,
-        "RvcCleanModeSelect": _RVC_CLEAN_MODE_SELECT_CLUSTER_INFO,
+        "RvcRunModeSelect": _RVC_RUN_MODE_CLUSTER_INFO,
+        "RvcCleanModeSelect": _RVC_CLEAN_MODE_CLUSTER_INFO,
         "TemperatureControl": _TEMPERATURE_CONTROL_CLUSTER_INFO,
         "RefrigeratorAlarm": _REFRIGERATOR_ALARM_CLUSTER_INFO,
-        "DishwasherModeSelect": _DISHWASHER_MODE_SELECT_CLUSTER_INFO,
+        "DishwasherModeSelect": _DISHWASHER_MODE_CLUSTER_INFO,
         "AirQuality": _AIR_QUALITY_CLUSTER_INFO,
         "SmokeCoAlarm": _SMOKE_CO_ALARM_CLUSTER_INFO,
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,
