@@ -1388,7 +1388,6 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
         {
             int isCA                 = 0;
             int pathLen              = -1;
-            unsigned char * seqStart = p;
 
             VerifyOrExit(extCritical, error = CHIP_ERROR_INTERNAL);
             extBasicPresent = true;
@@ -1397,11 +1396,14 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
             VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
             if (len > 0)
             {
+                unsigned char * seqStart = p;
                 result = mbedtls_asn1_get_bool(&p, end, &isCA);
                 VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_INTERNAL);
 
-                // Missing pathLen optional tag will leave pathLen == -1.
-                bool hasPathLen = (p <= (seqStart + len));
+                // Check if pathLen is there by validating if the cursor didn't get to the end of
+                // of the internal SEQUENCE for the basic constraints encapsulation.
+                // Missing pathLen optional tag will leave pathLen == -1 for following checks.
+                bool hasPathLen = (p != (seqStart + len));
                 if (hasPathLen)
                 {
                     // Extract pathLen value, making sure it's a valid format.
