@@ -115,6 +115,9 @@ private:
                              chip::Inet::InterfaceId interfaceId   = chip::Inet::InterfaceId::Null(),
                              chip::Inet::IPAddressType addressType = chip::Inet::IPAddressType::kAny);
 
+    CHIP_ERROR SingleBroadcastImpl(chip::System::PacketBufferHandle && data, uint16_t port,
+                                   chip::Inet::InterfaceId, chip::Inet::IPAddressType);
+
     static void OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::System::PacketBufferHandle && buffer,
                                     const chip::Inet::IPPacketInfo * info);
 
@@ -131,6 +134,19 @@ private:
 #if INET_CONFIG_ENABLE_IPV4
     chip::Inet::IPAddress mIpv4BroadcastAddress;
 #endif
+
+    struct BroadcastDestination {
+        chip::Inet::InterfaceId interfaceId;
+        chip::Inet::IPAddressType addressType;
+
+        BroadcastDestination(chip::Inet::InterfaceId id, chip::Inet::IPAddressType type): interfaceId(id), addressType(type) {}
+        BroadcastDestination() : interfaceId(chip::Inet::InterfaceId::Null()),
+                                 addressType(chip::Inet::IPAddressType::kUnknown) {}
+
+    };
+    static constexpr size_t kMaxBroadcastDestinationCount = 20;
+    size_t mBroadcastDestinationCount = 0;
+    std::array<BroadcastDestination, kMaxBroadcastDestinationCount> mBroadcastDestination;
 
     bool mIsInitialized = false;
 };

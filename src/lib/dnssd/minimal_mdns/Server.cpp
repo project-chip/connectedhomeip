@@ -175,6 +175,7 @@ CHIP_ERROR Server::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> *
     ReturnErrorOnFailure(mIpv4Endpoint->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
 #endif
 
+    mBroadcastDestinationCount = 0;
     // ensure we are in the multicast groups required
     while (it->Next(&interfaceId, &addressType))
     {
@@ -195,6 +196,15 @@ CHIP_ERROR Server::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> *
             ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %" CHIP_ERROR_FORMAT,
                          interfaceName, AddressTypeStr(addressType), err.Format());
             continue;
+        }
+
+        if (mBroadcastDestinationCount < mBroadcastDestination.size())
+        {
+            mBroadcastDestination[mBroadcastDestinationCount++] = BroadcastDestination(interfaceId, addressType);
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "MDNS has insufficient resources to keep track of broadcast address.");
         }
     }
 
@@ -251,6 +261,81 @@ CHIP_ERROR Server::BroadcastSend(chip::System::PacketBufferHandle && data, uint1
 CHIP_ERROR Server::BroadcastImpl(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interfaceId,
                                  chip::Inet::IPAddressType addressType)
 {
+    if (interfaceId != chip::Inet::InterfaceId::Null())
+    {
+        return SingleBroadcastImpl(std::move(data), port, interfaceId, addressType);
+    }
+
+    // broadcast over every single interface/port pair
+    unsigned successes = 0;
+    unsigned failures  = 0;
+
+    CHIP_ERROR lastError = CHIP_ERROR_NO_ENDPOINT;
+
+    for (size_t i = 0; i < mBroadcastDestinationCount; i++)
+    {
+        const BroadcastDestination & info = mBroadcastDestination[i];
+
+        if ((addressType != chip::Inet::IPAddressType::kAny) && (addressType != info.addressType))
+        {
+            continue;
+        }
+
+        chip::System::PacketBufferHandle tempBuf = data.CloneData();
+        CHIP_ERROR err                           = CHIP_ERROR_NO_MEMORY;
+
+        if (!tempBuf.IsNull())
+        {
+            err = SingleBroadcastImpl(std::move(tempBuf), port, info.interfaceId, info.addressType);
+        }
+
+        if (err == CHIP_NO_ERROR)
+        {
+            ++successes;
+        }
+        else
+        {
+            lastError = err;
+            ++failures;
+
+#if CHIP_DETAIL_LOGGING
+            char ifaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
+            err = info.interfaceId.GetInterfaceName(ifaceName, sizeof(ifaceName));
+            if (err != CHIP_NO_ERROR)
+            {
+                strcpy(ifaceName, "???");
+            }
+            ChipLogDetail(Discovery, "Warning: Attempt to mDNS broadcast failed on %s: %" CHIP_ERROR_FORMAT, ifaceName,
+                          lastError.Format());
+#endif
+        }
+    }
+
+    if (failures != 0)
+    {
+        // if we had failures, log if the final status was success or failure, to make log reading
+        // easier. Some mDNS failures may be expected (e.g. for interfaces unavailable)
+        if (successes != 0)
+        {
+            ChipLogDetail(Discovery, "mDNS broadcast had only partial success: %u successes and %u failures.", successes, failures);
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "mDNS broadcast full failed in %u separate send attempts.", failures);
+        }
+    }
+
+    if (successes == 0)
+    {
+        return lastError; // guaranteed not a success
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Server::SingleBroadcastImpl(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interfaceId,
+                                       chip::Inet::IPAddressType addressType)
+{
 #if INET_CONFIG_ENABLE_IPV4
     if (addressType == chip::Inet::IPAddressType::kIPv4)
     {
@@ -279,7 +364,6 @@ CHIP_ERROR Server::BroadcastImpl(chip::System::PacketBufferHandle && data, uint1
     }
 #endif
 
-    VerifyOrReturnError(mIpv6Endpoint != nullptr, CHIP_ERROR_NOT_CONNECTED);
     return mIpv6Endpoint->SendTo(mIpv6BroadcastAddress, port, std::move(data), interfaceId);
 }
 
