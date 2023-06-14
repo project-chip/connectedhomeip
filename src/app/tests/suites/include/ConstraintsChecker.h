@@ -300,6 +300,17 @@ protected:
     }
 
     template <typename T, typename U>
+    bool CheckConstraintMinValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current,
+                                 const chip::app::DataModel::Nullable<U> & expected)
+    {
+        if (expected.IsNull())
+        {
+            return true;
+        }
+        return CheckConstraintMinValue(itemName, current, expected.Value());
+    }
+
+    template <typename T, typename U>
     bool CheckConstraintMinValue(const char * itemName, const T & current, const chip::Optional<U> & expected)
     {
         if (!expected.HasValue())
@@ -373,6 +384,17 @@ protected:
             return true;
         }
         return CheckConstraintMaxValue(itemName, current.Value(), static_cast<T>(expected));
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintMaxValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current,
+                                 const chip::app::DataModel::Nullable<U> & expected)
+    {
+        if (expected.IsNull())
+        {
+            return true;
+        }
+        return CheckConstraintMaxValue(itemName, current, expected.Value());
     }
 
     template <typename T, typename U>

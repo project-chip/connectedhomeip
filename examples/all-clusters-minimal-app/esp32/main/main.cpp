@@ -52,6 +52,8 @@
 #endif
 
 #if CONFIG_OPENTHREAD_ENABLED
+#include <common/OpenthreadConfig.h>
+#include <platform/ESP32/OpenthreadLauncher.h>
 #include <platform/ThreadStackManager.h>
 #endif
 
@@ -186,6 +188,13 @@ extern "C" void app_main()
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    esp_openthread_platform_config_t config = {
+        .radio_config = ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG(),
+        .host_config  = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
+        .port_config  = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
+    };
+    set_openthread_platform_config(&config);
+
     if (DeviceLayer::ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to initialize Thread stack");
