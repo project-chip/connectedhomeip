@@ -19,8 +19,8 @@ limitations under the License.
 
   <struct name="SemanticTagStruct">
     <cluster code="0x0050"/>
-    <item name="MfgCode" type="vendor_id"/>
-    <item name="Value"   type="ENUM16" optional="false"/>
+    <item name="MfgCode" type="vendor_id" optional="false"/>
+    <item name="Value"   type="ENUM16"    optional="false"/>
   </struct>
 
   <struct name="ModeOptionStruct">
@@ -39,7 +39,7 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
     <!-- Base data types -->
-    <attribute side="server" code="0x0000" define="MODE_DESCRIPTION"   type="CHAR_STRING"                        length="32"  writable="false" optional="false" isNullable="false">Description</attribute>
+    <attribute side="server" code="0x0000" define="MODE_DESCRIPTION"   type="CHAR_STRING"                        length="64"  writable="false" optional="false" isNullable="false">Description</attribute>
     <attribute side="server" code="0x0001" define="STANDARD_NAMESPACE" type="ENUM16"                                          writable="false" optional="false" isNullable="true">StandardNamespace</attribute>
     <attribute side="server" code="0x0002" define="SUPPORTED_MODES"    type="ARRAY" entryType="ModeOptionStruct" length="255" writable="false" optional="false" isNullable="false">SupportedModes</attribute>
     <attribute side="server" code="0x0003" define="CURRENT_MODE"       type="INT8U"                                           writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
