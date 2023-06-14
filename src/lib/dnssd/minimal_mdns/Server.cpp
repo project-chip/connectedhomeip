@@ -365,6 +365,7 @@ CHIP_ERROR Server::SingleBroadcastImpl(chip::System::PacketBufferHandle && data,
     }
 #endif
 
+    VerifyOrReturnError(mIpv6Endpoint != nullptr, CHIP_ERROR_NOT_CONNECTED);
     return mIpv6Endpoint->SendTo(mIpv6BroadcastAddress, port, std::move(data), interfaceId);
 }
 
