@@ -214,7 +214,7 @@ tests:
 
     - label:
           "Check that MeasuredValue, MinMeasuredValue, MaxMeasuredValue, Measurement Unit
-          and Uncertainty are excluded from AttributeList when CMOCONC.S.F00 (MEA) is 
+          and Uncertainty are excluded from AttributeList when CMOCONC.S.F00 (MEA) is
           not set"
       command: "readAttribute"
       attribute: "AttributeList"
