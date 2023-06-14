@@ -28,13 +28,13 @@ namespace TimeSynchronization {
 using namespace chip::app;
 using chip::app::Clusters::TimeSynchronization::Delegate;
 
-class TimeSyncManager : public Delegate
+class DefaultTimeSyncDelegate : public Delegate
 {
 
 public:
     using TimeZoneList = DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>;
 
-    TimeSyncManager() : Delegate(){};
+    DefaultTimeSyncDelegate() : Delegate(){};
     void HandleTimeZoneChanged(const TimeZoneList timeZoneList) override;
     bool HandleUpdateDSTOffset(chip::CharSpan name) override;
     bool IsNTPAddressValid(chip::CharSpan ntp) override;

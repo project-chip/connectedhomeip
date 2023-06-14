@@ -16,28 +16,28 @@
  *    limitations under the License.
  */
 
-#include "TimeSyncManager.h"
+#include "DefaultTimeSyncDelegate.h"
 
 using namespace chip::app::Clusters::TimeSynchronization;
 
-void TimeSyncManager::HandleTimeZoneChanged(const TimeZoneList timeZoneList)
+void DefaultTimeSyncDelegate::HandleTimeZoneChanged(const TimeZoneList timeZoneList)
 {
     // placeholder implementation
 }
 
-bool TimeSyncManager::HandleUpdateDSTOffset(chip::CharSpan name)
+bool DefaultTimeSyncDelegate::HandleUpdateDSTOffset(chip::CharSpan name)
 {
     // placeholder implementation
     return false;
 }
 
-bool TimeSyncManager::IsNTPAddressValid(chip::CharSpan ntp)
+bool DefaultTimeSyncDelegate::IsNTPAddressValid(chip::CharSpan ntp)
 {
     // placeholder implementation
     return true;
 }
 
-bool TimeSyncManager::IsNTPAddressDomain(chip::CharSpan ntp)
+bool DefaultTimeSyncDelegate::IsNTPAddressDomain(chip::CharSpan ntp)
 {
     // placeholder implementation
     return false;

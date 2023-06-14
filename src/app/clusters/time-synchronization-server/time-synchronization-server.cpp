@@ -15,7 +15,7 @@
  */
 
 #include "time-synchronization-server.h"
-#include "TimeSyncManager.h"
+#include "DefaultTimeSyncDelegate.h"
 #include "time-synchronization-delegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -56,7 +56,7 @@ Delegate * GetDelegate()
 {
     if (gDelegate == nullptr)
     {
-        static TimeSyncManager dg;
+        static DefaultTimeSyncDelegate dg;
         gDelegate = &dg;
     }
     return gDelegate;

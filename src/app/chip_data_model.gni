@@ -254,7 +254,7 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/TimeSyncDataProvider.cpp",
-          "${_app_root}/clusters/${cluster}/TimeSyncManager.cpp",
+          "${_app_root}/clusters/${cluster}/DefaultTimeSyncDelegate.cpp",
         ]
       } else if (cluster == "scenes-server") {
         sources += [
