@@ -51,7 +51,7 @@ static MTRTestKeys * sTestKeys = nil;
 
 // These are the paths where the raw ota image file and the raw image file will be generated
 // in the createOtaImageFiles called during one time setup.
-NSString * kOtaRawImagePath = @"/tmp/darwin/framework-tests/chip-ota-requestor-app";
+NSString * kOtaRawImagePath = @"/tmp/test004-raw-image";
 NSString * kOtaImagePath = @"/tmp/test004-image";
 
 static NSString * kOtaFilePath1 = @"/tmp/chip-ota-requestor-downloaded-image1";
@@ -315,12 +315,6 @@ static BOOL sNeedsStackShutdown = YES;
 
 @implementation MTROTAProviderTests
 
-+ (void)setUp
-{
-    // Global setup, runs once
-    [self createOtaImageFiles];
-}
-
 + (void)tearDown
 {
     // Global teardown, runs once
@@ -436,64 +430,6 @@ static BOOL sNeedsStackShutdown = YES;
     XCTAssertFalse([controller isRunning]);
 
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
-}
-
-+ (void)createOtaImageFiles
-{
-    
-    // In this method we do the following:
-    //
-    // 1) Build the ota requestor app with software version number set to - kUpdatedSoftwareVersion and software version string set to kUpdatedSoftwareVersionString
-    // 2) Use ota_image_tool.py to create the ota image file from the ota requestor app build in step 1 at /tmp/darwin/framework-tests.
-    // 
-
-    // Find the absolute path to the gn_build_example.sh script and also the example app path and the output directory.
-    // PWD should point to our src/darwin/Framework, while the script is in scripts/examples, the app is in
-    // examples/ota-requestor-app/linux and the output directory is at /tmp/darwin/framework-tests. 
-    NSString * pwd = [[NSProcessInfo processInfo] environment][@"PWD"];
-    NSString * buildToolPath = [NSString
-        pathWithComponents:@[ [pwd substringToIndex:(pwd.length - @"src/darwin/Framework".length)], @"scripts/examples", @"gn_build_example.sh" ]];
-    NSString * appPath = [NSString
-        pathWithComponents:@[ [pwd substringToIndex:(pwd.length - @"src/darwin/Framework".length)], @"examples/ota-requestor-app/linux" ]];
-    NSString * outputPath = [NSString
-        pathWithComponents:@[ [kOtaRawImagePath substringToIndex:(kOtaRawImagePath.length - @"/chip-ota-requestor-app".length)]]];
-
-    NSString * softwareVersionArg = [NSString stringWithFormat:@"chip_device_config_device_software_version=%d",[kUpdatedSoftwareVersion intValue]];
-    NSString * softwareVersionStringArg = [NSString stringWithFormat:@"chip_device_config_device_software_version_string=\"%d.0\"",[kUpdatedSoftwareVersion intValue]];
-    NSTask *task1 = [[NSTask alloc] init];
-    [task1 setLaunchPath:buildToolPath];
-    [task1 setArguments: @[
-         appPath, outputPath, @"chip_config_network_layer_ble=false", softwareVersionArg, softwareVersionStringArg, @"non_spec_compliant_ota_action_delay_floor=0"
-    ]];
-
-    NSError * launchError = nil;
-    [task1 launchAndReturnError:&launchError];
-    XCTAssertNil(launchError);
-    [task1 waitUntilExit];
-    XCTAssertEqual([task1 terminationStatus], 0);
-
-    // Check if the ota raw image file is created at kOtaRawImagePath
-    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:kOtaRawImagePath]);
-
-    // Find the right absolute path to our ota_image_tool.py script.  PWD should
-    // point to our src/darwin/Framework, while the script is in
-    // src/app/ota_image_tool.py.
-    NSString * imageToolPath = [NSString
-        pathWithComponents:@[ [pwd substringToIndex:(pwd.length - @"darwin/Framework".length)], @"app", @"ota_image_tool.py" ]];
-   
-    NSTask *task2 = [[NSTask alloc] init];
-    [task2 setLaunchPath:imageToolPath];
-    [task2 setArguments:@[
-        @"create", @"-v", @"0xFFF1", @"-p", @"0x8001", @"-vn", [kUpdatedSoftwareVersion stringValue], @"-vs", kUpdatedSoftwareVersionString, @"-da", @"sha256", kOtaRawImagePath, kOtaImagePath
-    ]];
-    launchError = nil;
-    [task2 launchAndReturnError:&launchError];
-    XCTAssertNil(launchError);
-    [task2 waitUntilExit];
-    XCTAssertEqual([task2 terminationStatus], 0);
-
-    // Check if the ota image file is created at kOtaImagePath.
-    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:kOtaImagePath]);
 }
 
 - (void)test000_SetUp
