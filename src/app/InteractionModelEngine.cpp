@@ -647,6 +647,10 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
     ReportDataMessage::Parser report;
     VerifyOrReturnError(report.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    report.PrettyPrint();
+#endif
+
     SubscriptionId subscriptionId = 0;
     VerifyOrReturnError(report.GetSubscriptionId(&subscriptionId) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(report.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);

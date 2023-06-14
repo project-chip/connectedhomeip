@@ -8,10 +8,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
-import chip.devicecontroller.ClusterIDMapping
+import chip.devicecontroller.ClusterIDMapping.AdministratorCommissioning
 import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.OpenCommissioningCallback
+import chip.devicecontroller.ReportCallback
+import chip.devicecontroller.model.ChipAttributePath
+import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.InvokeElement
+import chip.devicecontroller.model.NodeState
 import chip.tlv.AnonymousTag
 import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
@@ -47,6 +51,9 @@ class MultiAdminClientFragment : Fragment() {
     binding.basicCommissioningMethodBtn.setOnClickListener { scope.launch { sendBasicCommissioningCommandClick() } }
     binding.enhancedCommissioningMethodBtn.setOnClickListener { scope.launch { sendEnhancedCommissioningCommandClick() } }
     binding.revokeBtn.setOnClickListener { scope.launch { sendRevokeCommandClick() } }
+    binding.readWindowStatusBtn.setOnClickListener { scope.launch { readAdministratorCommissioningClusterAttributeClick(AdministratorCommissioning.Attribute.WindowStatus) } }
+    binding.readAdminFabricIndexBtn.setOnClickListener { scope.launch { readAdministratorCommissioningClusterAttributeClick(AdministratorCommissioning.Attribute.AdminFabricIndex) } }
+    binding.readAdminVendorIdBtn.setOnClickListener { scope.launch { readAdministratorCommissioningClusterAttributeClick(AdministratorCommissioning.Attribute.AdminVendorId) } }
 
     return binding.root
   }
@@ -137,9 +144,9 @@ class MultiAdminClientFragment : Fragment() {
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
     tlvWriter.endStructure()
-    val invokeElement = InvokeElement.newInstance(0
-            , ClusterIDMapping.AdministratorCommissioning.ID
-            , ClusterIDMapping.AdministratorCommissioning.Command.RevokeCommissioning.id
+    val invokeElement = InvokeElement.newInstance(ADMINISTRATOR_COMMISSIONING_CLUSTER_ENDPOINT_ID
+            , AdministratorCommissioning.ID
+            , AdministratorCommissioning.Command.RevokeCommissioning.id
             , tlvWriter.getEncoded(), null)
 
     deviceController.invoke(object: InvokeCallback {
@@ -156,6 +163,25 @@ class MultiAdminClientFragment : Fragment() {
     }, getConnectedDevicePointer(), invokeElement, timedInvokeTimeout, 0)
   }
 
+  private suspend fun readAdministratorCommissioningClusterAttributeClick(attribute: AdministratorCommissioning.Attribute) {
+    val endpointId = ADMINISTRATOR_COMMISSIONING_CLUSTER_ENDPOINT_ID
+    val clusterId = AdministratorCommissioning.ID
+    val attributeId = attribute.id
+    val attributeName = attribute.name
+    val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
+    deviceController.readAttributePath(object: ReportCallback {
+      override fun onReport(nodeState: NodeState?) {
+        val value = nodeState?.getEndpointState(endpointId)?.getClusterState(clusterId)?.getAttributeState(attributeId)?.value ?: "null"
+        Log.i(TAG,"read $attributeName: $value")
+        showMessage("read $attributeName: $value")
+      }
+
+      override fun onError(attributePath: ChipAttributePath?, eventPath: ChipEventPath?, e: Exception) {
+        showMessage("read $attributeName - error : ${e?.message}")
+      }
+    }, getConnectedDevicePointer(), listOf(attributePath), 0)
+  }
+
   private suspend fun getConnectedDevicePointer(): Long {
     return ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId)
   }
@@ -168,6 +194,7 @@ class MultiAdminClientFragment : Fragment() {
 
   companion object {
     private const val TAG = "MultiAdminClientFragment"
+    private const val ADMINISTRATOR_COMMISSIONING_CLUSTER_ENDPOINT_ID = 0
     fun newInstance(): MultiAdminClientFragment = MultiAdminClientFragment()
   }
 }

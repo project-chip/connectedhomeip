@@ -19,22 +19,22 @@ limitations under the License.
 
   <bitmap name="Feature" type="BITMAP32">
     <cluster code="0x005D" />
-    <field name="InflowError"     mask="0x01" />
-    <field name="DrainError"      mask="0x02" />
-    <field name="DoorError"       mask="0x04" />
-    <field name="TempTooLow"      mask="0x08" />
-    <field name="TempTooHigh"     mask="0x10" />
-    <field name="WaterLevelError" mask="0x20" />
+    <field name="InflowAlarm"          mask="0x01" />
+    <field name="DrainAlarm"           mask="0x02" />
+    <field name="DoorAlarm"            mask="0x04" />
+    <field name="LowTemperatureAlarm"  mask="0x08" />
+    <field name="HighTemperatureAlarm" mask="0x10" />
+    <field name="WaterLevelAlarm"      mask="0x20" />
   </bitmap>
 
   <bitmap name="AlarmMap" type="BITMAP32">
      <cluster code="0x005D" />
-     <field name="InflowError"     mask="0x01"/>
-     <field name="DrainError"      mask="0x02"/>
-     <field name="DoorError"       mask="0x04"/>
-     <field name="TempTooLow"      mask="0x08"/>
-     <field name="TempTooHigh"     mask="0x10"/>
-     <field name="WaterLevelError" mask="0x20"/>
+     <field name="InflowError"           mask="0x01"/>
+     <field name="DrainError"            mask="0x02"/>
+     <field name="DoorError"             mask="0x04"/>
+     <field name="TempTooLow"            mask="0x08"/>
+     <field name="TempTooHigh"           mask="0x10"/>
+     <field name="WaterLevelError"       mask="0x20"/>
   </bitmap>
   
   <cluster>
@@ -47,13 +47,17 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MASK" type="AlarmMap" default="0" writable="true"  optional="false">Mask</attribute>
-    <attribute side="server" code="0x0001" define="LATCH" type="AlarmMap" default="0" writable="false" optional="false">Latch</attribute>
+    <attribute side="server" code="0x0000" define="MASK" type="AlarmMap" default="0" writable="false"  optional="false">Mask</attribute>
+    <attribute side="server" code="0x0001" define="LATCH" type="AlarmMap" default="0" writable="false" optional="true">Latch</attribute>
     <attribute side="server" code="0x0002" define="STATE" type="AlarmMap" default="0" writable="false" optional="false">State</attribute>
 
-    <command source="client" code="0x00" name="Reset" optional="false">
+    <command source="client" code="0x00" name="Reset" optional="true">
         <description>Reset alarm</description>
         <arg name="Alarms" type="AlarmMap" optional="false"/>
+    </command>
+
+    <command source="client" code="0x01" name="ModifyEnabledAlarms" optional="true">
+        <description>Modify enabled alarms</description>
         <arg name="Mask" type="AlarmMap" optional="true"/>
     </command>
 

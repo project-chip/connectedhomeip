@@ -30,6 +30,8 @@ declare_args() {
   chip_enable_ble_controller = false
   chip_use_secure_cert_dac_provider = false
   chip_use_esp32_ecdsa_peripheral = false
+  chip_enable_ethernet = false
+  chip_enable_route_hook = false
 }
 
 defines = [
@@ -45,7 +47,6 @@ static_library("ESP32") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "ConnectivityManagerImpl_Ethernet.cpp",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "ESP32Config.cpp",
@@ -119,15 +120,19 @@ static_library("ESP32") {
       "ConnectivityManagerImpl_WiFi.cpp",
       "NetworkCommissioningDriver.cpp",
       "NetworkCommissioningDriver.h",
-      "route_hook/ESP32RouteHook.c",
-      "route_hook/ESP32RouteHook.h",
-      "route_hook/ESP32RouteTable.c",
-      "route_hook/ESP32RouteTable.h",
     ]
     if (chip_mdns == "platform") {
       sources += [
         "WiFiDnssdImpl.cpp",
         "WiFiDnssdImpl.h",
+      ]
+    }
+    if (chip_enable_route_hook) {
+      sources += [
+        "route_hook/ESP32RouteHook.c",
+        "route_hook/ESP32RouteHook.h",
+        "route_hook/ESP32RouteTable.c",
+        "route_hook/ESP32RouteTable.h",
       ]
     }
   }
@@ -136,12 +141,18 @@ static_library("ESP32") {
     sources += [ "DnssdImpl.cpp" ]
   }
 
+  if (chip_enable_ethernet) {
+    sources += [
+      "ConnectivityManagerImpl_Ethernet.cpp",
+      "NetworkCommissioningDriver_Ethernet.cpp",
+    ]
+  }
+
   if (chip_enable_openthread) {
     sources += [
       "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
       "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
       "../OpenThread/OpenThreadUtils.cpp",
-      "OpenthreadConfig.h",
       "OpenthreadLauncher.c",
       "OpenthreadLauncher.h",
       "ThreadStackManagerImpl.cpp",

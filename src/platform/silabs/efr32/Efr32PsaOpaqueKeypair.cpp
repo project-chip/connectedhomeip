@@ -422,7 +422,7 @@ CHIP_ERROR EFR32OpaqueP256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t ms
     error = Sign(msg, msg_length, out_signature.Bytes(), out_signature.Capacity(), &output_length);
 
     SuccessOrExit(error);
-    SuccessOrExit(out_signature.SetLength(output_length));
+    SuccessOrExit(error = out_signature.SetLength(output_length));
 exit:
     return error;
 }
@@ -437,7 +437,7 @@ CHIP_ERROR EFR32OpaqueP256Keypair::ECDH_derive_secret(const P256PublicKey & remo
                    (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length(), &output_length);
 
     SuccessOrExit(error);
-    SuccessOrExit(out_secret.SetLength(output_length));
+    SuccessOrExit(error = out_secret.SetLength(output_length));
 exit:
     return error;
 }

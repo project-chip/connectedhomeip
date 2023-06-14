@@ -25,6 +25,10 @@
 
 #include "UserDirectedCommissioning.h"
 
+#ifdef __ZEPHYR__
+#include <zephyr/kernel.h>
+#endif // __ZEPHYR__
+
 #include <unistd.h>
 
 namespace chip {
@@ -50,7 +54,12 @@ CHIP_ERROR UserDirectedCommissioningClient::SendUDCMessage(TransportMgrBase * tr
             ChipLogError(AppServer, "UDC SendMessage failed: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
+        // Zephyr doesn't provide usleep implementation.
+#ifdef __ZEPHYR__
+        k_usleep(100 * 1000); // 100ms
+#else
         usleep(100 * 1000); // 100ms
+#endif // __ZEPHYR__
     }
 
     ChipLogProgress(Inet, "UDC msg sent");

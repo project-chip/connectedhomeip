@@ -63,6 +63,37 @@ K32W0FactoryDataProvider & K32W0FactoryDataProvider::GetDefaultInstance()
     return sInstance;
 }
 
+extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
+{
+    CHIP_ERROR error      = CHIP_NO_ERROR;
+    uint16_t backupLength = 0;
+
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+    // Check if PDM id related to factory data backup exists.
+    // If it does, it means an external event (such as a power loss)
+    // interrupted the factory data update process and the section
+    // from internal flash is most likely erased and should be restored.
+    if (PDM_bDoesDataExist(kNvmId_FactoryDataBackup, &backupLength))
+    {
+        chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
+        buffer.Calloc(K32W0FactoryDataProvider::kFactoryDataSize);
+        ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+
+        auto status = PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) buffer.Get(),
+                                              K32W0FactoryDataProvider::kFactoryDataSize, &backupLength);
+        ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
+
+        error = K32W0FactoryDataProvider::GetDefaultInstance().UpdateData(buffer.Get());
+        if (error == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(DeviceLayer, "Factory data was restored successfully");
+        }
+    }
+#endif
+
+    return error;
+}
+
 K32W0FactoryDataProvider::K32W0FactoryDataProvider()
 {
     maxLengths[FactoryDataId::kVerifierId]           = kSpake2pSerializedVerifier_MaxBase64Len;
@@ -86,6 +117,8 @@ K32W0FactoryDataProvider::K32W0FactoryDataProvider()
     maxLengths[FactoryDataId::kPartNumber]           = ConfigurationManager::kMaxPartNumberLength;
     maxLengths[FactoryDataId::kProductURL]           = ConfigurationManager::kMaxProductURLLength;
     maxLengths[FactoryDataId::kProductLabel]         = ConfigurationManager::kMaxProductLabelLength;
+
+    RegisterRestoreMechanism(FactoryDataDefaultRestoreMechanism);
 }
 
 CHIP_ERROR K32W0FactoryDataProvider::Init()
@@ -106,21 +139,42 @@ CHIP_ERROR K32W0FactoryDataProvider::Init()
                      kFactoryDataSize);
     }
 
-    error = Validate();
-    if (error != CHIP_NO_ERROR)
+    VerifyOrReturnError(mRestoreMechanisms.size() > 0, CHIP_FACTORY_DATA_RESTORE_MECHANISM);
+
+    for (auto & restore : mRestoreMechanisms)
     {
-        ChipLogError(DeviceLayer, "Factory data validation failed with error: %s", ErrorStr(error));
-        return error;
+        error = restore();
+        if (error != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+
+        error = Validate();
+        if (error != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+
+        break;
     }
 
-    return CHIP_NO_ERROR;
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Factory data init failed with: %s", ErrorStr(error));
+    }
+    else
+    {
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+        PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
+#endif
+    }
+
+    return error;
 }
 
 CHIP_ERROR K32W0FactoryDataProvider::Validate()
 {
     uint8_t sha256Output[SHA256_HASH_SIZE] = { 0 };
-
-    ReturnErrorOnFailure(Restore());
 
     auto status = OtaUtils_ReadFromInternalFlash((uint16_t) sizeof(Header), kFactoryDataStart, (uint8_t *) &mHeader, NULL,
                                                  pFunctionEepromRead);
@@ -133,34 +187,9 @@ CHIP_ERROR K32W0FactoryDataProvider::Validate()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::Restore()
+void K32W0FactoryDataProvider::RegisterRestoreMechanism(RestoreMechanism restore)
 {
-    CHIP_ERROR error      = CHIP_NO_ERROR;
-    uint16_t backupLength = 0;
-
-    // Check if PDM id related to factory data backup exists.
-    // If it does, it means an external event (such as a power loss)
-    // interrupted the factory data update process and the section
-    // from internal flash is most likely erased and should be restored.
-    if (PDM_bDoesDataExist(kNvmId_FactoryDataBackup, &backupLength))
-    {
-        chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
-        buffer.Calloc(kFactoryDataSize);
-        ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
-
-        auto status = PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) buffer.Get(), kFactoryDataSize, &backupLength);
-        ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
-
-        error = UpdateData(buffer.Get());
-        if (CHIP_NO_ERROR == error)
-        {
-            PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
-        }
-    }
-
-    // TODO: add hook to enable restore customization
-
-    return error;
+    mRestoreMechanisms.insert(mRestoreMechanisms.end(), restore);
 }
 
 CHIP_ERROR K32W0FactoryDataProvider::UpdateData(uint8_t * pBuf)
@@ -469,19 +498,25 @@ CHIP_ERROR K32W0FactoryDataProvider::GetHardwareVersionString(char * buf, size_t
 
 CHIP_ERROR K32W0FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
-    ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    char uniqueId[ConfigurationManager::kMaxUniqueIDLength] = { 0 };
-    uint16_t uniqueIdLen                                    = 0;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kUniqueId, (uint8_t *) (&uniqueId[0]), sizeof(uniqueId), uniqueIdLen));
+    CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
                   "Length of unique ID for rotating device ID is smaller than minimum.");
+    uint16_t uniqueIdLen = 0;
+    err                  = SearchForId(FactoryDataId::kUniqueId, (uint8_t *) uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
+#if defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    if (err != CHIP_NO_ERROR)
+    {
+        constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 
-    ReturnErrorCodeIf(uniqueIdLen > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(uniqueIdLen != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(uniqueIdSpan.data(), uniqueId, uniqueIdLen);
+        ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
+        uniqueIdLen = sizeof(uniqueId);
+        err         = CHIP_NO_ERROR;
+    }
+#endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+    ReturnErrorOnFailure(err);
     uniqueIdSpan.reduce_size(uniqueIdLen);
-    return CHIP_NO_ERROR;
 #endif
 
     return err;

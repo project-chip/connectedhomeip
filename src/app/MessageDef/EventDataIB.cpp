@@ -362,10 +362,10 @@ EventDataIB::Builder & EventDataIB::Builder::DeltaSystemTimestamp(const uint64_t
 }
 
 // Mark the end of this element and recover the type for outer container
-EventDataIB::Builder & EventDataIB::Builder::EndOfEventDataIB()
+CHIP_ERROR EventDataIB::Builder::EndOfEventDataIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

@@ -50,6 +50,11 @@
             "output": "src/controller/java/zap-generated/CHIPInvokeCallbacks.h"
         },
         {
+            "path": "CHIPClientCallbacks.zapt",
+            "name": "CHIP Client Callbacks header",
+            "output": "src/controller/java/zap-generated/CHIPClientCallbacks.h"
+        },
+        {
             "path": "CHIPInvokeCallbacks-src.zapt",
             "name": "CHIP cluster invoke callbacks for Java (native code)",
             "output": "src/controller/java/zap-generated/CHIPInvokeCallbacks.cpp"

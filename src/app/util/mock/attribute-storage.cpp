@@ -34,6 +34,7 @@
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
 #include <app/att-storage.h>
+#include <app/util/af.h>
 #include <app/util/mock/Constants.h>
 
 #include <app/AttributeAccessInterface.h>
@@ -115,7 +116,7 @@ uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint)
     return UINT16_MAX;
 }
 
-uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
+uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint)
 {
     for (size_t i = 0; i < ArraySize(endpoints); i++)
     {
@@ -125,6 +126,11 @@ uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
         }
     }
     return 0;
+}
+
+uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
+{
+    return emberAfGetClusterCountForEndpoint(endpoint);
 }
 
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
@@ -270,12 +276,52 @@ uint16_t emberAfLongStringLength(const uint8_t * buffer)
     return (length == 0xFFFF ? 0 : length);
 }
 
+// This will find the first server that has the clusterId given from the index of endpoint.
+bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
+{
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return false;
+    }
+
+    return clusterId; // Mock version return true as long as the endpoint is valid
+}
+
 namespace chip {
 namespace app {
+
 AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId)
 {
     return nullptr;
 }
+
+EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) : mClusterId(clusterId)
+{
+    EnsureMatchingEndpoint();
+}
+EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
+{
+    ++mEndpointIndex;
+    EnsureMatchingEndpoint();
+    return *this;
+}
+
+void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
+{
+    for (; mEndpointIndex < mEndpointCount; ++mEndpointIndex)
+    {
+        if (!emberAfEndpointIndexIsEnabled(mEndpointIndex))
+        {
+            continue;
+        }
+
+        if (emberAfContainsServerFromIndex(mEndpointIndex, mClusterId))
+        {
+            break;
+        }
+    }
+}
+
 } // namespace app
 namespace Test {
 
@@ -313,9 +359,8 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
         ReturnErrorOnFailure(attributeStatus.GetError());
         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
         ReturnErrorOnFailure(errorStatus.GetError());
-        attributeStatus.EndOfAttributeStatusIB();
-        ReturnErrorOnFailure(attributeStatus.GetError());
-        return attributeReport.EndOfAttributeReportIB().GetError();
+        ReturnErrorOnFailure(attributeStatus.EndOfAttributeStatusIB());
+        return attributeReport.EndOfAttributeReportIB();
     }
 
     // Attribute 4 acts as a large attribute to trigger chunking.
@@ -374,9 +419,8 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
-    attributeData.EndOfAttributeDataIB();
-    ReturnErrorOnFailure(attributeData.GetError());
-    return attributeReport.EndOfAttributeReportIB().GetError();
+    ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
+    return attributeReport.EndOfAttributeReportIB();
 }
 
 } // namespace Test

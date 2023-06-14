@@ -271,10 +271,14 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
     ];
 }
 {{#unless hasArguments}}
+{{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
+{{#unless (and (isStrEqual cluster "GroupKeyManagement")
+               (isStrEqual command "KeySetReadAllIndices"))}}
 - (void){{asLowerCamelCase command}}WithCompletionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {
   [self {{asLowerCamelCase command}}WithParams:nil completionHandler:completionHandler];
 }
+{{/unless}}
 {{/unless}}
 {{/if}}
 {{/inline}}

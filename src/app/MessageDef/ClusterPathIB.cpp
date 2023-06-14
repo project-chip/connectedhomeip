@@ -142,10 +142,10 @@ ClusterPathIB::Builder & ClusterPathIB::Builder::Cluster(const ClusterId aCluste
     return *this;
 }
 
-ClusterPathIB::Builder & ClusterPathIB::Builder::EndOfClusterPathIB()
+CHIP_ERROR ClusterPathIB::Builder::EndOfClusterPathIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

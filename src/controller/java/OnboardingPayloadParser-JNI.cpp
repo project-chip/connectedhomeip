@@ -1,7 +1,5 @@
 #include "lib/core/CHIPError.h"
 #include "lib/support/JniTypeWrappers.h"
-#include <setup_payload/ManualSetupPayloadGenerator.h>
-#include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
@@ -24,14 +22,15 @@ using namespace chip;
 #define SETUP_PAYLOAD_PARSER_JNI_ERROR_METHOD_NOT_FOUND _SETUP_PAYLOAD_PARSER_JNI_ERROR(2)
 #define SETUP_PAYLOAD_PARSER_JNI_ERROR_FIELD_NOT_FOUND _SETUP_PAYLOAD_PARSER_JNI_ERROR(3)
 
-#define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_setuppayload_SetupPayloadParser_##METHOD_NAME
+#define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
+    extern "C" JNIEXPORT RETURN JNICALL Java_chip_onboardingpayload_OnboardingPayloadParser_##METHOD_NAME
 
 static jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload);
 static jobject CreateCapabilitiesHashSet(JNIEnv * env, RendezvousInformationFlags flags);
 static void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPayload & payload);
 static void CreateCapabilitiesFromHashSet(JNIEnv * env, jobject discoveryCapabilitiesObj, RendezvousInformationFlags & flags);
 static CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj);
-static CHIP_ERROR ThrowInvalidManualPairingCodeFormatException(JNIEnv * env, jstring manualPairingCodeObj);
+static CHIP_ERROR ThrowOnboardingPayloadException(JNIEnv * env, CHIP_ERROR errToThrow);
 
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
@@ -53,8 +52,11 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
 
     if (skipPayloadValidation == JNI_FALSE && !payload.isValidQRCodePayload())
     {
-        jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
-        JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        ThrowOnboardingPayloadException(env, err);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SetupPayload, "Error throwing OnboardingPayloadException: %" CHIP_ERROR_FORMAT, err.Format());
+        }
         return nullptr;
     }
 
@@ -71,42 +73,9 @@ JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring 
     return TransformSetupPayload(env, payload);
 }
 
-JNI_METHOD(jobject, parsePayloadFromManualPairingCode)
-(JNIEnv * env, jobject self, jstring manualPairingCode, jboolean skipPayloadValidation)
-{
-    CHIP_ERROR err                       = CHIP_NO_ERROR;
-    const char * manualPairingCodeString = NULL;
-    SetupPayload payload;
-
-    manualPairingCodeString = env->GetStringUTFChars(manualPairingCode, 0);
-
-    err = ManualSetupPayloadParser(manualPairingCodeString).populatePayload(payload);
-    env->ReleaseStringUTFChars(manualPairingCode, manualPairingCodeString);
-
-    if (skipPayloadValidation == JNI_FALSE && !payload.isValidManualCode())
-    {
-        jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
-        JniReferences::GetInstance().ThrowError(env, exceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
-        return nullptr;
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        err = ThrowInvalidManualPairingCodeFormatException(env, manualPairingCode);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(SetupPayload, "Error throwing ThrowInvalidManualPairingCodeFormatException: %" CHIP_ERROR_FORMAT,
-                         err.Format());
-        }
-        return nullptr;
-    }
-
-    return TransformSetupPayload(env, payload);
-}
-
 jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
 {
-    jclass setupPayloadClass = env->FindClass("chip/setuppayload/SetupPayload");
+    jclass setupPayloadClass = env->FindClass("chip/onboardingpayload/OnboardingPayload");
     jmethodID setupConstr    = env->GetMethodID(setupPayloadClass, "<init>", "()V");
     jobject setupPayload     = env->NewObject(setupPayloadClass, setupConstr);
 
@@ -142,50 +111,51 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
                         CreateCapabilitiesHashSet(env, payload.rendezvousInformation.ValueOr(RendezvousInformationFlag::kNone)));
 
     jmethodID addOptionalInfoMid =
-        env->GetMethodID(setupPayloadClass, "addOptionalQRCodeInfo", "(Lchip/setuppayload/OptionalQRCodeInfo;)V");
+        env->GetMethodID(setupPayloadClass, "addOptionalQRCodeInfo", "(Lchip/onboardingpayload/OptionalQRCodeInfo;)V");
 
     std::vector<OptionalQRCodeInfo> optional_info = payload.getAllOptionalVendorData();
     for (OptionalQRCodeInfo & info : optional_info)
     {
 
-        jclass optionalInfoClass = env->FindClass("chip/setuppayload/OptionalQRCodeInfo");
+        jclass optionalInfoClass = env->FindClass("chip/onboardingpayload/OptionalQRCodeInfo");
         jobject optionalInfo     = env->AllocObject(optionalInfoClass);
         jfieldID tag             = env->GetFieldID(optionalInfoClass, "tag", "I");
-        jfieldID type = env->GetFieldID(optionalInfoClass, "type", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
-        jfieldID data = env->GetFieldID(optionalInfoClass, "data", "Ljava/lang/String;");
+        jfieldID type =
+            env->GetFieldID(optionalInfoClass, "type", "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+        jfieldID data  = env->GetFieldID(optionalInfoClass, "data", "Ljava/lang/String;");
         jfieldID int32 = env->GetFieldID(optionalInfoClass, "int32", "I");
 
         env->SetIntField(optionalInfo, tag, info.tag);
 
-        jclass enumClass  = env->FindClass("chip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType");
+        jclass enumClass  = env->FindClass("chip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType");
         jfieldID enumType = nullptr;
 
         switch (info.type)
         {
         case optionalQRCodeInfoTypeString:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_STRING", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_STRING",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeInt32:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_INT32", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_INT32",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeInt64:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_INT64", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_INT64",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeUInt32:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_UINT32", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_UINT32",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeUInt64:
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_UINT64", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_UINT64",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         case optionalQRCodeInfoTypeUnknown:
         default: // Optional Type variable has to set any value.
-            enumType =
-                env->GetStaticFieldID(enumClass, "TYPE_UNKNOWN", "Lchip/setuppayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
+            enumType = env->GetStaticFieldID(enumClass, "TYPE_UNKNOWN",
+                                             "Lchip/onboardingpayload/OptionalQRCodeInfo$OptionalQRCodeInfoType;");
             break;
         }
 
@@ -211,24 +181,25 @@ jobject CreateCapabilitiesHashSet(JNIEnv * env, RendezvousInformationFlags flags
     jobject capabilitiesHashSet  = env->NewObject(hashSetClass, hashSetConstructor);
 
     jmethodID hashSetAddMethod = env->GetMethodID(hashSetClass, "add", "(Ljava/lang/Object;)Z");
-    jclass capabilityEnum      = env->FindClass("chip/setuppayload/DiscoveryCapability");
+    jclass capabilityEnum      = env->FindClass("chip/onboardingpayload/DiscoveryCapability");
 
     if (flags.Has(chip::RendezvousInformationFlag::kBLE))
     {
-        jfieldID bleCapability = env->GetStaticFieldID(capabilityEnum, "BLE", "Lchip/setuppayload/DiscoveryCapability;");
+        jfieldID bleCapability = env->GetStaticFieldID(capabilityEnum, "BLE", "Lchip/onboardingpayload/DiscoveryCapability;");
         jobject enumObj        = env->GetStaticObjectField(capabilityEnum, bleCapability);
         env->CallBooleanMethod(capabilitiesHashSet, hashSetAddMethod, enumObj);
     }
     if (flags.Has(chip::RendezvousInformationFlag::kSoftAP))
     {
-        jfieldID softApCapability = env->GetStaticFieldID(capabilityEnum, "SOFT_AP", "Lchip/setuppayload/DiscoveryCapability;");
-        jobject enumObj           = env->GetStaticObjectField(capabilityEnum, softApCapability);
+        jfieldID softApCapability =
+            env->GetStaticFieldID(capabilityEnum, "SOFT_AP", "Lchip/onboardingpayload/DiscoveryCapability;");
+        jobject enumObj = env->GetStaticObjectField(capabilityEnum, softApCapability);
         env->CallBooleanMethod(capabilitiesHashSet, hashSetAddMethod, enumObj);
     }
     if (flags.Has(chip::RendezvousInformationFlag::kOnNetwork))
     {
         jfieldID onNetworkCapability =
-            env->GetStaticFieldID(capabilityEnum, "ON_NETWORK", "Lchip/setuppayload/DiscoveryCapability;");
+            env->GetStaticFieldID(capabilityEnum, "ON_NETWORK", "Lchip/onboardingpayload/DiscoveryCapability;");
         jobject enumObj = env->GetStaticObjectField(capabilityEnum, onNetworkCapability);
         env->CallBooleanMethod(capabilitiesHashSet, hashSetAddMethod, enumObj);
     }
@@ -246,36 +217,20 @@ JNI_METHOD(jstring, getQrCodeFromPayload)(JNIEnv * env, jobject self, jobject se
     err = QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(qrString);
     if (err != CHIP_NO_ERROR)
     {
-        jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
-        JniReferences::GetInstance().ThrowError(env, exceptionCls, err);
+        ThrowOnboardingPayloadException(env, err);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SetupPayload, "Error throwing OnboardingPayloadException: %" CHIP_ERROR_FORMAT, err.Format());
+        }
         return nullptr;
     }
 
     return env->NewStringUTF(qrString.c_str());
 }
 
-JNI_METHOD(jstring, getManualPairingCodeFromPayload)(JNIEnv * env, jobject self, jobject setupPayload)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    SetupPayload payload;
-    std::string outDecimalString;
-
-    TransformSetupPayloadFromJobject(env, setupPayload, payload);
-
-    err = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(outDecimalString);
-    if (err != CHIP_NO_ERROR)
-    {
-        jclass exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$SetupPayloadException");
-        JniReferences::GetInstance().ThrowError(env, exceptionCls, err);
-        return nullptr;
-    }
-
-    return env->NewStringUTF(outDecimalString.c_str());
-}
-
 void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPayload & payload)
 {
-    jclass setupPayloadClass = env->FindClass("chip/setuppayload/SetupPayload");
+    jclass setupPayloadClass = env->FindClass("chip/onboardingpayload/OnboardingPayload");
 
     jfieldID version                      = env->GetFieldID(setupPayloadClass, "version", "I");
     jfieldID vendorId                     = env->GetFieldID(setupPayloadClass, "vendorId", "I");
@@ -312,9 +267,9 @@ void CreateCapabilitiesFromHashSet(JNIEnv * env, jobject discoveryCapabilitiesOb
     jmethodID hashSetContainsMethod = env->GetMethodID(hashSetClass, "contains", "(Ljava/lang/Object;)Z");
 
     jboolean contains;
-    jclass capabilityEnum = env->FindClass("chip/setuppayload/DiscoveryCapability");
+    jclass capabilityEnum = env->FindClass("chip/onboardingpayload/DiscoveryCapability");
 
-    jfieldID bleCapability = env->GetStaticFieldID(capabilityEnum, "BLE", "Lchip/setuppayload/DiscoveryCapability;");
+    jfieldID bleCapability = env->GetStaticFieldID(capabilityEnum, "BLE", "Lchip/onboardingpayload/DiscoveryCapability;");
     jobject bleObj         = env->GetStaticObjectField(capabilityEnum, bleCapability);
     contains               = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, bleObj);
     if (contains)
@@ -322,7 +277,7 @@ void CreateCapabilitiesFromHashSet(JNIEnv * env, jobject discoveryCapabilitiesOb
         flags.Set(chip::RendezvousInformationFlag::kBLE);
     }
 
-    jfieldID softApCapability = env->GetStaticFieldID(capabilityEnum, "SOFT_AP", "Lchip/setuppayload/DiscoveryCapability;");
+    jfieldID softApCapability = env->GetStaticFieldID(capabilityEnum, "SOFT_AP", "Lchip/onboardingpayload/DiscoveryCapability;");
     jobject softApObj         = env->GetStaticObjectField(capabilityEnum, softApCapability);
     contains                  = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, softApObj);
     if (contains)
@@ -330,9 +285,10 @@ void CreateCapabilitiesFromHashSet(JNIEnv * env, jobject discoveryCapabilitiesOb
         flags.Set(chip::RendezvousInformationFlag::kSoftAP);
     }
 
-    jfieldID onNetworkCapability = env->GetStaticFieldID(capabilityEnum, "ON_NETWORK", "Lchip/setuppayload/DiscoveryCapability;");
-    jobject onNetworkObj         = env->GetStaticObjectField(capabilityEnum, onNetworkCapability);
-    contains                     = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, onNetworkObj);
+    jfieldID onNetworkCapability =
+        env->GetStaticFieldID(capabilityEnum, "ON_NETWORK", "Lchip/onboardingpayload/DiscoveryCapability;");
+    jobject onNetworkObj = env->GetStaticObjectField(capabilityEnum, onNetworkCapability);
+    contains             = env->CallBooleanMethod(discoveryCapabilitiesObj, hashSetContainsMethod, onNetworkObj);
     if (contains)
     {
         flags.Set(chip::RendezvousInformationFlag::kOnNetwork);
@@ -347,7 +303,7 @@ CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj)
 
     env->ExceptionClear();
 
-    exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$UnrecognizedQrCodeException");
+    exceptionCls = env->FindClass("chip/onboardingpayload/UnrecognizedQrCodeException");
     VerifyOrReturnError(exceptionCls != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_TYPE_NOT_FOUND);
     exceptionConstructor = env->GetMethodID(exceptionCls, "<init>", "(Ljava/lang/String;)V");
     VerifyOrReturnError(exceptionConstructor != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_METHOD_NOT_FOUND);
@@ -358,7 +314,7 @@ CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThrowInvalidManualPairingCodeFormatException(JNIEnv * env, jstring manualPairingCodeObj)
+CHIP_ERROR ThrowOnboardingPayloadException(JNIEnv * env, CHIP_ERROR errToThrow)
 {
     jclass exceptionCls            = nullptr;
     jmethodID exceptionConstructor = nullptr;
@@ -366,11 +322,14 @@ CHIP_ERROR ThrowInvalidManualPairingCodeFormatException(JNIEnv * env, jstring ma
 
     env->ExceptionClear();
 
-    exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$InvalidEntryCodeFormatException");
+    exceptionCls = env->FindClass("chip/onboardingpayload/OnboardingPayloadException");
     VerifyOrReturnError(exceptionCls != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_TYPE_NOT_FOUND);
     exceptionConstructor = env->GetMethodID(exceptionCls, "<init>", "(Ljava/lang/String;)V");
     VerifyOrReturnError(exceptionConstructor != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_METHOD_NOT_FOUND);
-    exception = (jthrowable) env->NewObject(exceptionCls, exceptionConstructor, manualPairingCodeObj);
+
+    jstring jerrStr = env->NewStringUTF(ErrorStr(errToThrow));
+
+    exception = (jthrowable) env->NewObject(exceptionCls, exceptionConstructor, jerrStr);
     VerifyOrReturnError(exception != NULL, SETUP_PAYLOAD_PARSER_JNI_ERROR_EXCEPTION_THROWN);
 
     env->Throw(exception);

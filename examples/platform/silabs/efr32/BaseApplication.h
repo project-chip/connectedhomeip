@@ -29,11 +29,15 @@
 #include "AppEvent.h"
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
-#include <app/clusters/identify-server/identify-server.h>
+#include <app/util/config.h>
 #include <ble/BLEEndPoint.h>
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
+
+#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+#include <app/clusters/identify-server/identify-server.h>
+#endif
 
 #ifdef DISPLAY_ENABLED
 #include "demo-ui.h"
@@ -103,6 +107,14 @@ public:
      */
     static void StopStatusLEDTimer(void);
 
+#ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
+    // Idenfiy server command callbacks.
+    static void OnIdentifyStart(Identify * identify);
+    static void OnIdentifyStop(Identify * identify);
+    static void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState);
+    static void OnTriggerIdentifyEffect(Identify * identify);
+#endif
+
     enum Function_t
     {
         kFunction_NoneSelected   = 0,
@@ -114,7 +126,7 @@ public:
     } Function;
 
 protected:
-    CHIP_ERROR Init(Identify * identifyObj);
+    CHIP_ERROR Init();
 
     /**
      * @brief Function called to start the function timer
@@ -172,6 +184,16 @@ protected:
      * @brief Updates device LEDs
      */
     static void LightEventHandler();
+
+    /**
+     * @brief Activate a set of Led patterns of the Status led
+     *        Identify patterns and Trigger effects have priority
+     *        If no identification patterns are in progress, we provide
+     *        commissioning status feedback.
+     *
+     * @return True if a Led pattern was set, otherwise, returns false.
+     */
+    static bool ActivateStatusLedPatterns();
 
     /**
      * @brief Start the factory Reset process

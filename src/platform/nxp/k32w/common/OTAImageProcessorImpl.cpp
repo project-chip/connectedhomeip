@@ -105,6 +105,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
+    GetRequestorInstance()->GetProviderLocation(imageProcessor->mBackupProviderLocation);
+
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mAccumulator.Init(sizeof(OTATlvHeader));
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
@@ -133,7 +135,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan & block)
             ReturnErrorOnFailure(mAccumulator.Accumulate(block));
             ByteSpan tlvHeader{ mAccumulator.data(), sizeof(OTATlvHeader) };
             ReturnErrorOnFailure(SelectProcessor(tlvHeader));
-            mCurrentProcessor->Init();
+            ReturnErrorOnFailure(mCurrentProcessor->Init());
         }
 
         status = mCurrentProcessor->Process(block);
@@ -141,6 +143,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan & block)
         {
             mAccumulator.Clear();
             mAccumulator.Init(sizeof(OTATlvHeader));
+
             mCurrentProcessor = nullptr;
         }
         else
@@ -167,6 +170,7 @@ CHIP_ERROR OTAImageProcessorImpl::SelectProcessor(ByteSpan & block)
         return CHIP_OTA_PROCESSOR_NOT_REGISTERED;
     }
 
+    ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %ld", pair->first);
     mCurrentProcessor = pair->second;
     mCurrentProcessor->SetLength(header.length);
     mCurrentProcessor->SetWasSelected(true);
@@ -194,16 +198,11 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor != nullptr)
     {
-        for (auto const & pair : imageProcessor->mProcessorMap)
-        {
-            if (pair.second->WasSelected())
-            {
-                pair.second->AbortAction();
-                pair.second->Clear();
-            }
-        }
+        imageProcessor->AbortAllProcessors();
     }
     imageProcessor->Clear();
+
+    OtaHookAbort();
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
@@ -252,6 +251,21 @@ void OTAImageProcessorImpl::HandleStatus(CHIP_ERROR status)
     {
         ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %s", ErrorStr(status));
         GetRequestorInstance()->CancelImageUpdate();
+    }
+}
+
+void OTAImageProcessorImpl::AbortAllProcessors()
+{
+    ChipLogError(SoftwareUpdate, "All selected processors will call abort action");
+
+    for (auto const & pair : mProcessorMap)
+    {
+        if (pair.second->WasSelected())
+        {
+            pair.second->AbortAction();
+            pair.second->Clear();
+            pair.second->SetWasSelected(false);
+        }
     }
 }
 
@@ -344,13 +358,21 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(SoftwareUpdate, "Apply action for tag %d processor failed.", (uint8_t) pair.first);
+                // Revert all previously applied actions if current apply action fails.
+                // Reset image processor and requestor states.
+                imageProcessor->AbortAllProcessors();
                 imageProcessor->Clear();
                 GetRequestorInstance()->Reset();
+
                 return;
             }
-            pair.second->Clear();
-            pair.second->SetWasSelected(false);
         }
+    }
+
+    for (auto const & pair : imageProcessor->mProcessorMap)
+    {
+        pair.second->Clear();
+        pair.second->SetWasSelected(false);
     }
 
     imageProcessor->mAccumulator.Clear();

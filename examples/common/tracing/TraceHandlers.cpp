@@ -22,10 +22,10 @@
 #include <string>
 #include <vector>
 
-#include "transport/TraceMessage.h"
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <transport/TraceMessage.h>
 
 // For `s` std::string literal suffix
 using namespace std::string_literals;
@@ -33,6 +33,7 @@ using namespace std::string_literals;
 namespace chip {
 namespace trace {
 
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 namespace {
 
 // Handles the output from the trace handlers.
@@ -349,6 +350,12 @@ void DeInitTrace()
 {
     gTraceOutputs.UnregisterAllStreams();
 }
+
+#else
+void AddTraceStream(TraceStream *) {}
+void InitTrace() {}
+void DeInitTrace() {}
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 } // namespace trace
 } // namespace chip

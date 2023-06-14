@@ -165,7 +165,7 @@ tests:
     # The value of bit 0..1 must be 10b & if (LF) value of bit 2..3 must be 10b else 00b & if (TL) value of bit 4..5 must be 10b else 00b
     # Only 3 possibilities are possible here : 0Ah = 10, 22h = 34 or 2Ah = 42 then check a range for simplicity [10 - 42]
     - label: "3a: TH reads OperationalStatus attribute's bit 0..1"
-      PICS: WNCV.S.A000a
+      PICS: WNCV.S.A000a && PICS_SDK_CI_ONLY
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
@@ -176,7 +176,7 @@ tests:
 
     - label:
           "3a: TH reads OperationalStatus attribute's bit 2..3 (WNCV.S.F00(LF))"
-      PICS: WNCV.S.A000a && WNCV.S.F00
+      PICS: WNCV.S.A000a && WNCV.S.F00 && PICS_SDK_CI_ONLY
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
@@ -187,7 +187,7 @@ tests:
 
     - label:
           "3a: TH reads OperationalStatus attribute's bit 2..3 (WNCV.S.F00(LF))"
-      PICS: WNCV.S.A000a && !WNCV.S.F00
+      PICS: WNCV.S.A000a && !WNCV.S.F00 && PICS_SDK_CI_ONLY
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
@@ -197,7 +197,7 @@ tests:
 
     - label:
           "3a: TH reads OperationalStatus attribute's bit 4..5 (WNCV.S.F01(TL))"
-      PICS: WNCV.S.A000a && WNCV.S.F01
+      PICS: WNCV.S.A000a && WNCV.S.F01 && PICS_SDK_CI_ONLY
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
@@ -208,13 +208,34 @@ tests:
 
     - label:
           "3a: TH reads OperationalStatus attribute's bit 4..5 (WNCV.S.F01(TL))"
-      PICS: WNCV.S.A000a && !WNCV.S.F01
+      PICS: WNCV.S.A000a && !WNCV.S.F01 && PICS_SDK_CI_ONLY
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
           constraints:
               type: bitmap8
               hasMasksClear: [0x10, 0x20]
+
+    #Issue https://github.com/CHIP-Specifications/chip-test-scripts/issues/509
+    - label: "3a: TH reads OperationalStatus attribute from DUT"
+      verification: |
+          ./chip-tool windowcovering read operational-status 1 1
+
+          Verify "OperationalStatus " on the TH(Chip-tool) Log: is currently not zero and is in closing mode
+
+          CHIP:DMG:                                         Data = 42,
+          CHIP:DMG: }
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_000ADataVersion: 324132078
+          CHIP:TOO:   OperationalStatus: 42
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     ### Depending on the DUT specs we might prefer a arguments here
     - label: "3a2: DUT updates its attributes"

@@ -128,16 +128,15 @@ def _GetSlowTests() -> Set[str]:
 
 
 def _GetInDevelopmentTests() -> Set[str]:
-    """Tests that fail in YAML for some reason.
-
-       Currently this is empty and returns an empty set, but this is kept around in case
-       there are tests that are a work in progress.
-    """
+    """Tests that fail in YAML for some reason."""
     return {
         "Test_AddNewFabricFromExistingFabric.yaml",     # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
         "TestEqualities.yaml",              # chip-repl does not support pseudo-cluster commands that return a value
         "TestExampleCluster.yaml",          # chip-repl does not load custom pseudo clusters
-        "TestClientMonitoringCluster.yaml"  # Client Monitoring Tests need a rework after the XML update
+        "Test_TC_TIMESYNC_1_1.yaml",         # Time sync SDK is not yet ready
+        "TestAttributesById.yaml",           # chip-repl does not support AnyCommands (06/06/2023)
+        "TestCommandsById.yaml",             # chip-repl does not support AnyCommands (06/06/2023)
+        "TestEventsById.yaml",               # chip-repl does not support AnyCommands (06/06/2023)
     }
 
 
@@ -187,14 +186,19 @@ def tests_with_command(chip_tool: str, is_manual: bool):
     if is_manual:
         test_tags.add(TestTag.MANUAL)
 
+    in_development_tests = [s.replace(".yaml", "") for s in _GetInDevelopmentTests()]
+
     for name in result.stdout.decode("utf8").split("\n"):
         if not name:
             continue
 
         target = target_for_name(name)
+        tags = test_tags.copy()
+        if name in in_development_tests:
+            tags.add(TestTag.IN_DEVELOPMENT)
 
         yield TestDefinition(
-            run_name=name, name=name, target=target, tags=test_tags
+            run_name=name, name=name, target=target, tags=tags
         )
 
 

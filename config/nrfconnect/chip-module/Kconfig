@@ -18,6 +18,14 @@ rsource "../../zephyr/Kconfig"
 
 if CHIP
 
+config CHIP_NRF_PLATFORM
+	bool
+	default y
+	help
+	  States that the configuration uses Matter nRF platform,
+	  what can be used to conditionally deviate from Zephyr generic configuration
+	  for nRF platform related purposes.
+
 # See config/zephyr/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
 	default "Nordic Semiconductor ASA"
@@ -94,7 +102,7 @@ config CHIP_MALLOC_SYS_HEAP
 config CHIP_FACTORY_DATA
 	bool "Factory data provider"
 	select ZCBOR
-	select FPROTECT
+	imply FPROTECT
 	help
 	  Enables the default nRF Connect factory data provider implementation that
 	  supports reading the factory data encoded in the CBOR format from the
@@ -126,6 +134,27 @@ config CHIP_FACTORY_DATA_VERSION
 	  a hidden configuration option that the user cannot change. You can use
 	  this value in the factory data provider implementation to verify that the
 	  factory data saved in the flash memory has the expected version.
+
+config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
+	int "Maximum length of rotating device ID unique ID in bytes"
+	default 16
+	depends on CHIP_FACTORY_DATA
+	help
+	  Maximum acceptable length of rotating device ID unique ID in bytes.
+
+config CHIP_FACTORY_DATA_WRITE_PROTECT
+	bool "Enable Factory Data write protection"
+	select FPROTECT
+	depends on CHIP_FACTORY_DATA
+	default y if CHIP_FACTORY_DATA
+	help
+		Enables the write protection of the Factory Data partition in the flash memory.
+		This is a recommended feature, but it requires the Settings partition size to be
+		a multiple of FPROTECT_BLOCK_SIZE and the Factory Data partition to be placed
+		right after the application partition in the address space (the Factory Data
+		partition offset must be equal to the last address of the application partition).
+		The second requirement is valid only when the FPROTECT_BLOCK_SIZE is bigger than
+		the flash memory page size.
 
 if CHIP_FACTORY_DATA_BUILD
 

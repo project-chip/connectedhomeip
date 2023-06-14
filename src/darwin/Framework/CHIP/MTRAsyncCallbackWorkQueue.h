@@ -54,9 +54,8 @@ typedef void (^MTRAsyncCallbackReadyHandler)(id context, NSUInteger retryCount);
 - (void)invalidate;
 
 // Work items may be enqueued from any queue or thread
+// Note: Once a work item is enqueued, its handlers cannot be modified
 - (void)enqueueWorkItem:(MTRAsyncCallbackQueueWorkItem *)item;
-
-// TODO: Add a "set concurrency width" method to allow for more than 1 work item at a time
 @end
 
 // An item in the work queue
@@ -71,10 +70,12 @@ typedef void (^MTRAsyncCallbackReadyHandler)(id context, NSUInteger retryCount);
 
 // Called by the creater of the work item when async work is done and should
 // be removed from the queue. The work queue will run the next work item.
+// Note: This must only be called from within the readyHandler
 - (void)endWork;
 
 // Called by the creater of the work item when async work should be retried.
 // The work queue will call this workItem's readyHandler again.
+// Note: This must only be called from within the readyHandler
 - (void)retryWork;
 @end
 

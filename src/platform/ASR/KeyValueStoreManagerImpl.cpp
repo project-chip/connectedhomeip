@@ -44,7 +44,7 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
 CHIP_ERROR KeyValueStoreManagerImpl::Init()
 {
-    // duet_flash_kv_init();
+    // KV has already been initialized at init_asrPlatform(), so return success
     return CHIP_NO_ERROR;
 }
 

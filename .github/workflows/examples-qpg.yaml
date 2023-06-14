@@ -47,7 +47,7 @@ jobs:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3
@@ -82,7 +82,7 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Build QPG6105 example apps
-              timeout-minutes: 20
+              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -95,7 +95,7 @@ jobs:
                         --copy-artifacts-to out/artifacts \
                      "
             - name: Build Matter SDK library
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   config/qpg/chip-gn/build.sh
 

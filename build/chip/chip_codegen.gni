@@ -135,7 +135,6 @@ template("_chip_build_time_zapgen") {
 
       # Application templates, actually generating files
       "${_template_dir}/access.zapt",
-      "${_template_dir}/CHIPClientCallbacks.zapt",
       "${_template_dir}/CHIPClusters.zapt",
       "${_template_dir}/endpoint_config.zapt",
       "${_template_dir}/gen_config.zapt",

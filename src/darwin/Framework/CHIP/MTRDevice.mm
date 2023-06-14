@@ -17,7 +17,8 @@
 
 #import <os/lock.h>
 
-#import "MTRAsyncCallbackWorkQueue.h"
+#import "MTRAsyncCallbackWorkQueue_Internal.h"
+#import "MTRAttributeSpecifiedCheck.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRCluster.h"
@@ -116,6 +117,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     MTRDeviceExpectedValueFieldIDIndex = 2
 };
 
+typedef NS_ENUM(NSUInteger, MTRDeviceReadRequestFieldIndex) {
+    MTRDeviceReadRequestFieldPathIndex = 0,
+    MTRDeviceReadRequestFieldParamsIndex = 1
+};
+
+typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemBatchingID) {
+    MTRDeviceWorkItemBatchingReadID = 1,
+};
+
+typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
+    MTRDeviceWorkItemDuplicateReadTypeID = 1,
+};
+
 @interface MTRDevice ()
 @property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
 @property (nonatomic) chip::FabricIndex fabricIndex;
@@ -189,7 +203,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRDevice: %p>[fabric: %u, nodeID: %@]", self, _fabricIndex, _nodeID];
+    return [NSString
+        stringWithFormat:@"<MTRDevice: %p>[fabric: %u, nodeID: 0x%016llX]", self, _fabricIndex, _nodeID.unsignedLongLongValue];
 }
 
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -252,6 +267,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     if (readClientToResubscribe) {
         readClientToResubscribe->TriggerResubscribeIfScheduled("operational advertisement seen");
     }
+}
+
+// Return YES if there's a valid delegate AND subscription is expected to report value
+- (BOOL)_subscriptionAbleToReport
+{
+    // TODO: include period from when first report comes in until establish callback
+    return (_weakDelegate.strongObject) && (_state == MTRDeviceStateReachable);
 }
 
 // assume lock is held
@@ -617,51 +639,279 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 }
 
 #pragma mark Device Interactions
+
+// Helper function to determine whether an attribute has "Changes Omitted" quality, which indicates that past the priming report in
+// a subscription, this attribute is not expected to be reported when its value changes
+//   * TODO: xml+codegen version to replace this hardcoded list.
+static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
+{
+    switch (attributePath.cluster.unsignedLongValue) {
+    case MTRClusterEthernetNetworkDiagnosticsID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRClusterEthernetNetworkDiagnosticsAttributePacketRxCountID:
+        case MTRClusterEthernetNetworkDiagnosticsAttributePacketTxCountID:
+        case MTRClusterEthernetNetworkDiagnosticsAttributeTxErrCountID:
+        case MTRClusterEthernetNetworkDiagnosticsAttributeCollisionCountID:
+        case MTRClusterEthernetNetworkDiagnosticsAttributeOverrunCountID:
+        case MTRClusterEthernetNetworkDiagnosticsAttributeCarrierDetectID:
+        case MTRClusterEthernetNetworkDiagnosticsAttributeTimeSinceResetID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterGeneralDiagnosticsID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRClusterGeneralDiagnosticsAttributeUpTimeID:
+        case MTRClusterGeneralDiagnosticsAttributeTotalOperationalHoursID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterThreadNetworkDiagnosticsID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRClusterThreadNetworkDiagnosticsAttributeOverrunCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeDetachedRoleCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeChildRoleCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRouterRoleCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeLeaderRoleCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeAttachAttemptCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributePartitionIdChangeCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeBetterPartitionAttachAttemptCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeParentChangeCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxTotalCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxAckedCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxDataCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxDataPollCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxBeaconCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxBeaconRequestCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxOtherCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxRetryCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxDirectMaxRetryExpiryCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxIndirectMaxRetryExpiryCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxErrCcaCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxErrAbortCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeTxErrBusyChannelCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxTotalCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxUnicastCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxBroadcastCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxDataCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxDataPollCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxBeaconCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxBeaconRequestCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxOtherCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxAddressFilteredCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxDestAddrFilteredCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxDuplicatedCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrNoFrameCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrUnknownNeighborCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrInvalidSrcAddrCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrSecCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrFcsCountID:
+        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrOtherCountID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterWiFiNetworkDiagnosticsID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRClusterWiFiNetworkDiagnosticsAttributeRssiID:
+        case MTRClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID:
+        case MTRClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID:
+        case MTRClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID:
+        case MTRClusterWiFiNetworkDiagnosticsAttributePacketMulticastTxCountID:
+        case MTRClusterWiFiNetworkDiagnosticsAttributePacketUnicastRxCountID:
+        case MTRClusterWiFiNetworkDiagnosticsAttributePacketUnicastTxCountID:
+        case MTRClusterWiFiNetworkDiagnosticsAttributeCurrentMaxRateID:
+        case MTRClusterWiFiNetworkDiagnosticsAttributeOverrunCountID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterOperationalCredentialsID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRClusterOperationalCredentialsAttributeNOCsID:
+        case MTRClusterOperationalCredentialsAttributeTrustedRootCertificatesID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterPowerSourceID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRClusterPowerSourceAttributeWiredAssessedInputVoltageID:
+        case MTRClusterPowerSourceAttributeWiredAssessedInputFrequencyID:
+        case MTRClusterPowerSourceAttributeWiredAssessedCurrentID:
+        case MTRClusterPowerSourceAttributeBatVoltageID:
+        case MTRClusterPowerSourceAttributeBatPercentRemainingID:
+        case MTRClusterPowerSourceAttributeBatTimeRemainingID:
+        case MTRClusterPowerSourceAttributeBatTimeToFullChargeID:
+        case MTRClusterPowerSourceAttributeBatChargingCurrentID:
+            return YES;
+        default:
+            return NO;
+        }
+    case MTRClusterTimeSynchronizationID:
+        switch (attributePath.attribute.unsignedLongValue) {
+        case MTRClusterTimeSynchronizationAttributeUTCTimeID:
+        case MTRClusterTimeSynchronizationAttributeLocalTimeID:
+            return YES;
+        default:
+            return NO;
+        }
+    default:
+        return NO;
+    }
+}
+
 - (NSDictionary<NSString *, id> *)readAttributeWithEndpointID:(NSNumber *)endpointID
                                                     clusterID:(NSNumber *)clusterID
                                                   attributeID:(NSNumber *)attributeID
                                                        params:(MTRReadParams *)params
 {
     NSString * logPrefix = [NSString stringWithFormat:@"%@ read %@ %@ %@", self, endpointID, clusterID, attributeID];
-    // Create work item, set ready handler to perform task, then enqueue the work
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
-        MTRBaseDevice * baseDevice = [self newBaseDevice];
-        [baseDevice
-            readAttributesWithEndpointID:endpointID
-                               clusterID:clusterID
-                             attributeID:attributeID
-                                  params:params
-                                   queue:self.queue
-                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                  if (values) {
-                                      // Since the format is the same data-value dictionary, this looks like an attribute
-                                      // report
-                                      MTR_LOG_INFO("%@ completion values %@", logPrefix, values);
-                                      [self _handleAttributeReport:values];
-                                  }
-
-                                  // TODO: better retry logic
-                                  if (error && (retryCount < 2)) {
-                                      MTR_LOG_ERROR(
-                                          "%@ completion error %@ retryWork %lu", logPrefix, error, (unsigned long) retryCount);
-                                      [workItem retryWork];
-                                  } else {
-                                      MTR_LOG_DEFAULT("%@ completion error %@ endWork", logPrefix, error);
-                                      [workItem endWork];
-                                  }
-                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncCallbackWorkQueue);
-    [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
-
-    // Return current known / expected value right away
     MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
                                                                            clusterID:clusterID
                                                                          attributeID:attributeID];
+
+    BOOL attributeIsSpecified = MTRAttributeIsSpecified(clusterID.unsignedIntValue, attributeID.unsignedIntValue);
+    BOOL hasChangesOmittedQuality = AttributeHasChangesOmittedQuality(attributePath);
+
+    // Return current known / expected value right away
     NSDictionary<NSString *, id> * attributeValueToReturn = [self _attributeValueDictionaryForAttributePath:attributePath];
+
+    // Send read request to device if any of the following are true:
+    // 1. The attribute is not in the specification (so we don't know whether hasChangesOmittedQuality can be trusted).
+    // 2. Subscription not in a state we can expect reports
+    // 3. There is subscription but attribute has Changes Omitted quality
+    // 4. Cache has no entry
+    // TODO: add option for BaseSubscriptionCallback to report during priming, to reduce when case 4 is hit
+    if (!attributeIsSpecified || ![self _subscriptionAbleToReport] || hasChangesOmittedQuality || !attributeValueToReturn) {
+        // Read requests container will be a mutable array of items, each being an array containing:
+        //   [attribute request path, params]
+        // Batching handler should only coalesce when params are equal.
+
+        // For this single read API there's only 1 array item. Use NSNull to stand in for nil params for easy comparison.
+        MTRAttributeRequestPath * readRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:endpointID
+                                                                                             clusterID:clusterID
+                                                                                           attributeID:attributeID];
+        NSArray * readRequestData = @[ readRequestPath, params ?: [NSNull null] ];
+
+        // But first, check if a duplicate read request is already queued and return
+        if ([_asyncCallbackWorkQueue isDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestData]) {
+            return attributeValueToReturn;
+        }
+
+        NSMutableArray<NSArray *> * readRequests = [NSMutableArray arrayWithObject:readRequestData];
+
+        // Create work item, set ready handler to perform task, then enqueue the work
+        MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
+        MTRAsyncCallbackBatchingHandler batchingHandler = ^(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged) {
+            NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
+            NSMutableArray<NSArray *> * readRequestsNext = opaqueDataNext;
+
+            *fullyMerged = NO;
+
+            // Can only read up to 9 paths at a time, per spec
+            if (readRequestsCurrent.count >= 9) {
+                MTR_LOG_DEFAULT("%@ batching cannot add more", logPrefix);
+                return;
+            }
+
+            while (readRequestsNext.count) {
+                // if params don't match then they cannot be merged
+                if (![readRequestsNext[0][MTRDeviceReadRequestFieldParamsIndex]
+                        isEqual:readRequestsCurrent[0][MTRDeviceReadRequestFieldParamsIndex]]) {
+                    MTR_LOG_DEFAULT("%@ batching merged all possible items", logPrefix);
+                    return;
+                }
+
+                // merge the next item's first request into the current item's list
+                [readRequestsCurrent addObject:readRequestsNext[0]];
+                MTR_LOG_INFO("%@ batching merging %@ => %lu total", logPrefix, readRequestsNext[0],
+                    (unsigned long) readRequestsCurrent.count);
+                [readRequestsNext removeObjectAtIndex:0];
+
+                // Can only read up to 9 paths at a time, per spec
+                if (readRequestsCurrent.count == 9) {
+                    MTR_LOG_DEFAULT("%@ batching to max paths allowed", logPrefix);
+                    break;
+                }
+            }
+
+            if (readRequestsNext.count == 0) {
+                MTR_LOG_DEFAULT("%@ batching - fully merged next item", logPrefix);
+                *fullyMerged = YES;
+            }
+        };
+        MTRAsyncCallbackDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+            for (NSArray * readItem in readRequests) {
+                if ([readItem isEqual:opaqueItemData]) {
+                    MTR_LOG_DEFAULT("%@ duplicate check found %@ - report duplicate", logPrefix, readItem);
+                    *isDuplicate = YES;
+                    *stop = YES;
+                    return;
+                }
+            }
+            *stop = NO;
+        };
+        MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+            MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
+
+            // Sanity check
+            if (readRequests.count == 0) {
+                MTR_LOG_ERROR("%@ dequeueWorkItem no read requests", logPrefix);
+                [workItem endWork];
+                return;
+            }
+
+            // Build the attribute paths from the read requests
+            NSMutableArray<MTRAttributeRequestPath *> * attributePaths = [NSMutableArray array];
+            for (NSArray * readItem in readRequests) {
+                // Sanity check
+                if (readItem.count < 2) {
+                    MTR_LOG_ERROR("%@ dequeueWorkItem read item missing info %@", logPrefix, readItem);
+                    [workItem endWork];
+                    return;
+                }
+                [attributePaths addObject:readItem[MTRDeviceReadRequestFieldPathIndex]];
+            }
+            // If param is the NSNull stand-in, then just use nil
+            id readParamObject = readRequests[0][MTRDeviceReadRequestFieldParamsIndex];
+            MTRReadParams * readParams = (![readParamObject isEqual:[NSNull null]]) ? readParamObject : nil;
+
+            MTRBaseDevice * baseDevice = [self newBaseDevice];
+            [baseDevice
+                readAttributePaths:attributePaths
+                        eventPaths:nil
+                            params:readParams
+                             queue:self.queue
+                        completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                            if (values) {
+                                // Since the format is the same data-value dictionary, this looks like an
+                                // attribute report
+                                MTR_LOG_INFO("%@ completion values %@", logPrefix, values);
+                                [self _handleAttributeReport:values];
+                            }
+
+                            // TODO: better retry logic
+                            if (error && (retryCount < 2)) {
+                                MTR_LOG_ERROR("%@ completion error %@ retryWork %lu", logPrefix, error, (unsigned long) retryCount);
+                                [workItem retryWork];
+                            } else {
+                                MTR_LOG_DEFAULT("%@ completion error %@ endWork", logPrefix, error);
+                                [workItem endWork];
+                            }
+                        }];
+        };
+        workItem.readyHandler = readyHandler;
+        [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:batchingHandler];
+        [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:duplicateCheckHandler];
+        MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncCallbackWorkQueue);
+        [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    }
 
     return attributeValueToReturn;
 }
@@ -689,6 +939,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
               expectedValueID:&expectedValueID];
 
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
+    // The write operation will install a duplicate check handler, to return NO for "isDuplicate". Since a write operation may
+    // change values, only read requests after this should be considered for duplicate requests.
+    MTRAsyncCallbackDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+        *isDuplicate = NO;
+        *stop = YES;
+    };
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [self newBaseDevice];
@@ -708,6 +964,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                               }];
     };
     workItem.readyHandler = readyHandler;
+    [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:duplicateCheckHandler];
     MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncCallbackWorkQueue);
     [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
 }
@@ -742,6 +999,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
         }
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
+    // The command operation will install a duplicate check handler, to return NO for "isDuplicate". Since a command operation may
+    // change values, only read requests after this should be considered for duplicate requests.
+    MTRAsyncCallbackDuplicateCheckHandler duplicateCheckHandler = ^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+        *isDuplicate = NO;
+        *stop = YES;
+    };
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [self newBaseDevice];
@@ -767,6 +1030,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                              }];
     };
     workItem.readyHandler = readyHandler;
+    [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:duplicateCheckHandler];
     MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncCallbackWorkQueue);
     [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
 }
@@ -1209,14 +1473,16 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
             MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]
         }];
     } else {
-        id value;
-        if (apData == nullptr) {
-            value = nil;
+        id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
+        if (value == nil) {
+            MTR_LOG_ERROR("Failed to decode event data for path %@", eventPath);
+            [mEventReports addObject:@ {
+                MTREventPathKey : eventPath,
+                MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED],
+            }];
         } else {
-            value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
+            [mEventReports addObject:[MTRBaseDevice eventReportForHeader:aEventHeader andData:value]];
         }
-
-        [mEventReports addObject:[MTRBaseDevice eventReportForHeader:aEventHeader andData:value]];
     }
 }
 
@@ -1244,7 +1510,13 @@ void SubscriptionCallback::OnAttributeData(
         }];
     } else {
         id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
-        if (value) {
+        if (value == nil) {
+            MTR_LOG_ERROR("Failed to decode attribute data for path %@", attributePath);
+            [mAttributeReports addObject:@ {
+                MTRAttributePathKey : attributePath,
+                MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_DECODE_FAILED],
+            }];
+        } else {
             [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRDataKey : value }];
         }
     }

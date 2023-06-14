@@ -18,6 +18,7 @@
 import re
 import string
 from abc import ABC, abstractmethod
+from typing import List
 
 from .errors import TestStepError
 
@@ -231,6 +232,8 @@ class _ConstraintType(BaseConstraint):
         success = False
         if self._type == 'boolean' and type(value) is bool:
             success = True
+        elif self._type == 'struct' and type(value) is dict:
+            success = True
         elif self._type == 'list' and type(value) is list:
             success = True
         elif self._type == 'char_string' and type(value) is str:
@@ -357,6 +360,10 @@ class _ConstraintType(BaseConstraint):
             success = value >= -36028797018963967 and value <= 36028797018963967
         elif self._type == 'nullable_int64s' and type(value) is int:
             success = value >= -9223372036854775807 and value <= 9223372036854775807
+        elif self._type == 'single' and type(value) is float:
+            success = self._is_single(value)
+        elif self._type == 'double' and type(value) is float:
+            success = self._is_double(value)
         else:
             success = self._type == value_type_name
         return success
@@ -366,6 +373,8 @@ class _ConstraintType(BaseConstraint):
 
         if type(value) is bool:
             types.append('boolean')
+        elif type(value) is dict:
+            types.append('struct')
         elif type(value) is list:
             types.append('list')
         elif type(value) is str:
@@ -497,6 +506,12 @@ class _ConstraintType(BaseConstraint):
             if value >= -9223372036854775807 and value <= 9223372036854775807:
                 types.append('nullable_int64s')
 
+            if self._is_single(value):
+                types.append('single')
+
+            if self._is_double(value):
+                types.append('double')
+
         types.sort(key=lambda input_type: [int(c) if c.isdigit(
         ) else c for c in re.split('([0-9]+)', input_type)])
 
@@ -504,10 +519,18 @@ class _ConstraintType(BaseConstraint):
             types.append(value_type_name)
 
         if len(types) == 1:
-            reason = f'The response type {types[0]}) does not match the constraint.'
+            reason = f'The response type ({types[0]}) does not match the constraint.'
         else:
             reason = f'The response value ({value}) is of one of those types: {types}.'
         return reason
+
+    def _is_single(self, value):
+        return (value >= -1.7976931348623157E+308 and value <= -2.2250738585072014E-308) or value == 0.0 or (
+            value >= 2.2250738585072014E-308 and value <= 1.7976931348623157E+308) or math.isnan(value) or math.isinf(value)
+
+    def _is_double(self, value):
+        return (value >= -1.7976931348623157E+308 and value <= -2.2250738585072014E-308) or value == 0.0 or (
+            value >= 2.2250738585072014E-308 and value <= 1.7976931348623157E+308) or math.isnan(value) or math.isinf(value)
 
 
 class _ConstraintMinLength(BaseConstraint):
@@ -759,7 +782,7 @@ class _ConstraintAnyOf(BaseConstraint):
         return f'The response value "{value}" is not a value from {self._any_of}.'
 
 
-def get_constraints(constraints: dict) -> list[BaseConstraint]:
+def get_constraints(constraints: dict) -> List[BaseConstraint]:
     _constraints = []
     context = constraints
 
