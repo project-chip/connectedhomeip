@@ -304,6 +304,8 @@ class CommandPathLocation:
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
 # from `str` is used. See https://stackoverflow.com/a/51976841.
+
+
 class ProblemSeverity(str, Enum):
     NOTE = "NOTE"
     WARNING = "WARNING"
