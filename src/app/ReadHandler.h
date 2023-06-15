@@ -356,7 +356,7 @@ private:
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
     /// @brief This allows the read handler to schedule a run as soon as the min interval has elapsed by setting the read handler to
-    /// a dirty state regardless of the attributes change, thus being reportable as soon as the min interval callback happends.
+    /// a dirty state regardless of the attributes change, thus being reportable as soon as the min interval callback happens.
     void ForceDirtyState();
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
@@ -404,7 +404,7 @@ private:
      */
     void Close(CloseOptions options = CloseOptions::kDropPersistedSubscription);
 
-    /// @brief This function is called when the min interval timer has expired, it restarts the timer on a timeout equalt to the
+    /// @brief This function is called when the min interval timer has expired, it restarts the timer on a timeout equal to the
     /// difference between the max interval and the min interval.
     static void MinIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState);
     static void MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void * apAppState);
@@ -427,7 +427,7 @@ private:
 
     void PersistSubscription();
 
-    /// @brief This function modifies at state Flag in the read handler and schedules an engine run if the read handler want from a
+    /// @brief This function modifies a state Flag in the read handler and schedules an engine run if the read handler want from a
     /// non reportable state to a reportable state, resulting in the emission of a report.
     /// @param aFlag Flag to set
     /// @param aValue Flag new value
