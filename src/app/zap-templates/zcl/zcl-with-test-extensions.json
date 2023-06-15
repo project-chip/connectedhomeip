@@ -302,7 +302,7 @@
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
         "Operational State": [
-            "OperationalState", 
+            "OperationalState",
             "OperationalError"
         ],
         "RVC Operational State": [
