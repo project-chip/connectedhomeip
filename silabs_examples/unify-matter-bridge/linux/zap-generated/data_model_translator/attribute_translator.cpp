@@ -109,7 +109,7 @@ CHIP_ERROR IdentifyAttributeAccess::Write(const ConcreteDataAttributePath& aPath
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -246,7 +246,7 @@ CHIP_ERROR GroupsAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -425,7 +425,7 @@ CHIP_ERROR ScenesAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -650,7 +650,7 @@ CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath& aPath, A
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -941,7 +941,7 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath& a
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -1527,7 +1527,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -2229,7 +2229,7 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath&
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -2850,7 +2850,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -3853,7 +3853,7 @@ CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath& aPa
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -4028,7 +4028,7 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const Conc
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -4563,7 +4563,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath& a
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -5469,7 +5469,7 @@ CHIP_ERROR IlluminanceMeasurementAttributeAccess::Write(const ConcreteDataAttrib
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -5676,7 +5676,7 @@ CHIP_ERROR TemperatureMeasurementAttributeAccess::Write(const ConcreteDataAttrib
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -5904,7 +5904,7 @@ CHIP_ERROR PressureMeasurementAttributeAccess::Write(const ConcreteDataAttribute
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -6162,7 +6162,7 @@ CHIP_ERROR FlowMeasurementAttributeAccess::Write(const ConcreteDataAttributePath
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -6353,7 +6353,7 @@ CHIP_ERROR RelativeHumidityMeasurementAttributeAccess::Write(const ConcreteDataA
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -6603,7 +6603,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 
@@ -7830,7 +7830,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
     if (!unify_node) {
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+        return CHIP_NO_ERROR;
     }
     nlohmann::json jsn;
 

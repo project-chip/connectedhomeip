@@ -101,7 +101,7 @@ CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAt
   auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
   if (!unify_node) {
-    return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    return CHIP_NO_ERROR;
   }
   nlohmann::json jsn;
 
