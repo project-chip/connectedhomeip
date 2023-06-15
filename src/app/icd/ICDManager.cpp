@@ -24,6 +24,9 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+
 namespace chip {
 namespace app {
 
@@ -31,7 +34,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 
-ICDManager::ICDManager()
+void ICDManager::ICDManager::Init()
 {
     uint32_t activeModeInterval;
     IcdManagement::Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval);
@@ -86,8 +89,8 @@ void ICDManager::UpdateOperationStates(OperationalState state)
 
     if (state == IdleMode)
     {
-        mOperationalState = IdleMode;
-        uint32_t idleModeInterval;
+        mOperationalState         = IdleMode;
+        uint32_t idleModeInterval = 0;
         IcdManagement::Attributes::IdleModeInterval::Get(kRootEndpointId, &idleModeInterval);
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(idleModeInterval), OnIdleModeDone, this);
 
@@ -102,9 +105,8 @@ void ICDManager::UpdateOperationStates(OperationalState state)
             // Make sure the idle mode timer is stopped
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
-            mOperationalState = ActiveMode;
-
-            uint32_t activeModeInterval;
+            mOperationalState           = ActiveMode;
+            uint32_t activeModeInterval = 0;
             IcdManagement::Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval);
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval), OnActiveModeDone, this);
 
@@ -113,7 +115,7 @@ void ICDManager::UpdateOperationStates(OperationalState state)
         }
         else
         {
-            uint16_t activeModeThreshold;
+            uint16_t activeModeThreshold = 0;
             IcdManagement::Attributes::ActiveModeThreshold::Get(kRootEndpointId, &activeModeThreshold);
             DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
         }

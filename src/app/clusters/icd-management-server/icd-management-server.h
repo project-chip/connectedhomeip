@@ -35,6 +35,4 @@ public:
                             const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
 
     Status StayActiveRequest(const chip::app::ConcreteCommandPath & commandPath);
-
-    bool HasFeature(Feature feature);
 };

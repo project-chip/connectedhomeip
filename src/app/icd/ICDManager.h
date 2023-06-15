@@ -41,7 +41,8 @@ public:
         LIT, // Long Interval Time ICD
     };
 
-    ICDManager();
+    ICDManager() {}
+    void Init();
     bool SupportCheckInProtocol();
     void UpdateIcdMode();
     void UpdateOperationStates(OperationalState state);
