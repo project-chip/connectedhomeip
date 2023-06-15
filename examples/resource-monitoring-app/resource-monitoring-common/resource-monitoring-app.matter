@@ -1509,6 +1509,38 @@ server cluster HepaFilterMonitoring = 113 {
   command ResetCondition(): DefaultSuccess = 0;
 }
 
+/** Attributes and commands for monitoring activated carbon filters in a device */
+server cluster ActivatedCarbonFilterMonitoring = 114 {
+  enum ChangeIndicationEnum : ENUM8 {
+    kOk = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum DegradationDirectionEnum : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+  }
+
+  readonly attribute percent condition = 0;
+  readonly attribute DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute boolean inPlaceIndicator = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCondition(): DefaultSuccess = 0;
+}
+
 /** An interface for controlling a fan in a heating/cooling system. */
 server cluster FanControl = 514 {
   enum AirflowDirectionEnum : ENUM8 {
@@ -1906,6 +1938,19 @@ endpoint 1 {
   }
 
   server cluster HepaFilterMonitoring {
+    ram      attribute condition;
+    ram      attribute degradationDirection;
+    ram      attribute changeIndication default = 0;
+    ram      attribute inPlaceIndicator;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster ActivatedCarbonFilterMonitoring {
     ram      attribute condition;
     ram      attribute degradationDirection;
     ram      attribute changeIndication default = 0;

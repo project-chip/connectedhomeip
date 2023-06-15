@@ -27,7 +27,7 @@
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
-#include "include/resource-monitoring-delegates.h"
+#include <resource-monitoring-delegates.h>
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
@@ -64,8 +64,11 @@ void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & co
 }
 
 
-Clusters::ResourceMonitoring::HepaFilterMonitoringDelegate HepaFilterDelegate;
-Clusters::ResourceMonitoring::Instance HepafilterInstance(0x1, Clusters::HepaFilterMonitoring::Id, &HepaFilterDelegate);
+Clusters::ResourceMonitoring::HepaFilterMonitoringDelegate hepaFilterDelegate;
+Clusters::ResourceMonitoring::Instance HepafilterInstance(0x1, Clusters::HepaFilterMonitoring::Id, &hepaFilterDelegate);
+
+Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringDelegate activatedCarbonFilterDelegate;
+Clusters::ResourceMonitoring::Instance ActivatedCarbonFilterInstance(0x1, Clusters::ActivatedCarbonFilterMonitoring::Id, &activatedCarbonFilterDelegate);
 
 void ApplicationInit()
 {
@@ -74,6 +77,7 @@ void ApplicationInit()
 #endif
 
     HepafilterInstance.Init();
+    ActivatedCarbonFilterInstance.Init();
 }
 
 int main(int argc, char * argv[])

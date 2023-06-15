@@ -35,7 +35,7 @@ namespace ResourceMonitoring {
 
 
 /// This is an application level delegate to handle HepaFilterMonitoringDelegate commands according to the specific business logic.
-//class RvcRunDelegate : public Delegate
+//class HepaFilterMonitoringDelegate : public Delegate
 class HepaFilterMonitoringDelegate : public Delegate
 {
 private:
@@ -48,7 +48,21 @@ public:
     ~HepaFilterMonitoringDelegate() override = default;
 };
 
-} // namespace ModeSelect
+/// This is an application level delegate to handle ActivatedCarbonFilterMonitoringDelegate commands according to the specific business logic.
+//class ActivatedCarbonFilterMonitoringDelegate : public Delegate
+class ActivatedCarbonFilterMonitoringDelegate : public Delegate
+{
+private:
+    CHIP_ERROR Init() override;
+    Status HandleResetCondition() override;
+
+public:
+    explicit ActivatedCarbonFilterMonitoringDelegate() : Delegate() {}
+
+    ~ActivatedCarbonFilterMonitoringDelegate() override = default;
+};
+
+} // namespace ResourceMonitoring
 } // namespace Clusters
 } // namespace app
 } // namespace chip

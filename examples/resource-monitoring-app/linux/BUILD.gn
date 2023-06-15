@@ -32,8 +32,9 @@ config("includes") {
 executable("chip-resource-monitoring-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
-    "HepafilterMonitoringDelegate.cpp",
-    "main.cpp"
+    "src/main.cpp",
+    "src/delegates/ActivatedCarbonFilterMonitoring.cpp",
+    "src/delegates/HepafilterMonitoringDelegate.cpp"
   ]
 
   deps = [
