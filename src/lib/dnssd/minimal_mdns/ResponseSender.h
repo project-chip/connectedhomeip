@@ -51,7 +51,11 @@ namespace Internal {
 //
 // We rely on knowing Matter DNSSD only sends the same set of data
 // for some instances like A/AAAA always being the same.
+//
 enum class ResponseItemsSent : uint8_t {
+    // DNSSD may have different servers referenced by IP addresses,
+    // however we know the matter dnssd server name is fixed and
+    // the same even across SRV records.
     kIPv4Addresses = 0x01,
     kIPv6Addresses = 0x02,
 };
