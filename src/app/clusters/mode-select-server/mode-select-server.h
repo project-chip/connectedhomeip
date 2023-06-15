@@ -66,7 +66,7 @@ public:
 private:
     EndpointId endpointId{};
     ClusterId clusterId{};
-    Delegate * delegate;
+    Delegate *delegate;
 
     void HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
     void HandleChangeToModeWithStatus(HandlerContext & ctx, const Commands::ChangeToModeWithStatus::DecodableType & req);
@@ -81,11 +81,11 @@ public:
      */
     Instance(EndpointId aEndpointId, ClusterId aClusterId, Delegate * aDelegate) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId)
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId),
+        delegate(aDelegate)
     {
         endpointId = aEndpointId;
         clusterId  = aClusterId;
-        delegate   = aDelegate;
     }
 
     ~Instance() override

@@ -22,7 +22,6 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/util/util.h>
 #include <utility>
-#include <vector>
 
 using chip::Protocols::InteractionModel::Status;
 using ModeOptionStructType  = chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type;
@@ -39,14 +38,12 @@ namespace ModeSelect {
 class Delegate
 {
 public:
-    const std::vector<ModeOptionStructType> modeOptions;
-
     /**
      * This is a helper function to build a mode option structure. It takes the label/name of the mode,
      * the value of the mode and a list of semantic tags that apply to this mode.
      */
     static ModeOptionStructType BuildModeOptionStruct(const char * label, uint8_t mode,
-                                                      const List<const SemanticTagStructType> & semanticTags)
+                                                      const List<const SemanticTagStructType> semanticTags)
     {
         Structs::ModeOptionStruct::Type option;
         option.label        = CharSpan::fromCharString(label);
@@ -55,9 +52,14 @@ public:
         return option;
     }
 
-    explicit Delegate(std::vector<ModeOptionStructType> modes) : modeOptions(std::move(modes)) {}
+    explicit Delegate() = default;
 
     virtual CHIP_ERROR Init() = 0;
+
+    /**
+     * Returns the number of modes provided and managed by the delegate.
+     */
+    virtual uint8_t NumberOfModes();
 
     /**
      * This function returns true if the mode value given matches one of the supported modes, otherwise it returns false.
@@ -65,16 +67,6 @@ public:
      * @param mode
      */
     bool IsSupportedMode(uint8_t mode);
-
-    /**
-     * If the mode value given is supported, this function will update modeOption to the ModeOptionStructType for the mode with
-     * the matching value and returns success. If the mode value given is not supported, the modeOption remains untouched and
-     * returns an InvalidCommand status.
-     *
-     * @param mode
-     * @param modeOption
-     */
-    Status GetMode(uint8_t mode, ModeOptionStructType & modeOption);
 
     /**
      * When a ChangeToMode command is received, if the NewMode value is a supported made, this function is called to decide if we
@@ -101,6 +93,34 @@ public:
     virtual void HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands::ChangeToModeResponse::Type & response);
 
     virtual ~Delegate() = default;
+
+    /**
+     * Get the mode label of the Nth mode in the list of modes. This is mostly useful for SDK code.
+     * @param modeIndex The index in the list of modes of the mode to be returned.
+     * @param found is set to true if a mode is found. If set to false, the return should be ignored.
+     * @return the mode label of the mode at modeIndex.
+     */
+    virtual CHIP_ERROR getModeLabelByIndex(uint8_t modeIndex, MutableCharSpan &label);
+
+    /**
+     * Get the mode value of the Nth mode in the list of modes. This is mostly useful for SDK code.
+     * @param modeIndex The index in the list of modes of the mode to be returned.
+     * @param found is set to true if a mode is found. If set to false, the return should be ignored.
+     * @return the mode value of the mode at modeIndex.
+     */
+    virtual CHIP_ERROR getModeValueByIndex(uint8_t modeIndex, uint8_t &value);
+
+    /**
+     * Get the mode tags of the Nth mode in the list of modes. This is mostly useful for SDK code.
+     * The caller must make sure the List points to an existing buffer of sufficient size to hold the spec-required number of tags, and the size of the List is the size of the buffer.
+     * 
+     * The implementation must place its desired SemanticTagStructType instances in that buffer and call reduce_size
+     * on the list to indicate how many entries were initialized.
+     * @param modeIndex The index in the list of modes of the mode to be returned.
+     * @param found is set to true if a mode is found. If set to false, the return should be ignored.
+     * @return a list of the mode tags of the mode at modeIndex.
+     */
+    virtual CHIP_ERROR getModeTagsByIndex(uint8_t modeIndex, List<SemanticTagStructType> &tags);
 };
 
 } // namespace ModeSelect

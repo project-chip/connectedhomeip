@@ -36,29 +36,39 @@ void Delegate::HandleChangeToModeWitheStatus(uint8_t mode, ModeSelect::Commands:
     response.status = to_underlying(ChangeToModeResponseStatus::kSuccess);
 }
 
+uint8_t Delegate::NumberOfModes()
+{
+    return 0;
+}
+
+CHIP_ERROR Delegate::getModeLabelByIndex(uint8_t modeIndex, MutableCharSpan &label)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR Delegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR Delegate::getModeTagsByIndex(uint8_t modeIndex, List<SemanticTagStructType> &tags)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 bool Delegate::IsSupportedMode(uint8_t modeValue)
-{ 
-    for (ModeOptionStructType modeStruct : modeOptions)
-    {
-        if (modeStruct.mode == modeValue)
-        {
-            return true;
+{
+    for (uint8_t i = 0; i < NumberOfModes(); i++) {
+        uint8_t value;
+        auto err = getModeValueByIndex(i, value);
+        if (err == CHIP_NO_ERROR) {
+            if (value == modeValue) {
+                return true;
+            }
+        } else {
+            break;
         }
     }
     ChipLogDetail(Zcl, "Cannot find the mode %u", modeValue);
     return false;
-}
-
-Status Delegate::GetMode(uint8_t modeValue, ModeOptionStructType &modeOption)
-{
-    for (ModeOptionStructType modeStruct : modeOptions)
-    {
-        if (modeStruct.mode == modeValue)
-        {
-            modeOption = modeStruct;
-            return Status::Success;
-        }
-    }
-    ChipLogDetail(Zcl, "Cannot find the mode %u", modeValue);
-    return Status::InvalidCommand;
 }

@@ -21,7 +21,6 @@
 #include <app/clusters/mode-select-server/mode-select-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/util.h>
 #include <platform/DiagnosticDataProvider.h>
 
 // using namespace std;
@@ -412,24 +411,49 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     switch (aPath.mAttributeId)
     {
     case Attributes::SupportedModes::Id:
-        if (delegate->modeOptions.empty())
+        if (delegate->NumberOfModes() == 0)
         {
             aEncoder.EncodeEmptyList();
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR err;
-        const auto mo = delegate->modeOptions;
-        err           = aEncoder.EncodeList([mo](const auto & encoder) -> CHIP_ERROR {
-            for (ModeOptionStructType mode : mo)
+        Delegate *d = delegate;
+        CHIP_ERROR err = aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR {
+            for (uint8_t i = 0; i < d->NumberOfModes(); i++)
             {
+                ModeOptionStructType mode;
+                ChipError err1 = CHIP_NO_ERROR;
+
+                // Get the mode label
+                char buffer[64];
+                MutableCharSpan label(buffer);
+                err1 = d->getModeLabelByIndex(i, label);
+                if (err1 != CHIP_NO_ERROR) {
+                    return err1;
+                }
+                mode.label = label;
+
+                // Get the mode value
+                err1 = d->getModeValueByIndex(i, mode.mode);
+                if (err1 != CHIP_NO_ERROR) {
+                    return err1;
+                }
+
+                // Get the mode tags
+                SemanticTagStructType tagsBuffer[8];
+                List<SemanticTagStructType> tags(tagsBuffer);
+                err1 = d->getModeTagsByIndex(i, tags);
+                if (err1 != CHIP_NO_ERROR) {
+                    return err1;
+                }
+                mode.semanticTags = tags;
+
                 ReturnErrorOnFailure(encoder.Encode(mode));
             }
             return CHIP_NO_ERROR;
         });
         ReturnErrorOnFailure(err);
     }
-
     return CHIP_NO_ERROR;
 }
 
