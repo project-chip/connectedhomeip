@@ -52,7 +52,8 @@ namespace Internal {
 // We rely on knowing Matter DNSSD only sends the same set of data
 // for some instances like A/AAAA always being the same.
 //
-enum class ResponseItemsSent : uint8_t {
+enum class ResponseItemsSent : uint8_t
+{
     // DNSSD may have different servers referenced by IP addresses,
     // however we know the matter dnssd server name is fixed and
     // the same even across SRV records.
@@ -72,11 +73,11 @@ public:
 
     void Reset(uint16_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * packet)
     {
-        mMessageId      = messageId;
-        mQuery          = &query;
-        mSource         = packet;
-        mSendError      = CHIP_NO_ERROR;
-        mResourceType   = ResourceType::kAnswer;
+        mMessageId    = messageId;
+        mQuery        = &query;
+        mSource       = packet;
+        mSendError    = CHIP_NO_ERROR;
+        mResourceType = ResourceType::kAnswer;
         mSentItems.ClearAll();
     }
 

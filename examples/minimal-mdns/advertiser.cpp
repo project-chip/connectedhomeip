@@ -325,7 +325,7 @@ int main(int argc, char ** args)
             err = chip::Dnssd::ServiceAdvertiser::Instance().Advertise(
                 chip::Dnssd::OperationalAdvertisingParameters()
                     .EnableIpV4(gOptions.enableIpV4)
-                    .SetPort(CHIP_PORT+1)
+                    .SetPort(CHIP_PORT + 1)
                     .SetMac(chip::ByteSpan(gOptions.mac, 6))
                     .SetPeerId(PeerId().SetCompressedFabricId(gOptions.fabricId + 1).SetNodeId(gOptions.nodeId + 1)));
         }
@@ -335,7 +335,7 @@ int main(int argc, char ** args)
             err = chip::Dnssd::ServiceAdvertiser::Instance().Advertise(
                 chip::Dnssd::OperationalAdvertisingParameters()
                     .EnableIpV4(gOptions.enableIpV4)
-                    .SetPort(CHIP_PORT+2)
+                    .SetPort(CHIP_PORT + 2)
                     .SetMac(chip::ByteSpan(gOptions.mac, 6))
                     .SetPeerId(PeerId().SetCompressedFabricId(gOptions.fabricId + 2).SetNodeId(gOptions.nodeId + 2)));
         }

@@ -102,7 +102,7 @@ public:
     /// Called when all responses were added for a particular responder
     ///
     /// Only called if a previous accept returned true.
-    virtual void ResponsesAdded(const Responder &) { }
+    virtual void ResponsesAdded(const Responder &) {}
 };
 
 } // namespace Minimal
