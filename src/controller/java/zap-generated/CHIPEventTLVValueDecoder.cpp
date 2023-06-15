@@ -2883,16 +2883,19 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             std::string value_errorState_errorStateIDCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
                 value_errorState_errorStateIDClassName.c_str(), value_errorState_errorStateIDCtorSignature.c_str(),
-                static_cast<uint8_t>(cppValue.errorState.errorStateID), value_errorState_errorStateID);
+                cppValue.errorState.errorStateID, value_errorState_errorStateID);
             jobject value_errorState_errorStateLabel;
-            if (cppValue.errorState.errorStateLabel.IsNull())
+            if (!cppValue.errorState.errorStateLabel.HasValue())
             {
-                value_errorState_errorStateLabel = nullptr;
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_errorState_errorStateLabel);
             }
             else
             {
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.errorState.errorStateLabel.Value(),
-                                                                                     value_errorState_errorStateLabel));
+                jobject value_errorState_errorStateLabelInsideOptional;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                    cppValue.errorState.errorStateLabel.Value(), value_errorState_errorStateLabelInsideOptional));
+                chip::JniReferences::GetInstance().CreateOptional(value_errorState_errorStateLabelInsideOptional,
+                                                                  value_errorState_errorStateLabel);
             }
             jobject value_errorState_errorStateDetails;
             if (!cppValue.errorState.errorStateDetails.HasValue())
@@ -2917,7 +2920,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jmethodID errorStateStructStructCtor_0 = env->GetMethodID(
-                errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;Ljava/util/Optional;)V");
+                errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
             if (errorStateStructStructCtor_0 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$OperationalStateClusterErrorStateStruct constructor");
@@ -2960,9 +2963,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             jobject value_completionErrorCode;
             std::string value_completionErrorCodeClassName     = "java/lang/Integer";
             std::string value_completionErrorCodeCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                value_completionErrorCodeClassName.c_str(), value_completionErrorCodeCtorSignature.c_str(),
-                static_cast<uint8_t>(cppValue.completionErrorCode), value_completionErrorCode);
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_completionErrorCodeClassName.c_str(),
+                                                                          value_completionErrorCodeCtorSignature.c_str(),
+                                                                          cppValue.completionErrorCode, value_completionErrorCode);
 
             jobject value_totalOperationalTime;
             if (!cppValue.totalOperationalTime.HasValue())
@@ -3026,6 +3029,189 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             if (operationCompletionStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$OperationalStateClusterOperationCompletionEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(operationCompletionStructClass, operationCompletionStructCtor, value_completionErrorCode,
+                                           value_totalOperationalTime, value_pausedTime);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::RoboticVacuumOperationalState::Id: {
+        using namespace app::Clusters::RoboticVacuumOperationalState;
+        switch (aPath.mEventId)
+        {
+        case Events::OperationalError::Id: {
+            Events::OperationalError::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_errorState;
+            jobject value_errorState_errorStateID;
+            std::string value_errorState_errorStateIDClassName     = "java/lang/Integer";
+            std::string value_errorState_errorStateIDCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                value_errorState_errorStateIDClassName.c_str(), value_errorState_errorStateIDCtorSignature.c_str(),
+                cppValue.errorState.errorStateID, value_errorState_errorStateID);
+            jobject value_errorState_errorStateLabel;
+            if (!cppValue.errorState.errorStateLabel.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_errorState_errorStateLabel);
+            }
+            else
+            {
+                jobject value_errorState_errorStateLabelInsideOptional;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                    cppValue.errorState.errorStateLabel.Value(), value_errorState_errorStateLabelInsideOptional));
+                chip::JniReferences::GetInstance().CreateOptional(value_errorState_errorStateLabelInsideOptional,
+                                                                  value_errorState_errorStateLabel);
+            }
+            jobject value_errorState_errorStateDetails;
+            if (!cppValue.errorState.errorStateDetails.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_errorState_errorStateDetails);
+            }
+            else
+            {
+                jobject value_errorState_errorStateDetailsInsideOptional;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                    cppValue.errorState.errorStateDetails.Value(), value_errorState_errorStateDetailsInsideOptional));
+                chip::JniReferences::GetInstance().CreateOptional(value_errorState_errorStateDetailsInsideOptional,
+                                                                  value_errorState_errorStateDetails);
+            }
+
+            jclass errorStateStructStructClass_0;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct",
+                errorStateStructStructClass_0);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct");
+                return nullptr;
+            }
+            jmethodID errorStateStructStructCtor_0 = env->GetMethodID(
+                errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
+            if (errorStateStructStructCtor_0 == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct constructor");
+                return nullptr;
+            }
+
+            value_errorState =
+                env->NewObject(errorStateStructStructClass_0, errorStateStructStructCtor_0, value_errorState_errorStateID,
+                               value_errorState_errorStateLabel, value_errorState_errorStateDetails);
+
+            jclass operationalErrorStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$RoboticVacuumOperationalStateClusterOperationalErrorEvent",
+                operationalErrorStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$RoboticVacuumOperationalStateClusterOperationalErrorEvent");
+                return nullptr;
+            }
+            jmethodID operationalErrorStructCtor =
+                env->GetMethodID(operationalErrorStructClass, "<init>",
+                                 "(Lchip/devicecontroller/ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct;)V");
+            if (operationalErrorStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$RoboticVacuumOperationalStateClusterOperationalErrorEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(operationalErrorStructClass, operationalErrorStructCtor, value_errorState);
+
+            return value;
+        }
+        case Events::OperationCompletion::Id: {
+            Events::OperationCompletion::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_completionErrorCode;
+            std::string value_completionErrorCodeClassName     = "java/lang/Integer";
+            std::string value_completionErrorCodeCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_completionErrorCodeClassName.c_str(),
+                                                                          value_completionErrorCodeCtorSignature.c_str(),
+                                                                          cppValue.completionErrorCode, value_completionErrorCode);
+
+            jobject value_totalOperationalTime;
+            if (!cppValue.totalOperationalTime.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_totalOperationalTime);
+            }
+            else
+            {
+                jobject value_totalOperationalTimeInsideOptional;
+                if (cppValue.totalOperationalTime.Value().IsNull())
+                {
+                    value_totalOperationalTimeInsideOptional = nullptr;
+                }
+                else
+                {
+                    std::string value_totalOperationalTimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_totalOperationalTimeInsideOptionalCtorSignature = "(J)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                        value_totalOperationalTimeInsideOptionalClassName.c_str(),
+                        value_totalOperationalTimeInsideOptionalCtorSignature.c_str(),
+                        cppValue.totalOperationalTime.Value().Value(), value_totalOperationalTimeInsideOptional);
+                }
+                chip::JniReferences::GetInstance().CreateOptional(value_totalOperationalTimeInsideOptional,
+                                                                  value_totalOperationalTime);
+            }
+
+            jobject value_pausedTime;
+            if (!cppValue.pausedTime.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_pausedTime);
+            }
+            else
+            {
+                jobject value_pausedTimeInsideOptional;
+                if (cppValue.pausedTime.Value().IsNull())
+                {
+                    value_pausedTimeInsideOptional = nullptr;
+                }
+                else
+                {
+                    std::string value_pausedTimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_pausedTimeInsideOptionalCtorSignature = "(J)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                        value_pausedTimeInsideOptionalClassName.c_str(), value_pausedTimeInsideOptionalCtorSignature.c_str(),
+                        cppValue.pausedTime.Value().Value(), value_pausedTimeInsideOptional);
+                }
+                chip::JniReferences::GetInstance().CreateOptional(value_pausedTimeInsideOptional, value_pausedTime);
+            }
+
+            jclass operationCompletionStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$RoboticVacuumOperationalStateClusterOperationCompletionEvent",
+                operationCompletionStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$RoboticVacuumOperationalStateClusterOperationCompletionEvent");
+                return nullptr;
+            }
+            jmethodID operationCompletionStructCtor = env->GetMethodID(
+                operationCompletionStructClass, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
+            if (operationCompletionStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl,
+                    "Could not find ChipEventStructs$RoboticVacuumOperationalStateClusterOperationCompletionEvent constructor");
                 return nullptr;
             }
 

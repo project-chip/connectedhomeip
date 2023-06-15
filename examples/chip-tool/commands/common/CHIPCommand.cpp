@@ -18,6 +18,7 @@
 
 #include "CHIPCommand.h"
 
+#include <TracingCommandLineArgument.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <core/CHIPBuildConfig.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
@@ -48,6 +49,7 @@ const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = null
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 
 namespace {
+
 CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::Credentials::AttestationTrustStore ** trustStore)
 {
     if (paaTrustStorePath == nullptr)
@@ -77,6 +79,7 @@ CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::
     *trustStore = &attestationTrustStore;
     return CHIP_NO_ERROR;
 }
+
 } // namespace
 
 CHIP_ERROR CHIPCommand::MaybeSetUpStack()
@@ -240,6 +243,14 @@ CHIP_ERROR CHIPCommand::Run()
 
 void CHIPCommand::StartTracing()
 {
+    if (mTraceTo.HasValue())
+    {
+        for (const auto & destination : mTraceTo.Value())
+        {
+            chip::CommandLineApp::EnableTracingFor(destination.c_str());
+        }
+    }
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::InitTrace();
 
@@ -266,6 +277,8 @@ void CHIPCommand::StartTracing()
 
 void CHIPCommand::StopTracing()
 {
+    chip::CommandLineApp::StopTracing();
+
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::trace::DeInitTrace();
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED

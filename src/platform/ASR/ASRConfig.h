@@ -25,8 +25,6 @@
 
 #pragma once
 
-// #include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include "asr_factory_config.h"
 #include <string.h>
 
