@@ -467,7 +467,13 @@ void ServerBase::OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::S
 
     if (HeaderRef(const_cast<uint8_t *>(data.Start())).GetFlags().IsQuery())
     {
-        srv->mDelegate->OnQuery(data, info);
+        // Only consider queries that are received on the same interface we are listening on.
+        // Without this, queries show up on all addresses on all interfaces, resulting
+        // in more replies than one would expect.
+        if (endPoint->GetBoundInterface() == info->Interface)
+        {
+            srv->mDelegate->OnQuery(data, info);
+        }
     }
     else
     {
