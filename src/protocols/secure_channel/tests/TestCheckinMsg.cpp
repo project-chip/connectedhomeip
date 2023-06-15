@@ -1,0 +1,257 @@
+/*
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <protocols/secure_channel/CheckinMessage.h>
+
+#include <crypto/DefaultSessionKeystore.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <protocols/Protocols.h>
+#include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/StatusReport.h>
+#include <system/SystemPacketBuffer.h>
+
+#include <crypto/tests/AES_CCM_128_test_vectors.h>
+
+#include <lib/support/UnitTestExtendedAssertions.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <nlunit-test.h>
+
+using namespace chip;
+using namespace chip::Protocols;
+using namespace chip::Protocols::SecureChannel;
+using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
+
+void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t outputBuffer[300]    = { 0 };
+    uint8_t oldOutputBuffer[300] = { 0 };
+    uint32_t counter             = 0;
+    ByteSpan userData;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TestSessionKeystoreImpl keystore;
+
+    // Verify that keys imported to the keystore behave as expected.
+    for (const ccm_128_test_vector * testPtr : ccm_128_test_vectors)
+    {
+        const ccm_128_test_vector & test = *testPtr;
+
+        Aes128KeyByteArray keyMaterial;
+        memcpy(keyMaterial, test.key, test.key_len);
+
+        Aes128KeyHandle keyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+
+        // Validate that counter change, indeed changes the output buffer content
+        counter = 0;
+        for (uint8_t j = 0; j < 5; j++)
+        {
+            err = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, userData, outputBuffer);
+            NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
+
+            // Verifiy that the output buffer changed
+            NL_TEST_ASSERT(inSuite, (memcmp(outputBuffer, oldOutputBuffer, 300) != 0));
+            memcpy(oldOutputBuffer, outputBuffer, 300);
+
+            // Increment by a random count. On the slim changes the increment is 0 add 1 to change output buffer
+            counter += chip::Crypto::GetRandU32() + 1;
+        }
+        keystore.DestroyKey(keyHandle);
+    }
+
+    // Parameter check
+    {
+        uint8_t data[]                                               = { "This is some user Data. It should be encrypted" };
+        userData                                                     = chip::ByteSpan(data);
+        const ccm_128_test_vector & test                             = *ccm_128_test_vectors[0];
+        uint8_t gargantuaBuffer[2 * CHIP_CHECK_IN_APP_DATA_MAX_SIZE] = { 0 };
+
+        Aes128KeyByteArray keyMaterial;
+        memcpy(keyMaterial, test.key, test.key_len);
+
+        Aes128KeyHandle keyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+
+        // Empty key handle with encrypt with either some garbage or with a 0 key
+        // Neitherless, considering the nature of the key it's the responsability of the
+        // caller to make sure the key is indeed valid.
+        Aes128KeyHandle emptyKeyHandle;
+        err = CheckinMessage::GenerateCheckingMessagePayload(emptyKeyHandle, counter, userData, outputBuffer);
+        NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
+
+        ByteSpan emptyData;
+        err = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, emptyData, outputBuffer);
+        NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
+
+        err = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, emptyData, nullptr);
+        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_INVALID_ARGUMENT == err));
+
+        userData = chip::ByteSpan(gargantuaBuffer, sizeof(gargantuaBuffer));
+        err      = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, userData, nullptr);
+        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_INVALID_ARGUMENT == err));
+
+        // Cleanup
+        keystore.DestroyKey(keyHandle);
+    }
+}
+
+void TestCheckin_Parse(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t outputBuffer[300] = { 0 };
+    uint8_t buffer[300]       = { 0 };
+    uint32_t counter          = 0, decryptedCounter;
+    uint16_t payloadSize      = 0;
+    ByteSpan userData;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    TestSessionKeystoreImpl keystore;
+
+    // Verify User Data Encryption Decryption
+    uint8_t data[]                   = { "This is some user Data. It should be encrypted" };
+    userData                         = chip::ByteSpan(data);
+    const ccm_128_test_vector & test = *ccm_128_test_vectors[0];
+
+    Aes128KeyByteArray keyMaterial;
+    memcpy(keyMaterial, test.key, test.key_len);
+
+    Aes128KeyHandle keyHandle;
+    NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+
+    //=================Encrypt=======================
+
+    err              = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, userData, outputBuffer, &payloadSize);
+    ByteSpan payload = chip::ByteSpan(outputBuffer, payloadSize);
+    NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
+
+    //=================Decrypt=======================
+
+    err = CheckinMessage::ParseCheckingMessagePayload(keyHandle, payload, decryptedCounter, nullptr);
+    NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR != err));
+
+    ByteSpan emptyPayload;
+    err = CheckinMessage::ParseCheckingMessagePayload(keyHandle, emptyPayload, decryptedCounter, buffer);
+    NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR != err));
+}
+
+void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t outputBuffer[300]    = { 0 };
+    uint8_t oldOutputBuffer[300] = { 0 };
+    uint32_t counter             = 0;
+    uint16_t payloadSize         = 0;
+    ByteSpan userData;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    TestSessionKeystoreImpl keystore;
+
+    // Verify User Data Encryption Decryption
+    uint8_t data[] = { "This is some user Data. It should be encrypted" };
+    userData       = chip::ByteSpan(data);
+    for (const ccm_128_test_vector * testPtr : ccm_128_test_vectors)
+    {
+        const ccm_128_test_vector & test = *testPtr;
+
+        Aes128KeyByteArray keyMaterial;
+        memcpy(keyMaterial, test.key, test.key_len);
+
+        Aes128KeyHandle keyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+
+        //=================Encrypt=======================
+
+        err = CheckinMessage::GenerateCheckingMessagePayload(keyHandle, counter, userData, outputBuffer, &payloadSize);
+        NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
+
+        //=================Decrypt=======================
+        uint32_t decryptedCounter = 0;
+        uint8_t buffer[300]       = { 0 };
+        ByteSpan payload          = chip::ByteSpan(outputBuffer, payloadSize);
+
+        err = CheckinMessage::ParseCheckingMessagePayload(keyHandle, payload, decryptedCounter, buffer);
+
+        NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
+
+        NL_TEST_ASSERT(inSuite, (memcmp(data, buffer, sizeof(data)) == 0));
+        NL_TEST_ASSERT(inSuite, (counter == decryptedCounter));
+
+        counter += chip::Crypto::GetRandU32() + 1;
+        keystore.DestroyKey(keyHandle);
+    }
+}
+
+// Test Suite
+
+/**
+ *  Test Suite that lists all the test functions.
+ */
+// clang-format off
+static const nlTest sTests[] =
+{
+    NL_TEST_DEF("TestCheckin_Generate", TestCheckin_Generate),
+    NL_TEST_DEF("TestCheckin_Parse", TestCheckin_Parse),
+    NL_TEST_DEF("TestCheckin_GenerateParse", TestCheckin_GenerateParse),
+
+    NL_TEST_SENTINEL()
+};
+// clang-format on
+
+/**
+ *  Set up the test suite.
+ */
+static int TestSetup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+static int TestTeardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
+// clang-format off
+static nlTestSuite sSuite =
+{
+    "Test-CHIP-Checkin-Message",
+    &sTests[0],
+    TestSetup,
+    TestTeardown,
+};
+// clang-format on
+
+/**
+ *  Main
+ */
+int TestCheckinMessage()
+{
+    // Run test suit against one context
+    nlTestRunner(&sSuite, nullptr);
+
+    return (nlTestRunnerStats(&sSuite));
+}
+
+CHIP_REGISTER_TEST_SUITE(TestCheckinMessage)
