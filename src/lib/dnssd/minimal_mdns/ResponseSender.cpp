@@ -107,7 +107,8 @@ CHIP_ERROR ResponseSender::Respond(uint16_t messageId, const QueryData & query, 
 {
     mSendState.Reset(messageId, query, querySource);
 
-    if (query.IsInternalBroadcast()) {
+    if (query.IsInternalBroadcast())
+    {
         // Deny listing large amount of data
         mSendState.MarkWasSent(ResponseItemsSent::kServiceListingData);
     }
@@ -165,7 +166,12 @@ CHIP_ERROR ResponseSender::Respond(uint16_t messageId, const QueryData & query, 
 
     // send all 'Additional' replies
     {
-        mSendState.SetResourceType(ResourceType::kAdditional);
+        if (!query.IsInternalBroadcast())
+        {
+            // Initial service broadcast should keep adding data as 'Answers' rather
+            // than addtional data (https://datatracker.ietf.org/doc/html/rfc6762#section-8.3)
+            mSendState.SetResourceType(ResourceType::kAdditional);
+        }
 
         QueryReplyFilter queryReplyFilter(query);
 
@@ -239,37 +245,41 @@ CHIP_ERROR ResponseSender::PrepareNewReplyPacket()
     return CHIP_NO_ERROR;
 }
 
-bool ResponseSender::Accept(const Responder &responder) const
+bool ResponseSender::Accept(const Responder & responder) const
 {
-    switch (responder.GetQType()) {
-        case QType::A:
-            return !mSendState.GetWasSent(ResponseItemsSent::kIPv4Addresses);
-        case QType::AAAA:
-            return !mSendState.GetWasSent(ResponseItemsSent::kIPv6Addresses);
-        case QType::PTR: {
-            static const QNamePart kDnsSdQueryPath[] = { "_services", "_dns-sd", "_udp", "local" };
+    switch (responder.GetQType())
+    {
+    case QType::A:
+        return !mSendState.GetWasSent(ResponseItemsSent::kIPv4Addresses);
+    case QType::AAAA:
+        return !mSendState.GetWasSent(ResponseItemsSent::kIPv6Addresses);
+    case QType::PTR: {
+        static const QNamePart kDnsSdQueryPath[] = { "_services", "_dns-sd", "_udp", "local" };
 
-            if (responder.GetQName() == FullQName(kDnsSdQueryPath)) {
-                return !mSendState.GetWasSent(ResponseItemsSent::kServiceListingData);
-            }
-        };
-        default:
-            break;
+        if (responder.GetQName() == FullQName(kDnsSdQueryPath))
+        {
+            return !mSendState.GetWasSent(ResponseItemsSent::kServiceListingData);
+        }
+    };
+    default:
+        break;
     }
 
     return true;
 }
 
-void ResponseSender::ResponsesAdded(const Responder &responder) {
-    switch (responder.GetQType()) {
-        case QType::A:
-            mSendState.MarkWasSent(ResponseItemsSent::kIPv4Addresses);
-            break;
-        case QType::AAAA:
-            mSendState.MarkWasSent(ResponseItemsSent::kIPv6Addresses);
-            break;
-        default:
-            break;
+void ResponseSender::ResponsesAdded(const Responder & responder)
+{
+    switch (responder.GetQType())
+    {
+    case QType::A:
+        mSendState.MarkWasSent(ResponseItemsSent::kIPv4Addresses);
+        break;
+    case QType::AAAA:
+        mSendState.MarkWasSent(ResponseItemsSent::kIPv6Addresses);
+        break;
+    default:
+        break;
     }
 }
 
