@@ -58,6 +58,10 @@ enum class ResponseItemsSent : uint8_t {
     // the same even across SRV records.
     kIPv4Addresses = 0x01,
     kIPv6Addresses = 0x02,
+
+    // Boot time advertisement filters. We allow multiple of these
+    // however we also allow filtering them out at response start
+    kServiceListingData = 0x04,
 };
 
 /// Represents the internal state for sending a currently active request
