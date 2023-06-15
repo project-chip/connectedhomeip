@@ -35,7 +35,7 @@
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
-static const uint16_t kTimeoutWithUpdateInSeconds = 60;
+static const uint16_t kTimeoutWithUpdateInSeconds = 10;
 static const uint64_t kDeviceId1 = 0x12341234;
 static const uint64_t kDeviceId2 = 0x12341235;
 // NOTE: These onboarding payloads are for the chip-ota-requestor-app, not chip-all-clusters-app
@@ -55,7 +55,7 @@ static MTRDeviceController * sController = nil;
 // Keys we can use to restart the controller.
 static MTRTestKeys * sTestKeys = nil;
 
-static NSString * kOtaFilePath1 = @"/tmp/chip-ota-requestor-downloaded-image1";
+static NSString * kOtaDownloadedFilePath1 = @"/tmp/chip-ota-requestor-downloaded-image1";
 
 static NSNumber * kUpdatedSoftwareVersion = @5;
 
@@ -643,8 +643,8 @@ static BOOL sNeedsStackShutdown = YES;
     while (fakeImage.length < rawImageSize) {
         [fakeImage appendData:rawImagePiece];
     }
-    NSString * rawImagePath = @"/tmp/test004-raw-image-test";
-    NSString * imagePath = @"/tmp/test004-image-test";
+    NSString * rawImagePath = @"/tmp/ota-test004-raw-image";
+    NSString * imagePath = @"/tmp/ota-test004-image";
 
     [[NSFileManager defaultManager] createFileAtPath:rawImagePath contents:fakeImage attributes:nil];
 
@@ -759,8 +759,7 @@ static BOOL sNeedsStackShutdown = YES;
         XCTAssertEqualObjects(params.updateToken, updateToken);
         XCTAssertEqualObjects(params.newVersion, kUpdatedSoftwareVersion); // TODO: Factor this out better!
 
-        XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:rawImagePath
-                                                                  andPath:@"/tmp/chip-ota-requestor-downloaded-image1"]);
+        XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:rawImagePath andPath:kOtaDownloadedFilePath1]);
 
         sOTAProviderDelegate.applyUpdateRequestHandler = nil;
         [sOTAProviderDelegate respondWithDiscontinueToApplyUpdateRequestWithCompletion:completion];
@@ -802,8 +801,8 @@ static BOOL sNeedsStackShutdown = YES;
 
     // These are the paths where the raw ota image file and the raw image file will be generated
     // as a pre-requisite to running the test.
-    NSString * otaRawImagePath = @"/tmp/test004-raw-image";
-    NSString * otaImagePath = @"/tmp/test004-image";
+    NSString * otaRawImagePath = @"/tmp/ota-test005-raw-image";
+    NSString * otaImagePath = @"/tmp/ota-test005-image";
 
     // Check if the ota raw image exists at kOtaRawImagePath
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath]);
@@ -914,11 +913,10 @@ static BOOL sNeedsStackShutdown = YES;
         XCTAssertEqualObjects(params.updateToken, updateToken);
         XCTAssertEqualObjects(params.newVersion, kUpdatedSoftwareVersion); // TODO: Factor this out better!
 
-        XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:otaRawImagePath
-                                                                  andPath:@"/tmp/chip-ota-requestor-downloaded-image1"]);
+        XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:otaRawImagePath andPath:kOtaDownloadedFilePath1]);
 
         sOTAProviderDelegate.applyUpdateRequestHandler = nil;
-        [sOTAProviderDelegate respondWithContinueToApplyUpdateRequestWithCompletion:completion];
+        [sOTAProviderDelegate respondWithProceedToApplyUpdateRequestWithCompletion:completion];
         [applyUpdateRequestExpectation fulfill];
     };
     sOTAProviderDelegate.notifyUpdateAppliedHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
