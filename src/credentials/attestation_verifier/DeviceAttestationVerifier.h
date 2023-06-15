@@ -295,7 +295,6 @@ public:
     {
     public:
         AttestationDeviceInfo(const AttestationInfo & attestationInfo);
-        AttestationDeviceInfo(const ByteSpan & attestationElementsBuffer, const ByteSpan paiDerBuffer, const ByteSpan dacDerBuffer);
 
         ~AttestationDeviceInfo() = default;
 
@@ -318,10 +317,16 @@ public:
             }
         }
 
+        VendorId BasicInformationVendorId() const { return mBasicInformationVendorId; }
+
+        uint16_t BasicInformationProductId() const { return mBasicInformationProductId; }
+
     private:
         Platform::ScopedMemoryBufferWithSize<uint8_t> mPaiDerBuffer;
         Platform::ScopedMemoryBufferWithSize<uint8_t> mDacDerBuffer;
         Platform::ScopedMemoryBufferWithSize<uint8_t> mCdBuffer;
+        VendorId mBasicInformationVendorId;
+        uint16_t mBasicInformationProductId;
     };
 
     typedef void (*OnAttestationInformationVerification)(void * context, const AttestationInfo & info,
