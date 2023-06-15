@@ -461,8 +461,10 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, AttributeValueDecoder & aDecoder)
 {
     EmberAfStatus result;
+    DataModel::Nullable<uint8_t> newMode;
+    ReturnErrorOnFailure(aDecoder.Decode(newMode));
 
-    if (aDecoder.WillDecodeNull()) // This indicates that the new mode is null.
+    if (newMode.IsNull()) // This indicates that the new mode is null.
     {
         switch (attributePath.mAttributeId)
         {
@@ -476,10 +478,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
     }
     else
     {
-        uint8_t newMode;
-        ReturnErrorOnFailure(aDecoder.Decode(newMode));
-
-        if (!delegate->IsSupportedMode(newMode))
+        if (!delegate->IsSupportedMode(newMode.Value()))
         {
             return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
         }
@@ -487,10 +486,10 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
         switch (attributePath.mAttributeId)
         {
         case ModeSelect::Attributes::StartUpMode::Id:
-            result = SetStartUpMode(newMode);
+            result = SetStartUpMode(newMode.Value());
             break;
         case ModeSelect::Attributes::OnMode::Id:
-            result = SetOnMode(newMode);
+            result = SetOnMode(newMode.Value());
             break;
         }
     }
