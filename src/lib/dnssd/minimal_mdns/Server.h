@@ -178,13 +178,6 @@ public:
         return *this;
     }
 
-    /// Iterator through all Endpoints
-    template <typename Function>
-    chip::Loop ForEachEndPoints(Function && function)
-    {
-        return mEndpoints.ForEachActiveObject(std::forward<Function>(function));
-    }
-
     /// A server is considered listening if any UDP endpoint is active.
     ///
     /// This is expected to return false after any Shutdown() and will
