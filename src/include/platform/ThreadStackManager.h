@@ -168,7 +168,7 @@ private:
     CHIP_ERROR GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
 
     /**
-     * Sets Sleepy End Device intervals configuration and posts kSEDIntervalChange event to inform other software
+     * Sets Sleepy End Device intervals configuration and posts kICDPollingIntervalChange event to inform other software
      * modules about the change.
      *
      * @param[in]  intervalsConfig  intervals configuration to be set

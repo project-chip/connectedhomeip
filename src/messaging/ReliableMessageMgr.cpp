@@ -38,7 +38,7 @@
 #include <platform/ConnectivityManager.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h>
+#include <app/icd/ICDManager.h> // nogncheck
 #endif
 
 using namespace chip::System::Clock::Literals;

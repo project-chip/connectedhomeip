@@ -1823,7 +1823,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetSEDIntervals
     if (err == CHIP_NO_ERROR)
     {
         ChipDeviceEvent event;
-        event.Type = DeviceEventType::kSEDIntervalChange;
+        event.Type = DeviceEventType::kICDPollingIntervalChange;
         err        = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
     }
 

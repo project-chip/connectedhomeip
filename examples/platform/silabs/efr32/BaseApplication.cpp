@@ -472,7 +472,17 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
                     SILABS_LOG("Failed to open the Basic Commissioning Window");
                 }
             }
-            else { SILABS_LOG("Network is already provisioned, Ble advertissement not enabled"); }
+            else
+            {
+                SILABS_LOG("Network is already provisioned, Ble advertissement not enabled");
+                DeviceLayer::ChipDeviceEvent event;
+                event.Type     = DeviceLayer::DeviceEventType::kAppWakeUpEvent;
+                CHIP_ERROR err = DeviceLayer::PlatformMgr().PostEvent(&event);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Failed to post App wake up Event event %" CHIP_ERROR_FORMAT, err.Format());
+                }
+            }
         }
         else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
         {

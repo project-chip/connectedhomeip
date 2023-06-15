@@ -168,6 +168,9 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
+  # This set some needed defines to test icd:manager-srcs
+  public_configs = [ "${chip_root}/src/app/icd:test-manager-config" ]
+
   public_deps = [
     ":binding-test-srcs",
     ":icd-management-test-srcs",
