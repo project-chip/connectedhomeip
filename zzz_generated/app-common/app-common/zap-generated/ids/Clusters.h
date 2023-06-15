@@ -184,6 +184,9 @@ static constexpr ClusterId Id = 0x0000005C;
 namespace OperationalState {
 static constexpr ClusterId Id = 0x00000060;
 } // namespace OperationalState
+namespace RoboticVacuumOperationalState {
+static constexpr ClusterId Id = 0x00000061;
+} // namespace RoboticVacuumOperationalState
 namespace HepaFilterMonitoring {
 static constexpr ClusterId Id = 0x00000071;
 } // namespace HepaFilterMonitoring

@@ -1940,12 +1940,12 @@ public ArrayList<ChipStructs.DishwasherModeSelectClusterModeTagStruct> modeTags;
 
 public static class OperationalStateClusterErrorStateStruct {
 public Integer errorStateID;
-public @Nullable String errorStateLabel;
+public Optional<String> errorStateLabel;
 public Optional<String> errorStateDetails;
 
   public OperationalStateClusterErrorStateStruct(
     Integer errorStateID
-      , @Nullable String errorStateLabel
+      , Optional<String> errorStateLabel
       , Optional<String> errorStateDetails
   ) {
     this.errorStateID = errorStateID;
@@ -1973,11 +1973,11 @@ public Optional<String> errorStateDetails;
 
 public static class OperationalStateClusterOperationalStateStruct {
 public Integer operationalStateID;
-public String operationalStateLabel;
+public Optional<String> operationalStateLabel;
 
   public OperationalStateClusterOperationalStateStruct(
     Integer operationalStateID
-      , String operationalStateLabel
+      , Optional<String> operationalStateLabel
   ) {
     this.operationalStateID = operationalStateID;
     this.operationalStateLabel = operationalStateLabel;
@@ -1987,6 +1987,66 @@ public String operationalStateLabel;
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("OperationalStateClusterOperationalStateStruct {\n");
+    output.append("\toperationalStateID: ");
+    output.append(operationalStateID);
+        output.append("\n");
+    output.append("\toperationalStateLabel: ");
+    output.append(operationalStateLabel);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RoboticVacuumOperationalStateClusterErrorStateStruct {
+public Integer errorStateID;
+public Optional<String> errorStateLabel;
+public Optional<String> errorStateDetails;
+
+  public RoboticVacuumOperationalStateClusterErrorStateStruct(
+    Integer errorStateID
+      , Optional<String> errorStateLabel
+      , Optional<String> errorStateDetails
+  ) {
+    this.errorStateID = errorStateID;
+    this.errorStateLabel = errorStateLabel;
+    this.errorStateDetails = errorStateDetails;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RoboticVacuumOperationalStateClusterErrorStateStruct {\n");
+    output.append("\terrorStateID: ");
+    output.append(errorStateID);
+        output.append("\n");
+    output.append("\terrorStateLabel: ");
+    output.append(errorStateLabel);
+        output.append("\n");
+    output.append("\terrorStateDetails: ");
+    output.append(errorStateDetails);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RoboticVacuumOperationalStateClusterOperationalStateStruct {
+public Integer operationalStateID;
+public Optional<String> operationalStateLabel;
+
+  public RoboticVacuumOperationalStateClusterOperationalStateStruct(
+    Integer operationalStateID
+      , Optional<String> operationalStateLabel
+  ) {
+    this.operationalStateID = operationalStateID;
+    this.operationalStateLabel = operationalStateLabel;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RoboticVacuumOperationalStateClusterOperationalStateStruct {\n");
     output.append("\toperationalStateID: ");
     output.append(operationalStateID);
         output.append("\n");

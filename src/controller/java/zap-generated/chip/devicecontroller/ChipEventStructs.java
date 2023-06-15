@@ -1305,6 +1305,60 @@ public @Nullable Optional<Long> pausedTime;
   }
 }
 
+public static class RoboticVacuumOperationalStateClusterOperationalErrorEvent {
+public ChipStructs.RoboticVacuumOperationalStateClusterErrorStateStruct errorState;
+
+  public RoboticVacuumOperationalStateClusterOperationalErrorEvent(
+    ChipStructs.RoboticVacuumOperationalStateClusterErrorStateStruct errorState
+  ) {
+    this.errorState = errorState;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RoboticVacuumOperationalStateClusterOperationalErrorEvent {\n");
+    output.append("\terrorState: ");
+    output.append(errorState);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RoboticVacuumOperationalStateClusterOperationCompletionEvent {
+public Integer completionErrorCode;
+public @Nullable Optional<Long> totalOperationalTime;
+public @Nullable Optional<Long> pausedTime;
+
+  public RoboticVacuumOperationalStateClusterOperationCompletionEvent(
+    Integer completionErrorCode
+      , @Nullable Optional<Long> totalOperationalTime
+      , @Nullable Optional<Long> pausedTime
+  ) {
+    this.completionErrorCode = completionErrorCode;
+    this.totalOperationalTime = totalOperationalTime;
+    this.pausedTime = pausedTime;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RoboticVacuumOperationalStateClusterOperationCompletionEvent {\n");
+    output.append("\tcompletionErrorCode: ");
+    output.append(completionErrorCode);
+        output.append("\n");
+    output.append("\ttotalOperationalTime: ");
+    output.append(totalOperationalTime);
+        output.append("\n");
+    output.append("\tpausedTime: ");
+    output.append(pausedTime);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 public static class DoorLockClusterDoorLockAlarmEvent {
 public Integer alarmCode;
 

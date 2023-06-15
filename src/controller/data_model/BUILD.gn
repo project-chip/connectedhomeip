@@ -242,6 +242,8 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/RefrigeratorAndTemperatureControlledCabinetModeSelectClient-ReadImpl.cpp",
       "jni/RelativeHumidityMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/RelativeHumidityMeasurementClient-ReadImpl.cpp",
+      "jni/RoboticVacuumOperationalStateClient-InvokeSubscribeImpl.cpp",
+      "jni/RoboticVacuumOperationalStateClient-ReadImpl.cpp",
       "jni/RvcCleanModeSelectClient-InvokeSubscribeImpl.cpp",
       "jni/RvcCleanModeSelectClient-ReadImpl.cpp",
       "jni/RvcRunModeSelectClient-InvokeSubscribeImpl.cpp",
