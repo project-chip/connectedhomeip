@@ -274,7 +274,6 @@ void SecureMessageReceivedHandler(const TraceSecureMessageReceivedData * eventDa
     // Note that `eventData->session` is currently ignored.
 }
 
-
 void TraceHandler(const char * type, const void * data, size_t size)
 {
     if ((std::string{ type } == kTraceMessageSentDataFormat) && (size == sizeof(TraceSecureMessageSentData)))
