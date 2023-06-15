@@ -10,7 +10,7 @@ ARG ARCH="arm64"
 
 ARG TARGET_DEPS="libavahi-client-dev:${ARCH}=0.8-5* libssl-dev:${ARCH}=1.1.1n-0* libsystemd-dev:${ARCH}=247.3-7* libwrap0-dev:${ARCH}=7.6.q-31 uthash-dev:${ARCH}=2.1.0-1 \
   libsqlite3-dev:${ARCH}=3.34.1-3 libedit-dev:${ARCH}=3.1-20191231-2+b1 libyaml-cpp0.6:${ARCH}=0.6.3-9 libmosquitto-dev:${ARCH}=2.0.11-1\
-  libreadline-dev:${ARCH}=8.1-1 libncurses5-dev:${ARCH}=6.2+20201114-2 libncursesw5-dev:${ARCH}=6.2+20201114-2 libyaml-cpp-dev:${ARCH}=0.6.3-9 \
+  libreadline-dev:${ARCH}=8.1-1 libncurses5-dev:${ARCH}=6.2+20201114-2+deb11u1 libncursesw5-dev:${ARCH}=6.2+20201114-2+deb11u1 libyaml-cpp-dev:${ARCH}=0.6.3-9 \
   libboost-atomic-dev:${ARCH}=1.74.0.3 libboost-chrono-dev:${ARCH}=1.74.0.3 libboost-date-time-dev:${ARCH}=1.74.0.3 \
   libboost-filesystem-dev:${ARCH}=1.74.0.3 libboost-regex-dev:${ARCH}=1.74.0.3 libboost-program-options-dev:${ARCH}=1.74.0.3 \
   libboost-serialization-dev:${ARCH}=1.74.0.3 libboost-system-dev:${ARCH}=1.74.0.3 libboost-thread-dev:${ARCH}=1.74.0.3 \
@@ -55,7 +55,7 @@ RUN curl -L https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86
 RUN pip3 install --no-cache-dir gcovr==5.2
 
 # Rust Version to install
-ENV RUST_VERSION=1.64.0
+ENV RUST_VERSION=1.65.0
 # Rust and Cargo home directories
 ENV RUSTUP_HOME=/opt/rustup-home
 ENV CARGO_HOME=/opt/cargo-home
