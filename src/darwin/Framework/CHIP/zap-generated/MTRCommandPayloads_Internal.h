@@ -224,6 +224,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:
+    (const chip::app::Clusters::RoboticVacuumOperationalState::Commands::OperationalCommandResponse::DecodableType &)
+        decodableStruct;
+
+@end
+
 @interface MTRDoorLockClusterGetWeekDayScheduleResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
