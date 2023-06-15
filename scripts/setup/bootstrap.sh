@@ -97,6 +97,9 @@ EOF
     fi
 }
 
+# remember PW_ENVIRONMENT_ROOT so that things like another
+# bootstrap or run_in_build_env.sh can be executed in a build env
+_ORIGINAL_PW_ENVIRONMENT_ROOT="$PW_ENVIRONMENT_ROOT"
 _bootstrap_or_activate "$0"
 unset -f _bootstrap_or_activate
 
@@ -109,3 +112,7 @@ unset _PW_TEXT
 unset PW_DOCTOR_SKIP_CIPD_CHECKS
 
 unset -f _chip_bootstrap_banner
+
+if ! [ -z "$_ORIGINAL_PW_ENVIRONMENT_ROOT" ]; then
+    export PW_ENVIRONMENT_ROOT="$_ORIGINAL_PW_ENVIRONMENT_ROOT";
+fi
