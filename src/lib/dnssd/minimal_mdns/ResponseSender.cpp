@@ -26,6 +26,8 @@ namespace Minimal {
 
 namespace {
 
+using namespace mdns::Minimal::Internal;
+
 constexpr uint16_t kMdnsStandardPort = 5353;
 
 // Restriction for UDP packets:  https://tools.ietf.org/html/rfc1035#section-4.2.1
@@ -230,6 +232,33 @@ CHIP_ERROR ResponseSender::PrepareNewReplyPacket()
     }
 
     return CHIP_NO_ERROR;
+}
+
+bool ResponseSender::Accept(const Responder &responder) const
+{
+    switch (responder.GetQType()) {
+        case QType::A:
+            return !mSendState.GetWasSent(ResponseItemsSent::kIPv4Addresses);
+        case QType::AAAA:
+            return !mSendState.GetWasSent(ResponseItemsSent::kIPv6Addresses);
+        default:
+            break;
+    }
+
+    return true;
+}
+
+void ResponseSender::ResponsesAdded(const Responder &responder) {
+    switch (responder.GetQType()) {
+        case QType::A:
+            mSendState.MarkWasSent(ResponseItemsSent::kIPv4Addresses);
+            break;
+        case QType::AAAA:
+            mSendState.MarkWasSent(ResponseItemsSent::kIPv6Addresses);
+            break;
+        default:
+            break;
+    }
 }
 
 void ResponseSender::AddResponse(const ResourceRecord & record)
