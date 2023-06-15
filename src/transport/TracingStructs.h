@@ -26,29 +26,32 @@ namespace Tracing {
 /// Concrete definitions of the message tracing info that session managers
 /// report
 
-enum class OutgoingMessageType {
+enum class OutgoingMessageType
+{
     kGroupMessage,
     kSecureSession,
     kUnauthenticated,
 };
 
 /// A message is about to be sent
-struct MessageSendInfo {
+struct MessageSendInfo
+{
     OutgoingMessageType messageType;
     const PayloadHeader * payloadHeader;
     const PacketHeader * packetHeader;
     const chip::ByteSpan payload;
 };
 
-enum class IncomingMessageType {
+enum class IncomingMessageType
+{
     kGroupMessage,
     kSecureUnicast,
     kUnauthenticated,
 };
 
-
 /// A message has been received
-struct MessageReceivedInfo {
+struct MessageReceivedInfo
+{
     const IncomingMessageType messageType;
     const PayloadHeader * payloadHeader;
     const PacketHeader * packetHeader;

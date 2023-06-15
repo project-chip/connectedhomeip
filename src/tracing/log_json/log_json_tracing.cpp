@@ -313,13 +313,13 @@ void LogJsonBackend::LogMessageSend(MessageSendInfo & info)
 
     switch (info.messageType)
     {
-        case OutgoingMessageType::kGroupMessage:
+    case OutgoingMessageType::kGroupMessage:
         value["messageType"] = "Group";
         break;
-        case OutgoingMessageType::kSecureSession:
+    case OutgoingMessageType::kSecureSession:
         value["messageType"] = "Secure";
         break;
-        case OutgoingMessageType::kUnauthenticated:
+    case OutgoingMessageType::kUnauthenticated:
         value["messageType"] = "Unauthenticated";
         break;
     }
@@ -339,15 +339,15 @@ void LogJsonBackend::LogMessageReceived(MessageReceivedInfo & info)
 
     switch (info.messageType)
     {
-        case IncomingMessageType::kGroupMessage:
-            value["messageType"] = "Group";
-            break;
-        case IncomingMessageType::kSecureUnicast:
-            value["messageType"] = "Secure";
-            break;
-        case IncomingMessageType::kUnauthenticated:
-            value["messageType"] = "Unauthenticated";
-            break;
+    case IncomingMessageType::kGroupMessage:
+        value["messageType"] = "Group";
+        break;
+    case IncomingMessageType::kSecureUnicast:
+        value["messageType"] = "Secure";
+        break;
+    case IncomingMessageType::kUnauthenticated:
+        value["messageType"] = "Unauthenticated";
+        break;
     }
 
     DecodePayloadHeader(value["payloadHeader"], info.payloadHeader);
