@@ -25,6 +25,7 @@
 #include "DeviceCallbacks.h"
 
 #include "CHIPDeviceManager.h"
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/server/Dnssd.h>

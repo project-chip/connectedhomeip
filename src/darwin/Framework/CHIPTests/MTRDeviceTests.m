@@ -2053,9 +2053,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     XCTestExpectation * onOffReportExpectation = [self expectationWithDescription:@"report OnOff attribute"];
     XCTestExpectation * attributeErrorReportExpectation = [self expectationWithDescription:@"report nonexistent attribute"];
-    // TODO: Right now the server does not seem to actually produce an error
-    // when trying to subscribe to events on a non-existent endpoint.
-    // XCTestExpectation * eventErrorReportExpectation = [self expectationWithDescription:@"report nonexistent event"];
+    XCTestExpectation * eventErrorReportExpectation = [self expectationWithDescription:@"report nonexistent event"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
@@ -2085,18 +2083,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 }
             } else if (result[@"eventPath"] != nil) {
                 MTREventPath * path = result[@"eventPath"];
-                XCTAssertEqualObjects(path.endpoint, @1);
-                XCTAssertEqualObjects(path.cluster, failClusterId);
+                XCTAssertEqualObjects(path.endpoint, failEndpointId);
+                XCTAssertEqualObjects(path.cluster, @40);
                 XCTAssertEqualObjects(path.event, @0);
                 XCTAssertNil(result[@"data"]);
                 XCTAssertNotNil(result[@"error"]);
                 XCTAssertEqual(
                     [MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]], MTRInteractionErrorCodeUnsupportedEndpoint);
-                // TODO: Right now the server does not seem to actually produce an error
-                // when trying to subscribe to events on a non-existent
-                // endpoint.  Catch it if it starts doing that.
-                XCTFail("Need to re-enable the eventErrorReportExpectation bits");
-                // [eventErrorReportExpectation fulfill];
+                [eventErrorReportExpectation fulfill];
             } else {
                 XCTFail("Unexpected result dictionary");
             }
@@ -2122,9 +2116,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         resubscriptionScheduled:nil];
 
     // Wait till establishment
-    [self waitForExpectations:@[
-        onOffReportExpectation, attributeErrorReportExpectation, /* eventErrorReportExpectation, */ expectation
-    ]
+    [self waitForExpectations:@[ onOffReportExpectation, attributeErrorReportExpectation, eventErrorReportExpectation, expectation ]
                       timeout:kTimeoutInSeconds];
 
     // Set up expectation for report
@@ -2133,19 +2125,28 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertNil(error);
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
-        NSDictionary * result = values[0];
-        MTRAttributePath * path = result[@"attributePath"];
 
-        // We will only be getting incremental reports for the OnOff attribute.
-        XCTAssertEqualObjects(path.endpoint, @1);
-        XCTAssertEqualObjects(path.cluster, @6);
-        XCTAssertEqualObjects(path.attribute, @0);
+        for (NSDictionary * result in values) {
+            // Note: we will get updates for our event subscription too, each time
+            // with errors.
+            if (result[@"eventPath"] != nil) {
+                continue;
+            }
 
-        XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
-        XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
-        if ([result[@"data"][@"value"] boolValue] == YES) {
-            [reportExpectation fulfill];
-            globalReportHandler = nil;
+            MTRAttributePath * path = result[@"attributePath"];
+            XCTAssertNotNil(path);
+
+            // We will only be getting incremental attribute reports for the OnOff attribute.
+            XCTAssertEqualObjects(path.endpoint, @1);
+            XCTAssertEqualObjects(path.cluster, @6);
+            XCTAssertEqualObjects(path.attribute, @0);
+
+            XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+            XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+            if ([result[@"data"][@"value"] boolValue] == YES) {
+                [reportExpectation fulfill];
+                globalReportHandler = nil;
+            }
         }
     };
 
@@ -2190,16 +2191,26 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertNil(error);
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
-        NSDictionary * result = values[0];
-        MTRAttributePath * path = result[@"attributePath"];
-        XCTAssertEqualObjects(path.endpoint, @1);
-        XCTAssertEqualObjects(path.cluster, @6);
-        XCTAssertEqualObjects(path.attribute, @0);
-        XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
-        XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
-        if ([result[@"data"][@"value"] boolValue] == NO) {
-            [reportExpectation fulfill];
-            globalReportHandler = nil;
+
+        for (NSDictionary * result in values) {
+            // Note: we will get updates for our event subscription too, each time
+            // with errors.
+            if (result[@"eventPath"] != nil) {
+                continue;
+            }
+
+            MTRAttributePath * path = result[@"attributePath"];
+            XCTAssertNotNil(path);
+
+            XCTAssertEqualObjects(path.endpoint, @1);
+            XCTAssertEqualObjects(path.cluster, @6);
+            XCTAssertEqualObjects(path.attribute, @0);
+            XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+            XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+            if ([result[@"data"][@"value"] boolValue] == NO) {
+                [reportExpectation fulfill];
+                globalReportHandler = nil;
+            }
         }
     };
 
