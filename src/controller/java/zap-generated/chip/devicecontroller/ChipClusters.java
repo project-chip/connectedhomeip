@@ -13778,18 +13778,6 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
 
-    public void readDescriptionAttribute(
-      CharStringAttributeCallback callback
-    ) {
-      readDescriptionAttribute(chipClusterPtr, callback);
-    }
-    public void subscribeDescriptionAttribute(
-        CharStringAttributeCallback callback
-,
-      int minInterval, int maxInterval) {
-      subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
     public void readSupportedModesAttribute(
       SupportedModesAttributeCallback callback
     ) {
@@ -13923,13 +13911,6 @@ public class ChipClusters {
       int minInterval, int maxInterval) {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
-
-    private native void readDescriptionAttribute(long chipClusterPtr,
-        CharStringAttributeCallback callback
-    );
-    private native void subscribeDescriptionAttribute(long chipClusterPtr,
-        CharStringAttributeCallback callback
-, int minInterval, int maxInterval);
 
     private native void readSupportedModesAttribute(long chipClusterPtr,
         SupportedModesAttributeCallback callback
@@ -14072,18 +14053,6 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
 
-    public void readDescriptionAttribute(
-      CharStringAttributeCallback callback
-    ) {
-      readDescriptionAttribute(chipClusterPtr, callback);
-    }
-    public void subscribeDescriptionAttribute(
-        CharStringAttributeCallback callback
-,
-      int minInterval, int maxInterval) {
-      subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
     public void readSupportedModesAttribute(
       SupportedModesAttributeCallback callback
     ) {
@@ -14217,13 +14186,6 @@ public class ChipClusters {
       int minInterval, int maxInterval) {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
-
-    private native void readDescriptionAttribute(long chipClusterPtr,
-        CharStringAttributeCallback callback
-    );
-    private native void subscribeDescriptionAttribute(long chipClusterPtr,
-        CharStringAttributeCallback callback
-, int minInterval, int maxInterval);
 
     private native void readSupportedModesAttribute(long chipClusterPtr,
         SupportedModesAttributeCallback callback
@@ -14621,18 +14583,6 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
 
-    public void readDescriptionAttribute(
-      CharStringAttributeCallback callback
-    ) {
-      readDescriptionAttribute(chipClusterPtr, callback);
-    }
-    public void subscribeDescriptionAttribute(
-        CharStringAttributeCallback callback
-,
-      int minInterval, int maxInterval) {
-      subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
     public void readSupportedModesAttribute(
       SupportedModesAttributeCallback callback
     ) {
@@ -14766,13 +14716,6 @@ public class ChipClusters {
       int minInterval, int maxInterval) {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
-
-    private native void readDescriptionAttribute(long chipClusterPtr,
-        CharStringAttributeCallback callback
-    );
-    private native void subscribeDescriptionAttribute(long chipClusterPtr,
-        CharStringAttributeCallback callback
-, int minInterval, int maxInterval);
 
     private native void readSupportedModesAttribute(long chipClusterPtr,
         SupportedModesAttributeCallback callback
@@ -14915,18 +14858,6 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
 
-    public void readDescriptionAttribute(
-      CharStringAttributeCallback callback
-    ) {
-      readDescriptionAttribute(chipClusterPtr, callback);
-    }
-    public void subscribeDescriptionAttribute(
-        CharStringAttributeCallback callback
-,
-      int minInterval, int maxInterval) {
-      subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
     public void readSupportedModesAttribute(
       SupportedModesAttributeCallback callback
     ) {
@@ -15060,13 +14991,6 @@ public class ChipClusters {
       int minInterval, int maxInterval) {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
-
-    private native void readDescriptionAttribute(long chipClusterPtr,
-        CharStringAttributeCallback callback
-    );
-    private native void subscribeDescriptionAttribute(long chipClusterPtr,
-        CharStringAttributeCallback callback
-, int minInterval, int maxInterval);
 
     private native void readSupportedModesAttribute(long chipClusterPtr,
         SupportedModesAttributeCallback callback
@@ -15658,18 +15582,6 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
 
-    public void readDescriptionAttribute(
-      CharStringAttributeCallback callback
-    ) {
-      readDescriptionAttribute(chipClusterPtr, callback);
-    }
-    public void subscribeDescriptionAttribute(
-        CharStringAttributeCallback callback
-,
-      int minInterval, int maxInterval) {
-      subscribeDescriptionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
     public void readSupportedModesAttribute(
       SupportedModesAttributeCallback callback
     ) {
@@ -15803,13 +15715,6 @@ public class ChipClusters {
       int minInterval, int maxInterval) {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
-
-    private native void readDescriptionAttribute(long chipClusterPtr,
-        CharStringAttributeCallback callback
-    );
-    private native void subscribeDescriptionAttribute(long chipClusterPtr,
-        CharStringAttributeCallback callback
-, int minInterval, int maxInterval);
 
     private native void readSupportedModesAttribute(long chipClusterPtr,
         SupportedModesAttributeCallback callback

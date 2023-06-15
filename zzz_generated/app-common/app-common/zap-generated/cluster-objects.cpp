@@ -11607,9 +11607,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::Description::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, description));
-        break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
@@ -11740,9 +11737,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::Description::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, description));
-        break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
@@ -11923,9 +11917,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::Description::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, description));
-        break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
@@ -12056,9 +12047,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::Description::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, description));
-        break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;
@@ -12381,9 +12369,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::Description::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, description));
-        break;
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedModes));
         break;

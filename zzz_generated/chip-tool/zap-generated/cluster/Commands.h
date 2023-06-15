@@ -4089,11 +4089,10 @@ private:
 | * ChangeToMode                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * Description                                                       | 0x0000 |
-| * SupportedModes                                                    | 0x0001 |
-| * CurrentMode                                                       | 0x0002 |
-| * StartUpMode                                                       | 0x0003 |
-| * OnMode                                                            | 0x0004 |
+| * SupportedModes                                                    | 0x0000 |
+| * CurrentMode                                                       | 0x0001 |
+| * StartUpMode                                                       | 0x0002 |
+| * OnMode                                                            | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -4142,11 +4141,10 @@ private:
 | * ChangeToMode                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * Description                                                       | 0x0000 |
-| * SupportedModes                                                    | 0x0001 |
-| * CurrentMode                                                       | 0x0002 |
-| * StartUpMode                                                       | 0x0003 |
-| * OnMode                                                            | 0x0004 |
+| * SupportedModes                                                    | 0x0000 |
+| * CurrentMode                                                       | 0x0001 |
+| * StartUpMode                                                       | 0x0002 |
+| * OnMode                                                            | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -4215,11 +4213,10 @@ private:
 | * ChangeToMode                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * Description                                                       | 0x0000 |
-| * SupportedModes                                                    | 0x0001 |
-| * CurrentMode                                                       | 0x0002 |
-| * StartUpMode                                                       | 0x0003 |
-| * OnMode                                                            | 0x0004 |
+| * SupportedModes                                                    | 0x0000 |
+| * CurrentMode                                                       | 0x0001 |
+| * StartUpMode                                                       | 0x0002 |
+| * OnMode                                                            | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -4267,11 +4264,10 @@ private:
 | * ChangeToMode                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * Description                                                       | 0x0000 |
-| * SupportedModes                                                    | 0x0001 |
-| * CurrentMode                                                       | 0x0002 |
-| * StartUpMode                                                       | 0x0003 |
-| * OnMode                                                            | 0x0004 |
+| * SupportedModes                                                    | 0x0000 |
+| * CurrentMode                                                       | 0x0001 |
+| * StartUpMode                                                       | 0x0002 |
+| * OnMode                                                            | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -4393,11 +4389,10 @@ private:
 | * ChangeToMode                                                      |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * Description                                                       | 0x0000 |
-| * SupportedModes                                                    | 0x0001 |
-| * CurrentMode                                                       | 0x0002 |
-| * StartUpMode                                                       | 0x0003 |
-| * OnMode                                                            | 0x0004 |
+| * SupportedModes                                                    | 0x0000 |
+| * CurrentMode                                                       | 0x0001 |
+| * StartUpMode                                                       | 0x0002 |
+| * OnMode                                                            | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -14497,7 +14492,6 @@ void registerClusterLaundryWasherMode(Commands & commands, CredentialIssuerComma
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -14509,8 +14503,6 @@ void registerClusterLaundryWasherMode(Commands & commands, CredentialIssuerComma
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
-                                                    credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::LaundryWasherMode::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -14534,7 +14526,6 @@ void registerClusterLaundryWasherMode(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -14571,7 +14562,6 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinetMode(Commands & c
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -14583,8 +14573,6 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinetMode(Commands & c
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
-                                                    credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -14608,7 +14596,6 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinetMode(Commands & c
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -14712,7 +14699,6 @@ void registerClusterRvcRunMode(Commands & commands, CredentialIssuerCommands * c
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -14724,8 +14710,6 @@ void registerClusterRvcRunMode(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
-                                                    credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::RvcRunMode::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -14749,7 +14733,6 @@ void registerClusterRvcRunMode(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -14785,7 +14768,6 @@ void registerClusterRvcCleanMode(Commands & commands, CredentialIssuerCommands *
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -14797,8 +14779,6 @@ void registerClusterRvcCleanMode(Commands & commands, CredentialIssuerCommands *
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
-                                                    credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::RvcCleanMode::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -14822,7 +14802,6 @@ void registerClusterRvcCleanMode(Commands & commands, CredentialIssuerCommands *
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -15001,7 +14980,6 @@ void registerClusterDishwasherMode(Commands & commands, CredentialIssuerCommands
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
         make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
@@ -15013,8 +14991,6 @@ void registerClusterDishwasherMode(Commands & commands, CredentialIssuerCommands
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::CharSpan>>(Id, "description", Attributes::Description::Id, WriteCommandType::kForceWrite,
-                                                    credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::DishwasherMode::Structs::ModeOptionStruct::Type>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -15038,7 +15014,6 @@ void registerClusterDishwasherMode(Commands & commands, CredentialIssuerCommands
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                     //
         make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //

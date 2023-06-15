@@ -1385,11 +1385,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace LaundryWasherMode {
 namespace Attributes {
 
-namespace Description {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace Description
-
 namespace CurrentMode {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
@@ -1424,11 +1419,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace RefrigeratorAndTemperatureControlledCabinetMode {
 namespace Attributes {
-
-namespace Description {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace Description
 
 namespace CurrentMode {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
@@ -1500,11 +1490,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace RvcRunMode {
 namespace Attributes {
 
-namespace Description {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace Description
-
 namespace CurrentMode {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
@@ -1539,11 +1524,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace RvcCleanMode {
 namespace Attributes {
-
-namespace Description {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace Description
 
 namespace CurrentMode {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
@@ -1646,11 +1626,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace DishwasherMode {
 namespace Attributes {
-
-namespace Description {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace Description
 
 namespace CurrentMode {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u

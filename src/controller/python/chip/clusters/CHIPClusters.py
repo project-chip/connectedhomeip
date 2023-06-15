@@ -4371,33 +4371,27 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000001: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000002: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000004: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4454,33 +4448,27 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000001: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000002: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000004: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4607,33 +4595,27 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000001: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000002: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000004: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4690,33 +4672,27 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000001: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000002: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000004: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4917,33 +4893,27 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000001: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000002: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000004: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,

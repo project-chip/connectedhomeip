@@ -2173,18 +2173,15 @@ public final class ChipIdLookup {
     }
     if (clusterId == 81L) {
       if (attributeId == 0L) {
-        return "Description";
-      }
-      if (attributeId == 1L) {
         return "SupportedModes";
       }
-      if (attributeId == 2L) {
+      if (attributeId == 1L) {
         return "CurrentMode";
       }
-      if (attributeId == 3L) {
+      if (attributeId == 2L) {
         return "StartUpMode";
       }
-      if (attributeId == 4L) {
+      if (attributeId == 3L) {
         return "OnMode";
       }
       if (attributeId == 65528L) {
@@ -2209,18 +2206,15 @@ public final class ChipIdLookup {
     }
     if (clusterId == 82L) {
       if (attributeId == 0L) {
-        return "Description";
-      }
-      if (attributeId == 1L) {
         return "SupportedModes";
       }
-      if (attributeId == 2L) {
+      if (attributeId == 1L) {
         return "CurrentMode";
       }
-      if (attributeId == 3L) {
+      if (attributeId == 2L) {
         return "StartUpMode";
       }
-      if (attributeId == 4L) {
+      if (attributeId == 3L) {
         return "OnMode";
       }
       if (attributeId == 65528L) {
@@ -2278,18 +2272,15 @@ public final class ChipIdLookup {
     }
     if (clusterId == 84L) {
       if (attributeId == 0L) {
-        return "Description";
-      }
-      if (attributeId == 1L) {
         return "SupportedModes";
       }
-      if (attributeId == 2L) {
+      if (attributeId == 1L) {
         return "CurrentMode";
       }
-      if (attributeId == 3L) {
+      if (attributeId == 2L) {
         return "StartUpMode";
       }
-      if (attributeId == 4L) {
+      if (attributeId == 3L) {
         return "OnMode";
       }
       if (attributeId == 65528L) {
@@ -2314,18 +2305,15 @@ public final class ChipIdLookup {
     }
     if (clusterId == 85L) {
       if (attributeId == 0L) {
-        return "Description";
-      }
-      if (attributeId == 1L) {
         return "SupportedModes";
       }
-      if (attributeId == 2L) {
+      if (attributeId == 1L) {
         return "CurrentMode";
       }
-      if (attributeId == 3L) {
+      if (attributeId == 2L) {
         return "StartUpMode";
       }
-      if (attributeId == 4L) {
+      if (attributeId == 3L) {
         return "OnMode";
       }
       if (attributeId == 65528L) {
@@ -2416,18 +2404,15 @@ public final class ChipIdLookup {
     }
     if (clusterId == 89L) {
       if (attributeId == 0L) {
-        return "Description";
-      }
-      if (attributeId == 1L) {
         return "SupportedModes";
       }
-      if (attributeId == 2L) {
+      if (attributeId == 1L) {
         return "CurrentMode";
       }
-      if (attributeId == 3L) {
+      if (attributeId == 2L) {
         return "StartUpMode";
       }
-      if (attributeId == 4L) {
+      if (attributeId == 3L) {
         return "OnMode";
       }
       if (attributeId == 65528L) {

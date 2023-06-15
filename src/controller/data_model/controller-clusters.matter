@@ -2811,11 +2811,10 @@ client cluster LaundryWasherMode = 81 {
     ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute char_string<64> description = 0;
-  readonly attribute ModeOptionStruct supportedModes[] = 1;
-  readonly attribute int8u currentMode = 2;
-  attribute optional nullable int8u startUpMode = 3;
-  attribute optional nullable int8u onMode = 4;
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2859,11 +2858,10 @@ client cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute char_string<64> description = 0;
-  readonly attribute ModeOptionStruct supportedModes[] = 1;
-  readonly attribute int8u currentMode = 2;
-  attribute optional nullable int8u startUpMode = 3;
-  attribute optional nullable int8u onMode = 4;
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2937,11 +2935,10 @@ client cluster RvcRunMode = 84 {
     ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute char_string<64> description = 0;
-  readonly attribute ModeOptionStruct supportedModes[] = 1;
-  readonly attribute int8u currentMode = 2;
-  attribute optional nullable int8u startUpMode = 3;
-  attribute optional nullable int8u onMode = 4;
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2990,11 +2987,10 @@ client cluster RvcCleanMode = 85 {
     ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute char_string<64> description = 0;
-  readonly attribute ModeOptionStruct supportedModes[] = 1;
-  readonly attribute int8u currentMode = 2;
-  attribute optional nullable int8u startUpMode = 3;
-  attribute optional nullable int8u onMode = 4;
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3092,11 +3088,10 @@ client cluster DishwasherMode = 89 {
     ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute char_string<64> description = 0;
-  readonly attribute ModeOptionStruct supportedModes[] = 1;
-  readonly attribute int8u currentMode = 2;
-  attribute optional nullable int8u startUpMode = 3;
-  attribute optional nullable int8u onMode = 4;
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

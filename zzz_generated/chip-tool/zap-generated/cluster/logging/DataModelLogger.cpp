@@ -7842,11 +7842,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case LaundryWasherMode::Id: {
         switch (path.mAttributeId)
         {
-        case LaundryWasherMode::Attributes::Description::Id: {
-            chip::CharSpan value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Description", 1, value);
-        }
         case LaundryWasherMode::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherMode::Structs::ModeOptionStruct::DecodableType>
                 value;
@@ -7904,11 +7899,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case RefrigeratorAndTemperatureControlledCabinetMode::Id: {
         switch (path.mAttributeId)
         {
-        case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::Description::Id: {
-            chip::CharSpan value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Description", 1, value);
-        }
         case RefrigeratorAndTemperatureControlledCabinetMode::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<
                 chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Structs::ModeOptionStruct::DecodableType>
@@ -8023,11 +8013,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case RvcRunMode::Id: {
         switch (path.mAttributeId)
         {
-        case RvcRunMode::Attributes::Description::Id: {
-            chip::CharSpan value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Description", 1, value);
-        }
         case RvcRunMode::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunMode::Structs::ModeOptionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -8084,11 +8069,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case RvcCleanMode::Id: {
         switch (path.mAttributeId)
         {
-        case RvcCleanMode::Attributes::Description::Id: {
-            chip::CharSpan value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Description", 1, value);
-        }
         case RvcCleanMode::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::RvcCleanMode::Structs::ModeOptionStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -8257,11 +8237,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case DishwasherMode::Id: {
         switch (path.mAttributeId)
         {
-        case DishwasherMode::Attributes::Description::Id: {
-            chip::CharSpan value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Description", 1, value);
-        }
         case DishwasherMode::Attributes::SupportedModes::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherMode::Structs::ModeOptionStruct::DecodableType>
                 value;

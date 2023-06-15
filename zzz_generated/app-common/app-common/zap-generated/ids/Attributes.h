@@ -2470,24 +2470,20 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace LaundryWasherMode {
 namespace Attributes {
 
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
 namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
 
 namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
 namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace StartUpMode
 
 namespace OnMode {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace OnMode
 
 namespace GeneratedCommandList {
@@ -2520,24 +2516,20 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace RefrigeratorAndTemperatureControlledCabinetMode {
 namespace Attributes {
 
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
 namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
 
 namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
 namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace StartUpMode
 
 namespace OnMode {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace OnMode
 
 namespace GeneratedCommandList {
@@ -2616,24 +2608,20 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace RvcRunMode {
 namespace Attributes {
 
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
 namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
 
 namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
 namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace StartUpMode
 
 namespace OnMode {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace OnMode
 
 namespace GeneratedCommandList {
@@ -2666,24 +2654,20 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace RvcCleanMode {
 namespace Attributes {
 
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
 namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
 
 namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
 namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace StartUpMode
 
 namespace OnMode {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace OnMode
 
 namespace GeneratedCommandList {
@@ -2808,24 +2792,20 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace DishwasherMode {
 namespace Attributes {
 
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
 namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
 
 namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
 namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace StartUpMode
 
 namespace OnMode {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace OnMode
 
 namespace GeneratedCommandList {

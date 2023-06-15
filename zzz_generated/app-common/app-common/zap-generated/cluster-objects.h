@@ -14359,19 +14359,6 @@ public:
 
 namespace Attributes {
 
-namespace Description {
-struct TypeInfo
-{
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherMode::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 64; }
-};
-} // namespace Description
 namespace SupportedModes {
 struct TypeInfo
 {
@@ -14467,7 +14454,6 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Description::TypeInfo::DecodableType description;
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
@@ -14575,19 +14561,6 @@ public:
 
 namespace Attributes {
 
-namespace Description {
-struct TypeInfo
-{
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 64; }
-};
-} // namespace Description
 namespace SupportedModes {
 struct TypeInfo
 {
@@ -14684,7 +14657,6 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Description::TypeInfo::DecodableType description;
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
@@ -14903,19 +14875,6 @@ public:
 
 namespace Attributes {
 
-namespace Description {
-struct TypeInfo
-{
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunMode::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 64; }
-};
-} // namespace Description
 namespace SupportedModes {
 struct TypeInfo
 {
@@ -15011,7 +14970,6 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Description::TypeInfo::DecodableType description;
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
@@ -15119,19 +15077,6 @@ public:
 
 namespace Attributes {
 
-namespace Description {
-struct TypeInfo
-{
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanMode::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 64; }
-};
-} // namespace Description
 namespace SupportedModes {
 struct TypeInfo
 {
@@ -15227,7 +15172,6 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Description::TypeInfo::DecodableType description;
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;
@@ -15651,19 +15595,6 @@ public:
 
 namespace Attributes {
 
-namespace Description {
-struct TypeInfo
-{
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 64; }
-};
-} // namespace Description
 namespace SupportedModes {
 struct TypeInfo
 {
@@ -15759,7 +15690,6 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Description::TypeInfo::DecodableType description;
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
         Attributes::StartUpMode::TypeInfo::DecodableType startUpMode;

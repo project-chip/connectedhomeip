@@ -12213,18 +12213,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::LaundryWasherMode;
         switch (aPath.mAttributeId)
         {
-        case Attributes::Description::Id: {
-            using TypeInfo = Attributes::Description::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
-            return value;
-        }
         case Attributes::SupportedModes::Id: {
             using TypeInfo = Attributes::SupportedModes::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -12518,18 +12506,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
         switch (aPath.mAttributeId)
         {
-        case Attributes::Description::Id: {
-            using TypeInfo = Attributes::Description::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
-            return value;
-        }
         case Attributes::SupportedModes::Id: {
             using TypeInfo = Attributes::SupportedModes::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -13049,18 +13025,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::RvcRunMode;
         switch (aPath.mAttributeId)
         {
-        case Attributes::Description::Id: {
-            using TypeInfo = Attributes::Description::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
-            return value;
-        }
         case Attributes::SupportedModes::Id: {
             using TypeInfo = Attributes::SupportedModes::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -13353,18 +13317,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::RvcCleanMode;
         switch (aPath.mAttributeId)
         {
-        case Attributes::Description::Id: {
-            using TypeInfo = Attributes::Description::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
-            return value;
-        }
         case Attributes::SupportedModes::Id: {
             using TypeInfo = Attributes::SupportedModes::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -14055,18 +14007,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::DishwasherMode;
         switch (aPath.mAttributeId)
         {
-        case Attributes::Description::Id: {
-            using TypeInfo = Attributes::Description::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue, value));
-            return value;
-        }
         case Attributes::SupportedModes::Id: {
             using TypeInfo = Attributes::SupportedModes::TypeInfo;
             TypeInfo::DecodableType cppValue;
