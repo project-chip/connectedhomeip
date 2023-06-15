@@ -291,10 +291,10 @@ private:
 
     bool IsIdle() const { return mState == HandlerState::Idle; }
 
-    /// @brief Returns whether the ReadHandler is in a state where it can send a report immediately. The main conditions for that
-    /// are that the handler is in a generating reports state and that the, meaning it has been subscribe to or is processing a read
-    /// request, that the min interval has elapsed and that either max interval has elapsed, forcing an empty report, or that the
-    /// handler is dirty. This function is used to determine whether a handler should be scheduled for a run.
+    /// @brief Returns whether the ReadHandler is in a state where it can immediately send a report. The main conditions for this
+    /// are that the handler is in a report generating state, meaning it is subscribed to or processing a read request, that the min
+    /// interval has expired and the max interval has expired, forcing an empty report, or that the handler is dirty. This function
+    /// is used to determine whether a report generation should be scheduled for the handler.
     /// @return
     bool IsReportableNow() const
     {
