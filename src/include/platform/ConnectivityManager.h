@@ -488,6 +488,13 @@ inline CHIP_ERROR ConnectivityManager::RequestSEDActiveMode(bool onOff, bool del
 }
 #endif
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+inline CHIP_ERROR ConnectivityManager::SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+{
+    return static_cast<ImplClass *>(this)->_SetPollingInterval(pollingInterval);
+}
+#endif
+
 inline bool ConnectivityManager::IsThreadAttached()
 {
     return static_cast<ImplClass *>(this)->_IsThreadAttached();

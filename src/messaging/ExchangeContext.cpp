@@ -239,8 +239,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             }
 
 #if CONFIG_DEVICE_LAYER
-            ChipDeviceEvent event;
-            event.Type        = DeviceEventType::kChipMsgSentEvent;
+            DeviceLayer::ChipDeviceEvent event;
+            event.Type        = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
             CHIP_ERROR status = DeviceLayer::PlatformMgr().PostEvent(&event);
             if (status != CHIP_NO_ERROR)
             {
@@ -646,8 +646,8 @@ void ExchangeContext::MessageHandled()
     UpdateSEDIntervalMode();
 #endif
 #if CONFIG_DEVICE_LAYER
-    ChipDeviceEvent event;
-    event.Type        = DeviceEventType::kChipMsgReceivedEvent;
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type        = DeviceLayer::DeviceEventType::kChipMsgReceivedEvent;
     CHIP_ERROR status = DeviceLayer::PlatformMgr().PostEvent(&event);
     if (status != CHIP_NO_ERROR)
     {

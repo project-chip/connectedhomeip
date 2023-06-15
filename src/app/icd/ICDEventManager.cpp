@@ -27,7 +27,7 @@ CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
     VerifyOrReturnError(icdManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mICDManager = icdManager;
 
-    PlatformMgr().AddEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(nullptr));
+    PlatformMgr().AddEventHandler(ICDEventHandler, reinterpret_cast<intptr_t>(mICDManager));
 
     return CHIP_NO_ERROR;
 }
@@ -42,6 +42,13 @@ CHIP_ERROR ICDEventManager::Shutdown()
 
 void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
+    ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(arg);
+
+    if (pIcdManager == nullptr)
+    {
+        return;
+    }
+
     switch (event->Type)
     {
     case DeviceEventType::kSubcriptionEstablised:
@@ -52,7 +59,7 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
     case DeviceEventType::kChipMsgSentEvent:
     case DeviceEventType::kChipMsgReceivedEvent:
     case DeviceEventType::kAppWakeUpEvent:
-        mICDManager.UpdateOperationStates(ActiveMode);
+        pIcdManager->UpdateOperationStates(ICDManager::ActiveMode);
         break;
     default:
         break;

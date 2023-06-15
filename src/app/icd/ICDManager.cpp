@@ -15,11 +15,15 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/icd-management-server/icd-management-server.cpp>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/icd/ICDManager.h>
+//#include <app/server/Server.h>
+//#include <app/util/IcdMonitoringTable.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include
 namespace chip {
 namespace app {
 
@@ -31,9 +35,18 @@ ICDManager::ICDManager()
 {
     uint32_t activeModeInterval;
     IcdManagement::Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval);
-    VerifyOrDie(kFastPollingInterval < activeModeInterval);
+    VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
     UpdateIcdMode();
     UpdateOperationStates(ActiveMode);
+}
+
+bool ICDManager::SupportCheckInProtocol()
+{
+    bool success;
+    uint32_t featureMap;
+    success = (IcdManagement::Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+
+    return success ? ((featureMap & to_underlying(IcdManagement::Feature::kCheckInProtocolSupport)) != 0) : false;
 }
 
 void ICDManager::UpdateIcdMode()
@@ -42,22 +55,23 @@ void ICDManager::UpdateIcdMode()
 
     // Per spec, To run an ICD in LIT mode, The Check In Protocol Feature is required.
     // The slow polling interval shall also be greater than 15 seconds.
-    if (kSlowPollingInterval > kICDSitModePollingThreashold && IcdManagementServer::HasFeature(kCheckInProtocolSupport))
+    if (kSlowPollingInterval > kICDSitModePollingThreashold && SupportCheckInProtocol())
     {
-        // We can only get to LIT Mode, if at least one client is registered to the ICD device
-        const auto & fabricTable = Server::GetInstance().GetFabricTable();
-        for (const auto & fabricInfo : fabricTable)
-        {
-            PersistentStorageDelegate & storage = chip::Server::GetInstance().GetPersistentStorage();
-            IcdMonitoringTable table(storage, fabricInfo.GetFabricIndex(), 1);
-            if (!table.IsEmpty())
-            {
-                tempMode = LIT;
-                break;
-            }
-        }
+        // TODO ICD FIX DEPENDENCY ISSUE with app/util/IcdMonitoringTable.h and app/server:server
+        // // We can only get to LIT Mode, if at least one client is registered to the ICD device
+        // const auto & fabricTable = Server::GetInstance().GetFabricTable();
+        // for (const auto & fabricInfo : fabricTable)
+        // {
+        //     PersistentStorageDelegate & storage = Server::GetInstance().GetPersistentStorage();
+        //     IcdMonitoringTable table(storage, fabricInfo.GetFabricIndex(), 1);
+        //     if (!table.IsEmpty())
+        //     {
+        //         tempMode = LIT;
+        //         break;
+        //     }
+        // }
     }
-    mIcdMode = tempMode
+    mIcdMode = tempMode;
 }
 
 void ICDManager::UpdateOperationStates(OperationalState state)
@@ -67,7 +81,7 @@ void ICDManager::UpdateOperationStates(OperationalState state)
     if (mOperationalState == IdleMode && state == IdleMode)
     {
         // Nothing to do in this case
-        return
+        return;
     }
 
     if (state == IdleMode)
@@ -75,10 +89,10 @@ void ICDManager::UpdateOperationStates(OperationalState state)
         mOperationalState = IdleMode;
         uint32_t idleModeInterval;
         IcdManagement::Attributes::IdleModeInterval::Get(kRootEndpointId, &idleModeInterval);
-        DeviceLayer::SystemLayer().StartTimer(idleModeInterval, OnIdleModeDone, this);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(idleModeInterval), OnIdleModeDone, this);
 
-        // TODO ICD What do we do if this fails?
-        DeviceLayer::ConnectivityMgr().SetPollingInterval(kSlowPollingInterval);
+        // TODO ICD What do we do if this fails? AND WHY CAN I NOT PASS kSlowPollingInterval
+        DeviceLayer::ConnectivityMgr().SetPollingInterval(System::Clock::Milliseconds32(300));
     }
     else if (state == ActiveMode)
     {
@@ -92,28 +106,30 @@ void ICDManager::UpdateOperationStates(OperationalState state)
 
             uint32_t activeModeInterval;
             IcdManagement::Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval);
-            DeviceLayer::SystemLayer().StartTimer(activeModeInterval, OnActiveModeDone, this);
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval), OnActiveModeDone, this);
 
-            // TODO ICD What do we do if this fails?
-            DeviceLayer::ConnectivityMgr().SetPollingInterval(kFastPollingInterval);
+            // TODO ICD What do we do if this fails? AND WHY CAN I NOT PASS kFastPollingInterval
+            DeviceLayer::ConnectivityMgr().SetPollingInterval(System::Clock::Milliseconds32(10));
         }
         else
         {
-            uint32_t activeModeThreshold;
+            uint16_t activeModeThreshold;
             IcdManagement::Attributes::ActiveModeThreshold::Get(kRootEndpointId, &activeModeThreshold);
-            DeviceLayer::SystemLayer().ExtendTimerTo(activeModeThreshold, OnActiveModeDone, this);
+            DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
         }
     }
 }
 
 void ICDManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
 {
-    UpdateOperationStates(ActiveMode);
+    ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(appState);
+    pIcdManager->UpdateOperationStates(ActiveMode);
 }
 
 void ICDManager::OnActiveModeDone(System::Layer * aLayer, void * appState)
 {
-    UpdateOperationStates(IdleMode);
+    ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(appState);
+    pIcdManager->UpdateOperationStates(IdleMode);
 }
 
 } // namespace app

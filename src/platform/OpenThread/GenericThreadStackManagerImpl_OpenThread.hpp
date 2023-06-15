@@ -385,7 +385,9 @@ CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-
+#if CHIP_DEVICE_CONFIG_ENABLE_SED || CHIP_CONFIG_ENABLE_ICD_SERVER
+    otLinkModeConfig linkMode;
+#endif
     // If there is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -401,7 +403,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED || CHIP_CONFIG_ENABLE_ICD_SERVER
     // Thread network discovery makes Sleepy End Devices detach from a network, so temporarily disable the SED mode.
-    otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
+    linkMode = otThreadGetLinkMode(mOTInst);
 
     if (!linkMode.mRxOnWhenIdle)
     {
@@ -1963,7 +1965,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::RequestSEDModeUpdate(c
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Impl()->LockThreadStack();

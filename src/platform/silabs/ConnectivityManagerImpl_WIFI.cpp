@@ -221,7 +221,7 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-CHIP_ERROR ThreadStackManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+CHIP_ERROR ConnectivityManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
     // TODO ICD
     (void) pollingInterval;

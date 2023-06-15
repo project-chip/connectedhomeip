@@ -37,6 +37,10 @@
 #include <messaging/ReliableMessageContext.h>
 #include <platform/ConnectivityManager.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDManager.h>
+#endif
+
 using namespace chip::System::Clock::Literals;
 
 namespace chip {

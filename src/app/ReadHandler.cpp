@@ -326,9 +326,9 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
             UpdateReportTimer();
         }
 
-        ChipDeviceEvent event;
-        event.Type        = DeviceEventType::kSubcriptionReportSent;
-        CHIP_ERROR status = PlatformMgr().PostEvent(&event);
+        DeviceLayer::ChipDeviceEvent event;
+        event.Type        = DeviceLayer::DeviceEventType::kSubcriptionReportSent;
+        CHIP_ERROR status = DeviceLayer::PlatformMgr().PostEvent(&event);
         if (status != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Failed to post Report sent event %" CHIP_ERROR_FORMAT, status.Format());

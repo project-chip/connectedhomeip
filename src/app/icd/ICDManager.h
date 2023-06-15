@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -26,6 +28,7 @@ namespace app {
  */
 class ICDManager
 {
+public:
     enum OperationalState : uint8_t
     {
         IdleMode,
@@ -38,8 +41,8 @@ class ICDManager
         LIT, // Long Interval Time ICD
     };
 
-public:
     ICDManager();
+    bool SupportCheckInProtocol();
     void UpdateIcdMode();
     void UpdateOperationStates(OperationalState state);
     ICDMode GetIcdMode() { return mIcdMode; }
@@ -48,15 +51,15 @@ public:
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
 
-private:
-    static constexpr System::Clock::Milliseconds32 kICDSitModePollingThreashold = 15000_ms32;
+protected:
+    static void OnIdleModeDone(System::Layer * aLayer, void * appState);
+    static void OnActiveModeDone(System::Layer * aLayer, void * appState);
 
-    // TODO ICD should they be System::Clock::Milliseconds32
+private:
+    static constexpr System::Clock::Milliseconds32 kICDSitModePollingThreashold = System::Clock::Milliseconds32(15000);
+
     static constexpr System::Clock::Milliseconds32 kSlowPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
     static constexpr System::Clock::Milliseconds32 kFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
-
-    void OnIdleModeDone(System::Layer * aLayer, void * appState);
-    void OnActiveModeDone(System::Layer * aLayer, void * appState);
 
     OperationalState mOperationalState = IdleMode;
     ICDMode mIcdMode                   = SIT;

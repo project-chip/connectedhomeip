@@ -27,6 +27,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDManager.h>
+#endif
+
 namespace chip {
 
 using namespace System::Clock::Literals;
