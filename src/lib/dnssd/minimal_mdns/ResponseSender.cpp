@@ -107,6 +107,11 @@ CHIP_ERROR ResponseSender::Respond(uint16_t messageId, const QueryData & query, 
 {
     mSendState.Reset(messageId, query, querySource);
 
+    if (query.IsInternalBroadcast()) {
+        // Deny listing large amount of data
+        mSendState.MarkWasSent(ResponseItemsSent::kServiceListingData);
+    }
+
     // Responder has a stateful 'additional replies required' that is used within the response
     // loop. 'no additionals required' is set at the start and additionals are marked as the query
     // reply is built.
@@ -241,6 +246,13 @@ bool ResponseSender::Accept(const Responder &responder) const
             return !mSendState.GetWasSent(ResponseItemsSent::kIPv4Addresses);
         case QType::AAAA:
             return !mSendState.GetWasSent(ResponseItemsSent::kIPv6Addresses);
+        case QType::PTR: {
+            static const QNamePart kDnsSdQueryPath[] = { "_services", "_dns-sd", "_udp", "local" };
+
+            if (responder.GetQName() == FullQName(kDnsSdQueryPath)) {
+                return !mSendState.GetWasSent(ResponseItemsSent::kServiceListingData);
+            }
+        };
         default:
             break;
     }
