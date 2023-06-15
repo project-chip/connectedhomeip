@@ -1835,7 +1835,7 @@ enum class OperationalStateEnum : uint8_t
 };
 } // namespace OperationalState
 
-namespace RoboticVacuumOperationalState {
+namespace RvcOperationalState {
 
 // Enum for ErrorStateEnum
 enum class ErrorStateEnum : uint8_t
@@ -1867,7 +1867,7 @@ enum class OperationalStateEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
-} // namespace RoboticVacuumOperationalState
+} // namespace RvcOperationalState
 
 namespace HepaFilterMonitoring {
 

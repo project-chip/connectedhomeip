@@ -15291,8 +15291,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::RoboticVacuumOperationalState::Id: {
-        using namespace app::Clusters::RoboticVacuumOperationalState;
+    case app::Clusters::RvcOperationalState::Id: {
+        using namespace app::Clusters::RvcOperationalState;
         switch (aPath.mAttributeId)
         {
         case Attributes::PhaseList::Id: {
@@ -15405,20 +15405,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jclass operationalStateStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$RoboticVacuumOperationalStateClusterOperationalStateStruct",
+                    env, "chip/devicecontroller/ChipStructs$RvcOperationalStateClusterOperationalStateStruct",
                     operationalStateStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl,
-                                 "Could not find class ChipStructs$RoboticVacuumOperationalStateClusterOperationalStateStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$RvcOperationalStateClusterOperationalStateStruct");
                     return nullptr;
                 }
                 jmethodID operationalStateStructStructCtor_1 =
                     env->GetMethodID(operationalStateStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
                 if (operationalStateStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(
-                        Zcl, "Could not find ChipStructs$RoboticVacuumOperationalStateClusterOperationalStateStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$RvcOperationalStateClusterOperationalStateStruct constructor");
                     return nullptr;
                 }
 
@@ -15459,19 +15457,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
             jclass operationalStateStructStructClass_0;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$RoboticVacuumOperationalStateClusterOperationalStateStruct",
+                env, "chip/devicecontroller/ChipStructs$RvcOperationalStateClusterOperationalStateStruct",
                 operationalStateStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$RoboticVacuumOperationalStateClusterOperationalStateStruct");
+                ChipLogError(Zcl, "Could not find class ChipStructs$RvcOperationalStateClusterOperationalStateStruct");
                 return nullptr;
             }
             jmethodID operationalStateStructStructCtor_0 =
                 env->GetMethodID(operationalStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
             if (operationalStateStructStructCtor_0 == nullptr)
             {
-                ChipLogError(Zcl,
-                             "Could not find ChipStructs$RoboticVacuumOperationalStateClusterOperationalStateStruct constructor");
+                ChipLogError(Zcl, "Could not find ChipStructs$RvcOperationalStateClusterOperationalStateStruct constructor");
                 return nullptr;
             }
 
@@ -15521,18 +15518,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
             jclass errorStateStructStructClass_0;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct",
-                errorStateStructStructClass_0);
+                env, "chip/devicecontroller/ChipStructs$RvcOperationalStateClusterErrorStateStruct", errorStateStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct");
+                ChipLogError(Zcl, "Could not find class ChipStructs$RvcOperationalStateClusterErrorStateStruct");
                 return nullptr;
             }
             jmethodID errorStateStructStructCtor_0 = env->GetMethodID(
                 errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
             if (errorStateStructStructCtor_0 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct constructor");
+                ChipLogError(Zcl, "Could not find ChipStructs$RvcOperationalStateClusterErrorStateStruct constructor");
                 return nullptr;
             }
 

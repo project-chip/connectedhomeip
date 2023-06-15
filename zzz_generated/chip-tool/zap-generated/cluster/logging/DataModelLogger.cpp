@@ -3713,7 +3713,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const RoboticVacuumOperationalState::Events::OperationalError::DecodableType & value)
+                                     const RvcOperationalState::Events::OperationalError::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3729,7 +3729,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const RoboticVacuumOperationalState::Events::OperationCompletion::DecodableType & value)
+                                     const RvcOperationalState::Events::OperationCompletion::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -4541,9 +4541,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const RoboticVacuumOperationalState::Commands::OperationalCommandResponse::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("commandResponseState", indent + 1, value.commandResponseState));
@@ -8539,67 +8538,67 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case RoboticVacuumOperationalState::Id: {
+    case RvcOperationalState::Id: {
         switch (path.mAttributeId)
         {
-        case RoboticVacuumOperationalState::Attributes::PhaseList::Id: {
+        case RvcOperationalState::Attributes::PhaseList::Id: {
             chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PhaseList", 1, value);
         }
-        case RoboticVacuumOperationalState::Attributes::CurrentPhase::Id: {
+        case RvcOperationalState::Attributes::CurrentPhase::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentPhase", 1, value);
         }
-        case RoboticVacuumOperationalState::Attributes::CountdownTime::Id: {
+        case RvcOperationalState::Attributes::CountdownTime::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CountdownTime", 1, value);
         }
-        case RoboticVacuumOperationalState::Attributes::OperationalStateList::Id: {
+        case RvcOperationalState::Attributes::OperationalStateList::Id: {
             chip::app::DataModel::DecodableList<
-                chip::app::Clusters::RoboticVacuumOperationalState::Structs::OperationalStateStruct::DecodableType>
+                chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalStateList", 1, value);
         }
-        case RoboticVacuumOperationalState::Attributes::OperationalState::Id: {
-            chip::app::Clusters::RoboticVacuumOperationalState::Structs::OperationalStateStruct::DecodableType value;
+        case RvcOperationalState::Attributes::OperationalState::Id: {
+            chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalState", 1, value);
         }
-        case RoboticVacuumOperationalState::Attributes::OperationalError::Id: {
-            chip::app::Clusters::RoboticVacuumOperationalState::Structs::ErrorStateStruct::DecodableType value;
+        case RvcOperationalState::Attributes::OperationalError::Id: {
+            chip::app::Clusters::RvcOperationalState::Structs::ErrorStateStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalError", 1, value);
         }
-        case RoboticVacuumOperationalState::Attributes::GeneratedCommandList::Id: {
+        case RvcOperationalState::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case RoboticVacuumOperationalState::Attributes::AcceptedCommandList::Id: {
+        case RvcOperationalState::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case RoboticVacuumOperationalState::Attributes::EventList::Id: {
+        case RvcOperationalState::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case RoboticVacuumOperationalState::Attributes::AttributeList::Id: {
+        case RvcOperationalState::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case RoboticVacuumOperationalState::Attributes::FeatureMap::Id: {
+        case RvcOperationalState::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case RoboticVacuumOperationalState::Attributes::ClusterRevision::Id: {
+        case RvcOperationalState::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -16432,11 +16431,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
-    case RoboticVacuumOperationalState::Id: {
+    case RvcOperationalState::Id: {
         switch (path.mCommandId)
         {
-        case RoboticVacuumOperationalState::Commands::OperationalCommandResponse::Id: {
-            RoboticVacuumOperationalState::Commands::OperationalCommandResponse::DecodableType value;
+        case RvcOperationalState::Commands::OperationalCommandResponse::Id: {
+            RvcOperationalState::Commands::OperationalCommandResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalCommandResponse", 1, value);
         }
@@ -17055,16 +17054,16 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
         break;
     }
-    case RoboticVacuumOperationalState::Id: {
+    case RvcOperationalState::Id: {
         switch (header.mPath.mEventId)
         {
-        case RoboticVacuumOperationalState::Events::OperationalError::Id: {
-            chip::app::Clusters::RoboticVacuumOperationalState::Events::OperationalError::DecodableType value;
+        case RvcOperationalState::Events::OperationalError::Id: {
+            chip::app::Clusters::RvcOperationalState::Events::OperationalError::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationalError", 1, value);
         }
-        case RoboticVacuumOperationalState::Events::OperationCompletion::Id: {
-            chip::app::Clusters::RoboticVacuumOperationalState::Events::OperationCompletion::DecodableType value;
+        case RvcOperationalState::Events::OperationCompletion::Id: {
+            chip::app::Clusters::RvcOperationalState::Events::OperationCompletion::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationCompletion", 1, value);
         }

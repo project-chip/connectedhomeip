@@ -571,17 +571,17 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback
-    : public Callback::Callback<CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackType>
+class CHIPRvcOperationalStateClusterOperationalCommandResponseCallback
+    : public Callback::Callback<CHIPRvcOperationalStateClusterOperationalCommandResponseCallbackType>
 {
 public:
-    CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback);
+    CHIPRvcOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback);
 
-    ~CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback();
+    ~CHIPRvcOperationalStateClusterOperationalCommandResponseCallback();
 
-    static void CallbackFn(
-        void * context,
-        const chip::app::Clusters::RoboticVacuumOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

@@ -187,8 +187,8 @@ public class ClusterIDMapping {
         if (clusterId == OperationalState.ID) {
             return new OperationalState();
         }
-        if (clusterId == RoboticVacuumOperationalState.ID) {
-            return new RoboticVacuumOperationalState();
+        if (clusterId == RvcOperationalState.ID) {
+            return new RvcOperationalState();
         }
         if (clusterId == HepaFilterMonitoring.ID) {
             return new HepaFilterMonitoring();
@@ -7709,7 +7709,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class RoboticVacuumOperationalState implements BaseCluster {
+    public static class RvcOperationalState implements BaseCluster {
         public static final long ID = 97L;
         public long getID() {
             return ID;

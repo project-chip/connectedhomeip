@@ -299,8 +299,11 @@
             "LocalTime"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
-        "Operational State": ["OperationalState", "OperationalError"],
-        "Robotic Vacuum Operational State": [
+        "Operational State": [
+            "OperationalState", 
+            "OperationalError"
+        ],
+        "RVC Operational State": [
             "OperationalState",
             "OperationalError"
         ]

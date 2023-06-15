@@ -5305,8 +5305,8 @@ class ChipClusters:
             },
         },
     }
-    _ROBOTIC_VACUUM_OPERATIONAL_STATE_CLUSTER_INFO = {
-        "clusterName": "RoboticVacuumOperationalState",
+    _RVC_OPERATIONAL_STATE_CLUSTER_INFO = {
+        "clusterName": "RvcOperationalState",
         "clusterId": 0x00000061,
         "commands": {
             0x00000000: {
@@ -15695,7 +15695,7 @@ class ChipClusters:
         0x0000005B: _AIR_QUALITY_CLUSTER_INFO,
         0x0000005C: _SMOKE_CO_ALARM_CLUSTER_INFO,
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
-        0x00000061: _ROBOTIC_VACUUM_OPERATIONAL_STATE_CLUSTER_INFO,
+        0x00000061: _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         0x00000073: _CERAMIC_FILTER_MONITORING_CLUSTER_INFO,
@@ -15830,7 +15830,7 @@ class ChipClusters:
         "AirQuality": _AIR_QUALITY_CLUSTER_INFO,
         "SmokeCoAlarm": _SMOKE_CO_ALARM_CLUSTER_INFO,
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,
-        "RoboticVacuumOperationalState": _ROBOTIC_VACUUM_OPERATIONAL_STATE_CLUSTER_INFO,
+        "RvcOperationalState": _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         "CeramicFilterMonitoring": _CERAMIC_FILTER_MONITORING_CLUSTER_INFO,

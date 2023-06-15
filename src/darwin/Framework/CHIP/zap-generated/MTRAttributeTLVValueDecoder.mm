@@ -10356,10 +10356,10 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForRoboticVacuumOperationalStateCluster(
+static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(
     AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::RoboticVacuumOperationalState;
+    using namespace Clusters::RvcOperationalState;
     switch (aAttributeId) {
     case Attributes::PhaseList::Id: {
         using TypeInfo = Attributes::PhaseList::TypeInfo;
@@ -10439,8 +10439,8 @@ static id _Nullable DecodeAttributeValueForRoboticVacuumOperationalStateCluster(
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRRoboticVacuumOperationalStateClusterOperationalStateStruct * newElement_0;
-                newElement_0 = [MTRRoboticVacuumOperationalStateClusterOperationalStateStruct new];
+                MTRRVCOperationalStateClusterOperationalStateStruct * newElement_0;
+                newElement_0 = [MTRRVCOperationalStateClusterOperationalStateStruct new];
                 newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
                 if (entry_0.operationalStateLabel.HasValue()) {
                     newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
@@ -10470,8 +10470,8 @@ static id _Nullable DecodeAttributeValueForRoboticVacuumOperationalStateCluster(
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTRRoboticVacuumOperationalStateClusterOperationalStateStruct * _Nonnull value;
-        value = [MTRRoboticVacuumOperationalStateClusterOperationalStateStruct new];
+        MTRRVCOperationalStateClusterOperationalStateStruct * _Nonnull value;
+        value = [MTRRVCOperationalStateClusterOperationalStateStruct new];
         value.operationalStateID = [NSNumber numberWithUnsignedChar:cppValue.operationalStateID];
         if (cppValue.operationalStateLabel.HasValue()) {
             value.operationalStateLabel = AsString(cppValue.operationalStateLabel.Value());
@@ -10492,8 +10492,8 @@ static id _Nullable DecodeAttributeValueForRoboticVacuumOperationalStateCluster(
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull value;
-        value = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
+        MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull value;
+        value = [MTRRVCOperationalStateClusterErrorStateStruct new];
         value.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorStateID];
         if (cppValue.errorStateLabel.HasValue()) {
             value.errorStateLabel = AsString(cppValue.errorStateLabel.Value());
@@ -24591,8 +24591,8 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     case Clusters::OperationalState::Id: {
         return DecodeAttributeValueForOperationalStateCluster(aPath.mAttributeId, aReader, aError);
     }
-    case Clusters::RoboticVacuumOperationalState::Id: {
-        return DecodeAttributeValueForRoboticVacuumOperationalStateCluster(aPath.mAttributeId, aReader, aError);
+    case Clusters::RvcOperationalState::Id: {
+        return DecodeAttributeValueForRVCOperationalStateCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeAttributeValueForHEPAFilterMonitoringCluster(aPath.mAttributeId, aReader, aError);

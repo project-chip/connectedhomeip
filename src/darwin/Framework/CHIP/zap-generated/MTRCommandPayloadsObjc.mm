@@ -6714,7 +6714,7 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 @end
-@implementation MTRRoboticVacuumOperationalStateClusterPauseParams
+@implementation MTRRVCOperationalStateClusterPauseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6726,7 +6726,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRoboticVacuumOperationalStateClusterPauseParams alloc] init];
+    auto other = [[MTRRVCOperationalStateClusterPauseParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -6741,7 +6741,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRoboticVacuumOperationalStateClusterStopParams
+@implementation MTRRVCOperationalStateClusterStopParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6753,7 +6753,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRoboticVacuumOperationalStateClusterStopParams alloc] init];
+    auto other = [[MTRRVCOperationalStateClusterStopParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -6768,7 +6768,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRoboticVacuumOperationalStateClusterStartParams
+@implementation MTRRVCOperationalStateClusterStartParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6780,7 +6780,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRoboticVacuumOperationalStateClusterStartParams alloc] init];
+    auto other = [[MTRRVCOperationalStateClusterStartParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -6795,7 +6795,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRoboticVacuumOperationalStateClusterResumeParams
+@implementation MTRRVCOperationalStateClusterResumeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6807,7 +6807,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRoboticVacuumOperationalStateClusterResumeParams alloc] init];
+    auto other = [[MTRRVCOperationalStateClusterResumeParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -6822,19 +6822,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams
+@implementation MTRRVCOperationalStateClusterOperationalCommandResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _commandResponseState = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
+        _commandResponseState = [MTRRVCOperationalStateClusterErrorStateStruct new];
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams alloc] init];
+    auto other = [[MTRRVCOperationalStateClusterOperationalCommandResponseParams alloc] init];
 
     other.commandResponseState = self.commandResponseState;
 
@@ -6855,7 +6855,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::RoboticVacuumOperationalState::Commands::OperationalCommandResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -6890,13 +6890,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+@implementation MTRRVCOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RoboticVacuumOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
+    (const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
 {
     {
-        self.commandResponseState = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
+        self.commandResponseState = [MTRRVCOperationalStateClusterErrorStateStruct new];
         self.commandResponseState.errorStateID =
             [NSNumber numberWithUnsignedChar:decodableStruct.commandResponseState.errorStateID];
         if (decodableStruct.commandResponseState.errorStateLabel.HasValue()) {

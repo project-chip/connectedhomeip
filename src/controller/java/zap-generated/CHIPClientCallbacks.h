@@ -594,19 +594,19 @@ typedef void (*OperationalStateEventListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*OperationalStateAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*RoboticVacuumOperationalStatePhaseListListAttributeCallback)(
+typedef void (*RvcOperationalStatePhaseListListAttributeCallback)(
     void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & data);
-typedef void (*RoboticVacuumOperationalStateOperationalStateListListAttributeCallback)(
+typedef void (*RvcOperationalStateOperationalStateListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::RoboticVacuumOperationalState::Structs::OperationalStateStruct::DecodableType> & data);
-typedef void (*RoboticVacuumOperationalStateGeneratedCommandListListAttributeCallback)(
+        chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType> & data);
+typedef void (*RvcOperationalStateGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*RoboticVacuumOperationalStateAcceptedCommandListListAttributeCallback)(
+typedef void (*RvcOperationalStateAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*RoboticVacuumOperationalStateEventListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*RoboticVacuumOperationalStateAttributeListListAttributeCallback)(
+typedef void (*RvcOperationalStateEventListListAttributeCallback)(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*RvcOperationalStateAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*HepaFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);

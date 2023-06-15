@@ -13913,7 +13913,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 @end
 
-@implementation MTRClusterRoboticVacuumOperationalState
+@implementation MTRClusterRVCOperationalState
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
@@ -13930,20 +13930,20 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                     completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion
 {
     [self pauseWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)pauseWithParams:(MTRRoboticVacuumOperationalStateClusterPauseParams * _Nullable)params
+- (void)pauseWithParams:(MTRRVCOperationalStateClusterPauseParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+               completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
                               NSError * _Nullable error))completion
 {
     NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
-                                     _endpoint, (unsigned int) MTRClusterIDTypeRoboticVacuumOperationalStateID,
-                                     (unsigned int) MTRCommandIDTypeClusterRoboticVacuumOperationalStateCommandPauseID];
+                                     _endpoint, (unsigned int) MTRClusterIDTypeRVCOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandPauseID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -13955,7 +13955,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge(
+        auto * bridge = new MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge(
             self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 MTRClustersLogCompletion(logPrefix, value, error);
@@ -13965,14 +13965,13 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
-                RoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                RVCOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
-                auto * typedBridge
-                    = static_cast<MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                auto * typedBridge = static_cast<MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
                 Optional<uint16_t> timedInvokeTimeoutMs;
                 Optional<Timeout> invokeTimeout;
                 ListFreer listFreer;
-                RoboticVacuumOperationalState::Commands::Pause::Type request;
+                RvcOperationalState::Commands::Pause::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -14007,20 +14006,20 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)stopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                    completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
     [self stopWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)stopWithParams:(MTRRoboticVacuumOperationalStateClusterStopParams * _Nullable)params
+- (void)stopWithParams:(MTRRVCOperationalStateClusterStopParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+               completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
                               NSError * _Nullable error))completion
 {
     NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
-                                     _endpoint, (unsigned int) MTRClusterIDTypeRoboticVacuumOperationalStateID,
-                                     (unsigned int) MTRCommandIDTypeClusterRoboticVacuumOperationalStateCommandStopID];
+                                     _endpoint, (unsigned int) MTRClusterIDTypeRVCOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandStopID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -14032,7 +14031,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge(
+        auto * bridge = new MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge(
             self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 MTRClustersLogCompletion(logPrefix, value, error);
@@ -14042,14 +14041,13 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
-                RoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                RVCOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
-                auto * typedBridge
-                    = static_cast<MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                auto * typedBridge = static_cast<MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
                 Optional<uint16_t> timedInvokeTimeoutMs;
                 Optional<Timeout> invokeTimeout;
                 ListFreer listFreer;
-                RoboticVacuumOperationalState::Commands::Stop::Type request;
+                RvcOperationalState::Commands::Stop::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -14084,20 +14082,20 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)startWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                     completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion
 {
     [self startWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)startWithParams:(MTRRoboticVacuumOperationalStateClusterStartParams * _Nullable)params
+- (void)startWithParams:(MTRRVCOperationalStateClusterStartParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+               completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
                               NSError * _Nullable error))completion
 {
     NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
-                                     _endpoint, (unsigned int) MTRClusterIDTypeRoboticVacuumOperationalStateID,
-                                     (unsigned int) MTRCommandIDTypeClusterRoboticVacuumOperationalStateCommandStartID];
+                                     _endpoint, (unsigned int) MTRClusterIDTypeRVCOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandStartID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -14109,7 +14107,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge(
+        auto * bridge = new MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge(
             self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 MTRClustersLogCompletion(logPrefix, value, error);
@@ -14119,14 +14117,13 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
-                RoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                RVCOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
-                auto * typedBridge
-                    = static_cast<MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                auto * typedBridge = static_cast<MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
                 Optional<uint16_t> timedInvokeTimeoutMs;
                 Optional<Timeout> invokeTimeout;
                 ListFreer listFreer;
-                RoboticVacuumOperationalState::Commands::Start::Type request;
+                RvcOperationalState::Commands::Start::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -14161,20 +14158,20 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)resumeWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                      completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+                      completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
                                      NSError * _Nullable error))completion
 {
     [self resumeWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)resumeWithParams:(MTRRoboticVacuumOperationalStateClusterResumeParams * _Nullable)params
+- (void)resumeWithParams:(MTRRVCOperationalStateClusterResumeParams * _Nullable)params
            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-               completion:(void (^)(MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
+               completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
                               NSError * _Nullable error))completion
 {
     NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
-                                     _endpoint, (unsigned int) MTRClusterIDTypeRoboticVacuumOperationalStateID,
-                                     (unsigned int) MTRCommandIDTypeClusterRoboticVacuumOperationalStateCommandResumeID];
+                                     _endpoint, (unsigned int) MTRClusterIDTypeRVCOperationalStateID,
+                                     (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandResumeID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -14186,7 +14183,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge(
+        auto * bridge = new MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge(
             self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 MTRClustersLogCompletion(logPrefix, value, error);
@@ -14196,14 +14193,13 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
-                RoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
+                RVCOperationalStateClusterOperationalCommandResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
-                auto * typedBridge
-                    = static_cast<MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
+                auto * typedBridge = static_cast<MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge *>(bridge);
                 Optional<uint16_t> timedInvokeTimeoutMs;
                 Optional<Timeout> invokeTimeout;
                 ListFreer listFreer;
-                RoboticVacuumOperationalState::Commands::Resume::Type request;
+                RvcOperationalState::Commands::Resume::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
@@ -14239,105 +14235,97 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 - (NSDictionary<NSString *, id> *)readAttributePhaseListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributePhaseListID)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributePhaseListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPhaseWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeCurrentPhaseID)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeCurrentPhaseID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCountdownTimeWithParams:(MTRReadParams * _Nullable)params
 {
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                                     attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeCountdownTimeID)
-                                          params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeCountdownTimeID)
+                                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOperationalStateListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeOperationalStateListID)
-                             params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalStateListID)
+                                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOperationalStateWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeOperationalStateID)
-                             params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalStateID)
+                                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOperationalErrorWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeOperationalErrorID)
-                             params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeOperationalErrorID)
+                                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeGeneratedCommandListID)
-                             params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeGeneratedCommandListID)
+                                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device
-        readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeAcceptedCommandListID)
-                             params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeAcceptedCommandListID)
+                                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeEventListID)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeEventListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                                     attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeAttributeListID)
-                                          params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeAttributeListID)
+                                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                                        attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
-    return
-        [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeRoboticVacuumOperationalStateID)
-                                     attributeID:@(MTRAttributeIDTypeClusterRoboticVacuumOperationalStateAttributeClusterRevisionID)
-                                          params:params];
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRVCOperationalStateAttributeClusterRevisionID)
+                                             params:params];
 }
 
 @end

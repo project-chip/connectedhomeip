@@ -2018,9 +2018,9 @@ static BOOL AttributeIsSpecifiedInOperationalStateCluster(AttributeId aAttribute
     }
     }
 }
-static BOOL AttributeIsSpecifiedInRoboticVacuumOperationalStateCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInRVCOperationalStateCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::RoboticVacuumOperationalState;
+    using namespace Clusters::RvcOperationalState;
     switch (aAttributeId) {
     case Attributes::PhaseList::Id: {
         return YES;
@@ -5145,8 +5145,8 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::OperationalState::Id: {
         return AttributeIsSpecifiedInOperationalStateCluster(aAttributeId);
     }
-    case Clusters::RoboticVacuumOperationalState::Id: {
-        return AttributeIsSpecifiedInRoboticVacuumOperationalStateCluster(aAttributeId);
+    case Clusters::RvcOperationalState::Id: {
+        return AttributeIsSpecifiedInRVCOperationalStateCluster(aAttributeId);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return AttributeIsSpecifiedInHEPAFilterMonitoringCluster(aAttributeId);

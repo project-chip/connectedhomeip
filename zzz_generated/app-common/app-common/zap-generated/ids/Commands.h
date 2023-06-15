@@ -785,7 +785,7 @@ static constexpr CommandId Id = 0x00000004;
 } // namespace Commands
 } // namespace OperationalState
 
-namespace RoboticVacuumOperationalState {
+namespace RvcOperationalState {
 namespace Commands {
 
 namespace Pause {
@@ -809,7 +809,7 @@ static constexpr CommandId Id = 0x00000004;
 } // namespace OperationalCommandResponse
 
 } // namespace Commands
-} // namespace RoboticVacuumOperationalState
+} // namespace RvcOperationalState
 
 namespace HepaFilterMonitoring {
 namespace Commands {

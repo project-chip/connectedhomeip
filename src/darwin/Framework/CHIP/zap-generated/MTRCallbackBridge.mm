@@ -9233,7 +9233,7 @@ void MTROperationalStateAttributeListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRRoboticVacuumOperationalStatePhaseListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCOperationalStatePhaseListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & value)
 {
     NSArray * _Nullable objCValue;
@@ -9265,7 +9265,7 @@ void MTRRoboticVacuumOperationalStatePhaseListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRoboticVacuumOperationalStatePhaseListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCOperationalStatePhaseListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -9280,9 +9280,9 @@ void MTRRoboticVacuumOperationalStatePhaseListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRRoboticVacuumOperationalStateOperationalStateListListAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTRRVCOperationalStateOperationalStateListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::RoboticVacuumOperationalState::Structs::OperationalStateStruct::DecodableType> & value)
+        chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9290,8 +9290,8 @@ void MTRRoboticVacuumOperationalStateOperationalStateListListAttributeCallbackBr
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRRoboticVacuumOperationalStateClusterOperationalStateStruct * newElement_0;
-            newElement_0 = [MTRRoboticVacuumOperationalStateClusterOperationalStateStruct new];
+            MTRRVCOperationalStateClusterOperationalStateStruct * newElement_0;
+            newElement_0 = [MTRRVCOperationalStateClusterOperationalStateStruct new];
             newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
             if (entry_0.operationalStateLabel.HasValue()) {
                 newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
@@ -9315,7 +9315,7 @@ void MTRRoboticVacuumOperationalStateOperationalStateListListAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRoboticVacuumOperationalStateOperationalStateListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCOperationalStateOperationalStateListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -9330,11 +9330,11 @@ void MTRRoboticVacuumOperationalStateOperationalStateListListAttributeCallbackSu
     }
 }
 
-void MTRRoboticVacuumOperationalStateOperationalStateStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::Clusters::RoboticVacuumOperationalState::Structs::OperationalStateStruct::DecodableType & value)
+void MTRRVCOperationalStateOperationalStateStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType & value)
 {
-    MTRRoboticVacuumOperationalStateClusterOperationalStateStruct * _Nonnull objCValue;
-    objCValue = [MTRRoboticVacuumOperationalStateClusterOperationalStateStruct new];
+    MTRRVCOperationalStateClusterOperationalStateStruct * _Nonnull objCValue;
+    objCValue = [MTRRVCOperationalStateClusterOperationalStateStruct new];
     objCValue.operationalStateID = [NSNumber numberWithUnsignedChar:value.operationalStateID];
     if (value.operationalStateLabel.HasValue()) {
         objCValue.operationalStateLabel = AsString(value.operationalStateLabel.Value());
@@ -9349,7 +9349,7 @@ void MTRRoboticVacuumOperationalStateOperationalStateStructAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRoboticVacuumOperationalStateOperationalStateStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCOperationalStateOperationalStateStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -9364,11 +9364,11 @@ void MTRRoboticVacuumOperationalStateOperationalStateStructAttributeCallbackSubs
     }
 }
 
-void MTRRoboticVacuumOperationalStateOperationalErrorStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::RoboticVacuumOperationalState::Structs::ErrorStateStruct::DecodableType & value)
+void MTRRVCOperationalStateOperationalErrorStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::RvcOperationalState::Structs::ErrorStateStruct::DecodableType & value)
 {
-    MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull objCValue;
-    objCValue = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
+    MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull objCValue;
+    objCValue = [MTRRVCOperationalStateClusterErrorStateStruct new];
     objCValue.errorStateID = [NSNumber numberWithUnsignedChar:value.errorStateID];
     if (value.errorStateLabel.HasValue()) {
         objCValue.errorStateLabel = AsString(value.errorStateLabel.Value());
@@ -9393,7 +9393,7 @@ void MTRRoboticVacuumOperationalStateOperationalErrorStructAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRoboticVacuumOperationalStateOperationalErrorStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCOperationalStateOperationalErrorStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -9408,7 +9408,7 @@ void MTRRoboticVacuumOperationalStateOperationalErrorStructAttributeCallbackSubs
     }
 }
 
-void MTRRoboticVacuumOperationalStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCOperationalStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -9431,7 +9431,7 @@ void MTRRoboticVacuumOperationalStateGeneratedCommandListListAttributeCallbackBr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRoboticVacuumOperationalStateGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCOperationalStateGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -9446,7 +9446,7 @@ void MTRRoboticVacuumOperationalStateGeneratedCommandListListAttributeCallbackSu
     }
 }
 
-void MTRRoboticVacuumOperationalStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCOperationalStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -9469,7 +9469,7 @@ void MTRRoboticVacuumOperationalStateAcceptedCommandListListAttributeCallbackBri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRoboticVacuumOperationalStateAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCOperationalStateAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -9484,7 +9484,7 @@ void MTRRoboticVacuumOperationalStateAcceptedCommandListListAttributeCallbackSub
     }
 }
 
-void MTRRoboticVacuumOperationalStateEventListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCOperationalStateEventListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -9507,7 +9507,7 @@ void MTRRoboticVacuumOperationalStateEventListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRoboticVacuumOperationalStateEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCOperationalStateEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -9522,7 +9522,7 @@ void MTRRoboticVacuumOperationalStateEventListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRRoboticVacuumOperationalStateAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRRVCOperationalStateAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -9545,7 +9545,7 @@ void MTRRoboticVacuumOperationalStateAttributeListListAttributeCallbackBridge::O
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRoboticVacuumOperationalStateAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCOperationalStateAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17744,10 +17744,10 @@ void MTROperationalStateClusterOperationalCommandResponseCallbackBridge::OnSucce
     DispatchSuccess(context, response);
 };
 
-void MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::Clusters::RoboticVacuumOperationalState::Commands::OperationalCommandResponse::DecodableType & data)
+void MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & data)
 {
-    auto * response = [MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams new];
+    auto * response = [MTRRVCOperationalStateClusterOperationalCommandResponseParams new];
     CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
     if (err != CHIP_NO_ERROR) {
         OnFailureFn(context, err);
@@ -21827,15 +21827,15 @@ void MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackSubs
     }
 }
 
-void MTRRoboticVacuumOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RoboticVacuumOperationalState::ErrorStateEnum value)
+void MTRRVCOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RvcOperationalState::ErrorStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRoboticVacuumOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21850,8 +21850,8 @@ void MTRRoboticVacuumOperationalStateClusterErrorStateEnumAttributeCallbackSubsc
     }
 }
 
-void MTRNullableRoboticVacuumOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::RoboticVacuumOperationalState::ErrorStateEnum> & value)
+void MTRNullableRVCOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcOperationalState::ErrorStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21862,7 +21862,7 @@ void MTRNullableRoboticVacuumOperationalStateClusterErrorStateEnumAttributeCallb
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRoboticVacuumOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableRVCOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21877,15 +21877,15 @@ void MTRNullableRoboticVacuumOperationalStateClusterErrorStateEnumAttributeCallb
     }
 }
 
-void MTRRoboticVacuumOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RoboticVacuumOperationalState::OperationalStateEnum value)
+void MTRRVCOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::RvcOperationalState::OperationalStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRoboticVacuumOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRRVCOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21900,8 +21900,8 @@ void MTRRoboticVacuumOperationalStateClusterOperationalStateEnumAttributeCallbac
     }
 }
 
-void MTRNullableRoboticVacuumOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::RoboticVacuumOperationalState::OperationalStateEnum> & value)
+void MTRNullableRVCOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcOperationalState::OperationalStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21912,8 +21912,7 @@ void MTRNullableRoboticVacuumOperationalStateClusterOperationalStateEnumAttribut
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRoboticVacuumOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableRVCOperationalStateClusterOperationalStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

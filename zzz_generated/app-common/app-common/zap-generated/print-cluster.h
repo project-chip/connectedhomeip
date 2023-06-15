@@ -364,8 +364,7 @@
 #endif
 
 #if defined(ZCL_USING_OPERATIONAL_STATE_RVC_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_RVC_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                            \
-    { chip::app::Clusters::RoboticVacuumOperationalState::Id, "Robotic Vacuum Operational State" },
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER { chip::app::Clusters::RvcOperationalState::Id, "RVC Operational State" },
 #else
 #define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER
 #endif

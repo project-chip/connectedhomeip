@@ -784,25 +784,25 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRoboticVacuumOperationalStateClusterErrorStateStruct : NSObject <NSCopying>
+@interface MTRRVCOperationalStateClusterErrorStateStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRoboticVacuumOperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
+@interface MTRRVCOperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRoboticVacuumOperationalStateClusterOperationalErrorEvent : NSObject <NSCopying>
-@property (nonatomic, copy) MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_NEWLY_AVAILABLE;
+@interface MTRRVCOperationalStateClusterOperationalErrorEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRoboticVacuumOperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
+@interface MTRRVCOperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_NEWLY_AVAILABLE;
