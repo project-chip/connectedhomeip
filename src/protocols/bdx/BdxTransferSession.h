@@ -359,7 +359,7 @@ private:
      *   Helper method to prepare and send an outgoing message of type OutputEventType::kMsgToSend
      */
     template <typename MessageType>
-    TransferSession::MessageTypeData PrepareOutgoingMessageEvent(MessageType messageType);
+    void PrepareAndSendOutgoingMessageEvent(MessageType messageType, System::PacketBufferHandle msg);
 
     /**
      * @brief
@@ -410,9 +410,9 @@ private:
     uint64_t mStartOffset          = 0; ///< 0 represents no offset
     uint64_t mTransferLength       = 0; ///< 0 represents indefinite length
     uint16_t mTransferMaxBlockSize = 0;
-    
-    const uint8_t * mFileDesignator = nullptr;
-    uint16_t mFileDesLength         = 0;
+
+    const uint8_t * mFileDesignator       = nullptr;
+    uint16_t mFileDesLength               = 0;
     uint16_t mTransferRequestMaxBlockSize = 0;
     TransferControlFlags mTransferRequestControlFlags;
 
