@@ -317,7 +317,7 @@ public:
             }
         }
 
-        VendorId BasicInformationVendorId() const { return mBasicInformationVendorId; }
+        uint16_t BasicInformationVendorId() const { return mBasicInformationVendorId; }
 
         uint16_t BasicInformationProductId() const { return mBasicInformationProductId; }
 
@@ -325,7 +325,7 @@ public:
         Platform::ScopedMemoryBufferWithSize<uint8_t> mPaiDerBuffer;
         Platform::ScopedMemoryBufferWithSize<uint8_t> mDacDerBuffer;
         Platform::ScopedMemoryBufferWithSize<uint8_t> mCdBuffer;
-        VendorId mBasicInformationVendorId;
+        uint16_t mBasicInformationVendorId;
         uint16_t mBasicInformationProductId;
     };
 
