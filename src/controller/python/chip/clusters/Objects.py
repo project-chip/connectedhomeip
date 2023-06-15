@@ -14896,7 +14896,7 @@ class ModeSelect(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class ModeSelectFeature(IntFlag):
+        class Feature(IntFlag):
             kOnOff = 0x1
 
     class Structs:

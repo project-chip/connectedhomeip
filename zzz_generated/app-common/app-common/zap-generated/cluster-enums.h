@@ -1468,8 +1468,8 @@ enum class Feature : uint32_t
 
 namespace ModeSelect {
 
-// Bitmap for ModeSelectFeature
-enum class ModeSelectFeature : uint32_t
+// Bitmap for Feature
+enum class Feature : uint32_t
 {
     kOnOff = 0x1,
 };

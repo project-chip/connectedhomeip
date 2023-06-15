@@ -2303,7 +2303,7 @@ server cluster IcdManagement = 70 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 server cluster ModeSelect = 80 {
-  bitmap ModeSelectFeature : BITMAP32 {
+  bitmap Feature : BITMAP32 {
     kOnOff = 0x1;
   }
 
