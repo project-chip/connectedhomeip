@@ -267,9 +267,6 @@ void DecodePacketHeader(Json::Value & value, const PacketHeader * packetHeader)
             value["groupId"] = groupId.Value();
         }
     }
-
-    // TODO: a decode would be useful however it likely requires more decode
-    //       metadata
 }
 
 void DecodePayloadData(Json::Value & value, chip::ByteSpan payload)
