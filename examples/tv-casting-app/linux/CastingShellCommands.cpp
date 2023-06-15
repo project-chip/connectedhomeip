@@ -23,6 +23,7 @@
 
 #include "CastingServer.h"
 #include "CastingUtils.h"
+#include "JsonTLV.h"
 #include "app/clusters/bindings/BindingManager.h"
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
@@ -78,6 +79,149 @@ void PrintBindings()
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
     }
+}
+
+class MockCommandSenderCallback : public chip::app::CommandSender::Callback
+{
+public:
+    void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
+                    const chip::app::StatusIB & aStatus, chip::TLV::TLVReader * aData) override
+    {
+        ChipLogDetail(Controller, "OnResponse Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%x",
+                      aPath.mClusterId, aPath.mCommandId, aPath.mEndpointId);
+
+        uint8_t out_buf[1024];
+        Encoding::BufferWriter buf_writer(out_buf, sizeof(out_buf));
+
+        TLV::Debug::Dump(*aData, TLV::Json::TLVDumpWriter);
+        TLV::Json::WriteJSON(*aData, buf_writer);
+
+        ChipLogDetail(Controller, "OnResponse %s", out_buf);
+
+        ChipLogDetail(Controller, "OnResponse DumpDone");
+    }
+    void OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override
+    {
+        ChipLogError(Controller, "OnError happens with %" CHIP_ERROR_FORMAT, aError.Format());
+    }
+    void OnDone(chip::app::CommandSender * apCommandSender) override
+    {
+        ChipLogDetail(Controller, "OnDone CommandSender");
+        if (apCommandSender != nullptr)
+        {
+            chip::Platform::Delete(apCommandSender);
+            ChipLogDetail(Controller, "Cleaned up");
+        }
+    }
+
+} mockCommandSenderDelegate;
+
+CHIP_ERROR SendClusterCommand(chip::NodeId node, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
+                              uint16_t timedRequestTimeoutMs, uint16_t imTimeoutMs, char * json)
+{
+    chip::TLV::TLVWriter writer;
+    chip::TLV::TLVReader reader;
+
+    uint8_t buf[74];
+    uint8_t out_buf[1024];
+
+    Encoding::BufferWriter buf_writer(out_buf, sizeof(out_buf));
+
+    writer.Init(buf);
+    writer.ImplicitProfileId = chip::TLV::kCommonProfileId;
+
+    JsonTLV customJson;
+    ReturnErrorOnFailure(customJson.Parse("SendClusterCommand", json));
+
+    ReturnErrorOnFailure(customJson.Encode(writer, chip::TLV::CommonTag(77)));
+
+    reader.Init(buf, writer.GetLengthWritten());
+    reader.ImplicitProfileId = chip::TLV::kCommonProfileId;
+    reader.Next();
+
+    CastingServer::GetInstance()->SendCommand(mockCommandSenderDelegate, endpointId, clusterId, commandId, reader,
+                                              timedRequestTimeoutMs, imTimeoutMs);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR RunJsonTest(const char * json, const char * testName)
+{
+    chip::TLV::TLVWriter writer;
+    chip::TLV::TLVReader reader;
+
+    uint8_t buf[74];
+    uint8_t out_buf[1024];
+    Encoding::BufferWriter buf_writer(out_buf, sizeof(out_buf));
+
+    writer.Init(buf);
+    writer.ImplicitProfileId = chip::TLV::kCommonProfileId;
+
+    JsonTLV customJson;
+    ReturnLogErrorOnFailure(customJson.Parse(testName, json));
+    ReturnLogErrorOnFailure(customJson.Encode(writer, chip::TLV::CommonTag(77)));
+
+    ChipLogProgress(AppServer, "--------Start Raw Bytes");
+    for (uint32_t i = 0; i < writer.GetLengthWritten(); i++)
+    {
+        if (i != 0 && i % 16 == 0)
+            printf("\n");
+        printf("0x%02X, ", buf[i]);
+    }
+    printf("\n");
+    ChipLogProgress(AppServer, "--------End Raw Bytes");
+
+    reader.Init(buf, writer.GetLengthWritten());
+    reader.ImplicitProfileId = chip::TLV::kCommonProfileId;
+    reader.Next();
+
+    TLV::Debug::Dump(reader, TLV::Json::TLVDumpWriter);
+
+    ChipLogProgress(AppServer, "%s", json);
+    TLV::Json::WriteJSON(reader, buf_writer);
+
+    ChipLogProgress(AppServer, "%s", out_buf);
+
+    Json::Value inputValue;
+    VerifyOrReturnLogError(JsonParser2::ParseCustomArgument(testName, json, inputValue), CHIP_ERROR_INVALID_ARGUMENT);
+
+    Json::Value outputValue;
+    VerifyOrReturnLogError(JsonParser2::ParseCustomArgument(testName, (char *) out_buf, outputValue), CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrReturnLogError(inputValue == outputValue, CHIP_ERROR_DECODE_FAILED);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR RunJsonTests()
+{
+    char json[] = "{"
+                  "\"0x0\" : { \"tlvType\":\"0x00\", \"value\": 7 },"
+                  "\"0x1\" : { \"tlvType\":\"0x0c\", \"value\": \"foo\" },"
+                  "\"0x2\" : {"
+                  "\"0x0\" : { \"tlvType\":\"0x0a\", \"value\": 8.000000 }"
+                  "},"
+                  "\"0x3\" : ["
+                  "{ \"tlvType\":\"0x0c\", \"value\": \"bar\" },"
+                  "{ \"tlvType\":\"0x0c\", \"value\": \"bat\" },"
+                  "{"
+                  "\"0x0\" : { \"tlvType\":\"0x04\", \"value\": 7 },"
+                  "\"0x1\" : { \"tlvType\":\"0x04\", \"value\": 8 }"
+                  "},"
+                  "{ \"tlvType\":\"0x08\", \"value\": true },"
+                  "{ \"tlvType\":\"0x04\", \"value\": 5463 }"
+                  "],"
+                  "\"0x4\" : { \"tlvType\":\"0x04\", \"value\": 3 }"
+                  "}";
+    ReturnErrorOnFailure(RunJsonTest(json, "test 1"));
+
+    ReturnErrorOnFailure(RunJsonTest(
+        "{\"0x0\" : { \"tlvType\":\"0x00\", \"value\": 7 },\"0x1\" : { \"tlvType\":\"0x0c\", \"value\": \"foo\" },\"0x2\" "
+        ": {\"0x0\" : { \"tlvType\":\"0x0a\", \"value\": 8.000000 }}}",
+        "test 2"));
+
+    ReturnErrorOnFailure(RunJsonTest("{\"0x0\" : { \"tlvType\":\"0x04\", \"value\": 1 }}", "test 3"));
+
+    return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR CastingHandler(int argc, char ** argv)
@@ -136,6 +280,39 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         chip::NodeId node = (chip::NodeId) strtoull(argv[1], &eptr, 0);
         CastingServer::GetInstance()->ReadServerClustersForNode(node);
         return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "invoke") == 0)
+    {
+        ChipLogProgress(DeviceLayer, "invoke");
+        if (argc < 8)
+        {
+            return PrintAllCommands();
+        }
+
+        // Keypad Input: send key
+        // cast invoke 0 1 1289 0 0 5000 {"0x0":{"tlvType":"0x04","value":7}}
+
+        // MediaPlayback: play
+        // cast invoke 0 1 1286 0 0 5000 {}
+
+        char * eptr;
+        chip::NodeId node              = (chip::NodeId) strtoull(argv[1], &eptr, 0);
+        chip::EndpointId endpointId    = (chip::EndpointId) strtoull(argv[2], &eptr, 0);
+        chip::ClusterId clusterId      = (chip::ClusterId) strtoull(argv[3], &eptr, 0);
+        chip::CommandId commandId      = (chip::CommandId) strtoull(argv[4], &eptr, 0);
+        uint16_t timedRequestTimeoutMs = (uint16_t) strtoull(argv[5], &eptr, 0);
+        uint16_t imTimeoutMs           = (uint16_t) strtoull(argv[6], &eptr, 0);
+        char * json                    = argv[7];
+
+        ChipLogProgress(DeviceLayer, "invoke json=%s", json);
+
+        SendClusterCommand(node, endpointId, clusterId, commandId, timedRequestTimeoutMs, imTimeoutMs, json);
+        return CHIP_NO_ERROR;
+    }
+    if (strcmp(argv[0], "run-json-tests") == 0)
+    {
+        ChipLogProgress(DeviceLayer, "run-json-tests");
+        return RunJsonTests();
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     if (strcmp(argv[0], "sendudc") == 0)

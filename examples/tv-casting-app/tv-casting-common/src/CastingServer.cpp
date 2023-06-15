@@ -139,6 +139,7 @@ CHIP_ERROR CastingServer::OpenBasicCommissioningWindow(std::function<void(CHIP_E
     mOnConnectionSuccessClientCallback = onConnectionSuccess;
     mOnConnectionFailureClientCallback = onConnectionFailure;
     mOnNewOrUpdatedEndpoint            = onNewOrUpdatedEndpoint;
+    ChipLogError(AppServer, "-----------------------CastingServer PrepareForCommissioning");
     return Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(kCommissioningWindowTimeout);
 }
 
@@ -241,6 +242,55 @@ void CastingServer::ReadServerClustersForNode(NodeId nodeId)
                     endpointInfo->PrintInfo();
                 }
             }
+        }
+    }
+}
+
+void CastingServer::SendCommand(chip::app::CommandSender::Callback & callback, uint32_t endpointId, uint32_t clusterId,
+                                uint32_t commandId, chip::TLV::TLVReader & reader, uint16_t timedRequestTimeoutMs,
+                                uint16_t imTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    app::CommandSender * commandSender;
+    chip::TLV::TLVWriter * writer = nullptr;
+
+    const OperationalDeviceProxy * device = mActiveTargetVideoPlayerInfo.GetOperationalDeviceProxy();
+    if (device == nullptr)
+    {
+        ChipLogError(AppServer, "Failed in getting an instance of DeviceProxy");
+        return;
+    }
+    VerifyOrExit(device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
+
+    commandSender = Platform::New<app::CommandSender>(&callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0);
+
+    SuccessOrExit(err = commandSender->PrepareCommand(app::CommandPathParams(static_cast<EndpointId>(endpointId), /* group id */ 0,
+                                                                             static_cast<ClusterId>(clusterId),
+                                                                             static_cast<CommandId>(commandId),
+                                                                             app::CommandPathFlags::kEndpointIdValid),
+                                                      false));
+
+    writer = commandSender->GetCommandDataIBTLVWriter();
+    VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    SuccessOrExit(err = writer->CopyContainer(chip::TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader));
+
+    SuccessOrExit(err = commandSender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
+                                                                                : Optional<uint16_t>::Missing()));
+
+    SuccessOrExit(err =
+                      commandSender->SendCommandRequest(device->GetSecureSession().Value(),
+                                                        imTimeoutMs != 0 ? MakeOptional(System::Clock::Milliseconds32(imTimeoutMs))
+                                                                         : Optional<System::Clock::Timeout>::Missing()));
+
+exit:
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "SendCommand Invoke Error: %s", err.AsString());
+        if (commandSender != nullptr)
+        {
+            chip::Platform::Delete(commandSender);
         }
     }
 }
