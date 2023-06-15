@@ -37,27 +37,27 @@ tests:
       command: "readAttribute"
       attribute: "StandardNamespace"
       response:
-        value: 0
+          value: 0
 
     - label: "Read SupportedModes"
       command: "readAttribute"
       attribute: "SupportedModes"
       response:
-        value:
-          [
-            { Label: "Black", Mode: 0, SemanticTags: [{ "Value": 0 }] },
-            {
-              Label: "Cappuccino",
-              Mode: 4,
-              SemanticTags: [{ "Value": 0 }],
-            },
-            {
-              Label: "Espresso",
-              Mode: 7,
-              SemanticTags: [{ "Value": 0 }],
-            },
-          ]
-        constraints:
+          value:
+              [
+                  { Label: "Black", Mode: 0, SemanticTags: [{ "Value": 0 }] },
+                  {
+                      Label: "Cappuccino",
+                      Mode: 4,
+                      SemanticTags: [{ "Value": 0 }],
+                  },
+                  {
+                      Label: "Espresso",
+                      Mode: 7,
+                      SemanticTags: [{ "Value": 0 }],
+                  },
+              ]
+          constraints:
               type: list
               minLength: 3
               maxLength: 3
