@@ -264,11 +264,12 @@ class ChipDeviceControllerBase():
             self._ChipStack.commissioningCompleteEvent.set()
             self._ChipStack.completeEvent.set()
 
-        def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, manualCode: str, setupCode: str, err: PyChipError) -> None:
+        def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupManualCode: str,
+                                     setupQRCode: str, err: PyChipError) -> None:
             if err.is_success:
                 print("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
                 self._ChipStack.openCommissioningWindowPincode[nodeid] = CommissioningParameters(
-                    setupPinCode=setupPinCode, setupManualCode=manualCode.decode(), setupQRCode=setupCode.decode())
+                    setupPinCode=setupPinCode, setupManualCode=setupManualCode.decode(), setupQRCode=setupQRCode.decode())
             else:
                 print("Failed to open commissioning window: {}".format(err))
 
@@ -1171,7 +1172,8 @@ class ChipDeviceControllerBase():
             nodeid, [(endpoint, attributeType)]))
         path = ClusterAttribute.AttributePath(
             EndpointId=endpoint, Attribute=attributeType)
-        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[endpoint][clusterType][attributeType], dataVersion=result[endpoint][clusterType][ClusterAttribute.DataVersion])
+        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId),
+                                      status=0, value=result[endpoint][clusterType][attributeType], dataVersion=result[endpoint][clusterType][ClusterAttribute.DataVersion])
 
     def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, dataVersion=0, blocking=True):
         req = None

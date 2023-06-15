@@ -36,7 +36,7 @@ extern "C" {
 typedef void (*DevicePairingDelegate_OnPairingCompleteFunct)(PyChipError err);
 typedef void (*DevicePairingDelegate_OnCommissioningCompleteFunct)(NodeId nodeId, PyChipError err);
 typedef void (*DevicePairingDelegate_OnWindowOpenCompleteFunct)(NodeId nodeId, uint32_t setupPinCode, const char * manualCode,
-                                                                const char * setupCode, PyChipError err);
+                                                                const char * setupQRCode, PyChipError err);
 
 // Used for testing by OpCredsBinding
 typedef void (*DevicePairingDelegate_OnCommissioningSuccessFunct)(PeerId peerId);

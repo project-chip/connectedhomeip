@@ -134,14 +134,14 @@ void ScriptDevicePairingDelegate::OnOpenCommissioningWindow(NodeId deviceId, CHI
 {
     if (mOnWindowOpenCompleteCallback != nullptr)
     {
-        std::string manualPairingCode;
-        std::string setupPairingCode;
+        std::string setupManualCode;
+        std::string setupQRCode;
 
-        ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
-        QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(setupPairingCode);
-        ChipLogProgress(Zcl, "ManualPairingCode = %s", manualPairingCode.c_str());
-        ChipLogProgress(Zcl, "SetupPairingCode = %s", setupPairingCode.c_str());
-        mOnWindowOpenCompleteCallback(deviceId, payload.setUpPINCode, manualPairingCode.c_str(), setupPairingCode.c_str(),
+        ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(setupManualCode);
+        QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(setupQRCode);
+        ChipLogProgress(Zcl, "SetupManualCode = %s", setupManualCode.c_str());
+        ChipLogProgress(Zcl, "SetupQRCode = %s", setupQRCode.c_str());
+        mOnWindowOpenCompleteCallback(deviceId, payload.setUpPINCode, setupManualCode.c_str(), setupQRCode.c_str(),
                                       ToPyChipError(status));
     }
     if (mWindowOpener != nullptr)
