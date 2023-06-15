@@ -38,10 +38,10 @@ _install_additional_pip_requirements() {
         for platform in "${_PLATFORMS[@]}"; do
             # Allow none as an alias of nothing extra installed (like -p none)
             if [ "$platform" != "none" ]; then
-              echo "Installing pip requirements for ${platform}..."
+              echo "Installing pip requirements for $platform..."
               pip install -q \
-                   -r "${_CHIP_ROOT}/scripts/setup/requirements.${platform}.txt" \
-                   -c "${_CHIP_ROOT}/scripts/setup/constraints.txt"
+                   -r "$_CHIP_ROOT/scripts/setup/requirements.$platform.txt" \
+                   -c "$_CHIP_ROOT/scripts/setup/constraints.txt"
             fi
         done
     fi
@@ -141,9 +141,9 @@ _bootstrap_or_activate "$0"
 if [ "$_ACTION_TAKEN" = "bootstrap" ]; then
    # by default, install all extra pip dependencies even if slow
    # unless arguments say otherwise
-   _install_additional_pip_requirements "all" $*
+   _install_additional_pip_requirements "all" "$@"
 else
-   _install_additional_pip_requirements "none" $*
+   _install_additional_pip_requirements "none" "$@"
 fi
 
 unset -f _bootstrap_or_activate
