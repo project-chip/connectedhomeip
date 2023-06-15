@@ -22,26 +22,26 @@ _install_additional_pip_requirements() {
     # figure out additional pip install items
     while [[ $# -gt 0 ]]; do
         case $1 in
-            -p|--platform)
+            -p | --platform)
                 _SETUP_PLATFORM=$2
                 shift # argument
                 shift # value
                 ;;
             *)
-                shift;
+                shift
                 ;;
         esac
     done
 
     if ! [ -z "$_SETUP_PLATFORM" ]; then
-        IFS="," read -r -a _PLATFORMS <<< "$_SETUP_PLATFORM"
+        IFS="," read -r -a _PLATFORMS <<<"$_SETUP_PLATFORM"
         for platform in "${_PLATFORMS[@]}"; do
             # Allow none as an alias of nothing extra installed (like -p none)
             if [ "$platform" != "none" ]; then
-              echo "Installing pip requirements for $platform..."
-              pip install -q \
-                   -r "$_CHIP_ROOT/scripts/setup/requirements.$platform.txt" \
-                   -c "$_CHIP_ROOT/scripts/setup/constraints.txt"
+                echo "Installing pip requirements for $platform..."
+                pip install -q \
+                    -r "$_CHIP_ROOT/scripts/setup/requirements.$platform.txt" \
+                    -c "$_CHIP_ROOT/scripts/setup/constraints.txt"
             fi
         done
     fi
@@ -139,11 +139,11 @@ _ORIGINAL_PW_ENVIRONMENT_ROOT="$PW_ENVIRONMENT_ROOT"
 _bootstrap_or_activate "$0"
 
 if [ "$_ACTION_TAKEN" = "bootstrap" ]; then
-   # by default, install all extra pip dependencies even if slow
-   # unless arguments say otherwise
-   _install_additional_pip_requirements "all" "$@"
+    # by default, install all extra pip dependencies even if slow
+    # unless arguments say otherwise
+    _install_additional_pip_requirements "all" "$@"
 else
-   _install_additional_pip_requirements "none" "$@"
+    _install_additional_pip_requirements "none" "$@"
 fi
 
 unset -f _bootstrap_or_activate
@@ -162,5 +162,5 @@ unset PW_DOCTOR_SKIP_CIPD_CHECKS
 unset -f _chip_bootstrap_banner
 
 if ! [ -z "$_ORIGINAL_PW_ENVIRONMENT_ROOT" ]; then
-    export PW_ENVIRONMENT_ROOT="$_ORIGINAL_PW_ENVIRONMENT_ROOT";
+    export PW_ENVIRONMENT_ROOT="$_ORIGINAL_PW_ENVIRONMENT_ROOT"
 fi
