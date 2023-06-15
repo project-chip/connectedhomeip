@@ -44,6 +44,7 @@
 #include "rsi_wlan_config.h"
 
 #include "dhcp_client.h"
+#include "lwip/nd6.h"
 #include "wfx_rsi.h"
 
 /* Rsi driver Task will use as its stack */
@@ -561,6 +562,10 @@ void wfx_rsi_task(void * arg)
                 /* Checks if the assigned IPv6 address is preferred by evaluating
                  * the first block of IPv6 address ( block 0)
                  */
+                if (!hasNotifiedIPV6)
+                {
+                    nd6_tmr();
+                }
                 if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
                 {
                     wfx_ipv6_notify(GET_IPV6_SUCCESS);
