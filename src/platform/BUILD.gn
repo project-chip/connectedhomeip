@@ -69,10 +69,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Device software version string as a string having the format "x.y"  e.g. chip_device_config_device_software_version="7.0" (but make sure to escape it from the shell!)
     chip_device_config_device_software_version_string = ""
 
-    # Device vendor id as an integer. Configurable vendor ids allowed are 65521 (0xFFF1), 65522 (0xFFF2), 655223 (0xFFF3).
+    # Device vendor id as a decimal integer. Configurable vendor ids allowed are 65521 (0xFFF1), 65522 (0xFFF2), 655223 (0xFFF3).
     chip_device_config_device_vendor_id = ""
 
-    # Device product id as an integer. Configurable product ids allowed are in the range 32768 (0x8000) - 32867 (0x8063)
+    # Device product id as a decimal integer. Configurable product ids allowed are in the range 32768 (0x8000) - 32867 (0x8063)
     chip_device_config_device_product_id = ""
 
     # Define the default number of ip addresses to discover
