@@ -295,7 +295,7 @@ private:
     /// are that the handler is in a report generating state, meaning it is subscribed to or processing a read request, that the min
     /// interval has expired and the max interval has expired, forcing an empty report, or that the handler is dirty. This function
     /// is used to determine whether a report generation should be scheduled for the handler.
-    /// @return
+    /// @return Whether the ReadHandler is in a state where it can immediately send a report.
     bool IsReportableNow() const
     {
         // Important: Anything that changes the state IsReportableNow depends on in
@@ -331,7 +331,7 @@ private:
 
     /// @brief Update mDirtyGeneration to the latest DirtySetGeneration of the InteractionModelEngine. As this might make the
     /// readhandler dirty, this function checks if the readhandler is now reportable and schedules a run if it is the case.
-    /// @param aAttributeChanged
+    /// @param aAttributeChanged Path to the attribute that was changed.
     void UpdateDirtyGeneration(const AttributePathParams & aAttributeChanged);
     bool IsDirty() const
     {
@@ -435,7 +435,7 @@ private:
 
     /// @brief This function calls the SetStateFlagAndScheduleReport with the flag value to false, thus possibly emitting a report
     /// generation.
-    /// @param aFlag
+    /// @param aFlag Flag to clear
     void ClearStateFlagAndScheduleReport(ReadHandlerFlags aFlag);
 
     // Helpers for continuing the subscription resumption
