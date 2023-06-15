@@ -16,7 +16,8 @@
 
 _install_additional_pip_requirements() {
     # by default, install all extra pip dependencies even if slow
-    _SETUP_PLATFORM="all"
+    _SETUP_PLATFORM=$1
+    shift
 
     # figure out additional pip install items
     while [[ $# -gt 0 ]]; do
