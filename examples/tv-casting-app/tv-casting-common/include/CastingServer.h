@@ -77,6 +77,8 @@ public:
                                          std::function<void(CHIP_ERROR)> onConnectionFailure,
                                          std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
     void ReadServerClustersForNode(chip::NodeId nodeId);
+    void SendCommand(chip::app::CommandSender::Callback & callback, uint32_t endpointId, uint32_t clusterId, uint32_t commandId,
+                     chip::TLV::TLVReader & reader, uint16_t timedRequestTimeoutMs, uint16_t imTimeoutMs);
     static void OnDescriptorReadSuccessResponse(void * context,
                                                 const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList);
     static void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error);
