@@ -153,7 +153,6 @@ pw_cleanup
 unset _ACTION_TAKEN
 unset _CHIP_ROOT
 unset PW_CIPD_INSTALL_DIR
-unset CIPD_CACHE_DIR
 unset _PW_BANNER_FUNC
 unset _PW_TEXT
 unset PW_DOCTOR_SKIP_CIPD_CHECKS
