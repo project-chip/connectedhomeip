@@ -271,7 +271,7 @@ void DecodePacketHeader(Json::Value & value, const PacketHeader * packetHeader)
 
 void DecodePayloadData(Json::Value & value, chip::ByteSpan payload)
 {
-    value["payloadSize"] = static_cast<Value::UInt>(payload.size());
+    value["payloadSize"] = static_cast<Json::Value::UInt>(payload.size());
 
     // TODO: a decode would be useful however it likely requires more decode
     //       metadata
