@@ -66,7 +66,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Device software version as an integer.  e.g. chip_device_config_device_software_version=7
     chip_device_config_device_software_version = ""
 
-    # Device software version string as a string having the format "x.y"  e.g. chip_device_config_device_software_version="\"7.0\""
+    # Device software version string as a string having the format "x.y"  e.g. chip_device_config_device_software_version="7.0" (but make sure to escape it from the shell!)
     chip_device_config_device_software_version_string = ""
 
     # Device vendor id as an integer. Configurable vendor ids allowed are 65521 (0xFFF1), 65522 (0xFFF2), 655223 (0xFFF3).

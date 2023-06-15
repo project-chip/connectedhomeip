@@ -263,7 +263,7 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
     completion(params, nil);
 }
 
-- (void)respondWithContinueToApplyUpdateRequestWithCompletion:(ApplyUpdateRequestCompletion)completion
+- (void)respondWithProceedToApplyUpdateRequestWithCompletion:(ApplyUpdateRequestCompletion)completion
 {
     __auto_type * params = [[MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
     params.action = @(MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed);
