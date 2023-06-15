@@ -1078,6 +1078,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("smokeCoAlarm", writeSmokeCoAlarmInteractionInfo);
     Map<String, InteractionInfo> writeOperationalStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("operationalState", writeOperationalStateInteractionInfo);
+    Map<String, InteractionInfo> writeRoboticVacuumOperationalStateInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("roboticVacuumOperationalState", writeRoboticVacuumOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("hepaFilterMonitoring", writeHepaFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeActivatedCarbonFilterMonitoringInteractionInfo = new LinkedHashMap<>();

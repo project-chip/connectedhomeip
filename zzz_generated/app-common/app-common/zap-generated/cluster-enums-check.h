@@ -1500,6 +1500,38 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::Opera
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(RoboticVacuumOperationalState::ErrorStateEnum val)
+{
+    using EnumType = RoboticVacuumOperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kFailedToFindChargingDock:
+    case EnumType::kStuck:
+    case EnumType::kDustBinMissing:
+    case EnumType::kDustBinFull:
+    case EnumType::kWaterTankEmpty:
+    case EnumType::kWaterTankMissing:
+    case EnumType::kWaterTankLidOpen:
+    case EnumType::kMopCleaningPadMissing:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(RoboticVacuumOperationalState::OperationalStateEnum val)
+{
+    using EnumType = RoboticVacuumOperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kSeekingCharger:
+    case EnumType::kCharging:
+    case EnumType::kDocked:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(HepaFilterMonitoring::ChangeIndicationEnum val)
 {
     using EnumType = HepaFilterMonitoring::ChangeIndicationEnum;

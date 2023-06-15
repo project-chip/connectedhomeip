@@ -7420,6 +7420,120 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readRoboticVacuumOperationalStateInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readRoboticVacuumOperationalStatePhaseListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readRoboticVacuumOperationalStatePhaseListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster).readPhaseListAttribute(
+              (ChipClusters.RoboticVacuumOperationalStateCluster.PhaseListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedRoboticVacuumOperationalStateClusterPhaseListAttributeCallback(),
+          readRoboticVacuumOperationalStatePhaseListCommandParams
+        );
+        result.put("readPhaseListAttribute", readRoboticVacuumOperationalStatePhaseListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readRoboticVacuumOperationalStateCurrentPhaseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readRoboticVacuumOperationalStateCurrentPhaseAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster).readCurrentPhaseAttribute(
+              (ChipClusters.RoboticVacuumOperationalStateCluster.CurrentPhaseAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedRoboticVacuumOperationalStateClusterCurrentPhaseAttributeCallback(),
+          readRoboticVacuumOperationalStateCurrentPhaseCommandParams
+        );
+        result.put("readCurrentPhaseAttribute", readRoboticVacuumOperationalStateCurrentPhaseAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readRoboticVacuumOperationalStateCountdownTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readRoboticVacuumOperationalStateCountdownTimeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster).readCountdownTimeAttribute(
+              (ChipClusters.RoboticVacuumOperationalStateCluster.CountdownTimeAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedRoboticVacuumOperationalStateClusterCountdownTimeAttributeCallback(),
+          readRoboticVacuumOperationalStateCountdownTimeCommandParams
+        );
+        result.put("readCountdownTimeAttribute", readRoboticVacuumOperationalStateCountdownTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readRoboticVacuumOperationalStateOperationalStateListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readRoboticVacuumOperationalStateOperationalStateListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster).readOperationalStateListAttribute(
+              (ChipClusters.RoboticVacuumOperationalStateCluster.OperationalStateListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedRoboticVacuumOperationalStateClusterOperationalStateListAttributeCallback(),
+          readRoboticVacuumOperationalStateOperationalStateListCommandParams
+        );
+        result.put("readOperationalStateListAttribute", readRoboticVacuumOperationalStateOperationalStateListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readRoboticVacuumOperationalStateGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readRoboticVacuumOperationalStateGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.RoboticVacuumOperationalStateCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedRoboticVacuumOperationalStateClusterGeneratedCommandListAttributeCallback(),
+          readRoboticVacuumOperationalStateGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readRoboticVacuumOperationalStateGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readRoboticVacuumOperationalStateAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readRoboticVacuumOperationalStateAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.RoboticVacuumOperationalStateCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedRoboticVacuumOperationalStateClusterAcceptedCommandListAttributeCallback(),
+          readRoboticVacuumOperationalStateAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readRoboticVacuumOperationalStateAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readRoboticVacuumOperationalStateEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readRoboticVacuumOperationalStateEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster).readEventListAttribute(
+              (ChipClusters.RoboticVacuumOperationalStateCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedRoboticVacuumOperationalStateClusterEventListAttributeCallback(),
+          readRoboticVacuumOperationalStateEventListCommandParams
+        );
+        result.put("readEventListAttribute", readRoboticVacuumOperationalStateEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readRoboticVacuumOperationalStateAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readRoboticVacuumOperationalStateAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.RoboticVacuumOperationalStateCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedRoboticVacuumOperationalStateClusterAttributeListAttributeCallback(),
+          readRoboticVacuumOperationalStateAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readRoboticVacuumOperationalStateAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readRoboticVacuumOperationalStateFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readRoboticVacuumOperationalStateFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readRoboticVacuumOperationalStateFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readRoboticVacuumOperationalStateFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readRoboticVacuumOperationalStateClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readRoboticVacuumOperationalStateClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readRoboticVacuumOperationalStateClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readRoboticVacuumOperationalStateClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readHepaFilterMonitoringInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readHepaFilterMonitoringConditionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readHepaFilterMonitoringConditionAttributeInteractionInfo = new InteractionInfo(
@@ -23222,6 +23336,7 @@ public class ClusterReadMapping {
             put("airQuality", readAirQualityInteractionInfo());
             put("smokeCoAlarm", readSmokeCoAlarmInteractionInfo());
             put("operationalState", readOperationalStateInteractionInfo());
+            put("roboticVacuumOperationalState", readRoboticVacuumOperationalStateInteractionInfo());
             put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());
             put("activatedCarbonFilterMonitoring", readActivatedCarbonFilterMonitoringInteractionInfo());
             put("ceramicFilterMonitoring", readCeramicFilterMonitoringInteractionInfo());
