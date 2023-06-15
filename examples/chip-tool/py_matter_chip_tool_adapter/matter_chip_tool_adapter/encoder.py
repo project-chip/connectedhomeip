@@ -34,8 +34,7 @@ _ANY_COMMANDS_LIST_ARGUMENTS_WITH_WILDCARDS = [
 
 
 _ALIASES = {
-    'AnyCommands': {
-        'alias': 'any',
+    '*': {
         'commands': {
             'CommandById': {
                 'alias': 'command-by-id',
@@ -97,6 +96,9 @@ _ALIASES = {
                 },
             },
         }
+    },
+    'AnyCommands': {
+        'alias': 'any',
     },
     'CommissionerCommands': {
         'alias': 'pairing',
@@ -313,7 +315,7 @@ class Encoder:
             else:
                 argument_name = 'value'
 
-        return self.__get_alias(cluster_name, command_name, argument_name) or argument_name
+        return self.__get_alias('*', command_name, argument_name) or self.__get_alias(cluster_name, command_name, argument_name) or argument_name
 
     def __maybe_add(self, rv, value, name):
         if value is None:

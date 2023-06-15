@@ -728,7 +728,7 @@ class _ConstraintHasMaskSet(BaseConstraint):
         self._has_masks_set = has_masks_set
 
     def check_response(self, value, value_type_name) -> bool:
-        return all([(value & mask) == mask for mask in self._has_masks_set])
+        return all([(value & mask) != 0 for mask in self._has_masks_set])
 
     def get_reason(self, value, value_type_name) -> str:
         expected_masks = []

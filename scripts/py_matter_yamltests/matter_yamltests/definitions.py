@@ -87,6 +87,9 @@ class SpecDefinitions:
                     self.__responses_by_id[code][struct.code] = struct
                     self.__responses_by_name[name][struct.name] = struct.code
 
+    def get_cluster_names(self) -> List[str]:
+        return [name for name, _ in self.__clusters_by_name.items()]
+
     def get_cluster_name(self, cluster_id: int) -> str:
         cluster = self.__clusters_by_id.get(cluster_id)
         return cluster.name if cluster else None

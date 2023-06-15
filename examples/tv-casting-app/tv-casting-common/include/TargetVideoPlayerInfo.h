@@ -23,6 +23,8 @@
 #include <app/OperationalSessionSetup.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
+
 constexpr size_t kMaxNumberOfEndpoints = 5;
 
 class TargetVideoPlayerInfo;
