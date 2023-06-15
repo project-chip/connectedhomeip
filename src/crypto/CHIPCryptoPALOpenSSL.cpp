@@ -1653,7 +1653,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
                 }
                 else
                 {
-                    VerifyOrExit(isCA && (pathLen == -1 || pathLen == 0 || pathLen == 1), err = CHIP_ERROR_INTERNAL);
+                    // For PAA, pathlen must be absent or equal to 1 (see Matter 1.1 spec 6.2.2.5)
+                    VerifyOrExit(isCA && (pathLen == -1 || pathLen == 1), err = CHIP_ERROR_INTERNAL);
                 }
             }
             break;

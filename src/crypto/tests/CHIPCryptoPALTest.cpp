@@ -156,6 +156,8 @@ public:
 };
 #endif
 
+#include "DacValidationExplicitVectors.h"
+
 } // namespace
 
 static uint32_t gs_test_entropy_source_called = 0;
@@ -1956,14 +1958,25 @@ static void TestX509_VerifyAttestationCertificateFormat(nlTestSuite * inSuite, v
         {  ByteSpan(),                                    Crypto::AttestationCertType::kDAC, CHIP_ERROR_INVALID_ARGUMENT },
         {  sTestCert_PAI_FFF2_NoPID_FB_Cert,              Crypto::AttestationCertType::kDAC, CHIP_ERROR_INTERNAL         },
         {  sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert, Crypto::AttestationCertType::kPAA, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaaWithNoPathlen},                   Crypto::AttestationCertType::kPAA, CHIP_NO_ERROR               },
+        {  ByteSpan{kPaiPathLenMissing},                  Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaiPathLen1},                        Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaaPathLen2},                        Crypto::AttestationCertType::kPAA, CHIP_ERROR_INTERNAL         },
     };
     // clang-format on
 
+    int case_idx = 0;
     for (auto & testCase : sValidationTestCases)
     {
         ByteSpan cert  = testCase.cert;
         CHIP_ERROR err = VerifyAttestationCertificateFormat(cert, testCase.type);
+        if (err != testCase.expectedError)
+        {
+            ChipLogError(Crypto, "Failed TestX509_VerifyAttestationCertificateFormat sub-case %d, err: %" CHIP_ERROR_FORMAT,
+                         case_idx, err.Format());
+        }
         NL_TEST_ASSERT(inSuite, err == testCase.expectedError);
+        ++case_idx;
     }
 }
 
