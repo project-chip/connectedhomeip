@@ -54,10 +54,12 @@ uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
 chip::ClusterId kTestClusterId          = 6;
+chip::ClusterId kTestEventClusterId     = chip::Test::MockClusterId(1);
 chip::ClusterId kInvalidTestClusterId   = 7;
 chip::EndpointId kTestEndpointId        = 1;
-chip::EventId kTestEventIdDebug         = 1;
-chip::EventId kTestEventIdCritical      = 2;
+chip::EndpointId kTestEventEndpointId   = chip::Test::kMockEndpoint1;
+chip::EventId kTestEventIdDebug         = chip::Test::MockEventId(1);
+chip::EventId kTestEventIdCritical      = chip::Test::MockEventId(2);
 uint8_t kTestFieldValue1                = 1;
 chip::TLV::Tag kTestEventTag            = chip::TLV::ContextTag(1);
 chip::EndpointId kInvalidTestEndpointId = 3;
@@ -128,11 +130,11 @@ void GenerateEvents(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2;
     chip::app::EventOptions options1;
-    options1.mPath     = { kTestEndpointId, kTestClusterId, kTestEventIdDebug };
+    options1.mPath     = { kTestEventEndpointId, kTestEventClusterId, kTestEventIdDebug };
     options1.mPriority = chip::app::PriorityLevel::Info;
 
     chip::app::EventOptions options2;
-    options2.mPath     = { kTestEndpointId, kTestClusterId, kTestEventIdCritical };
+    options2.mPath     = { kTestEventEndpointId, kTestEventClusterId, kTestEventIdCritical };
     options2.mPriority = chip::app::PriorityLevel::Critical;
     TestEventGenerator testEventGenerator;
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
@@ -820,8 +822,8 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
     chip::app::EventPathParams eventPathParams[1];
-    eventPathParams[0].mEndpointId = kTestEndpointId;
-    eventPathParams[0].mClusterId  = kTestClusterId;
+    eventPathParams[0].mEndpointId = kTestEventEndpointId;
+    eventPathParams[0].mClusterId  = kTestEventClusterId;
 
     chip::app::AttributePathParams attributePathParams[2];
     attributePathParams[0].mEndpointId  = kTestEndpointId;
@@ -1498,12 +1500,12 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -1690,11 +1692,11 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -2340,12 +2342,12 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -2461,12 +2463,12 @@ void TestReadInteraction::TestSubscribeRoundtripStatusReportTimeout(nlTestSuite 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -2641,12 +2643,12 @@ void TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout(nlTestS
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -2712,12 +2714,12 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -2814,12 +2816,12 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -2915,12 +2917,12 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReport(nlTestSuite * ap
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
