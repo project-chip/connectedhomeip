@@ -15,7 +15,6 @@
 #
 
 _install_additional_pip_requirements() {
-    # by default, install all extra pip dependencies even if slow
     _SETUP_PLATFORM=$1
     shift
 
@@ -139,8 +138,8 @@ _ORIGINAL_PW_ENVIRONMENT_ROOT="$PW_ENVIRONMENT_ROOT"
 _bootstrap_or_activate "$0"
 
 if [ "$_ACTION_TAKEN" = "bootstrap" ]; then
-    # by default, install all extra pip dependencies even if slow
-    # unless arguments say otherwise
+    # By default, install all extra pip dependencies even if slow. -p/--platform
+    # arguments may override this default.
     _install_additional_pip_requirements "all" "$@"
 else
     _install_additional_pip_requirements "none" "$@"
