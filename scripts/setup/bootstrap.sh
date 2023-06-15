@@ -38,7 +38,9 @@ _install_additional_pip_requirements() {
             # Allow none as an alias of nothing extra installed (like -p none)
             if [ "$platform" != "none" ]; then
               echo "Installing pip requirements for ${platform}..."
-              pip install -q -r "$_CHIP_ROOT/scripts/setup/requirements.${platform}.txt"
+              pip install -q \
+                   -r "${_CHIP_ROOT}/scripts/setup/requirements.${platform}.txt" \
+                   -c "${_CHIP_ROOT}/scripts/setup/constraints.txt"
             fi
         done
     fi
