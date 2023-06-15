@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ChipStructs
+import chip.devicecontroller.ChipTLVValueDecoder
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -99,8 +101,26 @@ class OpCredClientFragment : Fragment() {
 
       override fun onReport(nodeState: NodeState?) {
         val value = nodeState?.getEndpointState(endpointId)?.getClusterState(clusterId)?.getAttributeState(attributeId)?.value ?: "null"
-        Log.i(TAG,"OpCred $attributeName value: $value")
-        showMessage("OpCred $attributeName value: $value")
+        val tlv = nodeState?.getEndpointState(endpointId)?.getClusterState(clusterId)?.getAttributeState(attributeId)?.tlv
+
+        if (tlv == null) {
+          Log.i(TAG,"OpCred $attributeName value: $value")
+          showMessage("OpCred $attributeName value: $value")
+          return
+        }
+
+        val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
+        when (attribute) {
+          OperationalCredentials.Attribute.Fabrics -> {
+            val ret = ChipTLVValueDecoder.decodeAttributeValue<List<ChipStructs.OperationalCredentialsClusterFabricDescriptorStruct>>(attributePath, tlv)
+            Log.i(TAG,"OpCred $attributeName value: $value")
+            showMessage(ret.toString())
+          }
+          else -> {
+            Log.i(TAG,"OpCred $attributeName value: $value")
+            showMessage("OpCred $attributeName value: $value")
+          }
+        }
       }
 
     }, devicePtr, listOf(ChipAttributePath.newInstance(endpointId, clusterId, attributeId)), null, false, 0 /* imTimeoutMs */)
