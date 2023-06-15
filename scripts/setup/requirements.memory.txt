@@ -1,4 +1,4 @@
-t# scripts/tools/memory
+# scripts/tools/memory
 anytree
 cxxfilt
 ghapi
