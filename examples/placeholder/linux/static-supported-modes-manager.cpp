@@ -24,9 +24,9 @@ Structs::ModeOptionStruct::Type buildModeOptionStruct(const char * label, uint8_
 }
 } // namespace
 
-constexpr SemanticTag semanticTagsBlack[]     = { detail::Structs::SemanticTagStruct::Type{ .value = 0 } };
-constexpr SemanticTag semanticTagsCappucino[] = { detail::Structs::SemanticTagStruct::Type{ .value = 0 } };
-constexpr SemanticTag semanticTagsEspresso[]  = { detail::Structs::SemanticTagStruct::Type{ .value = 0 } };
+constexpr SemanticTag semanticTagsBlack[]     = { { .value = 0 } };
+constexpr SemanticTag semanticTagsCappucino[] = { { .value = 0 } };
+constexpr SemanticTag semanticTagsEspresso[]  = { { .value = 0 } };
 
 // TODO: Configure your options for each endpoint
 storage_value_type StaticSupportedModesManager::coffeeOptions[] = {
