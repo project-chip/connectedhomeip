@@ -260,7 +260,8 @@ bool ResponseSender::Accept(const Responder & responder) const
         {
             return !mSendState.GetWasSent(ResponseItemsSent::kServiceListingData);
         }
-    };
+        break;
+    }
     default:
         break;
     }
