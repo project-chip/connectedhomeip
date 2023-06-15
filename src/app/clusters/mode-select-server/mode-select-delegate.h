@@ -40,7 +40,8 @@ class Delegate
 public:
     /**
      * This is a helper function to build a mode option structure. It takes the label/name of the mode,
-     * the value of the mode and a list of semantic tags that apply to this mode.
+     * the value of the mode and a list of semantic tags that apply to this mode. NOTE, the caller must
+     * ensure that the lifetime of the label and semanticTags is as long as the returned structure.
      */
     static ModeOptionStructType BuildModeOptionStruct(const char * label, uint8_t mode,
                                                       const List<const SemanticTagStructType> semanticTags)

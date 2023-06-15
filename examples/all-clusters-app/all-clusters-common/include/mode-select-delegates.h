@@ -85,9 +85,9 @@ private:
                                                    { .value = static_cast<uint16_t>(Clusters::RvcClean::SemanticTags::kDeepClean) }};
 
     const ModeOptionStructType modeOptions[3] = {
-        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Black", Clusters::ModeSelect::ModeBlack, List<const SemanticTagStructType>(semanticTagZero)),
-        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Cappuccino", Clusters::ModeSelect::ModeCappuccino, noSemanticTags),
-        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Espresso", Clusters::ModeSelect::ModeEspresso, List<const SemanticTagStructType>(semanticTagsBoost))
+        Delegate::BuildModeOptionStruct("Black", Clusters::ModeSelect::ModeBlack, List<const SemanticTagStructType>(semanticTagZero)),
+        Delegate::BuildModeOptionStruct("Cappuccino", Clusters::ModeSelect::ModeCappuccino, noSemanticTags),
+        Delegate::BuildModeOptionStruct("Espresso", Clusters::ModeSelect::ModeEspresso, List<const SemanticTagStructType>(semanticTagsBoost))
     };
 
     CHIP_ERROR Init() override;
