@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <system/SystemClock.h>
@@ -41,11 +42,18 @@ public:
         LIT, // Long Interval Time ICD
     };
 
+    enum KeepActiveFlags : uint8_t
+    {
+        kCommissioningWindowOpen = 0x01,
+        kFailSafeArmed           = 0x02,
+    };
+
     ICDManager() {}
     void Init();
-    bool SupportCheckInProtocol();
     void UpdateIcdMode();
     void UpdateOperationStates(OperationalState state);
+    void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
+    bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
     ICDMode GetIcdMode() { return mIcdMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
 
@@ -58,10 +66,12 @@ protected:
 
 private:
     static constexpr System::Clock::Milliseconds32 kICDSitModePollingThreashold = System::Clock::Milliseconds32(15000);
+    static constexpr System::Clock::Milliseconds32 kSlowPollingInterval         = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    static constexpr System::Clock::Milliseconds32 kFastPollingInterval         = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
-    static constexpr System::Clock::Milliseconds32 kSlowPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
-    static constexpr System::Clock::Milliseconds32 kFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
+    bool SupportCheckInProtocol();
 
+    BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
     OperationalState mOperationalState = IdleMode;
     ICDMode mIcdMode                   = SIT;
 };

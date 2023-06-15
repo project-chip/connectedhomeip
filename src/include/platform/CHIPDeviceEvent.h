@@ -196,6 +196,11 @@ enum PublicEventTypes
     kInterfaceIpAddressChanged,
 
     /**
+     * Signals that the commissioning window has open or closed.
+     */
+    kCommissioningWindowStatusChanged,
+
+    /**
      * Commissioning has completed by a call to the general commissioning cluster command.
      */
     kCommissioningComplete,
@@ -205,6 +210,11 @@ enum PublicEventTypes
      * successfully invoked.
      */
     kFailSafeTimerExpired,
+
+    /**
+     * Signals that the fail-safe state changed (Armed/Unarmed)
+     */
+    kFailSafeStateChanged,
 
     /**
      *
@@ -260,8 +270,6 @@ enum InternalEventTypes
     kCHIPoBLEIndicateConfirm,
     kCHIPoBLEConnectionError,
     kCHIPoBLENotifyConfirm,
-    kSubcriptionEstablised,
-    kSubscriptionTerminated,
     kSubcriptionReportSent,
     kChipMsgSentEvent,
     kChipMsgReceivedEvent,
@@ -511,6 +519,16 @@ struct ChipDeviceEvent final
             bool addNocCommandHasBeenInvoked;
             bool updateNocCommandHasBeenInvoked;
         } FailSafeTimerExpired;
+
+        struct
+        {
+            bool armed;
+        } FailSafeState;
+
+        struct
+        {
+            bool open;
+        } CommissioningWindowStatus;
 
         struct
         {
