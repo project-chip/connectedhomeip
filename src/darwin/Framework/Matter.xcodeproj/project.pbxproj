@@ -902,6 +902,23 @@
 			path = partials;
 			sourceTree = "<group>";
 		};
+		51189FC72A33ACE900184508 /* TestHelpers */ = {
+			isa = PBXGroup;
+			children = (
+				D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */,
+				51C8E3F72825CDB600D47D00 /* MTRTestKeys.m */,
+				D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */,
+				51D10D2D2808E2CA00E8CA3D /* MTRTestStorage.m */,
+				D437613E285BDC0D0051FEA2 /* MTRErrorTestUtils.h */,
+				51E24E72274E0DAC007CCF6E /* MTRErrorTestUtils.mm */,
+				1E748B3928941A45008A1BE8 /* MTRTestOTAProvider.h */,
+				1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */,
+				51742B4829CB5F45009974FE /* MTRTestResetCommissioneeHelper.h */,
+				51742B4929CB5FC0009974FE /* MTRTestResetCommissioneeHelper.m */,
+			);
+			path = TestHelpers;
+			sourceTree = "<group>";
+		};
 		B20252832459E34F00F97062 = {
 			isa = PBXGroup;
 			children = (
@@ -1052,16 +1069,7 @@
 		B202529A2459E34F00F97062 /* CHIPTests */ = {
 			isa = PBXGroup;
 			children = (
-				1E748B3928941A45008A1BE8 /* MTRTestOTAProvider.h */,
-				1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */,
-				D437613E285BDC0D0051FEA2 /* MTRErrorTestUtils.h */,
-				D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */,
-				D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */,
-				51E24E72274E0DAC007CCF6E /* MTRErrorTestUtils.mm */,
-				51C8E3F72825CDB600D47D00 /* MTRTestKeys.m */,
-				51D10D2D2808E2CA00E8CA3D /* MTRTestStorage.m */,
-				51742B4829CB5F45009974FE /* MTRTestResetCommissioneeHelper.h */,
-				51742B4929CB5FC0009974FE /* MTRTestResetCommissioneeHelper.m */,
+				51189FC72A33ACE900184508 /* TestHelpers */,
 				3DFCB3282966684500332B35 /* MTRCertificateInfoTests.m */,
 				99C65E0F267282F1003402F6 /* MTRControllerTests.m */,
 				5AE6D4E327A99041001F2493 /* MTRDeviceTests.m */,

@@ -367,7 +367,10 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
 
     jobject value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
     // If we don't know this event, just skip it.
-    VerifyOrReturn(err != CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
+    if (err == CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB)
+    {
+        err = CHIP_NO_ERROR;
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(nullptr, eventPathObj, err));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(),
                    ReportError(nullptr, eventPathObj, CHIP_JNI_ERROR_EXCEPTION_THROWN));

@@ -571,6 +571,22 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPRvcOperationalStateClusterOperationalCommandResponseCallback
+    : public Callback::Callback<CHIPRvcOperationalStateClusterOperationalCommandResponseCallbackType>
+{
+public:
+    CHIPRvcOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback);
+
+    ~CHIPRvcOperationalStateClusterOperationalCommandResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDoorLockClusterGetWeekDayScheduleResponseCallback
     : public Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
 {

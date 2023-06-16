@@ -457,6 +457,14 @@ void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief RVC Operational State Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief HEPA Filter Monitoring Cluster Init
  *
  * Cluster Init
@@ -5170,6 +5178,82 @@ void emberAfOperationalStateClusterServerTickCallback(chip::EndpointId endpoint)
  * @param endpoint  Endpoint that is being served
  */
 void emberAfOperationalStateClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// RVC Operational State Cluster
+//
+
+/** @brief RVC Operational State Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfRvcOperationalStateClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief RVC Operational State Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterRvcOperationalStateClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief RVC Operational State Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfRvcOperationalStateClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief RVC Operational State Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterRvcOperationalStateClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief RVC Operational State Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterRvcOperationalStateClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief RVC Operational State Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterRvcOperationalStateClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief RVC Operational State Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfRvcOperationalStateClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief RVC Operational State Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfRvcOperationalStateClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // HEPA Filter Monitoring Cluster
@@ -11730,6 +11814,30 @@ bool emberAfOperationalStateClusterStartCallback(
 bool emberAfOperationalStateClusterResumeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalState::Commands::Resume::DecodableType & commandData);
+/**
+ * @brief RVC Operational State Cluster Pause Command callback (from client)
+ */
+bool emberAfRvcOperationalStateClusterPauseCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RvcOperationalState::Commands::Pause::DecodableType & commandData);
+/**
+ * @brief RVC Operational State Cluster Stop Command callback (from client)
+ */
+bool emberAfRvcOperationalStateClusterStopCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RvcOperationalState::Commands::Stop::DecodableType & commandData);
+/**
+ * @brief RVC Operational State Cluster Start Command callback (from client)
+ */
+bool emberAfRvcOperationalStateClusterStartCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RvcOperationalState::Commands::Start::DecodableType & commandData);
+/**
+ * @brief RVC Operational State Cluster Resume Command callback (from client)
+ */
+bool emberAfRvcOperationalStateClusterResumeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::RvcOperationalState::Commands::Resume::DecodableType & commandData);
 /**
  * @brief HEPA Filter Monitoring Cluster ResetCondition Command callback (from client)
  */

@@ -24,6 +24,7 @@
 #include <access/AccessControl.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
@@ -957,10 +958,9 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 }
 } // namespace
 
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aPath)
 {
-    return emberAfLocateAttributeMetadata(aConcreteClusterPath.mEndpointId, aConcreteClusterPath.mClusterId,
-                                          aConcreteClusterPath.mAttributeId);
+    return emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 }
 
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
@@ -1069,6 +1069,38 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
     }
 
     return false;
+}
+
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+{
+    using Protocols::InteractionModel::Status;
+
+    const EmberAfEndpointType * type = emberAfFindEndpointType(aPath.mEndpointId);
+    if (type == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, CLUSTER_MASK_SERVER);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+    for (size_t i = 0; i < cluster->eventCount; ++i)
+    {
+        if (cluster->eventList[i] == aPath.mEventId)
+        {
+            return Status::Success;
+        }
+    }
+
+    return Status::UnsupportedEvent;
+#else
+    // No way to tell. Just claim supported.
+    return Status::Success;
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
 }
 
 } // namespace app

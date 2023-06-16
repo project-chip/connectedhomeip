@@ -295,6 +295,8 @@ exit:
 
 CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & aHasEncodedData, ReadHandler * apReadHandler)
 {
+    using Protocols::InteractionModel::Status;
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     for (auto current = apReadHandler->mpEventPathList; current != nullptr;)
     {
@@ -304,8 +306,21 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
             continue;
         }
 
-        Access::RequestPath requestPath{ .cluster = current->mValue.mClusterId, .endpoint = current->mValue.mEndpointId };
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
+        Status status = CheckEventSupportStatus(path);
+        if (status != Status::Success)
+        {
+            TLV::TLVWriter checkpoint = aWriter;
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(status));
+            if (err != CHIP_NO_ERROR)
+            {
+                aWriter = checkpoint;
+                break;
+            }
+            aHasEncodedData = true;
+        }
+
+        Access::RequestPath requestPath{ .cluster = current->mValue.mClusterId, .endpoint = current->mValue.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
         err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
@@ -316,8 +331,7 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         else
         {
             TLV::TLVWriter checkpoint = aWriter;
-            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path,
-                                                        StatusIB(Protocols::InteractionModel::Status::UnsupportedAccess));
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(Status::UnsupportedAccess));
             if (err != CHIP_NO_ERROR)
             {
                 aWriter = checkpoint;
