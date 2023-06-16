@@ -3811,6 +3811,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterDishwasherAlarmAttributeMaskID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterDishwasherAlarmAttributeLatchID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterDishwasherAlarmAttributeStateID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterDishwasherAlarmAttributeSupportedID MTR_NEWLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterDishwasherAlarmAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterDishwasherAlarmAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE

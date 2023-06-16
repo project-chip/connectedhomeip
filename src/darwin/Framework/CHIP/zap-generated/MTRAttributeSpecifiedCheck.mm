@@ -1986,6 +1986,9 @@ static BOOL AttributeIsSpecifiedInDishwasherAlarmCluster(AttributeId aAttributeI
     case Attributes::State::Id: {
         return YES;
     }
+    case Attributes::Supported::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

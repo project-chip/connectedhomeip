@@ -7285,6 +7285,17 @@ public class ClusterReadMapping {
           readDishwasherAlarmStateCommandParams
         );
         result.put("readStateAttribute", readDishwasherAlarmStateAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDishwasherAlarmSupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDishwasherAlarmSupportedAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DishwasherAlarmCluster) cluster).readSupportedAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readDishwasherAlarmSupportedCommandParams
+        );
+        result.put("readSupportedAttribute", readDishwasherAlarmSupportedAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readDishwasherAlarmGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readDishwasherAlarmGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

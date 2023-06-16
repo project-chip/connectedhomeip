@@ -2962,6 +2962,10 @@ namespace State {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace State
 
+namespace Supported {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Supported
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

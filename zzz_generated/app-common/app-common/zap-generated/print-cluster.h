@@ -355,10 +355,10 @@
 #define CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER
 #endif
 
-#if defined(ZCL_USING_DISHWASHER_ALARM_SERVER) || defined(ZCL_USING_DISHWASHER_ALARM_CLIENT)
-#define CHIP_PRINTCLUSTER_DISHWASHER_ALARM { chip::app::Clusters::DishwasherAlarm::Id, "Dishwasher Alarm" },
+#if defined(ZCL_USING_DISHWASHER_ALARM_CLUSTER_SERVER) || defined(ZCL_USING_DISHWASHER_ALARM_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER { chip::app::Clusters::DishwasherAlarm::Id, "Dishwasher Alarm" },
 #else
-#define CHIP_PRINTCLUSTER_DISHWASHER_ALARM
+#define CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER
 #endif
 
 #if defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_CLIENT)
@@ -987,7 +987,7 @@
     CHIP_PRINTCLUSTER_DISHWASHER_MODE_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
-    CHIP_PRINTCLUSTER_DISHWASHER_ALARM                                                                                             \
+    CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \

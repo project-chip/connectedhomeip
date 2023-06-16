@@ -16463,7 +16463,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ModifyEnabledAlarms::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
 
-    Optional<chip::BitMask<AlarmMap>> mask;
+    chip::BitMask<AlarmMap> mask = static_cast<chip::BitMask<AlarmMap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -16478,7 +16478,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ModifyEnabledAlarms::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
 
-    Optional<chip::BitMask<AlarmMap>> mask;
+    chip::BitMask<AlarmMap> mask = static_cast<chip::BitMask<AlarmMap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ModifyEnabledAlarms
@@ -16522,6 +16522,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace State
+namespace Supported {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Supported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Supported
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -16572,6 +16584,8 @@ struct TypeInfo
         Attributes::Latch::TypeInfo::DecodableType latch =
             static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>(0);
         Attributes::State::TypeInfo::DecodableType state =
+            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>(0);
+        Attributes::Supported::TypeInfo::DecodableType supported =
             static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;

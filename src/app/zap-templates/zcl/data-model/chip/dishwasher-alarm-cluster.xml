@@ -40,7 +40,7 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="MASK"      type="AlarmMap" default="0" writable="false" optional="false">Mask</attribute>
     <attribute side="server" code="0x0001" define="LATCH"     type="AlarmMap" default="0" writable="false" optional="true">Latch</attribute>
     <attribute side="server" code="0x0002" define="STATE"     type="AlarmMap" default="0" writable="false" optional="false">State</attribute>
-    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmMap" default="0" writable="false" optional="false">State</attribute>
+    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmMap" default="0" writable="false" optional="false">Supported</attribute>
 
     <command source="client" code="0x00" name="Reset" optional="true">
         <description>Reset alarm</description>

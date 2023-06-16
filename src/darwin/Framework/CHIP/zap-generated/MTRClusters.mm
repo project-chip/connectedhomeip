@@ -13579,7 +13579,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     }
 }
 
-- (void)modifyEnabledAlarmsWithParams:(MTRDishwasherAlarmClusterModifyEnabledAlarmsParams * _Nullable)params
+- (void)modifyEnabledAlarmsWithParams:(MTRDishwasherAlarmClusterModifyEnabledAlarmsParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
@@ -13626,13 +13626,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
                     }
                 }
-                if (params != nil) {
-                    if (params.mask != nil) {
-                        auto & definedValue_0 = request.mask.Emplace();
-                        definedValue_0
-                            = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(params.mask.unsignedIntValue);
-                    }
-                }
+                request.mask = static_cast<std::remove_reference_t<decltype(request.mask)>>(params.mask.unsignedIntValue);
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
@@ -13674,6 +13668,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeDishwasherAlarmID)
                                         attributeID:@(MTRAttributeIDTypeClusterDishwasherAlarmAttributeStateID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeSupportedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeDishwasherAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterDishwasherAlarmAttributeSupportedID)
                                              params:params];
 }
 

@@ -1216,6 +1216,7 @@ typedef void (*SmokeCOAlarmAttributeListListAttributeCallback)(void * context,
 typedef void (*DishwasherAlarmMaskAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>);
 typedef void (*DishwasherAlarmLatchAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>);
 typedef void (*DishwasherAlarmStateAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>);
+typedef void (*DishwasherAlarmSupportedAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>);
 typedef void (*DishwasherAlarmGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DishwasherAlarmAcceptedCommandListListAttributeCallback)(
@@ -9446,6 +9447,36 @@ public:
     void OnSubscriptionEstablished();
     using MTRDishwasherAlarmStateAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDishwasherAlarmStateAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDishwasherAlarmSupportedAttributeCallbackBridge : public MTRCallbackBridge<DishwasherAlarmSupportedAttributeCallback>
+{
+public:
+    MTRDishwasherAlarmSupportedAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<DishwasherAlarmSupportedAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRDishwasherAlarmSupportedAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<DishwasherAlarmSupportedAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value);
+};
+
+class MTRDishwasherAlarmSupportedAttributeCallbackSubscriptionBridge : public MTRDishwasherAlarmSupportedAttributeCallbackBridge
+{
+public:
+    MTRDishwasherAlarmSupportedAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   MTRActionBlock action,
+                                                                   MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRDishwasherAlarmSupportedAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRDishwasherAlarmSupportedAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRDishwasherAlarmSupportedAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
