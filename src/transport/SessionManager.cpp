@@ -389,7 +389,6 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
                     destination = &(multicastAddress.SetInterface(interfaceId));
                     if (mTransportMgr != nullptr)
                     {
-                        CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, &tempBuf);
                         if (CHIP_NO_ERROR != mTransportMgr->SendMessage(*destination, std::move(tempBuf)))
                         {
                             ChipLogError(Inet, "Failed to send Multicast message on interface %s", name);
@@ -418,7 +417,6 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
     if (mTransportMgr != nullptr)
     {
-        CHIP_TRACE_PREPARED_MESSAGE_SENT(destination, &msgBuf);
         return mTransportMgr->SendMessage(*destination, std::move(msgBuf));
     }
 
@@ -543,7 +541,6 @@ CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionH
 
 void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
-    CHIP_TRACE_PREPARED_MESSAGE_RECEIVED(&peerAddress, &msg);
     PacketHeader partialPacketHeader;
 
     CHIP_ERROR err = partialPacketHeader.DecodeFixed(msg);
