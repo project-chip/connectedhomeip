@@ -140,7 +140,7 @@ public:
 
     // Implementation of ResponderDelegate
     void AddResponse(const ResourceRecord & record) override;
-    bool Accept(const Responder &) const override;
+    bool ShouldSend(const Responder &) const override;
     void ResponsesAdded(const Responder &) override;
 
     void SetServer(ServerBase * server) { mServer = server; }

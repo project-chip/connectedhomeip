@@ -31,7 +31,7 @@ public:
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                          const ResponseConfiguration & configuration) override
     {
-        if (!delegate->Accept(*this))
+        if (!delegate->ShouldSend(*this))
         {
             return;
         }
