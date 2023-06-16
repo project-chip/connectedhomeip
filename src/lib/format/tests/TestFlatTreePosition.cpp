@@ -180,9 +180,33 @@ void TestDeeperEnter(nlTestSuite * inSuite, void * inContext)
     ASSERT_HAS_CONTEXT_TAG(position, 2);
 }
 
+void TestDescendLimit(nlTestSuite * inSuite, void * inContext)
+{
+    Position<NamedTag, 2> position(tree.data(), tree.size());
+
+    position.Enter(ByName("world"));
+    ASSERT_HAS_CONTEXT_TAG(position, 2);
+
+    position.Enter(ByName("b"));
+    ASSERT_HAS_PROFILE_TAG(position, 234, 2);
+
+    // only 2 positions can be remembered. Running out of space
+    position.Enter(ByName("foo"));
+    NL_TEST_ASSERT(inSuite, position.Get() == nullptr);
+
+    position.Exit();
+    ASSERT_HAS_NAME(position, "b");
+    ASSERT_HAS_PROFILE_TAG(position, 234, 2);
+
+    position.Exit();
+    ASSERT_HAS_NAME(position, "world");
+    ASSERT_HAS_CONTEXT_TAG(position, 2);
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestSimpleEnterExit", TestSimpleEnterExit), //
     NL_TEST_DEF("TestDeeperEnter", TestDeeperEnter),         //
+    NL_TEST_DEF("TestDescendLimit", TestDescendLimit),         //
     NL_TEST_SENTINEL()                                       //
 };
 
