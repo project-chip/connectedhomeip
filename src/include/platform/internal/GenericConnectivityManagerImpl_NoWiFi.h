@@ -74,9 +74,6 @@ public:
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
-#endif
     static const char * _WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode);
     static const char * _WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode);
     static const char * _WiFiStationStateToStr(ConnectivityManager::WiFiStationState state);
@@ -223,15 +220,6 @@ inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPSta
 {
     return nullptr;
 }
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-template <class ImplClass>
-inline CHIP_ERROR
-GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-#endif
 
 } // namespace Internal
 } // namespace DeviceLayer

@@ -59,7 +59,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
   ]
 
-  if (!chip_link_tests) {
+  if (!chip_build_tests) {
     defines += [ "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}" ]
   }
 }
