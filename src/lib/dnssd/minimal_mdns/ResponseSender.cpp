@@ -107,7 +107,7 @@ CHIP_ERROR ResponseSender::Respond(uint16_t messageId, const QueryData & query, 
 {
     mSendState.Reset(messageId, query, querySource);
 
-    if (query.IsInternalBroadcast())
+    if (query.IsAnnounceBroadcast())
     {
         // Deny listing large amount of data
         mSendState.MarkWasSent(ResponseItemsSent::kServiceListingData);
@@ -166,7 +166,7 @@ CHIP_ERROR ResponseSender::Respond(uint16_t messageId, const QueryData & query, 
 
     // send all 'Additional' replies
     {
-        if (!query.IsInternalBroadcast())
+        if (!query.IsAnnounceBroadcast())
         {
             // Initial service broadcast should keep adding data as 'Answers' rather
             // than addtional data (https://datatracker.ietf.org/doc/html/rfc6762#section-8.3)
