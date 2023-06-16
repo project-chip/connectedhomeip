@@ -106,4 +106,4 @@ report is different here. Some examples:
 
 -   `While running this test, I observed device under test rebooting, logs attached.`
 
--   `This only happens intermitently - I see it about 30% of the time`
+-   `This only happens intermittently - I see it about 30% of the time`

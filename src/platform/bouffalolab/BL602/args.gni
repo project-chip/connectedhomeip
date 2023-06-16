@@ -28,8 +28,6 @@ chip_inet_config_enable_ipv4 = true
 
 chip_enable_rotating_device_id = false
 
-chip_config_memory_management = "platform"
-
 chip_build_tests = false
 chip_inet_config_enable_dns_resolver = false
 chip_inet_config_enable_tun_endpoint = false

@@ -274,6 +274,32 @@
         "Test_TC_G_2_1"
     ],
     "Scenes": ["Test_TC_S_1_1"],
+    "ReplaceableMonitoring": [
+        "Test_TC_ACFREMON_1_1",
+        "Test_TC_ACFREMON_2_1",
+        "Test_TC_CFREMON_1_1",
+        "Test_TC_CFREMON_2_1",
+        "Test_TC_ESFREMON_1_1",
+        "Test_TC_ESFREMON_2_1",
+        "Test_TC_FTREMON_1_1",
+        "Test_TC_FTREMON_2_1",
+        "Test_TC_HEPAFREMON_1_1",
+        "Test_TC_HEPAFREMON_2_1",
+        "Test_TC_INKCREMON_1_1",
+        "Test_TC_INKCREMON_2_1",
+        "Test_TC_IONFREMON_1_1",
+        "Test_TC_IONFREMON_2_1",
+        "Test_TC_OZFREMON_1_1",
+        "Test_TC_OZFREMON_2_1",
+        "Test_TC_TCREMON_1_1",
+        "Test_TC_TCREMON_2_1",
+        "Test_TC_UVFREMON_1_1",
+        "Test_TC_UVFREMON_2_1",
+        "Test_TC_WTREMON_1_1",
+        "Test_TC_WTREMON_2_1",
+        "Test_TC_ZEOFREMON_1_1",
+        "Test_TC_ZEOFREMON_2_1"
+    ],
     "AirQuality": ["Test_TC_AIRQUAL_1_1", "Test_TC_AIRQUAL_2_1"],
     "collection": [
         "AccessControl",
@@ -325,6 +351,7 @@
         "SoftwareDiagnostics",
         "Subscriptions",
         "DoorLock",
-        "Groups"
+        "Groups",
+        "ReplaceableMonitoring"
     ]
 }

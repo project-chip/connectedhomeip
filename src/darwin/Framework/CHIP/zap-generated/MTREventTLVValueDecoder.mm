@@ -1554,18 +1554,6 @@ static id _Nullable DecodeEventPayloadForModeSelectCluster(EventId aEventId, TLV
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForWasherControlsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::WasherControls;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForTemperatureControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TemperatureControl;
@@ -1783,16 +1771,16 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
         do {
             MTROperationalStateClusterErrorStateStruct * _Nonnull memberValue;
             memberValue = [MTROperationalStateClusterErrorStateStruct new];
-            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.errorState.errorStateID)];
-            if (cppValue.errorState.errorStateLabel.IsNull()) {
-                memberValue.errorStateLabel = nil;
-            } else {
+            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
+            if (cppValue.errorState.errorStateLabel.HasValue()) {
                 memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
                 if (memberValue.errorStateLabel == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;
                 }
+            } else {
+                memberValue.errorStateLabel = nil;
             }
             if (cppValue.errorState.errorStateDetails.HasValue()) {
                 memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value());
@@ -1820,7 +1808,101 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.completionErrorCode)];
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.completionErrorCode];
+            value.completionErrorCode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.totalOperationalTime.HasValue()) {
+                if (cppValue.totalOperationalTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.totalOperationalTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.totalOperationalTime = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.pausedTime.HasValue()) {
+                if (cppValue.pausedTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.pausedTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.pausedTime = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForRoboticVacuumOperationalStateCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::RoboticVacuumOperationalState;
+    switch (aEventId) {
+    case Events::OperationalError::Id: {
+        Events::OperationalError::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRRoboticVacuumOperationalStateClusterOperationalErrorEvent new];
+
+        do {
+            MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
+            memberValue = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
+            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
+            if (cppValue.errorState.errorStateLabel.HasValue()) {
+                memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
+                if (memberValue.errorStateLabel == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            } else {
+                memberValue.errorStateLabel = nil;
+            }
+            if (cppValue.errorState.errorStateDetails.HasValue()) {
+                memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value());
+                if (memberValue.errorStateDetails == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            } else {
+                memberValue.errorStateDetails = nil;
+            }
+            value.errorState = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::OperationCompletion::Id: {
+        Events::OperationCompletion::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRRoboticVacuumOperationalStateClusterOperationCompletionEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.completionErrorCode];
             value.completionErrorCode = memberValue;
         } while (0);
         do {
@@ -1877,133 +1959,6 @@ static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
     EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ActivatedCarbonFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForCeramicFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::CeramicFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForElectrostaticFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::ElectrostaticFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForUVFilterMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::UvFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForIonizingFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::IonizingFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForZeoliteFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::ZeoliteFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForOzoneFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::OzoneFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForWaterTankMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::WaterTankMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForFuelTankMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::FuelTankMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForInkCartridgeMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::InkCartridgeMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForTonerCartridgeMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::TonerCartridgeMonitoring;
     switch (aEventId) {
     default: {
         break;
@@ -2674,71 +2629,6 @@ static id _Nullable DecodeEventPayloadForCarbonDioxideConcentrationMeasurementCl
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForEthyleneConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::EthyleneConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForEthyleneOxideConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::EthyleneOxideConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForHydrogenConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::HydrogenConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForHydrogenSulfideConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::HydrogenSulfideConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForNitricOxideConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::NitricOxideConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForNitrogenDioxideConcentrationMeasurementCluster(
     EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -2752,283 +2642,10 @@ static id _Nullable DecodeEventPayloadForNitrogenDioxideConcentrationMeasurement
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForOxygenConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::OxygenConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForOzoneConcentrationMeasurementCluster(
     EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OzoneConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForSulfurDioxideConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::SulfurDioxideConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForDissolvedOxygenConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::DissolvedOxygenConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForBromateConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::BromateConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForChloraminesConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::ChloraminesConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForChlorineConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::ChlorineConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForFecalColiformEColiConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::FecalColiformEColiConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForFluorideConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::FluorideConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForHaloaceticAcidsConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::HaloaceticAcidsConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForTotalTrihalomethanesConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::TotalTrihalomethanesConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForTotalColiformBacteriaConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::TotalColiformBacteriaConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForTurbidityConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::TurbidityConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForCopperConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::CopperConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForLeadConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::LeadConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForManganeseConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::ManganeseConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForSulfateConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::SulfateConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForBromodichloromethaneConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::BromodichloromethaneConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForBromoformConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::BromoformConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForChlorodibromomethaneConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::ChlorodibromomethaneConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForChloroformConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::ChloroformConcentrationMeasurement;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForSodiumConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::SodiumConcentrationMeasurement;
     switch (aEventId) {
     default: {
         break;
@@ -3512,9 +3129,6 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::ModeSelect::Id: {
         return DecodeEventPayloadForModeSelectCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::WasherControls::Id: {
-        return DecodeEventPayloadForWasherControlsCluster(aPath.mEventId, aReader, aError);
-    }
     case Clusters::TemperatureControl::Id: {
         return DecodeEventPayloadForTemperatureControlCluster(aPath.mEventId, aReader, aError);
     }
@@ -3530,41 +3144,14 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::OperationalState::Id: {
         return DecodeEventPayloadForOperationalStateCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::RoboticVacuumOperationalState::Id: {
+        return DecodeEventPayloadForRoboticVacuumOperationalStateCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeEventPayloadForHEPAFilterMonitoringCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::CeramicFilterMonitoring::Id: {
-        return DecodeEventPayloadForCeramicFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::ElectrostaticFilterMonitoring::Id: {
-        return DecodeEventPayloadForElectrostaticFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::UvFilterMonitoring::Id: {
-        return DecodeEventPayloadForUVFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::IonizingFilterMonitoring::Id: {
-        return DecodeEventPayloadForIonizingFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::ZeoliteFilterMonitoring::Id: {
-        return DecodeEventPayloadForZeoliteFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::OzoneFilterMonitoring::Id: {
-        return DecodeEventPayloadForOzoneFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::WaterTankMonitoring::Id: {
-        return DecodeEventPayloadForWaterTankMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::FuelTankMonitoring::Id: {
-        return DecodeEventPayloadForFuelTankMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::InkCartridgeMonitoring::Id: {
-        return DecodeEventPayloadForInkCartridgeMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::TonerCartridgeMonitoring::Id: {
-        return DecodeEventPayloadForTonerCartridgeMonitoringCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);
@@ -3617,89 +3204,11 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::CarbonDioxideConcentrationMeasurement::Id: {
         return DecodeEventPayloadForCarbonDioxideConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::EthyleneConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForEthyleneConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::EthyleneOxideConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForEthyleneOxideConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::HydrogenConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForHydrogenConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::HydrogenSulfideConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForHydrogenSulfideConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::NitricOxideConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForNitricOxideConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
     case Clusters::NitrogenDioxideConcentrationMeasurement::Id: {
         return DecodeEventPayloadForNitrogenDioxideConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::OxygenConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForOxygenConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
     case Clusters::OzoneConcentrationMeasurement::Id: {
         return DecodeEventPayloadForOzoneConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::SulfurDioxideConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForSulfurDioxideConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::DissolvedOxygenConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForDissolvedOxygenConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::BromateConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForBromateConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::ChloraminesConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForChloraminesConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::ChlorineConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForChlorineConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::FecalColiformEColiConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForFecalColiformEColiConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::FluorideConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForFluorideConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::HaloaceticAcidsConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForHaloaceticAcidsConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::TotalTrihalomethanesConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForTotalTrihalomethanesConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::TotalColiformBacteriaConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForTotalColiformBacteriaConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::TurbidityConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForTurbidityConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::CopperConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForCopperConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::LeadConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForLeadConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::ManganeseConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForManganeseConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::SulfateConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForSulfateConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::BromodichloromethaneConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForBromodichloromethaneConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::BromoformConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForBromoformConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::ChlorodibromomethaneConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForChlorodibromomethaneConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::ChloroformConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForChloroformConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::SodiumConcentrationMeasurement::Id: {
-        return DecodeEventPayloadForSodiumConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::Pm25ConcentrationMeasurement::Id: {
         return DecodeEventPayloadForPM25ConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);

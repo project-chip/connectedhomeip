@@ -979,6 +979,7 @@ otaissues
 OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
+otaproviders
 OTAProviderSerialPort
 OTARequesterImpl
 OTARequestorDriver

@@ -30,7 +30,8 @@ from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
-from typing import List, Optional, Tuple
+from enum import Enum
+from typing import List, Optional, Tuple, Union
 
 from chip.tlv import float32, uint
 
@@ -239,6 +240,87 @@ class MatterTestConfig:
     chip_tool_credentials_path: Optional[pathlib.Path] = None
 
 
+class ClusterMapper:
+    """Describe clusters/attributes using schema names."""
+
+    def __init__(self, legacy_cluster_mapping) -> None:
+        self._mapping = legacy_cluster_mapping
+
+    def get_cluster_string(self, cluster_id: int) -> str:
+        mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
+        if not mapping:
+            return f"Cluster Unknown ({cluster_id}, 0x{cluster_id:08X})"
+        else:
+            name = mapping["clusterName"]
+            return f"Cluster {name} ({cluster_id}, 0x{cluster_id:04X})"
+
+    def get_attribute_string(self, cluster_id: int, attribute_id) -> str:
+        mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
+        if not mapping:
+            return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
+        else:
+            attribute_mapping = mapping["attributes"].get(attribute_id, None)
+
+            if not attribute_mapping:
+                return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
+            else:
+                attribute_name = attribute_mapping["attributeName"]
+                return f"Attribute {attribute_name} ({attribute_id}, 0x{attribute_id:04X})"
+
+
+@dataclass
+class AttributePathLocation:
+    endpoint_id: int
+    cluster_id: Optional[int] = None
+    attribute_id: Optional[int] = None
+
+    def as_cluster_string(self, mapper: ClusterMapper):
+        desc = f"Endpoint {self.endpoint_id}"
+        if self.cluster_id is not None:
+            desc += f", {mapper.get_cluster_string(self.cluster_id)}"
+        return desc
+
+    def as_string(self, mapper: ClusterMapper):
+        desc = self.as_cluster_string(mapper)
+        if self.cluster_id is not None and self.attribute_id is not None:
+            desc += f", {mapper.get_attribute_string(self.cluster_id, self.attribute_id)}"
+
+        return desc
+
+
+@dataclass
+class EventPathLocation:
+    endpoint_id: int
+    cluster_id: int
+    event_id: int
+
+
+@dataclass
+class CommandPathLocation:
+    endpoint_id: int
+    cluster_id: int
+    command_id: int
+
+# ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
+# appeared in 3.11. To make it JSON serializable easily, multiple inheritance
+# from `str` is used. See https://stackoverflow.com/a/51976841.
+
+
+class ProblemSeverity(str, Enum):
+    NOTE = "NOTE"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
+
+
+@dataclass
+class ProblemNotice:
+    test_name: str
+    location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation]
+    severity: ProblemSeverity
+    problem: str
+    spec_location: str = ""
+
+
 class MatterStackState:
     def __init__(self, config: MatterTestConfig):
         self._logger = logger
@@ -325,6 +407,9 @@ class MatterBaseTest(base_test.BaseTestClass):
     def __init__(self, *args):
         super().__init__(*args)
 
+        # List of accumulated problems across all tests
+        self.problems = []
+
     @property
     def matter_test_config(self) -> MatterTestConfig:
         return unstash_globally(self.user_params.get("matter_test_config"))
@@ -344,6 +429,27 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def dut_node_id(self) -> int:
         return self.matter_test_config.dut_node_ids[0]
+
+    def setup_class(self):
+        super().setup_class()
+
+        # Mappings of cluster IDs to names and metadata.
+        # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
+        self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
+
+    def teardown_class(self):
+        """Final teardown after all tests: log all problems"""
+        if len(self.problems) == 0:
+            return
+
+        logging.info("###########################################################")
+        logging.info("Problems found:")
+        logging.info("===============")
+        for problem in self.problems:
+            logging.info(f"- {json.dumps(dataclass_asdict(problem))}")
+        logging.info("###########################################################")
+
+        super().teardown_class()
 
     def check_pics(self, pics_key: str) -> bool:
         picsd = self.matter_test_config.pics
@@ -405,6 +511,15 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def print_step(self, stepnum: int, title: str) -> None:
         logging.info('***** Test Step %d : %s', stepnum, title)
+
+    def record_error(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation], problem: str, spec_location: str = ""):
+        self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
+
+    def record_warning(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation], problem: str, spec_location: str = ""):
+        self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.WARNING, problem, spec_location))
+
+    def record_note(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation], problem: str, spec_location: str = ""):
+        self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):

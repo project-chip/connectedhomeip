@@ -112,6 +112,22 @@ tests:
           constraints:
               hasMasksSet: [0x01, 0x04] # [MaskVal1, MaskVal3]
 
+    - label: "Write attribute BITMAP32 with MaskVal1"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: 1 # MaskVal1
+
+    - label:
+          "Read attribute BITMAP32 with MaskVal1 and ensure Maskval1 or MaskVal3
+          are set"
+      command: "readAttribute"
+      attribute: "bitmap32"
+      response:
+          value: 1 # MaskVal1
+          constraints:
+              hasMasksSet: [0x05] # [MaskVal1, MaskVal3]
+
     - label: "Write attribute BITMAP32 Back to Default Value"
       command: "writeAttribute"
       attribute: "bitmap32"
