@@ -40,7 +40,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#if defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(BRD4325B))
 #define LIGHT_LED 1
 #else
 #define LIGHT_LED 0
