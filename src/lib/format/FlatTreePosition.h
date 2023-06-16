@@ -29,6 +29,26 @@ namespace FlatTree {
 /// however the position still allows moving back again.
 ///
 /// DESCEND_DEPTH is the maximum remembered depth for going back up.
+///
+/// General usage:
+///
+///     Position<DataType, 10> position(tree, tree_size);
+///
+///     position.Enter(ByName("foo"));
+///     position.Enter(ByName("bar"));
+///     position.Enter(ByName("baz"));
+///
+///     position.Get()  /// content of foo::bar::baz if it exists
+///
+///     position.Exit();
+///     position.Exit();
+///
+///     position.Get()  /// content of foo if it exists
+///
+///     position.Enter(ById(1234));
+///
+///     position.Get()  /// content of foo::1234
+///
 template <typename CONTENT, size_t DESCEND_DEPTH>
 class Position
 {
