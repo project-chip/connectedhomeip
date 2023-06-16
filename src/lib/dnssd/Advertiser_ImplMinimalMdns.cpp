@@ -885,17 +885,7 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
         // TODO: ideally we may want to have a destination that is explicit as "unicast/destIp"
         //       vs "multicast/addressType". Such a change requires larger code updates.
         packetInfo.SrcAddress = chip::Inet::IPAddress::Loopback(addressType);
-
-#if INET_CONFIG_ENABLE_IPV4
-        if (addressType == chip::Inet::IPAddressType::kIPv4)
-        {
-            BroadcastIpAddresses::GetIpv4Into(packetInfo.DestAddress);
-        }
-        else
-#endif
-        {
-            BroadcastIpAddresses::GetIpv6Into(packetInfo.DestAddress);
-        }
+        packetInfo.DestAddress = BroadcastIpAddresses::Get(addressType);
         packetInfo.SrcPort   = kMdnsPort;
         packetInfo.DestPort  = kMdnsPort;
         packetInfo.Interface = interfaceId;
