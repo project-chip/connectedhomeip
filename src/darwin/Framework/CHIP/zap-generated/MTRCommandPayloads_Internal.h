@@ -224,11 +224,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+@interface MTRRVCOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RoboticVacuumOperationalState::Commands::OperationalCommandResponse::DecodableType &)
-        decodableStruct;
+    (const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct;
 
 @end
 

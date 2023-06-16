@@ -85,7 +85,7 @@
 | AirQuality                                                          | 0x005B |
 | SmokeCoAlarm                                                        | 0x005C |
 | OperationalState                                                    | 0x0060 |
-| RoboticVacuumOperationalState                                       | 0x0061 |
+| RvcOperationalState                                                 | 0x0061 |
 | HepaFilterMonitoring                                                | 0x0071 |
 | ActivatedCarbonFilterMonitoring                                     | 0x0072 |
 | CeramicFilterMonitoring                                             | 0x0073 |
@@ -4865,7 +4865,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster RoboticVacuumOperationalState                               | 0x0061 |
+| Cluster RvcOperationalState                                         | 0x0061 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Pause                                                             |   0x00 |
@@ -4895,10 +4895,10 @@ private:
 /*
  * Command Pause
  */
-class RoboticVacuumOperationalStatePause : public ClusterCommand
+class RvcOperationalStatePause : public ClusterCommand
 {
 public:
-    RoboticVacuumOperationalStatePause(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("pause", credsIssuerConfig)
+    RvcOperationalStatePause(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("pause", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -4918,16 +4918,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::RoboticVacuumOperationalState::Commands::Pause::Type mRequest;
+    chip::app::Clusters::RvcOperationalState::Commands::Pause::Type mRequest;
 };
 
 /*
  * Command Stop
  */
-class RoboticVacuumOperationalStateStop : public ClusterCommand
+class RvcOperationalStateStop : public ClusterCommand
 {
 public:
-    RoboticVacuumOperationalStateStop(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop", credsIssuerConfig)
+    RvcOperationalStateStop(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("stop", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -4947,16 +4947,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::RoboticVacuumOperationalState::Commands::Stop::Type mRequest;
+    chip::app::Clusters::RvcOperationalState::Commands::Stop::Type mRequest;
 };
 
 /*
  * Command Start
  */
-class RoboticVacuumOperationalStateStart : public ClusterCommand
+class RvcOperationalStateStart : public ClusterCommand
 {
 public:
-    RoboticVacuumOperationalStateStart(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("start", credsIssuerConfig)
+    RvcOperationalStateStart(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("start", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -4976,16 +4976,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::RoboticVacuumOperationalState::Commands::Start::Type mRequest;
+    chip::app::Clusters::RvcOperationalState::Commands::Start::Type mRequest;
 };
 
 /*
  * Command Resume
  */
-class RoboticVacuumOperationalStateResume : public ClusterCommand
+class RvcOperationalStateResume : public ClusterCommand
 {
 public:
-    RoboticVacuumOperationalStateResume(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("resume", credsIssuerConfig)
+    RvcOperationalStateResume(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("resume", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -5005,7 +5005,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::RoboticVacuumOperationalState::Commands::Resume::Type mRequest;
+    chip::app::Clusters::RvcOperationalState::Commands::Resume::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -15673,21 +15673,21 @@ void registerClusterOperationalState(Commands & commands, CredentialIssuerComman
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterRoboticVacuumOperationalState(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterRvcOperationalState(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::RoboticVacuumOperationalState;
+    using namespace chip::app::Clusters::RvcOperationalState;
 
-    const char * clusterName = "RoboticVacuumOperationalState";
+    const char * clusterName = "RvcOperationalState";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                  //
-        make_unique<RoboticVacuumOperationalStatePause>(credsIssuerConfig),  //
-        make_unique<RoboticVacuumOperationalStateStop>(credsIssuerConfig),   //
-        make_unique<RoboticVacuumOperationalStateStart>(credsIssuerConfig),  //
-        make_unique<RoboticVacuumOperationalStateResume>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),        //
+        make_unique<RvcOperationalStatePause>(credsIssuerConfig),  //
+        make_unique<RvcOperationalStateStop>(credsIssuerConfig),   //
+        make_unique<RvcOperationalStateStart>(credsIssuerConfig),  //
+        make_unique<RvcOperationalStateResume>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -15712,14 +15712,13 @@ void registerClusterRoboticVacuumOperationalState(Commands & commands, Credentia
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "countdown-time", 0, UINT32_MAX,
                                                                               Attributes::CountdownTime::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::RoboticVacuumOperationalState::Structs::OperationalStateStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::Type>>>(
             Id, "operational-state-list", Attributes::OperationalStateList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<
-            WriteAttributeAsComplex<chip::app::Clusters::RoboticVacuumOperationalState::Structs::OperationalStateStruct::Type>>(
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::Type>>(
             Id, "operational-state", Attributes::OperationalState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::Clusters::RoboticVacuumOperationalState::Structs::ErrorStateStruct::Type>>(
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::RvcOperationalState::Structs::ErrorStateStruct::Type>>(
             Id, "operational-error", Attributes::OperationalError::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -24679,7 +24678,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterAirQuality(commands, credsIssuerConfig);
     registerClusterSmokeCoAlarm(commands, credsIssuerConfig);
     registerClusterOperationalState(commands, credsIssuerConfig);
-    registerClusterRoboticVacuumOperationalState(commands, credsIssuerConfig);
+    registerClusterRvcOperationalState(commands, credsIssuerConfig);
     registerClusterHepaFilterMonitoring(commands, credsIssuerConfig);
     registerClusterActivatedCarbonFilterMonitoring(commands, credsIssuerConfig);
     registerClusterCeramicFilterMonitoring(commands, credsIssuerConfig);

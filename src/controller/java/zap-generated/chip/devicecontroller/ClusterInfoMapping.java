@@ -7332,7 +7332,7 @@ public class ClusterInfoMapping {
         }
       }
 
-      public static class DelegatedRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback implements ChipClusters.RoboticVacuumOperationalStateCluster.OperationalCommandResponseCallback, DelegatedClusterCallback {
+      public static class DelegatedRvcOperationalStateClusterOperationalCommandResponseCallback implements ChipClusters.RvcOperationalStateCluster.OperationalCommandResponseCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -7340,7 +7340,7 @@ public class ClusterInfoMapping {
         }
 
         @Override
-        public void onSuccess(ChipStructs.RoboticVacuumOperationalStateClusterErrorStateStruct CommandResponseState) {
+        public void onSuccess(ChipStructs.RvcOperationalStateClusterErrorStateStruct CommandResponseState) {
            Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
                // CommandResponseState: Struct ErrorStateStruct
                // Conversion from this type to Java is not properly implemented yet
@@ -7353,7 +7353,7 @@ public class ClusterInfoMapping {
         }
       }
 
-      public static class DelegatedRoboticVacuumOperationalStateClusterPhaseListAttributeCallback implements ChipClusters.RoboticVacuumOperationalStateCluster.PhaseListAttributeCallback, DelegatedClusterCallback {
+      public static class DelegatedRvcOperationalStateClusterPhaseListAttributeCallback implements ChipClusters.RvcOperationalStateCluster.PhaseListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -7372,7 +7372,7 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
-      public static class DelegatedRoboticVacuumOperationalStateClusterCurrentPhaseAttributeCallback implements ChipClusters.RoboticVacuumOperationalStateCluster.CurrentPhaseAttributeCallback, DelegatedClusterCallback {
+      public static class DelegatedRvcOperationalStateClusterCurrentPhaseAttributeCallback implements ChipClusters.RvcOperationalStateCluster.CurrentPhaseAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -7391,7 +7391,7 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
-      public static class DelegatedRoboticVacuumOperationalStateClusterCountdownTimeAttributeCallback implements ChipClusters.RoboticVacuumOperationalStateCluster.CountdownTimeAttributeCallback, DelegatedClusterCallback {
+      public static class DelegatedRvcOperationalStateClusterCountdownTimeAttributeCallback implements ChipClusters.RvcOperationalStateCluster.CountdownTimeAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -7410,7 +7410,7 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
-      public static class DelegatedRoboticVacuumOperationalStateClusterOperationalStateListAttributeCallback implements ChipClusters.RoboticVacuumOperationalStateCluster.OperationalStateListAttributeCallback, DelegatedClusterCallback {
+      public static class DelegatedRvcOperationalStateClusterOperationalStateListAttributeCallback implements ChipClusters.RvcOperationalStateCluster.OperationalStateListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -7418,9 +7418,9 @@ public class ClusterInfoMapping {
         }
 
 @Override
-        public void onSuccess( List<ChipStructs.RoboticVacuumOperationalStateClusterOperationalStateStruct> valueList) {
+        public void onSuccess( List<ChipStructs.RvcOperationalStateClusterOperationalStateStruct> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.RoboticVacuumOperationalStateClusterOperationalStateStruct>");
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.RvcOperationalStateClusterOperationalStateStruct>");
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -7429,26 +7429,7 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
-      public static class DelegatedRoboticVacuumOperationalStateClusterGeneratedCommandListAttributeCallback implements ChipClusters.RoboticVacuumOperationalStateCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
-        private ClusterCommandCallback callback;
-        @Override
-        public void setCallbackDelegate(ClusterCommandCallback callback) {
-          this.callback = callback;
-        }
-
-@Override
-        public void onSuccess( List<Long> valueList) {
-          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-          responseValues.put(commandResponseInfo, valueList);
-          callback.onSuccess(responseValues);
-        }
-        @Override
-        public void onError(Exception ex) {
-          callback.onFailure(ex);
-        }
-      }
-      public static class DelegatedRoboticVacuumOperationalStateClusterAcceptedCommandListAttributeCallback implements ChipClusters.RoboticVacuumOperationalStateCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+      public static class DelegatedRvcOperationalStateClusterGeneratedCommandListAttributeCallback implements ChipClusters.RvcOperationalStateCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -7467,7 +7448,7 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
-      public static class DelegatedRoboticVacuumOperationalStateClusterEventListAttributeCallback implements ChipClusters.RoboticVacuumOperationalStateCluster.EventListAttributeCallback, DelegatedClusterCallback {
+      public static class DelegatedRvcOperationalStateClusterAcceptedCommandListAttributeCallback implements ChipClusters.RvcOperationalStateCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -7486,7 +7467,26 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
-      public static class DelegatedRoboticVacuumOperationalStateClusterAttributeListAttributeCallback implements ChipClusters.RoboticVacuumOperationalStateCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+      public static class DelegatedRvcOperationalStateClusterEventListAttributeCallback implements ChipClusters.RvcOperationalStateCluster.EventListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedRvcOperationalStateClusterAttributeListAttributeCallback implements ChipClusters.RvcOperationalStateCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -20026,9 +20026,9 @@ public class ClusterInfoMapping {
       ClusterInfo operationalStateClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.OperationalStateCluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("operationalState", operationalStateClusterInfo);
-      ClusterInfo roboticVacuumOperationalStateClusterInfo = new ClusterInfo(
-        (ptr, endpointId) -> new ChipClusters.RoboticVacuumOperationalStateCluster(ptr, endpointId), new HashMap<>());
-      clusterMap.put("roboticVacuumOperationalState", roboticVacuumOperationalStateClusterInfo);
+      ClusterInfo rvcOperationalStateClusterInfo = new ClusterInfo(
+        (ptr, endpointId) -> new ChipClusters.RvcOperationalStateCluster(ptr, endpointId), new HashMap<>());
+      clusterMap.put("rvcOperationalState", rvcOperationalStateClusterInfo);
       ClusterInfo hepaFilterMonitoringClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.HepaFilterMonitoringCluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("hepaFilterMonitoring", hepaFilterMonitoringClusterInfo);
@@ -20320,7 +20320,7 @@ public class ClusterInfoMapping {
       destination.get("airQuality").combineCommands(source.get("airQuality"));
       destination.get("smokeCoAlarm").combineCommands(source.get("smokeCoAlarm"));
       destination.get("operationalState").combineCommands(source.get("operationalState"));
-      destination.get("roboticVacuumOperationalState").combineCommands(source.get("roboticVacuumOperationalState"));
+      destination.get("rvcOperationalState").combineCommands(source.get("rvcOperationalState"));
       destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
       destination.get("activatedCarbonFilterMonitoring").combineCommands(source.get("activatedCarbonFilterMonitoring"));
       destination.get("ceramicFilterMonitoring").combineCommands(source.get("ceramicFilterMonitoring"));
@@ -22542,56 +22542,56 @@ public class ClusterInfoMapping {
      commandMap.put("smokeCoAlarm", smokeCoAlarmClusterInteractionInfoMap);
      Map<String, InteractionInfo> operationalStateClusterInteractionInfoMap = new LinkedHashMap<>();
      commandMap.put("operationalState", operationalStateClusterInteractionInfoMap);
-     Map<String, InteractionInfo> roboticVacuumOperationalStateClusterInteractionInfoMap = new LinkedHashMap<>();
-     Map<String, CommandParameterInfo> roboticVacuumOperationalStatepauseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-       InteractionInfo roboticVacuumOperationalStatepauseInteractionInfo = new InteractionInfo(
+     Map<String, InteractionInfo> rvcOperationalStateClusterInteractionInfoMap = new LinkedHashMap<>();
+     Map<String, CommandParameterInfo> rvcOperationalStatepauseCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo rvcOperationalStatepauseInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
-           ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster)
-           .pause((ChipClusters.RoboticVacuumOperationalStateCluster.OperationalCommandResponseCallback) callback
+           ((ChipClusters.RvcOperationalStateCluster) cluster)
+           .pause((ChipClusters.RvcOperationalStateCluster.OperationalCommandResponseCallback) callback
            
            );
          },
-         () -> new DelegatedRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback(),
-           roboticVacuumOperationalStatepauseCommandParams
+         () -> new DelegatedRvcOperationalStateClusterOperationalCommandResponseCallback(),
+           rvcOperationalStatepauseCommandParams
        );
-       roboticVacuumOperationalStateClusterInteractionInfoMap.put("pause", roboticVacuumOperationalStatepauseInteractionInfo);
-     Map<String, CommandParameterInfo> roboticVacuumOperationalStatestopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-       InteractionInfo roboticVacuumOperationalStatestopInteractionInfo = new InteractionInfo(
+       rvcOperationalStateClusterInteractionInfoMap.put("pause", rvcOperationalStatepauseInteractionInfo);
+     Map<String, CommandParameterInfo> rvcOperationalStatestopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo rvcOperationalStatestopInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
-           ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster)
-           .stop((ChipClusters.RoboticVacuumOperationalStateCluster.OperationalCommandResponseCallback) callback
+           ((ChipClusters.RvcOperationalStateCluster) cluster)
+           .stop((ChipClusters.RvcOperationalStateCluster.OperationalCommandResponseCallback) callback
            
            );
          },
-         () -> new DelegatedRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback(),
-           roboticVacuumOperationalStatestopCommandParams
+         () -> new DelegatedRvcOperationalStateClusterOperationalCommandResponseCallback(),
+           rvcOperationalStatestopCommandParams
        );
-       roboticVacuumOperationalStateClusterInteractionInfoMap.put("stop", roboticVacuumOperationalStatestopInteractionInfo);
-     Map<String, CommandParameterInfo> roboticVacuumOperationalStatestartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-       InteractionInfo roboticVacuumOperationalStatestartInteractionInfo = new InteractionInfo(
+       rvcOperationalStateClusterInteractionInfoMap.put("stop", rvcOperationalStatestopInteractionInfo);
+     Map<String, CommandParameterInfo> rvcOperationalStatestartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo rvcOperationalStatestartInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
-           ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster)
-           .start((ChipClusters.RoboticVacuumOperationalStateCluster.OperationalCommandResponseCallback) callback
+           ((ChipClusters.RvcOperationalStateCluster) cluster)
+           .start((ChipClusters.RvcOperationalStateCluster.OperationalCommandResponseCallback) callback
            
            );
          },
-         () -> new DelegatedRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback(),
-           roboticVacuumOperationalStatestartCommandParams
+         () -> new DelegatedRvcOperationalStateClusterOperationalCommandResponseCallback(),
+           rvcOperationalStatestartCommandParams
        );
-       roboticVacuumOperationalStateClusterInteractionInfoMap.put("start", roboticVacuumOperationalStatestartInteractionInfo);
-     Map<String, CommandParameterInfo> roboticVacuumOperationalStateresumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-       InteractionInfo roboticVacuumOperationalStateresumeInteractionInfo = new InteractionInfo(
+       rvcOperationalStateClusterInteractionInfoMap.put("start", rvcOperationalStatestartInteractionInfo);
+     Map<String, CommandParameterInfo> rvcOperationalStateresumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo rvcOperationalStateresumeInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
-           ((ChipClusters.RoboticVacuumOperationalStateCluster) cluster)
-           .resume((ChipClusters.RoboticVacuumOperationalStateCluster.OperationalCommandResponseCallback) callback
+           ((ChipClusters.RvcOperationalStateCluster) cluster)
+           .resume((ChipClusters.RvcOperationalStateCluster.OperationalCommandResponseCallback) callback
            
            );
          },
-         () -> new DelegatedRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback(),
-           roboticVacuumOperationalStateresumeCommandParams
+         () -> new DelegatedRvcOperationalStateClusterOperationalCommandResponseCallback(),
+           rvcOperationalStateresumeCommandParams
        );
-       roboticVacuumOperationalStateClusterInteractionInfoMap.put("resume", roboticVacuumOperationalStateresumeInteractionInfo);
-     commandMap.put("roboticVacuumOperationalState", roboticVacuumOperationalStateClusterInteractionInfoMap);
+       rvcOperationalStateClusterInteractionInfoMap.put("resume", rvcOperationalStateresumeInteractionInfo);
+     commandMap.put("rvcOperationalState", rvcOperationalStateClusterInteractionInfoMap);
      Map<String, InteractionInfo> hepaFilterMonitoringClusterInteractionInfoMap = new LinkedHashMap<>();
      commandMap.put("hepaFilterMonitoring", hepaFilterMonitoringClusterInteractionInfoMap);
      Map<String, InteractionInfo> activatedCarbonFilterMonitoringClusterInteractionInfoMap = new LinkedHashMap<>();

@@ -3114,7 +3114,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRoboticVacuumOperationalStateClusterErrorStateStruct
+@implementation MTRRVCOperationalStateClusterErrorStateStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3130,7 +3130,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRRoboticVacuumOperationalStateClusterErrorStateStruct alloc] init];
+    auto other = [[MTRRVCOperationalStateClusterErrorStateStruct alloc] init];
 
     other.errorStateID = self.errorStateID;
     other.errorStateLabel = self.errorStateLabel;
@@ -3148,7 +3148,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRoboticVacuumOperationalStateClusterOperationalStateStruct
+@implementation MTRRVCOperationalStateClusterOperationalStateStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3162,7 +3162,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRRoboticVacuumOperationalStateClusterOperationalStateStruct alloc] init];
+    auto other = [[MTRRVCOperationalStateClusterOperationalStateStruct alloc] init];
 
     other.operationalStateID = self.operationalStateID;
     other.operationalStateLabel = self.operationalStateLabel;
@@ -3179,19 +3179,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRoboticVacuumOperationalStateClusterOperationalErrorEvent
+@implementation MTRRVCOperationalStateClusterOperationalErrorEvent
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _errorState = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
+        _errorState = [MTRRVCOperationalStateClusterErrorStateStruct new];
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRRoboticVacuumOperationalStateClusterOperationalErrorEvent alloc] init];
+    auto other = [[MTRRVCOperationalStateClusterOperationalErrorEvent alloc] init];
 
     other.errorState = self.errorState;
 
@@ -3207,7 +3207,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRRoboticVacuumOperationalStateClusterOperationCompletionEvent
+@implementation MTRRVCOperationalStateClusterOperationCompletionEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3223,7 +3223,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRRoboticVacuumOperationalStateClusterOperationCompletionEvent alloc] init];
+    auto other = [[MTRRVCOperationalStateClusterOperationCompletionEvent alloc] init];
 
     other.completionErrorCode = self.completionErrorCode;
     other.totalOperationalTime = self.totalOperationalTime;

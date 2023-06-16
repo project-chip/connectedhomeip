@@ -3372,9 +3372,9 @@ void CHIPOperationalStateClusterOperationalCommandResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, CommandResponseState);
 }
-CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback::
-    CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallbackType>(CallbackFn, this)
+CHIPRvcOperationalStateClusterOperationalCommandResponseCallback::CHIPRvcOperationalStateClusterOperationalCommandResponseCallback(
+    jobject javaCallback) :
+    Callback::Callback<CHIPRvcOperationalStateClusterOperationalCommandResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3390,8 +3390,8 @@ CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback::
     }
 }
 
-CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback::
-    ~CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback()
+CHIPRvcOperationalStateClusterOperationalCommandResponseCallback::
+    ~CHIPRvcOperationalStateClusterOperationalCommandResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3402,9 +3402,9 @@ CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback::
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback::CallbackFn(
+void CHIPRvcOperationalStateClusterOperationalCommandResponseCallback::CallbackFn(
     void * context,
-    const chip::app::Clusters::RoboticVacuumOperationalState::Commands::OperationalCommandResponse::DecodableType & dataResponse)
+    const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3414,10 +3414,10 @@ void CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback:
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback,
-                    void (*)(CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback>);
+    std::unique_ptr<CHIPRvcOperationalStateClusterOperationalCommandResponseCallback,
+                    void (*)(CHIPRvcOperationalStateClusterOperationalCommandResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPRvcOperationalStateClusterOperationalCommandResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPRvcOperationalStateClusterOperationalCommandResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -3425,8 +3425,8 @@ void CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback:
     VerifyOrReturn(javaCallbackRef != nullptr);
 
     err = JniReferences::GetInstance().FindMethod(
-        env, javaCallbackRef, "onSuccess",
-        "(Lchip/devicecontroller/ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct;)V", &javaMethod);
+        env, javaCallbackRef, "onSuccess", "(Lchip/devicecontroller/ChipStructs$RvcOperationalStateClusterErrorStateStruct;)V",
+        &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject CommandResponseState;
@@ -3465,18 +3465,17 @@ void CHIPRoboticVacuumOperationalStateClusterOperationalCommandResponseCallback:
 
     jclass errorStateStructStructClass_0;
     err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct",
-        errorStateStructStructClass_0);
+        env, "chip/devicecontroller/ChipStructs$RvcOperationalStateClusterErrorStateStruct", errorStateStructStructClass_0);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Could not find class ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct");
+        ChipLogError(Zcl, "Could not find class ChipStructs$RvcOperationalStateClusterErrorStateStruct");
         return;
     }
     jmethodID errorStateStructStructCtor_0 =
         env->GetMethodID(errorStateStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V");
     if (errorStateStructStructCtor_0 == nullptr)
     {
-        ChipLogError(Zcl, "Could not find ChipStructs$RoboticVacuumOperationalStateClusterErrorStateStruct constructor");
+        ChipLogError(Zcl, "Could not find ChipStructs$RvcOperationalStateClusterErrorStateStruct constructor");
         return;
     }
 

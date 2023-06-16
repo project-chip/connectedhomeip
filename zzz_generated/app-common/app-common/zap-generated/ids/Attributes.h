@@ -3021,7 +3021,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace OperationalState
 
-namespace RoboticVacuumOperationalState {
+namespace RvcOperationalState {
 namespace Attributes {
 
 namespace PhaseList {
@@ -3073,7 +3073,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RoboticVacuumOperationalState
+} // namespace RvcOperationalState
 
 namespace HepaFilterMonitoring {
 namespace Attributes {

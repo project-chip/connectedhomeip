@@ -3416,7 +3416,7 @@ client cluster OperationalState = 96 {
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
-client cluster RoboticVacuumOperationalState = 97 {
+client cluster RvcOperationalState = 97 {
   enum ErrorStateEnum : ENUM8 {
     kFailedToFindChargingDock = 64;
     kStuck = 65;
