@@ -132,7 +132,6 @@ jobs:
               timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0 chip_device_config_device_software_version=5 chip_device_config_device_software_version_string='"5.0"'
-                  src/app/ota_image_tool.py create -v 0xFF01 -p 0x8001 -vn 5 -vs "5.0" -da sha256 out/debug/chip-ota-requestor-app /tmp/ota-test005-image
                   cp out/debug/chip-ota-requestor-app /tmp/ota-test005-raw-image
             - name: Build example OTA Requestor
               timeout-minutes: 10
