@@ -2417,14 +2417,14 @@ server cluster OperationalState = 96 {
   }
 
   struct ErrorStateStruct {
-    ErrorStateEnum errorStateID = 0;
-    nullable char_string<64> errorStateLabel = 1;
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
     optional char_string<64> errorStateDetails = 2;
   }
 
   struct OperationalStateStruct {
-    OperationalStateEnum operationalStateID = 0;
-    char_string<64> operationalStateLabel = 1;
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
   }
 
   critical event OperationalError = 0 {
@@ -2432,7 +2432,7 @@ server cluster OperationalState = 96 {
   }
 
   info event OperationCompletion = 1 {
-    ErrorStateEnum completionErrorCode = 0;
+    ENUM8 completionErrorCode = 0;
     optional nullable elapsed_s totalOperationalTime = 1;
     optional nullable elapsed_s pausedTime = 2;
   }
