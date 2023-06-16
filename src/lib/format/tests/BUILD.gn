@@ -23,6 +23,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestFlatTree.cpp",
+    "TestFlatTreePosition.cpp",
   ]
   sources = []
 
@@ -35,7 +36,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/format:flat_tree",
+    "${chip_root}/src/lib/format:flat-tree",
     "${chip_root}/src/lib/support:testing",
     "${nlunit_test_root}:nlunit-test",
   ]

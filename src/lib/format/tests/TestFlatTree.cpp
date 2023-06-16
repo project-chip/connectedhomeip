@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/format/flat_tree.h>
+#include <lib/format/FlatTree.h>
 
 #include <lib/core/TLVTags.h>
 #include <lib/support/UnitTestRegistration.h>
