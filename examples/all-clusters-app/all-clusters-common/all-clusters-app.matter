@@ -2437,6 +2437,15 @@ server cluster OperationalState = 96 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  response struct OperationalCommandResponse = 4 {
+    ErrorStateStruct commandResponseState = 0;
+  }
+
+  command Pause(): OperationalCommandResponse = 0;
+  command Stop(): OperationalCommandResponse = 1;
+  command Start(): OperationalCommandResponse = 2;
+  command Resume(): OperationalCommandResponse = 3;
 }
 
 /** Attributes and commands for monitoring HEPA filters in a device */
