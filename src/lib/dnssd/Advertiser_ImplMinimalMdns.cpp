@@ -906,7 +906,7 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
         // This optimization likely will take more logic and state storage, so
         // for now it is not done.
         QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
-        queryData.SetIsInternalBroadcast(true);
+        queryData.SetIsAnnounceBroadcast(true);
 
         for (auto & it : mOperationalResponders)
         {
