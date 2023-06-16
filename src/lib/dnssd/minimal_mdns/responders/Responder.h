@@ -97,7 +97,7 @@ public:
     /// Accept to add responses for the particular responder.
     ///
     /// This will be called before responders serialize their records.
-    virtual bool Accept(const Responder &) const { return true; }
+    virtual bool ShouldSend(const Responder &) const { return true; }
 
     /// Called when all responses were added for a particular responder
     ///

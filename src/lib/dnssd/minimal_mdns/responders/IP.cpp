@@ -30,7 +30,7 @@ void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
                                     const ResponseConfiguration & configuration)
 {
 #if INET_CONFIG_ENABLE_IPV4
-    if (!delegate->Accept(*this))
+    if (!delegate->ShouldSend(*this))
     {
         return;
     }
@@ -58,7 +58,7 @@ void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
 void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                     const ResponseConfiguration & configuration)
 {
-    if (!delegate->Accept(*this))
+    if (!delegate->ShouldSend(*this))
     {
         return;
     }

@@ -142,7 +142,7 @@ void QueryResponderBase::MarkAdditionalRepliesFor(QueryResponderIterator it)
 void QueryResponderBase::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
                                          const ResponseConfiguration & configuration)
 {
-    if (!delegate->Accept(*this))
+    if (!delegate->ShouldSend(*this))
     {
         return;
     }

@@ -245,7 +245,7 @@ CHIP_ERROR ResponseSender::PrepareNewReplyPacket()
     return CHIP_NO_ERROR;
 }
 
-bool ResponseSender::Accept(const Responder & responder) const
+bool ResponseSender::ShouldSend(const Responder & responder) const
 {
     switch (responder.GetQType())
     {
