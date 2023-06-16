@@ -13325,7 +13325,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Events
 
 } // namespace OperationalState
-namespace RoboticVacuumOperationalState {
+namespace RvcOperationalState {
 namespace Structs {} // namespace Structs
 
 namespace Commands {
@@ -13634,7 +13634,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace OperationCompletion.
 } // namespace Events
 
-} // namespace RoboticVacuumOperationalState
+} // namespace RvcOperationalState
 namespace HepaFilterMonitoring {
 
 namespace Commands {
@@ -28200,7 +28200,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::RoboticVacuumOperationalState::Id: {
+    case Clusters::RvcOperationalState::Id: {
         switch (aCommand)
         {
         default:

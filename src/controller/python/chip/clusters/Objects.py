@@ -18314,7 +18314,7 @@ class OperationalState(Cluster):
 
 
 @dataclass
-class RoboticVacuumOperationalState(Cluster):
+class RvcOperationalState(Cluster):
     id: typing.ClassVar[int] = 0x0061
 
     @ChipUtility.classproperty
@@ -18324,9 +18324,9 @@ class RoboticVacuumOperationalState(Cluster):
                 ClusterObjectFieldDescriptor(Label="phaseList", Tag=0x00000000, Type=typing.Union[Nullable, typing.List[str]]),
                 ClusterObjectFieldDescriptor(Label="currentPhase", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="countdownTime", Tag=0x00000002, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="operationalStateList", Tag=0x00000003, Type=typing.List[RoboticVacuumOperationalState.Structs.OperationalStateStruct]),
-                ClusterObjectFieldDescriptor(Label="operationalState", Tag=0x00000004, Type=RoboticVacuumOperationalState.Structs.OperationalStateStruct),
-                ClusterObjectFieldDescriptor(Label="operationalError", Tag=0x00000005, Type=RoboticVacuumOperationalState.Structs.ErrorStateStruct),
+                ClusterObjectFieldDescriptor(Label="operationalStateList", Tag=0x00000003, Type=typing.List[RvcOperationalState.Structs.OperationalStateStruct]),
+                ClusterObjectFieldDescriptor(Label="operationalState", Tag=0x00000004, Type=RvcOperationalState.Structs.OperationalStateStruct),
+                ClusterObjectFieldDescriptor(Label="operationalError", Tag=0x00000005, Type=RvcOperationalState.Structs.ErrorStateStruct),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -18338,9 +18338,9 @@ class RoboticVacuumOperationalState(Cluster):
     phaseList: 'typing.Union[Nullable, typing.List[str]]' = None
     currentPhase: 'typing.Union[Nullable, uint]' = None
     countdownTime: 'typing.Union[None, Nullable, uint]' = None
-    operationalStateList: 'typing.List[RoboticVacuumOperationalState.Structs.OperationalStateStruct]' = None
-    operationalState: 'RoboticVacuumOperationalState.Structs.OperationalStateStruct' = None
-    operationalError: 'RoboticVacuumOperationalState.Structs.ErrorStateStruct' = None
+    operationalStateList: 'typing.List[RvcOperationalState.Structs.OperationalStateStruct]' = None
+    operationalState: 'RvcOperationalState.Structs.OperationalStateStruct' = None
+    operationalError: 'RvcOperationalState.Structs.ErrorStateStruct' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -18467,10 +18467,10 @@ class RoboticVacuumOperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="commandResponseState", Tag=0, Type=RoboticVacuumOperationalState.Structs.ErrorStateStruct),
+                        ClusterObjectFieldDescriptor(Label="commandResponseState", Tag=0, Type=RvcOperationalState.Structs.ErrorStateStruct),
                     ])
 
-            commandResponseState: 'RoboticVacuumOperationalState.Structs.ErrorStateStruct' = field(default_factory=lambda: RoboticVacuumOperationalState.Structs.ErrorStateStruct())
+            commandResponseState: 'RvcOperationalState.Structs.ErrorStateStruct' = field(default_factory=lambda: RvcOperationalState.Structs.ErrorStateStruct())
 
     class Attributes:
         @dataclass
@@ -18533,9 +18533,9 @@ class RoboticVacuumOperationalState(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[RoboticVacuumOperationalState.Structs.OperationalStateStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.List[RvcOperationalState.Structs.OperationalStateStruct])
 
-            value: 'typing.List[RoboticVacuumOperationalState.Structs.OperationalStateStruct]' = field(default_factory=lambda: [])
+            value: 'typing.List[RvcOperationalState.Structs.OperationalStateStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class OperationalState(ClusterAttributeDescriptor):
@@ -18549,9 +18549,9 @@ class RoboticVacuumOperationalState(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=RoboticVacuumOperationalState.Structs.OperationalStateStruct)
+                return ClusterObjectFieldDescriptor(Type=RvcOperationalState.Structs.OperationalStateStruct)
 
-            value: 'RoboticVacuumOperationalState.Structs.OperationalStateStruct' = field(default_factory=lambda: RoboticVacuumOperationalState.Structs.OperationalStateStruct())
+            value: 'RvcOperationalState.Structs.OperationalStateStruct' = field(default_factory=lambda: RvcOperationalState.Structs.OperationalStateStruct())
 
         @dataclass
         class OperationalError(ClusterAttributeDescriptor):
@@ -18565,9 +18565,9 @@ class RoboticVacuumOperationalState(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=RoboticVacuumOperationalState.Structs.ErrorStateStruct)
+                return ClusterObjectFieldDescriptor(Type=RvcOperationalState.Structs.ErrorStateStruct)
 
-            value: 'RoboticVacuumOperationalState.Structs.ErrorStateStruct' = field(default_factory=lambda: RoboticVacuumOperationalState.Structs.ErrorStateStruct())
+            value: 'RvcOperationalState.Structs.ErrorStateStruct' = field(default_factory=lambda: RvcOperationalState.Structs.ErrorStateStruct())
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -18680,10 +18680,10 @@ class RoboticVacuumOperationalState(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="errorState", Tag=0, Type=RoboticVacuumOperationalState.Structs.ErrorStateStruct),
+                        ClusterObjectFieldDescriptor(Label="errorState", Tag=0, Type=RvcOperationalState.Structs.ErrorStateStruct),
                     ])
 
-            errorState: 'RoboticVacuumOperationalState.Structs.ErrorStateStruct' = field(default_factory=lambda: RoboticVacuumOperationalState.Structs.ErrorStateStruct())
+            errorState: 'RvcOperationalState.Structs.ErrorStateStruct' = field(default_factory=lambda: RvcOperationalState.Structs.ErrorStateStruct())
 
         @dataclass
         class OperationCompletion(ClusterEvent):

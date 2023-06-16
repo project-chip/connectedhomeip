@@ -341,7 +341,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace OperationalState
 
-namespace RoboticVacuumOperationalState {
+namespace RvcOperationalState {
 namespace Events {
 
 namespace OperationalError {
@@ -353,7 +353,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace OperationCompletion
 
 } // namespace Events
-} // namespace RoboticVacuumOperationalState
+} // namespace RvcOperationalState
 
 namespace DoorLock {
 namespace Events {

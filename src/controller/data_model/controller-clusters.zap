@@ -13096,7 +13096,7 @@
           ]
         },
         {
-          "name": "Robotic Vacuum Operational State",
+          "name": "RVC Operational State",
           "code": 97,
           "mfgCode": null,
           "define": "OPERATIONAL_STATE_RVC_CLUSTER",
@@ -13172,7 +13172,7 @@
           ]
         },
         {
-          "name": "Robotic Vacuum Operational State",
+          "name": "RVC Operational State",
           "code": 97,
           "mfgCode": null,
           "define": "OPERATIONAL_STATE_RVC_CLUSTER",

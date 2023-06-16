@@ -1466,9 +1466,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::Opera
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(RoboticVacuumOperationalState::ErrorStateEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcOperationalState::ErrorStateEnum val)
 {
-    using EnumType = RoboticVacuumOperationalState::ErrorStateEnum;
+    using EnumType = RvcOperationalState::ErrorStateEnum;
     switch (val)
     {
     case EnumType::kFailedToFindChargingDock:
@@ -1484,9 +1484,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RoboticVacuumOperationa
         return static_cast<EnumType>(0);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(RoboticVacuumOperationalState::OperationalStateEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcOperationalState::OperationalStateEnum val)
 {
-    using EnumType = RoboticVacuumOperationalState::OperationalStateEnum;
+    using EnumType = RvcOperationalState::OperationalStateEnum;
     switch (val)
     {
     case EnumType::kSeekingCharger:

@@ -1848,10 +1848,9 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForRoboticVacuumOperationalStateCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::RoboticVacuumOperationalState;
+    using namespace Clusters::RvcOperationalState;
     switch (aEventId) {
     case Events::OperationalError::Id: {
         Events::OperationalError::DecodableType cppValue;
@@ -1860,11 +1859,11 @@ static id _Nullable DecodeEventPayloadForRoboticVacuumOperationalStateCluster(
             return nil;
         }
 
-        __auto_type * value = [MTRRoboticVacuumOperationalStateClusterOperationalErrorEvent new];
+        __auto_type * value = [MTRRVCOperationalStateClusterOperationalErrorEvent new];
 
         do {
-            MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
-            memberValue = [MTRRoboticVacuumOperationalStateClusterErrorStateStruct new];
+            MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull memberValue;
+            memberValue = [MTRRVCOperationalStateClusterErrorStateStruct new];
             memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
             if (cppValue.errorState.errorStateLabel.HasValue()) {
                 memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
@@ -1898,7 +1897,7 @@ static id _Nullable DecodeEventPayloadForRoboticVacuumOperationalStateCluster(
             return nil;
         }
 
-        __auto_type * value = [MTRRoboticVacuumOperationalStateClusterOperationCompletionEvent new];
+        __auto_type * value = [MTRRVCOperationalStateClusterOperationCompletionEvent new];
 
         do {
             NSNumber * _Nonnull memberValue;
@@ -3144,8 +3143,8 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::OperationalState::Id: {
         return DecodeEventPayloadForOperationalStateCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::RoboticVacuumOperationalState::Id: {
-        return DecodeEventPayloadForRoboticVacuumOperationalStateCluster(aPath.mEventId, aReader, aError);
+    case Clusters::RvcOperationalState::Id: {
+        return DecodeEventPayloadForRVCOperationalStateCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeEventPayloadForHEPAFilterMonitoringCluster(aPath.mEventId, aReader, aError);

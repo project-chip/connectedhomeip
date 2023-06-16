@@ -4267,7 +4267,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRoboticVacuumOperationalStateClusterPauseParams : NSObject <NSCopying>
+@interface MTRRVCOperationalStateClusterPauseParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4295,7 +4295,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRoboticVacuumOperationalStateClusterStopParams : NSObject <NSCopying>
+@interface MTRRVCOperationalStateClusterStopParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4323,7 +4323,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRoboticVacuumOperationalStateClusterStartParams : NSObject <NSCopying>
+@interface MTRRVCOperationalStateClusterStartParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4351,7 +4351,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRoboticVacuumOperationalStateClusterResumeParams : NSObject <NSCopying>
+@interface MTRRVCOperationalStateClusterResumeParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4379,13 +4379,12 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
-@interface MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams : NSObject <NSCopying>
+@interface MTRRVCOperationalStateClusterOperationalCommandResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy)
-    MTRRoboticVacuumOperationalStateClusterErrorStateStruct * _Nonnull commandResponseState MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull commandResponseState MTR_NEWLY_AVAILABLE;
 
 /**
- * Initialize an MTRRoboticVacuumOperationalStateClusterOperationalCommandResponseParams with a response-value dictionary
+ * Initialize an MTRRVCOperationalStateClusterOperationalCommandResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not

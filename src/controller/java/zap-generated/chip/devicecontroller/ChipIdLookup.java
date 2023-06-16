@@ -184,7 +184,7 @@ public final class ChipIdLookup {
       return "OperationalState";
     }
     if (clusterId == 97L) {
-      return "RoboticVacuumOperationalState";
+      return "RvcOperationalState";
     }
     if (clusterId == 113L) {
       return "HepaFilterMonitoring";

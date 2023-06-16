@@ -1962,12 +1962,12 @@ public Optional<String> operationalStateLabel;
   }
 }
 
-public static class RoboticVacuumOperationalStateClusterErrorStateStruct {
+public static class RvcOperationalStateClusterErrorStateStruct {
 public Integer errorStateID;
 public Optional<String> errorStateLabel;
 public Optional<String> errorStateDetails;
 
-  public RoboticVacuumOperationalStateClusterErrorStateStruct(
+  public RvcOperationalStateClusterErrorStateStruct(
     Integer errorStateID
       , Optional<String> errorStateLabel
       , Optional<String> errorStateDetails
@@ -1980,7 +1980,7 @@ public Optional<String> errorStateDetails;
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("RoboticVacuumOperationalStateClusterErrorStateStruct {\n");
+    output.append("RvcOperationalStateClusterErrorStateStruct {\n");
     output.append("\terrorStateID: ");
     output.append(errorStateID);
         output.append("\n");
@@ -1995,11 +1995,11 @@ public Optional<String> errorStateDetails;
   }
 }
 
-public static class RoboticVacuumOperationalStateClusterOperationalStateStruct {
+public static class RvcOperationalStateClusterOperationalStateStruct {
 public Integer operationalStateID;
 public Optional<String> operationalStateLabel;
 
-  public RoboticVacuumOperationalStateClusterOperationalStateStruct(
+  public RvcOperationalStateClusterOperationalStateStruct(
     Integer operationalStateID
       , Optional<String> operationalStateLabel
   ) {
@@ -2010,7 +2010,7 @@ public Optional<String> operationalStateLabel;
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("RoboticVacuumOperationalStateClusterOperationalStateStruct {\n");
+    output.append("RvcOperationalStateClusterOperationalStateStruct {\n");
     output.append("\toperationalStateID: ");
     output.append(operationalStateID);
         output.append("\n");

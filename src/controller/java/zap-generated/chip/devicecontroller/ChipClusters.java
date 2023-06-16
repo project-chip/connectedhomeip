@@ -16595,10 +16595,10 @@ public class ChipClusters {
 , int minInterval, int maxInterval);
   }
 
-  public static class RoboticVacuumOperationalStateCluster extends BaseChipCluster {
+  public static class RvcOperationalStateCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 97L;
 
-    public RoboticVacuumOperationalStateCluster(long devicePtr, int endpointId) {
+    public RvcOperationalStateCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -16661,7 +16661,7 @@ public class ChipClusters {
       
       , @Nullable Integer timedInvokeTimeoutMs);
     public interface OperationalCommandResponseCallback {
-      void onSuccess(ChipStructs.RoboticVacuumOperationalStateClusterErrorStateStruct commandResponseState);
+      void onSuccess(ChipStructs.RvcOperationalStateClusterErrorStateStruct commandResponseState);
       
       void onError(Exception error);
     }
@@ -16683,7 +16683,7 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
       public interface OperationalStateListAttributeCallback {
-        void onSuccess( List<ChipStructs.RoboticVacuumOperationalStateClusterOperationalStateStruct> valueList);
+        void onSuccess( List<ChipStructs.RvcOperationalStateClusterOperationalStateStruct> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }

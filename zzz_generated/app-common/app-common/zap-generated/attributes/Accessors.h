@@ -1787,7 +1787,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace OperationalState
 
-namespace RoboticVacuumOperationalState {
+namespace RvcOperationalState {
 namespace Attributes {
 
 namespace CurrentPhase {
@@ -1815,7 +1815,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RoboticVacuumOperationalState
+} // namespace RvcOperationalState
 
 namespace HepaFilterMonitoring {
 namespace Attributes {
