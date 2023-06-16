@@ -2425,8 +2425,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::LaundryWasherModeSelect::Id: {
-        using namespace app::Clusters::LaundryWasherModeSelect;
+    case app::Clusters::LaundryWasherMode::Id: {
+        using namespace app::Clusters::LaundryWasherMode;
         switch (aPath.mEventId)
         {
         default:
@@ -2435,8 +2435,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Id: {
-        using namespace app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect;
+    case app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id: {
+        using namespace app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
         switch (aPath.mEventId)
         {
         default:
@@ -2455,8 +2455,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::RvcRunModeSelect::Id: {
-        using namespace app::Clusters::RvcRunModeSelect;
+    case app::Clusters::RvcRunMode::Id: {
+        using namespace app::Clusters::RvcRunMode;
         switch (aPath.mEventId)
         {
         default:
@@ -2465,8 +2465,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::RvcCleanModeSelect::Id: {
-        using namespace app::Clusters::RvcCleanModeSelect;
+    case app::Clusters::RvcCleanMode::Id: {
+        using namespace app::Clusters::RvcCleanMode;
         switch (aPath.mEventId)
         {
         default:
@@ -2547,8 +2547,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::DishwasherModeSelect::Id: {
-        using namespace app::Clusters::DishwasherModeSelect;
+    case app::Clusters::DishwasherMode::Id: {
+        using namespace app::Clusters::DishwasherMode;
         switch (aPath.mEventId)
         {
         default:
