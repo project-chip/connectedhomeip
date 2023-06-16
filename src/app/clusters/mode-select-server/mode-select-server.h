@@ -62,6 +62,7 @@ public:
     EmberAfStatus GetOnMode(DataModel::Nullable<uint8_t> &) const;
     EmberAfStatus SetOnMode(uint8_t value) const;
     EmberAfStatus SetOnModeNull() const;
+    EndpointId GetEndpointId() const {return endpointId;}
 
 private:
     EndpointId endpointId{};
