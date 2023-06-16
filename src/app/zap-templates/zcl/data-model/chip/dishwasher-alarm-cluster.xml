@@ -32,7 +32,7 @@ limitations under the License.
     <domain>Appliances</domain>
     <description>Attributes and commands for configuring the Dishwasher alarm.</description>
     <code>0x005D</code>
-    <define>DISHWASHER_ALARM</define>
+    <define>DISHWASHER_ALARM_CLUSTER</define>
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
