@@ -13167,7 +13167,7 @@
           "name": "Dishwasher Alarm",
           "code": 93,
           "mfgCode": null,
-          "define": "DISHWASHER_ALARM",
+          "define": "DISHWASHER_ALARM_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
@@ -13219,7 +13219,7 @@
           "name": "Dishwasher Alarm",
           "code": 93,
           "mfgCode": null,
-          "define": "DISHWASHER_ALARM",
+          "define": "DISHWASHER_ALARM_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [

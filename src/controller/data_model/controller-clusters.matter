@@ -3351,15 +3351,6 @@ client cluster DishwasherAlarm = 93 {
     kWaterLevelError = 0x20;
   }
 
-  bitmap Feature : BITMAP32 {
-    kInflowAlarm = 0x1;
-    kDrainAlarm = 0x2;
-    kDoorAlarm = 0x4;
-    kLowTemperatureAlarm = 0x8;
-    kHighTemperatureAlarm = 0x10;
-    kWaterLevelAlarm = 0x20;
-  }
-
   info event Notify = 0 {
     AlarmMap active = 0;
     AlarmMap inactive = 1;
@@ -3370,6 +3361,7 @@ client cluster DishwasherAlarm = 93 {
   readonly attribute AlarmMap mask = 0;
   readonly attribute optional AlarmMap latch = 1;
   readonly attribute AlarmMap state = 2;
+  readonly attribute AlarmMap state = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3382,7 +3374,7 @@ client cluster DishwasherAlarm = 93 {
   }
 
   request struct ModifyEnabledAlarmsRequest {
-    optional AlarmMap mask = 0;
+    AlarmMap mask = 0;
   }
 
   /** Reset alarm */
