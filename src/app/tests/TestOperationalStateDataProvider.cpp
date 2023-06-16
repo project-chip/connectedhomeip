@@ -154,6 +154,16 @@ void TestUseOpStateIDGetOpStateStruct(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == OperationalStateDataProv.UseOpStateIDGetOpStateStruct(endpoint, clusterId, pOp));
 
     NL_TEST_ASSERT(inSuite, 0 == memcmp(opPaused, pOp.operationalStateLabel.data(), strlen(opPaused)));
+
+    pOp.operationalStateID = OperationalStateEnum::kRunning;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == OperationalStateDataProv.UseOpStateIDGetOpStateStruct(endpoint, clusterId, pOp));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(opPaused, pOp.operationalStateLabel.data(), strlen(opRunning)));
+
+    pOp.operationalStateID = OperationalStateEnum::kStopped;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == OperationalStateDataProv.UseOpStateIDGetOpStateStruct(endpoint, clusterId, pOp));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(opPaused, pOp.operationalStateLabel.data(), strlen(opStopped)));
+
+
 }
 
 void TestPhaseListStoreLoad(nlTestSuite * inSuite, void * inContext)
