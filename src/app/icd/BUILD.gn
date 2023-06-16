@@ -31,11 +31,6 @@ source_set("manager-srcs") {
   ]
 }
 
-# Used to enabled ICD related method gated by a build argument in test
-config("test-manager-config") {
-  defines = [ "CHIP_CONFIG_ENABLE_ICD_SERVER=1" ]
-}
-
 # servers-srcs source-set contains all the sources and configurations necessary to build the ICD Server functionality
 # All sources, configurations and dependencies necessary for the ICD Server featureset need to go in this source-set
 #

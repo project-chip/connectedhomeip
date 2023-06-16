@@ -17,6 +17,7 @@ import("//build_overrides/nlio.gni")
 import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/build/chip/tests.gni")
 import("common_flags.gni")
 import("icd/icd.gni")
 
@@ -56,8 +57,11 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY=${chip_access_control_policy_logging_verbosity}",
     "CHIP_CONFIG_PERSIST_SUBSCRIPTIONS=${chip_persist_subscriptions}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
-    "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
   ]
+
+  if (!chip_link_tests) {
+    defines += [ "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}" ]
+  }
 }
 
 source_set("app_config") {

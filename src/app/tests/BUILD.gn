@@ -168,8 +168,7 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  # This set some needed defines to test icd:manager-srcs
-  public_configs = [ "${chip_root}/src/app/icd:test-manager-config" ]
+  public_configs = [ ":test-icd-manager-config" ]
 
   public_deps = [
     ":binding-test-srcs",
@@ -196,4 +195,9 @@ chip_test_suite("tests") {
   if (chip_persist_subscriptions) {
     test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
   }
+}
+
+# Used to enabled ICD related method gated by a build argument in test
+config("test-icd-manager-config") {
+  defines = [ "CHIP_CONFIG_ENABLE_ICD_SERVER=1" ]
 }

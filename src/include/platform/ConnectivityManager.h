@@ -225,9 +225,8 @@ public:
      */
     CHIP_ERROR RequestSEDActiveMode(bool onOff, bool delayIdle = false);
 #endif
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+
     CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
-#endif
 
     // CHIPoBLE service methods
     Ble::BleLayer * GetBleLayer();
@@ -488,12 +487,14 @@ inline CHIP_ERROR ConnectivityManager::RequestSEDActiveMode(bool onOff, bool del
 }
 #endif
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
 inline CHIP_ERROR ConnectivityManager::SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     return static_cast<ImplClass *>(this)->_SetPollingInterval(pollingInterval);
-}
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
+}
 
 inline bool ConnectivityManager::IsThreadAttached()
 {

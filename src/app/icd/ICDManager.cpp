@@ -58,35 +58,30 @@ void ICDManager::UpdateIcdMode()
 
     // The Check In Protocol Feature is required and the slow polling interval shall also be greater than 15 seconds
     // to run an ICD in LIT mode.
-    if (kSlowPollingInterval > kICDSitModePollingThreashold && SupportCheckInProtocol())
-    {
-        // TODO ICD LIT FIX DEPENDENCY ISSUE with app/util/IcdMonitoringTable.h and app/server:server
-        // Check In protocol not implented yet.
-        // // We can only get to LIT Mode, if at least one client is registered to the ICD device
-        // const auto & fabricTable = Server::GetInstance().GetFabricTable();
-        // for (const auto & fabricInfo : fabricTable)
-        // {
-        //     PersistentStorageDelegate & storage = Server::GetInstance().GetPersistentStorage();
-        //     IcdMonitoringTable table(storage, fabricInfo.GetFabricIndex(), 1);
-        //     if (!table.IsEmpty())
-        //     {
-        //         tempMode = LIT;
-        //         break;
-        //     }
-        // }
-    }
+    // if (kSlowPollingInterval > kICDSitModePollingThreashold && SupportCheckInProtocol())
+    // {
+    //     TODO ICD LIT FIX DEPENDENCY ISSUE with app/util/IcdMonitoringTable.h and app/server:server
+    //     Check In protocol not implented yet.
+    //     // We can only get to LIT Mode, if at least one client is registered to the ICD device
+    //     const auto & fabricTable = Server::GetInstance().GetFabricTable();
+    //     for (const auto & fabricInfo : fabricTable)
+    //     {
+    //         PersistentStorageDelegate & storage = Server::GetInstance().GetPersistentStorage();
+    //         IcdMonitoringTable table(storage, fabricInfo.GetFabricIndex(), 1);
+    //         if (!table.IsEmpty())
+    //         {
+    //             tempMode = LIT;
+    //             break;
+    //         }
+    //     }
+    // }
     mIcdMode = tempMode;
 }
 
 void ICDManager::UpdateOperationStates(OperationalState state)
 {
     assertChipStackLockedByCurrentThread();
-
-    if (mOperationalState == IdleMode && state == IdleMode)
-    {
-        // Nothing to do in this case
-        return;
-    }
+    VerifyOrReturn(mOperationalState == IdleMode && state == IdleMode);
 
     if (state == IdleMode)
     {
@@ -98,7 +93,7 @@ void ICDManager::UpdateOperationStates(OperationalState state)
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetSlowPollingInterval());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "Failed to set Polling Interval: err %s", ErrorStr(err))
+            ChipLogError(AppServer, "Failed to set Polling Interval: err %s", ErrorStr(err));
         }
     }
     else if (state == ActiveMode)
@@ -117,7 +112,7 @@ void ICDManager::UpdateOperationStates(OperationalState state)
             CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetFastPollingInterval());
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "Failed to set Polling Interval: err %s", ErrorStr(err))
+                ChipLogError(AppServer, "Failed to set Polling Interval: err %s", ErrorStr(err));
             }
         }
         else

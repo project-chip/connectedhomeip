@@ -255,7 +255,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Implement:
-    //   "A sleepy sender SHOULD increase t to also account for its own sleepy interval
+    //   "An ICD sender SHOULD increase t to also account for its own sleepy interval
     //   required to receive the acknowledgment"
     mrpBackoffTime += app::ICDManager::GetFastPollingInterval();
 #elif CHIP_DEVICE_CONFIG_ENABLE_SED
