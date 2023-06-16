@@ -4,7 +4,6 @@
 struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
-    optional char_string<64> tagName = 2;
 }
 
 struct ModeOptionStruct {
@@ -18,9 +17,20 @@ struct ApplicationStruct {
     char_string applicationID = 1;
 }
 
+struct ErrorStateStruct {
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
+}
+
 struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
+}
+
+struct OperationalStateStruct {
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
 }
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */

@@ -376,7 +376,7 @@ class Encoder:
         return name[:1].lower() + name[1:]
 
     def __format_cluster_name(self, name):
-        return name.lower().replace(' ', '').replace('/', '').lower()
+        return name.lower().replace(' ', '').replace('/', '').replace('.', '').lower()
 
     def __format_command_name(self, name):
         if name is None:
