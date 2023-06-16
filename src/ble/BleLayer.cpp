@@ -308,6 +308,15 @@ void BleLayer::Shutdown()
 
 void BleLayer::CloseAllBleConnections()
 {
+    //Cancel any ongoing attempt to establish new BLE connection
+    if (mConnectionDelegate != nullptr) {
+        CHIP_ERROR err = mConnectionDelegate->CancelConnection();
+        if (err == CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            ChipLogDetail(Ble, "BleConnectionDelegate::CancelConnection is not implemented.");
+        }
+    }
+
     // Close and free all BLE end points.
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
     {
