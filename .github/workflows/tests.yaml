@@ -55,7 +55,7 @@ jobs:
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.1.0
               if: ${{ !env.ACT }}
               name: Checkout
               with:
@@ -331,7 +331,7 @@ jobs:
         runs-on: macos-latest
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.1.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2

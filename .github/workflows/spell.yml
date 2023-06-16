@@ -29,7 +29,7 @@ jobs:
         name: Check Spelling - reviewdog
         runs-on: ubuntu-latest
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.1.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
@@ -44,7 +44,7 @@ jobs:
         name: Check Spelling - pyspelling
         runs-on: ubuntu-latest
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.1.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2

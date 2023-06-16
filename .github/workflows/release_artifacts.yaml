@@ -37,7 +37,7 @@ jobs:
             image: connectedhomeip/chip-build-esp32:0.7.3
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.1.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
@@ -92,7 +92,7 @@ jobs:
         container:
             image: connectedhomeip/chip-build-efr32:0.7.3
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.1.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
