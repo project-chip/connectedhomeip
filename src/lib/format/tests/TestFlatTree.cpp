@@ -31,57 +31,64 @@ namespace {
 using namespace chip::FlatTree;
 using namespace chip::TLV;
 
-Entry<Tag, const char *> node1[] = {
+struct NamedTag {
+    Tag tag;
+    const char *name;
+};
+
+Entry<NamedTag> node1[] = {
     {ContextTag(1), "hello"},
     {ContextTag(2), "world"},
 };
 
-Entry<Tag, const char *> node2[] = {
+Entry<NamedTag> node2[] = {
     {ProfileTag(123, 1), "a"},
     {ProfileTag(234, 2), "b"},
     {ProfileTag(345, 3), "c"},
 };
 
-Entry<Tag, const char *> node3[] = {
+Entry<NamedTag> node3[] = {
     {AnonymousTag(), "foo"},
 };
 
 #define _ENTRY(n) {sizeof(n)/sizeof(n[0]), n}
 
-std::array<Node<Tag, const char *>, 3> tree = {{
+std::array<Node<NamedTag>, 3> tree = {{
         _ENTRY(node1),
         _ENTRY(node2),
         _ENTRY(node3),
 }};
 
-// DO NOT SUBMIT: tests for layouts of data
-struct Data {
-    uint32_t id;
-    const char *name;
-    uint8_t  tlv_type;
-    uint8_t  flags;
-};
+class ByTag {
+  public:
+    constexpr ByTag(Tag tag): mTag(tag) {}
 
+    bool operator()(const NamedTag &item) {
+        return item.tag == mTag;
+    }
+  private:
+    const Tag mTag;
+};
 
 void TestFlatTreeFind(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 0, ContextTag(1))->value, "hello") == 0);
-    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 0, ContextTag(2))->value, "world") == 0);
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 0, ContextTag(3)) == nullptr);
+    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 0, ByTag(ContextTag(1)))->data.name, "hello") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 0, ByTag(ContextTag(2)))->data.name, "world") == 0);
+    NL_TEST_ASSERT(inSuite, FindEntry(tree, 0, ByTag(ContextTag(3))) == nullptr);
 
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 1, ContextTag(1)) == nullptr);
-    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 1, ProfileTag(234, 2))->value, "b") == 0);
-    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 1, ProfileTag(345, 3))->value, "c") == 0);
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 1, AnonymousTag()) == nullptr);
+    NL_TEST_ASSERT(inSuite, FindEntry(tree, 1, ByTag(ContextTag(1))) == nullptr);
+    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 1, ByTag(ProfileTag(234, 2)))->data.name, "b") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 1, ByTag(ProfileTag(345, 3)))->data.name, "c") == 0);
+    NL_TEST_ASSERT(inSuite, FindEntry(tree, 1, ByTag(AnonymousTag())) == nullptr);
 
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 2, ContextTag(1)) == nullptr);
-    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 2, AnonymousTag())->value, "foo") == 0);
+    NL_TEST_ASSERT(inSuite, FindEntry(tree, 2, ByTag(ContextTag(1))) == nullptr);
+    NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 2, ByTag(AnonymousTag()))->data.name, "foo") == 0);
 
     // out of array
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 3, AnonymousTag()) == nullptr);
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 100, AnonymousTag()) == nullptr);
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 1000, AnonymousTag()) == nullptr);
-    NL_TEST_ASSERT(inSuite, FindEntry(tree, 9999999, AnonymousTag()) == nullptr);
+    NL_TEST_ASSERT(inSuite, FindEntry(tree, 3, ByTag(AnonymousTag())) == nullptr);
+    NL_TEST_ASSERT(inSuite, FindEntry(tree, 100, ByTag(AnonymousTag())) == nullptr);
+    NL_TEST_ASSERT(inSuite, FindEntry(tree, 1000, ByTag(AnonymousTag())) == nullptr);
+    NL_TEST_ASSERT(inSuite, FindEntry(tree, 9999999, ByTag(AnonymousTag())) == nullptr);
 }
 
 const nlTest sTests[] = {
@@ -99,3 +106,4 @@ int TestFlatTree()
 }
 
 CHIP_REGISTER_TEST_SUITE(TestFlatTree)
+
