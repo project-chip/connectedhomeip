@@ -826,8 +826,8 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
     bool intersectsInterestPath = false;
     InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject(
         [&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
-            // We call UpdateDirtyGeneration for both read interactions and subscribe interactions, since we may send inconsistent
-            // attribute data between two chunks. UpdateDirtyGeneration will not schedule a new run for read handlers which are
+            // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
+            // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
             // waiting for a response to the last message chunk for read interactions.
             if (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse())
             {
@@ -835,7 +835,7 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
                 {
                     if (object->mValue.Intersects(aAttributePath))
                     {
-                        handler->UpdateDirtyGeneration(aAttributePath);
+                        handler->AttributePathIsDirty(aAttributePath);
                         intersectsInterestPath = true;
                         break;
                     }

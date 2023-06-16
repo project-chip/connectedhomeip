@@ -212,12 +212,12 @@ private:
 
     enum class ReadHandlerFlags : uint8_t
     {
-        // mHoldMinInterval is used to prevent subscription data delivery while we are
+        // WaitingUntilMinInterval is used to prevent subscription data delivery while we are
         // waiting for the min reporting interval to elapse.
         WaitingUntilMinInterval = (1 << 0),
 
-        // mHoldMaxInterval is used to prevent subscription empty report delivery while we
-        // are waiting for the max reporting interval to elaps.  When mHoldMaxInterval
+        // WaitingUntilMaxInterval is used to prevent subscription empty report delivery while we
+        // are waiting for the max reporting interval to elaps.  When WaitingUntilMaxInterval
         // becomes false, we are allowed to send an empty report to keep the
         // subscription alive on the client.
         WaitingUntilMaxInterval = (1 << 1),
@@ -291,18 +291,15 @@ private:
 
     bool IsIdle() const { return mState == HandlerState::Idle; }
 
-    /// @brief Returns whether the ReadHandler is in a state where it can immediately send a report. The main conditions for this
-    /// are that the handler is in a report generating state, meaning it is subscribed to or processing a read request, that the min
-    /// interval has expired and the max interval has expired, forcing an empty report, or that the handler is dirty. This function
+    /// @brief Returns whether the ReadHandler is in a state where it can immediately send a report. This function
     /// is used to determine whether a report generation should be scheduled for the handler.
-    /// @return Whether the ReadHandler is in a state where it can immediately send a report.
     bool IsReportableNow() const
     {
         // Important: Anything that changes the state IsReportableNow depends on in
         // a way that causes IsReportableNow to become true must call ScheduleRun
         // on the reporting engine.
-        return mState == HandlerState::GeneratingReports && !mFlags.Has(ReadHandlerFlags::HoldMinInterval) &&
-            (IsDirty() || !mFlags.Has(ReadHandlerFlags::HoldMaxInterval));
+        return mState == HandlerState::GeneratingReports && !mFlags.Has(ReadHandlerFlags::WaitingUntilMinInterval) &&
+            (IsDirty() || !mFlags.Has(ReadHandlerFlags::WaitingUntilMaxInterval));
     }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
@@ -329,15 +326,15 @@ private:
     void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
 
-    /// @brief Update mDirtyGeneration to the latest DirtySetGeneration of the InteractionModelEngine. As this might make the
-    /// readhandler dirty, this function checks if the readhandler is now reportable and schedules a run if it is the case.
+    /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will scehdule an engine run if
+    /// the change to the attribute path makes the ReadHandler reportable.
     /// @param aAttributeChanged Path to the attribute that was changed.
-    void UpdateDirtyGeneration(const AttributePathParams & aAttributeChanged);
+    void AttributePathIsDirty(const AttributePathParams & aAttributeChanged);
     bool IsDirty() const
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
-    void ClearForceDirtyFlag() { ClearStateFlagAndScheduleReport(ReadHandlerFlags::ForceDirty); }
+    void ClearForceDirtyFlag() { ClearStateFlag(ReadHandlerFlags::ForceDirty); }
     NodeId GetInitiatorNodeId() const
     {
         auto session = GetSession();
@@ -356,7 +353,7 @@ private:
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
     /// @brief Forces the read handler into a dirty state, regardless of what's going on with attributes.
-    /// This can lead to scheduling of a reporting run immediately, if the min interval has been reached, 
+    /// This can lead to scheduling of a reporting run immediately, if the min interval has been reached,
     /// or after the min interval is reached if it has not yet been reached.
     void ForceDirtyState();
 
@@ -428,16 +425,16 @@ private:
 
     void PersistSubscription();
 
-    /// @brief Modifies a state flag in the read handler and schedules an engine run if the read handler want from a
-    /// non-reportable state to a reportable state.
+    /// @brief Modifies a state flag in the read handler. If the flag went from a
+    /// non-reportable state to a reportable state, schedules an engine run.
     /// @param aFlag Flag to set
     /// @param aValue Flag new value
-    void SetStateFlagAndScheduleReport(ReadHandlerFlags aFlag, bool aValue = true);
+    void SetStateFlag(ReadHandlerFlags aFlag, bool aValue = true);
 
-    /// @brief This function calls the SetStateFlagAndScheduleReport with the flag value set to false, thus possibly emitting a report
+    /// @brief This function calls the SetStateFlag with the flag value set to false, thus possibly emitting a report
     /// generation.
     /// @param aFlag Flag to clear
-    void ClearStateFlagAndScheduleReport(ReadHandlerFlags aFlag);
+    void ClearStateFlag(ReadHandlerFlags aFlag);
 
     // Helpers for continuing the subscription resumption
     static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
@@ -455,7 +452,7 @@ private:
     // current generation when we started sending the last set reports that we completed.
     //
     // This allows us to reset the iterator to the beginning of the current
-    // cluster instead of the beginning of the whole report in UpdateDirtyGeneration, without
+    // cluster instead of the beginning of the whole report in AttributePathIsDirty, without
     // permanently missing dirty any paths.
     uint64_t mDirtyGeneration = 0;
 
@@ -469,14 +466,14 @@ private:
     /*
      *           (mDirtyGeneration = b > a, this is a dirty read handler)
      *        +- Start Report -> mCurrentReportsBeginGeneration = c
-     *        |      +- UpdateDirtyGeneration (Attribute Y) -> mDirtyGeneration = d
+     *        |      +- AttributePathIsDirty (Attribute Y) -> mDirtyGeneration = d
      *        |      |     +- Last Chunk -> mPreviousReportsBeginGeneration = mCurrentReportsBeginGeneration = c
      *        |      |     |   +- (mDirtyGeneration = d) > (mPreviousReportsBeginGeneration = c), this is a dirty read handler
      *        |      |     |   |  Attribute X has a dirty generation less than c, Attribute Y has a dirty generation larger than c
      *        |      |     |   |  So Y will be included in the report but X will not be inclued in this report.
      * -a--b--c------d-----e---f---> Generation
      *  |  |
-     *  |  +- UpdateDirtyGeneration (Attribute X) (mDirtyGeneration = b)
+     *  |  +- AttributePathIsDirty (Attribute X) (mDirtyGeneration = b)
      *  +- mPreviousReportsBeginGeneration
      * For read handler, if mDirtyGeneration > mPreviousReportsBeginGeneration, then we regard it as a dirty read handler, and it
      * should generate report on timeout reached.

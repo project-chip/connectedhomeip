@@ -60,7 +60,7 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
     mLastWrittenEventsBytes     = 0;
     mTransactionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
     mFlags.ClearAll();
-    SetStateFlagAndScheduleReport(ReadHandlerFlags::PrimingReports);
+    SetStateFlag(ReadHandlerFlags::PrimingReports);
 
     mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
 }
@@ -80,7 +80,7 @@ void ReadHandler::ResumeSubscription(CASESessionManager & caseSessionManager,
     mSubscriptionId          = subscriptionInfo.mSubscriptionId;
     mMinIntervalFloorSeconds = subscriptionInfo.mMinInterval;
     mMaxInterval             = subscriptionInfo.mMaxInterval;
-    SetStateFlagAndScheduleReport(ReadHandlerFlags::FabricFiltered, subscriptionInfo.mFabricFiltered);
+    SetStateFlag(ReadHandlerFlags::FabricFiltered, subscriptionInfo.mFabricFiltered);
 
     // Move dynamically allocated attributes and events from the SubscriptionInfo struct into
     // the object pool managed by the IM engine
@@ -187,7 +187,7 @@ void ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
     else
     {
         // Force us to be in a dirty state so we get processed by the reporting
-        SetStateFlagAndScheduleReport(ReadHandlerFlags::ForceDirty);
+        SetStateFlag(ReadHandlerFlags::ForceDirty);
     }
 }
 
@@ -214,7 +214,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
             {
                 err = SendSubscribeResponse();
 
-                SetStateFlagAndScheduleReport(ReadHandlerFlags::ActiveSubscription);
+                SetStateFlag(ReadHandlerFlags::ActiveSubscription);
 
                 auto * appCallback = mManagementCallback.GetAppCallback();
                 if (appCallback)
@@ -297,7 +297,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     {
         mCurrentReportsBeginGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
     }
-    SetStateFlagAndScheduleReport(ReadHandlerFlags::ChunkedReport, aMoreChunks);
+    SetStateFlag(ReadHandlerFlags::ChunkedReport, aMoreChunks);
     bool responseExpected = IsType(InteractionType::Subscribe) || aMoreChunks;
 
     mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
@@ -442,7 +442,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 
     bool isFabricFiltered;
     ReturnErrorOnFailure(readRequestParser.GetIsFabricFiltered(&isFabricFiltered));
-    SetStateFlagAndScheduleReport(ReadHandlerFlags::FabricFiltered, isFabricFiltered);
+    SetStateFlag(ReadHandlerFlags::FabricFiltered, isFabricFiltered);
     ReturnErrorOnFailure(readRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
 
@@ -636,7 +636,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
 
     ReturnErrorOnFailure(UpdateReportTimer());
 
-    ClearStateFlagAndScheduleReport(ReadHandlerFlags::PrimingReports);
+    ClearStateFlag(ReadHandlerFlags::PrimingReports);
     return mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeResponse, std::move(packet));
 }
 
@@ -718,7 +718,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
     bool isFabricFiltered;
     ReturnErrorOnFailure(subscribeRequestParser.GetIsFabricFiltered(&isFabricFiltered));
-    SetStateFlagAndScheduleReport(ReadHandlerFlags::FabricFiltered, isFabricFiltered);
+    SetStateFlag(ReadHandlerFlags::FabricFiltered, isFabricFiltered);
     ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
     ReturnErrorOnFailure(subscribeRequestParser.ExitContainer());
     MoveToState(HandlerState::GeneratingReports);
@@ -758,7 +758,7 @@ void ReadHandler::MinIntervalExpiredCallback(System::Layer * apSystemLayer, void
     VerifyOrReturn(apAppState != nullptr);
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
     ChipLogDetail(DataManagement, "Unblock report hold after min %d seconds", readHandler->mMinIntervalFloorSeconds);
-    readHandler->ClearStateFlagAndScheduleReport(ReadHandlerFlags::HoldMinInterval);
+    readHandler->ClearStateFlag(ReadHandlerFlags::WaitingUntilMinInterval);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         System::Clock::Seconds16(readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds), MaxIntervalExpiredCallback,
         readHandler);
@@ -768,7 +768,7 @@ void ReadHandler::MaxIntervalExpiredCallback(System::Layer * apSystemLayer, void
 {
     VerifyOrReturn(apAppState != nullptr);
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
-    readHandler->ClearStateFlagAndScheduleReport(ReadHandlerFlags::HoldMaxInterval);
+    readHandler->ClearStateFlag(ReadHandlerFlags::WaitingUntilMaxInterval);
     ChipLogProgress(DataManagement, "Refresh subscribe timer sync after %d seconds",
                     readHandler->mMaxInterval - readHandler->mMinIntervalFloorSeconds);
 }
@@ -784,8 +784,8 @@ CHIP_ERROR ReadHandler::UpdateReportTimer()
     {
         ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with min %d seconds and max %d seconds",
                         mMinIntervalFloorSeconds, mMaxInterval);
-        SetStateFlagAndScheduleReport(ReadHandlerFlags::HoldMinInterval);
-        SetStateFlagAndScheduleReport(ReadHandlerFlags::HoldMaxInterval);
+        SetStateFlag(ReadHandlerFlags::WaitingUntilMinInterval);
+        SetStateFlag(ReadHandlerFlags::WaitingUntilMaxInterval);
         ReturnErrorOnFailure(
             InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
                 System::Clock::Seconds16(mMinIntervalFloorSeconds), MinIntervalExpiredCallback, this));
@@ -800,13 +800,13 @@ void ReadHandler::ResetPathIterator()
     mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
 }
 
-void ReadHandler::UpdateDirtyGeneration(const AttributePathParams & aAttributeChanged)
+void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeChanged)
 {
     ConcreteAttributePath path;
 
     mDirtyGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
 
-    // We won't reset the path iterator for every UpdateDirtyGeneration call to reduce the number of full data reports.
+    // We won't reset the path iterator for every AttributePathIsDirty call to reduce the number of full data reports.
     // The iterator will be reset after finishing each report session.
     //
     // Here we just reset the iterator to the beginning of the current cluster, if the dirty path affects it.
@@ -846,10 +846,10 @@ Transport::SecureSession * ReadHandler::GetSession() const
 
 void ReadHandler::ForceDirtyState()
 {
-    SetStateFlagAndScheduleReport(ReadHandlerFlags::ForceDirty);
+    SetStateFlag(ReadHandlerFlags::ForceDirty);
 }
 
-void ReadHandler::SetStateFlagAndScheduleReport(ReadHandlerFlags aFlag, bool aValue)
+void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
 {
     bool oldReportable = IsReportableNow();
     mFlags.Set(aFlag, aValue);
@@ -860,9 +860,9 @@ void ReadHandler::SetStateFlagAndScheduleReport(ReadHandlerFlags aFlag, bool aVa
     }
 }
 
-void ReadHandler::ClearStateFlagAndScheduleReport(ReadHandlerFlags aFlag)
+void ReadHandler::ClearStateFlag(ReadHandlerFlags aFlag)
 {
-    SetStateFlagAndScheduleReport(aFlag, false);
+    SetStateFlag(aFlag, false);
 }
 
 void ReadHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
