@@ -116,22 +116,11 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
 {
     ChipLogDetail(Zcl, "OperationalState: HandlePauseState");
     Commands::OperationalCommandResponse::Type response;
-    GenericOperationalErrorState currentErrState;
-    GenericOperationalState currentOperationalState;
-
-    // copy current operational state
-    currentOperationalState = mOperationalState;
-    // copy current operational error
-    currentErrState = mOperationalError;
 
     // callback
-    mDelegate->HandlePauseState(currentOperationalState, currentErrState);
+    mDelegate->HandlePauseState(mOperationalState, mOperationalError);
 
-    // set operational error
-    SetOperationalState(currentOperationalState);
-
-    // copy current operational error
-    mOperationalError = currentErrState;
+    SetOperationalState(mOperationalState);
 
     // return operational error
     response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
@@ -154,22 +143,11 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
 {
     ChipLogDetail(Zcl, "OperationalState: HandleResumeState");
     Commands::OperationalCommandResponse::Type response;
-    GenericOperationalErrorState currentErrState;
-    GenericOperationalState currentOperationalState;
-
-    // copy current operational state
-    currentOperationalState = mOperationalState;
-    // copy current operational error
-    currentErrState = mOperationalError;
 
     // callback
-    mDelegate->HandleResumeState(currentOperationalState, currentErrState);
+    mDelegate->HandleResumeState(mOperationalState, mOperationalError);
 
-    // set operational error
-    SetOperationalState(currentOperationalState);
-
-    // copy current operational error
-    mOperationalError = currentErrState;
+    SetOperationalState(mOperationalState);
 
     // return operational error
     response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
@@ -191,22 +169,11 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
 {
     ChipLogDetail(Zcl, "OperationalState: HandleStartState");
     Commands::OperationalCommandResponse::Type response;
-    GenericOperationalErrorState currentErrState;
-    GenericOperationalState currentOperationalState;
-
-    // copy current operational state
-    currentOperationalState = mOperationalState;
-    // copy current operational error
-    currentErrState = mOperationalError;
 
     // callback
-    mDelegate->HandleStartState(currentOperationalState, currentErrState);
+    mDelegate->HandleStartState(mOperationalState, mOperationalError);
 
-    // set operational error
-    SetOperationalState(currentOperationalState);
-
-    // copy current operational error
-    mOperationalError = currentErrState;
+    SetOperationalState(mOperationalState);
 
     // return operational error
     response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
@@ -228,22 +195,11 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
 {
     ChipLogDetail(Zcl, "OperationalState: HandleStopState");
     Commands::OperationalCommandResponse::Type response;
-    GenericOperationalErrorState currentErrState;
-    GenericOperationalState currentOperationalState;
-
-    // copy current operational state
-    currentOperationalState = mOperationalState;
-    // copy current operational error
-    currentErrState = mOperationalError;
 
     // callback
-    mDelegate->HandleStopState(currentOperationalState, currentErrState);
+    mDelegate->HandleStopState(mOperationalState, mOperationalError);
 
-    // set operational error
-    SetOperationalState(currentOperationalState);
-
-    // copy current operational error
-    mOperationalError = currentErrState;
+    SetOperationalState(mOperationalState);
 
     // return operational error
     response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
