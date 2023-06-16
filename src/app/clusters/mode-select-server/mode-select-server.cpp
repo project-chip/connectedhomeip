@@ -405,7 +405,7 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     return CHIP_NO_ERROR;
 }
 
-// Implements the read functionality for non-standard attributes.
+// Implements the read functionality for complex attributes.
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
