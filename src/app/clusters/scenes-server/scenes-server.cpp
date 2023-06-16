@@ -561,6 +561,16 @@ void ScenesServer::RegisterSceneHandler(scenes::SceneHandler * handler)
     }
 }
 
+void ScenesServer::UnregisterSceneHandler(scenes::SceneHandler * handler)
+{
+    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+
+    if (IsHandlerRegistered(handler))
+    {
+        sceneTable->UnregisterHandler(handler);
+    }
+}
+
 void ScenesServer::HandleAddScene(HandlerContext & ctx, const Commands::AddScene::DecodableType & req)
 {
     AddSceneParse<Commands::AddScene::DecodableType, Commands::AddSceneResponse::Type>(ctx, req, mGroupProvider);

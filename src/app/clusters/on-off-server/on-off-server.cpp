@@ -167,6 +167,10 @@ public:
             buffer[0] = OnOff::Id;
             clusterBuffer.reduce_size(1);
         }
+        else
+        {
+            clusterBuffer.reduce_size(0);
+        }
     }
 
     // Default function for OnOff cluster, only checks if OnOff is enabled on the endpoint
@@ -195,10 +199,10 @@ public:
 
         AttributeValuePair pairs[scenableAttributeCount];
 
-        Pairs[0].attributeID.SetValue(Attributes::OnOff::Id);
-        Pairs[0].attributeValue = currentValue;
+        pairs[0].attributeID.SetValue(Attributes::OnOff::Id);
+        pairs[0].attributeValue = currentValue;
 
-        app::DataModel::List<AttributeValuePair> attributeValueList(Pairs);
+        app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
 
         return EncodeAttributeValueList(attributeValueList, serializedBytes);
     }
@@ -257,7 +261,7 @@ private:
     EmberEventControl * sceneEventControl(EndpointId endpoint)
     {
         EmberEventControl * controller =
-            OnOffServer::Instance().getEventControl(endpoint, sceneHandlerEventControls, ArraySize(sceneHandlerEventControls));
+            OnOffServer::Instance().getEventControl(endpoint, Span<EmberEventControl>(sceneHandlerEventControls));
         VerifyOrReturnValue(controller != nullptr, nullptr);
 
         controller->endpoint = endpoint;
@@ -319,7 +323,7 @@ void OnOffServer::cancelEndpointTimerCallback(EmberEventControl * control)
 
 void OnOffServer::cancelEndpointTimerCallback(EndpointId endpoint)
 {
-    auto control = OnOffServer::getEventControl(endpoint, gEventControls, ArraySize(gEventControls));
+    auto control = OnOffServer::getEventControl(endpoint, Span<EmberEventControl>(gEventControls));
     if (control)
     {
         cancelEndpointTimerCallback(control);
@@ -426,7 +430,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
                 Attributes::OffWaitTime::Set(endpoint, 0);
 
                 // Stop timer on the endpoint
-                EmberEventControl * event = getEventControl(endpoint, gEventControls, ArraySize(gEventControls));
+                EmberEventControl * event = getEventControl(endpoint, Span<EmberEventControl>(gEventControls));
                 if (event != nullptr)
                 {
                     cancelEndpointTimerCallback(event);
@@ -541,7 +545,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 
 #ifdef EMBER_AF_PLUGIN_SCENES
         // Registers Scene handlers for the On/Off cluster on the server
-        app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(OnOffServer::Instance().GetSceneHandler());
+        // app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(OnOffServer::Instance().GetSceneHandler());
 #endif
 
 #ifdef EMBER_AF_PLUGIN_MODE_SELECT
@@ -867,7 +871,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
             ChipLogProgress(Zcl, "Timer  Callback - wait Off Time cycle finished");
 
             // Stop timer on the endpoint
-            cancelEndpointTimerCallback(getEventControl(endpoint, gEventControls, ArraySize(gEventControls)));
+            cancelEndpointTimerCallback(getEventControl(endpoint, Span<EmberEventControl>(gEventControls)));
         }
     }
 }
@@ -888,15 +892,15 @@ bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint
  * @param[in] eventControlArraySize Size of the event control array
  * @return EmberEventControl* configured event control
  */
-EmberEventControl * OnOffServer::getEventControl(chip::EndpointId endpoint, EmberEventControl * eventControlArray,
-                                                 size_t eventControlArraySize)
+EmberEventControl * OnOffServer::getEventControl(chip::EndpointId endpoint, const Span<EmberEventControl> & eventControlArray)
 {
     uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, OnOff::Id, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (index >= eventControlArraySize)
+    if (index >= eventControlArray.size())
     {
         return nullptr;
     }
-    return &eventControlArray[index];
+
+    return &eventControlArray.data()[index];
 }
 
 /**
@@ -907,7 +911,7 @@ EmberEventControl * OnOffServer::getEventControl(chip::EndpointId endpoint, Embe
  */
 EmberEventControl * OnOffServer::configureEventControl(EndpointId endpoint)
 {
-    EmberEventControl * controller = getEventControl(endpoint, gEventControls, ArraySize(gEventControls));
+    EmberEventControl * controller = getEventControl(endpoint, Span<EmberEventControl>(gEventControls));
     VerifyOrReturnError(controller != nullptr, nullptr);
 
     controller->endpoint = endpoint;
