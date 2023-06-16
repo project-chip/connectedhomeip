@@ -143,8 +143,6 @@ void ScenesServer::Shutdown()
 {
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
 
-    SceneTable * sceneTable = scenes::GetSceneTableImpl();
-    sceneTable->Finish();
     mGroupProvider = nullptr;
     mIsInitialized = false;
 }
