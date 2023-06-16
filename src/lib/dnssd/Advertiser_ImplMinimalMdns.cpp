@@ -880,7 +880,7 @@ void AdvertiserMinMdns::AdvertiseRecords(BroadcastAdvertiseType type)
         // since we use "BROADCAST" (unicast is false), we do not actually care about
         // the source IP address value, just that it has the right "type"
         //
-        // NOTE: cannot use Boradcast address as the source as they have the type kAny.
+        // NOTE: cannot use Broadcast address as the source as they have the type kAny.
         //
         // TODO: ideally we may want to have a destination that is explicit as "unicast/destIp"
         //       vs "multicast/addressType". Such a change requires larger code updates.
