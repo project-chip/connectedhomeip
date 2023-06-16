@@ -17,16 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="BITMAP32">
-    <cluster code="0x005D" />
-    <field name="InflowAlarm"          mask="0x01" />
-    <field name="DrainAlarm"           mask="0x02" />
-    <field name="DoorAlarm"            mask="0x04" />
-    <field name="LowTemperatureAlarm"  mask="0x08" />
-    <field name="HighTemperatureAlarm" mask="0x10" />
-    <field name="WaterLevelAlarm"      mask="0x20" />
-  </bitmap>
-
   <bitmap name="AlarmMap" type="BITMAP32">
      <cluster code="0x005D" />
      <field name="InflowError"           mask="0x01"/>
@@ -47,9 +37,10 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="MASK" type="AlarmMap" default="0" writable="false"  optional="false">Mask</attribute>
-    <attribute side="server" code="0x0001" define="LATCH" type="AlarmMap" default="0" writable="false" optional="true">Latch</attribute>
-    <attribute side="server" code="0x0002" define="STATE" type="AlarmMap" default="0" writable="false" optional="false">State</attribute>
+    <attribute side="server" code="0x0000" define="MASK"      type="AlarmMap" default="0" writable="false" optional="false">Mask</attribute>
+    <attribute side="server" code="0x0001" define="LATCH"     type="AlarmMap" default="0" writable="false" optional="true">Latch</attribute>
+    <attribute side="server" code="0x0002" define="STATE"     type="AlarmMap" default="0" writable="false" optional="false">State</attribute>
+    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmMap" default="0" writable="false" optional="false">State</attribute>
 
     <command source="client" code="0x00" name="Reset" optional="true">
         <description>Reset alarm</description>
@@ -58,7 +49,7 @@ limitations under the License.
 
     <command source="client" code="0x01" name="ModifyEnabledAlarms" optional="true">
         <description>Modify enabled alarms</description>
-        <arg name="Mask" type="AlarmMap" optional="true"/>
+        <arg name="Mask" type="AlarmMap" optional="false"/>
     </command>
 
     <event side="server" code="0x00" priority="info" name="Notify" optional="false">
