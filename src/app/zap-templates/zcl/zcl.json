@@ -34,7 +34,7 @@
         "content-launch-cluster.xml",
         "descriptor-cluster.xml",
         "diagnostic-logs-cluster.xml",
-        "dishwasher-alarm.xml",
+        "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-select-cluster.xml",
         "door-lock-cluster.xml",
         "electrical-measurement-cluster.xml",
@@ -109,15 +109,9 @@
     "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": [
-                "Always",
-                "Conditional",
-                "Never"
-            ]
+            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
         },
-        "bool": [
-            "commandDiscovery"
-        ]
+        "bool": ["commandDiscovery"]
     },
     "defaults": {
         "text": {
@@ -161,12 +155,8 @@
             "CapabilityMinima",
             "ProductAppearance"
         ],
-        "Bridged Device Basic Information": [
-            "ProductAppearance"
-        ],
-        "Descriptor": [
-            "ClusterRevision"
-        ],
+        "Bridged Device Basic Information": ["ProductAppearance"],
+        "Descriptor": ["ClusterRevision"],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -212,10 +202,7 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
-        "Scenes": [
-            "SceneCount",
-            "RemainingCapacity"
-        ],
+        "Scenes": ["SceneCount", "RemainingCapacity"],
         "Unit Testing": [
             "struct_attr",
             "nullable_struct",
@@ -299,19 +286,10 @@
             "CurrentMaxRate",
             "OverrunCount"
         ],
-        "Channel": [
-            "Lineup",
-            "CurrentChannel"
-        ],
-        "Media Playback": [
-            "SampledPosition"
-        ],
-        "Application Launcher": [
-            "CurrentApp"
-        ],
-        "Application Basic": [
-            "Application"
-        ],
+        "Channel": ["Lineup", "CurrentChannel"],
+        "Media Playback": ["SampledPosition"],
+        "Application Launcher": ["CurrentApp"],
+        "Application Basic": ["Application"],
         "Time Synchronization": [
             "TrustedTimeSource",
             "DefaultNTP",
@@ -320,23 +298,11 @@
             "UTCTime",
             "LocalTime"
         ],
-        "Temperature Control": [
-            "SupportedTemperatureLevels"
-        ],
-        "Operational State": [
-            "OperationalState",
-            "OperationalError"
-        ]
+        "Temperature Control": ["SupportedTemperatureLevels"],
+        "Operational State": ["OperationalState", "OperationalError"]
     },
     "defaultReportingPolicy": "mandatory",
-    "ZCLDataTypes": [
-        "ARRAY",
-        "BITMAP",
-        "ENUM",
-        "NUMBER",
-        "STRING",
-        "STRUCT"
-    ],
+    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
     "fabricHandling": {
         "automaticallyCreateFields": true,
         "indexFieldId": 254,
