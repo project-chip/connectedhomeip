@@ -214,13 +214,13 @@ private:
     {
         // mHoldMinInterval is used to prevent subscription data delivery while we are
         // waiting for the min reporting interval to elapse.
-        HoldMinInterval = (1 << 0),
+        WaitingUntilMinInterval = (1 << 0),
 
         // mHoldMaxInterval is used to prevent subscription empty report delivery while we
         // are waiting for the max reporting interval to elaps.  When mHoldMaxInterval
         // becomes false, we are allowed to send an empty report to keep the
         // subscription alive on the client.
-        HoldMaxInterval = (1 << 1),
+        WaitingUntilMaxInterval = (1 << 1),
 
         // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during
         // sending last chunked message.
@@ -355,8 +355,9 @@ private:
 
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
-    /// @brief This allows the read handler to schedule a run as soon as the min interval has elapsed by setting the read handler to
-    /// a dirty state regardless of the attributes change, thus being reportable as soon as the min interval callback happens.
+    /// @brief Forces the read handler into a dirty state, regardless of what's going on with attributes.
+    /// This can lead to scheduling of a reporting run immediately, if the min interval has been reached, 
+    /// or after the min interval is reached if it has not yet been reached.
     void ForceDirtyState();
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
@@ -427,13 +428,13 @@ private:
 
     void PersistSubscription();
 
-    /// @brief This function modifies a state Flag in the read handler and schedules an engine run if the read handler want from a
-    /// non reportable state to a reportable state, resulting in the emission of a report.
+    /// @brief Modifies a state flag in the read handler and schedules an engine run if the read handler want from a
+    /// non-reportable state to a reportable state.
     /// @param aFlag Flag to set
     /// @param aValue Flag new value
     void SetStateFlagAndScheduleReport(ReadHandlerFlags aFlag, bool aValue = true);
 
-    /// @brief This function calls the SetStateFlagAndScheduleReport with the flag value to false, thus possibly emitting a report
+    /// @brief This function calls the SetStateFlagAndScheduleReport with the flag value set to false, thus possibly emitting a report
     /// generation.
     /// @param aFlag Flag to clear
     void ClearStateFlagAndScheduleReport(ReadHandlerFlags aFlag);
