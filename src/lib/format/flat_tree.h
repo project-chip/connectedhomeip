@@ -49,15 +49,14 @@ struct Entry
 template <typename CONTENT>
 struct Node
 {
-    size_t entry_count;          // number of items in [entries]
-    Entry<CONTENT> *entries; // child items of [entry_count] size
-
+    size_t entry_count;       // number of items in [entries]
+    Entry<CONTENT> * entries; // child items of [entry_count] size
 
     /// Attempt to find the entry with given matcher.
     ///
     /// Returns nullptr if no matches can be found.
-    template<typename MATCHER>
-    const Entry<CONTENT> *find_entry(MATCHER matcher) const
+    template <typename MATCHER>
+    const Entry<CONTENT> * find_entry(MATCHER matcher) const
     {
         for (size_t i = 0; i < entry_count; i++)
         {

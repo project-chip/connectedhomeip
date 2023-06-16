@@ -25,48 +25,51 @@
 
 #include <nlunit-test.h>
 
-
 namespace {
 
 using namespace chip::FlatTree;
 using namespace chip::TLV;
 
-struct NamedTag {
+struct NamedTag
+{
     Tag tag;
-    const char *name;
+    const char * name;
 };
 
 Entry<NamedTag> node1[] = {
-    {ContextTag(1), "hello"},
-    {ContextTag(2), "world"},
+    { ContextTag(1), "hello" },
+    { ContextTag(2), "world" },
 };
 
 Entry<NamedTag> node2[] = {
-    {ProfileTag(123, 1), "a"},
-    {ProfileTag(234, 2), "b"},
-    {ProfileTag(345, 3), "c"},
+    { ProfileTag(123, 1), "a" },
+    { ProfileTag(234, 2), "b" },
+    { ProfileTag(345, 3), "c" },
 };
 
 Entry<NamedTag> node3[] = {
-    {AnonymousTag(), "foo"},
+    { AnonymousTag(), "foo" },
 };
 
-#define _ENTRY(n) {sizeof(n)/sizeof(n[0]), n}
-
-std::array<Node<NamedTag>, 3> tree = {{
-        _ENTRY(node1),
-        _ENTRY(node2),
-        _ENTRY(node3),
-}};
-
-class ByTag {
-  public:
-    constexpr ByTag(Tag tag): mTag(tag) {}
-
-    bool operator()(const NamedTag &item) {
-        return item.tag == mTag;
+#define _ENTRY(n)                                                                                                                  \
+    {                                                                                                                              \
+        sizeof(n) / sizeof(n[0]), n                                                                                                \
     }
-  private:
+
+std::array<Node<NamedTag>, 3> tree = { {
+    _ENTRY(node1),
+    _ENTRY(node2),
+    _ENTRY(node3),
+} };
+
+class ByTag
+{
+public:
+    constexpr ByTag(Tag tag) : mTag(tag) {}
+
+    bool operator()(const NamedTag & item) { return item.tag == mTag; }
+
+private:
     const Tag mTag;
 };
 
@@ -93,7 +96,7 @@ void TestFlatTreeFind(nlTestSuite * inSuite, void * inContext)
 
 const nlTest sTests[] = {
     NL_TEST_DEF("TestFlatTreeFind", TestFlatTreeFind), //
-    NL_TEST_SENTINEL()                                   //
+    NL_TEST_SENTINEL()                                 //
 };
 
 } // namespace
@@ -106,4 +109,3 @@ int TestFlatTree()
 }
 
 CHIP_REGISTER_TEST_SUITE(TestFlatTree)
-
