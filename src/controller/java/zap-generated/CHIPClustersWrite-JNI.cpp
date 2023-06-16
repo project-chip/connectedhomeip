@@ -2342,12 +2342,12 @@ JNI_METHOD(void, ModeSelectCluster, writeOnModeAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, LaundryWasherModeSelectCluster, writeStartUpModeAttribute)
+JNI_METHOD(void, LaundryWasherModeCluster, writeStartUpModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::LaundryWasherModeSelect::Attributes::StartUpMode::TypeInfo;
+    using TypeInfo = chip::app::Clusters::LaundryWasherMode::Attributes::StartUpMode::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2376,8 +2376,8 @@ JNI_METHOD(void, LaundryWasherModeSelectCluster, writeStartUpModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                              = CHIP_NO_ERROR;
-    LaundryWasherModeSelectCluster * cppCluster = reinterpret_cast<LaundryWasherModeSelectCluster *>(clusterPtr);
+    CHIP_ERROR err                        = CHIP_NO_ERROR;
+    LaundryWasherModeCluster * cppCluster = reinterpret_cast<LaundryWasherModeCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -2402,12 +2402,12 @@ JNI_METHOD(void, LaundryWasherModeSelectCluster, writeStartUpModeAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, LaundryWasherModeSelectCluster, writeOnModeAttribute)
+JNI_METHOD(void, LaundryWasherModeCluster, writeOnModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::LaundryWasherModeSelect::Attributes::OnMode::TypeInfo;
+    using TypeInfo = chip::app::Clusters::LaundryWasherMode::Attributes::OnMode::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2436,8 +2436,8 @@ JNI_METHOD(void, LaundryWasherModeSelectCluster, writeOnModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                              = CHIP_NO_ERROR;
-    LaundryWasherModeSelectCluster * cppCluster = reinterpret_cast<LaundryWasherModeSelectCluster *>(clusterPtr);
+    CHIP_ERROR err                        = CHIP_NO_ERROR;
+    LaundryWasherModeCluster * cppCluster = reinterpret_cast<LaundryWasherModeCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -2462,12 +2462,12 @@ JNI_METHOD(void, LaundryWasherModeSelectCluster, writeOnModeAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, RefrigeratorAndTemperatureControlledCabinetModeSelectCluster, writeStartUpModeAttribute)
+JNI_METHOD(void, RefrigeratorAndTemperatureControlledCabinetModeCluster, writeStartUpModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::StartUpMode::TypeInfo;
+    using TypeInfo = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::StartUpMode::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2497,8 +2497,8 @@ JNI_METHOD(void, RefrigeratorAndTemperatureControlledCabinetModeSelectCluster, w
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    RefrigeratorAndTemperatureControlledCabinetModeSelectCluster * cppCluster =
-        reinterpret_cast<RefrigeratorAndTemperatureControlledCabinetModeSelectCluster *>(clusterPtr);
+    RefrigeratorAndTemperatureControlledCabinetModeCluster * cppCluster =
+        reinterpret_cast<RefrigeratorAndTemperatureControlledCabinetModeCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -2523,12 +2523,12 @@ JNI_METHOD(void, RefrigeratorAndTemperatureControlledCabinetModeSelectCluster, w
     onFailure.release();
 }
 
-JNI_METHOD(void, RefrigeratorAndTemperatureControlledCabinetModeSelectCluster, writeOnModeAttribute)
+JNI_METHOD(void, RefrigeratorAndTemperatureControlledCabinetModeCluster, writeOnModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Attributes::OnMode::TypeInfo;
+    using TypeInfo = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::OnMode::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2558,8 +2558,8 @@ JNI_METHOD(void, RefrigeratorAndTemperatureControlledCabinetModeSelectCluster, w
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    RefrigeratorAndTemperatureControlledCabinetModeSelectCluster * cppCluster =
-        reinterpret_cast<RefrigeratorAndTemperatureControlledCabinetModeSelectCluster *>(clusterPtr);
+    RefrigeratorAndTemperatureControlledCabinetModeCluster * cppCluster =
+        reinterpret_cast<RefrigeratorAndTemperatureControlledCabinetModeCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -2704,12 +2704,12 @@ JNI_METHOD(void, WasherControlsCluster, writeNumberOfRinsesAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, RvcRunModeSelectCluster, writeStartUpModeAttribute)
+JNI_METHOD(void, RvcRunModeCluster, writeStartUpModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::RvcRunModeSelect::Attributes::StartUpMode::TypeInfo;
+    using TypeInfo = chip::app::Clusters::RvcRunMode::Attributes::StartUpMode::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2738,8 +2738,8 @@ JNI_METHOD(void, RvcRunModeSelectCluster, writeStartUpModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                       = CHIP_NO_ERROR;
-    RvcRunModeSelectCluster * cppCluster = reinterpret_cast<RvcRunModeSelectCluster *>(clusterPtr);
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    RvcRunModeCluster * cppCluster = reinterpret_cast<RvcRunModeCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -2764,12 +2764,12 @@ JNI_METHOD(void, RvcRunModeSelectCluster, writeStartUpModeAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, RvcRunModeSelectCluster, writeOnModeAttribute)
+JNI_METHOD(void, RvcRunModeCluster, writeOnModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::RvcRunModeSelect::Attributes::OnMode::TypeInfo;
+    using TypeInfo = chip::app::Clusters::RvcRunMode::Attributes::OnMode::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2798,8 +2798,8 @@ JNI_METHOD(void, RvcRunModeSelectCluster, writeOnModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                       = CHIP_NO_ERROR;
-    RvcRunModeSelectCluster * cppCluster = reinterpret_cast<RvcRunModeSelectCluster *>(clusterPtr);
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    RvcRunModeCluster * cppCluster = reinterpret_cast<RvcRunModeCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -2824,12 +2824,12 @@ JNI_METHOD(void, RvcRunModeSelectCluster, writeOnModeAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, RvcCleanModeSelectCluster, writeStartUpModeAttribute)
+JNI_METHOD(void, RvcCleanModeCluster, writeStartUpModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::RvcCleanModeSelect::Attributes::StartUpMode::TypeInfo;
+    using TypeInfo = chip::app::Clusters::RvcCleanMode::Attributes::StartUpMode::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2858,8 +2858,8 @@ JNI_METHOD(void, RvcCleanModeSelectCluster, writeStartUpModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
-    RvcCleanModeSelectCluster * cppCluster = reinterpret_cast<RvcCleanModeSelectCluster *>(clusterPtr);
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    RvcCleanModeCluster * cppCluster = reinterpret_cast<RvcCleanModeCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -2884,12 +2884,12 @@ JNI_METHOD(void, RvcCleanModeSelectCluster, writeStartUpModeAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, RvcCleanModeSelectCluster, writeOnModeAttribute)
+JNI_METHOD(void, RvcCleanModeCluster, writeOnModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::RvcCleanModeSelect::Attributes::OnMode::TypeInfo;
+    using TypeInfo = chip::app::Clusters::RvcCleanMode::Attributes::OnMode::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2918,8 +2918,8 @@ JNI_METHOD(void, RvcCleanModeSelectCluster, writeOnModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
-    RvcCleanModeSelectCluster * cppCluster = reinterpret_cast<RvcCleanModeSelectCluster *>(clusterPtr);
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    RvcCleanModeCluster * cppCluster = reinterpret_cast<RvcCleanModeCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -2944,12 +2944,12 @@ JNI_METHOD(void, RvcCleanModeSelectCluster, writeOnModeAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, DishwasherModeSelectCluster, writeStartUpModeAttribute)
+JNI_METHOD(void, DishwasherModeCluster, writeStartUpModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::DishwasherModeSelect::Attributes::StartUpMode::TypeInfo;
+    using TypeInfo = chip::app::Clusters::DishwasherMode::Attributes::StartUpMode::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2978,8 +2978,8 @@ JNI_METHOD(void, DishwasherModeSelectCluster, writeStartUpModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-    DishwasherModeSelectCluster * cppCluster = reinterpret_cast<DishwasherModeSelectCluster *>(clusterPtr);
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    DishwasherModeCluster * cppCluster = reinterpret_cast<DishwasherModeCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -3004,12 +3004,12 @@ JNI_METHOD(void, DishwasherModeSelectCluster, writeStartUpModeAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, DishwasherModeSelectCluster, writeOnModeAttribute)
+JNI_METHOD(void, DishwasherModeCluster, writeOnModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::DishwasherModeSelect::Attributes::OnMode::TypeInfo;
+    using TypeInfo = chip::app::Clusters::DishwasherMode::Attributes::OnMode::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -3038,8 +3038,8 @@ JNI_METHOD(void, DishwasherModeSelectCluster, writeOnModeAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-    DishwasherModeSelectCluster * cppCluster = reinterpret_cast<DishwasherModeSelectCluster *>(clusterPtr);
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    DishwasherModeCluster * cppCluster = reinterpret_cast<DishwasherModeCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));

@@ -524,7 +524,7 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             WiFiStationState prevState = mWiFiStationState;
             ChangeWiFiStationState(kWiFiStationState_NotConnected);
-            if (prevState != kWiFiStationState_Connecting_Failed)
+            if (prevState == kWiFiStationState_Connecting_Failed)
             {
                 ChipLogProgress(DeviceLayer, "WiFi station failed to connect");
                 // TODO: check retry count if exceeded, then clearwificonfig
@@ -858,13 +858,13 @@ void ConnectivityManagerImpl::RtkWiFiScanCompletedHandler(void)
 
 void ConnectivityManagerImpl::DHCPProcessThread(void * param)
 {
-    matter_lwip_dhcp(0, DHCP_START);
+    matter_lwip_dhcp();
     PlatformMgr().LockChipStack();
     sInstance.OnStationIPv4AddressAvailable();
     PlatformMgr().UnlockChipStack();
 #if LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if LWIP_IPV6
-    matter_lwip_dhcp(0, DHCP6_START);
+    matter_lwip_dhcp6();
     PlatformMgr().LockChipStack();
     sInstance.OnIPv6AddressAvailable();
     PlatformMgr().UnlockChipStack();

@@ -272,6 +272,7 @@ kotlin_library("onboarding_payload") {
     "src/chip/onboardingpayload/OnboardingPayload.kt",
     "src/chip/onboardingpayload/OnboardingPayloadParser.kt",
     "src/chip/onboardingpayload/OptionalQRCodeInfo.kt",
+    "src/chip/onboardingpayload/VendorId.kt",
     "src/chip/onboardingpayload/Verhoeff.kt",
     "src/chip/onboardingpayload/Verhoeff10.kt",
   ]

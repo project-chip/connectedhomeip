@@ -5316,6 +5316,8 @@
               - ThreadMetricsStruct
           GeneralDiagnostics:
               - NetworkInterface
+          ModeSelect:
+              - SemanticTagStruct
           OperationalCredentials:
               - FabricDescriptorStruct
           DoorLock:
@@ -5432,6 +5434,10 @@
                   - iPv4Addresses
                   - iPv6Addresses
                   - type
+          ModeSelect:
+              SemanticTagStruct:
+                  - mfgCode
+                  - value
           OperationalCredentials:
               FabricDescriptorStruct:
                   - rootPublicKey
@@ -6528,6 +6534,8 @@
               ThreadMetricsStruct: ThreadMetrics
           GeneralDiagnostics:
               NetworkInterface: NetworkInterfaceType
+          ModeSelect:
+              SemanticTagStruct: SemanticTag
           OperationalCredentials:
               FabricDescriptorStruct: FabricDescriptor
           DoorLock:
@@ -7515,8 +7523,6 @@
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
               - ProductAppearanceStruct
-          ModeSelect:
-              - ModeTagStruct
           NetworkCommissioning:
               - WiFiInterfaceScanResultStruct
               - ThreadInterfaceScanResultStruct
@@ -7541,12 +7547,6 @@
               ProductAppearanceStruct:
                   - finish
                   - primaryColor
-          ModeSelect:
-              ModeTagStruct:
-                  - mfgCode
-                  - value
-              ModeOptionStruct:
-                  - modeTags
           NetworkCommissioning:
               WiFiInterfaceScanResultStruct:
                   - security
@@ -8278,10 +8278,6 @@
           ThreadNetworkDiagnostics:
               - NeighborTable
               - RouteTable
-      struct fields:
-          ModeSelect:
-              ModeOptionStruct:
-                  - semanticTags
       bitmaps:
           Groups:
               - GroupClusterFeature
@@ -8307,8 +8303,6 @@
       structs:
           AccessControl:
               AccessControlTargetStruct: Target
-          ModeSelect:
-              ModeTagStruct: SemanticTag
           NetworkCommissioning:
               WiFiInterfaceScanResultStruct: WiFiInterfaceScanResult
               ThreadInterfaceScanResultStruct: ThreadInterfaceScanResult
@@ -8316,10 +8310,6 @@
           ThreadNetworkDiagnostics:
               NeighborTableStruct: NeighborTable
               RouteTableStruct: RouteTable
-      struct fields:
-          ModeSelect:
-              ModeOptionStruct:
-                  modeTags: semanticTags
       enum values:
           TimeSynchronization:
               TimeSourceEnum:
@@ -8394,30 +8384,12 @@
           - TonerCartridgeMonitoring
           # Not ready to be public API yet.
           - ICDManagement
-          - LaundryWasherModeSelect
-          - RefrigeratorAndTemperatureControlledCabinetModeSelect
-          - RVCRunModeSelect
-          - RVCCleanModeSelect
-          - DishwasherModeSelect
+          - LaundryWasherMode
+          - RefrigeratorAndTemperatureControlledCabinetMode
+          - RVCRunMode
+          - RVCCleanMode
+          - DishwasherMode
           - WasherControls
-      commands:
-          ModeSelect:
-              # Still very in-flux.
-              - ChangeToModeWithStatus
-              - ChangeToModeResponse
-      struct fields:
-          ModeSelect:
-              ModeTagStruct:
-                  - tagName
-      enums:
-          ModeSelect:
-              # Still very in-flux.
-              - ModeTag
-              - StatusCode
-      bitmap values:
-          ModeSelect:
-              Feature:
-                  - ExtendedStatus
       # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
       ids:

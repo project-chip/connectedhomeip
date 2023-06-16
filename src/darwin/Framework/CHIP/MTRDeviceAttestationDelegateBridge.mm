@@ -43,7 +43,9 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
                 MTRDeviceAttestationDeviceInfo * deviceInfo =
                     [[MTRDeviceAttestationDeviceInfo alloc] initWithDACCertificate:dacData
                                                                  dacPAICertificate:paiData
-                                                            certificateDeclaration:cdData];
+                                                            certificateDeclaration:cdData
+                                                          basicInformationVendorID:@(info.BasicInformationVendorId())
+                                                         basicInformationProductID:@(info.BasicInformationProductId())];
                 NSError * error = (attestationResult == chip::Credentials::AttestationVerificationResult::kSuccess)
                     ? nil
                     : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
