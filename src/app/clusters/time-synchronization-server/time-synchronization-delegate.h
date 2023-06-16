@@ -18,14 +18,18 @@
 
 #pragma once
 
+#include "TimeSyncDataProvider.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <list>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace TimeSynchronization {
 
-using TimeZoneList = DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>;
+using TimeZoneList = Span<TimeZoneStore>;
 
 /** @brief
  *    Defines methods for implementing application-specific logic for the Time Synchronization Cluster.

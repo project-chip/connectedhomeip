@@ -21,23 +21,32 @@
 
 #pragma once
 
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/support/DefaultStorageKeyAllocator.h>
-
 #include <app-common/zap-generated/cluster-objects.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/Span.h>
+
+using TimeZoneStruct = chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type;
+using DSTOffsets     = chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>;
+
+typedef struct
+{
+    TimeZoneStruct timeZone;
+    char name[64];
+} TimeZoneStore;
+
+typedef struct
+{
+    chip::Span<TimeZoneStore> timeZoneList;
+    size_t size;
+} TimeZoneObj;
 
 namespace chip {
 
 class TimeSyncDataProvider
 {
+    using TrustedTimeSource = chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::Type;
 
 public:
-    using TrustedTimeSource = app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::Type;
-    using DefaultNtp        = app::Clusters::TimeSynchronization::Attributes::DefaultNTP::TypeInfo::Type;
-    using TimeZones         = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>;
-    using DSTOffsets        = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>;
-
     ~TimeSyncDataProvider() {}
 
     void Init(PersistentStorageDelegate & persistentStorage) { mPersistentStorage = &persistentStorage; }
@@ -50,8 +59,8 @@ public:
     CHIP_ERROR LoadDefaultNtp(MutableCharSpan & defaultNtp);
     CHIP_ERROR ClearDefaultNtp();
 
-    CHIP_ERROR StoreTimeZone(const TimeZones & timeZoneList);
-    CHIP_ERROR LoadTimeZone(TimeZones & timeZoneList, uint8_t & size);
+    CHIP_ERROR StoreTimeZone(const chip::Span<TimeZoneStore> & timeZoneList);
+    CHIP_ERROR LoadTimeZone(TimeZoneObj & timeZoneList);
     CHIP_ERROR ClearTimeZone();
 
     CHIP_ERROR StoreDSTOffset(const DSTOffsets & dstOffsetList);

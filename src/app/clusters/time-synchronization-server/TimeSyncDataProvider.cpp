@@ -17,6 +17,7 @@
  */
 
 #include "TimeSyncDataProvider.h"
+#include <lib/support/DefaultStorageKeyAllocator.h>
 
 #include <lib/core/TLV.h>
 namespace chip {
@@ -85,7 +86,7 @@ CHIP_ERROR TimeSyncDataProvider::ClearDefaultNtp()
     return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::TSDefaultNTP().KeyName());
 }
 
-CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const TimeZones & timeZoneList)
+CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const chip::Span<TimeZoneStore> & timeZoneList)
 {
     uint8_t buffer[kTimeZoneListMaxSerializedSize];
     TLV::TLVWriter writer;
@@ -94,9 +95,9 @@ CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const TimeZones & timeZoneList)
     writer.Init(buffer);
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
 
-    for (auto const & timeZone : timeZoneList)
+    for (auto const & tzStore : timeZoneList)
     {
-        ReturnErrorOnFailure(timeZone.Encode(writer, TLV::AnonymousTag()));
+        ReturnErrorOnFailure(tzStore.timeZone.Encode(writer, TLV::AnonymousTag()));
     }
 
     ReturnErrorOnFailure(writer.EndContainer(outerType));
@@ -104,12 +105,13 @@ CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const TimeZones & timeZoneList)
     return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::TSTimeZone().KeyName(), buffer,
                                                static_cast<uint16_t>(writer.GetLengthWritten()));
 }
-CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZones & timeZoneList, uint8_t & size)
+CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZoneObj & timeZoneObj)
 {
     uint8_t buffer[kTimeZoneListMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     CHIP_ERROR err;
-    size = 0;
+    timeZoneObj.size   = 0;
+    auto & tzStoreList = timeZoneObj.timeZoneList;
 
     ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::TSTimeZone().KeyName(), bufferSpan));
 
@@ -121,33 +123,26 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZones & timeZoneList, uint8_t 
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
     reader.CountRemainingInContainer(&count);
-    VerifyOrReturnError(count <= timeZoneList.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(count <= tzStoreList.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     uint8_t i = 0;
 
-    while ((err = reader.Next()) == CHIP_NO_ERROR && i < timeZoneList.size())
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        auto & tz = timeZoneList[i];
-        app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type timeZone;
-        ReturnErrorOnFailure(timeZone.Decode(reader));
-        tz.offset  = timeZone.offset;
-        tz.validAt = timeZone.validAt;
-        if (timeZone.name.HasValue())
+        auto & tzStore = tzStoreList[i];
+        app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type tz;
+        ReturnErrorOnFailure(tz.Decode(reader));
+        tzStore.timeZone.offset  = tz.offset;
+        tzStore.timeZone.validAt = tz.validAt;
+        if (tz.name.HasValue())
         {
-            if (tz.name.HasValue() && timeZone.name.Value().size() <= tz.name.Value().size())
-            {
-                char * dest = const_cast<char *>(tz.name.Value().data());
-                size_t len  = timeZone.name.Value().size();
-                memcpy(dest, timeZone.name.Value().data(), len);
-                tz.name.SetValue(chip::CharSpan(tz.name.Value().data(), len));
-            }
-            else
-            {
-                return CHIP_ERROR_BUFFER_TOO_SMALL;
-            }
+            size_t len = tz.name.Value().size();
+            chip::MutableCharSpan tempSpan(tzStore.name, len);
+            ReturnErrorOnFailure(chip::CopyCharSpanToMutableCharSpan(tz.name.Value(), tempSpan));
+            tzStore.timeZone.name.SetValue(chip::CharSpan(tzStore.name, len));
         }
         else
         {
-            tz.name.ClearValue();
+            tzStore.timeZone.name.ClearValue();
         }
         i++;
     }
@@ -158,7 +153,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZones & timeZoneList, uint8_t 
     err = reader.Next();
     VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    size = i;
+    timeZoneObj.size = i;
 
     return CHIP_NO_ERROR;
 }

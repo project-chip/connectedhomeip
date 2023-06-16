@@ -27,7 +27,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters::TimeSynchronization;
 
 using TrustedTimeSource = app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::Type;
-using TimeZoneList      = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>;
+using TimeZoneList      = Span<TimeZoneStore>;
 using TimeZone          = app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type;
 using DSTOffsetList     = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>;
 using DSTOffset         = app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type;
@@ -103,51 +103,50 @@ void TestTimeZoneStoreLoad(nlTestSuite * inSuite, void * inContext)
     TimeSyncDataProvider timeSyncDataProv;
     timeSyncDataProv.Init(persistentStorage);
 
-    const auto makeTimeZone = [](int32_t offset, uint64_t validAt, char * name, uint8_t len = 0) {
-        TimeZone tz;
-        tz.offset  = offset;
-        tz.validAt = validAt;
-        if (len)
-            tz.name.SetValue(chip::CharSpan(name, len));
-        return tz;
+    const auto makeTimeZone = [](int32_t offset = 0, uint64_t validAt = 0, char * name = nullptr, uint8_t len = 0) {
+        TimeZoneStore tzS;
+        tzS.timeZone.offset  = offset;
+        tzS.timeZone.validAt = validAt;
+        if (name != nullptr && len)
+        {
+            memcpy(tzS.name, name, len);
+            tzS.timeZone.name.SetValue(chip::CharSpan(tzS.name, len));
+        }
+        return tzS;
     };
-    char tzCET[4]   = "CET";
-    char tzCST[64]  = "CST";
-    char tzCDT[65]  = "CDT";
-    TimeZone tzS[3] = { makeTimeZone(1, 1, tzCET, sizeof(tzCET)), makeTimeZone(2, 2, tzCST, sizeof(tzCST)),
-                        makeTimeZone(3, 3, tzCDT, sizeof(tzCDT)) };
+    char tzShort[]       = "LA";
+    char tzLong[]        = "MunichOnTheLongRiverOfIsarInNiceSummerWeatherWithAugustinerBeer";
+    char tzBerlin[]      = "Berlin";
+    TimeZoneStore tzS[3] = { makeTimeZone(1, 1, tzShort, sizeof(tzShort)), makeTimeZone(2, 2, tzLong, sizeof(tzLong)),
+                             makeTimeZone(3, 3, tzBerlin, sizeof(tzBerlin)) };
     TimeZoneList tzL(tzS);
     NL_TEST_ASSERT(inSuite, tzL.size() == 3);
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.StoreTimeZone(tzL));
 
-    char tzA[10];
-    char tzB[64];
-    char tzC[65];
-    TimeZone emptyTzS[3] = { makeTimeZone(0, 0, tzA, sizeof(tzA)), makeTimeZone(0, 0, tzB, sizeof(tzB)),
-                             makeTimeZone(0, 0, tzC, sizeof(tzC)) };
+    TimeZoneStore emptyTzS[3] = { makeTimeZone(), makeTimeZone(), makeTimeZone() };
 
     tzL = TimeZoneList(emptyTzS);
-    uint8_t size;
+    TimeZoneObj tzObj{ tzL, 3 };
     NL_TEST_ASSERT(inSuite, tzL.size() == 3);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.LoadTimeZone(tzL, size));
-    NL_TEST_ASSERT(inSuite, size == 3);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.LoadTimeZone(tzObj));
+    NL_TEST_ASSERT(inSuite, tzObj.size == 3);
 
     NL_TEST_ASSERT(inSuite, !tzL.empty());
 
     if (!tzL.empty())
     {
-        auto & tz = tzL.data()[0];
+        auto & tz = tzL[0].timeZone;
         NL_TEST_ASSERT(inSuite, tz.offset == 1);
         NL_TEST_ASSERT(inSuite, tz.validAt == 1);
         NL_TEST_ASSERT(inSuite, tz.name.HasValue());
-        NL_TEST_ASSERT(inSuite, tz.name.Value().size() == 4);
+        NL_TEST_ASSERT(inSuite, tz.name.Value().size() == 3);
 
         tzL = tzL.SubSpan(1);
     }
 
     if (!tzL.empty())
     {
-        auto & tz = tzL.data()[0];
+        auto & tz = tzL[0].timeZone;
         NL_TEST_ASSERT(inSuite, tz.offset == 2);
         NL_TEST_ASSERT(inSuite, tz.validAt == 2);
         NL_TEST_ASSERT(inSuite, tz.name.HasValue());
@@ -158,11 +157,11 @@ void TestTimeZoneStoreLoad(nlTestSuite * inSuite, void * inContext)
 
     if (!tzL.empty())
     {
-        auto & tz = tzL.data()[0];
+        auto & tz = tzL[0].timeZone;
         NL_TEST_ASSERT(inSuite, tz.offset == 3);
         NL_TEST_ASSERT(inSuite, tz.validAt == 3);
         NL_TEST_ASSERT(inSuite, tz.name.HasValue());
-        NL_TEST_ASSERT(inSuite, tz.name.Value().size() == 65);
+        NL_TEST_ASSERT(inSuite, tz.name.Value().size() == 7);
 
         tzL = tzL.SubSpan(1);
     }
@@ -176,12 +175,11 @@ void TestTimeZoneEmpty(nlTestSuite * inSuite, void * inContext)
     TimeSyncDataProvider timeSyncDataProv;
     timeSyncDataProv.Init(persistentStorage);
 
-    TimeZoneList timeZoneList;
-    uint8_t size = 0;
+    TimeZoneObj timeZoneObj;
 
-    NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == timeSyncDataProv.LoadTimeZone(timeZoneList, size));
-    NL_TEST_ASSERT(inSuite, !timeZoneList.begin());
-    NL_TEST_ASSERT(inSuite, size == 0);
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == timeSyncDataProv.LoadTimeZone(timeZoneObj));
+    NL_TEST_ASSERT(inSuite, !timeZoneObj.timeZoneList.begin());
+    NL_TEST_ASSERT(inSuite, timeZoneObj.size == 0);
 }
 
 void TestDSTOffset(nlTestSuite * inSuite, void * inContext)

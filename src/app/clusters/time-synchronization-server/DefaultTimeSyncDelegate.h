@@ -32,8 +32,6 @@ class DefaultTimeSyncDelegate : public Delegate
 {
 
 public:
-    using TimeZoneList = DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>;
-
     DefaultTimeSyncDelegate() : Delegate(){};
     void HandleTimeZoneChanged(const TimeZoneList timeZoneList) override;
     bool HandleUpdateDSTOffset(chip::CharSpan name) override;

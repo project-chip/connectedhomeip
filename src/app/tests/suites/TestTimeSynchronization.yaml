@@ -68,6 +68,15 @@ tests:
       response:
           value: [{ Offset: 100, ValidAt: 0 }]
 
+    - label: "Set Time Zone with very long name"
+      command: "SetTimeZone"
+      arguments:
+          values:
+              - name: "TimeZone"
+                value: [{ Offset: 100, ValidAt: 0, Name: "MunichOnTheLongRiverOfIsarInNiceSummerWeatherWithAugustinerBeerss" }]
+      response:
+          error: CONSTRAINT_ERROR
+
     - label: "Set Time Zone with first item validAt not zero"
       command: "SetTimeZone"
       arguments:
@@ -77,7 +86,7 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Set Time Zone with second item validAt non-zero"
+    - label: "Set Time Zone with second item validAt zero"
       command: "SetTimeZone"
       arguments:
           values:
@@ -89,6 +98,20 @@ tests:
                     ]
       response:
           error: CONSTRAINT_ERROR
+
+    - label: "Set Time Zone with more than supported list count"
+      command: "SetTimeZone"
+      arguments:
+          values:
+              - name: "TimeZone"
+                value:
+                    [
+                        { Offset: 100, ValidAt: 0, Name: "CST" },
+                        { Offset: 200, ValidAt: 1, Name: "CDT" },
+                        { Offset: 200, ValidAt: 2, Name: "CET" },
+                    ]
+      response:
+          error: RESOURCE_EXHAUSTED
 
     - label: "Set Time Zone empty"
       command: "SetTimeZone"
@@ -164,7 +187,7 @@ tests:
                         { Offset: 0, ValidStarting: 3, ValidUntil: null },
                     ]
 
-    - label: "Read sorted DSTOffset"
+    - label: "Read DSTOffset"
       command: "readAttribute"
       attribute: "DSTOffset"
       response:
@@ -182,3 +205,17 @@ tests:
                 value: [{ Offset: 0, ValidStarting: 1, ValidUntil: 1 }]
       response:
           error: CONSTRAINT_ERROR
+
+    - label: "Set DSTOffset with more than supported list count"
+      command: "SetDSTOffset"
+      arguments:
+          values:
+              - name: "DSTOffset"
+                value:
+                    [
+                        { Offset: 1, ValidStarting: 1, ValidUntil: 2 },
+                        { Offset: 0, ValidStarting: 3, ValidUntil: 5 },
+                        { Offset: 0, ValidStarting: 6, ValidUntil: null },
+                    ]
+      response:
+          error: RESOURCE_EXHAUSTED
