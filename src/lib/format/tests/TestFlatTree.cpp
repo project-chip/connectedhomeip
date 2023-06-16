@@ -66,11 +66,18 @@ class ByTag
 {
 public:
     constexpr ByTag(Tag tag) : mTag(tag) {}
-
     bool operator()(const NamedTag & item) { return item.tag == mTag; }
-
 private:
     const Tag mTag;
+};
+
+class ByName
+{
+  public:
+    constexpr ByName(const char *name) : mName(name) {}
+    bool operator()(const NamedTag & item) {return strcmp(item.name, mName) == 0; }
+  private:
+    const char * mName;
 };
 
 void TestFlatTreeFind(nlTestSuite * inSuite, void * inContext)
@@ -78,6 +85,10 @@ void TestFlatTreeFind(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 0, ByTag(ContextTag(1)))->data.name, "hello") == 0);
     NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 0, ByTag(ContextTag(2)))->data.name, "world") == 0);
     NL_TEST_ASSERT(inSuite, FindEntry(tree, 0, ByTag(ContextTag(3))) == nullptr);
+
+    NL_TEST_ASSERT(inSuite, FindEntry(tree, 0, ByName("hello"))->data.tag == ContextTag(1));
+    NL_TEST_ASSERT(inSuite, FindEntry(tree, 0, ByName("world"))->data.tag == ContextTag(2));
+    NL_TEST_ASSERT(inSuite, FindEntry(tree, 0, ByName("foo")) == nullptr);
 
     NL_TEST_ASSERT(inSuite, FindEntry(tree, 1, ByTag(ContextTag(1))) == nullptr);
     NL_TEST_ASSERT(inSuite, strcmp(FindEntry(tree, 1, ByTag(ProfileTag(234, 2)))->data.name, "b") == 0);
