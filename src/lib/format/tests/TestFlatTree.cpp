@@ -54,6 +54,14 @@ std::array<Node<Tag, const char *>, 3> tree = {{
         _ENTRY(node3),
 }};
 
+// DO NOT SUBMIT: tests for layouts of data
+struct Data {
+    uint32_t id;
+    const char *name;
+    uint8_t  tlv_type;
+    uint8_t  flags;
+};
+
 
 void TestFlatTreeFind(nlTestSuite * inSuite, void * inContext)
 {
