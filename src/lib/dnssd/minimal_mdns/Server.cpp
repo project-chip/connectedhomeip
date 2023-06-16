@@ -127,24 +127,12 @@ chip::Inet::IPAddress Get(chip::Inet::IPAddressType addressType)
 #if INET_CONFIG_ENABLE_IPV4
     if (addressType == chip::Inet::IPAddressType::kIPv4)
     {
-        if (!chip::Inet::IPAddress::FromString("224.0.0.251", address))
-        {
-            ChipLogError(Discovery, "Failed to parse standard IPv4 broadcast address");
-
-            // not valid, however the parsing should never fail
-            return chip::Inet::IPAddress::Any;
-        }
+        VerifyOrDie(chip::Inet::IPAddress::FromString("224.0.0.251", address));
     }
     else
 #endif
     {
-        if (!chip::Inet::IPAddress::FromString("FF02::FB", address))
-        {
-            ChipLogError(Discovery, "Failed to parse standard IPv6 broadcast address");
-
-            // not valid, however the parsing should never fail
-            return chip::Inet::IPAddress::Any;
-        }
+        VerifyOrDie(chip::Inet::IPAddress::FromString("FF02::FB", address));
     }
     return address;
 }
