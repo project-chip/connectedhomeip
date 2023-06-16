@@ -212,11 +212,11 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestFlatTree()
+int TestFlatTreePosition()
 {
     nlTestSuite theSuite = { "FlatTree", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestFlatTree)
+CHIP_REGISTER_TEST_SUITE(TestFlatTreePosition)
