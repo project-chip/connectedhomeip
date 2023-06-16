@@ -72,8 +72,8 @@ public:
         bool mState;
     };
 
-    /// @brief Struct holding an array of EndpointStatePair, handles insertion , get and removal by EndpointID.
-    /// TODO: Implemente generic object to handle this boilerplate array manipulation
+    /// @brief Struct holding an array of EndpointStatePair. Handles insertion, get and removal by EndpointID.
+    /// TODO: Implement generic object to handle this boilerplate array manipulation
     struct StatePairBuffer
     {
         bool IsEmpty() const { return (mPairCount == 0); }
@@ -132,7 +132,7 @@ public:
             VerifyOrReturnValue(CHIP_NO_ERROR == FindPair(endpoint, position), CHIP_NO_ERROR);
 
             uint16_t nextPos = static_cast<uint16_t>(position + 1);
-            uint16_t moveNum = static_cast<uint16_t>(MAX_ENDPOINT_COUNT - nextPos);
+            uint16_t moveNum = static_cast<uint16_t>(mPairCount - nextPos);
 
             // Compress array after removal, if the removed position is not the last
             if (moveNum)
@@ -193,7 +193,7 @@ public:
             return CHIP_ERROR_READ_FAILED;
         }
 
-        AttributeValuePair Pairs[scenableAttributeCount];
+        AttributeValuePair pairs[scenableAttributeCount];
 
         Pairs[0].attributeID.SetValue(Attributes::OnOff::Id);
         Pairs[0].attributeValue = currentValue;
@@ -225,7 +225,7 @@ public:
         auto pair_iterator = attributeValueList.begin();
         while (pair_iterator.Next())
         {
-            Scenes::Structs::AttributeValuePair::DecodableType decodePair = pair_iterator.GetValue();
+            auto & decodePair = pair_iterator.GetValue();
             if (decodePair.attributeID.HasValue())
             {
                 // If attribute ID was encoded, verify it is the proper ID for the OnOff attribute
