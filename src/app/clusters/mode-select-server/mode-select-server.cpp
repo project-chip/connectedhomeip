@@ -183,10 +183,21 @@ EmberAfStatus Instance::SetStartUpModeNull() const
 
 std::map<uint32_t, Instance*> Instance::ModeSelectAliasesInstanceMap;
 
+bool Instance::isAliasCluster() const
+{
+    for (unsigned int AliasedCluster : AliasedClusters) {
+        if (clusterId == AliasedCluster)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 CHIP_ERROR Instance::Init()
 {
     // Check that the cluster ID given is a valid mode select alias cluster ID.
-    if (!std::any_of(AliasedClusters.begin(), AliasedClusters.end(), [this](ClusterId i){return i == clusterId;}))
+    if (!isAliasCluster())
     {
         ChipLogError(Zcl, "ModeSelect: The cluster with ID %lu is not a mode select alias.", long(clusterId));
         return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?

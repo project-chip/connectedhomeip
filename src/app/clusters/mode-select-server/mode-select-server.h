@@ -68,6 +68,11 @@ private:
     ClusterId clusterId{};
     Delegate *delegate;
 
+    /**
+     * This checks to see if this clusters instance is a valid ModeBase aliased cluster based on the AliasedClusters list.
+     * @return true if the clusterId of this instance is a valid ModeBase cluster.
+     */
+    bool isAliasCluster() const;
     void HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
     void HandleChangeToModeWithStatus(HandlerContext & ctx, const Commands::ChangeToModeWithStatus::DecodableType & req);
 
