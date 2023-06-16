@@ -464,93 +464,78 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPModeSelectClusterChangeToModeResponseCallback
-    : public Callback::Callback<CHIPModeSelectClusterChangeToModeResponseCallbackType>
+class CHIPLaundryWasherModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPLaundryWasherModeClusterChangeToModeResponseCallbackType>
 {
 public:
-    CHIPModeSelectClusterChangeToModeResponseCallback(jobject javaCallback);
+    CHIPLaundryWasherModeClusterChangeToModeResponseCallback(jobject javaCallback);
 
-    ~CHIPModeSelectClusterChangeToModeResponseCallback();
+    ~CHIPLaundryWasherModeClusterChangeToModeResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
+                           const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback
-    : public Callback::Callback<CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallbackType>
+class CHIPRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallbackType>
 {
 public:
-    CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback(jobject javaCallback);
+    CHIPRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallback(jobject javaCallback);
 
-    ~CHIPLaundryWasherModeSelectClusterChangeToModeResponseCallback();
+    ~CHIPRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallback();
 
-    static void
-    CallbackFn(void * context,
-               const chip::app::Clusters::LaundryWasherModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
+    static void CallbackFn(
+        void * context,
+        const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &
+            data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback
-    : public Callback::Callback<CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallbackType>
+class CHIPRvcRunModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPRvcRunModeClusterChangeToModeResponseCallbackType>
 {
 public:
-    CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback(jobject javaCallback);
+    CHIPRvcRunModeClusterChangeToModeResponseCallback(jobject javaCallback);
 
-    ~CHIPRefrigeratorAndTemperatureControlledCabinetModeSelectClusterChangeToModeResponseCallback();
+    ~CHIPRvcRunModeClusterChangeToModeResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetModeSelect::Commands::
-                               ChangeToModeResponse::DecodableType & data);
+                           const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPRvcRunModeSelectClusterChangeToModeResponseCallback
-    : public Callback::Callback<CHIPRvcRunModeSelectClusterChangeToModeResponseCallbackType>
+class CHIPRvcCleanModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPRvcCleanModeClusterChangeToModeResponseCallbackType>
 {
 public:
-    CHIPRvcRunModeSelectClusterChangeToModeResponseCallback(jobject javaCallback);
+    CHIPRvcCleanModeClusterChangeToModeResponseCallback(jobject javaCallback);
 
-    ~CHIPRvcRunModeSelectClusterChangeToModeResponseCallback();
+    ~CHIPRvcCleanModeClusterChangeToModeResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::RvcRunModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
+                           const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback
-    : public Callback::Callback<CHIPRvcCleanModeSelectClusterChangeToModeResponseCallbackType>
+class CHIPDishwasherModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPDishwasherModeClusterChangeToModeResponseCallbackType>
 {
 public:
-    CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback(jobject javaCallback);
+    CHIPDishwasherModeClusterChangeToModeResponseCallback(jobject javaCallback);
 
-    ~CHIPRvcCleanModeSelectClusterChangeToModeResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::RvcCleanModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPDishwasherModeSelectClusterChangeToModeResponseCallback
-    : public Callback::Callback<CHIPDishwasherModeSelectClusterChangeToModeResponseCallbackType>
-{
-public:
-    CHIPDishwasherModeSelectClusterChangeToModeResponseCallback(jobject javaCallback);
-
-    ~CHIPDishwasherModeSelectClusterChangeToModeResponseCallback();
+    ~CHIPDishwasherModeClusterChangeToModeResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::DishwasherModeSelect::Commands::ChangeToModeResponse::DecodableType & data);
+                           const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

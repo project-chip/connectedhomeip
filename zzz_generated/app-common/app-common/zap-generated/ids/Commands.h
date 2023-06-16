@@ -638,88 +638,64 @@ namespace ChangeToMode {
 static constexpr CommandId Id = 0x00000000;
 } // namespace ChangeToMode
 
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
-namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace ChangeToModeResponse
-
 } // namespace Commands
 } // namespace ModeSelect
 
-namespace LaundryWasherModeSelect {
+namespace LaundryWasherMode {
 namespace Commands {
 
 namespace ChangeToMode {
 static constexpr CommandId Id = 0x00000000;
 } // namespace ChangeToMode
 
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
 namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
+static constexpr CommandId Id = 0x00000001;
 } // namespace ChangeToModeResponse
 
 } // namespace Commands
-} // namespace LaundryWasherModeSelect
+} // namespace LaundryWasherMode
 
-namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
+namespace RefrigeratorAndTemperatureControlledCabinetMode {
 namespace Commands {
 
 namespace ChangeToMode {
 static constexpr CommandId Id = 0x00000000;
 } // namespace ChangeToMode
 
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
 namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
+static constexpr CommandId Id = 0x00000001;
 } // namespace ChangeToModeResponse
 
 } // namespace Commands
-} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
+} // namespace RefrigeratorAndTemperatureControlledCabinetMode
 
-namespace RvcRunModeSelect {
+namespace RvcRunMode {
 namespace Commands {
 
 namespace ChangeToMode {
 static constexpr CommandId Id = 0x00000000;
 } // namespace ChangeToMode
 
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
 namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
+static constexpr CommandId Id = 0x00000001;
 } // namespace ChangeToModeResponse
 
 } // namespace Commands
-} // namespace RvcRunModeSelect
+} // namespace RvcRunMode
 
-namespace RvcCleanModeSelect {
+namespace RvcCleanMode {
 namespace Commands {
 
 namespace ChangeToMode {
 static constexpr CommandId Id = 0x00000000;
 } // namespace ChangeToMode
 
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
 namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
+static constexpr CommandId Id = 0x00000001;
 } // namespace ChangeToModeResponse
 
 } // namespace Commands
-} // namespace RvcCleanModeSelect
+} // namespace RvcCleanMode
 
 namespace TemperatureControl {
 namespace Commands {
@@ -731,23 +707,19 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace TemperatureControl
 
-namespace DishwasherModeSelect {
+namespace DishwasherMode {
 namespace Commands {
 
 namespace ChangeToMode {
 static constexpr CommandId Id = 0x00000000;
 } // namespace ChangeToMode
 
-namespace ChangeToModeWithStatus {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeToModeWithStatus
-
 namespace ChangeToModeResponse {
-static constexpr CommandId Id = 0x00000002;
+static constexpr CommandId Id = 0x00000001;
 } // namespace ChangeToModeResponse
 
 } // namespace Commands
-} // namespace DishwasherModeSelect
+} // namespace DishwasherMode
 
 namespace SmokeCoAlarm {
 namespace Commands {

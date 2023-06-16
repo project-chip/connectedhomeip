@@ -4279,13 +4279,6 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
@@ -4364,8 +4357,8 @@ class ChipClusters:
             },
         },
     }
-    _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO = {
-        "clusterName": "LaundryWasherModeSelect",
+    _LAUNDRY_WASHER_MODE_CLUSTER_INFO = {
+        "clusterName": "LaundryWasherMode",
         "clusterId": 0x00000051,
         "commands": {
             0x00000000: {
@@ -4375,43 +4368,30 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000004: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000005: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4454,8 +4434,8 @@ class ChipClusters:
             },
         },
     }
-    _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER_INFO = {
-        "clusterName": "RefrigeratorAndTemperatureControlledCabinetModeSelect",
+    _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO = {
+        "clusterName": "RefrigeratorAndTemperatureControlledCabinetMode",
         "clusterId": 0x00000052,
         "commands": {
             0x00000000: {
@@ -4465,43 +4445,30 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000004: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000005: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4614,8 +4581,8 @@ class ChipClusters:
             },
         },
     }
-    _RVC_RUN_MODE_SELECT_CLUSTER_INFO = {
-        "clusterName": "RvcRunModeSelect",
+    _RVC_RUN_MODE_CLUSTER_INFO = {
+        "clusterName": "RvcRunMode",
         "clusterId": 0x00000054,
         "commands": {
             0x00000000: {
@@ -4625,43 +4592,30 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000004: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000005: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4704,8 +4658,8 @@ class ChipClusters:
             },
         },
     }
-    _RVC_CLEAN_MODE_SELECT_CLUSTER_INFO = {
-        "clusterName": "RvcCleanModeSelect",
+    _RVC_CLEAN_MODE_CLUSTER_INFO = {
+        "clusterName": "RvcCleanMode",
         "clusterId": 0x00000055,
         "commands": {
             0x00000000: {
@@ -4715,43 +4669,30 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000004: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000005: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4938,8 +4879,8 @@ class ChipClusters:
             },
         },
     }
-    _DISHWASHER_MODE_SELECT_CLUSTER_INFO = {
-        "clusterName": "DishwasherModeSelect",
+    _DISHWASHER_MODE_CLUSTER_INFO = {
+        "clusterName": "DishwasherMode",
         "clusterId": 0x00000059,
         "commands": {
             0x00000000: {
@@ -4949,43 +4890,30 @@ class ChipClusters:
                     "newMode": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "ChangeToModeWithStatus",
-                "args": {
-                    "newMode": "int",
-                },
-            },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "Description",
-                "attributeId": 0x00000000,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000002: {
                 "attributeName": "SupportedModes",
-                "attributeId": 0x00000002,
+                "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
             },
-            0x00000003: {
+            0x00000001: {
                 "attributeName": "CurrentMode",
-                "attributeId": 0x00000003,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000004: {
+            0x00000002: {
                 "attributeName": "StartUpMode",
-                "attributeId": 0x00000004,
+                "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000005: {
+            0x00000003: {
                 "attributeName": "OnMode",
-                "attributeId": 0x00000005,
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -15684,14 +15612,14 @@ class ChipClusters:
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000046: _ICD_MANAGEMENT_CLUSTER_INFO,
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
-        0x00000051: _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO,
-        0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER_INFO,
+        0x00000051: _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
+        0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
         0x00000053: _WASHER_CONTROLS_CLUSTER_INFO,
-        0x00000054: _RVC_RUN_MODE_SELECT_CLUSTER_INFO,
-        0x00000055: _RVC_CLEAN_MODE_SELECT_CLUSTER_INFO,
+        0x00000054: _RVC_RUN_MODE_CLUSTER_INFO,
+        0x00000055: _RVC_CLEAN_MODE_CLUSTER_INFO,
         0x00000056: _TEMPERATURE_CONTROL_CLUSTER_INFO,
         0x00000057: _REFRIGERATOR_ALARM_CLUSTER_INFO,
-        0x00000059: _DISHWASHER_MODE_SELECT_CLUSTER_INFO,
+        0x00000059: _DISHWASHER_MODE_CLUSTER_INFO,
         0x0000005B: _AIR_QUALITY_CLUSTER_INFO,
         0x0000005C: _SMOKE_CO_ALARM_CLUSTER_INFO,
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
@@ -15819,14 +15747,14 @@ class ChipClusters:
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "IcdManagement": _ICD_MANAGEMENT_CLUSTER_INFO,
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
-        "LaundryWasherModeSelect": _LAUNDRY_WASHER_MODE_SELECT_CLUSTER_INFO,
-        "RefrigeratorAndTemperatureControlledCabinetModeSelect": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SELECT_CLUSTER_INFO,
+        "LaundryWasherMode": _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
+        "RefrigeratorAndTemperatureControlledCabinetMode": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
         "WasherControls": _WASHER_CONTROLS_CLUSTER_INFO,
-        "RvcRunModeSelect": _RVC_RUN_MODE_SELECT_CLUSTER_INFO,
-        "RvcCleanModeSelect": _RVC_CLEAN_MODE_SELECT_CLUSTER_INFO,
+        "RvcRunMode": _RVC_RUN_MODE_CLUSTER_INFO,
+        "RvcCleanMode": _RVC_CLEAN_MODE_CLUSTER_INFO,
         "TemperatureControl": _TEMPERATURE_CONTROL_CLUSTER_INFO,
         "RefrigeratorAlarm": _REFRIGERATOR_ALARM_CLUSTER_INFO,
-        "DishwasherModeSelect": _DISHWASHER_MODE_SELECT_CLUSTER_INFO,
+        "DishwasherMode": _DISHWASHER_MODE_CLUSTER_INFO,
         "AirQuality": _AIR_QUALITY_CLUSTER_INFO,
         "SmokeCoAlarm": _SMOKE_CO_ALARM_CLUSTER_INFO,
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,

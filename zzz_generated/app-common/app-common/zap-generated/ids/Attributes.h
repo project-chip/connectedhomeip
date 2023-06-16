@@ -2467,27 +2467,23 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ModeSelect
 
-namespace LaundryWasherModeSelect {
+namespace LaundryWasherMode {
 namespace Attributes {
 
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
 namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
 
 namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
 namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace StartUpMode
 
 namespace OnMode {
-static constexpr AttributeId Id = 0x00000005;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace OnMode
 
 namespace GeneratedCommandList {
@@ -2515,29 +2511,25 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace LaundryWasherModeSelect
+} // namespace LaundryWasherMode
 
-namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
+namespace RefrigeratorAndTemperatureControlledCabinetMode {
 namespace Attributes {
 
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
 namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
 
 namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
 namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace StartUpMode
 
 namespace OnMode {
-static constexpr AttributeId Id = 0x00000005;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace OnMode
 
 namespace GeneratedCommandList {
@@ -2565,7 +2557,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
+} // namespace RefrigeratorAndTemperatureControlledCabinetMode
 
 namespace WasherControls {
 namespace Attributes {
@@ -2613,27 +2605,23 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace WasherControls
 
-namespace RvcRunModeSelect {
+namespace RvcRunMode {
 namespace Attributes {
 
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
 namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
 
 namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
 namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace StartUpMode
 
 namespace OnMode {
-static constexpr AttributeId Id = 0x00000005;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace OnMode
 
 namespace GeneratedCommandList {
@@ -2661,29 +2649,25 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RvcRunModeSelect
+} // namespace RvcRunMode
 
-namespace RvcCleanModeSelect {
+namespace RvcCleanMode {
 namespace Attributes {
 
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
 namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
 
 namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
 namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace StartUpMode
 
 namespace OnMode {
-static constexpr AttributeId Id = 0x00000005;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace OnMode
 
 namespace GeneratedCommandList {
@@ -2711,7 +2695,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace RvcCleanModeSelect
+} // namespace RvcCleanMode
 
 namespace TemperatureControl {
 namespace Attributes {
@@ -2805,27 +2789,23 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace RefrigeratorAlarm
 
-namespace DishwasherModeSelect {
+namespace DishwasherMode {
 namespace Attributes {
 
-namespace Description {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Description
-
 namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace SupportedModes
 
 namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
 namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace StartUpMode
 
 namespace OnMode {
-static constexpr AttributeId Id = 0x00000005;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace OnMode
 
 namespace GeneratedCommandList {
@@ -2853,7 +2833,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace DishwasherModeSelect
+} // namespace DishwasherMode
 
 namespace AirQuality {
 namespace Attributes {
