@@ -102,16 +102,6 @@ void OperationalStateServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-CHIP_ERROR OperationalStateServer::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback,
-                                                             void * context)
-{
-    callback(Commands::Pause::Id, context);
-    callback(Commands::Resume::Id, context);
-    callback(Commands::Start::Id, context);
-    callback(Commands::Stop::Id, context);
-    return CHIP_NO_ERROR;
-}
-
 void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Commands::Pause::DecodableType & req)
 {
     ChipLogDetail(Zcl, "OperationalState: HandlePauseState");

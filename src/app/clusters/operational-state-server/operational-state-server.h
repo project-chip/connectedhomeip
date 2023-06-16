@@ -65,7 +65,6 @@ public:
 
     // Inherited from CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
 
     /// IM-level implementation of read
     ///
