@@ -892,7 +892,7 @@ bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint
  * @param[in] eventControlArraySize Size of the event control array
  * @return EmberEventControl* configured event control
  */
-EmberEventControl * OnOffServer::getEventControl(chip::EndpointId endpoint, const Span<EmberEventControl> & eventControlArray)
+EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint, const Span<EmberEventControl> & eventControlArray)
 {
     uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, OnOff::Id, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
     if (index >= eventControlArray.size())
@@ -900,7 +900,7 @@ EmberEventControl * OnOffServer::getEventControl(chip::EndpointId endpoint, cons
         return nullptr;
     }
 
-    return &eventControlArray.data()[index];
+    return &eventControlArray[index];
 }
 
 /**
