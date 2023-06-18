@@ -196,6 +196,11 @@ CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::B
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
+Clusters::RvcRun::RvcRunDelegate rvcRunDelegate;
+Clusters::RvcRun::Instance rvcRunInstance(0x1, Clusters::ModeRun::Id, &rvcRunDelegate);
+
+Clusters::RvcClean::RvcCleanDelegate rvcCleanDelegate;
+Clusters::RvcClean::Instance rvcCleanInstance(0x1, Clusters::RvcClean::Id, &rvcCleanDelegate);
 } // namespace
 
 void ApplicationInit()
@@ -251,6 +256,9 @@ void ApplicationInit()
     {
         sEthernetNetworkCommissioningInstance.Init();
     }
+
+    rvcRunInstance.Init();
+    rvcCleanInstance.Init();
 
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 
