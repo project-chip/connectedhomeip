@@ -23,20 +23,17 @@
 #include <lib/support/StringBuilder.h>
 #include <transport/TracingStructs.h>
 
-#include <json/json.h>
+#include <perfetto.h>
 
-#include <sstream>
-#include <string>
+static constexpr const char * kMatterCategory = "Matter";
 
-static cosntexpr const char * kMatterCategory = "Matter"
-
-    PERFETTO_DEFINE_CATEGORIES(perfetto::Category(kMatterCategory).SetDescription("Matter trace events"));
+PERFETTO_DEFINE_CATEGORIES(perfetto::Category(kMatterCategory).SetDescription("Matter trace events"));
 
 namespace chip {
 namespace Tracing {
 namespace Perfetto {
 
-PerfettoBackend & PerfettoBackend::Initialize()
+PerfettoBackend & PerfettoBackend::Init()
 {
     perfetto::TracingInitArgs args;
 
@@ -44,6 +41,8 @@ PerfettoBackend & PerfettoBackend::Initialize()
     args.backends |= perfetto::kSystemBackend;
 
     perfetto::Tracing::Initialize(args);
+
+    return *this;
 }
 
 void PerfettoBackend::TraceBegin(const char * label, const char * group)

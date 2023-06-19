@@ -22,6 +22,10 @@
 #include <tracing/log_json/log_json_tracing.h>
 #include <tracing/registry.h>
 
+#ifdef ENABLE_PERFETTO_TRACING
+#include <tracing/perfetto/perfetto_tracing.h>
+#endif
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -66,7 +70,7 @@ void EnableTracingFor(const char * cliArg)
         {
             if (!perfetto_backend.IsInList())
             {
-                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend));
+                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend.Init()));
             }
         }
 #endif // ENABLE_PERFETTO_TRACING

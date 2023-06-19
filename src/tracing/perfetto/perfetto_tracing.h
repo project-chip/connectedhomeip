@@ -32,7 +32,7 @@ public:
     PerfettoBackend() = default;
 
     /// MUST be called before being used as a backend.
-    PerfettoBackend &Initialize();
+    PerfettoBackend &Init();
 
     void TraceBegin(const char * label, const char * group) override;
     void TraceEnd(const char * label, const char * group) override;
