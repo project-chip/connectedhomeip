@@ -326,8 +326,8 @@ private:
     void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
 
-    /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine run if
-    /// the change to the attribute path makes the ReadHandler reportable.
+    /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine
+    /// run if the change to the attribute path makes the ReadHandler reportable.
     /// @param aAttributeChanged Path to the attribute that was changed.
     void AttributePathIsDirty(const AttributePathParams & aAttributeChanged);
     bool IsDirty() const
