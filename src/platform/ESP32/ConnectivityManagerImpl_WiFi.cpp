@@ -426,7 +426,7 @@ CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
 #if CONFIG_WIFI_POWER_SAVE_MAX
             wifiConfig.sta.listen_interval = CONFIG_WIFI_PS_LISTEN_INTERVAL;
 #endif
-            esp_err_t err              = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+            esp_err_t err = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
             if (err != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", esp_err_to_name(err));
