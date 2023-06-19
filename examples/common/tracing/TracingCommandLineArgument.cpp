@@ -36,6 +36,11 @@ using ::chip::Tracing::LogJson::LogJsonBackend;
 // currently supported backends
 LogJsonBackend log_json_backend;
 
+#ifdef ENABLE_PERFETTO_TRACING
+using ::chip::Tracing::Perfetto::PerfettoBackend;
+PerfettoBackend perfetto_backend;
+#endif
+
 // ScopedRegistration ensures register/unregister is met, as long
 // as the vector is cleared (and we do so when stopping tracing).
 std::vector<std::unique_ptr<ScopedRegistration>> tracing_backends;
@@ -56,6 +61,15 @@ void EnableTracingFor(const char * cliArg)
                 tracing_backends.push_back(std::make_unique<ScopedRegistration>(log_json_backend));
             }
         }
+#ifdef ENABLE_PERFETTO_TRACING
+        else if (value.data_equal(CharSpan::fromCharString("perfetto")))
+        {
+            if (!perfetto_backend.IsInList())
+            {
+                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend));
+            }
+        }
+#endif // ENABLE_PERFETTO_TRACING
         else
         {
             ChipLogError(AppServer, "Unknown trace destination: '%s'", std::string(value.data(), value.size()).c_str());

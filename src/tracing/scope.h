@@ -25,7 +25,11 @@
 
 #define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
-#elif defined(MATTER_TRACE_MULTIPLEXED)
+#else
+
+#ifndef MATTER_TRACE_MULTIPLEXED
+#include <matter/tracing/macros_impl.h>
+#endif
 
 namespace chip {
 namespace Tracing {
@@ -70,9 +74,6 @@ private:
 ///   } // TRACE_END called here
 #define MATTER_TRACE_SCOPE(label, group) ::chip::Tracing::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(label, group)
 
-#else
-// backends MUST provide a config for this
-#include <matter/tracing/macros_impl.h>
 #endif
 
 #else // ifdef MATTER_TRACING_ENABLED

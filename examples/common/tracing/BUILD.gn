@@ -20,6 +20,11 @@ config("default_config") {
   include_dirs = [ "." ]
 }
 
+config("enable_perfetto") {
+  defines = [ "ENABLE_PERFETTO_TRACING" ]
+}
+
+
 source_set("commandline") {
   sources = [
     "TracingCommandLineArgument.cpp",
@@ -33,6 +38,12 @@ source_set("commandline") {
   ]
 
   public_configs = [ ":default_config" ]
+
+  if (target_os == "linux") {
+    deps += [ "${chip_root}/src/tracing/perfetto" ]
+    public_configs += [ ":enable_perfetto" ]
+  }
+
 
   cflags = [ "-Wconversion" ]
 }
