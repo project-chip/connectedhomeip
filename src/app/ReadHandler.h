@@ -326,7 +326,7 @@ private:
     void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
 
-    /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will scehdule an engine run if
+    /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine run if
     /// the change to the attribute path makes the ReadHandler reportable.
     /// @param aAttributeChanged Path to the attribute that was changed.
     void AttributePathIsDirty(const AttributePathParams & aAttributeChanged);
@@ -425,13 +425,13 @@ private:
 
     void PersistSubscription();
 
-    /// @brief Modifies a state flag in the read handler. If the flag went from a
-    /// non-reportable state to a reportable state, schedules an engine run.
+    /// @brief Modifies a state flag in the read handler. If the read handler went from a
+    /// non-reportable state to a reportable state, schedules a reporting engine run.
     /// @param aFlag Flag to set
     /// @param aValue Flag new value
     void SetStateFlag(ReadHandlerFlags aFlag, bool aValue = true);
 
-    /// @brief This function calls the SetStateFlag with the flag value set to false, thus possibly emitting a report
+    /// @brief This function call SetStateFlag with the flag value set to false, thus possibly emitting a report
     /// generation.
     /// @param aFlag Flag to clear
     void ClearStateFlag(ReadHandlerFlags aFlag);
