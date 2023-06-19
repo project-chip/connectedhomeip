@@ -29,6 +29,8 @@ static constexpr const char * kMatterCategory = "Matter";
 
 PERFETTO_DEFINE_CATEGORIES(perfetto::Category(kMatterCategory).SetDescription("Matter trace events"));
 
+PERFETTO_TRACK_EVENT_STATIC_STORAGE();
+
 namespace chip {
 namespace Tracing {
 namespace Perfetto {
