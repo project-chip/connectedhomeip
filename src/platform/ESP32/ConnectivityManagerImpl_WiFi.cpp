@@ -941,11 +941,13 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 
     uint16_t vendorId;
     uint16_t productId;
+    char serial[sizeof(wifiConfig.ap.ssid)-sizeof(CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX)];
+    memset(serial, 0, sizeof(serial));
     ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetVendorId(vendorId));
     ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetProductId(productId));
+    ReturnErrorOnFailure(GetDeviceInstanceInfoProvider()->GetSerialNumber(serial, sizeof(serial)));
 
-    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%03X-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
-             discriminator, vendorId, productId);
+    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s-%s", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, serial);
     wifiConfig.ap.channel         = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
     wifiConfig.ap.authmode        = WIFI_AUTH_OPEN;
     wifiConfig.ap.max_connection  = CHIP_DEVICE_CONFIG_WIFI_AP_MAX_STATIONS;
