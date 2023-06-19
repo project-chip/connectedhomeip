@@ -390,6 +390,39 @@ menu "CHIP Device Layer"
                 The amount of time (in milliseconds) to wait for Internet connectivity to be established on
                 the device's WiFi station interface during a Network Provisioning TestConnectivity operation.
 
+        choice WIFI_POWER_SAVE_MODE
+            prompt "WiFi power-saving mode"
+            default WIFI_POWER_SAVE_MIN
+            depends on ENABLE_WIFI_STATION && !ENABLE_WIFI_AP
+            help
+                The Modem-sleep mode which refers to the legacy power-saving mode in the IEEE 802.11 protocol.
+
+            config WIFI_POWER_SAVE_MIN
+                bool "Minimal power-saving mode"
+                help
+                    In minimum power-saving mode, station wakes up every DTIM to receive beacon.
+
+            config WIFI_POWER_SAVE_MAX
+                bool "Maximum power-saving mode"
+                help
+                    In maximum power-saving mode, station wakes up in every listen interval to receive beacon.
+                    Listen interval can be configured by calling API 'esp_wifi_set_config()' before connecting
+                    to AP.
+
+            config WIFI_POWER_SAVE_NONE
+                bool "No power-saving"
+                help
+                    No power save
+
+        endchoice
+
+        config WIFI_PS_LISTEN_INTERVAL
+            int "Listen interval for maximum power-saving mode"
+            depends on WIFI_POWER_SAVE_MAX
+            default 3
+            help
+                Interval for station to listen to beacon from AP. The unit of listen interval is one beacon interval.
+
     endmenu
 
     menu "WiFi AP Options"
