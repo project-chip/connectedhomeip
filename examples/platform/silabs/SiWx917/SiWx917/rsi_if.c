@@ -559,13 +559,18 @@ void wfx_rsi_task(void * arg)
                     hasNotifiedIPV4 = false;
                 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-                /* Checks if the assigned IPv6 address is preferred by evaluating
-                 * the first block of IPv6 address ( block 0)
+                /*
+                 * Checks if the IPv6 event has been notified, if not invoke the nd6_tmr,
+                 * which starts the duplicate address detectation.
                  */
                 if (!hasNotifiedIPV6)
                 {
                     nd6_tmr();
                 }
+                /*
+                 * Checks if the assigned IPv6 address is preferred by evaluating
+                 * the first block of IPv6 address ( block 0)
+                 */
                 if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
                 {
                     wfx_ipv6_notify(GET_IPV6_SUCCESS);
