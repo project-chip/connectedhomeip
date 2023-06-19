@@ -44,10 +44,11 @@ namespace Tracing {
 class Scoped
 {
 public:
-    inline Scoped(const char *label, const char *group) : mGroup(group) { MATTER_TRACE_BEGIN(label, group); }
-    inline ~Scoped() { MATTER_TRACE_END(mGroup); }
+    inline Scoped(const char *label, const char *group) : mLabel(label), mGroup(group) { MATTER_TRACE_BEGIN(label, group); }
+    inline ~Scoped() { MATTER_TRACE_END(mLabel, mGroup); }
 
 private:
+    const char *mLabel;
     const char *mGroup;
 };
 

@@ -51,11 +51,11 @@ void Begin(const char *label, const char *group)
     }
 }
 
-void End(const char *group)
+void End(const char *label, const char *group)
 {
     for (auto & backend : gTracingBackends)
     {
-        backend.TraceEnd(group);
+        backend.TraceEnd(label, group);
     }
 }
 

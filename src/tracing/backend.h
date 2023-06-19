@@ -37,14 +37,17 @@ public:
     virtual void TraceBegin(const char *label, const char *group) {}
 
     /// Tracing end assumes completing a previously started scope with TraceBegin
-    /// and nesting is assumed (hence label is not repeated)
+    /// and nesting is assumed.
     ///
     /// Expect scopes like:
     ///    TraceBegin("foo", "A")
     ///      TraceBegin("bar", "A")
-    ///      TraceEnd("A")  // ends "BAR"
-    ///    TraceEnd("A")    // ends "FOO"
-    virtual void TraceEnd(const char *group) {}
+    ///
+    ///      // NOT VALID HERE: TraceEnd("foo", "A")
+    ///
+    ///      TraceEnd("bar", "A")  // ends "BAR"
+    ///    TraceEnd("foo", "A")    // ends "FOO"
+    virtual void TraceEnd(const char *label, const char *group) {}
 
     /// Trace a zero-sized event
     virtual void TraceInstant(const char *label, const char *group) {}

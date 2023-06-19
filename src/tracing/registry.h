@@ -60,7 +60,7 @@ private:
 namespace Internal {
 
 void Begin(const char *label, const char *group);
-void End(const char *group);
+void End(const char *label, const char *group);
 void Instant(const char *label, const char *group);
 
 void LogMessageSend(::chip::Tracing::MessageSendInfo & info);

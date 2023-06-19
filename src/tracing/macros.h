@@ -52,7 +52,7 @@
 
 // This gets forwarded to the multiplexed instance
 #define MATTER_TRACE_BEGIN(label, group) ::chip::Tracing::Internal::Begin(label, group)
-#define MATTER_TRACE_END(group) ::chip::Tracing::Internal::End(group)
+#define MATTER_TRACE_END(label, group) ::chip::Tracing::Internal::End(label, group)
 #define MATTER_TRACE_INSTANT(label, group) ::chip::Tracing::Internal::Instant(label, group)
 
 #else
@@ -60,7 +60,7 @@
 //
 // Expected macros provided by implementations:
 //    MATTER_TRACE_BEGIN(label, group)
-//    MATTER_TRACE_END(group)
+//    MATTER_TRACE_END(label, group)
 //    MATTER_TRACE_INSTANT(label, group)
 //    MATTER_TRACE_SCOPE(label, group)
 #include <matter/tracing/macros_impl.h>

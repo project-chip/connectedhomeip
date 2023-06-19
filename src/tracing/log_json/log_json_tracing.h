@@ -32,7 +32,7 @@ public:
     LogJsonBackend() = default;
 
     void TraceBegin(const char *label, const char *group) override;
-    void TraceEnd(const char *group) override;
+    void TraceEnd(const char *label, const char *group) override;
     void TraceInstant(const char *label, const char *group) override;
     void LogMessageSend(MessageSendInfo &) override;
     void LogMessageReceived(MessageReceivedInfo &) override;

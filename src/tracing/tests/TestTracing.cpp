@@ -41,8 +41,8 @@ public:
         mTraces.push_back(std::string("BEGIN:") + group + ":"+label);
     }
 
-    void TraceEnd(const char *group) override {
-        mTraces.push_back(std::string("END:") + group);
+    void TraceEnd(const char *label, const char *group) override {
+        mTraces.push_back(std::string("END:") + group + ":" + label);
     }
 
     void TraceInstant(const char *label, const char *group) override
@@ -68,9 +68,9 @@ void TestBasicTracing(nlTestSuite * inSuite, void * inContext)
             // direct scope begin/end (not usual, but should work)
             MATTER_TRACE_BEGIN("C", "Group");
             MATTER_TRACE_BEGIN("D", "Group");
-            MATTER_TRACE_END("Group");
+            MATTER_TRACE_END("D", "Group");
             MATTER_TRACE_INSTANT("FOO", "Group");
-            MATTER_TRACE_END("Group");
+            MATTER_TRACE_END("C", "Group");
         }
         {
             MATTER_TRACE_SCOPE("E", "Group");
@@ -82,13 +82,13 @@ void TestBasicTracing(nlTestSuite * inSuite, void * inContext)
         "BEGIN:Group:B",
         "BEGIN:Group:C",
         "BEGIN:Group:D",
-        "END:Group",
+        "END:Group:D",
         "INSTANT:Group:FOO",
-        "END:Group",
-        "END:Group",
+        "END:Group:C",
+        "END:Group:B",
         "BEGIN:Group:E",
-        "END:Group",
-        "END:Group",
+        "END:Group:E",
+        "END:Group:A",
     };
 
     NL_TEST_ASSERT(inSuite, backend.traces().size() == expected.size());
@@ -123,11 +123,11 @@ void TestMultipleBackends(nlTestSuite * inSuite, void * inContext)
         "BEGIN:G:1",
         "BEGIN:G:2",
         "BEGIN:G:3",
-        "END:G",
+        "END:G:3",
         "BEGIN:G:4",
-        "END:G",
-        "END:G",
-        "END:G",
+        "END:G:4",
+        "END:G:2",
+        "END:G:1",
     };
 
     NL_TEST_ASSERT(inSuite, b1.traces().size() == expected1.size());
@@ -136,10 +136,10 @@ void TestMultipleBackends(nlTestSuite * inSuite, void * inContext)
     std::vector<std::string> expected2 = {
         "BEGIN:G:2",
         "BEGIN:G:3",
-        "END:G",
+        "END:G:3",
         "BEGIN:G:4",
-        "END:G",
-        "END:G",
+        "END:G:4",
+        "END:G:2",
     };
 
     NL_TEST_ASSERT(inSuite, b2.traces().size() == expected2.size());
@@ -147,7 +147,7 @@ void TestMultipleBackends(nlTestSuite * inSuite, void * inContext)
 
     std::vector<std::string> expected3 = {
         "BEGIN:G:3",
-        "END:G",
+        "END:G:3",
     };
 
     NL_TEST_ASSERT(inSuite, b3.traces().size() == expected3.size());

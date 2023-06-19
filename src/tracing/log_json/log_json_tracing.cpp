@@ -118,10 +118,11 @@ void LogJsonBackend::TraceBegin(const char *label, const char *group)
     LogJsonValue(value);
 }
 
-void LogJsonBackend::TraceEnd(const char *group)
+void LogJsonBackend::TraceEnd(const char *label, const char *group)
 {
     Json::Value value;
     value["event"] = "TraceEnd";
+    value["label"] = label;
     value["group"] = group;
     LogJsonValue(value);
 }
