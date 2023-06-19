@@ -392,17 +392,19 @@ void SPIDRV_SetBaudrate(uint32_t baudrate)
     USART_InitSync(MY_USART, &usartInit);
 }
 
-void sl_wfx_host_spiflash_cs_assert(void)
+sl_status_t sl_wfx_host_spiflash_cs_assert(void)
 {
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    return SL_STATUS_OK;
 }
 
-void sl_wfx_host_spiflash_cs_deassert(void)
+sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
 {
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    return SL_STATUS_OK;
 }
 
-void sl_wfx_host_pre_bootloader_spi_transfer(void)
+sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     /*
@@ -410,53 +412,59 @@ void sl_wfx_host_pre_bootloader_spi_transfer(void)
      */
     SPIDRV_SetBaudrate(SL_SPIDRV_MX25_FLASH_BITRATE);
     sl_wfx_host_spiflash_cs_assert();
+    return SL_STATUS_OK;
 }
 
-void sl_wfx_host_post_bootloader_spi_transfer(void)
+sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 {
     /*
      * De-Assert CS pin for EXT SPI Flash
      */
     sl_wfx_host_spiflash_cs_deassert();
     xSemaphoreGive(spi_sem_sync_hdl);
+    return SL_STATUS_OK;
 }
 
-void sl_wfx_host_pre_lcd_spi_transfer(void)
+sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     SPIDRV_SetBaudrate(SL_SPIDRV_LCD_BITRATE);
     /*LCD CS is handled as part of LCD gsdk*/
+    return SL_STATUS_OK;
 }
 
-void sl_wfx_host_post_lcd_spi_transfer(void)
+sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 {
     xSemaphoreGive(spi_sem_sync_hdl);
+    return SL_STATUS_OK;
 }
 
-void sl_wfx_host_pre_uart_transfer(void)
+sl_status_t sl_wfx_host_pre_uart_transfer(void)
 {
     if (spi_sem_sync_hdl == NULL)
     {
         // UART is initialized before host SPI interface
         // spi_sem_sync_hdl will not be initalized during execution
         GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
-        return;
+        return SL_STATUS_OK;
     }
     sl_wfx_disable_irq();
     sl_wfx_host_disable_platform_interrupt();
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
+    return SL_STATUS_OK;
 }
 
-void sl_wfx_host_post_uart_transfer(void)
+sl_status_t sl_wfx_host_post_uart_transfer(void)
 {
     if (spi_sem_sync_hdl == NULL)
     {
-        return;
+        return SL_STATUS_OK;
     }
     GPIO_PinModeSet(gpioPortA, 8, gpioModeInputPull, 1);
     xSemaphoreGive(spi_sem_sync_hdl);
     sl_wfx_host_enable_platform_interrupt();
     sl_wfx_enable_irq();
+    return SL_STATUS_OK;
 }
 #endif /* EFR32MG24 */

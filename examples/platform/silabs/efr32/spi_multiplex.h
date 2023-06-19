@@ -91,77 +91,77 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void);
 #endif /* RS911X_WIFI */
 
 /****************************************************************************
- * @fn  void sl_wfx_host_spiflash_cs_assert()
+ * @fn  sl_status_t sl_wfx_host_spiflash_cs_assert()
  * @brief
  *     Assert SPI flash chip select.
  * @param[in] None
- * @return returns void
+ * @return returns SL_STATUS_OK
  *****************************************************************************/
-void sl_wfx_host_spiflash_cs_assert(void);
+sl_status_t sl_wfx_host_spiflash_cs_assert(void);
 
 /****************************************************************************
- * @fn  void sl_wfx_host_spiflash_cs_deassert()
+ * @fn  sl_status_t sl_wfx_host_spiflash_cs_deassert()
  * @brief
  *     De-Assert SPI flash chip select.
  * @param[in] None
- * @return returns void
+ * @return returns SL_STATUS_OK
  *****************************************************************************/
-void sl_wfx_host_spiflash_cs_deassert(void);
+sl_status_t sl_wfx_host_spiflash_cs_deassert(void);
 
 /****************************************************************************
- * @fn  void sl_wfx_host_pre_bootloader_spi_transfer()
+ * @fn  sl_status_t sl_wfx_host_pre_bootloader_spi_transfer()
  * @brief
  *     Take a semaphore and controlling CS pin for EXP header and SPI flash
  * @param[in] None
- * @return returns void
+ * @return SL_STATUS_OK
  *****************************************************************************/
-void sl_wfx_host_pre_bootloader_spi_transfer(void);
+sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void);
 
 /****************************************************************************
- * @fn  void sl_wfx_host_post_bootloader_spi_transfer()
+ * @fn  sl_status_t sl_wfx_host_post_bootloader_spi_transfer()
  * @brief
  *     De-Assert EXT SPI flash CS pin and release semaphore
  * @param[in] None
- * @return returns void
+ * @return SL_STATUS_OK
  *****************************************************************************/
-void sl_wfx_host_post_bootloader_spi_transfer(void);
+sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void);
 
 /****************************************************************************
- * @fn  void sl_wfx_host_pre_lcd_spi_transfer()
+ * @fn  sl_status_t sl_wfx_host_pre_lcd_spi_transfer()
  * @brief
  *     Take a semaphore and setting LCD baudrate
  * @param[in] None
- * @return returns void
+ * @return SL_STATUS_OK
  *****************************************************************************/
-void sl_wfx_host_pre_lcd_spi_transfer(void);
+sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void);
 
 /****************************************************************************
- * @fn  void sl_wfx_host_post_lcd_spi_transfer()
+ * @fn  sl_status_t sl_wfx_host_post_lcd_spi_transfer()
  * @brief
  *     Release semaphore
  * @param[in] None
- * @return returns void
+ * @return SL_STATUS_OK
  *****************************************************************************/
-void sl_wfx_host_post_lcd_spi_transfer(void);
+sl_status_t sl_wfx_host_post_lcd_spi_transfer(void);
 
 #if defined(WF200_WIFI)
 /****************************************************************************
- * @fn  void sl_wfx_host_pre_uart_transfer()
+ * @fn  sl_status_t sl_wfx_host_pre_uart_transfer()
  * @brief
  *     Take a semaphore and setting GPIO, disable IRQ
  * @param[in] None
- * @return returns void
+ * @return SL_STATUS_OK
  *****************************************************************************/
-void sl_wfx_host_pre_uart_transfer(void);
+sl_status_t sl_wfx_host_pre_uart_transfer(void);
 
 /****************************************************************************
- * @fn  void sl_wfx_host_post_uart_transfer()
+ * @fn  sl_status_t sl_wfx_host_post_uart_transfer()
  * @brief
  *     Reset GPIO, enabled IRQ, release semaphore
  * @param[in] None
- * @return returns void
+ * @return SL_STATUS_OK
  *****************************************************************************/
-void sl_wfx_host_post_uart_transfer(void);
+sl_status_t sl_wfx_host_post_uart_transfer(void);
 #endif /* WF200_WIFI */
 
 #ifdef __cplusplus

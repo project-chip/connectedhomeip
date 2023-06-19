@@ -193,7 +193,11 @@ sl_status_t sl_wfx_host_spi_cs_assert(void)
 
     if (!spi_enabled) // Reduce SPIDRV_Init
     {
-        SPIDRV_Init(SL_SPIDRV_HANDLE, &sl_spidrv_eusart_init_exp);
+        if (ECODE_OK != SPIDRV_Init(SL_SPIDRV_HANDLE, &sl_spidrv_eusart_init_exp))
+        {
+            xSemaphoreGive(spi_sem_sync_hdl);
+            return SL_STATUS_FAIL;
+        }
         spi_enabled = true;
     }
     GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
@@ -204,7 +208,11 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
 {
     if (spi_enabled)
     {
-        SPIDRV_DeInit(SL_SPIDRV_HANDLE);
+        if (ECODE_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
+        {
+            xSemaphoreGive(spi_sem_sync_hdl);
+            return SL_STATUS_FAIL;
+        }
         spi_enabled = false;
     }
     GPIO_PinOutSet(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);
@@ -213,23 +221,28 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
     return SL_STATUS_OK;
 }
 
-void sl_wfx_host_spiflash_cs_assert(void)
+sl_status_t sl_wfx_host_spiflash_cs_assert(void)
 {
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    return SL_STATUS_OK;
 }
 
-void sl_wfx_host_spiflash_cs_deassert(void)
+sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
 {
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
+    return SL_STATUS_OK;
 }
 
-// TODO: (MATTER-1904) Add logic to return from function and implement error checking
-void sl_wfx_host_pre_bootloader_spi_transfer(void)
+sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     if (spi_enabled)
     {
-        SPIDRV_DeInit(SL_SPIDRV_HANDLE);
+        if (ECODE_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
+        {
+            xSemaphoreGive(spi_sem_sync_hdl);
+            return SL_STATUS_FAIL;
+        }
         spi_enabled = false;
     }
     // bootloader_init takes care of SPIDRV_Init()
@@ -237,38 +250,50 @@ void sl_wfx_host_pre_bootloader_spi_transfer(void)
     if (status != BOOTLOADER_OK)
     {
         SILABS_LOG("bootloader_init error: %x", status);
-        return;
+        xSemaphoreGive(spi_sem_sync_hdl);
+        return SL_STATUS_FAIL;
     }
     sl_wfx_host_spiflash_cs_assert();
+    return SL_STATUS_OK;
 }
 
-void sl_wfx_host_post_bootloader_spi_transfer(void)
+sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 {
     // bootloader_deinit will do USART disable
     int32_t status = bootloader_deinit();
     if (status != BOOTLOADER_OK)
     {
         SILABS_LOG("bootloader_deinit error: %x", status);
-        return;
+        xSemaphoreGive(spi_sem_sync_hdl);
+        return SL_STATUS_FAIL;
     }
     GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
     sl_wfx_host_spiflash_cs_deassert();
     xSemaphoreGive(spi_sem_sync_hdl);
 }
 
-void sl_wfx_host_pre_lcd_spi_transfer(void)
+sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     if (spi_enabled)
     {
-        SPIDRV_DeInit(SL_SPIDRV_HANDLE);
+        if (ECODE_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
+        {
+            xSemaphoreGive(spi_sem_sync_hdl);
+            return SL_STATUS_FAIL;
+        }
         spi_enabled = false;
     }
     // sl_memlcd_refresh takes care of SPIDRV_Init()
-    sl_memlcd_refresh(sl_memlcd_get());
+    if(SL_STATUS_OK != sl_memlcd_refresh(sl_memlcd_get())
+    {
+        xSemaphoreGive(spi_sem_sync_hdl);
+        return SL_STATUS_FAIL;
+    }
+    return SL_STATUS_OK;
 }
 
-void sl_wfx_host_post_lcd_spi_transfer(void)
+sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 {
     USART_Enable(SL_MEMLCD_SPI_PERIPHERAL, usartDisable);
     CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);

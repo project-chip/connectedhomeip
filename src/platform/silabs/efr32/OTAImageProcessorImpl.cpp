@@ -171,11 +171,21 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
             writeBufOffset++;
         }
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-        sl_wfx_host_pre_bootloader_spi_transfer();
+        err = sl_wfx_host_pre_bootloader_spi_transfer();
+        if (err != SL_STATUS_OK)
+        {
+            ChipLogError(SoftwareUpdate, "sl_wfx_host_pre_bootloader_spi_transfer() error: %ld", err);
+            return;
+        }
 #endif
         CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, kAlignmentBytes);)
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-        sl_wfx_host_post_bootloader_spi_transfer();
+        err = sl_wfx_host_post_bootloader_spi_transfer();
+        if (err != SL_STATUS_OK)
+        {
+            ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
+            return;
+        }
 #endif
         if (err)
         {
@@ -199,7 +209,12 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     // Force KVS to store pending keys such as data from StoreCurrentUpdateInfo()
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    sl_wfx_host_pre_bootloader_spi_transfer();
+    err = sl_wfx_host_pre_bootloader_spi_transfer();
+    if (err != SL_STATUS_OK)
+    {
+        ChipLogError(SoftwareUpdate, "sl_wfx_host_pre_bootloader_spi_transfer() error: %ld", err);
+        return;
+    }
 #endif
     CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
     if (err != SL_BOOTLOADER_OK)
@@ -208,7 +223,12 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-        sl_wfx_host_post_bootloader_spi_transfer();
+        err = sl_wfx_host_post_bootloader_spi_transfer();
+        if (err != SL_STATUS_OK)
+        {
+            ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
+            return;
+        }
 #endif
         return;
     }
@@ -220,13 +240,23 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         // Call the OTARequestor API to reset the state
         GetRequestorInstance()->CancelImageUpdate();
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-        sl_wfx_host_post_bootloader_spi_transfer();
+        err = sl_wfx_host_post_bootloader_spi_transfer();
+        if (err != SL_STATUS_OK)
+        {
+            ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
+            return;
+        }
 #endif
         return;
     }
 
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-    sl_wfx_host_post_bootloader_spi_transfer();
+    err = sl_wfx_host_post_bootloader_spi_transfer();
+    if (err != SL_STATUS_OK)
+    {
+        ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
+        return;
+    }
 #endif
     // This reboots the device
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
@@ -281,11 +311,21 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         {
             writeBufOffset = 0;
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-            sl_wfx_host_pre_bootloader_spi_transfer();
+            err = sl_wfx_host_pre_bootloader_spi_transfer();
+            if (err != SL_STATUS_OK)
+            {
+                ChipLogError(SoftwareUpdate, "sl_wfx_host_pre_bootloader_spi_transfer() error: %ld", err);
+                return;
+            }
 #endif
             CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, kAlignmentBytes);)
 #if (defined(EFR32MG24) && defined(SL_WIFI))
-            sl_wfx_host_post_bootloader_spi_transfer();
+            err = sl_wfx_host_post_bootloader_spi_transfer();
+            if (err != SL_STATUS_OK)
+            {
+                ChipLogError(SoftwareUpdate, "sl_wfx_host_post_bootloader_spi_transfer() error: %ld", err);
+                return;
+            }
 #endif
             if (err)
             {
