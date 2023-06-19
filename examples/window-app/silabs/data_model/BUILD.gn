@@ -12,16 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
 
-# The location of the build configuration file.
-buildconfig = "${build_root}/config/BUILDCONFIG.gn"
+chip_data_model("silabs-window") {
+  zap_file = "window-app.zap"
 
-# CHIP uses angle bracket includes.
-check_system_includes = true
-
-default_args = {
-  target_cpu = "arm"
-  target_os = "freertos"
-  import("//args.gni")
+  zap_pregenerated_dir = "${chip_root}/zzz_generated/window-app/zap-generated"
+  is_server = true
 }
