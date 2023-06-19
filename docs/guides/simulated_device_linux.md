@@ -136,7 +136,7 @@ new code is generated.
 7. Then, the code will be generated using ZAP.
 
     ```
-    ./scripts/tools/zap/generate.py examples/placeholder/linux/apps/app1/config.zap -t examples/placeholder/templates/templates.json -o zzz_generated/placeholder/app1/zap-generated
+    ./scripts/tools/zap/generate.py examples/placeholder/linux/apps/app1/config.zap -t examples/placeholder/linux/apps/app1/templates/templates.json -o zzz_generated/placeholder/app1/zap-generated
     ```
 
     The following command can be used to generate and compile:
