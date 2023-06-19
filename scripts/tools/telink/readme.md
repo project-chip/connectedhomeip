@@ -35,7 +35,8 @@ tool.
 
 ```shell
 cd path/to/connectedhomeip/scripts/tools/telink/
-python3 -m pip install -r requirements.txt
+python3 -m pip install -r requirements.build.txt
+python3 -m pip install -r requirements.telink.txt
 ```
 
 ## Usage

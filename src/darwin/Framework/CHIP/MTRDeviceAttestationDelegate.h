@@ -28,14 +28,28 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * The vendor ID for the device from the Device Attestation Certificate. May be nil only if attestation was unsucessful.
+ * The vendor ID from the Device Attestation Certificate. May be nil only if attestation was unsuccessful.
  */
 @property (nonatomic, readonly, nullable) NSNumber * vendorID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
- * The product ID for the device from the Device Attestation Certificate. May be nil only if attestation was unsucessful.
+ * The product ID from the Device Attestation Certificate. May be nil only if attestation was unsuccessful.
  */
 @property (nonatomic, readonly, nullable) NSNumber * productID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * The vendor ID value from the device's Basic Information cluster that was used
+ * for device attestation.  If attestation succeeds, this must match the vendor
+ * ID from the certification declaration.
+ */
+@property (nonatomic, readonly) NSNumber * basicInformationVendorID MTR_NEWLY_AVAILABLE;
+
+/**
+ * The product ID value from the device's Basic Information cluster that was
+ * used for device attestation.  If attestation succeeds, this must match one of
+ * the product IDs from the certification declaration.
+ */
+@property (nonatomic, readonly) NSNumber * basicInformationProductID MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, readonly) MTRCertificateDERBytes dacCertificate;
 @property (nonatomic, readonly) MTRCertificateDERBytes dacPAICertificate;

@@ -35,9 +35,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-MTR_NEWLY_DEPRECATED("Please use MTRModeSelectClusterModeTagStruct")
-@interface MTRModeSelectClusterSemanticTagStruct : MTRModeSelectClusterModeTagStruct
-@end
-
 NS_ASSUME_NONNULL_END

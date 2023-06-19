@@ -22,10 +22,10 @@
 #include <string>
 #include <vector>
 
-#include "transport/TraceMessage.h"
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <transport/TraceMessage.h>
 
 // For `s` std::string literal suffix
 using namespace std::string_literals;
@@ -33,6 +33,7 @@ using namespace std::string_literals;
 namespace chip {
 namespace trace {
 
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 namespace {
 
 // Handles the output from the trace handlers.
@@ -198,7 +199,7 @@ std::string PayloadHeaderToJson(const PayloadHeader * payloadHeader)
 
     std::string jsonBody;
 
-    uint8_t exchangeFlags = payloadHeader->GetExhangeFlags();
+    uint8_t exchangeFlags = payloadHeader->GetExchangeFlags();
     jsonBody += AsFirstJsonKey("exchange_flags", std::to_string(exchangeFlags));
 
     uint16_t exchangeId = payloadHeader->GetExchangeID();
@@ -221,22 +222,6 @@ std::string PayloadHeaderToJson(const PayloadHeader * payloadHeader)
     {
         jsonBody += AsNextJsonKey("acknowledged_msg_counter", std::to_string(acknowledgedMessageCounter.Value()));
     }
-
-    return jsonBody;
-}
-
-std::string PreparedSecureMessageDataToJson(const TracePreparedSecureMessageData * data, const std::string & peerAddressKey)
-{
-    const System::PacketBuffer * packetBuffer = data->packetBuffer->operator->();
-    std::string jsonBody                      = "{";
-    jsonBody += AsFirstJsonKey(peerAddressKey, AsJsonString(data->peerAddress));
-    jsonBody += ", ";
-    jsonBody += AsFirstJsonKey("payload_size", std::to_string(packetBuffer->DataLength()));
-    jsonBody += ", ";
-    jsonBody += AsFirstJsonKey("payload_hex", AsJsonHexString(packetBuffer->Start(), packetBuffer->DataLength()));
-    jsonBody += ", ";
-    jsonBody += AsFirstJsonKey("buffer_ptr", std::to_string(reinterpret_cast<std::uintptr_t>(packetBuffer)));
-    jsonBody += "}";
 
     return jsonBody;
 }
@@ -289,41 +274,9 @@ void SecureMessageReceivedHandler(const TraceSecureMessageReceivedData * eventDa
     // Note that `eventData->session` is currently ignored.
 }
 
-void PreparedMessageSentHandler(const TracePreparedSecureMessageData * eventData)
-{
-    if (!gTraceOutputs.HasStreamAvailable())
-    {
-        return;
-    }
-
-    gTraceOutputs.StartEvent(std::string{ kTraceMessageEvent } + "." + kTracePreparedMessageSentDataFormat);
-    gTraceOutputs.AddField("json", PreparedSecureMessageDataToJson(eventData, "destination"));
-    gTraceOutputs.FinishEvent();
-}
-
-void PreparedMessageReceivedHandler(const TracePreparedSecureMessageData * eventData)
-{
-    if (!gTraceOutputs.HasStreamAvailable())
-    {
-        return;
-    }
-
-    gTraceOutputs.StartEvent(std::string{ kTraceMessageEvent } + "." + kTracePreparedMessageReceivedDataFormat);
-    gTraceOutputs.AddField("json", PreparedSecureMessageDataToJson(eventData, "source"));
-    gTraceOutputs.FinishEvent();
-}
-
 void TraceHandler(const char * type, const void * data, size_t size)
 {
-    if ((std::string{ type } == kTracePreparedMessageReceivedDataFormat) && (size == sizeof(TracePreparedSecureMessageData)))
-    {
-        PreparedMessageReceivedHandler(reinterpret_cast<const TracePreparedSecureMessageData *>(data));
-    }
-    else if ((std::string{ type } == kTracePreparedMessageSentDataFormat) && (size == sizeof(TracePreparedSecureMessageData)))
-    {
-        PreparedMessageSentHandler(reinterpret_cast<const TracePreparedSecureMessageData *>(data));
-    }
-    else if ((std::string{ type } == kTraceMessageSentDataFormat) && (size == sizeof(TraceSecureMessageSentData)))
+    if ((std::string{ type } == kTraceMessageSentDataFormat) && (size == sizeof(TraceSecureMessageSentData)))
     {
         SecureMessageSentHandler(reinterpret_cast<const TraceSecureMessageSentData *>(data));
     }
@@ -349,6 +302,12 @@ void DeInitTrace()
 {
     gTraceOutputs.UnregisterAllStreams();
 }
+
+#else
+void AddTraceStream(TraceStream *) {}
+void InitTrace() {}
+void DeInitTrace() {}
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 } // namespace trace
 } // namespace chip

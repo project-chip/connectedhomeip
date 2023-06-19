@@ -68,8 +68,6 @@ jobs:
                         - '**/tests/**'
                       shell:
                         - 'examples/shell/nrfconnect/**'
-                      pigweed-app:
-                        - 'examples/pigweed-app/nrfconnect/**'
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
               env:
@@ -148,15 +146,6 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 shell \
                     examples/shell/nrfconnect/build/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-            - name: Build example nRF Connect SDK Pigweed on nRF52840 DK
-              if: github.event_name == 'push' || steps.changed_paths.outputs.pigweed-app == 'true'
-              timeout-minutes: 15
-              run: |
-                  scripts/examples/nrfconnect_example.sh pigweed-app nrf52840dk_nrf52840
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nrfconnect nrf52840dk_nrf52840 pigweed-app \
-                    examples/pigweed-app/nrfconnect/build/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Pump App on nRF52840 DK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'

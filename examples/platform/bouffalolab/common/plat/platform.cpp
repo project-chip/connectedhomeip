@@ -30,7 +30,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <route_hook/bl_route_hook.h>
 #endif
-#include <PlatformManagerImpl.h>
+#include <platform/bouffalolab/common/PlatformManagerImpl.h>
 
 #if HEAP_MONITORING
 #include <MemMonitoring.h>
@@ -38,9 +38,9 @@
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
 #include <utils_list.h>
 #endif
 

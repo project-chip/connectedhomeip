@@ -22,6 +22,8 @@
 #include <controller/CHIPCluster.h>
 #include <functional>
 
+#include <app-common/zap-generated/cluster-objects.h>
+
 // COMMAND CLASSES
 class PlayCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Play::Type,
                                             chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>

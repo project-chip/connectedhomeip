@@ -35,7 +35,7 @@
 #define WIFI_STA_DISCONNECT_DELAY (pdMS_TO_TICKS(200))
 
 using namespace ::chip;
-//#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
@@ -425,4 +425,3 @@ bool BLWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip
-//#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

@@ -201,11 +201,6 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterWasherControls ()
-@property (nonatomic, readonly) uint16_t endpoint;
-@property (nonatomic, readonly) MTRDevice * device;
-@end
-
 @interface MTRClusterTemperatureControl ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
@@ -227,6 +222,11 @@
 @end
 
 @interface MTRClusterOperationalState ()
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterRVCOperationalState ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
