@@ -31,6 +31,12 @@ class Backend : public ::chip::IntrusiveListNodeBase<>
 public:
     virtual ~Backend() = default;
 
+    /// Guaranteed to be called before registering
+    virtual void Open() {}
+
+    /// Guaranteed to be called after un-registering.
+    virtual void Close() {}
+
     /// Begin a trace for the specified scope.
     ///
     /// Scope WILL be completed by a corresponding TraceEnd call.

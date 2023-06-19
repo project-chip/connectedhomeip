@@ -30,6 +30,7 @@ IntrusiveList<Backend> gTracingBackends;
 void Register(Backend & backend)
 {
     assertChipStackLockedByCurrentThread();
+    backend.Open();
     gTracingBackends.PushBack(&backend);
 }
 
@@ -37,6 +38,7 @@ void Unregister(Backend & backend)
 {
     assertChipStackLockedByCurrentThread();
     gTracingBackends.Remove(&backend);
+    backend.Close();
 }
 
 #ifdef MATTER_TRACING_ENABLED
