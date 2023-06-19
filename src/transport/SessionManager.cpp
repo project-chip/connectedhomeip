@@ -40,9 +40,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
+#include <tracing/macros.h>
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/SecureMessageCodec.h>
+#include <transport/TracingStructs.h>
 #include <transport/TransportMgr.h>
 
 // Global object
@@ -178,6 +180,9 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         }
 
         // Trace before any encryption
+        MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kGroupMessage, &payloadHeader, &packetHeader,
+                                chip::ByteSpan(message->Start(), message->TotalLength()));
+
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
 
         Crypto::SymmetricKeyContext * keyContext =
@@ -213,6 +218,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             .SetSessionType(Header::SessionType::kUnicastSession);
 
         // Trace before any encryption
+        MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kSecureSession, &payloadHeader, &packetHeader,
+                                chip::ByteSpan(message->Start(), message->TotalLength()));
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
 
         CryptoContext::NonceStorage nonce;
@@ -244,6 +251,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         }
 
         // Trace after all headers are settled.
+        MATTER_LOG_MESSAGE_SEND(chip::Tracing::OutgoingMessageType::kUnauthenticated, &payloadHeader, &packetHeader,
+                                chip::ByteSpan(message->Start(), message->TotalLength()));
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, message->Start(), message->TotalLength());
 
         ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
@@ -641,11 +650,17 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
         // CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED.
         unsecuredSession->GetPeerMessageCounter().CommitUnencrypted(packetHeader.GetMessageCounter());
     }
-
     if (mCB != nullptr)
     {
+        MATTER_LOG_MESSAGE_RECEIVED(chip::Tracing::IncomingMessageType::kUnauthenticated, &payloadHeader, &packetHeader,
+                                    unsecuredSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()));
+
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, unsecuredSession, peerAddress, msg->Start(), msg->TotalLength());
         mCB->OnMessageReceived(packetHeader, payloadHeader, session, isDuplicate, std::move(msg));
+    }
+    else
+    {
+        ChipLogError(Inet, "Received UNSECURED message was not processed.");
     }
 }
 
@@ -751,8 +766,14 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
 
     if (mCB != nullptr)
     {
+        MATTER_LOG_MESSAGE_RECEIVED(chip::Tracing::IncomingMessageType::kSecureUnicast, &payloadHeader, &packetHeader,
+                                    secureSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()));
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, secureSession, peerAddress, msg->Start(), msg->TotalLength());
         mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), isDuplicate, std::move(msg));
+    }
+    else
+    {
+        ChipLogError(Inet, "Received SECURED message was not processed.");
     }
 }
 
@@ -958,9 +979,17 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
         // TODO : When MCSP is done, clean up session creation logic
         Transport::IncomingGroupSession groupSession(groupContext.group_id, groupContext.fabric_index,
                                                      packetHeaderCopy.GetSourceNodeId().Value());
+
+        MATTER_LOG_MESSAGE_RECEIVED(chip::Tracing::IncomingMessageType::kGroupMessage, &payloadHeader, &packetHeaderCopy,
+                                    &groupSession, &peerAddress, chip::ByteSpan(msg->Start(), msg->TotalLength()));
+
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeaderCopy, &groupSession, peerAddress, msg->Start(), msg->TotalLength());
         mCB->OnMessageReceived(packetHeaderCopy, payloadHeader, SessionHandle(groupSession),
                                SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
+    }
+    else
+    {
+        ChipLogError(Inet, "Received GROUP message was not processed.");
     }
 }
 

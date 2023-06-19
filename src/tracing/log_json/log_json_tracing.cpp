@@ -21,6 +21,7 @@
 #include <lib/address_resolve/TracingStructs.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
+#include <transport/TracingStructs.h>
 
 #include <json/json.h>
 
@@ -219,6 +220,63 @@ void LogJsonValue(Json::Value const & value)
     ChipLogProgress(Automation, "%s", output.str().c_str());
 }
 
+void DecodePayloadHeader(Json::Value & value, const PayloadHeader * payloadHeader)
+{
+
+    value["exchangeFlags"] = payloadHeader->GetExchangeFlags();
+    value["exchangeId"]    = payloadHeader->GetExchangeID();
+    value["protocolId"]    = payloadHeader->GetProtocolID().ToFullyQualifiedSpecForm();
+    value["messageType"]   = payloadHeader->GetMessageType();
+    value["initiator"]     = payloadHeader->IsInitiator();
+    value["needsAck"]      = payloadHeader->NeedsAck();
+
+    const Optional<uint32_t> & acknowledgedMessageCounter = payloadHeader->GetAckMessageCounter();
+    if (acknowledgedMessageCounter.HasValue())
+    {
+        value["ackMessageCounter"] = acknowledgedMessageCounter.Value();
+    }
+}
+
+void DecodePacketHeader(Json::Value & value, const PacketHeader * packetHeader)
+{
+    value["msgCounter"]    = packetHeader->GetMessageCounter();
+    value["sessionId"]     = packetHeader->GetSessionId();
+    value["flags"]         = packetHeader->GetMessageFlags();
+    value["securityFlags"] = packetHeader->GetSecurityFlags();
+
+    {
+        const Optional<NodeId> & nodeId = packetHeader->GetSourceNodeId();
+        if (nodeId.HasValue())
+        {
+            value["sourceNodeId"] = nodeId.Value();
+        }
+    }
+
+    {
+        const Optional<NodeId> & nodeId = packetHeader->GetDestinationNodeId();
+        if (nodeId.HasValue())
+        {
+            value["destinationNodeId"] = nodeId.Value();
+        }
+    }
+
+    {
+        const Optional<GroupId> & groupId = packetHeader->GetDestinationGroupId();
+        if (groupId.HasValue())
+        {
+            value["groupId"] = groupId.Value();
+        }
+    }
+}
+
+void DecodePayloadData(Json::Value & value, chip::ByteSpan payload)
+{
+    value["payloadSize"] = static_cast<Json::Value::UInt>(payload.size());
+
+    // TODO: a decode would be useful however it likely requires more decode
+    //       metadata
+}
+
 } // namespace
 
 void LogJsonBackend::TraceBegin(Scope scope)
@@ -245,17 +303,54 @@ void LogJsonBackend::TraceInstant(Instant instant)
     LogJsonValue(value);
 }
 
-void LogJsonBackend::LogMessageSend(MessageSendInfo &)
+void LogJsonBackend::LogMessageSend(MessageSendInfo & info)
 {
     Json::Value value;
-    value["TODO"] = "LogMessageSend";
+    value["event"] = "MessageSend";
+
+    switch (info.messageType)
+    {
+    case OutgoingMessageType::kGroupMessage:
+        value["messageType"] = "Group";
+        break;
+    case OutgoingMessageType::kSecureSession:
+        value["messageType"] = "Secure";
+        break;
+    case OutgoingMessageType::kUnauthenticated:
+        value["messageType"] = "Unauthenticated";
+        break;
+    }
+
+    DecodePayloadHeader(value["payloadHeader"], info.payloadHeader);
+    DecodePacketHeader(value["packetHeader"], info.packetHeader);
+    DecodePayloadData(value["payload"], info.payload);
+
     LogJsonValue(value);
 }
 
-void LogJsonBackend::LogMessageReceived(MessageReceiveInfo &)
+void LogJsonBackend::LogMessageReceived(MessageReceivedInfo & info)
 {
     Json::Value value;
-    value["TODO"] = "LogMessageReceived";
+
+    value["event"] = "MessageReceived";
+
+    switch (info.messageType)
+    {
+    case IncomingMessageType::kGroupMessage:
+        value["messageType"] = "Group";
+        break;
+    case IncomingMessageType::kSecureUnicast:
+        value["messageType"] = "Secure";
+        break;
+    case IncomingMessageType::kUnauthenticated:
+        value["messageType"] = "Unauthenticated";
+        break;
+    }
+
+    DecodePayloadHeader(value["payloadHeader"], info.payloadHeader);
+    DecodePacketHeader(value["packetHeader"], info.packetHeader);
+    DecodePayloadData(value["payload"], info.payload);
+
     LogJsonValue(value);
 }
 
