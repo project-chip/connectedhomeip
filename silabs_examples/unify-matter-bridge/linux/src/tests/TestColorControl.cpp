@@ -579,9 +579,10 @@ static void TestColorControlCommandStepHue(nlTestSuite * sSuite, void * apContex
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     Clusters::ColorControl::Commands::StepHue::Type request;
+    request.stepMode = chip::app::Clusters::ColorControl::HueStepMode::kUp;
     CHIP_ERROR err = ctx.command_test<Clusters::ColorControl::Commands::StepHue::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/ColorControl/Commands/StepHue",
-        R"({"OptionsMask":0,"OptionsOverride":0,"StepMode":"{}","StepSize":0,"TransitionTime":0})", request);
+        R"({"OptionsMask":0,"OptionsOverride":0,"StepMode":"Up","StepSize":0,"TransitionTime":0})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
@@ -609,9 +610,10 @@ static void TestColorControlCommandStepSaturation(nlTestSuite * sSuite, void * a
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     Clusters::ColorControl::Commands::StepSaturation::Type request;
+    request.stepMode = chip::app::Clusters::ColorControl::SaturationStepMode::kUp;
     CHIP_ERROR err = ctx.command_test<Clusters::ColorControl::Commands::StepSaturation::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/ColorControl/Commands/StepSaturation",
-        R"({"OptionsMask":0,"OptionsOverride":0,"StepMode":"{}","StepSize":0,"TransitionTime":0})", request);
+        R"({"OptionsMask":0,"OptionsOverride":0,"StepMode":"Up","StepSize":0,"TransitionTime":0})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
@@ -689,9 +691,10 @@ static void TestColorControlCommandEnhancedStepHue(nlTestSuite * sSuite, void * 
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     Clusters::ColorControl::Commands::EnhancedStepHue::Type request;
+    request.stepMode = chip::app::Clusters::ColorControl::HueStepMode::kUp;
     CHIP_ERROR err = ctx.command_test<Clusters::ColorControl::Commands::EnhancedStepHue::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/ColorControl/Commands/EnhancedStepHue",
-        R"({"OptionsMask":0,"OptionsOverride":0,"StepMode":"{}","StepSize":0,"TransitionTime":0})", request);
+        R"({"OptionsMask":0,"OptionsOverride":0,"StepMode":"Up","StepSize":0,"TransitionTime":0})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
@@ -741,9 +744,10 @@ static void TestColorControlCommandStepColorTemperature(nlTestSuite * sSuite, vo
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     Clusters::ColorControl::Commands::StepColorTemperature::Type request;
+    request.stepMode = chip::app::Clusters::ColorControl::HueStepMode::kUp;
     CHIP_ERROR err = ctx.command_test<Clusters::ColorControl::Commands::StepColorTemperature::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/ColorControl/Commands/StepColorTemperature",
-        R"({"ColorTemperatureMaximumMireds":0,"ColorTemperatureMinimumMireds":0,"OptionsMask":0,"OptionsOverride":0,"StepMode":"{}","StepSize":0,"TransitionTime":0})",
+        R"({"ColorTemperatureMaximumMireds":0,"ColorTemperatureMinimumMireds":0,"OptionsMask":0,"OptionsOverride":0,"StepMode":"Up","StepSize":0,"TransitionTime":0})",
         request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }

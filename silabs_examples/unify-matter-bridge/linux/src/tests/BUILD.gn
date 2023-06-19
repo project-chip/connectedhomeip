@@ -47,16 +47,13 @@ chip_test_suite("tests") {
     "TestClusterInteractor.cpp",
     "TestClusterTranslator.cpp",
     "TestDeviceMapper.cpp",
-    # TODO Fix test and renable 
-    # (../scripts/run_tests.sh: line 35: 7421 Segmentation fault (core dumped) $testExecutable &> /dev/null)
-    # "TestClusterEmulator.cpp",
+    "TestClusterEmulator.cpp",
     "TestExample.cpp",
     "TestLevelControl.cpp",
     "TestGroupTranslator.cpp",
     "TestGroupCommandTranslator.cpp",
     "TestCli.cpp",
-    # TODO Fix test and renable when possible
-    #"TestColorControl.cpp",
+    "TestColorControl.cpp",
     "TestNodeStateMonitor.cpp",
     "TestOnOff.cpp",
     "TestOnOffCommandsHandler.cpp",
