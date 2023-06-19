@@ -1962,6 +1962,7 @@ static void TestX509_VerifyAttestationCertificateFormat(nlTestSuite * inSuite, v
         {  ByteSpan{kPaiPathLenMissing},                  Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
         {  ByteSpan{kPaiPathLen1},                        Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
         {  ByteSpan{kPaaPathLen2},                        Crypto::AttestationCertType::kPAA, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kWrongPathLenFormat},                 Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
     };
     // clang-format on
 
