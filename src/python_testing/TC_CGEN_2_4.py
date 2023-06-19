@@ -49,11 +49,11 @@ class TC_CGEN_2_4(MatterBaseTest):
         # This will run the commissioning up to the point where stage x is run and the
         # response is sent before the test commissioner simulates a failure
         self.th2.SetTestCommissionerPrematureCompleteAfter(stage)
-        success, errcode = self.th2.CommissionOnNetwork(
+        errcode = self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=pin,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminators[0])
-        logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(success, errcode))
-        asserts.assert_false(success, 'Commissioning complete did not error as expected')
+        logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+        asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
         asserts.assert_true(errcode.sdk_part == expectedErrorPart, 'Unexpected error type returned from CommissioningComplete')
         asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
@@ -89,10 +89,10 @@ class TC_CGEN_2_4(MatterBaseTest):
 
         logging.info('Step 16 - TH2 fully commissions the DUT')
         self.th2.ResetTestCommissioner()
-        success, errcode = self.th2.CommissionOnNetwork(
+        errcode = self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=pin,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminators[0])
-        logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(success, errcode))
+        logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
 
         logging.info('Step 17 - TH1 sends an arm failsafe')
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
