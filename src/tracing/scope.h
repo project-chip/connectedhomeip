@@ -80,5 +80,3 @@ private:
 #define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
 #endif
-
-
