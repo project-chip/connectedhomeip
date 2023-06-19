@@ -43,6 +43,7 @@ PerfettoBackend & PerfettoBackend::Init()
     args.backends |= perfetto::kSystemBackend;
 
     perfetto::Tracing::Initialize(args);
+    perfetto::TrackEvent::Register();
 
     return *this;
 }
