@@ -360,6 +360,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
 
     if (dataset.IsCommissioned())
     {
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(kAttachNetworkTimeoutSeconds), OnConnectNetworkTimeout,
+                                              this);
         ReturnErrorOnFailure(Impl()->SetThreadEnabled(true));
         mpConnectCallback = callback;
     }
@@ -368,16 +370,37 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinished()
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::CancelOngoingOperations(void)
 {
     if (mpConnectCallback != nullptr)
     {
-        DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-            VerifyOrReturn(mpConnectCallback != nullptr);
-            mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
-            mpConnectCallback = nullptr;
-        });
+        Impl()->SetThreadEnabled(false);
+        OnAttachEnd(NetworkCommissioning::Status::kOtherConnectionFailure);
     }
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnConnectNetworkTimeout(System::Layer * systemLayer, void * appState)
+{
+    DeviceLayer::SystemLayer().ScheduleLambda(
+        []() { ThreadStackMgrImpl().OnAttachEnd(NetworkCommissioning::Status::kNetworkNotFound); });
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinished()
+{
+    DeviceLayer::SystemLayer().ScheduleLambda([]() { ThreadStackMgrImpl().OnAttachEnd(NetworkCommissioning::Status::kSuccess); });
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnAttachEnd(NetworkCommissioning::Status status)
+{
+    VerifyOrReturn(mpConnectCallback != nullptr);
+
+    // CancelOnGoingOperations will be called when the upper driver is invalidating the callback. So the reference to the callback
+    // is expected to be valid here.
+    mpConnectCallback->OnResult(status, CharSpan(), 0);
+    mpConnectCallback = nullptr;
 }
 
 template <class ImplClass>
