@@ -17,10 +17,10 @@
  */
 #pragma once
 
-#define _MATTER_TRACE_DISABLE(...)              \
-    do                                          \
-        {                                       \
-        } while (false)
+#define _MATTER_TRACE_DISABLE(...)                                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (false)
 
 #ifndef MATTER_TRACING_ENABLED
 

@@ -59,9 +59,9 @@ private:
 // Internal calls, that will delegate to appropriate backends as needed
 namespace Internal {
 
-void Begin(const char *label, const char *group);
-void End(const char *label, const char *group);
-void Instant(const char *label, const char *group);
+void Begin(const char * label, const char * group);
+void End(const char * label, const char * group);
+void Instant(const char * label, const char * group);
 
 void LogMessageSend(::chip::Tracing::MessageSendInfo & info);
 void LogMessageReceived(::chip::Tracing::MessageReceivedInfo & info);

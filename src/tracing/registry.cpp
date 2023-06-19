@@ -43,7 +43,7 @@ void Unregister(Backend & backend)
 
 namespace Internal {
 
-void Begin(const char *label, const char *group)
+void Begin(const char * label, const char * group)
 {
     for (auto & backend : gTracingBackends)
     {
@@ -51,7 +51,7 @@ void Begin(const char *label, const char *group)
     }
 }
 
-void End(const char *label, const char *group)
+void End(const char * label, const char * group)
 {
     for (auto & backend : gTracingBackends)
     {
@@ -59,7 +59,7 @@ void End(const char *label, const char *group)
     }
 }
 
-void Instant(const char *label, const char *group)
+void Instant(const char * label, const char * group)
 {
     for (auto & backend : gTracingBackends)
     {

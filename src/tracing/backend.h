@@ -34,7 +34,7 @@ public:
     /// Begin a trace for the specified scope.
     ///
     /// Scope WILL be completed by a corresponding TraceEnd call.
-    virtual void TraceBegin(const char *label, const char *group) {}
+    virtual void TraceBegin(const char * label, const char * group) {}
 
     /// Tracing end assumes completing a previously started scope with TraceBegin
     /// and nesting is assumed.
@@ -47,10 +47,10 @@ public:
     ///
     ///      TraceEnd("bar", "A")  // ends "BAR"
     ///    TraceEnd("foo", "A")    // ends "FOO"
-    virtual void TraceEnd(const char *label, const char *group) {}
+    virtual void TraceEnd(const char * label, const char * group) {}
 
     /// Trace a zero-sized event
-    virtual void TraceInstant(const char *label, const char *group) {}
+    virtual void TraceInstant(const char * label, const char * group) {}
 
     virtual void LogMessageSend(MessageSendInfo &) { TraceInstant("MessageSent", "Messaging"); }
     virtual void LogMessageReceived(MessageReceivedInfo &) { TraceInstant("MessageReceived", "Messaging"); }

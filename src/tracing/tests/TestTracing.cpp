@@ -21,8 +21,8 @@
 #include <nlunit-test.h>
 
 #include <algorithm>
-#include <vector>
 #include <string>
+#include <vector>
 
 using namespace chip;
 using namespace chip::Tracing;
@@ -37,15 +37,14 @@ public:
     const std::vector<std::string> & traces() const { return mTraces; }
 
     // Implementation
-    void TraceBegin(const char *label, const char *group) override {
-        mTraces.push_back(std::string("BEGIN:") + group + ":"+label);
+    void TraceBegin(const char * label, const char * group) override
+    {
+        mTraces.push_back(std::string("BEGIN:") + group + ":" + label);
     }
 
-    void TraceEnd(const char *label, const char *group) override {
-        mTraces.push_back(std::string("END:") + group + ":" + label);
-    }
+    void TraceEnd(const char * label, const char * group) override { mTraces.push_back(std::string("END:") + group + ":" + label); }
 
-    void TraceInstant(const char *label, const char *group) override
+    void TraceInstant(const char * label, const char * group) override
     {
         mTraces.push_back(std::string("INSTANT:") + group + ":" + label);
     }
@@ -78,17 +77,8 @@ void TestBasicTracing(nlTestSuite * inSuite, void * inContext)
     }
 
     std::vector<std::string> expected = {
-        "BEGIN:Group:A",
-        "BEGIN:Group:B",
-        "BEGIN:Group:C",
-        "BEGIN:Group:D",
-        "END:Group:D",
-        "INSTANT:Group:FOO",
-        "END:Group:C",
-        "END:Group:B",
-        "BEGIN:Group:E",
-        "END:Group:E",
-        "END:Group:A",
+        "BEGIN:Group:A", "BEGIN:Group:B", "BEGIN:Group:C", "BEGIN:Group:D", "END:Group:D", "INSTANT:Group:FOO",
+        "END:Group:C",   "END:Group:B",   "BEGIN:Group:E", "END:Group:E",   "END:Group:A",
     };
 
     NL_TEST_ASSERT(inSuite, backend.traces().size() == expected.size());
@@ -120,26 +110,14 @@ void TestMultipleBackends(nlTestSuite * inSuite, void * inContext)
     }
 
     std::vector<std::string> expected1 = {
-        "BEGIN:G:1",
-        "BEGIN:G:2",
-        "BEGIN:G:3",
-        "END:G:3",
-        "BEGIN:G:4",
-        "END:G:4",
-        "END:G:2",
-        "END:G:1",
+        "BEGIN:G:1", "BEGIN:G:2", "BEGIN:G:3", "END:G:3", "BEGIN:G:4", "END:G:4", "END:G:2", "END:G:1",
     };
 
     NL_TEST_ASSERT(inSuite, b1.traces().size() == expected1.size());
     NL_TEST_ASSERT(inSuite, std::equal(b1.traces().begin(), b1.traces().end(), expected1.begin(), expected1.end()));
 
     std::vector<std::string> expected2 = {
-        "BEGIN:G:2",
-        "BEGIN:G:3",
-        "END:G:3",
-        "BEGIN:G:4",
-        "END:G:4",
-        "END:G:2",
+        "BEGIN:G:2", "BEGIN:G:3", "END:G:3", "BEGIN:G:4", "END:G:4", "END:G:2",
     };
 
     NL_TEST_ASSERT(inSuite, b2.traces().size() == expected2.size());

@@ -108,8 +108,7 @@ void DecodePayloadData(Json::Value & value, chip::ByteSpan payload)
 
 } // namespace
 
-
-void LogJsonBackend::TraceBegin(const char *label, const char *group)
+void LogJsonBackend::TraceBegin(const char * label, const char * group)
 {
     Json::Value value;
     value["event"] = "TraceBegin";
@@ -118,7 +117,7 @@ void LogJsonBackend::TraceBegin(const char *label, const char *group)
     LogJsonValue(value);
 }
 
-void LogJsonBackend::TraceEnd(const char *label, const char *group)
+void LogJsonBackend::TraceEnd(const char * label, const char * group)
 {
     Json::Value value;
     value["event"] = "TraceEnd";
@@ -127,7 +126,7 @@ void LogJsonBackend::TraceEnd(const char *label, const char *group)
     LogJsonValue(value);
 }
 
-void LogJsonBackend::TraceInstant(const char *label, const char *group)
+void LogJsonBackend::TraceInstant(const char * label, const char * group)
 {
     Json::Value value;
     value["event"] = "TraceInstant";
