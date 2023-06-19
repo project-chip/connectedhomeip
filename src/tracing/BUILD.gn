@@ -21,7 +21,15 @@ config("tracing_enabled") {
   defines = [ "MATTER_TRACING_ENABLED" ]
 }
 
-static_library("tracing") {
+config("tracing_multiplexed") {
+  defines = [ "MATTER_TRACE_MULTIPLEXED" ]
+}
+
+config("tracing_none") {
+  defines = [ "MATTER_TRACE_NONE" ]
+}
+
+  static_library("tracing") {
   sources = [
     "backend.h",
     "log_declares.h",
@@ -29,12 +37,19 @@ static_library("tracing") {
     "registry.cpp",
     "registry.h",
     "scope.h",
-    "scopes.h",
   ]
 
   public_deps = [ "${chip_root}/src/lib/support" ]
 
   if (matter_enable_tracing_support) {
     public_configs = [ ":tracing_enabled" ]
+
+    if (matter_trace_config == "multiplexed") {
+      public_configs += [ ":tracing_multiplexed" ]
+    } else if (matter_trace_config == "none") {
+      public_configs += [ ":tracing_none" ]
+    } else {
+      public_configs += [ matter_trace_config ]
+    }
   }
 }

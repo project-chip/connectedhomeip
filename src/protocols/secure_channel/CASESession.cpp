@@ -436,7 +436,6 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
                                          Optional<ReliableMessageProtocolConfig> mrpLocalConfig)
 {
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::CASESession_EstablishSession);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Return early on error here, as we have not initialized any state yet
@@ -585,14 +584,13 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 CHIP_ERROR CASESession::SendSigma1()
 {
     MATTER_TRACE_EVENT_SCOPE("SendSigma1", "CASESession");
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::CASESession_SendSigma1);
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
-                                                  sizeof(uint16_t),            // initiatorSessionId,
-                                                  kSHA256_Hash_Length,         // destinationId
-                                                  kP256_PublicKey_Length,      // InitiatorEphPubKey,
-                                                  mrpParamsSize,               // initiatorMRPParams
-                                                  SessionResumptionStorage::kResumptionIdSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+                                                             sizeof(uint16_t),            // initiatorSessionId,
+                                                             kSHA256_Hash_Length,         // destinationId
+                                                             kP256_PublicKey_Length,      // InitiatorEphPubKey,
+                                                             mrpParamsSize,               // initiatorMRPParams
+                                                             SessionResumptionStorage::kResumptionIdSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R1;
@@ -692,7 +690,6 @@ CHIP_ERROR CASESession::SendSigma1()
 CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleSigma1_and_SendSigma2", "CASESession");
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::CASESession_HandleSigma1_and_SendSigma2);
     ReturnErrorOnFailure(HandleSigma1(std::move(msg)));
 
     return CHIP_NO_ERROR;
@@ -778,7 +775,6 @@ CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumpti
 CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleSigma1", "CASESession");
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::CASESession_HandleSigma1);
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
 
@@ -863,7 +859,6 @@ exit:
 CHIP_ERROR CASESession::SendSigma2Resume()
 {
     MATTER_TRACE_EVENT_SCOPE("SendSigma2Resume", "CASESession");
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::CASESession_SendSigma2Resume);
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     size_t max_sigma2_resume_data_len = TLV::EstimateStructOverhead(
         SessionResumptionStorage::kResumptionIdSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, sizeof(uint16_t), mrpParamsSize);
@@ -918,7 +913,6 @@ CHIP_ERROR CASESession::SendSigma2Resume()
 CHIP_ERROR CASESession::SendSigma2()
 {
     MATTER_TRACE_EVENT_SCOPE("SendSigma2", "CASESession");
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::CASESession_SendSigma2);
 
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1017,7 +1011,7 @@ CHIP_ERROR CASESession::SendSigma2()
     // Construct Sigma2 Msg
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
-                                                  msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, mrpParamsSize);
+                                                             msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, mrpParamsSize);
 
     System::PacketBufferHandle msg_R2 = System::PacketBufferHandle::New(data_len);
     VerifyOrReturnError(!msg_R2.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -1057,7 +1051,6 @@ CHIP_ERROR CASESession::SendSigma2()
 CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleSigma2Resume", "CASESession");
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::CASESession_HandleSigma2Resume);
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
@@ -1124,7 +1117,6 @@ exit:
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::CASESession_HandleSigma2_and_SendSigma3);
     ReturnErrorOnFailure(HandleSigma2(std::move(msg)));
     ReturnErrorOnFailure(SendSigma3a());
 
@@ -1134,7 +1126,6 @@ CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle &
 CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleSigma2", "CASESession");
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::CASESession_HandleSigma2);
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVReader decryptedDataTlvReader;
@@ -1304,7 +1295,6 @@ exit:
 CHIP_ERROR CASESession::SendSigma3a()
 {
     MATTER_TRACE_EVENT_SCOPE("SendSigma3", "CASESession");
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::CASESession_SendSigma3);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogDetail(SecureChannel, "Sending Sigma3");
@@ -1519,7 +1509,6 @@ exit:
 CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_EVENT_SCOPE("HandleSigma3", "CASESession");
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::CASESession_HandleSigma3);
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVReader decryptedDataTlvReader;

@@ -18,7 +18,6 @@
 
 #include <lib/support/IntrusiveList.h>
 #include <tracing/log_declares.h>
-#include <tracing/scopes.h>
 
 namespace chip {
 namespace Tracing {
@@ -34,35 +33,28 @@ public:
 
     /// Begin a trace for the specified scope.
     ///
-    /// Scopes must be completed by a corresponding
-    /// TraceEnd call.
-    virtual void TraceBegin(Scope scope) = 0;
+    /// Scope WILL be completed by a corresponding TraceEnd call.
+    virtual void TraceBegin(const char *label, const char *group) {}
 
-    /// Tracing end assumes completing a previously
-    /// started scope with TraceBegin and nesting is assumed.
+    /// Tracing end assumes completing a previously started scope with TraceBegin
+    /// and nesting is assumed (hence label is not repeated)
     ///
     /// Expect scopes like:
-    ///    TraceBegin(Foo)
-    ///      TraceBegin(Bar)
-    ///      TraceEnd(Bar)
-    ///    TraceEnd(Foo)
-    ///
-    /// The following is NOT acceptable:
-    ///    TraceBegin(Foo)
-    ///    TraceBegin(Bar)
-    ///    TraceEnd(Foo)
-    ///    TraceEnd(Bar)
-    virtual void TraceEnd(Scope scope) = 0;
+    ///    TraceBegin("foo", "A")
+    ///      TraceBegin("bar", "A")
+    ///      TraceEnd("A")  // ends "BAR"
+    ///    TraceEnd("A")    // ends "FOO"
+    virtual void TraceEnd(const char *group) {}
 
     /// Trace a zero-sized event
-    virtual void TraceInstant(Instant instant) = 0;
+    virtual void TraceInstant(const char *label, const char *group) {}
 
-    virtual void LogMessageSend(MessageSendInfo &) { TraceInstant(Instant::Log_MessageSend); }
-    virtual void LogMessageReceived(MessageReceivedInfo &) { TraceInstant(Instant::Log_MessageReceived); }
+    virtual void LogMessageSend(MessageSendInfo &) { TraceInstant("MessageSent", "Messaging"); }
+    virtual void LogMessageReceived(MessageReceivedInfo &) { TraceInstant("MessageReceived", "Messaging"); }
 
-    virtual void LogNodeLookup(NodeLookupInfo &) { TraceInstant(Instant::Log_NodeLookup); }
-    virtual void LogNodeDiscovered(NodeDiscoveredInfo &) { TraceInstant(Instant::Log_NodeDiscovered); }
-    virtual void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) { TraceInstant(Instant::Log_NodeDiscoveryFailed); }
+    virtual void LogNodeLookup(NodeLookupInfo &) { TraceInstant("Lookup", "DNSSD"); }
+    virtual void LogNodeDiscovered(NodeDiscoveredInfo &) { TraceInstant("Node Discovered", "DNSSD"); }
+    virtual void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) { TraceInstant("Discovery Failed", "DNSSD"); }
 };
 
 } // namespace Tracing
