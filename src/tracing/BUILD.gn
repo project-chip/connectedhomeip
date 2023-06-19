@@ -29,7 +29,7 @@ config("tracing_none") {
   defines = [ "MATTER_TRACE_NONE" ]
 }
 
-  static_library("tracing") {
+static_library("tracing") {
   sources = [
     "backend.h",
     "log_declares.h",
