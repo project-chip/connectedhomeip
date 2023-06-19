@@ -90,21 +90,21 @@ CHIP_ERROR se05x_sessionOpen(void)
     sss_status_t status = ex_sss_boot_connectstring(0, NULL, &portName);
     if (kStatus_SSS_Success != status)
     {
-        ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_boot_connectstring failed");
+        ChipLogError(Crypto, "se05x error: ex_sss_boot_connectstring failed");
         return CHIP_ERROR_INTERNAL;
     }
 
     status = ex_sss_boot_open(&gex_sss_chip_ctx, portName);
     if (kStatus_SSS_Success != status)
     {
-        ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_boot_open failed");
+        ChipLogError(Crypto, "se05x error: ex_sss_boot_open failed");
         return CHIP_ERROR_INTERNAL;
     }
 
     status = ex_sss_key_store_and_object_init(&gex_sss_chip_ctx);
     if (kStatus_SSS_Success != status)
     {
-        ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_key_store_and_object_init failed");
+        ChipLogError(Crypto, "se05x error: ex_sss_key_store_and_object_init failed");
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -120,7 +120,7 @@ void se05x_delete_key(uint32_t keyid)
 
     if (se05x_sessionOpen() != CHIP_NO_ERROR)
     {
-        ChipLogError(Crypto, "se05x error: %s\n", "Error in session open");
+        ChipLogError(Crypto, "se05x error: Error in session open");
         return;
     }
 
@@ -135,17 +135,17 @@ void se05x_delete_key(uint32_t keyid)
                 smstatus = Se05x_API_DeleteSecureObject(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid);
                 if (smstatus != SM_OK)
                 {
-                    ChipLogError(Crypto, "se05x error: %s\n", "Error in deleting key");
+                    ChipLogError(Crypto, "se05x error: Error in deleting key");
                 }
             }
             else
             {
-                ChipLogError(Crypto, "se05x warn: %s\n", "Key doesnot exists");
+                ChipLogError(Crypto, "se05x warn: Key doesnot exists");
             }
         }
         else
         {
-            ChipLogError(Crypto, "se05x error: %s\n", "Error in Se05x_API_CheckObjectExists");
+            ChipLogError(Crypto, "se05x error: Error in Se05x_API_CheckObjectExists");
         }
     }
     return;
