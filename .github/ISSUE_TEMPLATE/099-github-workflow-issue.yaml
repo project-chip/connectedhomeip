@@ -1,17 +1,17 @@
-name: "\U0001F5BA Documentation Issue"
-description: Create an issue to improve documentation
-title: "[Documentation] "
-labels: ["documentation", "needs triage"]
+name: "\U0001F477 GitHub / CI / Workflow"
+description: Create an issue to improve CI / Workflows
+title: "[Workflow] "
+labels: ["workflows", "needs triage"]
 body:
     - type: markdown
       attributes:
           value: |
-              Thanks for reporting an issue against the Matter SDK! We need information about the bug report to follow up, so please help us out by filling out this information.
+              Thanks for reporting an issue against the Matter SDK's workflows! We need information about the bug report to follow up, so please help us out by filling out this information.
     - type: textarea
       id: repro
       attributes:
-          label: Documentation issues
-          description: "What updates to documentation are needed?"
+          label: Workflow issues
+          description: "What updates to the workflows are needed?"
           value: |
               1.
               2.
@@ -42,6 +42,7 @@ body:
               - windows
               - other
               - core (please add to version below)
+              - all
       validations:
           required: false
     - type: textarea
@@ -55,4 +56,4 @@ body:
           required: false
     - type: markdown
       attributes:
-          value: "Thanks for helping improve our documentation."
+          value: "Thanks for helping improve our development workflows"
