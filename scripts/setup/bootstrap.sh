@@ -33,7 +33,7 @@ _install_additional_pip_requirements() {
     done
 
     if ! [ -z "$_SETUP_PLATFORM" ]; then
-        if ! [ -z "$ZSH_VERSION" ]; then
+        if [ -n "$ZSH_VERSION" ]; then
            IFS="," read -r -A _PLATFORMS <<<"$_SETUP_PLATFORM"
         else
            IFS="," read -r -a _PLATFORMS <<<"$_SETUP_PLATFORM"
