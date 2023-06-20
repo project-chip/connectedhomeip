@@ -16,7 +16,7 @@ declare_args() {
   # Tracing can have a non-zero size impact to binaries. We try to make
   # the impact minimal (the backends themselves add some size), however
   # for now tracing is opt-in
-  matter_enable_tracing_support = target_os == "linux"
+  matter_enable_tracing_support = current_os == "linux"
 
   # Defines the trace backend. Current matter tracing splits the logic
   # into two parts:
