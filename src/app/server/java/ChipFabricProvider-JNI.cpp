@@ -32,7 +32,6 @@
 #include <lib/support/JniTypeWrappers.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <thread>
-#include <trace/trace.h>
 
 using namespace chip;
 

@@ -34,7 +34,6 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
-#include <trace/trace.h>
 #include <tracing/scope.h>
 
 using namespace chip;

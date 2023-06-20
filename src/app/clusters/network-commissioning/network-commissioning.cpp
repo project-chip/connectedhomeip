@@ -31,7 +31,6 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <trace/trace.h>
 #include <tracing/scope.h>
 
 using namespace chip;

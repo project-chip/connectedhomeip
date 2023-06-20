@@ -48,7 +48,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <string.h>
-#include <trace/trace.h>
 #include <tracing/scope.h>
 
 using namespace chip;

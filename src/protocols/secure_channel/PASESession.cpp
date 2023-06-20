@@ -44,7 +44,6 @@
 #include <protocols/secure_channel/StatusReport.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <trace/trace.h>
 #include <tracing/scope.h>
 #include <transport/SessionManager.h>
 

@@ -33,7 +33,6 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/internal/BLEManager.h>
-#include <trace/trace.h>
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
