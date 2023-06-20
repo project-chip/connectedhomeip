@@ -703,8 +703,8 @@ void WindowApp::Cover::CallbackPositionSet(intptr_t arg)
         uint16_t value = data->percent100ths;
         char buffer[BYTE];
         itoa(value, buffer, DECIMAL);
-        DIC_SendMsg("tilt/position set", (const char *)(buffer));
-#endif //DIC_ENABLE
+        DIC_SendMsg("tilt/position set", (const char *) (buffer));
+#endif // DIC_ENABLE
     }
     else
     {
@@ -713,8 +713,8 @@ void WindowApp::Cover::CallbackPositionSet(intptr_t arg)
         uint16_t value = data->percent100ths;
         char buffer[BYTE];
         itoa(value, buffer, DECIMAL);
-        DIC_SendMsg("lift/position set",(const char *)(buffer));
-#endif //DIC_ENABLE
+        DIC_SendMsg("lift/position set", (const char *) (buffer));
+#endif // DIC_ENABLE
     }
 
     chip::Platform::Delete(data);
