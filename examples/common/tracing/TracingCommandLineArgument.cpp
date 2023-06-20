@@ -46,17 +46,17 @@ using ::chip::Tracing::Perfetto::PerfettoBackend;
 
 PerfettoBackend perfetto_backend;
 
-
-bool StartsWith(CharSpan argument, const char *prefix) {
+bool StartsWith(CharSpan argument, const char * prefix)
+{
     const size_t prefix_len = strlen(prefix);
-    if (argument.size() < prefix_len) {
+    if (argument.size() < prefix_len)
+    {
         return false;
     }
 
     argument.reduce_size(prefix_len);
     return argument.data_equal(CharSpan(prefix, prefix_len));
 }
-
 
 #endif
 

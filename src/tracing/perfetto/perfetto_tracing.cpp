@@ -26,8 +26,8 @@
 #include <perfetto.h>
 
 #include <errno.h>
-#include <string.h>
 #include <fcntl.h>
+#include <string.h>
 
 static constexpr const char * kMatterCategory = "Matter";
 
@@ -67,7 +67,8 @@ void PerfettoBackend::OpenTracingFile(const char * name)
     CloseTracingFile();
 
     mTraceFileId = open(name, O_RDWR | O_CREAT | O_TRUNC, 0600);
-    if (mTraceFileId < 0) {
+    if (mTraceFileId < 0)
+    {
         ChipLogError(Automation, "Failed to open logging file '%s': %s", name, strerror(errno));
         mTraceFileId = kInvalidFileId;
     }
@@ -84,7 +85,8 @@ void PerfettoBackend::CloseTracingFile()
 
 void PerfettoBackend::Open()
 {
-    if (mTraceFileId == kInvalidFileId) {
+    if (mTraceFileId == kInvalidFileId)
+    {
         return;
     }
 
@@ -99,7 +101,8 @@ void PerfettoBackend::Open()
 
 void PerfettoBackend::Close()
 {
-    if (!mTracingSession) {
+    if (!mTracingSession)
+    {
         return;
     }
 

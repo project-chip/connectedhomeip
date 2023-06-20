@@ -26,7 +26,6 @@
 #define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "log"
 #endif
 
-
 namespace chip {
 namespace CommandLineApp {
 
