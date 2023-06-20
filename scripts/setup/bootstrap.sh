@@ -34,9 +34,9 @@ _install_additional_pip_requirements() {
 
     if ! [ -z "$_SETUP_PLATFORM" ]; then
         if [ -n "$ZSH_VERSION" ]; then
-           IFS="," read -r -A _PLATFORMS <<<"$_SETUP_PLATFORM"
+            IFS="," read -r -A _PLATFORMS <<<"$_SETUP_PLATFORM"
         else
-           IFS="," read -r -a _PLATFORMS <<<"$_SETUP_PLATFORM"
+            IFS="," read -r -a _PLATFORMS <<<"$_SETUP_PLATFORM"
         fi
         for platform in "${_PLATFORMS[@]}"; do
             # Allow none as an alias of nothing extra installed (like -p none)
