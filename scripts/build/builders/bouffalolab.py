@@ -148,7 +148,7 @@ class BouffalolabBuilder(GnBuilder):
         # Generate Bouffalo Lab format OTA image for development purpose.
 
         ota_images_folder_path = self.output_dir + "/ota_images"
-        ota_images_dev_image = self.output_dir + "/" +self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash.dev"
+        ota_images_dev_image = self.output_dir + "/" +self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash"
         ota_images_image = self.output_dir + "/ota_images/FW_OTA.bin.xz.hash"
         ota_images_firmware = self.output_dir + "/" +self.app.AppNamePrefix(self.chip_name) + ".bin"
 
