@@ -16,7 +16,7 @@ for various operations. They are:
     time of a notable event
 
 Tracing and instant values MUST be constant strings as some backends rely on
-that property for caching (e.g. pw_trace would do tokenization, perfetto
+that property for caching (e.g. pw_trace would do tokenization and perfetto
 marks them as `perfetto::StaticString`)
 
 ### Data Logging
