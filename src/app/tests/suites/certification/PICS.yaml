@@ -2638,6 +2638,84 @@ PICS:
       id: DRLK.S.A0035
 
     #
+    #Server ReadOnly attribute
+    #
+    - label:
+          "Does the DUT(server) support the EnableLocalProgramming attribute and
+          is ReadOnly"
+      id: DRLK.S.A0028.ReadOnly
+
+    - label:
+          "Does the DUT(server) support the LocalProgrammingFeatures attribute
+          and is ReadOnly"
+      id: DRLK.S.A002c.ReadOnly
+
+    #
+    # Server write attributes
+    #
+
+    - label: "Does the DUT(server) support the DoorOpen Events attribute?"
+      id: DRLK.S.A0004.Write
+
+    - label: "Does the DUT(server) support the DoorClosedEvents attribute?"
+      id: DRLK.S.A0005.Write
+
+    - label: "Does the DUT(server) support the OpenPeriod attribute?"
+      id: DRLK.S.A0006.Write
+
+    - label: "Does the DUT(server) support the Language attribute?"
+      id: DRLK.S.A0021.Write
+
+    - label: "Does the DUT(server) support the LEDSettings attribute?"
+      id: DRLK.S.A0022.Write
+
+    - label: "Does the DUT(server) support the AutoRelockTime attribute?"
+      id: DRLK.S.A0023.Write
+
+    - label: "Does the DUT(server) support the SoundVolume attribute?"
+      id: DRLK.S.A0024.Write
+
+    - label: "Does the DUT(server) support the OperatingMode attribute?"
+      id: DRLK.S.A0025.Write
+
+    - label:
+          "Does the DUT(server) support the EnableLocalProgramming attribute?"
+      id: DRLK.S.A0028.Write
+
+    - label: "Does the DUT(server) support the EnableOneTouchLocking attribute?"
+      id: DRLK.S.A0029.Write
+
+    - label: "Does the DUT(server) support the EnableInsideStatusLED attribute?"
+      id: DRLK.S.A002a.Write
+
+    - label:
+          "Does the DUT(server) support the EnablePrivacyModeButton attribute?"
+      id: DRLK.S.A002b.Write
+
+    - label:
+          "Does the DUT(server) support the LocalProgrammingFeatures attribute?"
+      id: DRLK.S.A002c.Write
+
+    - label: "Does the DUT(server) support the WrongCodeEntryLimit attribute?"
+      id: DRLK.S.A0030.Write
+
+    - label:
+          "Does the DUT(server) support the UserCodedTemporaryDisableTime
+          attribute?"
+      id: DRLK.S.A0031.Write
+
+    - label: "Does the DUT(server) support the SendPINOverTheAir attribute?"
+      id: DRLK.S.A0032.Write
+
+    - label:
+          "Does the DUT(server) support the RequirePINForRemoteOperation
+          attribute?"
+      id: DRLK.S.A0033.Write
+
+    - label: "Does the DUT(server) support the ExpiringUserTimeOut attribute?"
+      id: DRLK.S.A0035.Write
+
+    #
     # server / commandsReceived
     #
     - label: "Does the DUT(server) support the Lock Door command?"
@@ -9301,3 +9379,69 @@ PICS:
     - label:
           "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
       id: RNCONC.S.Afffd
+
+    ##  Fan control
+
+    # Features
+    - label: "Does the device support multiple speeds from 0-100"
+      id: FAN.S.F00
+
+    - label: "Does the device support automatic mode"
+      id: FAN.S.F01
+
+    - label: "Does the device support rocking movement"
+      id: FAN.S.F02
+
+    - label: "Does the device support wind emulation"
+      id: FAN.S.F03
+
+    - label: "Does the device support the step command"
+      id: FAN.S.F04
+
+    - label: "Does the device support the direction attribute"
+      id: FAN.S.F05
+
+    #
+    # Server Attributes
+    #
+    - label: "Does the device implement the FanMode attribute?"
+      id: FAN.S.A0000
+
+    - label: "Does the device implement the FanModeSequence attribute?"
+      id: FAN.S.A0001
+
+    - label: "Does the device implement the PercentSetting attribute?"
+      id: FAN.S.A0002
+
+    - label: "Does the device implement the PercentCurrent attribute?"
+      id: FAN.S.A0003
+
+    - label: "Does the device implement the SpeedMax attribute?"
+      id: FAN.S.A0004
+
+    - label: "Does the device implement the SpeedSetting attribute?"
+      id: FAN.S.A0005
+
+    - label: "Does the device implement the SpeedCurrent attribute?"
+      id: FAN.S.A0006
+
+    - label: "Does the device implement the RockSupport attribute?"
+      id: FAN.S.A0007
+
+    - label: "Does the device implement the RockSetting attribute?"
+      id: FAN.S.A0008
+
+    - label: "Does the device implement the WindSupport attribute?"
+      id: FAN.S.A0009
+
+    - label: "Does the device implement the WindSetting attribute?"
+      id: FAN.S.A000A
+
+    - label: "Does the device implement the AirflowDirection attribute?"
+      id: FAN.S.A000B
+
+    #
+    #Server commands
+    #
+    - label: "Does the device implement receiving the Step command?"
+      id: FAN.S.C00.Rsp
