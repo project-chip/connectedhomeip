@@ -5091,6 +5091,12 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x0000000C: {
+                "attributeName": "ExpiryDate",
+                "attributeId": 0x0000000C,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
