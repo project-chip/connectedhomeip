@@ -312,3 +312,4 @@
 	path = third_party/perfetto/repo
 	url = https://github.com/google/perfetto.git
 	branch = master
+	platforms = linux,android
