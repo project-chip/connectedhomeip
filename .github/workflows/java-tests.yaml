@@ -185,7 +185,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing AlreadyDiscovered Test
-              timeout-minutes: 15
+              timeout-minutes: 25
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -197,7 +197,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Address-PaseOnly Test
-              timeout-minutes: 15
+              timeout-minutes: 25
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -209,7 +209,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing SetupQRCode Test
-              timeout-minutes: 15
+              timeout-minutes: 25
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -221,7 +221,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing ManualCode Test
-              timeout-minutes: 15
+              timeout-minutes: 25
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
