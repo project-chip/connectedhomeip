@@ -70,7 +70,7 @@ struct AppEvent
         struct
         {
             LEDWidget * LedWidget;
-        } UpdateLedStateEvent;
+        } UpdateLedStateEvent;   
     };
 
     EventHandler Handler;
