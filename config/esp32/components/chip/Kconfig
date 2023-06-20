@@ -284,9 +284,9 @@ menu "CHIP Device Layer"
             bool "Enable Background event processing"
             default n
             help
-                Few cryptographic operations requires more time for processing,
-                When this option is enabled, main matter task can delegate some
-                time consuming operations to background task so that main matter
+                Some cryptographic operations requires more time for processing,
+                When this option is enabled, the main matter task can delegate some
+                time consuming operations to a background task so that the main matter
                 task is not blocked and can process other work.
     endmenu
 
