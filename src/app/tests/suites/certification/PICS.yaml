@@ -2636,7 +2636,7 @@ PICS:
 
     - label: "Does the DUT(server) support the ExpiringUserTimeOut attribute?"
       id: DRLK.S.A0035
-    
+
     #
     #Server ReadOnly attribute
     #
