@@ -373,6 +373,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         // SUCCESS. Call the delegates
         if (resolver->IsActiveCommissionParse())
         {
+            MATTER_TRACE_SCOPE("Active commissioning delegate call", "MinMdnsResolver");
             DiscoveredNodeData nodeData;
 
             CHIP_ERROR err = resolver->Take(nodeData);
@@ -395,6 +396,7 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         }
         else if (resolver->IsActiveOperationalParse())
         {
+            MATTER_TRACE_SCOPE("Active operational delegate call", "MinMdnsResolver");
             ResolvedNodeData nodeData;
 
             CHIP_ERROR err = resolver->Take(nodeData);
