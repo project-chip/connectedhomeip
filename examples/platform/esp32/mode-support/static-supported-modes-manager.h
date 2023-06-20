@@ -33,7 +33,7 @@ private:
     using SemanticTag          = Structs::SemanticTagStruct::Type;
     int mSize;
 
-    static ModeOptionsProvider *epModeOptionsProviderList;
+    static ModeOptionsProvider * epModeOptionsProviderList;
 
     void FreeSupportedModes(EndpointId endpointId) const;
 
