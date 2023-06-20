@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/chip.gni")
 
 declare_args() {
   # Tracing can have a non-zero size impact to binaries. We try to make
   # the impact minimal (the backends themselves add some size), however
   # for now tracing is opt-in
-  matter_enable_tracing_support = false
+  matter_enable_tracing_support = (current_os == "linux")
 
   # Defines the trace backend. Current matter tracing splits the logic
   # into two parts:
@@ -39,5 +40,9 @@ declare_args() {
   #
   # since tracing is very noisy, we generally expect it to be explicitly
   # set up
-  matter_trace_config = "none"
+  if (current_os == "linux") {
+    matter_trace_config = "${chip_root}/src/tracing/perfetto:tracing"
+  } else {
+    matter_trace_config = "none"
+  }
 }
