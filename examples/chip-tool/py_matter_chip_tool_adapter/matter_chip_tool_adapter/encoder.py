@@ -234,10 +234,36 @@ class Encoder:
         return command_name, command_specifier
 
     def __get_arguments(self, request):
+        # chip-tool expects a json encoded string that contains both mandatory and optional arguments for the target command.
+        #
+        # Those arguments are either top level properties of the request object or under the 'arguments' property.
+        #
+        # Usually if an argument is used by multiple commands (e.g: 'endpoint', 'min-interval', 'commissioner-name') it is represented as
+        # a top level property of the request.
+        # Otherwise if the argument is a command specific argument, it can be retrieved as a member of the 'arguments' property.
+        #
+        # As an example, the following test step:
+        #
+        # - label: "Send Test Add Arguments Command"
+        #   nodeId: 0x12344321
+        #   endpoint: 1
+        #   cluster: Unit Testing
+        #   command: TestAddArguments
+        #   identity: beta
+        #   arguments:
+        #       values:
+        #           - name: arg1
+        #             value: 3
+        #           - name: arg2
+        #             value: 4
+        #
+        # Will be translated to:
+        #   destination-id": "0x12344321", "endpoint-id-ignored-for-group-commands": "1", "arg1":"3", "arg2":"17", "commissioner-name": "beta"
         arguments = ''
         arguments = self.__maybe_add_destination(arguments, request)
         arguments = self.__maybe_add_endpoint(arguments, request)
         arguments = self.__maybe_add_command_arguments(arguments, request)
+        arguments = self.__maybe_add_data_version(arguments, request)
         arguments = self.__maybe_add(
             arguments, request.min_interval, "min-interval")
         arguments = self.__maybe_add(
@@ -301,6 +327,25 @@ class Encoder:
             if rv:
                 rv += ', '
             rv += f'"{name}":{value}'
+
+        return rv
+
+    def __maybe_add_data_version(self, rv, request):
+        if request.data_version is None:
+            return rv
+
+        value = ''
+        if type(request.data_version) is list:
+            for index, version in enumerate(request.data_version):
+                value += str(version)
+                if index != len(request.data_version) - 1:
+                    value += ','
+        else:
+            value = request.data_version
+
+        if rv:
+            rv += ', '
+        rv += f'"data-version":"{value}"'
 
         return rv
 
