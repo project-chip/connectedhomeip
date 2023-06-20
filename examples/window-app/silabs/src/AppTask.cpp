@@ -39,7 +39,7 @@
 
 #include <lib/support/CodeUtils.h>
 
-#if defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if !defined(BRD2704A)
 #define LIGHT_LED 1
 #else
 #define LIGHT_LED 0
@@ -137,21 +137,4 @@ void AppTask::AppTaskMain(void * pvParameter)
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
     }
-    
-    #ifdef SL_WIFI
-    /*
-     * Wait for the WiFi to be initialized
-     */
-    SILABS_LOG("APP: Wait WiFi Init");
-    while (!wfx_hw_ready())
-    {
-        vTaskDelay(10);
-    }
-    SILABS_LOG("APP: Done WiFi Init");
-    /* We will init server when we get IP */
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    sWiFiNetworkCommissioningInstance.Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    /* added for commisioning with wifi */
-#endif
 }
