@@ -494,15 +494,14 @@ static void wfx_rsi_do_join(void)
             connect_security_mode = RSI_WPA_WPA2_MIXED;
             break;
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
-#ifdef CHIP_9117
         case WFX_SEC_WPA3:
+        #ifdef CHIP_9117 
             connect_security_mode = RSI_WPA3_PERSONAL_TRANSITION;
-            break;
-#else
-        case WFX_SEC_WPA3:
+        #else 
+        /* TODO: RSI_WPA3_TRANSITION to  RSI_WPA3_PERSONAL_TRANSITION in coming release */
             connect_security_mode = RSI_WPA3_TRANSITION;
-            break;
 #endif // CHIP_9117
+            break;
 #endif // WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         case WFX_SEC_NONE:
             connect_security_mode = RSI_OPEN;

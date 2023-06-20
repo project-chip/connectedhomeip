@@ -389,7 +389,7 @@ static void wfx_rsi_save_ap_info()
     case SME_WPA3_TRANSITION:
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
     case SME_WPA3:
-        wfx_rsi.sec.security = RSI_WPA3_PERSONAL;
+        wfx_rsi.sec.security = RSI_WPA3_PERSONAL_TRANSITION;
 #else
         wfx_rsi.sec.security = WFX_SEC_WPA2;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
