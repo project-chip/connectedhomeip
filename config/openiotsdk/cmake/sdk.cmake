@@ -22,7 +22,6 @@
 include(FetchContent)
 
 get_filename_component(OPEN_IOT_SDK_SOURCE ${CHIP_ROOT}/third_party/open-iot-sdk/sdk REALPATH)
-get_filename_component(OPEN_IOT_SDK_STORAGE_SOURCE ${CHIP_ROOT}/third_party/open-iot-sdk/storage REALPATH)
 
 # Open IoT SDK targets passed to CHIP build
 list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS)
@@ -282,21 +281,6 @@ if("mbedtls" IN_LIST IOTSDK_FETCH_LIST)
         mbedtls-threading-cmsis-rtos
     )
 endif()
-
-# Additional Open IoT SDK port components
-
-# Add Open IoT SDK storage source
-add_subdirectory(${OPEN_IOT_SDK_STORAGE_SOURCE} ./sdk_storage_build)
-list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
-    iotsdk-blockdevice
-    iotsdk-tdbstore
-)
-
-# Add custom storage library
-add_subdirectory(${OPEN_IOT_SDK_CONFIG}/storage storage_build)
-list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
-    openiotsdk-storage
-)
 
 function(sdk_post_build target)
     string(REPLACE "_ns" "" APP_NAME ${target})

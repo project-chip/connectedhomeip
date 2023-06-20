@@ -41,14 +41,12 @@ TELNET_CONNECTION_PORT=""
 FAILED_TESTS=0
 IS_UNIT_TEST=0
 FVP_NETWORK="user"
-KVS_STORAGE_TYPE="tdb"
 KVS_STORAGE_FILE=""
 NO_ACTIVATE=""
 CRYPTO_BACKEND="mbedtls"
 APP_VERSION="1"
 APP_VERSION_STR="0.0.1"
 
-declare -A tdb_storage_param=([instance]=sram [memspace]=0 [address]=0x0 [size]=0x100000)
 declare -A ps_storage_param=([instance]=qspi_sram [memspace]=0 [address]=0x660000 [size]=0x12000)
 
 readarray -t SUPPORTED_APP_NAMES <"$CHIP_ROOT"/examples/platform/openiotsdk/supported_examples.txt
@@ -69,7 +67,6 @@ Options:
     -C,--command    <command>           Action to execute <build-run | run | test | build - default>
     -d,--debug      <debug_enable>      Build in debug mode <true | false - default>
     -l,--lwipdebug  <lwip_debug_enable> Build with LwIP debug logs support <true | false - default>
-    -k,--kvsstore   <kvs_storage_type>  Select KVS storage type <ps | tdb - default>
     -b,--backend    <crypto_backend)    Select crypto backend <psa | mbedtls - default>
     -p,--path       <build_path>        Build path <build_path - default is example_dir/build>
     -K,--kvsfile    <kvs_storage_file>  Path to KVS storage file which will be used to ensure persistence <kvs_storage_file - default is empty which means disable persistence>
@@ -139,10 +136,6 @@ function build_with_cmake() {
         BUILD_OPTIONS+=(-DCONFIG_CHIP_OPEN_IOT_SDK_LWIP_DEBUG=YES)
     fi
 
-    if [[ $KVS_STORAGE_TYPE == "ps" ]]; then
-        BUILD_OPTIONS+=(-DCONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS=YES)
-    fi
-
     BUILD_OPTIONS+=(-DCONFIG_CHIP_CRYPTO="$CRYPTO_BACKEND")
 
     cmake -G Ninja -S "$EXAMPLE_PATH" -B "$BUILD_PATH" --toolchain="$TOOLCHAIN_PATH" "${BUILD_OPTIONS[@]}"
@@ -185,11 +178,7 @@ function run_fvp() {
     fi
 
     if [ -n "$KVS_STORAGE_FILE" ]; then
-        if [[ $KVS_STORAGE_TYPE == "ps" ]]; then
-            declare -n storage_param=ps_storage_param
-        else
-            declare -n storage_param=tdb_storage_param
-        fi
+        declare -n storage_param=ps_storage_param
         if [ -f "$KVS_STORAGE_FILE" ]; then
             RUN_OPTIONS+=(--data "mps3_board.${storage_param[instance]}=$KVS_STORAGE_FILE@${storage_param[memspace]}:${storage_param[address]}")
         fi
@@ -311,10 +300,6 @@ while :; do
             LWIP_DEBUG=$2
             shift 2
             ;;
-        -k | --kvsstore)
-            KVS_STORAGE_TYPE=$2
-            shift 2
-            ;;
         -K | --kvsfile)
             KVS_STORAGE_FILE=$2
             shift 2
@@ -397,15 +382,6 @@ if [[ "$EXAMPLE" == "unit-tests" ]]; then
 else
     EXAMPLE_PATH="$CHIP_ROOT/examples/$EXAMPLE/openiotsdk"
 fi
-
-case "$KVS_STORAGE_TYPE" in
-    ps | tdb) ;;
-    *)
-        echo "Wrong KVS storage type definition"
-        show_usage
-        exit 2
-        ;;
-esac
 
 case "$CRYPTO_BACKEND" in
     psa | mbedtls) ;;

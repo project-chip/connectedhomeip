@@ -301,43 +301,6 @@ You can also provide the own version of Matter example by setting
 set(TFM_NS_APP_VERSION "0.0.1")
 ```
 
-### Trusted Firmware-M Protected Storage
-
-By default, the
-[Block Device storage](./openiotsdk_platform_overview.md#storage) is used for
-storing Matter key-value data.
-
-There is an option to add
-[TF-M Protected Storage Service](https://tf-m-user-guide.trustedfirmware.org/integration_guide/services/tfm_ps_integration_guide.html)
-support for `key-value` storage component in the Matter examples. Set the
-variable `CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS` to `YES` to add
-`TF-M Protected Storage` support to your application. You can put it inside the
-main application `CMakeLists.txt` file:
-
-```
-set(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS YES)
-```
-
-or add as a Cmake command-line parameter:
-
-```
-cmake -G <...> -DCONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS=YES <...>
-```
-
-This option causes `key-value` objects will be stored in a secure part of flash
-memory and the Protected Storage Service takes care of their encryption and
-authentication.
-
-> 💡 **Notes**:
->
-> The `TF-M Protected Storage` option requires enabling
-> [TF-M](#trusted-firmware-m) support.
->
-> The `-k/--kvsstore` option in
-> [Open IoT SDK build script](../../scripts/examples/openiotsdk_example.sh)
-> selects key-value storage implementation for the Matter's examples. It
-> demonstrates how to use the `CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS` variable.
-
 ### Storing persistent memory block in external files
 
 The persistent storage is required to store key-value data of the Matter
@@ -354,13 +317,6 @@ available
 [here](./openiotsdk_platform_overview.md#fast-model-persistent-memory-via-files).
 Depending on the storage implementation, different flags are used in the `FVP`
 options.
-
-For block device storage use:
-
-```
---dump mps3_board.sram=<file-path>@0:0x0,0x100000
---data mps3_board.sram=<file-path>@0:0x0
-```
 
 For `TF-M` protected storage use:
 
