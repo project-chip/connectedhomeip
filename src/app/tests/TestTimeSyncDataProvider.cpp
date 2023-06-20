@@ -198,52 +198,53 @@ void TestDSTOffset(nlTestSuite * inSuite, void * inContext)
     };
     DSTOffset dstS[3] = { makeDSTOffset(1, 1, 2), makeDSTOffset(2, 2, 3), makeDSTOffset(3, 3) };
     DSTOffsetList dstL(dstS);
-    NL_TEST_ASSERT(inSuite, dstL.size() == 3);
+    DSTOffsetObj dstObj{ dstL, 3 };
+    NL_TEST_ASSERT(inSuite, dstObj.size == 3);
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.StoreDSTOffset(dstL));
 
     DSTOffset emtpyDstS[3] = { makeDSTOffset(), makeDSTOffset(), makeDSTOffset() };
 
-    dstL = DSTOffsetList(emtpyDstS);
-    uint8_t size;
-    NL_TEST_ASSERT(inSuite, dstL.size() == 3);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.LoadDSTOffset(dstL, size));
-    NL_TEST_ASSERT(inSuite, size == 3);
+    dstObj.dstOffsetList = DSTOffsetList(emtpyDstS);
+    dstObj.size          = 0;
+    NL_TEST_ASSERT(inSuite, dstObj.dstOffsetList.size() == 3);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.LoadDSTOffset(dstObj));
+    NL_TEST_ASSERT(inSuite, dstObj.size == 3);
 
-    NL_TEST_ASSERT(inSuite, !dstL.empty());
+    NL_TEST_ASSERT(inSuite, !dstObj.dstOffsetList.empty());
 
-    if (!dstL.empty())
+    if (!dstObj.dstOffsetList.empty())
     {
-        auto & dst = dstL.data()[0];
+        auto & dst = dstObj.dstOffsetList.data()[0];
         NL_TEST_ASSERT(inSuite, dst.offset == 1);
         NL_TEST_ASSERT(inSuite, dst.validStarting == 1);
         NL_TEST_ASSERT(inSuite, !dst.validUntil.IsNull());
         NL_TEST_ASSERT(inSuite, dst.validUntil.Value() == 2);
 
-        dstL = dstL.SubSpan(1);
+        dstObj.dstOffsetList = dstObj.dstOffsetList.SubSpan(1);
     }
 
-    if (!dstL.empty())
+    if (!dstObj.dstOffsetList.empty())
     {
-        auto & dst = dstL.data()[0];
+        auto & dst = dstObj.dstOffsetList.data()[0];
         NL_TEST_ASSERT(inSuite, dst.offset == 2);
         NL_TEST_ASSERT(inSuite, dst.validStarting == 2);
         NL_TEST_ASSERT(inSuite, !dst.validUntil.IsNull());
         NL_TEST_ASSERT(inSuite, dst.validUntil.Value() == 3);
 
-        dstL = dstL.SubSpan(1);
+        dstObj.dstOffsetList = dstObj.dstOffsetList.SubSpan(1);
     }
 
-    if (!dstL.empty())
+    if (!dstObj.dstOffsetList.empty())
     {
-        auto & dst = dstL.data()[0];
+        auto & dst = dstObj.dstOffsetList.data()[0];
         NL_TEST_ASSERT(inSuite, dst.offset == 3);
         NL_TEST_ASSERT(inSuite, dst.validStarting == 3);
         NL_TEST_ASSERT(inSuite, dst.validUntil.IsNull());
 
-        dstL = dstL.SubSpan(1);
+        dstObj.dstOffsetList = dstObj.dstOffsetList.SubSpan(1);
     }
 
-    NL_TEST_ASSERT(inSuite, dstL.empty());
+    NL_TEST_ASSERT(inSuite, dstObj.dstOffsetList.empty());
 }
 
 void TestDSTOffsetEmpty(nlTestSuite * inSuite, void * inContext)
@@ -252,12 +253,11 @@ void TestDSTOffsetEmpty(nlTestSuite * inSuite, void * inContext)
     TimeSyncDataProvider timeSyncDataProv;
     timeSyncDataProv.Init(persistentStorage);
 
-    DSTOffsetList dstOffset;
-    uint8_t size = 0;
+    DSTOffsetObj dstObj;
 
-    NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == timeSyncDataProv.LoadDSTOffset(dstOffset, size));
-    NL_TEST_ASSERT(inSuite, !dstOffset.begin());
-    NL_TEST_ASSERT(inSuite, size == 0);
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == timeSyncDataProv.LoadDSTOffset(dstObj));
+    NL_TEST_ASSERT(inSuite, !dstObj.dstOffsetList.begin());
+    NL_TEST_ASSERT(inSuite, dstObj.size == 0);
 }
 
 const nlTest sTests[] = { NL_TEST_DEF("Test TrustedTimeSource store load", TestTrustedTimeSourceStoreLoad),
