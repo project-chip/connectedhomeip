@@ -87,8 +87,8 @@ ARMmbed
 armv
 ASAN
 asdk
-AssertionError
 ASR
+AssertionError
 AST
 ASYNC
 atomics
@@ -954,6 +954,7 @@ OnOffClusterTest
 OnOffSwitchConfiguration
 OnPlatformEvent
 OO
+openiotsdk
 openjdk
 OpenOCD
 OpenSSL
@@ -1247,8 +1248,8 @@ SoftwareVersion
 softwareVersionStr
 SoftwareVersionString
 softwareVersionValid
-sphinxcontrib
 SparkFun
+sphinxcontrib
 SPI
 spiflash
 spinel

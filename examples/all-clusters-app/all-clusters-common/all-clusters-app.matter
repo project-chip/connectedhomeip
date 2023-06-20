@@ -2350,6 +2350,29 @@ server cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** Attributes and commands for configuring the Refrigerator alarm. */
+server cluster RefrigeratorAlarm = 87 {
+  bitmap AlarmMap : BITMAP32 {
+    kDoorOpen = 0x1;
+  }
+
+  info event Notify = 0 {
+    AlarmMap active = 0;
+    AlarmMap inactive = 1;
+    AlarmMap state = 2;
+    AlarmMap mask = 3;
+  }
+
+  readonly attribute AlarmMap mask = 0;
+  readonly attribute AlarmMap state = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Attributes for reporting air quality classification */
 server cluster AirQuality = 91 {
   enum AirQualityEnum : ENUM8 {
@@ -6131,6 +6154,18 @@ endpoint 1 {
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
     ram      attribute manufacturerExtension default = 255;
+  }
+
+  server cluster RefrigeratorAlarm {
+    emits event Notify;
+    ram      attribute mask default = 1;
+    ram      attribute state default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster AirQuality {
