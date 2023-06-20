@@ -48,7 +48,6 @@ namespace Internal {
 
 void Begin(const char * label, const char * group)
 {
-    assertChipStackLockedByCurrentThread();
     for (auto & backend : gTracingBackends)
     {
         backend.TraceBegin(label, group);
@@ -57,7 +56,6 @@ void Begin(const char * label, const char * group)
 
 void End(const char * label, const char * group)
 {
-    assertChipStackLockedByCurrentThread();
     for (auto & backend : gTracingBackends)
     {
         backend.TraceEnd(label, group);
@@ -66,7 +64,6 @@ void End(const char * label, const char * group)
 
 void Instant(const char * label, const char * group)
 {
-    assertChipStackLockedByCurrentThread();
     for (auto & backend : gTracingBackends)
     {
         backend.TraceInstant(label, group);
@@ -75,7 +72,6 @@ void Instant(const char * label, const char * group)
 
 void LogMessageSend(::chip::Tracing::MessageSendInfo & info)
 {
-    assertChipStackLockedByCurrentThread();
     for (auto & backend : gTracingBackends)
     {
         backend.LogMessageSend(info);
@@ -84,7 +80,6 @@ void LogMessageSend(::chip::Tracing::MessageSendInfo & info)
 
 void LogMessageReceived(::chip::Tracing::MessageReceivedInfo & info)
 {
-    assertChipStackLockedByCurrentThread();
     for (auto & backend : gTracingBackends)
     {
         backend.LogMessageReceived(info);
@@ -93,7 +88,6 @@ void LogMessageReceived(::chip::Tracing::MessageReceivedInfo & info)
 
 void LogNodeLookup(::chip::Tracing::NodeLookupInfo & info)
 {
-    assertChipStackLockedByCurrentThread();
     for (auto & backend : gTracingBackends)
     {
         backend.LogNodeLookup(info);
@@ -102,7 +96,6 @@ void LogNodeLookup(::chip::Tracing::NodeLookupInfo & info)
 
 void LogNodeDiscovered(::chip::Tracing::NodeDiscoveredInfo & info)
 {
-    assertChipStackLockedByCurrentThread();
     for (auto & backend : gTracingBackends)
     {
         backend.LogNodeDiscovered(info);
@@ -111,7 +104,6 @@ void LogNodeDiscovered(::chip::Tracing::NodeDiscoveredInfo & info)
 
 void LogNodeDiscoveryFailed(::chip::Tracing::NodeDiscoveryFailedInfo & info)
 {
-    assertChipStackLockedByCurrentThread();
     for (auto & backend : gTracingBackends)
     {
         backend.LogNodeDiscoveryFailed(info);
