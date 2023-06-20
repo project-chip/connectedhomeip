@@ -42,12 +42,13 @@ namespace Perfetto {
 PerfettoBackend & PerfettoBackend::Init(const char * output_name)
 {
     perfetto::TracingInitArgs args;
-    args.backends = perfetto::kSystemBackend;
 
     if ((output_name != nullptr) && (output_name[0] != '\0'))
     {
         OpenTracingFile(output_name);
-        args.backends |= perfetto::kInProcessBackend;
+        args.backends = perfetto::kInProcessBackend;
+    } else {
+        args.backends = perfetto::kSystemBackend;
     }
 
     perfetto::Tracing::Initialize(args);
@@ -92,9 +93,8 @@ void PerfettoBackend::Open()
 
     perfetto::TraceConfig cfg;
     cfg.add_buffers()->set_size_kb(1024);
+
     auto* ds_cfg = cfg.add_data_sources()->mutable_config();
-
-
     ds_cfg->set_name("track_event");  // corresponds to TRACE_EVENT
 
     mTracingSession = perfetto::Tracing::NewTrace();
