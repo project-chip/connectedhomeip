@@ -23,7 +23,7 @@
 #include <tracing/registry.h>
 
 #ifdef ENABLE_PERFETTO_TRACING
-#include <tracing/perfetto/perfetto_tracing.h>
+#include <tracing/perfetto/perfetto_tracing.h> // nogncheck
 #endif
 
 #include <memory>
