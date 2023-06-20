@@ -34,7 +34,7 @@ _install_additional_pip_requirements() {
 
     if ! [ -z "$_SETUP_PLATFORM" ]; then
         if [[ "$_PLATFORMS" == *,* ]]; then
-            _PLATFORMS=(${(s[,])_SETUP_PLATFORM})
+            _PLATFORMS="${_SETUP_PLATFORM/,/ }"
         else
             _PLATFORMS=$_SETUP_PLATFORM
         fi
