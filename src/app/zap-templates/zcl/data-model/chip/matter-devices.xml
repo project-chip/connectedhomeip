@@ -1880,6 +1880,26 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-smokecoalarm</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Smoke CO Alarm</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0076</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+            </include>
+            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Smoke CO Alarm" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Carbon Monoxide" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-all-clusters-app</name>
         <domain>CHIP</domain>
         <typeName>Matter All-clusters-app Server Example</typeName>
@@ -2053,7 +2073,7 @@ limitations under the License.
                 <requireAttribute>SERVER_LIST</requireAttribute>
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
-            </include>            
+            </include>
         </clusters>
     </deviceType>
 </configurator>
