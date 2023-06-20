@@ -37,9 +37,6 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -62,8 +59,6 @@
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <credentials/tests/CHIPCert_test_vectors.h>
 
-#define HSM_ECC_KEYID 0x11223344
-
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/TLV.h>
@@ -84,40 +79,11 @@ using namespace chip::TLV;
 
 namespace {
 
-#ifdef ENABLE_HSM_EC_KEY
-class Test_P256Keypair : public P256KeypairHSM
-{
-public:
-    Test_P256Keypair() { SetKeyId(HSM_ECC_KEYID); }
-    Test_P256Keypair(uint32_t keyId) { SetKeyId(keyId); }
-};
-#else
 using Test_P256Keypair                  = P256Keypair;
-#endif
-
-#ifdef ENABLE_HSM_SPAKE
-using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2pHSM_P256_SHA256_HKDF_HMAC;
-#else
 using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
-#endif
-
-#ifdef ENABLE_HSM_PBKDF2
-using TestPBKDF2_sha256 = PBKDF2_sha256HSM;
-#else
 using TestPBKDF2_sha256                 = PBKDF2_sha256;
-#endif
-
-#ifdef ENABLE_HSM_HKDF
-using TestHKDF_sha = HKDF_shaHSM;
-#else
 using TestHKDF_sha                      = HKDF_sha;
-#endif
-
-#ifdef ENABLE_HSM_HMAC
-using TestHMAC_sha = HMAC_shaHSM;
-#else
 using TestHMAC_sha                      = HMAC_sha;
-#endif
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
 #if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
@@ -1045,11 +1011,7 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
     Test_P256Keypair keypair1;
     NL_TEST_ASSERT(inSuite, keypair1.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
-#ifdef ENABLE_HSM_EC_KEY
-    Test_P256Keypair keypair2(HSM_ECC_KEYID + 1);
-#else
     Test_P256Keypair keypair2;
-#endif
     NL_TEST_ASSERT(inSuite, keypair2.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     P256ECDHDerivedSecret out_secret1;
@@ -1664,12 +1626,7 @@ static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inCon
 
 // We need to "generate" specific field elements
 // to do so we need to override the specific method
-class Test_Spake2p_P256_SHA256_HKDF_HMAC :
-#ifdef ENABLE_HSM_SPAKE
-    public Spake2pHSM_P256_SHA256_HKDF_HMAC
-#else
-    public Spake2p_P256_SHA256_HKDF_HMAC
-#endif
+class Test_Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p_P256_SHA256_HKDF_HMAC
 {
 public:
     CHIP_ERROR TestSetFE(const uint8_t * fe_in, size_t fe_in_len)
