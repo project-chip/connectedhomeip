@@ -22,7 +22,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <list>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
