@@ -422,7 +422,7 @@ static void wfx_rsi_save_ap_info() // translation
          */
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         wfx_rsi.sec.security = WFX_SEC_WPA3;
-#else /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
+#else  /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         wfx_rsi.sec.security = WFX_SEC_WPA2;
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         SILABS_LOG("%s: warn: failed with status: %02x", __func__, status);
@@ -502,7 +502,7 @@ static void wfx_rsi_do_join(void)
         case WFX_SEC_WPA3:
             connect_security_mode = RSI_WPA3_TRANSITION;
             break;
-#endif  // CHIP_9117
+#endif // CHIP_9117
 #endif // WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         case WFX_SEC_NONE:
             connect_security_mode = RSI_OPEN;

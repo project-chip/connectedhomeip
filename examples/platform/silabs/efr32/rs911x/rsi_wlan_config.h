@@ -42,14 +42,14 @@
 
 //! To set Extended custom feature select bit map
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
-    #ifdef CHIP_9117
+#ifdef CHIP_9117
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
     (EXT_FEAT_448K_M4SS_256K | EXT_FEAT_LOW_POWER_MODE | EXT_FEAT_XTAL_CLK_ENABLE | EXT_FEAT_IEEE_80211W)
 #else /* !CHIP_9117 */
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (EXT_FEAT_384K_MODE | EXT_FEAT_IEEE_80211W)
 #endif /* CHIP_9117 */
 #else  /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
-    #ifdef CHIP_9117
+#ifdef CHIP_9117
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (EXT_FEAT_448K_M4SS_256K | EXT_FEAT_LOW_POWER_MODE | EXT_FEAT_XTAL_CLK_ENABLE)
 #else /* !CHIP_9117 */
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP EXT_FEAT_384K_MODE
@@ -247,7 +247,6 @@
 #else
 #define RSI_JOIN_FEAT_BIT_MAP 0
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANS */
-
 
 #define RSI_LISTEN_INTERVAL 0
 
