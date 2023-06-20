@@ -23,8 +23,8 @@
 #include <lib/support/StringBuilder.h>
 #include <transport/TracingStructs.h>
 
-#include <perfetto.h>
 #include <matter/tracing/macros_impl.h>
+#include <perfetto.h>
 
 #include <errno.h>
 #include <fcntl.h>
@@ -156,9 +156,9 @@ void PerfettoBackend::LogMessageReceived(MessageReceivedInfo & info)
         break;
     }
 
-    TRACE_EVENT_INSTANT(                     //
+    TRACE_EVENT_INSTANT(              //
         "Matter", "Message Received", //
-        "message_type", messageType          //
+        "message_type", messageType   //
     );
 }
 
@@ -178,16 +178,16 @@ void PerfettoBackend::LogMessageSend(MessageSendInfo & info)
         break;
     }
 
-    TRACE_EVENT_INSTANT(                 //
-        "Matter", "Message Send", //
-        "message_type", messageType      //
+    TRACE_EVENT_INSTANT(            //
+        "Matter", "Message Send",   //
+        "message_type", messageType //
     );
 }
 
 void PerfettoBackend::LogNodeLookup(NodeLookupInfo & info)
 {
     TRACE_EVENT_INSTANT(                                                          //
-        "Matter", "NodeLookup",                                            //
+        "Matter", "NodeLookup",                                                   //
         "node_id", info.request->GetPeerId().GetNodeId(),                         //
         "compressed_fabric_id", info.request->GetPeerId().GetCompressedFabricId() //
     );
@@ -202,7 +202,7 @@ void PerfettoBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
     {
     case chip::Tracing::DiscoveryInfoType::kIntermediateResult:
         TRACE_EVENT_INSTANT(                                              //
-            "Matter", "NodeDiscovered Intermediate",               //
+            "Matter", "NodeDiscovered Intermediate",                      //
             "node_id", info.peerId->GetNodeId(),                          //
             "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
             "address", address_buff                                       //
@@ -210,7 +210,7 @@ void PerfettoBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
         break;
     case chip::Tracing::DiscoveryInfoType::kResolutionDone:
         TRACE_EVENT_INSTANT(                                              //
-            "Matter", "NodeDiscovered Final",                      //
+            "Matter", "NodeDiscovered Final",                             //
             "node_id", info.peerId->GetNodeId(),                          //
             "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
             "address", address_buff                                       //
@@ -218,7 +218,7 @@ void PerfettoBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
         break;
     case chip::Tracing::DiscoveryInfoType::kRetryDifferent:
         TRACE_EVENT_INSTANT(                                              //
-            "Matter", "NodeDiscovered Retry Different",            //
+            "Matter", "NodeDiscovered Retry Different",                   //
             "node_id", info.peerId->GetNodeId(),                          //
             "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
             "address", address_buff                                       //
@@ -230,7 +230,7 @@ void PerfettoBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
 void PerfettoBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
 {
     TRACE_EVENT_INSTANT(                                              //
-        "Matter", "Discovery Failed",                          //
+        "Matter", "Discovery Failed",                                 //
         "node_id", info.peerId->GetNodeId(),                          //
         "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
         "error", chip::ErrorStr(info.error)                           //
