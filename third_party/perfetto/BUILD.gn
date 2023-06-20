@@ -21,6 +21,10 @@ config("sdk_config") {
   cflags = [ "-Wno-format-nonliteral" ]
 }
 
+config("sdk_private_config") {
+  cflags = [ "-Wno-shadow" ]
+}
+
 source_set("sdk") {
   sources = [
     "repo/sdk/perfetto.cc",
@@ -28,4 +32,6 @@ source_set("sdk") {
   ]
 
   public_configs = [ ":sdk_config" ]
+
+  configs += [ ":sdk_private_config" ]
 }
