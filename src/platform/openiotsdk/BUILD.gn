@@ -20,8 +20,6 @@ import("${chip_root}/src/platform/device.gni")
 assert(chip_device_platform == "openiotsdk")
 
 declare_args() {
-  # Add Trusted Firmware-M (TF-M) support
-  chip_openiotsdk_use_tfm = false
   # Default value of software version
   chip_openiotsdk_software_version = "0"
 
@@ -40,10 +38,6 @@ buildconfig_header("openiotsdk_buildconfig") {
     "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${chip_openiotsdk_software_version_string}\"",
     "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${chip_openiotsdk_software_version}",
   ]
-
-  if (chip_openiotsdk_use_tfm) {
-    defines += [ "CHIP_OPEN_IOT_SDK_USE_TFM=1" ]
-  }
 }
 
 static_library("openiotsdk") {

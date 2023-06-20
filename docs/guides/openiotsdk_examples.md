@@ -281,18 +281,13 @@ More information about the Python tools you can find
 
 ### Trusted Firmware-M
 
-To add [TF-M](https://tf-m-user-guide.trustedfirmware.org) support to Matter
-example you need to set `TFM_SUPPORT` variable inside main application
-`CMakeLists.txt` file.
+Matter examples support the [TF-M](https://tf-m-user-guide.trusted firmware.org)
+by default.
 
-```
-set(TFM_SUPPORT YES)
-```
-
-This causes the Matter example to be built as non-secure application in
-Non-secure Processing Environment (`NSPE`). The bootloader and the secure part
-are also built from `TF-M` sources. All components are merged into a single
-executable file at the end of the building process.
+This means the example is built as non-secure application in a Non-secure
+Processing Environment (`NSPE`). The bootloader and the secure part are also
+built from `TF-M` sources. All components are merged into a single executable
+file at the end of the building process.
 
 You can also provide the own version of Matter example by setting
 `TFM_NS_APP_VERSION` variable.

@@ -26,7 +26,6 @@ list(APPEND CMAKE_MODULE_PATH ${LOCK_APP_COMMON})
 
 set(APP_TARGET chip-openiotsdk-lock-app-example_ns)
 
-set(TFM_SUPPORT YES)
 set(TFM_PROJECT_CONFIG_HEADER_FILE "${CMAKE_CURRENT_SOURCE_DIR}/tf-m-config/TfmProjectConfig.h")
 
 # Toolchain files need to exist before first call to project
@@ -47,7 +46,7 @@ chip_add_data_model(openiotsdk-app PUBLIC lock)
 
 # Add common lock-app sources
 include(lock-app)
-chip_add_lock_app_common(openiotsdk-app 
+chip_add_lock_app_common(openiotsdk-app
     SCOPE PUBLIC
 )
 
