@@ -33,11 +33,7 @@ _install_additional_pip_requirements() {
     done
 
     if ! [ -z "$_SETUP_PLATFORM" ]; then
-        if [[ "$_PLATFORMS" == *,* ]]; then
-            _PLATFORMS="${_SETUP_PLATFORM/,/ }"
-        else
-            _PLATFORMS=$_SETUP_PLATFORM
-        fi
+        _PLATFORMS="${_SETUP_PLATFORM/,/ }"
         for platform in ${_PLATFORMS}; do
             # Allow none as an alias of nothing extra installed (like -p none)
             if [ "$platform" != "none" ]; then
@@ -47,7 +43,10 @@ _install_additional_pip_requirements() {
                     -c "$_CHIP_ROOT/scripts/setup/constraints.txt"
             fi
         done
+        unset _PLATFORMS
     fi
+
+    unset _SETUP_PLATFORM
 }
 
 _bootstrap_or_activate() {
