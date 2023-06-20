@@ -286,7 +286,7 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
         spi_enabled = false;
     }
     // sl_memlcd_refresh takes care of SPIDRV_Init()
-    if(SL_STATUS_OK != sl_memlcd_refresh(sl_memlcd_get()))
+    if (SL_STATUS_OK != sl_memlcd_refresh(sl_memlcd_get()))
     {
         xSemaphoreGive(spi_sem_sync_hdl);
         return SL_STATUS_FAIL;
