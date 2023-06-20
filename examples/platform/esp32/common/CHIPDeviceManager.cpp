@@ -83,7 +83,10 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     ReturnErrorOnFailure(PlatformMgr().StartBackgroundEventLoopTask());
 
     // Start a task to run the CHIP Device event loop.
-    return PlatformMgr().StartEventLoopTask();
+    ReturnErrorOnFailure(PlatformMgr().StartEventLoopTask());
+
+    // This is a no op if CONFIG_ENABLE_BG_EVENT_PROCESSING is disabled
+    return PlatformMgr().StartBackgroundEventLoopTask();
 }
 } // namespace DeviceManager
 } // namespace chip
