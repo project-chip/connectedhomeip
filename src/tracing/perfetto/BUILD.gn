@@ -36,4 +36,6 @@ static_library("perfetto") {
     "${chip_root}/src/transport",
     "${chip_root}/third_party/perfetto:sdk",
   ]
+
+  public_configs = [":tracing" ]
 }
