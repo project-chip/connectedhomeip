@@ -33,8 +33,12 @@ _install_additional_pip_requirements() {
     done
 
     if ! [ -z "$_SETUP_PLATFORM" ]; then
-        IFS="," read -r -a _PLATFORMS <<<"$_SETUP_PLATFORM"
-        for platform in "${_PLATFORMS[@]}"; do
+        if [[ "$_PLATFORMS" == *,* ]]; then
+            _PLATFORMS=(${(s[,])_SETUP_PLATFORM})
+        else
+            _PLATFORMS=$_SETUP_PLATFORM
+        fi
+        for platform in ${_PLATFORMS}; do
             # Allow none as an alias of nothing extra installed (like -p none)
             if [ "$platform" != "none" ]; then
                 echo "Installing pip requirements for $platform..."
