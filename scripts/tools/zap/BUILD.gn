@@ -14,8 +14,11 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-action("tests") {
+import("$dir_pw_build/python.gni")
+
+pw_python_action("tests") {
   script = "test_generate.py"
 
   _stamp = "${target_gen_dir}/generate.test.passed"

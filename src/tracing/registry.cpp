@@ -74,7 +74,7 @@ void LogMessageSend(::chip::Tracing::MessageSendInfo & info)
     }
 }
 
-void LogMessageReceived(::chip::Tracing::MessageReceiveInfo & info)
+void LogMessageReceived(::chip::Tracing::MessageReceivedInfo & info)
 {
     for (auto & backend : gTracingBackends)
     {

@@ -4,7 +4,6 @@
 struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
-    optional char_string<64> tagName = 2;
 }
 
 struct ModeOptionStruct {
@@ -18,9 +17,20 @@ struct ApplicationStruct {
     char_string applicationID = 1;
 }
 
+struct ErrorStateStruct {
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
+}
+
 struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
+}
+
+struct OperationalStateStruct {
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -2304,40 +2314,19 @@ server cluster IcdManagement = 70 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 server cluster ModeSelect = 80 {
-  enum ModeTag : ENUM16 {
-    kAuto = 0;
-    kQuick = 1;
-    kQuiet = 2;
-    kLowNoise = 3;
-    kLowEnergy = 4;
-    kVacation = 5;
-    kMin = 6;
-    kMax = 7;
-    kNight = 8;
-    kDay = 9;
-  }
-
-  enum StatusCode : ENUM8 {
-    kSuccess = 0;
-    kUnsupportedMode = 1;
-    kGenericFailure = 2;
-  }
-
   bitmap Feature : BITMAP32 {
     kOnOff = 0x1;
-    kExtendedStatus = 0x2;
   }
 
-  struct ModeTagStruct {
-    optional vendor_id mfgCode = 0;
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
     enum16 value = 1;
-    optional char_string<64> tagName = 2;
   }
 
   struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
-    ModeTagStruct modeTags[] = 2;
+    SemanticTagStruct semanticTags[] = 2;
   }
 
   readonly attribute char_string<64> description = 0;
@@ -2359,6 +2348,29 @@ server cluster ModeSelect = 80 {
   }
 
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+}
+
+/** Attributes and commands for configuring the Refrigerator alarm. */
+server cluster RefrigeratorAlarm = 87 {
+  bitmap AlarmMap : BITMAP32 {
+    kDoorOpen = 0x1;
+  }
+
+  info event Notify = 0 {
+    AlarmMap active = 0;
+    AlarmMap inactive = 1;
+    AlarmMap state = 2;
+    AlarmMap mask = 3;
+  }
+
+  readonly attribute AlarmMap mask = 0;
+  readonly attribute AlarmMap state = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** Attributes for reporting air quality classification */
@@ -4355,9 +4367,14 @@ server cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute nullable single measuredValue = 0;
   readonly attribute nullable single minMeasuredValue = 1;
   readonly attribute nullable single maxMeasuredValue = 2;
+  readonly attribute nullable single peakMeasuredValue = 3;
+  readonly attribute elapsed_s peakMeasuredValueWindow = 4;
+  readonly attribute nullable single averageMeasuredValue = 5;
+  readonly attribute elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute single uncertainty = 7;
   readonly attribute MeasurementUnitEnum measurementUnit = 8;
   readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4402,6 +4419,15 @@ server cluster OzoneConcentrationMeasurement = 1045 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
+  readonly attribute nullable single peakMeasuredValue = 3;
+  readonly attribute elapsed_s peakMeasuredValueWindow = 4;
+  readonly attribute nullable single averageMeasuredValue = 5;
+  readonly attribute elapsed_s averageMeasuredValueWindow = 6;
+  readonly attribute single uncertainty = 7;
+  readonly attribute MeasurementUnitEnum measurementUnit = 8;
   readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -4503,6 +4529,16 @@ server cluster FormaldehydeConcentrationMeasurement = 1067 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
+  readonly attribute nullable single peakMeasuredValue = 3;
+  readonly attribute elapsed_s peakMeasuredValueWindow = 4;
+  readonly attribute nullable single averageMeasuredValue = 5;
+  readonly attribute elapsed_s averageMeasuredValueWindow = 6;
+  readonly attribute single uncertainty = 7;
+  readonly attribute MeasurementUnitEnum measurementUnit = 8;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4668,6 +4704,7 @@ server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute single uncertainty = 7;
   readonly attribute MeasurementUnitEnum measurementUnit = 8;
   readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4712,6 +4749,15 @@ server cluster RadonConcentrationMeasurement = 1071 {
     kAverageMeasurement = 0x20;
   }
 
+  readonly attribute nullable single measuredValue = 0;
+  readonly attribute nullable single minMeasuredValue = 1;
+  readonly attribute nullable single maxMeasuredValue = 2;
+  readonly attribute nullable single peakMeasuredValue = 3;
+  readonly attribute elapsed_s peakMeasuredValueWindow = 4;
+  readonly attribute nullable single averageMeasuredValue = 5;
+  readonly attribute elapsed_s averageMeasuredValueWindow = 6;
+  readonly attribute single uncertainty = 7;
+  readonly attribute MeasurementUnitEnum measurementUnit = 8;
   readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -6110,6 +6156,18 @@ endpoint 1 {
     ram      attribute manufacturerExtension default = 255;
   }
 
+  server cluster RefrigeratorAlarm {
+    emits event Notify;
+    ram      attribute mask default = 1;
+    ram      attribute state default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster AirQuality {
     ram      attribute airQuality default = 0;
     callback attribute generatedCommandList;
@@ -6606,25 +6664,39 @@ endpoint 1 {
     ram      attribute measuredValue default = 3;
     ram      attribute minMeasuredValue default = 1;
     ram      attribute maxMeasuredValue default = 150;
+    ram      attribute peakMeasuredValue default = 3;
+    ram      attribute peakMeasuredValueWindow default = 120;
+    ram      attribute averageMeasuredValue default = 3;
+    ram      attribute averageMeasuredValueWindow default = 120;
     ram      attribute uncertainty default = 1;
     ram      attribute measurementUnit default = 1;
-    ram      attribute measurementMedium default = 0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster OzoneConcentrationMeasurement {
     ram      attribute measurementMedium default = 0;
     ram      attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 14;
+    ram      attribute featureMap default = 63;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster OzoneConcentrationMeasurement {
+    ram      attribute measuredValue default = 10;
+    ram      attribute minMeasuredValue default = 3;
+    ram      attribute maxMeasuredValue default = 300;
+    ram      attribute peakMeasuredValue default = 50;
+    ram      attribute peakMeasuredValueWindow default = 3600;
+    ram      attribute averageMeasuredValue default = 20;
+    ram      attribute averageMeasuredValueWindow default = 3600;
+    ram      attribute uncertainty default = 0;
+    ram      attribute measurementUnit default = 0;
+    ram      attribute measurementMedium default = 0;
+    ram      attribute levelValue default = 1;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6649,12 +6721,22 @@ endpoint 1 {
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
-    ram      attribute levelValue default = 3;
+    ram      attribute measuredValue default = 10;
+    ram      attribute minMeasuredValue default = 0;
+    ram      attribute maxMeasuredValue default = 200;
+    ram      attribute peakMeasuredValue default = 10;
+    ram      attribute peakMeasuredValueWindow default = 7200;
+    ram      attribute averageMeasuredValue default = 2;
+    ram      attribute averageMeasuredValueWindow default = 7200;
+    ram      attribute uncertainty default = 0;
+    ram      attribute measurementUnit default = 3;
+    ram      attribute measurementMedium default = 0;
+    ram      attribute levelValue default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
+    ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6679,7 +6761,7 @@ endpoint 1 {
   }
 
   server cluster Pm10ConcentrationMeasurement {
-    ram      attribute measuredValue;
+    ram      attribute measuredValue default = 7;
     ram      attribute minMeasuredValue default = 2;
     ram      attribute maxMeasuredValue default = 400;
     ram      attribute peakMeasuredValue default = 49;
@@ -6709,22 +6791,32 @@ endpoint 1 {
     ram      attribute uncertainty default = 1;
     ram      attribute measurementUnit default = 1;
     ram      attribute measurementMedium default = 0;
+    ram      attribute levelValue default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 49;
+    ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster RadonConcentrationMeasurement {
+    ram      attribute measuredValue default = 10;
+    ram      attribute minMeasuredValue default = 5;
+    ram      attribute maxMeasuredValue default = 100;
+    ram      attribute peakMeasuredValue default = 36;
+    ram      attribute peakMeasuredValueWindow default = 3600;
+    ram      attribute averageMeasuredValue default = 20;
+    ram      attribute averageMeasuredValueWindow default = 3600;
+    ram      attribute uncertainty default = 0;
+    ram      attribute measurementUnit default = 0;
     ram      attribute measurementMedium default = 0;
-    ram      attribute levelValue default = 4;
+    ram      attribute levelValue default = 3;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 14;
+    ram      attribute featureMap default = 63;
     ram      attribute clusterRevision default = 1;
   }
 

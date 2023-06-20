@@ -64,7 +64,7 @@ void End(::chip::Tracing::Scope scope);
 void Instant(::chip::Tracing::Instant instant);
 
 void LogMessageSend(::chip::Tracing::MessageSendInfo & info);
-void LogMessageReceived(::chip::Tracing::MessageReceiveInfo & info);
+void LogMessageReceived(::chip::Tracing::MessageReceivedInfo & info);
 void LogNodeLookup(::chip::Tracing::NodeLookupInfo & info);
 void LogNodeDiscovered(::chip::Tracing::NodeDiscoveredInfo & info);
 void LogNodeDiscoveryFailed(::chip::Tracing::NodeDiscoveryFailedInfo & info);

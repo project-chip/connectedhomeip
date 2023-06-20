@@ -59,6 +59,9 @@ from .native import PyChipError
 
 __all__ = ["ChipDeviceController", "CommissioningParameters"]
 
+# Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
+CHIP_ERROR_TIMEOUT: int = 50
+
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, PyChipError)
 _DeviceUnpairingCompleteFunct = CFUNCTYPE(None, c_uint64, PyChipError)
 _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
@@ -143,13 +146,13 @@ class CommissionableNode(discovery.CommissionableNode):
     def SetDeviceController(self, devCtrl: 'ChipDeviceController'):
         self._devCtrl = devCtrl
 
-    def Commission(self, nodeId: int, setupPinCode: int):
+    def Commission(self, nodeId: int, setupPinCode: int) -> PyChipError:
         ''' Commission the device using the device controller discovered this device.
 
         nodeId: The nodeId commissioned to the device
         setupPinCode: The setup pin code of the device
         '''
-        self._devCtrl.CommissionOnNetwork(
+        return self._devCtrl.CommissionOnNetwork(
             nodeId, setupPinCode, filterType=discovery.FilterType.INSTANCE_NAME, filter=self.instanceName)
 
     def __rich_repr__(self):
@@ -409,7 +412,7 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         )
 
-    def ConnectBLE(self, discriminator, setupPinCode, nodeid):
+    def ConnectBLE(self, discriminator, setupPinCode, nodeid) -> PyChipError:
         self.CheckIsActive()
 
         self._ChipStack.commissioningCompleteEvent.clear()
@@ -421,8 +424,8 @@ class ChipDeviceControllerBase():
         ).raise_on_error()
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout
-            return False
-        return self._ChipStack.commissioningEventRes.is_success
+            return PyChipError(CHIP_ERROR_TIMEOUT)
+        return self._ChipStack.commissioningEventRes
 
     def UnpairDevice(self, nodeid: int):
         self.CheckIsActive()
@@ -1488,7 +1491,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
     def fabricAdmin(self) -> FabricAdmin:
         return self._fabricAdmin
 
-    def Commission(self, nodeid) -> bool:
+    def Commission(self, nodeid) -> PyChipError:
         '''
         Start the auto-commissioning process on a node after establishing a PASE connection.
         This function is intended to be used in conjunction with `EstablishPASESessionBLE` or
@@ -1508,15 +1511,18 @@ class ChipDeviceController(ChipDeviceControllerBase):
             lambda: self._dmLib.pychip_DeviceController_Commission(
                 self.devCtrl, nodeid)
         )
-        return (self._ChipStack.commissioningCompleteEvent.isSet() and (self._ChipStack.commissioningEventRes == 0))
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            # Error 50 is a timeout
+            return PyChipError(CHIP_ERROR_TIMEOUT)
+        return self._ChipStack.commissioningEventRes
 
-    def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes):
+    def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes) -> PyChipError:
         ''' Commissions a Thread device over BLE
         '''
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return self.ConnectBLE(discriminator, setupPinCode, nodeId)
 
-    def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str):
+    def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str) -> PyChipError:
         ''' Commissions a WiFi device over BLE
         '''
         self.SetWiFiCredentials(ssid, credentials)
@@ -1539,7 +1545,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
-                            filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None):
+                            filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None) -> PyChipError:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
         Supported filters are:
@@ -1573,10 +1579,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
                 self.devCtrl, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
-            return False, -1
-        return self._ChipStack.commissioningEventRes == 0, self._ChipStack.commissioningEventRes
+            # Error 50 is a timeout
+            return PyChipError(CHIP_ERROR_TIMEOUT)
+        return self._ChipStack.commissioningEventRes
 
-    def CommissionWithCode(self, setupPayload: str, nodeid: int):
+    def CommissionWithCode(self, setupPayload: str, nodeid: int) -> PyChipError:
         self.CheckIsActive()
 
         setupPayload = setupPayload.encode() + b'\0'
@@ -1592,10 +1599,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
                 self.devCtrl, setupPayload, nodeid)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
-            return False
-        return self._ChipStack.commissioningEventRes == 0
+            # Error 50 is a timeout
+            return PyChipError(CHIP_ERROR_TIMEOUT)
+        return self._ChipStack.commissioningEventRes
 
-    def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int):
+    def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int) -> PyChipError:
         """ DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode` """
         self.CheckIsActive()
 
@@ -1610,8 +1618,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
-            return False
-        return self._ChipStack.commissioningEventRes == 0
+            # Error 50 is a timeout
+            return PyChipError(CHIP_ERROR_TIMEOUT)
+        return self._ChipStack.commissioningEventRes
 
     def IssueNOCChain(self, csr: Clusters.OperationalCredentials.Commands.CSRResponse, nodeId: int):
         """Issue an NOC chain using the associated OperationalCredentialsDelegate.

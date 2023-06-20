@@ -90,31 +90,31 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm-chip-tool build"
             - name: Clean out build output
-              run: rm -rf ./out
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm-tv-casting-app
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm-tv-casting-app build"
             - name: Clean out build output
-              run: rm -rf ./out
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm-tv-server
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm-tv-server build"
             - name: Clean out build output
-              run: rm -rf ./out
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm64-tv-casting-app
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm64-tv-casting-app build"
             - name: Clean out build output
-              run: rm -rf ./out
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm64-tv-server
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target android-arm64-tv-server build"
             - name: Clean out build output
-              run: rm -rf ./out                    
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             - name: Build Android arm64-chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -124,7 +124,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test"
             - name: Clean out build output
-              run: rm -rf ./out
+              run: rm -rf ./out examples/android/CHIPTool/app/libs/jniLibs/*
             # - name: Build Android Studio build (arm64 only)
             #   run: |
             #     ./scripts/run_in_build_env.sh \

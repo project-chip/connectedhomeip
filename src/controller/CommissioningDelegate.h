@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>

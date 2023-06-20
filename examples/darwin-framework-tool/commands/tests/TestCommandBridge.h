@@ -422,32 +422,44 @@ protected:
 
     // Used when the minValue is a saved variable, since ConstraintsChecker does
     // not expect Core Foundation types.
-    template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
     bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
     {
         return ConstraintsChecker::CheckConstraintMinValue(itemName, current, [expected longLongValue]);
     }
 
-    template <typename T, std::enable_if_t<!std::is_signed<T>::value, int> = 0>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_signed<T>::value, int> = 0>
     bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
     {
         return ConstraintsChecker::CheckConstraintMinValue(itemName, current, [expected unsignedLongLongValue]);
+    }
+
+    template <typename T, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    bool CheckConstraintMinValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    {
+        return ConstraintsChecker::CheckConstraintMinValue(itemName, current, [expected doubleValue]);
     }
 
     using ConstraintsChecker::CheckConstraintMaxValue;
 
     // Used when the maxValue is a saved variable, since ConstraintsChecker does
     // not expect Core Foundation types.
-    template <typename T, std::enable_if_t<std::is_signed<T>::value, int> = 0>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, int> = 0>
     bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
     {
         return ConstraintsChecker::CheckConstraintMaxValue(itemName, current, [expected longLongValue]);
     }
 
-    template <typename T, std::enable_if_t<!std::is_signed<T>::value, int> = 0>
+    template <typename T, std::enable_if_t<std::is_integral<T>::value && !std::is_signed<T>::value, int> = 0>
     bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
     {
         return ConstraintsChecker::CheckConstraintMaxValue(itemName, current, [expected unsignedLongLongValue]);
+    }
+
+    template <typename T, std::enable_if_t<std::is_floating_point<T>::value, int> = 0>
+    bool CheckConstraintMaxValue(const char * _Nonnull itemName, T current, const NSNumber * _Nonnull expected)
+    {
+        return ConstraintsChecker::CheckConstraintMaxValue(itemName, current, [expected doubleValue]);
     }
 
     bool CheckConstraintHasValue(const char * _Nonnull itemName, id _Nullable current, bool shouldHaveValue)
