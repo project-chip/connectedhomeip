@@ -114,7 +114,6 @@ public:
     WindowManager();
 
     CHIP_ERROR Init();
-    CHIP_ERROR UpdateState();
     void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);

@@ -34,8 +34,6 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <sl_system_kernel.h>
-
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -57,11 +55,6 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 #define APP_STATE_LED 0
 #define APP_ACTION_LED 1
-
-#ifdef SL_WIFI
-chip::app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(chip::DeviceLayer::NetworkCommissioning::SlWiFiDriver::GetInstance()));
-#endif
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
@@ -124,63 +117,9 @@ WindowManager::Cover * WindowManager::GetCover(chip::EndpointId endpoint)
             return &mCoverList[i];
         }
     }
-    return nullptr; 
+    return nullptr;
 }
 
-CHIP_ERROR WindowManager::UpdateState()
-{
-    StateFlags oldState;
-
-#if CHIP_ENABLE_OPENTHREAD
-    oldState.isThreadProvisioned = !ConnectivityMgr().IsThreadProvisioned();
-#else
-    oldState.isWiFiProvisioned = !ConnectivityMgr().IsWiFiStationProvisioned();
-#endif
-    while (true)
-    {
-        // Collect connectivity and configuration state from the CHIP stack. Because
-        // the CHIP event loop is being run in a separate task, the stack must be
-        // locked while these values are queried.  However we use a non-blocking
-        // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
-        // when the CHIP task is busy (e.g. with a long crypto operation).
-        if (PlatformMgr().TryLockChipStack())
-        {
-#if CHIP_ENABLE_OPENTHREAD
-            mState.isThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            mState.isThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-#else
-            mState.isWiFiProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
-            mState.isWiFiEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
-#endif
-            mState.haveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
-            PlatformMgr().UnlockChipStack();
-        }
-
-#if CHIP_ENABLE_OPENTHREAD
-        if (mState.isThreadProvisioned != oldState.isThreadProvisioned)
-#else
-        if (mState.isWiFiProvisioned != oldState.isWiFiProvisioned)
-#endif
-        {
-            // Provisioned state changed
-            UpdateLEDs();
-            UpdateLCD();
-
-        }
-
-        if (mState.haveBLEConnections != oldState.haveBLEConnections)
-        {
-            // Provisioned state changed
-            UpdateLEDs();
-        }
-
-        mStatusLED.Animate();
-        mActionLED.Animate();
-        oldState = mState;
-    }
-
-    return CHIP_NO_ERROR;
-}
 
 void WindowManager::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute)
 {
@@ -672,10 +611,7 @@ CHIP_ERROR WindowManager::Init()
     slLCD.Init();
 #endif
 
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack(); 
-
-    SILABS_LOG("Starting FreeRTOS scheduler");
-    sl_system_kernel_start();
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     return CHIP_NO_ERROR;
 }
@@ -942,5 +878,5 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         default:
             break;
         }
-    
+
 }
