@@ -40,6 +40,12 @@ typedef struct
     size_t size;
 } TimeZoneObj;
 
+typedef struct
+{
+    DSTOffsets dstOffsetList;
+    size_t size;
+} DSTOffsetObj;
+
 namespace chip {
 
 class TimeSyncDataProvider
@@ -60,11 +66,11 @@ public:
     CHIP_ERROR ClearDefaultNtp();
 
     CHIP_ERROR StoreTimeZone(const chip::Span<TimeZoneStore> & timeZoneList);
-    CHIP_ERROR LoadTimeZone(TimeZoneObj & timeZoneList);
+    CHIP_ERROR LoadTimeZone(TimeZoneObj & timeZoneObj);
     CHIP_ERROR ClearTimeZone();
 
     CHIP_ERROR StoreDSTOffset(const DSTOffsets & dstOffsetList);
-    CHIP_ERROR LoadDSTOffset(DSTOffsets & dstOffsetList, uint8_t & size);
+    CHIP_ERROR LoadDSTOffset(DSTOffsetObj & dstOffsetObj);
     CHIP_ERROR ClearDSTOffset();
 
 private:

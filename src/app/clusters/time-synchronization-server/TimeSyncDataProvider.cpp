@@ -184,12 +184,12 @@ CHIP_ERROR TimeSyncDataProvider::StoreDSTOffset(const DSTOffsets & dstOffsetList
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffsets & dstOffsetList, uint8_t & size)
+CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffsetObj & dstOffsetObj)
 {
     uint8_t buffer[kDSTOffsetListMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     CHIP_ERROR err;
-    size = 0;
+    dstOffsetObj.size = 0;
 
     ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::TSDSTOffset().KeyName(), bufferSpan));
 
@@ -201,11 +201,11 @@ CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffsets & dstOffsetList, uint8
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
     reader.CountRemainingInContainer(&count);
-    VerifyOrReturnError(count <= dstOffsetList.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    auto dst  = dstOffsetList.begin();
+    VerifyOrReturnError(count <= dstOffsetObj.dstOffsetList.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    auto dst  = dstOffsetObj.dstOffsetList.begin();
     uint8_t i = 0;
 
-    while ((err = reader.Next()) == CHIP_NO_ERROR && i < dstOffsetList.size())
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(dst[i].Decode(reader));
         i++;
@@ -217,7 +217,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffsets & dstOffsetList, uint8
     err = reader.Next();
     VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    size = i;
+    dstOffsetObj.size = i;
 
     return CHIP_NO_ERROR;
 }

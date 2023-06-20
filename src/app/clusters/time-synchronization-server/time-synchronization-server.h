@@ -76,13 +76,13 @@ public:
     CHIP_ERROR SetDSTOffset(const DataModel::DecodableList<Structs::DSTOffsetStruct::Type> & dstL);
     CHIP_ERROR ClearDSTOffset(void);
     DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource(void);
-    Span<TimeZoneStore> GetTimeZone(void); //{ return mTimeZoneObj };
+    Span<TimeZoneStore> GetTimeZone(void);
     DataModel::List<Structs::DSTOffsetStruct::Type> GetDSTOffset(void);
     CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp);
 
     CHIP_ERROR SetUTCTime(chip::EndpointId ep, uint64_t utcTime, GranularityEnum granularity, TimeSourceEnum source);
     CHIP_ERROR GetLocalTime(chip::EndpointId ep, uint64_t & localTime);
-    GranularityEnum GetGranularity(void) { return mGranularity; }
+    GranularityEnum & GetGranularity() { return mGranularity; }
 
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 
@@ -94,10 +94,8 @@ public:
 private:
     DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
     TimeZoneObj mTimeZoneObj{ Span<TimeZoneStore>(mTz), 0 };
-    DataModel::List<Structs::DSTOffsetStruct::Type> mDstOffsetList = DataModel::List<Structs::DSTOffsetStruct::Type>(mDst);
+    DSTOffsetObj mDstOffsetObj{ DataModel::List<Structs::DSTOffsetStruct::Type>(mDst), 0 };
     GranularityEnum mGranularity;
-
-    uint8_t mDstOffsetListSize = 0;
 
     TimeZoneStore mTz[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
     Structs::DSTOffsetStruct::Type mDst[CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE];
