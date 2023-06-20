@@ -16,6 +16,7 @@
  */
 #include <lib/support/IntrusiveList.h>
 
+#include <matter/tracing/build_config.h>
 #include <platform/LockTracker.h>
 #include <tracing/registry.h>
 
