@@ -28,6 +28,8 @@
 using namespace ::chip;
 using namespace ::chip::Controller;
 
+extern NSMutableArray * gDiscoveredDevices;
+
 // A no-op MTRDeviceAttestationDelegate which lets us test (by default, in CI)
 // commissioning flows that have such a delegate.
 @interface NoOpAttestationDelegate : NSObject <MTRDeviceAttestationDelegate>
@@ -92,6 +94,9 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
     case PairingMode::Ble:
         PairWithCode(&error);
         break;
+    case PairingMode::AlreadyDiscoveredByIndex:
+        PairWithIndex(&error);
+        break;
     }
 
     if (error != nil) {
@@ -106,6 +111,29 @@ void PairingCommandBridge::PairWithCode(NSError * __autoreleasing * error)
     auto * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@(mSetupPINCode) discriminator:@(mDiscriminator)];
     MTRDeviceController * commissioner = CurrentCommissioner();
     [commissioner setupCommissioningSessionWithPayload:payload newNodeID:@(mNodeId) error:error];
+}
+
+void PairingCommandBridge::PairWithIndex(NSError * __autoreleasing * error)
+{
+    SetUpDeviceControllerDelegate();
+    MTRDeviceController * commissioner = CurrentCommissioner();
+
+    if (mIndex >= [gDiscoveredDevices count]) {
+        auto errorString = [NSString stringWithFormat:@"Error retrieving discovered device at index %@", @(mIndex)];
+        *error = [[NSError alloc] initWithDomain:@"PairingDomain"
+                                            code:MTRErrorCodeGeneralError
+                                        userInfo:@ { NSLocalizedDescriptionKey : NSLocalizedString(errorString, nil) }];
+        return;
+    }
+
+    NSString * onboardingPayload = [NSString stringWithUTF8String:mOnboardingPayload];
+    auto * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:onboardingPayload error:error];
+    if (payload == nil) {
+        return;
+    }
+
+    auto discoveredDevice = (MTRCommissionableBrowserResult *) gDiscoveredDevices[mIndex];
+    [commissioner setupCommissioningSessionWithDiscoveredDevice:discoveredDevice payload:payload newNodeID:@(mNodeId) error:error];
 }
 
 void PairingCommandBridge::PairWithPayload(NSError * __autoreleasing * error)
