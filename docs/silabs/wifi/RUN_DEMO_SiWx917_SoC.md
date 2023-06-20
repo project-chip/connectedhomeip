@@ -116,8 +116,3 @@ The commissioning command mentioned above does the following:
 It then starts providing mDNS records on IPv4 and IPv6
 - chip-tool then locates the device over Wi-Fi and establishes operational certificates
 - Future communications (tests) will then happen over Wi-Fi
- 
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](./DEMO_OVERVIEW.md)

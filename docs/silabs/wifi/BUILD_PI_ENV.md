@@ -109,10 +109,3 @@ Now the status of the service should be active and running:
 ```shell
 $ sudo systemctl status bluetooth.service
 ```
-
-
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](./DEMO_OVERVIEW.md)

@@ -19,6 +19,3 @@ Simplicity Studio is a complete development environment and tool suite. It has t
 Multi-platform debugger and performance analyzer for J-Link and J-Trace
 - Download for: [Windows](https://www.segger.com/downloads/jlink/Ozone_Setup_Windows_x64.exe) | [Mac](https://www.segger.com/downloads/jlink/Ozone_macOS_Universal.pkg) | [Linux](https://www.segger.com/downloads/jlink/Ozone_Linux_x86_64.deb)
 - [Flashing and debug procedure for Ozone](../wifi/RUN_DEMO_SiWx917_SoC.md)
-
-----
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

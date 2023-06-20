@@ -93,8 +93,3 @@ you laptop and connect it via USB to the Raspberry Pi.
 
 The Raspberry Pi's Open Thread Border Router can then use the RCP to communicate
 with the Thread network.
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

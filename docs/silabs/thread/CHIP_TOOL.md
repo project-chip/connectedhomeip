@@ -69,7 +69,7 @@ Available commands:
 
 <br>
 
-#### Usage:
+### Usage:
 
 <br>
 
@@ -198,14 +198,9 @@ The commands presented above are linked to scripts. You can edit **_.bashrc_**
 and rename the following alias to your liking.
 
 ```shell
-$ alias mattertool=‘source $HOME/scripts/matterTool.sh’
+$ alias mattertool=`source $HOME/scripts/matterTool.sh`
 ```
 
 ```shell
-$ alias otbrsetup=‘source $HOME/scripts/setupOTBR.sh'
+$ alias otbrsetup=`source $HOME/scripts/setupOTBR.sh`
 ```
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

@@ -73,8 +73,8 @@ you are using, select the appropriate command to build.
 >    1. The build commands given below are for the following applications: `lighting-app`, `lock-app`, `light-switch-app`, `window-app`
 >    2. In order to build applications other than those mentioned in # 1, (such as `thermostat-app`), substitute the appropriate application name & 
 substitute `/silabs/efr32/` with `/efr32/` after the application name.
->    3. Additional examples (such as `onoff-plug-app`) are provided in the [/examples](../../../examples/) or [/silabs_examples](../../../silabs_examples/) directory.
->    4. In order to build applications from [/silabs_examples](../../../silabs_examples/) (such as `onoff-plug-app`), substitute `examples` with `silabs_examples`.
+>    3. Additional examples (such as `onoff-plug-app`) are provided in the [/examples](https://github.com/SiliconLabs/matter/blob/latest/examples/) or [/silabs_examples](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/) directory.
+>    4. In order to build applications from [/silabs_examples](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/) (such as `onoff-plug-app`), substitute `examples` with `silabs_examples`.
 >    5. To build for EFR32MG24 host processors, substitute `BRD41xxx` in the build command with the appropriate MG24 board number
 from the [Hardware Requirements Page](../general/HARDWARE_REQUIREMENTS.md).
 
@@ -167,6 +167,3 @@ Navigate to
 `examples/platform/silabs/efr32/FreeRTOSConfig.h`. Find the macro:
 \``configMINIMAL_STACK_SIZE`\`, and change the macro value from `140` to
  **`320`**.
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](./DEMO_OVERVIEW.md)

@@ -49,8 +49,3 @@ All of the header files in your `config` project directory constitute the
 hardware configuration for your device. Copy these files 
 into your Matter project so that they can be used in place of the ones provided
 in the example.
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

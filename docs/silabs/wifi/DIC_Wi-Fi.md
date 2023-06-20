@@ -12,7 +12,7 @@
 
 ### Configuration of MQTT server
 To set up and configure AWS or Mosquitto for DIC support please see the following documentation: 
-   - [AWS installation](./AWS_CONFIGURATION_REGISTERATION.md)
+   - [AWS installation](./AWS_CONFIGURATION_REGISTRATION.md)
    - [Mosquitto installation](./MOSQUITTO_SETUP.md)
 ### Remote User Setup (MQTT Explorer)
      

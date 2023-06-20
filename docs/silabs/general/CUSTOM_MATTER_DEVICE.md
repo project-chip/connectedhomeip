@@ -133,9 +133,4 @@ $ mattertool levelcontrol read current-level 1 1 // Returns 10
 ```
 
 For more information on running a Silicon Labs lighting example on a Thunderboard Sense 2 see 
-[sl-newlight/efr32](../../../silabs_examples/sl-newLight/efr32/README.md).
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)
+[sl-newlight/efr32](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/sl-newLight/efr32/README.md).

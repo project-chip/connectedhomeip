@@ -46,7 +46,3 @@ From the drop-down menu, select the desired target device.
 ![](../../images/debug_session.gif)
 
 ## </ol>
-
------
-
-[Table of Contents](../../README.md)

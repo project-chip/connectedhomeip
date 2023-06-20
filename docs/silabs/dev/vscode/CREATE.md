@@ -36,8 +36,3 @@ Provide a name for the sample application target directory in the Matter workspa
 ## Windows
 
 Copying a sample application is not supported for Windows at this time.
-
-
------
-
-[Table of Contents](../../README.md)

@@ -32,8 +32,3 @@ steps:
 -   Press the BTN0 button and keep it pressed for about 1 min - this should
     cause LED0 and LED1 to turns ON and OFF for 3 times. You can then release
     the button
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](./DEMO_OVERVIEW.md)

@@ -36,8 +36,3 @@ $ sudo apt install
 -    To build enviorment follow the `Software setup` and `Compiling chip-tool` steps given in [SW_SETUP](./SW_SETUP.md),
 
 <br>
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](./DEMO_OVERVIEW.md)

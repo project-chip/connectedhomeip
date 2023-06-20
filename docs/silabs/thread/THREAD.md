@@ -39,8 +39,3 @@ controller and the OTBR, with a Silicon Labs device as the MAD.
 An alternate configuration is to use a Macbook as the controller, a Raspberry Pi
 as the OTBR, and a Silicon Labs Device as the MAD. This requires additional
 routing between the controller and OTBR.
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

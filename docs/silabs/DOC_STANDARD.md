@@ -22,7 +22,7 @@ $ this is a highlighted command
 ```
 
 ```shell
-$ if there is a second line it has it's own entry
+$ if there is a second line it has its own entry
 ```
 
 ```shell

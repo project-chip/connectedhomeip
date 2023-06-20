@@ -1,8 +1,11 @@
 # Silicon Labs Matter New Features
 
-## New Features for v2.0.0-1.1
+## New Features for v2.1.0-1.1
+- ### Update to GSDK Version 4.2.3
+  
+  The GSDK Version 4.2.3 includes important security enhancements for the Open Thread Stack which in turn updates all Matter over Thread implementations.
 
----
+## New Features for v2.0.0-1.1
 
 ## Matter Intermittently Connected Devices (ICD / Sleepy) Improvements
 - ### Expose the API for a device to change the max interval in a subscription request

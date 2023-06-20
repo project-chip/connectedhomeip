@@ -2,7 +2,7 @@
 
 This page explains how to measure the power values for EFR and Wi-Fi co-processor.
 
-### EFR32 + RS9116 Setup for Sleepy Devices
+## EFR32 + RS9116 Setup for Sleepy Devices
 
 ![Power measurment GPIO pin connection for 9116](./images/WiFi_9116_GPIO_Connection.png)
 

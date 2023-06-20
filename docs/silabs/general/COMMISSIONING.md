@@ -51,6 +51,3 @@ In step 8, the device starts to join the operational network with the configured
 Once the device is attached to the network (step 9), it can be discovered through Service Registration Protocol (**SRP**). To control that device, you must establish a secured connection through the Certification Authorized Session Establishment (**CASE**) process. 
 
 After the CASE session is established, the Matter device is commissioned successfully and can communicate with other devices in the Matter network (step 10).
-
-----
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

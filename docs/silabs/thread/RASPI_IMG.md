@@ -92,8 +92,3 @@ application inside the Raspberry Pi image.
 
 Refer to the [chip-tool page](./CHIP_TOOL.md) for information on using the Matter
 Hub with `mattertool` commands.
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

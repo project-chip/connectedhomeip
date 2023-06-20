@@ -7,8 +7,3 @@
 
 3. Select **Attach to Running Program** in the dropdown next to the **Power** button on the top-left hand corner of the page.
    ![Silicon Labs - SiWx917 SoC Ozone Target Connection Lost](./images/SiWx917SoC_AttachToRunningProgram.png)
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](./DEMO_OVERVIEW.md)

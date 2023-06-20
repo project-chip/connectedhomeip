@@ -8,7 +8,7 @@
 
 1.  Plug the WSTK and EFR into the laptop.
 
-2.  Based on the Application being built, make sure to flash proper [bootloader](../general/ARTIFACTS.md#matter-bootloader-binaries) internal or external binaries. 
+2.  Based on the Application being built, make sure to flash proper [bootloader](../general/ARTIFACTS.md) internal or external binaries. 
 
 3.  Launch Ozone, Simplicity Studio or Simplicity Commander Standalone - this
     will display a GUI. If you are not using Ozone, you can follow the
@@ -147,8 +147,3 @@ It then starts providing mDNS records on IPv4 and IPv6
 - chip-tool then locates the device over Wi-Fi and establishes operational
 certificates
 - Future communications (tests) will then happen over Wi-Fi
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](./DEMO_OVERVIEW.md)

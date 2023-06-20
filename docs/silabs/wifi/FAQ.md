@@ -12,7 +12,7 @@ Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's password**.
 
 **Error example:**
 
-```log
+```shell
 [1659464425.856025][34818:34823] CHIP:DL: HandlePlatformSpecificBLEEvent 16386
 [1659464425.856035][34818:34823] CHIP:IN: Clearing BLE pending packets.
 [1659464425.856055][34818:34823] CHIP:IN: BleConnection Error: ../../examples/chip-tool/third_party/connectedhomeip/src/platform/Linux/bluez/Helper.cpp:1775: CHIP Error 0x000000AC: Internal error
@@ -65,7 +65,7 @@ Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's password**.
 
 **Error example:**
 
-```log
+```shell
 [1659631352.672826][5076:5076] CHIP:TOO: Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1275: CHIP Error 0x00000050: Unsupported certificate format
 ```
 
@@ -196,9 +196,3 @@ commander.exe extflash read --range 0x00:+<total size to read>
 3. Reconnect the WF200 Expansion Board to the EFR32MG24 and reset the device.
 
 4. Re-run the OTA Update process from the beginning.
-
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](./DEMO_OVERVIEW.md)

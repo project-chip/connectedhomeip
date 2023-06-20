@@ -1,6 +1,6 @@
-## Build Procedure For DIC
+# Build Procedure For Direct Internet Connectivity (DIC)
 
-### Build command with DIC
+## Build command with DIC
 To enable DIC functionality use the `enable_dic=true` flag.
 ### Here is an example to build the lighting-app with DIC feature for the EFR32MG24 + 9116
    ```shell
@@ -20,7 +20,7 @@ To enable DIC functionality use the `enable_dic=true` flag.
    ```shell
 ./scripts/examples/gn_efr32_example.sh silabs_examples/Direct_Internet_lighting-app/SiWx917/ out/siwx917_DIC_light BRD4325B enable_dic=true chip_enable_wifi_ipv4=true
    ```
-### Compile using new/different certificates
+## Compile using new/different certificates
 
    - Two devices should not use the same Client ID. To use a different Client ID for your second connection do the following:
    - If using AWS, Change the following file `examples/platform/silabs/DIC/matter_abs_interface/include/dic_config.h` under `#if USE_AWS`

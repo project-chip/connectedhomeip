@@ -37,8 +37,3 @@ Build command is provided for the SiWx917 SoC processor.
 This contains instructions to run the Matter Wi-Fi demo using chip-tool
 running on a Linux Machine (either Laptop or Raspberry Pi) - follow this
 after successfully executing the above steps.
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](./DEMO_OVERVIEW.md)

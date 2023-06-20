@@ -55,6 +55,8 @@ docs/html
 
 # Documentation
 docs/_build
+docs/silabs/_build
+docs/silabs/_dox
 
 # VSCode java extensions
 .project

@@ -71,8 +71,3 @@ Pi image:
 | mattertool off         | Sends an **off** command to the MAD using chip-tool |
 
 <br>
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

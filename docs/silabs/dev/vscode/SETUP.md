@@ -91,7 +91,3 @@ $ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.
 1. Under the "Terminal" menu (or using shortcut Ctrl+shift+p), select "Run
    Task..."
 2. Select the "Bootstrap" task
-
----
-
-[Table of Contents](../../README.md)

@@ -91,7 +91,7 @@ MG24 boards only. In this use case both the running image and the downloadable
 update image must fit on the internal flash at the same time. This in turn
 requires that both images are built with a reduced feature set such as disabled
 logging and Matter shell (see
-[here](./OTA_SOFTWARE_UPDATE.md#Internal-Storage-Bootloader) for the list of
+[here](./OTA_SOFTWARE_UPDATE.md) for the list of
 features). Using LZMA compression when building the GBL file further reduces the
 downloaded image size.
 

@@ -29,8 +29,3 @@
   - If the DPLL value is left unchanged with a modified HFXO, the radio will be on the right frequency but the BLE packet timings will not be correct, which will cause issues within a few packets due to BLE's strict timing requirements.
 
 <br>
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

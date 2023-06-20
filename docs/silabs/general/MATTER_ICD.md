@@ -13,7 +13,8 @@ The maximum interval of a subscription request is what defines the frequency at 
 
 Within the subscription request / response model, a device has the opportunity to decide the maximum interval at which it will send its liveness check (Empty Report Update). 
 The device can set a maximum interval within this range:
-```
+
+```shell
 MinIntervalRequested ≤ MaxInterval ≤ MAX(1h, MaxIntervalRequested)
 ```
 
@@ -26,6 +27,7 @@ The following table shows the subscribe response fields.
 ### Maximum Interval Negotiation
 For a device to be able to Negotiate the Maximum Interval when receiving a subscribe request, 
 the application first needs to implement the `ApplicationCallback` class from the `ReadHandler.h` header.
+
 ```cpp
 /*
  * A callback used to interact with the application.

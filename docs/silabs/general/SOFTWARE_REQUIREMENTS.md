@@ -1,6 +1,6 @@
 # Matter Software Requirements
 
-## **System Agnostic Software Requirements (Windows/Mac/Linux):**
+## System Agnostic Software Requirements (Windows/Mac/Linux):
 
 1. SSH Client ([PuTTY](https://www.putty.org/), Terminal, or similar):
     
@@ -48,7 +48,7 @@
    demo applications. When you flash your application image be sure to include a
    bootloader as well (if one is not already present). Bootloader images are provided on the [Matter Artifacts page](../general/ARTIFACTS.md).
 
-## **Windows-Specific Software Requirements:**
+## Windows-Specific Software Requirements:
 
 &emsp; These requirements are in addition to those mentioned above, for Windows
 only.
@@ -63,7 +63,7 @@ only.
     > WSL or Virtual Box are used to emulate a virtual Linux machine, which is
     > useful for accessing the Linux command line tools
 
-## **Mac-Specific Requirements (building own images):**
+## Mac-Specific Requirements (building own images):
 
 &emsp; These requirements are in addition to those mentioned above for Mac OS
 users building their own images.
@@ -90,7 +90,7 @@ users building their own images.
     
     Depending on your Mac processor, you will have to complete the following additional steps.
 
-### **Apple Silicon (M1) Software Requirements:**
+### Apple Silicon (M1) Software Requirements:
 
 Users may also have to specify which `pkg-config`/`openssl` to use by adding
 these lines of code to `bootstrap.sh`:
@@ -103,7 +103,7 @@ $ export PATH="/opt/homebrew/opt/openssl@3/bin:$PATH"
 $ export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@3/lib/pkgconfig"
 ```
 
-### **Intel Software Requirements:**
+### Intel Software Requirements:
 
 ```shell
 $ cd /usr/local/lib/pkgconfig
@@ -125,7 +125,7 @@ $ port install openssl
 is sufficient to satisfy this
 dependency.
 
-## **Linux Specific Requirements:**
+## Linux Specific Requirements:
 
 On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following:
@@ -134,7 +134,7 @@ satisfied with the following:
 $ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
 ```
 
-## **Wi-Fi RS9116 Specific Requirements:**
+## Wi-Fi RS9116 Specific Requirements:
 
 Before you run the demo or development on the RS9116 please be sure that you
 update the RS9116 firmware.
@@ -145,7 +145,7 @@ Pre-Built RS9116 firmware is available in the github repository under `third_par
 2. [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware)
 
 
-## **Wi-Fi SiWx917 Specific Requirements:**
+## Wi-Fi SiWx917 Specific Requirements:
 
 Before you run the demo or development on the SiWx917 please be sure that you
 update the SiWx917 firmware.
@@ -163,9 +163,3 @@ Pre-Built SiWx917 firmware is available under `third_party/silabs/wisemcu-wifi-b
 3. For updating the SiWx917 SoC Firmware, you have several options outlined here:
    - [Updating the SiWx917 SoC Firmware using Simplicity Commander](../wifi/RUN_DEMO_SiWx917_SoC.md)
    - [Updating the SiWx917 SoC Firmware using Tera Term (Legacy Mode)](../wifi/SiWx917_SoC_FWUpdate.md)
-
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

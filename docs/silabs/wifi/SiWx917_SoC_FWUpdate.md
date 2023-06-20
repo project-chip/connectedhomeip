@@ -29,8 +29,3 @@
 9. Reset both the buttons to Off/Low state.
 
 10. Flash and run the application - [Running the Matter Demo on SiWx917 SoC](RUN_DEMO_SiWx917_SoC.md).
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](./DEMO_OVERVIEW.md)

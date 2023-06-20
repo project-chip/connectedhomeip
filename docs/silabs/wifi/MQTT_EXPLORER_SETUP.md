@@ -14,7 +14,7 @@
 
   - Add topics as shown (#, light/*, test_publish )
   - MQTT Client ID depends on the certificate set that you will use.
-  - Add the Certificate, following step 7 in [AWS installation](./AWS_CONFIGURATION_REGISTERATION.md)
+  - Add the Certificate, following step 7 in [AWS installation](./AWS_CONFIGURATION_REGISTRATION.md)
 
  ![Silicon Labs - DIC design](./images/mqtt_explorer_5.png)
 

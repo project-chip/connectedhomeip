@@ -37,14 +37,14 @@ use one of the following options:
 
     Documentation on how to build and use the lighting-app Matter Accessory
     Device is provided in this
-    [README.md](../../../examples/lighting-app/silabs/efr32/README.md)
+    [README.md](https://github.com/SiliconLabs/matter/blob/latest/examples/lighting-app/silabs/efr32/README.md)
 
     Please note that you only need to build a single device for the demo such as
     the lighting-app. If you wish to build other examples such as the sleepy end
     device you are welcome to, but it is not necessary for the demo.
 
-    > Additional examples are provided in [/examples](../../../examples/) directory,
-    or [/silabs_examples](../../../silabs_examples/) (such as `onoff-plug-app`).
+    > Additional examples are provided in [/examples](https://github.com/SiliconLabs/matter/blob/latest/examples/) directory,
+    or [/silabs_examples](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/) (such as `onoff-plug-app`).
 
     The build process puts all image files in the following location:
 
@@ -62,8 +62,3 @@ Once your Matter Accessory Device has been flashed it should show a QR code on
 the LCD. If no QR Code is present it may be that you need to add a bootloader to
 your device. Bootloader images are provided on the
 [Matter Artifacts page](../general/ARTIFACTS.md).
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

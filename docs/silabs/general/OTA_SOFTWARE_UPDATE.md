@@ -140,7 +140,7 @@ to 2).
 Starting the ota-provider-app with the --otaImageList command line option allows
 the user to supply a JSON file specifying the Software Version, Vendor and
 Product ID that identify the image served by the Provider, see
-[ota-provider-app](../../examples/ota-provider-app/linux/README.md)
+[ota-provider-app](https://github.com/SiliconLabs/matter/blob/latest/examples/ota-provider-app/linux/README.md)
 
 Example provider configuration file:
 

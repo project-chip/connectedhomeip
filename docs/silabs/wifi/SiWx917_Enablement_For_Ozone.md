@@ -20,8 +20,3 @@
 3.  If the above steps are successful, you can download and flash the Matter application 
     
     - [Flashing the Application with Ozone](./RUN_DEMO_SiWx917_SoC.md)
-
----
-
-[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) |
-[Wi-Fi Demo](./DEMO_OVERVIEW.md)
