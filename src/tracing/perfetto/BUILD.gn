@@ -22,15 +22,22 @@ config("tracing") {
   configs = [ "${chip_root}/third_party/perfetto:sdk_config" ]
 }
 
+source_set("perfetto_tracing") {
+  public = [ "include/matter/tracing/macros_impl.h" ]
+
+  public_deps = [ "${chip_root}/third_party/perfetto:sdk" ]
+
+  public_configs = [ ":tracing" ]
+}
+
 static_library("perfetto") {
   sources = [
-    # NOT a direct dependency, but available through the ":tracing" config:
-    #   "include/matter/tracing/macros_impl.h",
     "perfetto_tracing.cpp",
     "perfetto_tracing.h",
   ]
 
   public_deps = [
+    ":perfetto_tracing",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/tracing",
     "${chip_root}/src/transport",
