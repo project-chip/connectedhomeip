@@ -143,6 +143,50 @@ void PerfettoBackend::TraceInstant(const char * label, const char * group)
     TRACE_EVENT_INSTANT(kMatterCategory, perfetto::StaticString(label), "class_name", perfetto::StaticString(group));
 }
 
+void PerfettoBackend::LogMessageReceived(MessageReceivedInfo & info)
+{
+    const char * messageType = "UNKNOWN";
+    switch (info.messageType)
+    {
+    case IncomingMessageType::kGroupMessage:
+        messageType = "Group";
+        break;
+    case IncomingMessageType::kSecureUnicast:
+        messageType = "Secure";
+        break;
+    case IncomingMessageType::kUnauthenticated:
+        messageType = "Unauthenticated";
+        break;
+    }
+
+    TRACE_EVENT_INSTANT(                     //
+        kMatterCategory, "Message Received", //
+        "message_type", messageType          //
+    );
+}
+
+void PerfettoBackend::LogMessageSend(MessageSendInfo & info)
+{
+    const char * messageType = "UNKNOWN";
+    switch (info.messageType)
+    {
+    case OutgoingMessageType::kGroupMessage:
+        messageType = "Group";
+        break;
+    case OutgoingMessageType::kSecureSession:
+        messageType = "Secure";
+        break;
+    case OutgoingMessageType::kUnauthenticated:
+        messageType = "Unauthenticated";
+        break;
+    }
+
+    TRACE_EVENT_INSTANT(                 //
+        kMatterCategory, "Message Send", //
+        "message_type", messageType      //
+    );
+}
+
 void PerfettoBackend::LogNodeLookup(NodeLookupInfo & info)
 {
     TRACE_EVENT_INSTANT(                                                          //
