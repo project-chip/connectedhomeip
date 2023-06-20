@@ -116,30 +116,6 @@ void PerfettoBackend::Close()
     CloseTracingFile();
 }
 
-void PerfettoBackend::TraceBegin(const char * label, const char * group)
-{
-    // We generally expect macros to be used using
-    //
-    // matter_trace_config = "${chip_root}/src/tracing/perfetto:tracing"
-    //
-    // However perfetto can also do non-const string tracing (just likely
-    // slower)
-    TRACE_EVENT_BEGIN("Matter", perfetto::StaticString(label), "class_name", perfetto::StaticString(group));
-}
-
-void PerfettoBackend::TraceEnd(const char * label, const char * group)
-{
-    TRACE_EVENT_END("Matter");
-
-    // Force a trace flush to work around perfetto caching issues.
-    PERFETTO_INTERNAL_ADD_EMPTY_EVENT();
-}
-
-void PerfettoBackend::TraceInstant(const char * label, const char * group)
-{
-    TRACE_EVENT_INSTANT("Matter", perfetto::StaticString(label), "class_name", perfetto::StaticString(group));
-}
-
 void PerfettoBackend::LogMessageReceived(MessageReceivedInfo & info)
 {
     const char * messageType = "UNKNOWN";

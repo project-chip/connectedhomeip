@@ -41,9 +41,9 @@ public:
     void Open() override;
     void Close() override;
 
-    void TraceBegin(const char * label, const char * group) override;
-    void TraceEnd(const char * label, const char * group) override;
-    void TraceInstant(const char * label, const char * group) override;
+    // TraceBegin/End/Instant are EXPLICITLY not provided
+    // as they would be slower than expected. Perfetto trace macros
+    // are expected to be set exclusively (via matter_trace_config)
 
     void LogMessageSend(MessageSendInfo &) override;
     void LogMessageReceived(MessageReceivedInfo &) override;
