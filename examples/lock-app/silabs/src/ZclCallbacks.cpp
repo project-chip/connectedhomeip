@@ -33,7 +33,7 @@
 
 #ifdef DIC_ENABLE
 #include "dic.h"
-#endif //DIC_ENABLE
+#endif // DIC_ENABLE
 
 using namespace ::chip::app::Clusters;
 using namespace ::chip::DeviceLayer::Internal;
@@ -52,8 +52,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ChipLogProgress(Zcl, "Door lock cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
                         to_underlying(lockState));
 #ifdef DIC_ENABLE
-        DIC_SendMsg("lock/state", (const char *) ( lockState == DoorLock::DlLockState::kLocked ? "lock" : "unlock"));
-#endif //DIC_ENABLE
+        DIC_SendMsg("lock/state", (const char *) (lockState == DoorLock::DlLockState::kLocked ? "lock" : "unlock"));
+#endif // DIC_ENABLE
     }
 }
 

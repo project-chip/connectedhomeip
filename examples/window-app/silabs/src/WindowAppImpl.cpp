@@ -49,7 +49,7 @@ SilabsLCD slLCD;
 
 #ifdef DIC_ENABLE
 #include "DIC_EventHandler.h"
-#endif //DIC_ENABLE
+#endif // DIC_ENABLE
 
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
@@ -220,7 +220,7 @@ CHIP_ERROR WindowAppImpl::Init()
 
 #ifdef DIC_ENABLE
     chip::DICManager::Init();
-#endif //DIC_ENABLE
+#endif // DIC_ENABLE
 
 #ifdef DISPLAY_ENABLED
     slLCD.Init();

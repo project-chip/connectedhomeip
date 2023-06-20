@@ -37,7 +37,7 @@
 
 #ifdef DIC_ENABLE
 #include "DIC_EventHandler.h"
-#endif //DIC_ENABLE
+#endif // DIC_ENABLE
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
@@ -109,7 +109,7 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef DIC_ENABLE
     chip::DICManager::Init();
-#endif //DIC_ENABLE
+#endif // DIC_ENABLE
 
     return err;
 }
