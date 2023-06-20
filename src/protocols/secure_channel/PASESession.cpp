@@ -135,7 +135,6 @@ CHIP_ERROR PASESession::Init(SessionManager & sessionManager, uint32_t setupCode
 CHIP_ERROR PASESession::GeneratePASEVerifier(Spake2pVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
                                              bool useRandomPIN, uint32_t & setupPINCode)
 {
-    MATTER_TRACE_EVENT_SCOPE("GeneratePASEVerifier", "PASESession");
     MATTER_TRACE_SCOPE("GeneratePASEVerifier", "PASESession");
 
     if (useRandomPIN)
@@ -151,7 +150,6 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(Spake2pVerifier & verifier, uint32_
 
 CHIP_ERROR PASESession::SetupSpake2p()
 {
-    MATTER_TRACE_EVENT_SCOPE("SetupSpake2p", "PASESession");
     MATTER_TRACE_SCOPE("SetupSpake2p", "PASESession");
     uint8_t context[kSHA256_Hash_Length] = { 0 };
     MutableByteSpan contextSpan{ context };
@@ -213,7 +211,6 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
                              Optional<ReliableMessageProtocolConfig> mrpLocalConfig, Messaging::ExchangeContext * exchangeCtxt,
                              SessionEstablishmentDelegate * delegate)
 {
-    MATTER_TRACE_EVENT_SCOPE("Pair", "PASESession");
     MATTER_TRACE_SCOPE("Pair", "PASESession");
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR err = Init(sessionManager, peerSetUpPINCode, delegate);
@@ -268,7 +265,6 @@ CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session) const
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
 {
-    MATTER_TRACE_EVENT_SCOPE("SendPBKDFParamRequest", "PASESession");
     MATTER_TRACE_SCOPE("SendPBKDFParamRequest", "PASESession");
 
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
@@ -277,11 +273,11 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     const size_t max_msg_len   = TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize, // initiatorRandom,
-                                                           sizeof(uint16_t),            // initiatorSessionId
-                                                           sizeof(PasscodeId),          // passcodeId,
-                                                           sizeof(uint8_t),             // hasPBKDFParameters
-                                                           mrpParamsSize                // MRP Parameters
-    );
+                                                             sizeof(uint16_t),            // initiatorSessionId
+                                                             sizeof(PasscodeId),          // passcodeId,
+                                                             sizeof(uint8_t),             // hasPBKDFParameters
+                                                             mrpParamsSize                // MRP Parameters
+      );
 
     System::PacketBufferHandle req = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!req.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -318,7 +314,6 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
 CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandlePBKDFParamRequest", "PASESession");
     MATTER_TRACE_SCOPE("HandlePBKDFParamRequest", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -382,7 +377,6 @@ exit:
 
 CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool initiatorHasPBKDFParams)
 {
-    MATTER_TRACE_EVENT_SCOPE("SendPBKDFParamResponse", "PASESession");
     MATTER_TRACE_SCOPE("SendPBKDFParamResponse", "PASESession");
 
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
@@ -444,7 +438,6 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
 
 CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandlePBKDFParamResponse", "PASESession");
     MATTER_TRACE_SCOPE("HandlePBKDFParamResponse", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -541,7 +534,6 @@ exit:
 
 CHIP_ERROR PASESession::SendMsg1()
 {
-    MATTER_TRACE_EVENT_SCOPE("SendMsg1", "PASESession");
     MATTER_TRACE_SCOPE("SendMsg1", "PASESession");
     const size_t max_msg_len       = TLV::EstimateStructOverhead(kMAX_Point_Length);
     System::PacketBufferHandle msg = System::PacketBufferHandle::New(max_msg_len);
@@ -575,7 +567,6 @@ CHIP_ERROR PASESession::SendMsg1()
 
 CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && msg1)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleMsg1_and_SendMsg2", "PASESession");
     MATTER_TRACE_SCOPE("HandleMsg1_and_SendMsg2", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -646,7 +637,6 @@ exit:
 
 CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && msg2)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleMsg2_and_SendMsg3", "PASESession");
     MATTER_TRACE_SCOPE("HandleMsg2_and_SendMsg3", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -723,7 +713,6 @@ exit:
 
 CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleMsg3", "PASESession");
     MATTER_TRACE_SCOPE("HandleMsg3", "PASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
