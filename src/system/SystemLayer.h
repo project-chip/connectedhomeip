@@ -144,7 +144,7 @@ public:
      *   @param[in]  onComplete         A pointer to the function called when timer expires.
      *   @param[in]  appState           A pointer to the application state object used when timer expires.
      *
-     *   @return True if the timer exist and has not elapsed. False otherwise.
+     *   @return True if the timer exists and has not elapsed. False otherwise.
      */
     virtual bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) = 0;
 
