@@ -270,6 +270,7 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
     GPIO->USARTROUTE[SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
     sl_wfx_host_spiflash_cs_deassert();
     xSemaphoreGive(spi_sem_sync_hdl);
+    return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
@@ -285,7 +286,7 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
         spi_enabled = false;
     }
     // sl_memlcd_refresh takes care of SPIDRV_Init()
-    if(SL_STATUS_OK != sl_memlcd_refresh(sl_memlcd_get())
+    if(SL_STATUS_OK != sl_memlcd_refresh(sl_memlcd_get()))
     {
         xSemaphoreGive(spi_sem_sync_hdl);
         return SL_STATUS_FAIL;
@@ -299,6 +300,7 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
     CMU_ClockEnable(SPI_CLOCK(SL_MEMLCD_SPI_PERIPHERAL_NO), false);
     GPIO->USARTROUTE[SL_MEMLCD_SPI_PERIPHERAL_NO].ROUTEEN = PINOUT_CLEAR;
     xSemaphoreGive(spi_sem_sync_hdl);
+    return SL_STATUS_OK;
 }
 
 #endif /* EFR32MG24 */
