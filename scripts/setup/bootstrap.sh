@@ -47,7 +47,10 @@ _install_additional_pip_requirements() {
                     -c "$_CHIP_ROOT/scripts/setup/constraints.txt"
             fi
         done
+        unset _PLATFORMS
     fi
+
+    unset _SETUP_PLATFORM
 }
 
 _bootstrap_or_activate() {
