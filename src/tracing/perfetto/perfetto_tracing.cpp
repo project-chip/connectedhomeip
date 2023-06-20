@@ -95,8 +95,12 @@ void PerfettoBackend::Open()
     perfetto::TraceConfig cfg;
     cfg.add_buffers()->set_size_kb(1024);
 
+    // track_event corresponds to TRACE_EVENTS
+    auto* ds_cfg = cfg.add_data_sources()->mutable_config();
+    ds_cfg->set_name("track_event");
+
     mTracingSession->Setup(cfg, mTraceFileId);
-    mTracingSession->Start();
+    mTracingSession->StartBlocking();
 }
 
 void PerfettoBackend::Close()
@@ -109,6 +113,7 @@ void PerfettoBackend::Close()
     mTracingSession->FlushBlocking();
     mTracingSession->StopBlocking();
     mTracingSession.reset();
+    CloseTracingFile();
 }
 
 void PerfettoBackend::TraceBegin(const char * label, const char * group)
