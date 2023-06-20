@@ -1040,7 +1040,7 @@ For more information about subscriptions, see the Matter specification at
 chapter 8, section 5 (Subscribe Interaction).
 
 > **Note:** The subscription behavior will be different if you set the
-> seubscription to be sent with the parameter `isUrgent` set to `True`. See the
+> subscription to be sent with the parameter `isUrgent` set to `True`. See the
 > Matter specification for more information.
 
 #### Subscribing to an attribute
