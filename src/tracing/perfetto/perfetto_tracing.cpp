@@ -42,13 +42,13 @@ namespace Perfetto {
 PerfettoBackend & PerfettoBackend::Init(const char * output_name)
 {
     perfetto::TracingInitArgs args;
+    args.backends = perfetto::kSystemBackend;
 
     if ((output_name != nullptr) && (output_name[0] != '\0'))
     {
         OpenTracingFile(output_name);
         args.backends |= perfetto::kInProcessBackend;
     }
-    args.backends |= perfetto::kSystemBackend;
 
     perfetto::Tracing::Initialize(args);
     perfetto::TrackEvent::Register();
@@ -66,7 +66,7 @@ void PerfettoBackend::OpenTracingFile(const char * name)
     VerifyOrDie(name != nullptr);
     CloseTracingFile();
 
-    mTraceFileId = open(name, O_RDWR | O_CREAT | O_TRUNC, 0600);
+    mTraceFileId = open(name, O_RDWR | O_CREAT | O_TRUNC, 0640);
     if (mTraceFileId < 0)
     {
         ChipLogError(Automation, "Failed to open logging file '%s': %s", name, strerror(errno));
@@ -90,15 +90,14 @@ void PerfettoBackend::Open()
         return;
     }
 
-    mTracingSession = perfetto::Tracing::NewTrace();
-
     perfetto::TraceConfig cfg;
     cfg.add_buffers()->set_size_kb(1024);
-
-    // track_event corresponds to TRACE_EVENTS
     auto* ds_cfg = cfg.add_data_sources()->mutable_config();
-    ds_cfg->set_name("track_event");
 
+
+    ds_cfg->set_name("track_event");  // corresponds to TRACE_EVENT
+
+    mTracingSession = perfetto::Tracing::NewTrace();
     mTracingSession->Setup(cfg, mTraceFileId);
     mTracingSession->StartBlocking();
 }
@@ -109,6 +108,8 @@ void PerfettoBackend::Close()
     {
         return;
     }
+
+    perfetto::TrackEvent::Flush();
 
     mTracingSession->FlushBlocking();
     mTracingSession->StopBlocking();
