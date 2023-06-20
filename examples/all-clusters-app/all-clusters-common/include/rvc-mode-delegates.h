@@ -26,7 +26,7 @@
 
 template <typename T>
 using List               = chip::app::DataModel::List<T>;
-using SemanticTagStructType = chip::app::Clusters::detail::Structs::SemanticTagStruct::Type;
+using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 using ModeOptionStructType = chip::app::Clusters::detail::Structs::ModeOptionStruct::Type;
 
 namespace chip {
@@ -43,13 +43,13 @@ const uint8_t ModeMapping = 2;
 class RvcRunModeDelegate : public ModeBase::Delegate
 {
 private:
-    ModeTagStructType ModeTagsIdle[1]     = { { .value = static_cast<uint16_t>(Clusters::RvcRun::ModeTag::kIdle) } };
-    ModeTagStructType ModeTagsCleaning[1] = { { .value = static_cast<uint16_t>(Clusters::RvcRun::ModeTag::kCleaning) } };
+    ModeTagStructType ModeTagsIdle[1]     = { { .value = static_cast<uint16_t>(Clusters::RvcRunMode::ModeTag::kIdle) } };
+    ModeTagStructType ModeTagsCleaning[1] = { { .value = static_cast<uint16_t>(Clusters::RvcRunMode::ModeTag::kCleaning) } };
 
-    const ModeOptionStructType rvcRunOptions[3] = {
-        Delegate::BuildModeOptionStruct("Idle", Clusters::RvcRun::ModeIdle, List<const ModeTagStructType>(ModeTagsIdle)),
-        Delegate::BuildModeOptionStruct("Cleaning", Clusters::RvcRun::ModeCleaning, List<const ModeTagStructType>(ModeTagsCleaning)),
-        Delegate::BuildModeOptionStruct("Mapping", Clusters::RvcRun::ModeMapping, noSemanticTags),
+    const ModeOptionStructType modeOptions[3] = {
+        Delegate::BuildModeOptionStruct("Idle", Clusters::RvcRunMode::ModeIdle, List<const ModeTagStructType>(ModeTagsIdle)),
+        Delegate::BuildModeOptionStruct("Cleaning", Clusters::RvcRunMode::ModeCleaning, List<const ModeTagStructType>(ModeTagsCleaning)),
+        Delegate::BuildModeOptionStruct("Mapping", Clusters::RvcRunMode::ModeMapping, List<const ModeTagStructType>(ModeTagsIdle)), // todo set to no mode tags
     };
 
     CHIP_ERROR Init() override;
@@ -61,9 +61,9 @@ private:
     CHIP_ERROR getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags) override;
 
 public:
-    RvcRunDelegate() = default;
+    RvcRunModeDelegate() = default;
 
-    ~RvcRunDelegate() override = default;
+    ~RvcRunModeDelegate() override = default;
 };
 
 } // namespace RvcRunMode
@@ -78,15 +78,15 @@ const uint8_t ModeDeepClean = 2;
 class RvcCleanModeDelegate : public ModeBase::Delegate
 {
 private:
-    ModeTagStructType modeTagsVac[]   = { { .value = static_cast<uint16_t>(Clusters::RvcClean::SemanticTags::kVacuum) } };
-    ModeTagStructType modeTagsMop[]   = { { .value = static_cast<uint16_t>(Clusters::RvcClean::SemanticTags::kMop) } };
-    ModeTagStructType modeTagsBoost[] = { { .value = static_cast<uint16_t>(Clusters::ModeBase::SemanticTags::kMax) },
-                                          { .value = static_cast<uint16_t>(Clusters::RvcClean::SemanticTags::kDeepClean) }};
+    ModeTagStructType modeTagsVac[1]   = { { .value = static_cast<uint16_t>(Clusters::RvcCleanMode::ModeTag::kVacuum) } };
+    ModeTagStructType modeTagsMop[1]   = { { .value = static_cast<uint16_t>(Clusters::RvcCleanMode::ModeTag::kMop) } };
+    ModeTagStructType modeTagsBoost[2] = { { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kMax) },
+                                          { .value = static_cast<uint16_t>(Clusters::RvcCleanMode::ModeTag::kDeepClean) }};
 
-    const ModeOptionStructType rvcCleanOptions[3] = {
-        Delegate::BuildModeOptionStruct("Vacuum", Clusters::RvcClean::ModeVacuum, List<const ModeTagStructType>(modeTagsVac)),
-        Delegate::BuildModeOptionStruct("Wash", Clusters::RvcClean::ModeWash, List<const ModeTagStructType>(modeTagsMop)),
-        Delegate::BuildModeOptionStruct("Deep clean", Clusters::RvcClean::ModeDeepClean, List<const ModeTagStructType>(modeTagsBoost)),
+    const ModeOptionStructType modeOptions[3] = {
+        Delegate::BuildModeOptionStruct("Vacuum", Clusters::RvcCleanMode::ModeVacuum, List<const ModeTagStructType>(modeTagsVac)),
+        Delegate::BuildModeOptionStruct("Wash", Clusters::RvcCleanMode::ModeWash, List<const ModeTagStructType>(modeTagsMop)),
+        Delegate::BuildModeOptionStruct("Deep clean", Clusters::RvcCleanMode::ModeDeepClean, List<const ModeTagStructType>(modeTagsBoost)),
     };
 
     CHIP_ERROR Init() override;
@@ -98,9 +98,9 @@ private:
     CHIP_ERROR getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags) override;
 
 public:
-    RvcRunDelegate() = default;
+    RvcCleanModeDelegate() = default;
 
-    ~RvcRunDelegate() override = default;
+    ~RvcCleanModeDelegate() override = default;
 };
 
 } // namespace RvcCleanMode

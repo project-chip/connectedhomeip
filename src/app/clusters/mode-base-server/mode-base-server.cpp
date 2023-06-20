@@ -184,6 +184,15 @@ EmberAfStatus Instance::SetStartUpModeNull() const
                                 ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
+bool Instance::HasFeature(Feature feature) const
+{
+   bool success;
+   uint32_t featureMap;
+   success = (GetFeature(&featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+
+   return success && ((featureMap & to_underlying(feature)) != 0);
+}
+
 std::map<uint32_t, Instance*> Instance::ModeBaseAliasesInstanceMap;
 
 bool Instance::isAliasCluster() const
@@ -325,7 +334,7 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
    }
 }
 
-void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToModeWithStatus::DecodableType & commandData)
+void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
 {
    uint8_t newMode = commandData.newMode;
 
@@ -334,14 +343,14 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
    if (!delegate->IsSupportedMode(newMode))
    {
        ChipLogError(Zcl, "ModeBase: Failed to find the option with mode %u", newMode);
-       response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kUnsupportedMode);
+       response.status = static_cast<uint8_t>(StatusCode::kUnsupportedMode);
        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
        return;
    }
 
    delegate->HandleChangeToMode(newMode, response);
 
-   if (response.status == static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess))
+   if (response.status == static_cast<uint8_t>(StatusCode::kSuccess))
    {
        SetCurrentMode(newMode);
        ChipLogProgress(Zcl, "ModeBase: HandleChangeToMode changed to mode %u", newMode);

@@ -17,6 +17,7 @@
  */
 
 #include "mode-base-delegate.h"
+#include "mode-base-server.h"
 
 using namespace std;
 using namespace chip;
@@ -25,9 +26,9 @@ using namespace chip::app::Clusters::ModeBase;
 
 using ModeOptionStructType = detail::Structs::ModeOptionStruct::Type;
 
-void Delegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToMode::Type &response)
+void Delegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type &response)
 {
-    response.status = to_underlying(ChangeToModeResponseStatus::kSuccess);
+    response.status = to_underlying(StatusCode::kSuccess);
 }
 
 uint8_t Delegate::NumberOfModes()

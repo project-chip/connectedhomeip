@@ -18,6 +18,7 @@
 
 #pragma once
 
+//#include "mode-base-server.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/util/util.h>
@@ -29,6 +30,109 @@ using SemanticTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruc
 
 template <typename T>
 using List = chip::app::DataModel::List<T>;
+
+// todo have this be part of the auto generated code
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ModeBase {
+
+const std::array<ClusterId , 5> AliasedClusters = {0x51, 0x52, 0x54, 0x55, 0x59};
+
+namespace Attributes {
+
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace StartUpMode
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OnMode
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+
+// Commands
+using Feature = chip::app::Clusters::LaundryWasherMode::Feature;
+namespace Commands {
+
+namespace ChangeToMode {
+using Type                    = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::Type;
+using DecodableType           = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::DecodableType;
+static constexpr CommandId Id = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::Id;
+}
+
+namespace ChangeToModeResponse {
+
+using Type                    = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::Type;
+using DecodableType           = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType;
+static constexpr CommandId Id = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::Id;
+
+}
+
+}
+
+// enums
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kAuto = 0x0,
+    kQuick = 0x1,
+    kQuiet = 0x2,
+    kLowNoise = 0x3,
+    kLowEnergy = 0x4,
+    kVacation = 0x5,
+    kMin = 0x6,
+    kMax = 0x7,
+    kNight = 0x8,
+    kDay = 0x9,
+};
+
+// Enum for StatusCode
+enum class StatusCode : uint8_t
+{
+    kSuccess                = 0x0,
+    kUnsupportedMode        = 0x1,
+    kGenericFailure         = 0x2,
+};
+
+} // namespace ModeBase
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+
 
 namespace chip {
 namespace app {
@@ -46,10 +150,10 @@ public:
    static ModeOptionStructType BuildModeOptionStruct(const char * label, uint8_t mode,
                                                      const List<const SemanticTagStructType> semanticTags)
    {
-       Structs::ModeOptionStruct::Type option;
+       detail::Structs::ModeOptionStruct::Type option;
        option.label        = CharSpan::fromCharString(label);
        option.mode         = mode;
-       option.semanticTags = semanticTags;
+       option.modeTags = semanticTags;
        return option;
    }
 
@@ -87,7 +191,7 @@ public:
     *
     * todo can the detail namespace work for commands? If not, should we manually create cluster objects for these in a ModeBase namespace?
     */
-   virtual void HandleChangeToMode(uint8_t NewMode, detail::Commands::ChangeToModeResponse::Type & response);
+   virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
 
    virtual ~Delegate() = default;
 

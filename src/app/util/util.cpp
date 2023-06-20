@@ -160,6 +160,11 @@ void MatterPm1ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterPm25ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterRadonConcentrationMeasurementPluginServerInitCallback() {}
 void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback() {}
+void MatterRvcRunModePluginServerInitCallback() {}
+void MatterRvcCleanModePluginServerInitCallback() {}
+void MatterDishwasherModePluginServerInitCallback() {}
+void MatterLaundryWasherModePluginServerInitCallback() {}
+void MatterRefrigeratorAndTemperatureControlledCabinetModePluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************

@@ -30,26 +30,26 @@ CHIP_ERROR RvcRunModeDelegate::Init()
     return CHIP_NO_ERROR;
 }
 
-void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, Commands::ChangeToModeResponse::Type &response)
+void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type &response)
 {
     uint8_t currentMode;
-    EmberAfStatus status = RvcRun::Attributes::CurrentMode::Get(0x1, &currentMode);
+    EmberAfStatus status = RvcRunMode::Attributes::CurrentMode::Get(0x1, &currentMode);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kGenericFailure);
+        response.status = static_cast<uint8_t>(ModeBase::StatusCode::kGenericFailure);
         response.statusText.SetValue(chip::CharSpan("Could not get the current mode", 30));
         return;
     }
 
     // Our business logic states that we can only switch into the mapping state from the idle state.
-    if (NewMode == RvcRun::ModeMapping && currentMode != RvcRun::ModeIdle)
+    if (NewMode == RvcRunMode::ModeMapping && currentMode != RvcRunMode::ModeIdle)
     {
-        response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kGenericFailure);
+        response.status = static_cast<uint8_t>(ModeBase::StatusCode::kGenericFailure);
         response.statusText.SetValue(chip::CharSpan("Change to the mapping state is only allowed from idle", 53));
     }
 
-    response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess);
+    response.status = static_cast<uint8_t>(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR RvcRunModeDelegate::getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
@@ -77,10 +77,10 @@ CHIP_ERROR RvcRunModeDelegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &v
 CHIP_ERROR RvcRunModeDelegate::getModeTagsByIndex(uint8_t modeIndex, List<SemanticTagStructType> &tags)
 {
     if (modeIndex < NumberOfModes()) {
-        if (tags.size() >= modeOptions[modeIndex].semanticTags.size())
+        if (tags.size() >= modeOptions[modeIndex].modeTags.size())
         {
-            std::copy(modeOptions[modeIndex].semanticTags.begin(), modeOptions[modeIndex].semanticTags.end(), tags.begin());
-            tags.reduce_size(modeOptions[modeIndex].semanticTags.size());
+            std::copy(modeOptions[modeIndex].modeTags.begin(), modeOptions[modeIndex].modeTags.end(), tags.begin());
+            tags.reduce_size(modeOptions[modeIndex].modeTags.size());
 
             return CHIP_NO_ERROR;
         }
@@ -90,33 +90,33 @@ CHIP_ERROR RvcRunModeDelegate::getModeTagsByIndex(uint8_t modeIndex, List<Semant
 }
 
 
-CHIP_ERROR RvcCleanDelegate::Init()
+CHIP_ERROR RvcCleanModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
 }
 
-void RvcCleanDelegate::HandleChangeToMode(uint8_t NewMode, Commands::ChangeToModeResponse::Type &response)
+void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type &response)
 {
     uint8_t rvcRunCurrentMode;
-    EmberAfStatus status = RvcRun::Attributes::CurrentMode::Get(0x1, &rvcRunCurrentMode);
+    EmberAfStatus status = RvcRunMode::Attributes::CurrentMode::Get(0x1, &rvcRunCurrentMode);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kGenericFailure);
+        response.status = static_cast<uint8_t>(ModeBase::StatusCode::kGenericFailure);
         response.statusText.SetValue(chip::CharSpan("Could not get the current mode", 30));
         return;
     }
 
-    if (rvcRunCurrentMode == RvcRun::ModeCleaning)
+    if (rvcRunCurrentMode == RvcRunMode::ModeCleaning)
     {
-        response.status = static_cast<uint8_t>(RvcClean::ChangeToModeResponseStatus::kCleaningInProgress);
+        response.status = static_cast<uint8_t>(RvcCleanMode::StatusCode::kCleaningInProgress);
         response.statusText.SetValue(chip::CharSpan("Cannot change the cleaning mode during a clean", 60));
     }
 
-    response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess);
+    response.status = static_cast<uint8_t>(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR RvcCleanDelegate::getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
+CHIP_ERROR RvcCleanModeDelegate::getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
 {
     if (modeIndex < NumberOfModes()) {
         if (label.size() >= modeOptions[modeIndex].label.size())
@@ -129,7 +129,7 @@ CHIP_ERROR RvcCleanDelegate::getModeLabelByIndex(uint8_t modeIndex, chip::Mutabl
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcCleanDelegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
+CHIP_ERROR RvcCleanModeDelegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
 {
     if (modeIndex < NumberOfModes()) {
         value = modeOptions[modeIndex].mode;
@@ -138,13 +138,13 @@ CHIP_ERROR RvcCleanDelegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &val
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcCleanDelegate::getModeTagsByIndex(uint8_t modeIndex, List<SemanticTagStructType> &tags)
+CHIP_ERROR RvcCleanModeDelegate::getModeTagsByIndex(uint8_t modeIndex, List<SemanticTagStructType> &tags)
 {
     if (modeIndex < NumberOfModes()) {
-        if (tags.size() >= modeOptions[modeIndex].semanticTags.size())
+        if (tags.size() >= modeOptions[modeIndex].modeTags.size())
         {
-            std::copy(modeOptions[modeIndex].semanticTags.begin(), modeOptions[modeIndex].semanticTags.end(), tags.begin());
-            tags.reduce_size(modeOptions[modeIndex].semanticTags.size());
+            std::copy(modeOptions[modeIndex].modeTags.begin(), modeOptions[modeIndex].modeTags.end(), tags.begin());
+            tags.reduce_size(modeOptions[modeIndex].modeTags.size());
 
             return CHIP_NO_ERROR;
         }

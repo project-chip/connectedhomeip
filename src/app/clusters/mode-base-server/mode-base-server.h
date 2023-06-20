@@ -18,17 +18,18 @@
 
 #pragma once
 
+#include <app/CommandHandlerInterface.h>
 #include <app/AttributeAccessInterface.h>
-#include <app/clusters/mode-base-server/mode-base-delegate.h>
+#include "mode-base-delegate.h"
 #include <app/util/af.h>
 #include <map>
+
 
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ModeBase {
-
 
 class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
@@ -58,6 +59,7 @@ public:
     EmberAfStatus GetOnMode(DataModel::Nullable<uint8_t> &) const;
     EmberAfStatus SetOnMode(uint8_t value) const;
     EmberAfStatus SetOnModeNull() const;
+    bool HasFeature(Feature feature) const;
     EndpointId GetEndpointId() const {return endpointId;}
 
 private:
@@ -70,7 +72,7 @@ private:
      * @return true if the clusterId of this instance is a valid ModeBase cluster.
      */
     bool isAliasCluster() const;
-    void HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToModeWithStatus::DecodableType & req);
+    void HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
 
 public:
     /**
@@ -106,59 +108,3 @@ public:
 
 
 
-// todo have this be part of the auto generated code
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ModeBase {
-
-const std::array<ClusterId , 5> AliasedClusters = {0x51, 0x52, 0x54, 0x55, 0x59};
-
-namespace Attributes {
-
-namespace SupportedModes {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace SupportedModes
-
-namespace CurrentMode {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace CurrentMode
-
-namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace StartUpMode
-
-namespace OnMode {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace OnMode
-
-namespace GeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-
-namespace AcceptedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-
-namespace EventList {
-static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-
-} // namespace ModeSelect
-} // namespace Clusters
-} // namespace app
-} // namespace chip
