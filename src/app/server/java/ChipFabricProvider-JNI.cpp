@@ -58,8 +58,6 @@ CHIP_ERROR AndroidChipFabricProviderJNI_OnLoad(JavaVM * jvm, void * reserved)
     env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    chip::InitializeTracing();
-
 exit:
     if (err != CHIP_NO_ERROR)
     {

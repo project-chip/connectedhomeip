@@ -87,8 +87,6 @@ CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
     err = BleConnectCallbackJNI_OnLoad(jvm, reserved);
     SuccessOrExit(err);
 
-    chip::InitializeTracing();
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
