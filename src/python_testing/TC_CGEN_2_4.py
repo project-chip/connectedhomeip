@@ -23,18 +23,19 @@ import chip.clusters as Clusters
 import chip.clusters.enum
 import chip.FabricAdmin
 from chip import ChipDeviceCtrl
+from chip.ChipDeviceCtrl import CommissioningParameters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
 class TC_CGEN_2_4(MatterBaseTest):
 
-    def OpenCommissioningWindow(self) -> int:
+    def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
-            pin, code = self.th1.OpenCommissioningWindow(
+            params = self.th1.OpenCommissioningWindow(
                 nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.matter_test_config.discriminators[0], option=1)
             time.sleep(5)
-            return pin, code
+            return params
 
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
@@ -44,13 +45,13 @@ class TC_CGEN_2_4(MatterBaseTest):
             self, stage: int, expectedErrorPart: chip.native.ErrorSDKPart, expectedErrCode: int):
 
         logging.info("-----------------Fail on step {}-------------------------".format(stage))
-        pin, code = self.OpenCommissioningWindow()
+        params = self.OpenCommissioningWindow()
         self.th2.ResetTestCommissioner()
         # This will run the commissioning up to the point where stage x is run and the
         # response is sent before the test commissioner simulates a failure
         self.th2.SetTestCommissionerPrematureCompleteAfter(stage)
         errcode = self.th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id, setupPinCode=pin,
+            nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminators[0])
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
         asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
@@ -85,12 +86,12 @@ class TC_CGEN_2_4(MatterBaseTest):
         await self.CommissionToStageSendCompleteAndCleanup(13, chip.native.ErrorSDKPart.IM_CLUSTER_STATUS, 0x02)
 
         logging.info('Step 15 - TH1 opens a commissioning window')
-        pin, code = self.OpenCommissioningWindow()
+        params = self.OpenCommissioningWindow()
 
         logging.info('Step 16 - TH2 fully commissions the DUT')
         self.th2.ResetTestCommissioner()
         errcode = self.th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id, setupPinCode=pin,
+            nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminators[0])
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
 

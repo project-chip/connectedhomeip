@@ -57,7 +57,7 @@ from .interaction_model import InteractionModelError
 from .interaction_model import delegate as im
 from .native import PyChipError
 
-__all__ = ["ChipDeviceController"]
+__all__ = ["ChipDeviceController", "CommissioningParameters"]
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
 CHIP_ERROR_TIMEOUT: int = 50
@@ -67,7 +67,7 @@ _DeviceUnpairingCompleteFunct = CFUNCTYPE(None, c_uint64, PyChipError)
 _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
     None, c_uint64, PyChipError)
 _DevicePairingDelegate_OnOpenWindowCompleteFunct = CFUNCTYPE(
-    None, c_uint64, c_uint32, c_char_p, PyChipError)
+    None, c_uint64, c_uint32, c_char_p, c_char_p, PyChipError)
 _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
     None, c_uint64, c_uint8, PyChipError)
 # void (*)(Device *, CHIP_ERROR).
@@ -80,6 +80,13 @@ _IssueNOCChainCallbackPythonCallbackFunct = CFUNCTYPE(
     None, py_object, PyChipError, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_uint64)
 
 _ChipDeviceController_IterateDiscoveredCommissionableNodesFunct = CFUNCTYPE(None, c_char_p, c_size_t)
+
+
+@dataclass
+class CommissioningParameters:
+    setupPinCode: int
+    setupManualCode: str
+    setupQRCode: str
 
 
 @dataclass
@@ -260,10 +267,12 @@ class ChipDeviceControllerBase():
             self._ChipStack.commissioningCompleteEvent.set()
             self._ChipStack.completeEvent.set()
 
-        def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupCode: str, err: PyChipError) -> None:
+        def HandleOpenWindowComplete(nodeid: int, setupPinCode: int, setupManualCode: str,
+                                     setupQRCode: str, err: PyChipError) -> None:
             if err.is_success:
                 print("Open Commissioning Window complete setting nodeid {} pincode to {}".format(nodeid, setupPinCode))
-                self._ChipStack.openCommissioningWindowPincode[nodeid] = (setupPinCode, setupCode)
+                self._ChipStack.openCommissioningWindowPincode[nodeid] = CommissioningParameters(
+                    setupPinCode=setupPinCode, setupManualCode=setupManualCode.decode(), setupQRCode=setupQRCode.decode())
             else:
                 print("Failed to open commissioning window: {}".format(err))
 
@@ -658,7 +667,8 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         ).raise_on_error()
 
-    def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int, discriminator: int, option: int) -> (int, str):
+    def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int,
+                                discriminator: int, option: int) -> CommissioningParameters:
         self.CheckIsActive()
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
