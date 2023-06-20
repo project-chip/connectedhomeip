@@ -25,6 +25,12 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef DIC_ENABLE
+#define DECIMAL 10
+#define BYTE 5
+#include "dic.h"
+#endif
+
 using namespace chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
@@ -691,9 +697,25 @@ void WindowApp::Cover::CallbackPositionSet(intptr_t arg)
     position.SetNonNull(data->percent100ths);
 
     if (data->isTilt)
+    {
         TiltPositionSet(data->mEndpointId, position);
+#ifdef DIC_ENABLE
+        uint16_t value = data->percent100ths;
+        char buffer[BYTE];
+        itoa(value, buffer, DECIMAL);
+        DIC_SendMsg("tilt/position set", (const char *)(buffer));
+#endif //DIC_ENABLE
+    }
     else
+    {
         LiftPositionSet(data->mEndpointId, position);
+#ifdef DIC_ENABLE
+        uint16_t value = data->percent100ths;
+        char buffer[BYTE];
+        itoa(value, buffer, DECIMAL);
+        DIC_SendMsg("lift/position set",(const char *)(buffer));
+#endif //DIC_ENABLE
+    }
 
     chip::Platform::Delete(data);
 }
