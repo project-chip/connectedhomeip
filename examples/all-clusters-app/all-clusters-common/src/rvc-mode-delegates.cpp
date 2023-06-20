@@ -16,19 +16,21 @@
 *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <mode-select-delegates.h>
+#include <rvc-mode-delegates.h>
 
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::RvcRunMode;
+using namespace chip::app::Clusters::RvcCleanMode;
 using chip::Protocols::InteractionModel::Status;
 
 //-- Mode Select delegate functions
 
-CHIP_ERROR RvcRunDelegate::Init()
+CHIP_ERROR RvcRunModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
 }
 
-void RvcRunDelegate::HandleChangeToMode(uint8_t NewMode, Commands::ChangeToModeResponse::Type &response)
+void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, Commands::ChangeToModeResponse::Type &response)
 {
     uint8_t currentMode;
     EmberAfStatus status = RvcRun::Attributes::CurrentMode::Get(0x1, &currentMode);
@@ -50,7 +52,7 @@ void RvcRunDelegate::HandleChangeToMode(uint8_t NewMode, Commands::ChangeToModeR
     response.status = static_cast<uint8_t>(ChangeToModeResponseStatus::kSuccess);
 }
 
-CHIP_ERROR RvcRunDelegate::getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
+CHIP_ERROR RvcRunModeDelegate::getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
 {
     if (modeIndex < NumberOfModes()) {
         if (label.size() >= modeOptions[modeIndex].label.size())
@@ -63,7 +65,7 @@ CHIP_ERROR RvcRunDelegate::getModeLabelByIndex(uint8_t modeIndex, chip::MutableC
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcRunDelegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
+CHIP_ERROR RvcRunModeDelegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
 {
     if (modeIndex < NumberOfModes()) {
         value = modeOptions[modeIndex].mode;
@@ -72,7 +74,7 @@ CHIP_ERROR RvcRunDelegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &value
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcRunDelegate::getModeTagsByIndex(uint8_t modeIndex, List<SemanticTagStructType> &tags)
+CHIP_ERROR RvcRunModeDelegate::getModeTagsByIndex(uint8_t modeIndex, List<SemanticTagStructType> &tags)
 {
     if (modeIndex < NumberOfModes()) {
         if (tags.size() >= modeOptions[modeIndex].semanticTags.size())

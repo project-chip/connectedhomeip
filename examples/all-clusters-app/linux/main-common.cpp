@@ -20,6 +20,7 @@
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
 #include "include/tv-callbacks.h"
+#include "rvc-mode-delegates.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
@@ -35,6 +36,8 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
+#include "../all-clusters-common/include/rvc-mode-delegates.h"
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/NetworkCommissioningDriver.h>
@@ -196,11 +199,11 @@ CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::B
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
-Clusters::RvcRun::RvcRunDelegate rvcRunDelegate;
-Clusters::RvcRun::Instance rvcRunInstance(0x1, Clusters::ModeRun::Id, &rvcRunDelegate);
+Clusters::RvcRunMode::RvcRunModeDelegate rvcRunDelegate;
+Clusters::ModeBase::Instance rvcRunInstance(0x1, Clusters::RvcRunMode::Id, &rvcRunDelegate);
 
-Clusters::RvcClean::RvcCleanDelegate rvcCleanDelegate;
-Clusters::RvcClean::Instance rvcCleanInstance(0x1, Clusters::RvcClean::Id, &rvcCleanDelegate);
+Clusters::RvcCleanMode::RvcCleanModeDelegate rvcCleanDelegate;
+Clusters::ModeBase::Instance rvcCleanInstance(0x1, Clusters::RvcCleanMode::Id, &rvcCleanDelegate);
 } // namespace
 
 void ApplicationInit()

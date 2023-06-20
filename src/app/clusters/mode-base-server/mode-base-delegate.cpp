@@ -21,11 +21,11 @@
 using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ModeSelect;
+using namespace chip::app::Clusters::ModeBase;
 
-using ModeOptionStructType = Structs::ModeOptionStruct::Type;
+using ModeOptionStructType = detail::Structs::ModeOptionStruct::Type;
 
-void Delegate::HandleChangeToMode(uint8_t NewMode, ModeSelect::Commands::ChangeToModeResponse::Type &response)
+void Delegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToMode::Type &response)
 {
     response.status = to_underlying(ChangeToModeResponseStatus::kSuccess);
 }

@@ -187,7 +187,7 @@
         "DESCRIPTOR_CLUSTER": ["descriptor"],
         "DEVICE_TEMP_CLUSTER": [],
         "DIAGNOSTIC_LOGS_CLUSTER": ["diagnostic-logs-server"],
-        "DISHWASHER_MODE_CLUSTER": ["mode-select-server"],
+        "DISHWASHER_MODE_CLUSTER": ["mode-base-server"],
         "DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
@@ -220,7 +220,7 @@
         "INK_CARTRIDGE_MONITORING_CLUSTER": [],
         "IONIZING_FILTER_MONITORING_CLUSTER": [],
         "KEYPAD_INPUT_CLUSTER": ["keypad-input-server"],
-        "LAUNDRY_WASHER_MODE_CLUSTER": ["mode-select-server"],
+        "LAUNDRY_WASHER_MODE_CLUSTER": ["mode-base-server"],
         "LEAD_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "LEVEL_CONTROL_CLUSTER": ["level-control"],
         "LOCALIZATION_CONFIGURATION_CLUSTER": [
@@ -265,12 +265,12 @@
         "RADON_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "REFRIGERATOR_ALARM_CLUSTER": ["refrigerator-alarm-server"],
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER": [
-            "mode-select-server"
+            "mode-base-server"
         ],
         "REFRIGERATOR_ALARM_CLUSTER": ["refrigerator-alarm-server"],
         "RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER": [],
-        "RVC_CLEAN_MODE_CLUSTER": ["mode-select-server"],
-        "RVC_RUN_MODE_CLUSTER": ["mode-select-server"],
+        "RVC_CLEAN_MODE_CLUSTER": ["mode-base-server"],
+        "RVC_RUN_MODE_CLUSTER": ["mode-base-server"],
         "SCENES_CLUSTER": ["scenes-server"],
         "SMOKE_CO_ALARM_CLUSTER": ["smoke-co-alarm-server"],
         "SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER": [],

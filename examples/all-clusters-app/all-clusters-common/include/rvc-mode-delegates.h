@@ -33,20 +33,14 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-namespace RvcRun {
+namespace RvcRunMode {
+
 const uint8_t ModeIdle = 0;
 const uint8_t ModeCleaning = 1;
 const uint8_t ModeMapping = 2;
-}
-
-namespace RvcClean {
-const uint8_t ModeVacuum = 0;
-const uint8_t ModeWash = 1;
-const uint8_t ModeDeepClean = 2;
-}
 
 /// This is an application level delegate to handle RvcRun commands according to the specific business logic.
-class RvcRunDelegate : public Delegate
+class RvcRunModeDelegate : public ModeBase::Delegate
 {
 private:
     ModeTagStructType ModeTagsIdle[1]     = { { .value = static_cast<uint16_t>(Clusters::RvcRun::ModeTag::kIdle) } };
@@ -72,8 +66,16 @@ public:
     ~RvcRunDelegate() override = default;
 };
 
+} // namespace RvcRunMode
+
+namespace RvcCleanMode {
+
+const uint8_t ModeVacuum = 0;
+const uint8_t ModeWash = 1;
+const uint8_t ModeDeepClean = 2;
+
 /// This is an application level delegate to handle RvcClean commands according to the specific business logic.
-class RvcCleanDelegate : public Delegate
+class RvcCleanModeDelegate : public ModeBase::Delegate
 {
 private:
     ModeTagStructType modeTagsVac[]   = { { .value = static_cast<uint16_t>(Clusters::RvcClean::SemanticTags::kVacuum) } };
@@ -100,6 +102,8 @@ public:
 
     ~RvcRunDelegate() override = default;
 };
+
+} // namespace RvcCleanMode
 
 } // namespace Clusters
 } // namespace app

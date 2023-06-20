@@ -19,50 +19,29 @@
 #pragma once
 
 #include <app/AttributeAccessInterface.h>
-#include <app/clusters/mode-select-server/mode-select-delegate.h>
+#include <app/clusters/mode-base-server/mode-base-delegate.h>
 #include <app/util/af.h>
 #include <map>
 
 
-// todo have this be part of the auto generated code
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace ModeSelect {
-
-const std::array<ClusterId , 6> AliasedClusters = {0x50, 0x51, 0x52, 0x54, 0x55, 0x59};
-// todo define the ModeOptionStructType and SemanticTagStructType
-
-} // namespace ModeSelect
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-
-
-
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ModeSelect {
+namespace ModeBase {
 
 
 class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 
 public:
-    // This map holds pointers to all initialised ModeSelect instances. It provides a way to access all ModeSelect clusters.
-    static std::map<uint32_t, Instance*> ModeSelectAliasesInstanceMap;
+    // This map holds pointers to all initialised ModeBase instances. It provides a way to access all ModeBase clusters.
+    static std::map<uint32_t, Instance*> ModeBaseAliasesInstanceMap;
 
     CHIP_ERROR Init();
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
-
-    // Checks if this instance supports a feature
-    bool HasFeature(ModeSelectFeature feature) const;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -91,15 +70,14 @@ private:
      * @return true if the clusterId of this instance is a valid ModeBase cluster.
      */
     bool isAliasCluster() const;
-    void HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
-    void HandleChangeToModeWithStatus(HandlerContext & ctx, const Commands::ChangeToModeWithStatus::DecodableType & req);
+    void HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToModeWithStatus::DecodableType & req);
 
 public:
     /**
-     * Creates a mode select cluster instance. The Init() function needs to be called for this instance to be registered and
+     * Creates a mode base cluster instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId The ID of the ModeSelect aliased cluster to be instantiated.
+     * @param aClusterId The ID of the ModeBase aliased cluster to be instantiated.
      * @param aDelegate A pointer to a delegate that will handle application layer logic.
      */
     Instance(EndpointId aEndpointId, ClusterId aClusterId, Delegate * aDelegate) :
@@ -113,12 +91,72 @@ public:
 
     ~Instance() override
     {
-        ModeSelectAliasesInstanceMap.erase(clusterId);
+        ModeBaseAliasesInstanceMap.erase(clusterId);
     }
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 };
+
+} // namespace ModeSelect
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+
+
+
+// todo have this be part of the auto generated code
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ModeBase {
+
+const std::array<ClusterId , 5> AliasedClusters = {0x51, 0x52, 0x54, 0x55, 0x59};
+
+namespace Attributes {
+
+namespace SupportedModes {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
+
+namespace CurrentMode {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMode
+
+namespace StartUpMode {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace StartUpMode
+
+namespace OnMode {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace OnMode
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
 
 } // namespace ModeSelect
 } // namespace Clusters
