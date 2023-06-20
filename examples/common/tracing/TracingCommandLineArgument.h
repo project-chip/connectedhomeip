@@ -21,7 +21,7 @@
 /// to be pretty-printed in help strings if needed
 
 #ifdef ENABLE_PERFETTO_TRACING
-#define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "log, perfetto"
+#define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "log, perfetto, perfetto:<path>"
 #else
 #define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "log"
 #endif

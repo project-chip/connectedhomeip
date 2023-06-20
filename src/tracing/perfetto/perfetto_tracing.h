@@ -19,6 +19,9 @@
 
 #include <tracing/backend.h>
 
+#include <memory>
+#include <perfetto.h>
+
 namespace chip {
 namespace Tracing {
 namespace Perfetto {
@@ -30,13 +33,25 @@ class PerfettoBackend : public ::chip::Tracing::Backend
 {
 public:
     PerfettoBackend() = default;
+    ~PerfettoBackend();
 
     /// MUST be called before being used as a backend.
-    PerfettoBackend &Init();
+    PerfettoBackend &Init(const char *output_name);
+
+    void Open() override;
+    void Close() override;
 
     void TraceBegin(const char * label, const char * group) override;
     void TraceEnd(const char * label, const char * group) override;
     void TraceInstant(const char * label, const char * group) override;
+private:
+    static constexpr int kInvalidFileId = -1;
+
+    int mTraceFileId = kInvalidFileId;
+    std::unique_ptr<perfetto::TracingSession> mTracingSession;
+
+    void OpenTracingFile(const char *name);
+    void CloseTracingFile();
 };
 
 } // namespace Perfetto

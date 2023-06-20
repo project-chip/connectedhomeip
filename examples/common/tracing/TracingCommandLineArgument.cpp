@@ -41,8 +41,23 @@ using ::chip::Tracing::LogJson::LogJsonBackend;
 LogJsonBackend log_json_backend;
 
 #ifdef ENABLE_PERFETTO_TRACING
+
 using ::chip::Tracing::Perfetto::PerfettoBackend;
+
 PerfettoBackend perfetto_backend;
+
+
+bool StartsWith(CharSpan argument, const char *prefix) {
+    const size_t prefix_len = strlen(prefix);
+    if (argument.size() < prefix_len) {
+        return false;
+    }
+
+    argument.reduce_size(prefix_len);
+    return argument.data_equal(CharSpan(prefix, prefix_len));
+}
+
+
 #endif
 
 // ScopedRegistration ensures register/unregister is met, as long
@@ -70,7 +85,15 @@ void EnableTracingFor(const char * cliArg)
         {
             if (!perfetto_backend.IsInList())
             {
-                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend.Init()));
+                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend.Init(nullptr)));
+            }
+        }
+        else if (StartsWith(value, "perfetto:"))
+        {
+            if (!perfetto_backend.IsInList())
+            {
+                std::string fileName(value.data() + 9, value.size() - 9);
+                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend.Init(fileName.c_str())));
             }
         }
 #endif // ENABLE_PERFETTO_TRACING

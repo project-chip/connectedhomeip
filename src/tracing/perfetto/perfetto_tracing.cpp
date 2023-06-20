@@ -25,6 +25,10 @@
 
 #include <perfetto.h>
 
+#include <errno.h>
+#include <string.h>
+#include <fcntl.h>
+
 static constexpr const char * kMatterCategory = "Matter";
 
 PERFETTO_DEFINE_CATEGORIES(perfetto::Category(kMatterCategory).SetDescription("Matter trace events"));
@@ -35,17 +39,73 @@ namespace chip {
 namespace Tracing {
 namespace Perfetto {
 
-PerfettoBackend & PerfettoBackend::Init()
+PerfettoBackend & PerfettoBackend::Init(const char * output_name)
 {
     perfetto::TracingInitArgs args;
 
-    args.backends |= perfetto::kInProcessBackend;
+    if ((output_name != nullptr) && (output_name[0] != '\0'))
+    {
+        OpenTracingFile(output_name);
+        args.backends |= perfetto::kInProcessBackend;
+    }
     args.backends |= perfetto::kSystemBackend;
 
     perfetto::Tracing::Initialize(args);
     perfetto::TrackEvent::Register();
 
     return *this;
+}
+
+PerfettoBackend::~PerfettoBackend()
+{
+    CloseTracingFile();
+}
+
+void PerfettoBackend::OpenTracingFile(const char * name)
+{
+    VerifyOrDie(name != nullptr);
+    CloseTracingFile();
+
+    mTraceFileId = open(name, O_RDWR | O_CREAT | O_TRUNC, 0600);
+    if (mTraceFileId < 0) {
+        ChipLogError(Automation, "Failed to open logging file '%s': %s", name, strerror(errno));
+        mTraceFileId = kInvalidFileId;
+    }
+}
+
+void PerfettoBackend::CloseTracingFile()
+{
+    if (mTraceFileId != kInvalidFileId)
+    {
+        close(mTraceFileId);
+        mTraceFileId = kInvalidFileId;
+    }
+}
+
+void PerfettoBackend::Open()
+{
+    if (mTraceFileId == kInvalidFileId) {
+        return;
+    }
+
+    mTracingSession = perfetto::Tracing::NewTrace();
+
+    perfetto::TraceConfig cfg;
+    cfg.add_buffers()->set_size_kb(1024);
+
+    mTracingSession->Setup(cfg, mTraceFileId);
+    mTracingSession->Start();
+}
+
+void PerfettoBackend::Close()
+{
+    if (!mTracingSession) {
+        return;
+    }
+
+    mTracingSession->FlushBlocking();
+    mTracingSession->StopBlocking();
+    mTracingSession.reset();
 }
 
 void PerfettoBackend::TraceBegin(const char * label, const char * group)
