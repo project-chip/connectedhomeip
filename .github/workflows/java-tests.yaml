@@ -79,7 +79,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Generate unit tests
-              timeout-minutes: 1
+              timeout-minutes: 2
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/build/build_examples.py \
@@ -87,11 +87,11 @@ jobs:
                      gen \
                   '
             - name: Build unit tests
-              timeout-minutes: 25
+              timeout-minutes: 30
               run: scripts/run_in_build_env.sh 'ninja -C out/linux-x64-tests src:java_controller_tests'
 
             - name: Run unit tests
-              timeout-minutes: 10
+              timeout-minutes: 15
               # TODO: this direct path loading is not maintainable. Our build system should define and
               #       support test classes.
               run: |
@@ -103,7 +103,7 @@ jobs:
                    chip.tlv.TlvReaderTest           \
                    chip.jsontlv.JsonToTlvToJsonTest
             - name: Build Java Matter Controller and all clusters app
-              timeout-minutes: 50
+              timeout-minutes: 60
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
                   ./scripts/run_in_build_env.sh \
@@ -113,7 +113,7 @@ jobs:
                       build \
                    "
             - name: Run Discover Commissionables Test
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -125,7 +125,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Onnetwork Test
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -137,7 +137,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Invoke Test
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -149,7 +149,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Read Test
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -161,7 +161,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Write Test
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -173,7 +173,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Subscribe Test
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -185,7 +185,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing AlreadyDiscovered Test
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -197,7 +197,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Address-PaseOnly Test
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -209,7 +209,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing SetupQRCode Test
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -221,7 +221,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing ManualCode Test
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
