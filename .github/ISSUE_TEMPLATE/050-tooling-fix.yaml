@@ -1,6 +1,6 @@
 name: "\U0001F3C3 Tooling Fix/Feature"
 description: Create an issue for a tooling specific fix/feature
-title: "[Platform] "
+title: "[Tooling] "
 labels: ["tools", "needs triage"]
 body:
     - type: markdown
