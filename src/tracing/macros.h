@@ -17,6 +17,8 @@
  */
 #pragma once
 
+#include <matter/tracing/build_config.h>
+
 #define _MATTER_TRACE_DISABLE(...)                                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
@@ -62,7 +64,6 @@
 //    MATTER_TRACE_BEGIN(label, group)
 //    MATTER_TRACE_END(label, group)
 //    MATTER_TRACE_INSTANT(label, group)
-//    MATTER_TRACE_SCOPE(label, group)
 #include <matter/tracing/macros_impl.h>
 #endif
 
