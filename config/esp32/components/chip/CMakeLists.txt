@@ -163,10 +163,6 @@ if(CONFIG_ENABLE_PW_RPC)
     "\"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\""
   )
   chip_gn_arg_append(
-    "pw_trace_BACKEND"
-    "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized\""
-  )
-  chip_gn_arg_append(
     "dir_pw_third_party_nanopb"
     "\"//third_party/connectedhomeip/third_party/nanopb/repo\"")
   chip_gn_arg_append("pw_build_LINK_DEPS"
