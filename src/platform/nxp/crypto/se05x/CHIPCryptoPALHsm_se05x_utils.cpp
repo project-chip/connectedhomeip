@@ -22,7 +22,7 @@
  *      chip crypto apis use either HSM or rollback to software implementation.
  */
 
-#include "CHIPCryptoPALHsm_SE05X_utils.h"
+#include "CHIPCryptoPALHsm_se05x_utils.h"
 #include "fsl_sss_policy.h"
 
 ex_sss_boot_ctx_t gex_sss_chip_ctx;
@@ -76,39 +76,40 @@ static Mutex sSEObjMutex;
 #endif //#if ENABLE_REENTRANCY
 
 /* Open session to se05x */
-void se05x_sessionOpen(void)
+CHIP_ERROR se05x_sessionOpen(void)
 {
     static int is_session_open = 0;
     if (is_session_open)
     {
-        return;
+        return CHIP_NO_ERROR;
     }
 
     memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
 
-    const char * portName = nullptr;
-    sss_status_t status   = ex_sss_boot_connectstring(0, NULL, &portName);
+    char * portName     = nullptr;
+    sss_status_t status = ex_sss_boot_connectstring(0, NULL, &portName);
     if (kStatus_SSS_Success != status)
     {
-        ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_boot_connectstring failed");
-        return;
+        ChipLogError(Crypto, "se05x error: ex_sss_boot_connectstring failed");
+        return CHIP_ERROR_INTERNAL;
     }
 
     status = ex_sss_boot_open(&gex_sss_chip_ctx, portName);
     if (kStatus_SSS_Success != status)
     {
-        ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_boot_open failed");
-        return;
+        ChipLogError(Crypto, "se05x error: ex_sss_boot_open failed");
+        return CHIP_ERROR_INTERNAL;
     }
 
     status = ex_sss_key_store_and_object_init(&gex_sss_chip_ctx);
     if (kStatus_SSS_Success != status)
     {
-        ChipLogError(Crypto, "se05x error: %s\n", "ex_sss_key_store_and_object_init failed");
-        return;
+        ChipLogError(Crypto, "se05x error: ex_sss_key_store_and_object_init failed");
+        return CHIP_ERROR_INTERNAL;
     }
 
     is_session_open = 1;
+    return CHIP_NO_ERROR;
 }
 
 /* Delete key in se05x */
@@ -117,7 +118,11 @@ void se05x_delete_key(uint32_t keyid)
     smStatus_t smstatus   = SM_NOT_OK;
     SE05x_Result_t exists = kSE05x_Result_NA;
 
-    se05x_sessionOpen();
+    if (se05x_sessionOpen() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x error: Error in session open");
+        return;
+    }
 
     if (gex_sss_chip_ctx.ks.session != NULL)
     {
@@ -130,19 +135,20 @@ void se05x_delete_key(uint32_t keyid)
                 smstatus = Se05x_API_DeleteSecureObject(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid);
                 if (smstatus != SM_OK)
                 {
-                    ChipLogError(Crypto, "se05x error: %s\n", "Error in deleting key");
+                    ChipLogError(Crypto, "se05x error: Error in deleting key");
                 }
             }
             else
             {
-                ChipLogError(Crypto, "se05x warn: %s\n", "Key doesnot exists");
+                ChipLogError(Crypto, "se05x warn: Key doesnot exists");
             }
         }
         else
         {
-            ChipLogError(Crypto, "se05x error: %s\n", "Error in Se05x_API_CheckObjectExists");
+            ChipLogError(Crypto, "se05x error: Error in Se05x_API_CheckObjectExists");
         }
     }
+    return;
 }
 
 /* Set key in se05x */
@@ -223,7 +229,7 @@ CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
 
     certBitLen = (*buflen) * 8;
 
-    se05x_sessionOpen();
+    VerifyOrReturnError(se05x_sessionOpen() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
@@ -276,7 +282,7 @@ CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t * sigBuf, size_t * s
 #if ENABLE_REENTRANCY
 
 /* Init crypto object mutext */
-void init_cryptoObj_mutex(void)
+void se05x_init_cryptoObj_mutex(void)
 {
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     Mutex::Init(sSEObjMutex);
@@ -285,7 +291,7 @@ void init_cryptoObj_mutex(void)
 }
 
 /* Delete all crypto objects in se05x */
-void delete_crypto_objects(void)
+void se05x_delete_crypto_objects(void)
 {
     static int obj_deleted = 0;
     smStatus_t smstatus    = SM_NOT_OK;
@@ -299,7 +305,12 @@ void delete_crypto_objects(void)
     {
         return;
     }
-    se05x_sessionOpen();
+
+    if (se05x_sessionOpen() != CHIP_NO_ERROR)
+    {
+        return;
+    }
+
     if (gex_sss_chip_ctx.ks.session != NULL)
     {
         smstatus = Se05x_API_ReadCryptoObjectList(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, list, &listlen);
@@ -322,7 +333,7 @@ void delete_crypto_objects(void)
 }
 
 /* Get unused object id */
-SE05x_CryptoObjectID_t getObjID(void)
+SE05x_CryptoObjectID_t se05x_getCryptoObjID(void)
 {
     SE05x_CryptoObjectID_t objId = (SE05x_CryptoObjectID_t) 0;
     SE05x_Result_t exists        = kSE05x_Result_NA;
@@ -353,7 +364,7 @@ exit:
 }
 
 /* Set object id status */
-void setObjID(SE05x_CryptoObjectID_t objId, uint8_t status)
+void se05x_setCryptoObjID(SE05x_CryptoObjectID_t objId, uint8_t status)
 {
     LOCK_SECURE_ELEMENT();
     for (int i = 0; i < MAX_SPAKE_CRYPTO_OBJECT; i++)

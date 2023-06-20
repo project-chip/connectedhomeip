@@ -22,23 +22,21 @@
  *      chip crypto apis use either HSM or rollback to software implementation.
  */
 
-#include "CHIPCryptoPALHsm_SE05X_utils.h"
+#include "CHIPCryptoPALHsm_se05x_utils.h"
 #include <lib/core/CHIPEncoding.h>
-
-#if ENABLE_HSM_PBKDF2_SHA256
 
 namespace chip {
 namespace Crypto {
 
-PBKDF2_sha256HSM::PBKDF2_sha256HSM()
-{
-    keyid = kKeyId_pbkdf2_sha256_hmac_keyid;
-}
-PBKDF2_sha256HSM::~PBKDF2_sha256HSM() {}
+extern CHIP_ERROR pbkdf2_sha256_h(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
+                                  unsigned int iteration_count, uint32_t key_length, uint8_t * output);
 
-CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
-                                           unsigned int iteration_count, uint32_t key_length, uint8_t * output)
+CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
+                                        unsigned int iteration_count, uint32_t key_length, uint8_t * output)
 {
+#if !ENABLE_SE05X_PBKDF2_SHA256
+    return pbkdf2_sha256_h(password, plen, salt, slen, iteration_count, key_length, output);
+#else
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     VerifyOrReturnError(password != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(plen > 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -48,9 +46,9 @@ CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen
     VerifyOrReturnError(slen <= kSpake2p_Max_PBKDF_Salt_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(salt != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);
+    const uint32_t keyid = kKeyId_pbkdf2_sha256_hmac_keyid;
 
-    ChipLogDetail(Crypto, "Using se05x for pbkdf2 sha256");
+    ChipLogDetail(Crypto, "pbkdf2_sha256 : Using se05x for pbkdf2_sha256");
 
     static sss_policy_u commonPol;
     commonPol.type                     = KPolicy_Common;
@@ -72,7 +70,7 @@ CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen
     policy_for_hmac_key.policies[0] = &hmac_withPol;
     policy_for_hmac_key.policies[1] = &commonPol;
 
-    se05x_sessionOpen();
+    VerifyOrReturnError(se05x_sessionOpen() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     sss_object_t hmacKeyObj = {
@@ -94,13 +92,18 @@ CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen
         (uint16_t) iteration_count, kSE05x_MACAlgo_HMAC_SHA256, (uint16_t) key_length, 0,  /* derivedSessionKeyID */
         output, (size_t *) &key_length);
     VerifyOrExit(smStatus == SM_OK, error = CHIP_ERROR_INTERNAL);
+
     error = CHIP_NO_ERROR;
 exit:
-    sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &hmacKeyObj);
+    if (hmacKeyObj.keyStore->session != NULL)
+    {
+        sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &hmacKeyObj);
+    }
+
     return error;
+
+#endif // ENABLE_SE05X_PBKDF2_SHA256
 }
 
 } // namespace Crypto
 } // namespace chip
-
-#endif //#if ENABLE_HSM_PBKDF2_SHA256

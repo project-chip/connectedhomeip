@@ -103,6 +103,9 @@ class PyChipError(ctypes.Structure):
         GetLibraryHandle().pychip_FormatError(ctypes.pointer(self), buf, 256)
         return buf.value.decode()
 
+    def __bool__(self):
+        return self.is_success
+
     def __eq__(self, other):
         if isinstance(other, int):
             return self.code == other

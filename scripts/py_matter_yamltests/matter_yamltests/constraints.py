@@ -535,7 +535,8 @@ class _ConstraintType(BaseConstraint):
 
 class _ConstraintMinLength(BaseConstraint):
     def __init__(self, context, min_length):
-        super().__init__(context, types=[str, bytes, list])
+        super().__init__(context, types=[
+            str, bytes, list], is_null_allowed=True)
         self._min_length = min_length
 
     def check_response(self, value, value_type_name) -> bool:
@@ -547,7 +548,8 @@ class _ConstraintMinLength(BaseConstraint):
 
 class _ConstraintMaxLength(BaseConstraint):
     def __init__(self, context, max_length):
-        super().__init__(context, types=[str, bytes, list])
+        super().__init__(context, types=[
+            str, bytes, list], is_null_allowed=True)
         self._max_length = max_length
 
     def check_response(self, value, value_type_name) -> bool:

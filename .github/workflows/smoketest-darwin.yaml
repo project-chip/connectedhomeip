@@ -52,7 +52,7 @@ jobs:
               run: brew install python@3.9
 
             - name: Bootstrap cache
-              uses: actions/cache@v3
+              uses: buildjet/cache@v3
               timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}

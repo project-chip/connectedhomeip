@@ -22,29 +22,30 @@
  *      chip crypto apis use either HSM or rollback to software implementation.
  */
 
-#include "CHIPCryptoPALHsm_SE05X_utils.h"
+#include "CHIPCryptoPALHsm_se05x_utils.h"
 #include <lib/core/CHIPEncoding.h>
-
-#if ENABLE_HSM_HMAC_SHA256
 
 #define MAX_MAC_ONE_SHOT_DATA_LEN 900
 
 namespace chip {
 namespace Crypto {
 
-HMAC_shaHSM::HMAC_shaHSM()
-{
-    keyid = kKeyId_hmac_sha256_keyid;
-}
-HMAC_shaHSM::~HMAC_shaHSM() {}
+extern CHIP_ERROR HMAC_SHA256_h(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                uint8_t * out_buffer, size_t out_length);
 
-CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
-                                    uint8_t * out_buffer, size_t out_length)
+CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                 uint8_t * out_buffer, size_t out_length)
 
 {
+#if !ENABLE_SE05X_HMAC_SHA256
+    return HMAC_SHA256_h(key, key_length, message, message_length, out_buffer, out_length);
+#else
     CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
+    uint32_t keyid         = kKeyId_hmac_sha256_keyid;
     sss_mac_t ctx_mac      = { 0 };
     sss_object_t keyObject = { 0 };
+
+    ChipLogDetail(Crypto, "HMAC_SHA256 : Using se05x for HMAC");
 
     VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(key_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -55,12 +56,12 @@ CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, cons
 
     if (key_length > 256)
     {
-        return HMAC_sha::HMAC_SHA256(key, key_length, message, message_length, out_buffer, out_length);
+        return CHIP_ERROR_INTERNAL; // TODO - Add rollback
     }
 
     VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);
 
-    se05x_sessionOpen();
+    VerifyOrReturnError(se05x_sessionOpen() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     sss_status_t status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
@@ -110,12 +111,14 @@ exit:
         sss_mac_context_free(&ctx_mac);
     }
 
-    sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
+    if (keyObject.keyStore->session != NULL)
+    {
+        sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
+    }
 
     return error;
+#endif
 }
 
 } // namespace Crypto
 } // namespace chip
-
-#endif //#if ENABLE_HSM_HMAC_SHA256

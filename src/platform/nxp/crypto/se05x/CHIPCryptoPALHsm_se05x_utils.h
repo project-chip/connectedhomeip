@@ -19,11 +19,11 @@
 
 #include <string.h>
 
+#include <CHIPCryptoPAL_se05x.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
 #include <type_traits>
 
-#include <crypto/hsm/CHIPCryptoPALHsm_config.h>
+#include <CHIPCryptoPALHsm_se05x_config.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
@@ -45,8 +45,9 @@ enum keyid_values
     kKeyId_pbkdf2_sha256_hmac_keyid = 0x7D000000,
     kKeyId_hkdf_sha256_hmac_keyid,
     kKeyId_hmac_sha256_keyid,
-    kKeyId_sha256_ecc_pub_keyid,
-    kKeyId_case_ephemeral_keyid,
+    kKeyId_sha256_ecc_pub_keyid, // Used for ECDSA verify
+    kKeyId_case_ephemeral_keyid, // Used for ECDH
+    kKeyId_node_op_keyid_start,  // Node operational key pair
 };
 
 // Enable the below macro to make spake HSM imlementation reentrant.
@@ -71,7 +72,7 @@ extern "C" {
 #endif
 
 /* Open session to se05x */
-void se05x_sessionOpen(void);
+CHIP_ERROR se05x_sessionOpen(void);
 
 /* Delete key in se05x */
 void se05x_delete_key(uint32_t keyid);
@@ -83,16 +84,16 @@ CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t k
 #if ENABLE_REENTRANCY
 
 /* Init crypto object mutext */
-void init_cryptoObj_mutex(void);
+void se05x_init_cryptoObj_mutex(void);
 
 /* Delete all crypto objects in se05x */
-void delete_crypto_objects(void);
+void se05x_delete_crypto_objects(void);
 
 /* Get unused object id */
-SE05x_CryptoObjectID_t getObjID(void);
+SE05x_CryptoObjectID_t se05x_getCryptoObjID(void);
 
 /* Set object id status */
-void setObjID(SE05x_CryptoObjectID_t objId, uint8_t status);
+void se05x_setCryptoObjID(SE05x_CryptoObjectID_t objId, uint8_t status);
 
 #endif //#if ENABLE_REENTRANCY
 
