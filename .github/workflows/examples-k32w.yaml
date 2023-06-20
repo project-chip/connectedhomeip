@@ -86,7 +86,6 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target k32w-light-no-ble-se05x \
                       --target k32w-light-crypto-platform-tokenizer \
                       --target k32w-lock-crypto-platform-tokenizer \
                       --target k32w-lock-crypto-platform-low-power-nologs \

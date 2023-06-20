@@ -59,6 +59,9 @@ class TestXmlParser(unittest.TestCase):
                 <code>0x1234</code>
                 <description>Test</description>
 
+                <attribute side="server" code="10" type="CHAR_STRING" minLength="2" length="10" isNullable="true" \
+                    reportable="true" writable="false">SomeCharStringAttribute</attribute>
+
                 <attribute side="server" code="11" type="INT32U" min="0" max="2" isNullable="true" \
                     reportable="true" writable="false">SomeIntAttribute</attribute>
 
@@ -93,7 +96,17 @@ class TestXmlParser(unittest.TestCase):
                                  description="Test",
                                  attributes=[
                                      Attribute(definition=Field(
-                                         data_type=DataType(name='INT32U'),
+                                         data_type=DataType(
+                                             name='CHAR_STRING', min_length=2, max_length=10),
+                                         code=10,
+                                         name='SomeCharStringAttribute',
+                                         qualities=FieldQuality.NULLABLE),
+                                         qualities=AttributeQuality.READABLE,
+                                         readacl=AccessPrivilege.VIEW, writeacl=AccessPrivilege.OPERATE),
+
+                                     Attribute(definition=Field(
+                                         data_type=DataType(
+                                             name='INT32U', min_value=0, max_value=2),
                                          code=11,
                                          name='SomeIntAttribute',
                                          qualities=FieldQuality.NULLABLE),
@@ -101,7 +114,8 @@ class TestXmlParser(unittest.TestCase):
                                          readacl=AccessPrivilege.VIEW, writeacl=AccessPrivilege.OPERATE),
 
                                      Attribute(definition=Field(
-                                         data_type=DataType(name='INT8U'),
+                                         data_type=DataType(
+                                             name='INT8U', min_value=0, max_value=10),
                                          code=22, name='AttributeWithAccess',
                                          qualities=FieldQuality.OPTIONAL),
                                          qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE,
@@ -214,7 +228,10 @@ class TestXmlParser(unittest.TestCase):
                                                     name='Field3',
                                                     qualities=FieldQuality.FABRIC_SENSITIVE),
                                               Field(data_type=DataType(name='int32u',
-                                                                       max_length=None),
+                                                                       min_length=None,
+                                                                       max_length=None,
+                                                                       min_value=None,
+                                                                       max_value=None),
                                                     code=10,
                                                     name='Field10')],
                                       qualities=StructQuality.FABRIC_SCOPED)],
@@ -369,7 +386,7 @@ Some copyright here... testing that we skip over comments
                                          Attribute(
                                              definition=Field(
                                                  data_type=DataType(
-                                                     name='Type'),
+                                                     name='Type', min_value=0, max_value=9),
                                                  code=0,
                                                  name='Type',
                                              ),

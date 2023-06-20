@@ -8,26 +8,16 @@ virtualenv
 -c constraints.esp32.txt
 -r requirements.esp32.txt
 
-# mbed-os
 -r requirements.mbed.txt
-
-# bouffalolab
 -r requirements.bouffalolab.txt
-
-# openiotsdk
 -r requirements.openiotsdk.txt
-
-# Infineon
 -r requirements.infineon.txt
-
-# TI
 -r requirements.ti.txt
-
-# Telink
 -r requirements.telink.txt
-
-# cirque tests
-requests>=2.24.0
+-r requirements.zephyr.txt
+-r requirements.cirque.txt
+-r requirements.memory.txt
+-r requirements.yaml_tests.txt
 
 # device controller wheel package
 wheel; sys_platform == 'linux'
@@ -39,17 +29,6 @@ pyobjc-framework-corebluetooth; sys_platform == 'darwin'
 # mobly tests
 portpicker
 mobly
-
-# zephyr
-west>=0.12.0
-intelhex
-cbor
-cbor2
-jsonschema
-
-# happy tests
-lockfile
-psutil >= 5.7.3
 
 # pigweed
 ipython
@@ -63,13 +42,6 @@ mypy-protobuf==3.2.0
 protobuf==3.20.1
 types-protobuf==3.19.22
 
-# scripts/tools/memory
-anytree
-cxxfilt
-ghapi
-pandas ; platform_machine != 'aarch64' and platform_machine != 'arm64'
-tabulate
-
 cryptography
 
 # python unit tests
@@ -78,6 +50,3 @@ colorama
 # update tornado for pw_watch
 tornado
 
-# YAML test harness
-diskcache
-websockets

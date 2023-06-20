@@ -14,6 +14,38 @@
 # limitations under the License.
 #
 
+_install_additional_pip_requirements() {
+    _SETUP_PLATFORM=$1
+    shift
+
+    # figure out additional pip install items
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -p | --platform)
+                _SETUP_PLATFORM=$2
+                shift # argument
+                shift # value
+                ;;
+            *)
+                shift
+                ;;
+        esac
+    done
+
+    if ! [ -z "$_SETUP_PLATFORM" ]; then
+        IFS="," read -r -a _PLATFORMS <<<"$_SETUP_PLATFORM"
+        for platform in "${_PLATFORMS[@]}"; do
+            # Allow none as an alias of nothing extra installed (like -p none)
+            if [ "$platform" != "none" ]; then
+                echo "Installing pip requirements for $platform..."
+                pip install -q \
+                    -r "$_CHIP_ROOT/scripts/setup/requirements.$platform.txt" \
+                    -c "$_CHIP_ROOT/scripts/setup/constraints.txt"
+            fi
+        done
+    fi
+}
+
 _bootstrap_or_activate() {
     if [ -n "$BASH" ]; then
         local _BOOTSTRAP_PATH="${BASH_SOURCE[0]}"
@@ -24,7 +56,7 @@ _bootstrap_or_activate() {
     local _BOOTSTRAP_NAME="${_BOOTSTRAP_PATH##*/}"
     local _BOOTSTRAP_DIR="${_BOOTSTRAP_PATH%/*}"
     # Strip off the 'scripts[/setup]' directory, leaving the root of the repo.
-    local _CHIP_ROOT="$(cd "${_BOOTSTRAP_DIR%/setup}/.." && pwd)"
+    _CHIP_ROOT="$(cd "${_BOOTSTRAP_DIR%/setup}/.." && pwd)"
 
     local _CONFIG_FILE="scripts/setup/environment.json"
 
@@ -91,21 +123,42 @@ EOF
             --config-file "$_CHIP_ROOT/$_CONFIG_FILE" \
             --virtualenv-gn-out-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT/gn_out"
         pw_finalize bootstrap "$_SETUP_SH"
+        _ACTION_TAKEN="bootstrap"
     else
         pw_activate
         pw_finalize activate "$_SETUP_SH"
+        _ACTION_TAKEN="activate"
     fi
 }
 
+# remember PW_ENVIRONMENT_ROOT so that things like another
+# bootstrap or run_in_build_env.sh can be executed in a build env
+_ORIGINAL_PW_ENVIRONMENT_ROOT="$PW_ENVIRONMENT_ROOT"
+
 _bootstrap_or_activate "$0"
+
+if [ "$_ACTION_TAKEN" = "bootstrap" ]; then
+    # By default, install all extra pip dependencies even if slow. -p/--platform
+    # arguments may override this default.
+    _install_additional_pip_requirements "all" "$@"
+else
+    _install_additional_pip_requirements "none" "$@"
+fi
+
 unset -f _bootstrap_or_activate
+unset -f _install_additional_pip_requirements
 
 pw_cleanup
 
+unset _ACTION_TAKEN
+unset _CHIP_ROOT
 unset PW_CIPD_INSTALL_DIR
-unset CIPD_CACHE_DIR
 unset _PW_BANNER_FUNC
 unset _PW_TEXT
 unset PW_DOCTOR_SKIP_CIPD_CHECKS
 
 unset -f _chip_bootstrap_banner
+
+if ! [ -z "$_ORIGINAL_PW_ENVIRONMENT_ROOT" ]; then
+    export PW_ENVIRONMENT_ROOT="$_ORIGINAL_PW_ENVIRONMENT_ROOT"
+fi

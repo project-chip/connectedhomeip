@@ -22,30 +22,32 @@
  *      chip crypto apis use either HSM or rollback to software implementation.
  */
 
-#include "CHIPCryptoPALHsm_SE05X_utils.h"
+#include "CHIPCryptoPALHsm_se05x_utils.h"
 #include <lib/core/CHIPEncoding.h>
-
-#if ENABLE_HSM_HKDF_SHA256
 
 namespace chip {
 namespace Crypto {
 
-HKDF_shaHSM::HKDF_shaHSM()
-{
-    keyid = kKeyId_hkdf_sha256_hmac_keyid;
-}
-HKDF_shaHSM::~HKDF_shaHSM() {}
+extern CHIP_ERROR HKDF_SHA256_H(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
+                                const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length);
 
-CHIP_ERROR HKDF_shaHSM::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
-                                    const size_t salt_length, const uint8_t * info, const size_t info_length, uint8_t * out_buffer,
-                                    size_t out_length)
+CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
+                                 const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+#if !ENABLE_SE05X_HKDF_SHA256
+    return HKDF_SHA256_H(secret, secret_length, salt, salt_length, info, info_length, out_buffer, out_length);
+#else
+    CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
+    uint32_t keyid         = kKeyId_hkdf_sha256_hmac_keyid;
+    sss_object_t keyObject = { 0 };
+
     if (salt_length > 64 || info_length > 80 || secret_length > 256 || out_length > 768)
     {
         /* Length not supported by se05x. Rollback to SW */
-        return HKDF_sha::HKDF_SHA256(secret, secret_length, salt, salt_length, info, info_length, out_buffer, out_length);
+        return HKDF_SHA256_H(secret, secret_length, salt, salt_length, info, info_length, out_buffer, out_length);
     }
+
+    ChipLogDetail(Crypto, "HKDF_SHA256 : Using se05x for HKDF");
 
     // Salt is optional
     if (salt_length > 0)
@@ -58,13 +60,10 @@ CHIP_ERROR HKDF_shaHSM::HKDF_SHA256(const uint8_t * secret, const size_t secret_
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(secret != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);
-
-    se05x_sessionOpen();
+    VerifyOrReturnError(se05x_sessionOpen() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
-    sss_object_t keyObject = { 0 };
-    sss_status_t status    = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    sss_status_t status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     status = sss_key_object_allocate_handle(&keyObject, keyid, kSSS_KeyPart_Default, kSSS_CipherType_HMAC, secret_length,
@@ -81,12 +80,15 @@ CHIP_ERROR HKDF_shaHSM::HKDF_SHA256(const uint8_t * secret, const size_t secret_
 
     error = CHIP_NO_ERROR;
 exit:
-    sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
 
+    if (keyObject.keyStore->session != NULL)
+    {
+        sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
+    }
     return error;
+
+#endif // ENABLE_SE05X_HKDF_SHA256
 }
 
 } // namespace Crypto
 } // namespace chip
-
-#endif //#if ENABLE_HSM_HKDF_SHA256

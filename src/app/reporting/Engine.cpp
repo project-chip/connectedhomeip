@@ -636,7 +636,7 @@ void Engine::Run()
         ReadHandler * readHandler = imEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) imEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
-        if (readHandler->IsReportable())
+        if (readHandler->IsReportableNow())
         {
             mRunningReadHandler = readHandler;
             CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);
@@ -826,16 +826,16 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
     bool intersectsInterestPath = false;
     InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject(
         [&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
-            // We call SetDirty for both read interactions and subscribe interactions, since we may send inconsistent attribute data
-            // between two chunks. SetDirty will be ignored automatically by read handlers which are waiting for a response to the
-            // last message chunk for read interactions.
+            // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
+            // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
+            // waiting for a response to the last message chunk for read interactions.
             if (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse())
             {
                 for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
                 {
                     if (object->mValue.Intersects(aAttributePath))
                     {
-                        handler->SetDirty(aAttributePath);
+                        handler->AttributePathIsDirty(aAttributePath);
                         intersectsInterestPath = true;
                         break;
                     }
@@ -937,7 +937,7 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
             if (interestedPath->mValue.IsEventPathSupersetOf(aPath) && interestedPath->mValue.mIsUrgentEvent)
             {
                 isUrgentEvent = true;
-                handler->UnblockUrgentEventDelivery();
+                handler->ForceDirtyState();
                 break;
             }
         }
@@ -967,7 +967,7 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
             return Loop::Continue;
         }
 
-        handler->UnblockUrgentEventDelivery();
+        handler->ForceDirtyState();
 
         return Loop::Continue;
     });

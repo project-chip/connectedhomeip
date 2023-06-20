@@ -105,6 +105,7 @@ class YamlLoader:
             'minInterval': int,
             'maxInterval': int,
             'timedInteractionTimeoutMs': int,
+            'dataVersion': (list, int, str),  # Can be a variable
             'busyWaitMs': int,
             'wait': str,
         }
@@ -166,7 +167,8 @@ class YamlLoader:
             'error': str,
             'clusterError': int,
             'constraints': dict,
-            'saveAs': str
+            'saveAs': str,
+            'saveDataVersionAs': str,
         }
 
         if allow_name_key:
