@@ -40,6 +40,7 @@
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <examples/platform/esp32/mode-support/static-supported-modes-manager.h>
 #include <platform/ESP32/ESP32Utils.h>
 
 #if CONFIG_HAVE_DISPLAY
@@ -112,6 +113,9 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 static void InitServer(intptr_t context)
 {
     Esp32AppServer::Init(&sCallbacks); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+
+    app::Clusters::ModeSelect::StaticSupportedModesManager instance;
+    instance.InitEndpointArray(FIXED_ENDPOINT_COUNT);
 
 #if !(CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_THREAD)
     // We only have network commissioning on endpoint 0.

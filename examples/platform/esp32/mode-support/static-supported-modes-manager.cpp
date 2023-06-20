@@ -31,13 +31,15 @@ using SemanticTag          = Structs::SemanticTagStruct::Type;
 template <typename T>
 using List = app::DataModel::List<T>;
 
+SupportedModesManager::ModeOptionsProvider *StaticSupportedModesManager::epModeOptionsProviderList = nullptr;
+
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
-SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::epModeOptionsProviderList[FIXED_ENDPOINT_COUNT];
-
-void StaticSupportedModesManager::InitEndpointArray()
+void StaticSupportedModesManager::InitEndpointArray(int size)
 {
-    for (int i = 0; i < FIXED_ENDPOINT_COUNT; i++)
+    mSize = size;
+    epModeOptionsProviderList = new SupportedModesManager::ModeOptionsProvider[mSize];
+    for (int i = 0; i < mSize; i++)
     {
         epModeOptionsProviderList[i] = ModeOptionsProvider();
     }

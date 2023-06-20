@@ -31,14 +31,15 @@ class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::Supp
 private:
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
     using SemanticTag          = Structs::SemanticTagStruct::Type;
+    int mSize;
 
-    static ModeOptionsProvider epModeOptionsProviderList[FIXED_ENDPOINT_COUNT];
-
-    void InitEndpointArray();
+    static ModeOptionsProvider *epModeOptionsProviderList;
 
     void FreeSupportedModes(EndpointId endpointId) const;
 
 public:
+    void InitEndpointArray(int size);
+
     static const StaticSupportedModesManager instance;
 
     SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
@@ -48,11 +49,11 @@ public:
 
     void CleanUp(EndpointId endpointId) const;
 
-    StaticSupportedModesManager() { InitEndpointArray(); }
+    StaticSupportedModesManager() {}
 
     ~StaticSupportedModesManager()
     {
-        for (int i = 0; i < FIXED_ENDPOINT_COUNT; i++)
+        for (int i = 0; i < mSize; i++)
         {
             FreeSupportedModes(i);
         }
