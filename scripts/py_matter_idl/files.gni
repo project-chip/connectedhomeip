@@ -3,9 +3,6 @@ import("//build_overrides/chip.gni")
 
 # Templates used for generation
 matter_idl_generator_templates = [
-  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/bridge/BridgeClustersCpp.jinja",
-  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/bridge/BridgeClustersCommon.jinja",
-  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/bridge/BridgeClustersGlobalStructs.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ChipClustersCpp.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ChipClustersRead.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ClusterWriteMapping.jinja",
@@ -17,7 +14,6 @@ matter_idl_generator_templates = [
 matter_idl_generator_sources = [
   "${chip_root}/scripts/py_matter_idl/matter_idl/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/__init__.py",
-  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/bridge/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/application/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/filters.py",

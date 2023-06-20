@@ -58,7 +58,7 @@ public:
     virtual void TraceInstant(Instant instant) = 0;
 
     virtual void LogMessageSend(MessageSendInfo &) { TraceInstant(Instant::Log_MessageSend); }
-    virtual void LogMessageReceived(MessageReceiveInfo &) { TraceInstant(Instant::Log_MessageReceived); }
+    virtual void LogMessageReceived(MessageReceivedInfo &) { TraceInstant(Instant::Log_MessageReceived); }
 
     virtual void LogNodeLookup(NodeLookupInfo &) { TraceInstant(Instant::Log_NodeLookup); }
     virtual void LogNodeDiscovered(NodeDiscoveredInfo &) { TraceInstant(Instant::Log_NodeDiscovered); }

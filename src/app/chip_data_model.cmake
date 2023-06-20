@@ -75,11 +75,13 @@ function(chip_configure_data_model APP_TARGET)
 
     if (ARG_INCLUDE_SERVER)
         target_sources(${APP_TARGET} ${SCOPE}
-            ${CHIP_APP_BASE_DIR}/server/EchoHandler.cpp
+            ${CHIP_APP_BASE_DIR}/server/AclStorage.cpp
+            ${CHIP_APP_BASE_DIR}/server/DefaultAclStorage.cpp
+            ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
             ${CHIP_APP_BASE_DIR}/server/Dnssd.cpp
+            ${CHIP_APP_BASE_DIR}/server/EchoHandler.cpp
             ${CHIP_APP_BASE_DIR}/server/OnboardingCodesUtil.cpp
             ${CHIP_APP_BASE_DIR}/server/Server.cpp
-            ${CHIP_APP_BASE_DIR}/server/CommissioningWindowManager.cpp
         )
 
         target_compile_options(${APP_TARGET} ${SCOPE}
@@ -133,9 +135,7 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
         ${CHIP_APP_BASE_DIR}/util/binding-table.cpp
-        # Disable CM cluster table tests until update is done
-        # https://github.com/project-chip/connectedhomeip/issues/24425
-        # ${CHIP_APP_BASE_DIR}/util/ClientMonitoringRegistrationTable.cpp
+        ${CHIP_APP_BASE_DIR}/util/IcdMonitoringTable.cpp
         ${CHIP_APP_BASE_DIR}/util/DataModelHandler.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-compatibility-functions.cpp
         ${CHIP_APP_BASE_DIR}/util/error-mapping.cpp

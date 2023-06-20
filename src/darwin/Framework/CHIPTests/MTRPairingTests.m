@@ -64,6 +64,11 @@ static MTRTestKeys * sTestKeys = nil;
                                           error:(NSError * _Nullable)error
 {
     [self.expectation fulfill];
+    // Hard-coded to what our example server app uses for now.
+    // TODO: Build an example that uses the "origin" bits that allow a DAC and
+    // CD to have different vendor IDs, and verify things here.
+    XCTAssertEqualObjects(attestationDeviceInfo.basicInformationVendorID, @(0xFFF1));
+    XCTAssertEqualObjects(attestationDeviceInfo.basicInformationProductID, @(0x8001));
     [controller continueCommissioningDevice:opaqueDeviceHandle ignoreAttestationFailure:NO error:nil];
 }
 

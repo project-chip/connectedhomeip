@@ -35,14 +35,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.7.3
+            image: connectedhomeip/chip-build:0.7.16
             options: --user root
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3
@@ -71,14 +71,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.7.3
+            image: connectedhomeip/chip-build-esp32:0.7.16
             options: --user root
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3
@@ -107,14 +107,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.7.3
+            image: connectedhomeip/chip-build-nrf-platform:0.7.16
             options: --user root
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3

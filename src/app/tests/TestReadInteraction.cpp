@@ -54,10 +54,12 @@ uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
 chip::ClusterId kTestClusterId          = 6;
+chip::ClusterId kTestEventClusterId     = chip::Test::MockClusterId(1);
 chip::ClusterId kInvalidTestClusterId   = 7;
 chip::EndpointId kTestEndpointId        = 1;
-chip::EventId kTestEventIdDebug         = 1;
-chip::EventId kTestEventIdCritical      = 2;
+chip::EndpointId kTestEventEndpointId   = chip::Test::kMockEndpoint1;
+chip::EventId kTestEventIdDebug         = chip::Test::MockEventId(1);
+chip::EventId kTestEventIdCritical      = chip::Test::MockEventId(2);
 uint8_t kTestFieldValue1                = 1;
 chip::TLV::Tag kTestEventTag            = chip::TLV::ContextTag(1);
 chip::EndpointId kInvalidTestEndpointId = 3;
@@ -128,11 +130,11 @@ void GenerateEvents(nlTestSuite * apSuite, void * apContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2;
     chip::app::EventOptions options1;
-    options1.mPath     = { kTestEndpointId, kTestClusterId, kTestEventIdDebug };
+    options1.mPath     = { kTestEventEndpointId, kTestEventClusterId, kTestEventIdDebug };
     options1.mPriority = chip::app::PriorityLevel::Info;
 
     chip::app::EventOptions options2;
-    options2.mPath     = { kTestEndpointId, kTestClusterId, kTestEventIdCritical };
+    options2.mPath     = { kTestEventEndpointId, kTestEventClusterId, kTestEventIdCritical };
     options2.mPriority = chip::app::PriorityLevel::Critical;
     TestEventGenerator testEventGenerator;
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
@@ -468,7 +470,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     ctx.DrainAndServiceIO();
 
     GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
-    err = readClient.ProcessReportData(std::move(buf));
+    err = readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -494,7 +496,7 @@ void TestReadInteraction::TestReadUnexpectedSubscriptionId(nlTestSuite * apSuite
     // For read, we don't expect there is subscription id in report data.
     GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/,
                        true /*aHasSubscriptionId*/);
-    err = readClient.ProcessReportData(std::move(buf));
+    err = readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -637,7 +639,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
 
-    err = readClient.ProcessReportData(std::move(buf));
+    err = readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
 }
 
@@ -820,8 +822,8 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
     chip::app::EventPathParams eventPathParams[1];
-    eventPathParams[0].mEndpointId = kTestEndpointId;
-    eventPathParams[0].mClusterId  = kTestClusterId;
+    eventPathParams[0].mEndpointId = kTestEventEndpointId;
+    eventPathParams[0].mClusterId  = kTestEventClusterId;
 
     chip::app::AttributePathParams attributePathParams[2];
     attributePathParams[0].mEndpointId  = kTestEndpointId;
@@ -1498,12 +1500,12 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -1585,7 +1587,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         dirtyPath5.mAttributeId = 4;
 
         // Test report with 2 different path
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mGotEventResponse     = false;
         delegate.mNumAttributeResponse = 0;
@@ -1602,7 +1604,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 2 different path, and 1 same path
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1618,7 +1620,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, and one path is overlapped with another
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1634,7 +1636,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test report with 3 different path, all are not overlapped, one path is not interested for current subscription
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         err                            = engine->GetReportingEngine().SetDirty(dirtyPath1);
@@ -1650,8 +1652,8 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
         // Test empty report
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMaxInterval, false);
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
@@ -1690,11 +1692,11 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -1738,12 +1740,13 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         GenerateEvents(apSuite, apContext);
 
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
         delegate.mGotReport        = false;
 
-        NL_TEST_ASSERT(apSuite, nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite,
+                       nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
         nonUrgentDelegate.mGotEventResponse = false;
         nonUrgentDelegate.mGotReport        = false;
@@ -1779,13 +1782,14 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         // Since we just sent a report for our urgent subscription, we should have our min interval timer
         // running again.
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
         delegate.mGotEventResponse = false;
 
         // For our non-urgent subscription, we did not send anything, so we
         // should not have a min interval timer running there.
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite,
+                       !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
 
         // Wait for the min interval timer to fire.
@@ -1805,15 +1809,16 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         // min-interval timer should have fired, and our handler should still
         // not be dirty or even reportable.
-        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsReportableNow());
 
         // And the non-urgent one should not have changed state either, since
         // it's waiting for the max-interval.
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::HoldReport));
+        NL_TEST_ASSERT(apSuite,
+                       !nonUrgentDelegate.mpReadHandler->mFlags.Has(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval));
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportableNow());
 
         // There should be no reporting run scheduled.  This is very important;
         // otherwise we can get a false-positive pass below because the run was
@@ -1825,11 +1830,11 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
 
         // Urgent read handler should now be dirty, and reportable.
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsReportableNow());
 
         // Non-urgent read handler should not be reportable.
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsDirty());
-        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportable());
+        NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mpReadHandler->IsReportableNow());
 
         // Still no reporting should have happened.
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
@@ -1912,7 +1917,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         // Set a concrete path dirty
         {
-            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -1933,7 +1938,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         // Set a endpoint dirty
         {
-            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
             delegate.mNumArrayItems        = 0;
@@ -2025,7 +2030,7 @@ void TestReadInteraction::TestSubscribePartialOverlap(nlTestSuite * apSuite, voi
 
         // Set a partial overlapped path dirty
         {
-            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -2102,7 +2107,7 @@ void TestReadInteraction::TestSubscribeSetDirtyFullyOverlap(nlTestSuite * apSuit
 
         // Set a full overlapped path dirty and expect to receive one E2C3A1
         {
-            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+            delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
             delegate.mGotReport            = false;
             delegate.mNumAttributeResponse = 0;
 
@@ -2223,8 +2228,8 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMaxInterval, false);
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
 
         ctx.DrainAndServiceIO();
@@ -2340,12 +2345,12 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -2399,7 +2404,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         dirtyPath2.mAttributeId = 2;
 
         // Test report with 2 different path
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
 
@@ -2413,8 +2418,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout(nlTestSu
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMaxInterval, false);
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         ctx.ExpireSessionBobToAlice();
@@ -2461,12 +2466,12 @@ void TestReadInteraction::TestSubscribeRoundtripStatusReportTimeout(nlTestSuite 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -2641,12 +2646,12 @@ void TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout(nlTestS
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -2712,12 +2717,12 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -2761,8 +2766,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout(nlT
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMaxInterval, false);
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         delegate.mGotReport            = false;
@@ -2814,12 +2819,12 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -2863,8 +2868,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout(nlTestSui
         dirtyPath1.mEndpointId  = Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = Test::MockAttributeId(4);
 
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldSync, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mpReadHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMaxInterval, false);
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         delegate.mGotReport            = false;
@@ -2915,12 +2920,12 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReport(nlTestSuite * ap
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     chip::app::EventPathParams eventPathParams[2];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestEventIdDebug;
 
-    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
-    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
+    readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestEventClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestEventIdCritical;
 
     readPrepareParams.mEventPathParamsListSize = 2;
@@ -4104,7 +4109,7 @@ void TestReadInteraction::TestSubscribeInvalidateFabric(nlTestSuite * apSuite, v
 
     readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = Test::kMockEndpoint3;
     readPrepareParams.mpAttributePathParamsList[0].mClusterId   = Test::MockClusterId(2);
-    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = Test::MockAttributeId(4);
+    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = Test::MockAttributeId(1);
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 0;
@@ -4163,7 +4168,7 @@ void TestReadInteraction::TestShutdownSubscription(nlTestSuite * apSuite, void *
 
     readPrepareParams.mpAttributePathParamsList[0].mEndpointId  = Test::kMockEndpoint3;
     readPrepareParams.mpAttributePathParamsList[0].mClusterId   = Test::MockClusterId(2);
-    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = Test::MockAttributeId(4);
+    readPrepareParams.mpAttributePathParamsList[0].mAttributeId = Test::MockAttributeId(1);
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 0;
@@ -4210,7 +4215,7 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathParams subscribePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(4));
+    AttributePathParams subscribePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(1));
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     readPrepareParams.mpAttributePathParamsList    = &subscribePath;
@@ -4231,6 +4236,7 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
         ctx.DrainAndServiceIO();
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 0);
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
@@ -4243,13 +4249,15 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
         NL_TEST_ASSERT(apSuite, SessionHandle(*readHandler->GetSession()) == ctx.GetSessionAliceToBob());
 
         // Test that we send reports as needed.
-        readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mGotReport = false;
+        readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
         engine->GetReportingEngine().SetDirty(subscribePath);
 
         ctx.DrainAndServiceIO();
 
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 0);
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
@@ -4257,13 +4265,15 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
         // Test that if the session is defunct we don't send reports and clean
         // up properly.
         readHandler->GetSession()->MarkAsDefunct();
-        readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::HoldReport, false);
-        delegate.mGotReport = false;
+        readHandler->SetStateFlag(ReadHandler::ReadHandlerFlags::WaitingUntilMinInterval, false);
+        delegate.mGotReport            = false;
+        delegate.mNumAttributeResponse = 0;
         engine->GetReportingEngine().SetDirty(subscribePath);
 
         ctx.DrainAndServiceIO();
 
         NL_TEST_ASSERT(apSuite, !delegate.mGotReport);
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 0);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 0);
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);

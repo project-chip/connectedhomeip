@@ -25,18 +25,54 @@ template("asr_executable") {
 
   if (asr_ic_family == "asr595x") {
     objcopy = "${asr_toolchain_root}riscv-asr-elf-objcopy"
-  } else if (asr_ic_family == "asr582x") {
-    objcopy = "${asr_toolchain_root}arm-none-eabi-objcopy"
   } else {
-    objcopy = "objcopy"
+    objcopy = "${asr_toolchain_root}arm-none-eabi-objcopy"
   }
 
-  #Copy flashing dependencies to the output directory so that the output
-  #is collectively self-contained; this allows flashing to work reliably
-  #even if the build and flashing steps take place on different machines
-  #or in different containers.
-
-  flashable_executable(target_name) {
+  flash_target_name = target_name + ".flash_executable"
+  flashbundle_name = "${target_name}.flashbundle.txt"
+  flashable_executable(flash_target_name) {
     forward_variables_from(invoker, "*")
+  }
+
+  action("generate_ota_image") {
+    script = "${build_root}/gn_run_binary.py"
+
+    outputs = [ "${root_out_dir}/${output_base_name}_ota.bin" ]
+
+    if (asr_ic_family == "asr595x") {
+      gen_ota_tool = "${asr_sdk_build_root}/asr_sdk/tools/image_gen_header/image_gen_header"
+    } else {
+      gen_ota_tool =
+          "${asr_sdk_build_root}/asr_sdk/tools/otaImage/image_gen_header"
+    }
+
+    _ota_tool_path = rebase_path(gen_ota_tool, root_build_dir)
+
+    if (asr_ic_family == "asr595x") {
+      args = [
+        _ota_tool_path,
+        "${root_out_dir}/${objcopy_image_name}",
+        "-d",
+        "LEGA_A0V2",
+        "-b",
+        "REMAPPING",
+      ]
+    } else {
+      args = [
+        _ota_tool_path,
+        "${root_out_dir}/${objcopy_image_name}",
+        "flash_remapping",
+      ]
+    }
+
+    deps = [ ":$flash_target_name" ]
+  }
+
+  group(target_name) {
+    deps = [
+      ":$flash_target_name",
+      ":generate_ota_image",
+    ]
   }
 }

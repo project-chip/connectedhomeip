@@ -25,6 +25,7 @@ enum class PairingMode
     None,
     Code,
     Ble,
+    AlreadyDiscoveredByIndex,
 };
 
 enum class PairingNetworkType
@@ -67,6 +68,10 @@ public:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             break;
+        case PairingMode::AlreadyDiscoveredByIndex:
+            AddArgument("payload", &mOnboardingPayload);
+            AddArgument("index", 0, UINT16_MAX, &mIndex);
+            break;
         }
 
         AddArgument("use-device-attestation-delegate", 0, 1, &mUseDeviceAttestationDelegate,
@@ -82,6 +87,7 @@ public:
 
 private:
     void PairWithCode(NSError * __autoreleasing * error);
+    void PairWithIndex(NSError * __autoreleasing * error);
     void PairWithPayload(NSError * __autoreleasing * error);
     void Unpair();
     void SetUpDeviceControllerDelegate();
@@ -94,6 +100,7 @@ private:
     chip::NodeId mNodeId;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
+    uint16_t mIndex;
     char * mOnboardingPayload;
     chip::Optional<bool> mUseDeviceAttestationDelegate;
     chip::Optional<uint16_t> mDeviceAttestationFailsafeTime;

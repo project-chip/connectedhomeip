@@ -27,6 +27,7 @@ using chip::Protocols::InteractionModel::Status;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
 using SemanticTag          = Structs::SemanticTagStruct::Type;
+
 template <typename T>
 using List = app::DataModel::List<T>;
 

@@ -357,6 +357,8 @@ DCONF
 DCONFIG
 debianutils
 debugText
+decrypt
+decrypted
 DEDEDEDE
 deepnote
 DefaultOTAProviders
@@ -977,6 +979,7 @@ otaissues
 OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
+otaproviders
 OTAProviderSerialPort
 OTARequesterImpl
 OTARequestorDriver
@@ -1151,6 +1154,7 @@ RPC
 RPCs
 RPi
 RPis
+RSA
 rsn
 RSSI
 RST

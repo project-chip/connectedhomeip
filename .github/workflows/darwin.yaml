@@ -41,7 +41,7 @@ jobs:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3
@@ -128,6 +128,11 @@ jobs:
               timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
+            - name: Build OTA image files with software version number 5
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0 chip_device_config_device_software_version=5 chip_device_config_device_software_version_string='"5.0"'
+                  cp out/debug/chip-ota-requestor-app /tmp/ota-test005-raw-image
             - name: Build example OTA Requestor
               timeout-minutes: 10
               run: |
