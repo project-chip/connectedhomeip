@@ -47,7 +47,9 @@ PerfettoBackend & PerfettoBackend::Init(const char * output_name)
     {
         OpenTracingFile(output_name);
         args.backends = perfetto::kInProcessBackend;
-    } else {
+    }
+    else
+    {
         args.backends = perfetto::kSystemBackend;
     }
 
@@ -94,8 +96,8 @@ void PerfettoBackend::Open()
     perfetto::TraceConfig cfg;
     cfg.add_buffers()->set_size_kb(1024);
 
-    auto* ds_cfg = cfg.add_data_sources()->mutable_config();
-    ds_cfg->set_name("track_event");  // corresponds to TRACE_EVENT
+    auto * ds_cfg = cfg.add_data_sources()->mutable_config();
+    ds_cfg->set_name("track_event"); // corresponds to TRACE_EVENT
 
     mTracingSession = perfetto::Tracing::NewTrace();
     mTracingSession->Setup(cfg, mTraceFileId);
@@ -139,6 +141,59 @@ void PerfettoBackend::TraceEnd(const char * label, const char * group)
 void PerfettoBackend::TraceInstant(const char * label, const char * group)
 {
     TRACE_EVENT_INSTANT(kMatterCategory, perfetto::StaticString(label), "class_name", perfetto::StaticString(group));
+}
+
+void PerfettoBackend::LogNodeLookup(NodeLookupInfo & info)
+{
+    TRACE_EVENT_INSTANT(                                                          //
+        kMatterCategory, "NodeLookup",                                            //
+        "node_id", info.request->GetPeerId().GetNodeId(),                         //
+        "compressed_fabric_id", info.request->GetPeerId().GetCompressedFabricId() //
+    );
+}
+
+void PerfettoBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
+{
+    char address_buff[chip::Transport::PeerAddress::kMaxToStringSize];
+    info.result->address.ToString(address_buff);
+
+    switch (info.type)
+    {
+    case chip::Tracing::DiscoveryInfoType::kIntermediateResult:
+        TRACE_EVENT_INSTANT(                                              //
+            kMatterCategory, "NodeDiscovered Intermediate",               //
+            "node_id", info.peerId->GetNodeId(),                          //
+            "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
+            "address", address_buff                                       //
+        );
+        break;
+    case chip::Tracing::DiscoveryInfoType::kResolutionDone:
+        TRACE_EVENT_INSTANT(                                              //
+            kMatterCategory, "NodeDiscovered Final",                      //
+            "node_id", info.peerId->GetNodeId(),                          //
+            "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
+            "address", address_buff                                       //
+        );
+        break;
+    case chip::Tracing::DiscoveryInfoType::kRetryDifferent:
+        TRACE_EVENT_INSTANT(                                              //
+            kMatterCategory, "NodeDiscovered Retry Different",            //
+            "node_id", info.peerId->GetNodeId(),                          //
+            "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
+            "address", address_buff                                       //
+        );
+        break;
+    }
+}
+
+void PerfettoBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
+{
+    TRACE_EVENT_INSTANT(                                              //
+        kMatterCategory, "Discovery Failed",                          //
+        "node_id", info.peerId->GetNodeId(),                          //
+        "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
+        "error", chip::ErrorStr(info.error)                           //
+    );
 }
 
 } // namespace Perfetto

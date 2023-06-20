@@ -32,6 +32,7 @@
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <tracing/scope.h>
 
 // MDNS servers will receive all broadcast packets over the network.
 // Disable 'invalid packet' messages because the are expected and common
@@ -237,6 +238,8 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
 
 void PacketParser::ParseSrvRecords(const BytesRange & packet)
 {
+    MATTER_TRACE_SCOPE("Searching SRV Records", "PacketParser");
+
     mParsingState = RecordParsingState::kSrvInitialization;
     mPacketRange  = packet;
 
@@ -250,6 +253,8 @@ void PacketParser::ParseSrvRecords(const BytesRange & packet)
 
 void PacketParser::ParseNonSrvRecords(Inet::InterfaceId interface, const BytesRange & packet)
 {
+    MATTER_TRACE_SCOPE("Searching NON-SRV Records", "PacketParser");
+
     mParsingState = RecordParsingState::kRecordParsing;
     mPacketRange  = packet;
     mInterfaceId  = interface;
@@ -418,6 +423,8 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
+    MATTER_TRACE_SCOPE("Received MDNS Packet", "MinMdnsResolver");
+
     // Fill up any relevant data
     mPacketParser.ParseSrvRecords(data);
     mPacketParser.ParseNonSrvRecords(info->Interface, data);

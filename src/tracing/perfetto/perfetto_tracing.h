@@ -45,6 +45,10 @@ public:
     void TraceEnd(const char * label, const char * group) override;
     void TraceInstant(const char * label, const char * group) override;
 
+    void LogNodeLookup(NodeLookupInfo &) override;
+    void LogNodeDiscovered(NodeDiscoveredInfo &) override;
+    void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
+
 private:
     static constexpr int kInvalidFileId = -1;
 
