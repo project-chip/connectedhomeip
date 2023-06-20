@@ -28,7 +28,6 @@
 [![Android](https://github.com/project-chip/connectedhomeip/workflows/Android/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/android.yaml)
 [![Darwin](https://github.com/project-chip/connectedhomeip/workflows/Darwin/badge.svg)](https://github.com/project-chip/connectedhomeip/blob/master/.github/workflows/darwin.yaml)
 
-
 **Tests:**
 [![Unit / Integration Tests](https://github.com/project-chip/connectedhomeip/workflows/Unit%20/%20Integration%20Tests/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/unit_integration_test.yaml)
 [![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/cirque.yaml)
