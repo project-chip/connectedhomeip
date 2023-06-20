@@ -8,18 +8,18 @@ using namespace chip::Credentials;
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
 {
-
-    NodeId nodeId;
-    FabricId fabricId;
-
     ByteSpan span(data, len);
 
-    (void) ExtractFabricIdFromCert(span, &fabricId);
-    (void) ExtractNodeIdFabricIdFromOpCert(span, &nodeId, &fabricId);
+    {
+        NodeId nodeId;
+        FabricId fabricId;
+        (void) ExtractFabricIdFromCert(span, &fabricId);
+        (void) ExtractNodeIdFabricIdFromOpCert(span, &nodeId, &fabricId);
+    }
 
     {
-        ChipDN dn;
-        (void) ExtractSubjectDNFromX509Cert(span, dn);
+        CATValues cats;
+        (void) ExtractCATsFromOpCert(span, cats);
     }
 
     {
@@ -28,8 +28,29 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
     }
 
     {
+        chip::System::Clock::Seconds32 rcacNotBefore;
+        (void) ExtractNotBeforeFromChipCert(span, rcacNotBefore);
+    }
+
+    {
+        Credentials::CertificateKeyId skid;
+        (void) ExtractSKIDFromChipCert(span, skid);
+    }
+
+    {
+        ChipDN subjectDN;
+        (void) ExtractSubjectDNFromChipCert(span, subjectDN);
+    }
+
+    {
         ChipCertificateData certData;
         (void) DecodeChipCert(span, certData);
+    }
+
+    {
+        uint8_t outCertBuf[kMaxDERCertLength];
+        MutableByteSpan outCert(outCertBuf);
+        (void) ConvertChipCertToX509Cert(span, outCert);
     }
 
     return 0;
