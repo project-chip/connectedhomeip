@@ -16,6 +16,7 @@
  */
 #include <lib/support/IntrusiveList.h>
 
+#include <matter/tracing/build_config.h>
 #include <platform/LockTracker.h>
 #include <tracing/registry.h>
 
@@ -43,26 +44,27 @@ void Unregister(Backend & backend)
 
 namespace Internal {
 
-void Begin(::chip::Tracing::Scope scope)
+void Begin(const char * label, const char * group)
 {
     for (auto & backend : gTracingBackends)
     {
-        backend.TraceBegin(scope);
+        backend.TraceBegin(label, group);
     }
 }
 
-void End(::chip::Tracing::Scope scope)
+void End(const char * label, const char * group)
 {
     for (auto & backend : gTracingBackends)
     {
-        backend.TraceEnd(scope);
+        backend.TraceEnd(label, group);
     }
 }
-void Instant(::chip::Tracing::Instant instant)
+
+void Instant(const char * label, const char * group)
 {
     for (auto & backend : gTracingBackends)
     {
-        backend.TraceInstant(instant);
+        backend.TraceInstant(label, group);
     }
 }
 

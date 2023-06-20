@@ -19,7 +19,7 @@ import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
-if (matter_enable_tracing_support) {
+if (matter_enable_tracing_support && matter_trace_config == "multiplexed") {
   chip_test_suite("tests") {
     output_name = "libTracingTests"
 
