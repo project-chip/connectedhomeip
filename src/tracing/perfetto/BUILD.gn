@@ -18,11 +18,16 @@ import("//build_overrides/chip.gni")
 # Configuration for using perfetto tracing macros exclusively.
 config("tracing") {
   include_dirs = [ "include" ]
+
+  configs = [
+    "${chip_root}/third_party/perfetto:sdk_config",
+  ]
 }
 
 static_library("perfetto") {
   sources = [
-    "include/matter/tracing/macros_impl.h",
+    # NOT a direct dependency, but available through the ":tracing" config:
+    #   "include/matter/tracing/macros_impl.h",
     "perfetto_tracing.cpp",
     "perfetto_tracing.h",
   ]

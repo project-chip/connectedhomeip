@@ -55,7 +55,7 @@ static_library("tracing") {
 
   if (matter_enable_tracing_support) {
     if (matter_trace_config != "multiplexed" && matter_trace_config != "none") {
-      public_configs += [ matter_trace_config ]
+      public_configs = [ matter_trace_config ]
     }
   }
 }

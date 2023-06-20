@@ -345,6 +345,8 @@ void MinMdnsResolver::ScheduleIpAddressResolve(SerializedQNameIterator hostName)
 
 void MinMdnsResolver::AdvancePendingResolverStates()
 {
+    MATTER_TRACE_SCOPE("Advance pending resolve states", "MinMdnsResolver");
+
     for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
     {
         if (!resolver->IsActive())
@@ -680,6 +682,8 @@ void MinMdnsResolver::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
 
 CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 {
+    MATTER_TRACE_SCOPE("Schedule retries", "MinMdnsResolver");
+
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&RetryCallback, this);
 

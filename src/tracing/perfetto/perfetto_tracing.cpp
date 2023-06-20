@@ -24,14 +24,11 @@
 #include <transport/TracingStructs.h>
 
 #include <perfetto.h>
+#include <matter/tracing/macros_impl.h>
 
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
-
-static constexpr const char * kMatterCategory = "Matter";
-
-PERFETTO_DEFINE_CATEGORIES(perfetto::Category(kMatterCategory).SetDescription("Matter trace events"));
 
 PERFETTO_TRACK_EVENT_STATIC_STORAGE();
 
@@ -127,12 +124,12 @@ void PerfettoBackend::TraceBegin(const char * label, const char * group)
     //
     // However perfetto can also do non-const string tracing (just likely
     // slower)
-    TRACE_EVENT_BEGIN(kMatterCategory, perfetto::StaticString(label), "class_name", perfetto::StaticString(group));
+    TRACE_EVENT_BEGIN("Matter", perfetto::StaticString(label), "class_name", perfetto::StaticString(group));
 }
 
 void PerfettoBackend::TraceEnd(const char * label, const char * group)
 {
-    TRACE_EVENT_END(kMatterCategory);
+    TRACE_EVENT_END("Matter");
 
     // Force a trace flush to work around perfetto caching issues.
     PERFETTO_INTERNAL_ADD_EMPTY_EVENT();
@@ -140,7 +137,7 @@ void PerfettoBackend::TraceEnd(const char * label, const char * group)
 
 void PerfettoBackend::TraceInstant(const char * label, const char * group)
 {
-    TRACE_EVENT_INSTANT(kMatterCategory, perfetto::StaticString(label), "class_name", perfetto::StaticString(group));
+    TRACE_EVENT_INSTANT("Matter", perfetto::StaticString(label), "class_name", perfetto::StaticString(group));
 }
 
 void PerfettoBackend::LogMessageReceived(MessageReceivedInfo & info)
@@ -160,7 +157,7 @@ void PerfettoBackend::LogMessageReceived(MessageReceivedInfo & info)
     }
 
     TRACE_EVENT_INSTANT(                     //
-        kMatterCategory, "Message Received", //
+        "Matter", "Message Received", //
         "message_type", messageType          //
     );
 }
@@ -182,7 +179,7 @@ void PerfettoBackend::LogMessageSend(MessageSendInfo & info)
     }
 
     TRACE_EVENT_INSTANT(                 //
-        kMatterCategory, "Message Send", //
+        "Matter", "Message Send", //
         "message_type", messageType      //
     );
 }
@@ -190,7 +187,7 @@ void PerfettoBackend::LogMessageSend(MessageSendInfo & info)
 void PerfettoBackend::LogNodeLookup(NodeLookupInfo & info)
 {
     TRACE_EVENT_INSTANT(                                                          //
-        kMatterCategory, "NodeLookup",                                            //
+        "Matter", "NodeLookup",                                            //
         "node_id", info.request->GetPeerId().GetNodeId(),                         //
         "compressed_fabric_id", info.request->GetPeerId().GetCompressedFabricId() //
     );
@@ -205,7 +202,7 @@ void PerfettoBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
     {
     case chip::Tracing::DiscoveryInfoType::kIntermediateResult:
         TRACE_EVENT_INSTANT(                                              //
-            kMatterCategory, "NodeDiscovered Intermediate",               //
+            "Matter", "NodeDiscovered Intermediate",               //
             "node_id", info.peerId->GetNodeId(),                          //
             "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
             "address", address_buff                                       //
@@ -213,7 +210,7 @@ void PerfettoBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
         break;
     case chip::Tracing::DiscoveryInfoType::kResolutionDone:
         TRACE_EVENT_INSTANT(                                              //
-            kMatterCategory, "NodeDiscovered Final",                      //
+            "Matter", "NodeDiscovered Final",                      //
             "node_id", info.peerId->GetNodeId(),                          //
             "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
             "address", address_buff                                       //
@@ -221,7 +218,7 @@ void PerfettoBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
         break;
     case chip::Tracing::DiscoveryInfoType::kRetryDifferent:
         TRACE_EVENT_INSTANT(                                              //
-            kMatterCategory, "NodeDiscovered Retry Different",            //
+            "Matter", "NodeDiscovered Retry Different",            //
             "node_id", info.peerId->GetNodeId(),                          //
             "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
             "address", address_buff                                       //
@@ -233,7 +230,7 @@ void PerfettoBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
 void PerfettoBackend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
 {
     TRACE_EVENT_INSTANT(                                              //
-        kMatterCategory, "Discovery Failed",                          //
+        "Matter", "Discovery Failed",                          //
         "node_id", info.peerId->GetNodeId(),                          //
         "compressed_fabric_id", info.peerId->GetCompressedFabricId(), //
         "error", chip::ErrorStr(info.error)                           //

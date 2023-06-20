@@ -25,3 +25,5 @@ chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 matter_enable_tracing_support = true
 cpp_standard = "c++17"
+
+matter_trace_config = "${chip_root}/src/tracing/perfetto:tracing"

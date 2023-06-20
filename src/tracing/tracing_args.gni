@@ -36,9 +36,8 @@ declare_args() {
   #      large systems with fast logging when writing to logs)
   #    - any other value will provide a tracing config, which
   #      MUST include a path to `matter/tracing/macros_impl.h`
-  if (target_os == "linux") {
-    matter_trace_config = "multiplexed"
-  } else {
-    matter_trace_config = "none"
-  }
+  #
+  # since tracing is very noisy, we generally expect it to be explicitly
+  # set up
+  matter_trace_config = "none"
 }
