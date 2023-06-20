@@ -143,7 +143,8 @@ silabs_executable("thermostat_app") {
 
   if (enable_dic) {
     sources += [ "${examples_common_plat_dir}/DIC/matter_abs_interface/src/DIC_EventHandler.cpp" ]
-    include_dirs +=[ "${examples_common_plat_dir}/DIC/matter_abs_interface/include"]
+    include_dirs +=
+        [ "${examples_common_plat_dir}/DIC/matter_abs_interface/include" ]
   }
 
   if (use_temp_sensor) {
@@ -235,8 +236,8 @@ silabs_executable("thermostat_app") {
     ]
   }
 
-  if (enable_dic){
-   deps += [ "${examples_plat_dir}:efr32-dic" ]
+  if (enable_dic) {
+    deps += [ "${examples_plat_dir}:efr32-dic" ]
   }
 
   output_dir = root_out_dir
