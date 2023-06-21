@@ -7,22 +7,22 @@ ARG TARGETPLATFORM
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
-        "linux/amd64") \
-            echo "Building for linux/amd64" \
-        ;; \
-        "linux/arm64") \
-            echo "Building for linux/arm64" \
-        ;; \
-        *) \
-        if [ -z "$TARGETPLATFORM" ] ;\
-        then \
-            echo "TARGETPLATFORM not defined! Please run from buildkit (buildx)." \
-            && return 1 ;\
-        else \
-            echo "Unsupported platform ${TARGETPLATFORM}." \
-            && return 1 ;\
-        fi \
-        ;; \
+    "linux/amd64") \
+    echo "Building for linux/amd64" \
+    ;; \
+    "linux/arm64") \
+    echo "Building for linux/arm64" \
+    ;; \
+    *) \
+    if [ -z "$TARGETPLATFORM" ] ;\
+    then \
+    echo "TARGETPLATFORM not defined! Please run from buildkit (buildx)." \
+    && return 1 ;\
+    else \
+    echo "Unsupported platform ${TARGETPLATFORM}." \
+    && return 1 ;\
+    fi \
+    ;; \
     esac
 
 
@@ -100,13 +100,13 @@ RUN set -x \
 # Cmake v3.23.1
 ENV CMAKE_PLATFORM_VERSION=
 RUN case ${TARGETPLATFORM} in \
-        "linux/amd64") CMAKE_PLATFORM_VERSION="x86_64";; \
-        "linux/arm64") CMAKE_PLATFORM_VERSION="aarch64";; \
-        *) \
-            test -n "$TARGETPLATFORM" \
-            echo "Unsupported platform ${TARGETPLATFORM}" \
-            && return 1 ;\
-            ;; \
+    "linux/amd64") CMAKE_PLATFORM_VERSION="x86_64";; \
+    "linux/arm64") CMAKE_PLATFORM_VERSION="aarch64";; \
+    *) \
+    test -n "$TARGETPLATFORM" \
+    echo "Unsupported platform ${TARGETPLATFORM}" \
+    && return 1 ;\
+    ;; \
     esac \
     && set -x \
     && (cd /tmp \
@@ -199,43 +199,43 @@ RUN set -x \
 # a lot of threads-related APIs.
 ENV LD_LIBRARY_PATH_TSAN=/usr/lib/x86_64-linux-gnu-tsan
 RUN case ${TARGETPLATFORM} in \
-        "linux/amd64") \
-            set -x \
-            && mkdir -p $LD_LIBRARY_PATH_TSAN \
-            && export CCACHE_DISABLE=1 PYTHONDONTWRITEBYTECODE=1 \
-            && GLIB_VERSION=$(pkg-config --modversion glib-2.0) \
-            && git clone --depth=1 --branch=$GLIB_VERSION https://github.com/GNOME/glib.git \
-            && CFLAGS="-O2 -g -fsanitize=thread" meson glib/build glib \
-            && DESTDIR=../build-image ninja -C glib/build install \
-            && mv glib/build-image/usr/local/lib/x86_64-linux-gnu/lib* $LD_LIBRARY_PATH_TSAN \
-            && rm -rf glib \
-            ;; \
-        "linux/arm64") \
-            echo "ARM64 unsupported with TSAN" \
-            ;; \
-        *) \
-            echo "Unsupported platform ${TARGETPLATFORM}" \
-            && return 1 ;\
-            ;; \
+    "linux/amd64") \
+    set -x \
+    && mkdir -p $LD_LIBRARY_PATH_TSAN \
+    && export CCACHE_DISABLE=1 PYTHONDONTWRITEBYTECODE=1 \
+    && GLIB_VERSION=$(pkg-config --modversion glib-2.0) \
+    && git clone --depth=1 --branch=$GLIB_VERSION https://github.com/GNOME/glib.git \
+    && CFLAGS="-O2 -g -fsanitize=thread" meson glib/build glib \
+    && DESTDIR=../build-image ninja -C glib/build install \
+    && mv glib/build-image/usr/local/lib/x86_64-linux-gnu/lib* $LD_LIBRARY_PATH_TSAN \
+    && rm -rf glib \
+    ;; \
+    "linux/arm64") \
+    echo "ARM64 unsupported with TSAN" \
+    ;; \
+    *) \
+    echo "Unsupported platform ${TARGETPLATFORM}" \
+    && return 1 ;\
+    ;; \
     esac
 
 # NodeJS: install a newer version than what apt-get would read
 # This installs the latest LTS version of nodejs
 #
-# NodeJS is required by github actions, we use Wandalen/wretry.action@v1.0.36
+# NodeJS is required by github actions, we use Wandalen/wretry.action@v1.0.41
 # and that seems to use the built-in node installation in the image
 #
 # This is not a CHIP dependency directly, but used by CI
 ENV CHIP_NODE_VERSION=v16.13.2
 ENV NODE_PLATFORM_VERSION=
 RUN case ${TARGETPLATFORM} in \
-        "linux/amd64") NODE_PLATFORM_VERSION=x64;; \
-        "linux/arm64") NODE_PLATFORM_VERSION=arm64;; \
-        *) \
-            test -n "$TARGETPLATFORM" \
-            echo "Unsupported platform ${TARGETPLATFORM}" \
-            && return 1 ;\
-            ;; \
+    "linux/amd64") NODE_PLATFORM_VERSION=x64;; \
+    "linux/arm64") NODE_PLATFORM_VERSION=arm64;; \
+    *) \
+    test -n "$TARGETPLATFORM" \
+    echo "Unsupported platform ${TARGETPLATFORM}" \
+    && return 1 ;\
+    ;; \
     esac \
     && set -x \
     && mkdir node_js \
