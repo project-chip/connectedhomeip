@@ -36,19 +36,10 @@ constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISC
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
-                                       DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
+namespace {
+
+CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
 {
-    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    if (resolutionData.HasValue())
-    {
-        VerifyOrReturnError(discoveryType != DiscoveryType::kAll, CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    SetupPayload payload;
-    mConnectionType = commission;
-    mDiscoveryType  = discoveryType;
-
     bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
     if (isQRCode)
     {
@@ -61,8 +52,33 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
         VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    mRemoteId     = remoteId;
-    mSetUpPINCode = payload.setUpPINCode;
+    return CHIP_NO_ERROR;
+}
+} // namespace
+
+CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
+                                       DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
+{
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    SetupPayload payload;
+    ReturnErrorOnFailure(GetPayload(setUpCode, payload));
+
+    if (resolutionData.HasValue())
+    {
+        VerifyOrReturnError(discoveryType != DiscoveryType::kAll, CHIP_ERROR_INVALID_ARGUMENT);
+        if (mRemoteId == remoteId && mSetUpPINCode == payload.setUpPINCode && mConnectionType == commission &&
+            mDiscoveryType == discoveryType)
+        {
+            NotifyCommissionableDeviceDiscovered(resolutionData.Value());
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    mConnectionType = commission;
+    mDiscoveryType  = discoveryType;
+    mRemoteId       = remoteId;
+    mSetUpPINCode   = payload.setUpPINCode;
 
     ResetDiscoveryState();
 

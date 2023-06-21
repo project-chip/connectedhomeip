@@ -199,7 +199,7 @@ std::string PayloadHeaderToJson(const PayloadHeader * payloadHeader)
 
     std::string jsonBody;
 
-    uint8_t exchangeFlags = payloadHeader->GetExhangeFlags();
+    uint8_t exchangeFlags = payloadHeader->GetExchangeFlags();
     jsonBody += AsFirstJsonKey("exchange_flags", std::to_string(exchangeFlags));
 
     uint16_t exchangeId = payloadHeader->GetExchangeID();

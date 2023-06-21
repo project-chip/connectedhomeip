@@ -1388,6 +1388,13 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @brief The maximum number of attribute value pairs in an extension field set.
+ */
+#ifndef CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS
+#define CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS 15
+#endif
+
+/**
  * @brief The maximum number of clusters per scene, defaults to 3 for a typical usecase (onOff + level control + color control
  * cluster). Needs to be changed in case a greater number of clusters is chosen.
  */

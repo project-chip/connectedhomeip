@@ -261,16 +261,23 @@ After successful commissioning, cluster commands available to control the board.
 Please take [guide](../../ota-provider-app/linux/README.md) for more detail on
 ota-provider-app build and usage.
 
-### Create the Matter OTA with Bouffalolab OTA bin `FW_OTA.bin.xz.hash`
+### Create the Matter OTA image with Bouffalolab OTA `bin.xz.hash` format image
 
--   Build `Bouffalo Lab` OTA image as following execution using python script
-    `*.flash.py` under firmware build out folder,
-    ```shell
-    ./<output_firmware_name>.flash.py --build
-    ```
-    After script executed, a folder `ota_images` and an image
-    `FW_OTA.bin.xz.hash` will be generated. `FW_OTA.bin.xz.hash` is compressed
-    with hash verification for build out firmware.
+-   `Bouffalo Lab` OTA `bin.xz.hash` format image
+
+    -   Build `Bouffalo Lab` OTA image as following execution using python
+        script `*.flash.py` under firmware build out folder,
+        `shell ./<output_firmware_name>.flash.py --build` After script executed,
+        a folder `ota_images` and an image `FW_OTA.bin.xz.hash` will be
+        generated. `FW_OTA.bin.xz.hash` is compressed with hash verification for
+        build out firmware.
+
+    -   `bin.xz.hash` image
+
+        After compile done, the build script will call
+        `<output_firmware_name>.flash.py` to generate `Bouffalo Lab` OTA format
+        image as above, and put it under out folder with name likes
+        `<output_firmware_name>.bin.xz.hash`
 
 *   Build Matter `*.ota` OTA image with `Bouffalo Lab` OTA image under
     **connectedhomeip** repo folder

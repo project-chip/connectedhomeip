@@ -31,11 +31,11 @@ class LogJsonBackend : public ::chip::Tracing::Backend
 public:
     LogJsonBackend() = default;
 
-    void TraceBegin(Scope scope) override;
-    void TraceEnd(Scope scope) override;
-    void TraceInstant(Instant instant) override;
+    void TraceBegin(const char * label, const char * group) override;
+    void TraceEnd(const char * label, const char * group) override;
+    void TraceInstant(const char * label, const char * group) override;
     void LogMessageSend(MessageSendInfo &) override;
-    void LogMessageReceived(MessageReceiveInfo &) override;
+    void LogMessageReceived(MessageReceivedInfo &) override;
     void LogNodeLookup(NodeLookupInfo &) override;
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;

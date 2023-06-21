@@ -509,8 +509,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
         return result
 
-    def print_step(self, stepnum: int, title: str) -> None:
-        logging.info('***** Test Step %d : %s', stepnum, title)
+    def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
+        logging.info(f'***** Test Step {stepnum} : {title}')
 
     def record_error(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation], problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))

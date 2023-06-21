@@ -17,10 +17,17 @@
  */
 #pragma once
 
+#include <matter/tracing/build_config.h>
+
 #include <tracing/macros.h>
-#include <tracing/scopes.h>
 
 #ifdef MATTER_TRACING_ENABLED
+
+#ifdef MATTER_TRACE_NONE
+
+#define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+
+#elif defined(MATTER_TRACE_MULTIPLEXED)
 
 namespace chip {
 namespace Tracing {
@@ -29,7 +36,7 @@ namespace Tracing {
 ///
 /// Usage:
 ///   {
-///      ::chip::Tracing::Scoped scope(::chip::Tracing::Scope::CASESession_SendSigma1);
+///      ::chip::Tracing::Scoped scope("label", "group");
 ///      // TRACE_BEGIN called here
 ///
 ///      // ... add code here
@@ -39,11 +46,12 @@ namespace Tracing {
 class Scoped
 {
 public:
-    inline Scoped(Scope scope) : mScope(scope) { MATTER_TRACE_BEGIN(scope); }
-    inline ~Scoped() { MATTER_TRACE_END(mScope); }
+    inline Scoped(const char * label, const char * group) : mLabel(label), mGroup(group) { MATTER_TRACE_BEGIN(label, group); }
+    inline ~Scoped() { MATTER_TRACE_END(mLabel, mGroup); }
 
 private:
-    Scope mScope;
+    const char * mLabel;
+    const char * mGroup;
 };
 
 } // namespace Tracing
@@ -62,13 +70,15 @@ private:
 ///      // ... add code here
 ///
 ///   } // TRACE_END called here
-#define MATTER_TRACE_SCOPE(scope) ::chip::Tracing::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(scope)
+#define MATTER_TRACE_SCOPE(label, group) ::chip::Tracing::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(label, group)
+
+#else
+// backends MUST provide a config for this
+#include <matter/tracing/macros_impl.h>
+#endif
 
 #else // ifdef MATTER_TRACING_ENABLED
 
-#define MATTER_TRACE_SCOPE(scope)                                                                                                  \
-    do                                                                                                                             \
-    {                                                                                                                              \
-    } while (false)
+#define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
 #endif

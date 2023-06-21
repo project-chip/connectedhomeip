@@ -24,7 +24,6 @@
 #include <lib/support/CHIPMemString.h>
 #include <tracing/macros.h>
 #include <tracing/scope.h>
-#include <tracing/scopes.h>
 
 namespace chip {
 namespace Dnssd {
@@ -241,7 +240,7 @@ IncrementalResolver::RequiredInformationFlags IncrementalResolver::GetMissingReq
 
 CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const ResourceData & data, BytesRange packetRange)
 {
-    MATTER_TRACE_SCOPE(::chip::Tracing::Scope::Resolve_IncrementalRecordParse);
+    MATTER_TRACE_SCOPE("Incremental record parse", "Resolver");
 
     if (!IsActive())
     {
@@ -253,15 +252,14 @@ CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const Reso
     case QType::TXT:
         if (data.GetName() != mRecordName.Get())
         {
-            MATTER_TRACE_INSTANT(::chip::Tracing::Instant::Resolve_TxtNotApplicable);
-
+            MATTER_TRACE_INSTANT("TXT not applicable", "Resolver");
             return CHIP_NO_ERROR;
         }
         return OnTxtRecord(data, packetRange);
     case QType::A: {
         if (data.GetName() != mTargetHostName.Get())
         {
-            MATTER_TRACE_INSTANT(::chip::Tracing::Instant::Resolve_Ipv4NotApplicable);
+            MATTER_TRACE_INSTANT("IPv4 not applicable", "Resolver");
             return CHIP_NO_ERROR;
         }
 
@@ -284,7 +282,7 @@ CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const Reso
     case QType::AAAA: {
         if (data.GetName() != mTargetHostName.Get())
         {
-            MATTER_TRACE_INSTANT(::chip::Tracing::Instant::Resolve_Ipv6NotApplicable);
+            MATTER_TRACE_INSTANT("IPv6 not applicable", "Resolver");
             return CHIP_NO_ERROR;
         }
 

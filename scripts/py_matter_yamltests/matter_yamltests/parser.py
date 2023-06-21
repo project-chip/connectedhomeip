@@ -201,6 +201,8 @@ class _TestStepWithPlaceholders:
         self.max_interval = _value_or_none(test, 'maxInterval')
         self.timed_interaction_timeout_ms = _value_or_none(
             test, 'timedInteractionTimeoutMs')
+        self.data_version = _value_or_none(
+            test, 'dataVersion')
         self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
         self.wait_for = _value_or_none(test, 'wait')
         self.event_number = _value_or_none(test, 'eventNumber')
@@ -247,7 +249,7 @@ class _TestStepWithPlaceholders:
 
     def _update_mappings(self, test: dict, definitions: SpecDefinitions):
         cluster_name = self.cluster
-        if definitions is None or not definitions.has_cluster_by_name(cluster_name) or cluster_name == ANY_COMMANDS_CLUSTER_NAME or self.command in ANY_COMMANDS_LIST:
+        if definitions is None or (not definitions.has_cluster_by_name(cluster_name) and cluster_name != ANY_COMMANDS_CLUSTER_NAME):
             self.argument_mapping = None
             self.response_mapping = None
             self.response_mapping_name = None
@@ -297,6 +299,81 @@ class _TestStepWithPlaceholders:
             argument_mapping = event_mapping
             response_mapping = event_mapping
             response_mapping_name = event.name
+        elif cluster_name == ANY_COMMANDS_CLUSTER_NAME or self.command in ANY_COMMANDS_LIST:
+            # When the cluster is ANY_COMMANDS_CLUSTER_NAME the test step does not contain the direct mapping
+            # for the response in the cluster/command/attribute/event fields.
+            #
+            # When the command is part of ANY_COMMANDS_LIST the test step does not contain the direct mapping
+            # for the response in the command/attribute/event fields.
+            #
+            # NOTE: The logic for this paragraph has not yet be implemented.
+            # In some cases the response type can be inferred from the argument fields, if for example the command
+            # is a ReadById targetting a specific ClusterId/AttributeId that exists in the definitions.
+            #
+            # For the other cases, the response can NOT be inferred directly from the argumment fields, if for exammple
+            # the command is a ReadById using a wildcard in one of its fields. For this type of case, the test writer
+            # can add additional specifiers in the expected response type to help determine the response mapping.
+
+            mapping_names = []
+
+            for response in self.responses_with_placeholders:
+                for value in response.get('values'):
+                    if 'constraints' not in value:
+                        continue
+
+                    mapping_name = None
+                    cluster_name = self.cluster if self.cluster != ANY_COMMANDS_CLUSTER_NAME else response.get(
+                        'cluster')
+
+                    if cluster_name is not None:
+                        attribute_name = response.get('attribute')
+                        event_name = response.get('event')
+                        command_name = response.get('command')
+
+                        if attribute_name:
+                            attribute = definitions.get_attribute_by_name(
+                                cluster_name, attribute_name)
+
+                            if not attribute:
+                                targets = definitions.get_attribute_names(
+                                    cluster_name)
+                                test['response'] = ['...', response, '...']
+                                raise TestStepAttributeKeyError(
+                                    response, attribute_name, targets)
+
+                            mapping_name = attribute.definition.data_type.name
+                        elif event_name:
+                            event = definitions.get_event_by_name(
+                                cluster_name, event_name)
+
+                            if not event:
+                                targets = definitions.get_event_names(
+                                    cluster_name)
+                                test['response'] = ['...', response, '...']
+                                raise TestStepEventKeyError(
+                                    response, attribute_name, targets)
+
+                            mapping_name = event.name
+                        elif command_name:
+                            command = definitions.get_command_by_name(
+                                cluster_name, command_name)
+
+                            if not command:
+                                targets = definitions.get_command_names(
+                                    cluster_name)
+                                test['response'] = ['...', response, '...']
+                                raise TestStepCommandKeyError(
+                                    response, command_name, targets)
+
+                            mapping_name = command.output_param
+
+                    mapping_names.append(mapping_name)
+
+            # TODO: For now only the response_mapping_name is inferred, it allows to use the type constraint
+            #       on the responses.
+            argument_mapping = None
+            response_mapping = None
+            response_mapping_name = mapping_names
         else:
             command_name = self.command
             command = definitions.get_command_by_name(
@@ -337,7 +414,8 @@ class _TestStepWithPlaceholders:
         # members of the 'values' array which is what is used for other tests.
         value = {}
 
-        known_keys_to_copy = ['value', 'constraints', 'saveAs']
+        known_keys_to_copy = ['value', 'constraints',
+                              'saveAs', 'saveDataVersionAs']
         known_keys_to_allow = ['error', 'clusterError']
 
         for key, item in list(container.items()):
@@ -397,6 +475,8 @@ class _TestStepWithPlaceholders:
                     value[key] = self._update_value_with_definition(
                         item_value, mapping)
                 elif key == 'saveAs' and type(item_value) is str and item_value not in self._parsing_config_variable_storage:
+                    self._parsing_config_variable_storage[item_value] = None
+                elif key == 'saveDataVersionAs' and type(item_value) is str and item_value not in self._parsing_config_variable_storage:
                     self._parsing_config_variable_storage[item_value] = None
                 elif key == 'constraints':
                     for constraint, constraint_value in item_value.items():
@@ -488,6 +568,8 @@ class TestStep:
         if test.is_pics_enabled:
             self._update_placeholder_values(self.arguments)
             self._update_placeholder_values(self.responses)
+            self._test.data_version = self._config_variable_substitution(
+                self._test.data_version)
             self._test.node_id = self._config_variable_substitution(
                 self._test.node_id)
             self._test.run_if = self._config_variable_substitution(
@@ -580,6 +662,10 @@ class TestStep:
         return self._test.timed_interaction_timeout_ms
 
     @property
+    def data_version(self):
+        return self._test.data_version
+
+    @property
     def busy_wait_ms(self):
         return self._test.busy_wait_ms
 
@@ -621,11 +707,16 @@ class TestStep:
                 expected_response, received_response, result)
             self._response_cluster_error_validation(
                 expected_response, received_response, result)
+            self._response_values_source_validation(
+                expected_response, received_response, result)
             self._response_values_validation(
                 expected_response, received_response, result)
             self._response_constraints_validation(
                 expected_response, received_response, result)
-            self._maybe_save_as(expected_response, received_response, result)
+            self._maybe_save_as('saveAs', 'value',
+                                expected_response, received_response, result)
+            self._maybe_save_as('saveDataVersionAs', 'dataVersion',
+                                expected_response, received_response, result)
 
         # An empty response array in a test step (responses: []) implies that the test step does expect a response
         # but without any associated value.
@@ -750,6 +841,20 @@ class TestStep:
             # Nothing is logged here to not be redundant with the generic error checking code.
             pass
 
+    def _response_values_source_validation(self, expected_response, received_response, result):
+        check_type = PostProcessCheckType.RESPONSE_VALIDATION
+        error_value_wrong_source = 'The test expects a value from {source_name} "{expected}" but it received a value from {source_name} "{received}".'
+
+        sources = ['endpoint', 'cluster', 'attribute']
+        for source_name in sources:
+            expected = expected_response.get(source_name)
+            received = received_response.get(source_name)
+            success = expected is None or received is None or expected == received
+
+            if not success:
+                result.error(check_type, error_value_wrong_source.format(
+                    source_name=source_name, expected=expected, received=received))
+
     def _response_values_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.RESPONSE_VALIDATION
         error_success = 'The test expectation "{name} == {value}" is true'
@@ -816,7 +921,9 @@ class TestStep:
                 continue
 
             received_value = received_response.get('value')
-            if not self.is_attribute and not self.is_event:
+            if self.command in ANY_COMMANDS_LIST:
+                response_type_name = response_type_name.pop(0)
+            elif not self.is_attribute and not self.is_event:
                 expected_name = value.get('name')
                 if received_value is None or expected_name not in received_value:
                     received_value = None
@@ -843,17 +950,17 @@ class TestStep:
                     e.update_context(expected_response, self.step_index)
                     result.error(check_type, error_failure, e)
 
-    def _maybe_save_as(self, expected_response, received_response, result):
+    def _maybe_save_as(self, key: str, default_target: str, expected_response, received_response, result):
         check_type = PostProcessCheckType.SAVE_AS_VARIABLE
         error_success = 'The test save the value "{value}" as {name}.'
         error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
 
         for value in expected_response['values']:
-            if 'saveAs' not in value:
+            if key not in value:
                 continue
 
-            received_value = received_response.get('value')
-            if not self.is_attribute and not self.is_event:
+            received_value = received_response.get(default_target)
+            if not self.is_attribute and not self.is_event and not (self.command in ANY_COMMANDS_LIST):
                 expected_name = value.get('name')
                 if received_value is None or expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
@@ -863,7 +970,7 @@ class TestStep:
                 received_value = received_value.get(
                     expected_name) if received_value else None
 
-            save_as = value.get('saveAs')
+            save_as = value.get(key)
             self._runtime_config_variable_storage[save_as] = received_value
             result.success(check_type, error_success.format(
                 value=received_value, name=save_as))
