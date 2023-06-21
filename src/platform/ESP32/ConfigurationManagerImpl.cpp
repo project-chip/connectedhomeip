@@ -31,8 +31,8 @@
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-#include "esp_phy_init.h"
 #include "esp_ota_ops.h"
+#include "esp_phy_init.h"
 #include "esp_wifi.h"
 #include "nvs.h"
 #include "nvs_flash.h"
