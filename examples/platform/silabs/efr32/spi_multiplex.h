@@ -15,6 +15,13 @@
  *    limitations under the License.
  */
 
+/*
+ * This file contains all the functions specific to the MG24 family for
+ * multiplexing the SPI port with WiFi NCP and other WSTK
+ * devices such as External Flash and LCD.
+ * That can be extended to other families as well.
+ */
+
 #pragma once
 
 #if defined(EFR32MG24)
