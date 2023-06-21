@@ -223,6 +223,8 @@ template("efr32_sdk") {
       "SL_COMPONENT_CATALOG_PRESENT=1",
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
+      "SL_CATALOG_POWER_MANAGER_PRESENT",
+      "SL_CATALOG_SLEEPTIMER_PRESENT",
 
       #"__STACK_SIZE=0",
     ]
@@ -304,9 +306,9 @@ template("efr32_sdk") {
     if (use_system_view) {
       _include_dirs += [
         "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/Config/Cortex-M",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10",
         "${efr32_sdk_root}/util/third_party/segger/systemview/Config/",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/init/",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/",
       ]
 
       defines += [ "SL_SYSTEM_VIEW=1" ]
@@ -327,8 +329,6 @@ template("efr32_sdk") {
     if (enable_sleepy_device) {
       defines += [
         "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
-        "SL_CATALOG_POWER_MANAGER_PRESENT",
-        "SL_CATALOG_SLEEPTIMER_PRESENT",
         "SL_OT_IDLE_INTERVAL=${sl_ot_idle_interval_ms}",
         "SL_OT_ACTIVE_INTERVAL=${sl_ot_active_interval_ms}",
         "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold}",
@@ -620,6 +620,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/list.c",
+      "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
@@ -749,8 +750,8 @@ template("efr32_sdk") {
     if (use_system_view) {
       sources += [
         "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_SYSVIEW.c",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/Config/Cortex-M/SEGGER_SYSVIEW_Config_FreeRTOS.c",
-        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/SEGGER_SYSVIEW_FreeRTOS.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/init/SEGGER_SYSVIEW_Init.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/SEGGER_SYSVIEW_FreeRTOS.c",
       ]
     }
 
@@ -770,10 +771,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/spidrv/src/spidrv.c",
         "${silabs_gen_folder}/autogen/sl_spidrv_init.c",
       ]
-    }
-
-    if (enable_sleepy_device) {
-      sources += [ "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c" ]
     }
 
     if (defined(enable_fem)) {
@@ -923,6 +920,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Source/startup_mgm24.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM24/Source/system_mgm24.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/sl_fem_util.c",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/sl_rail_util_rssi.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_attestation.c",
         "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/sl_se_manager_cipher.c",
@@ -957,8 +955,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
-
-        #"${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/sl_rail_util_rssi.c",
       ]
     }
 
