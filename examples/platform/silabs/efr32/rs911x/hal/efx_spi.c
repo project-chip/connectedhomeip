@@ -172,7 +172,6 @@ void rsi_hal_board_init(void)
 
     /* Reset of Wifi chip */
     sl_wfx_host_reset_chip();
-    SILABS_LOG("%s completed.", __func__);
 }
 
 #if defined(EFR32MG24)
