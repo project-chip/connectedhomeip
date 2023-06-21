@@ -48,7 +48,7 @@ declare_args() {
   #
   # TODO: cpp_standard check is not ideal, it should be >= 17,
   #       however for now this is what we use in compilations
-  if ((current_os == "linux") && (cpp_standard == "gnu++17")) {
+  if (current_os == "linux" && cpp_standard == "gnu++17") {
     matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
   } else {
     matter_trace_config = "none"
