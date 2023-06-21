@@ -30,8 +30,8 @@ source_set("app1") {
   ]
 
   sources = [
-    "../../operational-state-delegates.cpp",
     "../../operational-state-delegate-impl.cpp",
+    "../../operational-state-delegates.cpp",
     "../../src/bridged-actions-stub.cpp",
     "../../static-supported-modes-manager.cpp",
   ]
