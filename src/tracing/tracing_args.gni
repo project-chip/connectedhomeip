@@ -11,7 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${build_root}/config/compiler/compiler.gni")
 
 declare_args() {
   # Tracing can have a non-zero size impact to binaries. We try to make
@@ -43,8 +45,12 @@ declare_args() {
   #
   # since tracing is very noisy, we generally expect it to be explicitly
   # set up
-  matter_trace_config = "none"
-
-  # Example for perfetto enabling:
-  # matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
+  #
+  # TODO: cpp_standard check is not ideal, it should be >= 17,
+  #       however for now this is what we use in compilations
+  if ((current_os == "linux") && (cpp_standard == "gnu++17")) {
+    matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
+  } else {
+    matter_trace_config = "none"
+  }
 }
