@@ -87,3 +87,18 @@ static_library("occupancy_sensing") {
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
+
+static_library("temperature") {
+  sources = [
+    "temperature.cpp",
+    "temperature.h",
+  ]
+
+  deps = [
+    ":windows",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/third_party/imgui",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}

@@ -62,6 +62,7 @@ class HostApp(Enum):
     DYNAMIC_BRIDGE = auto()
     JAVA_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
+    TEMPERATURE = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -108,6 +109,8 @@ class HostApp(Enum):
             return 'java-matter-controller'
         elif self == HostApp.CONTACT_SENSOR:
             return 'contact-sensor-app/linux'
+        elif self == HostApp.TEMPERATURE:
+            return 'temperature-measurement-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -190,6 +193,9 @@ class HostApp(Enum):
         elif self == HostApp.CONTACT_SENSOR:
             yield 'contact-sensor-app'
             yield 'contact-sensor-app.map'
+        elif self == HostApp.TEMPERATURE:
+            yield 'temperature-measurement-app'
+            yield 'temperature-measurement-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
