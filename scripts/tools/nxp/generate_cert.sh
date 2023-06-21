@@ -33,23 +33,49 @@ function exit_err() {
     exit 1
 }
 
-DATE="2022-06-21 12:35:00"
-LIFETIME="7305"
+if [ -z "$DATE" ]; then
+    DATE="2023-01-19"
+fi
 
-PAA_DATE="$DATE"
+if [ -z "$TIME" ]; then
+    TIME="10:17:00"
+fi
+
+if [ -z "$LIFETIME" ]; then
+    LIFETIME="7305"
+fi
+
+if [ -z "$VID" ]; then
+    VID="1037"
+fi
+
+if [ -z "$PID" ]; then
+    PID="A220"
+fi
+
+PAA_DATE="$DATE $TIME"
 PAA_LIFETIME="$LIFETIME"
-PAA_CERT="Chip-PAA-NXP-Cert.pem"
-PAA_KEY="Chip-PAA-NXP-Key.pem"
 
-PAI_DATE="$DATE"
+# Generate a new PAA only if PAA cert and key paths were not both specified.
+if [[ -n "$PAA_CERT" && -n "$PAA_KEY" ]]; then
+    echo "A PAA was provided. Will not generate a new one."
+    GENERATE_PAA=false
+else
+    GENERATE_PAA=true
+    PAA_CERT="Chip-PAA-NXP-Cert.pem"
+    PAA_CERT_DER="Chip-PAA-NXP-Cert.der"
+    PAA_KEY="Chip-PAA-NXP-Key.pem"
+fi
+
+PAI_DATE="$PAA_DATE"
 PAI_LIFETIME="$LIFETIME"
-PAI_VID="1037"
-PAI_PID="A220"
+PAI_VID="$VID"
+PAI_PID="$PID"
 PAI_CERT="Chip-PAI-NXP-"$PAI_VID"-"$PAI_PID"-Cert.pem"
 PAI_CERT_DER="Chip-PAI-NXP-"$PAI_VID"-"$PAI_PID"-Cert.der"
 PAI_KEY="Chip-PAI-NXP-"$PAI_VID"-"$PAI_PID"-Key.pem"
 
-DAC_DATE="$DATE"
+DAC_DATE="$PAA_DATE"
 DAC_LIFETIME="$LIFETIME"
 DAC_VID="$PAI_VID"
 DAC_PID="$PAI_PID"
@@ -59,13 +85,19 @@ DAC_KEY="Chip-DAC-NXP-"$DAC_VID"-"$DAC_PID"-Key.pem"
 DAC_KEY_DER="Chip-DAC-NXP-"$DAC_VID"-"$DAC_PID"-Key.der"
 
 # Remove certificates if present
-rm -rf "$PAA_CERT" "$PAA_KEY" "$PAI_CERT" "$PAI_KEY" "$DAC_CERT" "$DAC_KEY" "$PAI_CERT_DER" "$DAC_CERT_DER" "$DAC_KEY_DER" >/dev/null 2>&1
+if [ "$GENERATE_PAA" = true ]; then
+    rm -rf "$PAA_CERT" "$PAA_KEY" "$PAA_CERT_DER" >/dev/null 2>&1
+fi
+
+rm -rf "$PAI_CERT" "$PAI_KEY" "$DAC_CERT" "$DAC_KEY" "$PAI_CERT_DER" "$DAC_CERT_DER" "$DAC_KEY_DER" >/dev/null 2>&1
 
 # Generate certificates
 echo "Generate certificates"
 
 # PAA (root authoritity)
-"$CHIP_CERT_TOOL" gen-att-cert --type a --subject-cn "Matter Development PAA NXP" --valid-from "$PAA_DATE" --lifetime "$PAA_LIFETIME" --out-key "$PAA_KEY" --out "$PAA_CERT" && echo "Generated PAA" || exit_err "Failed to generate PAA"
+if [ "$GENERATE_PAA" = true ]; then
+    "$CHIP_CERT_TOOL" gen-att-cert --type a --subject-cn "Matter Development PAA NXP" --valid-from "$PAA_DATE" --lifetime "$PAA_LIFETIME" --out-key "$PAA_KEY" --out "$PAA_CERT" && echo "Generated PAA" || exit_err "Failed to generate PAA"
+fi
 
 # PAI (vendor)
 "$CHIP_CERT_TOOL" gen-att-cert --type i --subject-cn "Matter Development PAI NXP" --subject-vid "$PAI_VID" --valid-from "$PAI_DATE" --lifetime "$PAI_LIFETIME" --ca-key "$PAA_KEY" --ca-cert "$PAA_CERT" --out-key "$PAI_KEY" --out "$PAI_CERT" && echo "Generated PAI" || exit_err "Failed to generate PAI"
@@ -76,6 +108,11 @@ echo "Generate certificates"
 # Convert certificates and keys to der format (binary x509)
 echo "Convert certificates and keys to DER format"
 
+# PAA
+if [ "$GENERATE_PAA" = true ]; then
+    "$CHIP_CERT_TOOL" convert-cert -d "$PAA_CERT" "$PAA_CERT_DER" && echo "Converted PAA" || exit_err "Failed to convert PAA"
+fi
+
 # PAI
 "$CHIP_CERT_TOOL" convert-cert -d "$PAI_CERT" "$PAI_CERT_DER" && echo "Converted PAI" || exit_err "Failed to convert PAI"
 
@@ -84,3 +121,8 @@ echo "Convert certificates and keys to DER format"
 
 # DAC Key
 "$CHIP_CERT_TOOL" convert-key -d "$DAC_KEY" "$DAC_KEY_DER" && echo "Converted DAC Key" || exit_err "Failed to convert DAC Key"
+
+if [ -n "$FACTORY_DATA_DEST" ]; then
+    echo "Moving certificates to $FACTORY_DATA_DEST"
+    mv Chip-* "$FACTORY_DATA_DEST"
+fi
