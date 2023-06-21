@@ -34,7 +34,7 @@ constexpr size_t kOperationalErrorDetailsMaxSize = 64u;
 constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
 
 /**
- * A class wrap the operational state of operational state cluster
+ * A class which represents the operational state of an Operational State cluster derivation instance.
  */
 struct GenericOperationalState : public chip::app::Clusters::detail::Structs::OperationalStateStruct::Type
 {
