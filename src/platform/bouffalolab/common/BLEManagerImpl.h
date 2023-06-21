@@ -32,7 +32,7 @@ namespace Internal {
 using namespace chip::Ble;
 
 /**
- * Concrete implementation of the BLEManager singleton object for the BL702 platform.
+ * Concrete implementation of the BLEManager singleton object for the Bouffalo Lab platform.
  */
 class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
@@ -159,7 +159,7 @@ inline BLEManager & BLEMgr(void)
  * Returns the platform-specific implementation of the BLEManager singleton object.
  *
  * Internal components can use this to gain access to features of the BLEManager
- * that are specific to the BL702 platform.
+ * that are specific to the Bouffalo Lab platform.
  */
 inline BLEManagerImpl & BLEMgrImpl(void)
 {

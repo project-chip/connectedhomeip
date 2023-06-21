@@ -27,7 +27,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the PlatformManager singleton object for the BL602 platform.
+ * Concrete implementation of the PlatformManager singleton object for the Bouffalo Lab platform.
  */
 class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
 {
