@@ -24,8 +24,6 @@
 #include <app/util/af.h>
 #include <map>
 
-
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -49,7 +47,6 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // Generic accessor functions
-    EmberAfStatus GetFeature(uint32_t * value) const;
     bool HasFeature(Feature feature) const;
 
     void UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode);
@@ -60,12 +57,16 @@ public:
     DataModel::Nullable<uint8_t> GetOnMode();
     uint8_t GetCurrentMode();
 
-    EndpointId GetEndpointId() const {return endpointId;}
+    EndpointId GetEndpointId() const {return mEndpointId;}
+
+//    struct Type;
 
 private:
-    EndpointId endpointId{};
-    ClusterId clusterId{};
-    Delegate *delegate;
+    EndpointId mEndpointId{};
+    ClusterId mClusterId{};
+    Delegate * mDelegate;
+
+    uint32_t mFeature;
 
     // Attribute data store
     uint8_t mCurrentMode;
@@ -87,18 +88,19 @@ public:
      * @param aClusterId The ID of the ModeBase aliased cluster to be instantiated.
      * @param aDelegate A pointer to a delegate that will handle application layer logic.
      */
-    Instance(EndpointId aEndpointId, ClusterId aClusterId, Delegate * aDelegate) :
+    Instance(EndpointId aEndpointId, ClusterId aClusterId, Delegate * aDelegate, uint32_t aFeature) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        delegate(aDelegate)
+        mDelegate(aDelegate)
     {
-        endpointId = aEndpointId;
-        clusterId  = aClusterId;
+        mEndpointId = aEndpointId;
+        mClusterId  = aClusterId;
+        mFeature = aFeature;
     }
 
     ~Instance() override
     {
-        ModeBaseAliasesInstanceMap.erase(clusterId);
+        ModeBaseAliasesInstanceMap.erase(mClusterId);
     }
 
     template <typename RequestT, typename FuncT>

@@ -17,7 +17,6 @@
  */
 
 #include "mode-base-delegate.h"
-#include "mode-base-server.h"
 
 using namespace std;
 using namespace chip;

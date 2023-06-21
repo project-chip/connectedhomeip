@@ -36,30 +36,9 @@ namespace app {
 namespace Clusters {
 namespace ModeBase {
 
-// todo find a cleaner solution by modifying the zap generated code. Possibly use the AttributeAccessInterface for this.
-EmberAfStatus Instance::GetFeature(uint32_t * value) const
-{
-   using Traits = NumericAttributeTraits<uint32_t>;
-   Traits::StorageType temp;
-   uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-   EmberAfStatus status =
-       emberAfReadAttribute(endpointId, clusterId, ModeBase::Attributes::FeatureMap::Id, readable, sizeof(temp));
-   VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-   if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-   {
-       return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-   }
-   *value = Traits::StorageToWorking(temp);
-   return status;
-}
-
 bool Instance::HasFeature(Feature feature) const
 {
-   bool success;
-   uint32_t featureMap;
-   success = (GetFeature(&featureMap) == EMBER_ZCL_STATUS_SUCCESS);
-
-   return success && ((featureMap & to_underlying(feature)) != 0);
+   return (mFeature & to_underlying(feature)) != 0;
 }
 
 std::map<uint32_t, Instance*> Instance::ModeBaseAliasesInstanceMap;
@@ -67,7 +46,7 @@ std::map<uint32_t, Instance*> Instance::ModeBaseAliasesInstanceMap;
 bool Instance::isAliasCluster() const
 {
    for (unsigned int AliasedCluster : AliasedClusters) {
-       if (clusterId == AliasedCluster)
+       if (mClusterId == AliasedCluster)
        {
            return true;
        }
@@ -80,25 +59,25 @@ CHIP_ERROR Instance::Init()
    // Check that the cluster ID given is a valid mode base alias cluster ID.
    if (!isAliasCluster())
    {
-       ChipLogError(Zcl, "ModeBase: The cluster with ID %lu is not a mode base alias.", long(clusterId));
+       ChipLogError(Zcl, "ModeBase: The cluster with ID %lu is not a mode base alias.", long(mClusterId));
        return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
    }
 
    // Check if the cluster has been selected in zap
-   if (!emberAfContainsServer(endpointId, clusterId)) {
-       ChipLogError(Zcl, "ModeBase: The cluster with ID %lu was not enabled in zap.", long(clusterId));
+   if (!emberAfContainsServer(mEndpointId, mClusterId)) {
+       ChipLogError(Zcl, "ModeBase: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
        return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
    }
 
    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-   ReturnErrorOnFailure(delegate->Init());
+   ReturnErrorOnFailure(mDelegate->Init());
 
-   ModeBaseAliasesInstanceMap[clusterId] = this;
+   ModeBaseAliasesInstanceMap[mClusterId] = this;
 
    // StartUp behavior relies on CurrentMode StartUpMode attributes being non-volatile.
-   if (!emberAfIsKnownVolatileAttribute(endpointId, clusterId, Attributes::CurrentMode::Id) &&
-       !emberAfIsKnownVolatileAttribute(endpointId, clusterId, Attributes::StartUpMode::Id))
+   if (!emberAfIsKnownVolatileAttribute(mEndpointId, mClusterId, Attributes::CurrentMode::Id) &&
+       !emberAfIsKnownVolatileAttribute(mEndpointId, mClusterId, Attributes::StartUpMode::Id))
    {
        // Read the StartUpMode attribute and set the CurrentMode attribute
        // The StartUpMode attribute SHALL define the desired startup behavior of a
@@ -114,15 +93,15 @@ CHIP_ERROR Instance::Init()
            // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
            // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
            // value when the server is supplied with power, except if the OnMode attribute is null.
-           if (emberAfContainsServer(endpointId, OnOff::Id) &&
-               emberAfContainsAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-               emberAfContainsAttribute(endpointId, clusterId, ModeBase::Attributes::OnMode::Id) &&
+           if (emberAfContainsServer(mEndpointId, OnOff::Id) &&
+               emberAfContainsAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
+               emberAfContainsAttribute(mEndpointId, mClusterId, ModeBase::Attributes::OnMode::Id) &&
                HasFeature(ModeBase::Feature::kOnOff))
            {
                DataModel::Nullable<uint8_t> onMode = GetOnMode();
                bool onOffValueForStartUp = false;
-               if (!emberAfIsKnownVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-                   OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
+               if (!emberAfIsKnownVolatileAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
+                   OnOffServer::Instance().getOnOffValueForStartUp(mEndpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
                {
                    if (onOffValueForStartUp && !onMode.IsNull())
                    {
@@ -154,7 +133,7 @@ CHIP_ERROR Instance::Init()
 
            if (startUpMode.Value() != currentMode)
            {
-               if (!delegate->IsSupportedMode(startUpMode.Value()))
+               if (!mDelegate->IsSupportedMode(startUpMode.Value()))
                {
                    ChipLogError(Zcl, "ModeBase: Start-up_mode is not set to a valid mode.");
                    return CHIP_ERROR_INVALID_ARGUMENT; // todo is thins the correct error?
@@ -204,7 +183,7 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
 
    Commands::ChangeToModeResponse::Type response;
 
-   if (!delegate->IsSupportedMode(newMode))
+   if (!mDelegate->IsSupportedMode(newMode))
    {
        ChipLogError(Zcl, "ModeBase: Failed to find the option with mode %u", newMode);
        response.status = static_cast<uint8_t>(StatusCode::kUnsupportedMode);
@@ -212,7 +191,7 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
        return;
    }
 
-   delegate->HandleChangeToMode(newMode, response);
+   mDelegate->HandleChangeToMode(newMode, response);
 
    if (response.status == static_cast<uint8_t>(StatusCode::kSuccess))
    {
@@ -269,13 +248,13 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
        }
        break ;
    case Attributes::SupportedModes::Id:
-       if (delegate->NumberOfModes() == 0)
+       if (mDelegate->NumberOfModes() == 0)
        {
            aEncoder.EncodeEmptyList();
            return CHIP_NO_ERROR;
        }
 
-       Delegate *d = delegate;
+       Delegate *d = mDelegate;
        CHIP_ERROR err = aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR {
            for (uint8_t i = 0; i < d->NumberOfModes(); i++)
            {
@@ -336,7 +315,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
    }
    else
    {
-       if (!delegate->IsSupportedMode(newMode.Value()))
+       if (!mDelegate->IsSupportedMode(newMode.Value()))
        {
            return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
        }
@@ -362,7 +341,7 @@ void Instance::UpdateCurrentMode(uint8_t aNewMode)
    if (mCurrentMode != oldMode)
    {
        // The Administrator Commissioning cluster is always on the root endpoint.
-       MatterReportingAttributeChangeCallback(endpointId, clusterId, Attributes::CurrentMode::Id);
+       MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
    }
 }
 
@@ -373,7 +352,7 @@ void Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
    if (mStartUpMode != oldStartUpMode)
    {
        // The Administrator Commissioning cluster is always on the root endpoint.
-       MatterReportingAttributeChangeCallback(endpointId, clusterId, Attributes::StartUpMode::Id);
+       MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
    }
 }
 
@@ -384,7 +363,7 @@ void Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
    if (mOnMode != oldOnMode)
    {
        // The Administrator Commissioning cluster is always on the root endpoint.
-       MatterReportingAttributeChangeCallback(endpointId, clusterId, Attributes::OnMode::Id);
+       MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OnMode::Id);
    }
 }
 
@@ -403,6 +382,25 @@ uint8_t Instance::GetCurrentMode()
 {
    return mCurrentMode;
 }
+
+// todo is this possible?
+//struct Instance::Type
+//{
+//   public:
+//   // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+//   static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+//   ClusterId GetClusterId() { return clusterId; }
+//
+//   uint8_t status = static_cast<uint8_t>(0);
+//   Optional<chip::CharSpan> statusText;
+//
+//   CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+//
+//   using ResponseType = DataModel::NullObjectType;
+//
+//   static constexpr bool MustUseTimedInvoke() { return false; }
+//};
+
 
 } // namespace ModeBase
 } // namespace Clusters
