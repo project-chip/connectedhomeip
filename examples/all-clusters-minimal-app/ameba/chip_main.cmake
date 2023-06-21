@@ -131,6 +131,7 @@ list(
     ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/static-supported-modes-manager.cpp
     ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/operational-state-delegates.cpp
+    ${chip_dir}/examples/all-clusters-minimal-app/all-clusters-common/src/operational-state-delegate-impl.cpp
 
     ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-minimal-app/ameba/main/DeviceCallbacks.cpp

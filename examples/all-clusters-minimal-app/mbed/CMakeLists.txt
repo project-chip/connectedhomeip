@@ -62,6 +62,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON}/src/operational-state-delegates.cpp
+               ${ALL_CLUSTERS_COMMON}/src/operational-state-delegate-impl.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}
