@@ -170,9 +170,12 @@ class BouffalolabBuilder(GnBuilder):
         if not os.path.isfile(ota_images_firmware):
             return
 
-        os.system("python " + ota_images_flash_tool + " --build")
+        os.system("python " + ota_images_flash_tool + " --build > /dev/null")
 
         if not os.path.isfile(ota_images_image):
             return
 
         os.system("cp " + ota_images_image + " " + ota_images_dev_image)
+
+        logging.info("PostBuild:")
+        logging.info("Bouffalo Lab OTA format image: " + self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash is generated.")
