@@ -17,6 +17,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 config("app-main-config") {
   include_dirs = [ "." ]
@@ -75,6 +76,14 @@ source_set("app-main") {
 
   if (chip_enable_transport_trace) {
     deps += [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
+  }
+
+  if (matter_enable_tracing_support) {
+    deps += [
+      "${chip_root}/src/tracing",
+      "${chip_root}/examples/common/tracing:commandline",
+    ]
+    defines += [ "ENABLE_TRACING" ]
   }
 
   public_configs = [ ":app-main-config" ]

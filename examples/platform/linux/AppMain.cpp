@@ -65,6 +65,10 @@
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
+#ifdef ENABLE_TRACING
+#include <TracingCommandLineArgument.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #endif
@@ -121,6 +125,9 @@ void Cleanup()
     chip::trace::DeInitTrace();
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
+#ifdef ENABLE_TRACING
+    chip::CommandLineApp::StopTracing();
+#endif
     // TODO(16968): Lifecycle management of storage-using components like GroupDataProvider, etc
 }
 
