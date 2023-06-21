@@ -33,7 +33,7 @@ executable("chip-resource-monitoring-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
     "src/main.cpp",
-    "src/delegates/ActivatedCarbonFilterMonitoring.cpp",
+    "src/delegates/ActivatedCarbonFilterMonitoringDelegate.cpp",
     "src/delegates/HepafilterMonitoringDelegate.cpp"
   ]
 

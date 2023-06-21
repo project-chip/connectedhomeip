@@ -22,3 +22,4 @@ Status ActivatedCarbonFilterMonitoringDelegate::HandleResetCondition()
     ChipLogError(Zcl, "ActivatedCarbonFilterMonitoringDelegate::HandleResetCondition()");
     return Status::Success;
 }
+
