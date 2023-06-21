@@ -17,7 +17,7 @@ where the trace file is available through the Perfetto UI
 
 ## Capturing potentially multiple app tracing
 
-An example capturing all `track_event` entries is availabe in `matter.cfg` and
+An example capturing all `track_event` entries is available in `matter.cfg` and
 the perfetto repo has more examples.
 
 To capture using a central daemon on linux, you have to start the daemon:
