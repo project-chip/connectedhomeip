@@ -4,6 +4,7 @@ pull_request_rules:
       - "#approved-reviews-by>=1"
       - "#review-threads-unresolved=0"
       - "-draft"
+      - "label!=docker"
       - or:
         - "check-success=pullapprove"
         - "check-skipped=pullapprove"
