@@ -470,7 +470,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     {
         // we need to establish a matter hostname separately from the platform's default hostname
         char b[chip::Inet::IPAddress::kMaxStringLength];
-        SuccessOrExit(service.mInterface.GetInterfaceName(b, chip::Inet::IPAddress::kMaxStringLength));
+        SuccessOrExit(error = service.mInterface.GetInterfaceName(b, chip::Inet::IPAddress::kMaxStringLength));
         ChipLogDetail(DeviceLayer, "Using addresses from interface id=%d name=%s", service.mInterface.GetPlatformInterface(), b);
         matterHostname = std::string(service.mHostName) + ".local";
         // find addresses to publish
