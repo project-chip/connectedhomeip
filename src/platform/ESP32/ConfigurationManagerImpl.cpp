@@ -32,6 +32,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include "esp_ota_ops.h"
+#include "esp_phy_init.h"
 #include "esp_wifi.h"
 #include "nvs.h"
 #include "nvs_flash.h"
@@ -234,6 +235,17 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
     location       = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
     return CHIP_NO_ERROR;
 #endif
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t codeLen)
+{
+    // As per spec, codeLen has to be 2
+    VerifyOrReturnError((code != nullptr) && (codeLen == 2), CHIP_ERROR_INVALID_ARGUMENT);
+    // Write CountryCode to esp_phy layer
+    ReturnErrorOnFailure(MapConfigError(esp_phy_update_country_info(code)));
+    // As we do not have API to read country code from esp_phy layer, we are writing to NVS and when client reads the
+    // CountryCode then we read from NVS
+    return GenericConfigurationManagerImpl<ESP32Config>::StoreCountryCode(code, codeLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)

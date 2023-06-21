@@ -12622,6 +12622,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::SensitivityLevel::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, sensitivityLevel));
         break;
+    case Attributes::ExpiryDate::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, expiryDate));
+        break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
         break;

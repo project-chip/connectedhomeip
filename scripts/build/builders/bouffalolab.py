@@ -141,3 +141,27 @@ class BouffalolabBuilder(GnBuilder):
         }
 
         return items
+
+    def PostBuildCommand(self):
+
+        # Generate Bouffalo Lab format OTA image for development purpose.
+
+        ota_images_folder_path = self.output_dir + "/ota_images"
+        ota_images_dev_image = self.output_dir + "/" + self.app.AppNamePrefix(self.chip_name) + ".bin.xz.hash"
+        ota_images_image = self.output_dir + "/ota_images/FW_OTA.bin.xz.hash"
+        ota_images_firmware = self.output_dir + "/" + self.app.AppNamePrefix(self.chip_name) + ".bin"
+
+        ota_images_flash_tool = self.output_dir + "/" + self.app.AppNamePrefix(self.chip_name) + ".flash.py"
+
+        os.system("rm -rf " + ota_images_folder_path)
+        os.system("rm -rf " + ota_images_dev_image)
+
+        if not os.path.isfile(ota_images_firmware):
+            return
+
+        os.system("python " + ota_images_flash_tool + " --build")
+
+        if not os.path.isfile(ota_images_image):
+            return
+
+        os.system("cp " + ota_images_image + " " + ota_images_dev_image)

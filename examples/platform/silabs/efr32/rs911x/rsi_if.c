@@ -420,20 +420,17 @@ static void wfx_rsi_save_ap_info() // translation
         /*
          * Scan is done - failed
          */
-#if WIFI_ENABLE_SECURITY_WPA3
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         wfx_rsi.sec.security = WFX_SEC_WPA3;
-#else  /* !WIFI_ENABLE_SECURITY_WPA3 */
+#else  /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         wfx_rsi.sec.security = WFX_SEC_WPA2;
-#endif /* WIFI_ENABLE_SECURITY_WPA3 */
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         SILABS_LOG("%s: warn: failed with status: %02x", __func__, status);
         return;
     }
-    else
-    {
-        wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
-        wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
-        memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_MAX_STR_LEN);
-    }
+    wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
+    wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
+    memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_MAX_STR_LEN);
 
     switch (rsp.scan_info->security_mode)
     {
@@ -451,9 +448,13 @@ static void wfx_rsi_save_ap_info() // translation
     case SME_WEP:
         wfx_rsi.sec.security = WFX_SEC_WEP;
         break;
-    case SME_WPA3:
     case SME_WPA3_TRANSITION:
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
+    case SME_WPA3:
         wfx_rsi.sec.security = WFX_SEC_WPA3;
+#else
+        wfx_rsi.sec.security = WFX_SEC_WPA2;
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         break;
     default:
         wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
@@ -492,9 +493,11 @@ static void wfx_rsi_do_join(void)
         case WFX_SEC_WPA2:
             connect_security_mode = RSI_WPA_WPA2_MIXED;
             break;
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         case WFX_SEC_WPA3:
-            connect_security_mode = RSI_WPA3;
+            connect_security_mode = RSI_WPA3_TRANSITION;
             break;
+#endif // WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         case WFX_SEC_NONE:
             connect_security_mode = RSI_OPEN;
             break;

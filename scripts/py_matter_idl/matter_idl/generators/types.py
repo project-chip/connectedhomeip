@@ -427,7 +427,7 @@ def IsSignedDataType(data_type: DataType) -> bool:
     return sized_type.is_signed
 
 
-def GetDataTypeSizeInBits(data_type: DataType) -> int:
+def GetDataTypeSizeInBits(data_type: DataType) -> Optional[int]:
     """
     Returns the size in bits for a given data type or None if the data type can not be found.
     """
