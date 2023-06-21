@@ -21,7 +21,7 @@ _install_additional_pip_requirements() {
     # figure out additional pip install items
     while [ $# -gt 0 ]; do
         case $1 in
-            -p|--platform)
+            -p | --platform)
                 _SETUP_PLATFORM=$2
                 shift # argument
                 shift # value
@@ -36,10 +36,10 @@ _install_additional_pip_requirements() {
         _OLD_IFS=$IFS
         IFS=","
         if [ -n "$ZSH_VERSION" ]; then
-          setopt sh_word_split
+            setopt sh_word_split
         fi
 
-        for platform in ${_SETUP_PLATFORM}; do
+        for platform in "$_SETUP_PLATFORM"; do
             # Allow none as an alias of nothing extra installed (like -p none)
             if [ "$platform" != "none" ]; then
                 echo "Installing pip requirements for $platform..."
