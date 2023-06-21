@@ -131,6 +131,7 @@ public:
      *   @param[in]  aAppState          A pointer to the application state object used when timer expires.
      *
      *   @return CHIP_NO_ERROR On success.
+     *   @return CHIP_ERROR_INVALID_ARGUMENT If the provided aDelay value is 0
      *   @return CHIP_ERROR_NO_MEMORY If a timer cannot be allocated.
      *   @return Other Value indicating timer failed to start.
      */
@@ -144,7 +145,8 @@ public:
      *   @param[in]  onComplete         A pointer to the function called when timer expires.
      *   @param[in]  appState           A pointer to the application state object used when timer expires.
      *
-     *   @return True if the timer exists and has not elapsed. False otherwise.
+     *   @return True if there is a current timer set to call, at some point in the future, the provided onComplete callback
+     *           with the corresponding appState context. False otherwise.
      */
     virtual bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) = 0;
 

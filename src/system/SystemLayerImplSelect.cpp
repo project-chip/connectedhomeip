@@ -202,10 +202,12 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
 
 CHIP_ERROR LayerImplSelect::ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
-    assertChipStackLockedByCurrentThread();
-    Clock::Timeout remainingTime = mTimerList.GetRemainingTime(onComplete, appState);
+    VerifyOrReturnError(delay.count() > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (remainingTime.count() <= delay.count())
+    assertChipStackLockedByCurrentThread();
+
+    Clock::Timeout remainingTime = mTimerList.GetRemainingTime(onComplete, appState);
+    if (remainingTime.count() < delay.count())
     {
         if (remainingTime == Clock::kZero)
         {

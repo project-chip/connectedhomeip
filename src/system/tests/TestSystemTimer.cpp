@@ -646,6 +646,9 @@ static void ExtendTimerToTest(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(suite, strcmp(testState.record, "ABCD") == 0);
 
     Clock::Internal::SetSystemClockForTesting(savedClock);
+
+    // Extending a timer by 0 ms permitted
+    NL_TEST_ASSERT(suite, systemLayer.ExtendTimerTo(0_ms, TestState::A, &testState) == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 static void IsTimerActiveTest(nlTestSuite * inSuite, void * aContext)
