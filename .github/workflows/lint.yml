@@ -60,7 +60,7 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
             - name: Bootstrap cache
-              uses: actions/cache@v3
+              uses: buildjet/cache@v3
               timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
@@ -222,4 +222,3 @@ jobs:
               if: always()
               run: |
                   git grep -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
-

@@ -201,6 +201,8 @@ class _TestStepWithPlaceholders:
         self.max_interval = _value_or_none(test, 'maxInterval')
         self.timed_interaction_timeout_ms = _value_or_none(
             test, 'timedInteractionTimeoutMs')
+        self.data_version = _value_or_none(
+            test, 'dataVersion')
         self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
         self.wait_for = _value_or_none(test, 'wait')
         self.event_number = _value_or_none(test, 'eventNumber')
@@ -412,7 +414,8 @@ class _TestStepWithPlaceholders:
         # members of the 'values' array which is what is used for other tests.
         value = {}
 
-        known_keys_to_copy = ['value', 'constraints', 'saveAs']
+        known_keys_to_copy = ['value', 'constraints',
+                              'saveAs', 'saveDataVersionAs']
         known_keys_to_allow = ['error', 'clusterError']
 
         for key, item in list(container.items()):
@@ -472,6 +475,8 @@ class _TestStepWithPlaceholders:
                     value[key] = self._update_value_with_definition(
                         item_value, mapping)
                 elif key == 'saveAs' and type(item_value) is str and item_value not in self._parsing_config_variable_storage:
+                    self._parsing_config_variable_storage[item_value] = None
+                elif key == 'saveDataVersionAs' and type(item_value) is str and item_value not in self._parsing_config_variable_storage:
                     self._parsing_config_variable_storage[item_value] = None
                 elif key == 'constraints':
                     for constraint, constraint_value in item_value.items():
@@ -563,6 +568,8 @@ class TestStep:
         if test.is_pics_enabled:
             self._update_placeholder_values(self.arguments)
             self._update_placeholder_values(self.responses)
+            self._test.data_version = self._config_variable_substitution(
+                self._test.data_version)
             self._test.node_id = self._config_variable_substitution(
                 self._test.node_id)
             self._test.run_if = self._config_variable_substitution(
@@ -655,6 +662,10 @@ class TestStep:
         return self._test.timed_interaction_timeout_ms
 
     @property
+    def data_version(self):
+        return self._test.data_version
+
+    @property
     def busy_wait_ms(self):
         return self._test.busy_wait_ms
 
@@ -702,7 +713,10 @@ class TestStep:
                 expected_response, received_response, result)
             self._response_constraints_validation(
                 expected_response, received_response, result)
-            self._maybe_save_as(expected_response, received_response, result)
+            self._maybe_save_as('saveAs', 'value',
+                                expected_response, received_response, result)
+            self._maybe_save_as('saveDataVersionAs', 'dataVersion',
+                                expected_response, received_response, result)
 
         # An empty response array in a test step (responses: []) implies that the test step does expect a response
         # but without any associated value.
@@ -936,17 +950,17 @@ class TestStep:
                     e.update_context(expected_response, self.step_index)
                     result.error(check_type, error_failure, e)
 
-    def _maybe_save_as(self, expected_response, received_response, result):
+    def _maybe_save_as(self, key: str, default_target: str, expected_response, received_response, result):
         check_type = PostProcessCheckType.SAVE_AS_VARIABLE
         error_success = 'The test save the value "{value}" as {name}.'
         error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
 
         for value in expected_response['values']:
-            if 'saveAs' not in value:
+            if key not in value:
                 continue
 
-            received_value = received_response.get('value')
-            if not self.is_attribute and not self.is_event:
+            received_value = received_response.get(default_target)
+            if not self.is_attribute and not self.is_event and not (self.command in ANY_COMMANDS_LIST):
                 expected_name = value.get('name')
                 if received_value is None or expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
@@ -956,7 +970,7 @@ class TestStep:
                 received_value = received_value.get(
                     expected_name) if received_value else None
 
-            save_as = value.get('saveAs')
+            save_as = value.get(key)
             self._runtime_config_variable_storage[save_as] = received_value
             result.success(check_type, error_success.format(
                 value=received_value, name=save_as))

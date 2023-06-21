@@ -176,3 +176,14 @@ class TestStepWaitResponseError(TestStepError):
 
         self.tag_key_with_error(content, 'wait')
         self.tag_key_with_error(content, 'response')
+
+
+class TestStepResponseVariableError(TestStepError):
+    """Raise when a test step response use a variable but this variable does not exist in the config section.
+    """
+
+    def __init__(self, content):
+        message = 'The variable does not exist in the config section.'
+        super().__init__(message)
+
+        self.tag_key_with_error(content, 'response')

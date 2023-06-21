@@ -16,6 +16,7 @@ name: 24.6.1. [TC-LVL-6.1] Stop Verification (DUT as Server)
 
 PICS:
     - LVL.S
+    - LVL.S.M.VarRate
 
 config:
     nodeId: 0x12344321
