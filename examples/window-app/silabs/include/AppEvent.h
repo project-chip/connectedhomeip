@@ -66,7 +66,7 @@ struct AppEvent
     uint16_t Type;
     chip::EndpointId mEndpoint = 0;
     chip::AttributeId mAttributeId;
-    
+
     union
     {
         struct
@@ -82,7 +82,7 @@ struct AppEvent
         {
             void * Context;
         } WindowEvent;
-    
+
     };
 
     EventHandler Handler;
