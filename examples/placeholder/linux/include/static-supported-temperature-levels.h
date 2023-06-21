@@ -21,7 +21,6 @@
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
-#include <cstring>
 
 namespace chip {
 namespace app {
@@ -32,32 +31,36 @@ namespace TemperatureControl {
  * This implementation statically defines the options.
  */
 
-class StaticSupportedTemperatureLevelsManager : public SupportedTemperatureLevelsManager
+class StaticSupportedTemperatureLevels : public SupportedTemperatureLevelsIterator
 {
-    using TemperatureLevelStructType = Structs::TemperatureLevelStruct::Type;
-    using storage_value_type         = TemperatureLevelStructType;
-
     struct EndpointPair
     {
         EndpointId mEndpointId;
-        TemperatureLevelStructType * mData;
+        chip::CharSpan * mTemperatureLevels;
         int mSize;
 
-        EndpointPair(EndpointId aEndpointId, TemperatureLevelStructType * aData, int aSize) :
-            mEndpointId(aEndpointId), mData(aData), mSize(aSize)
-        {}
+        EndpointPair(EndpointId aEndpointId, chip::CharSpan * aTemperatureLevels, int aSize) :
+            mEndpointId(aEndpointId), mTemperatureLevels(new chip::CharSpan[aSize]), mSize(aSize)
+        {
+            for (int i = 0; i < aSize; i++)
+            {
+                mTemperatureLevels[i] = aTemperatureLevels[i];
+            }
+        }
+
+        ~EndpointPair() {}
     };
 
-    static storage_value_type temperatureLevelOptions[];
+    static chip::CharSpan temperatureLevelOptions[3];
 
 public:
     static const EndpointPair supportedOptionsByEndpoints[EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
-    static TemperatureLevelStructType * data;
+    int Size() override;
 
-    ~StaticSupportedTemperatureLevelsManager(){};
+    bool Next(chip::CharSpan & item) override;
 
-    StaticSupportedTemperatureLevelsManager() {}
+    ~StaticSupportedTemperatureLevels() {}
 };
 
 } // namespace TemperatureControl

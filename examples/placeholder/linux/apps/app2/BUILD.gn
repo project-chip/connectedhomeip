@@ -32,7 +32,7 @@ source_set("app2") {
   sources = [
     "../../src/bridged-actions-stub.cpp",
     "../../static-supported-modes-manager.cpp",
-    "../../static-supported-temperature-levels-manager.cpp",
+    "../../static-supported-temperature-levels.cpp",
   ]
 
   public_deps = [ ":configuration" ]

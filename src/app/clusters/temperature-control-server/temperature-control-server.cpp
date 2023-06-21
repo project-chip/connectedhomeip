@@ -33,6 +33,8 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
+const uint8_t MaxTemperatureLevelStringSize = 32;
+
 class TemperatureControlAttrAccess : public AttributeAccessInterface
 {
 public:
@@ -49,27 +51,28 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
 {
     VerifyOrDie(aPath.mClusterId == TemperatureControl::Id);
 
-    TemperatureControl::SupportedTemperatureLevelsManager::Iterator iterator(aPath.mEndpointId);
-
     if (TemperatureControl::Attributes::SupportedTemperatureLevels::Id == aPath.mAttributeId)
     {
-        Structs::TemperatureLevelStruct::Type item;
-        bool hasList = false;
-        CHIP_ERROR err;
-        err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-            while (iterator.Next(item))
-            {
-                hasList = true;
-                ReturnErrorOnFailure(encoder.Encode(item));
-            }
-            return CHIP_NO_ERROR;
-        });
-
-        if (!hasList)
+        TemperatureControl::SupportedTemperatureLevelsIterator * instance =
+            TemperatureControl::SupportedTemperatureLevelsIterator::GetInstance();
+        if (instance == nullptr)
         {
             aEncoder.EncodeEmptyList();
             return CHIP_NO_ERROR;
         }
+
+        instance->Reset(aPath.mEndpointId);
+
+        CHIP_ERROR err;
+        err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+            char buffer[MaxTemperatureLevelStringSize];
+            chip::MutableCharSpan item(buffer);
+            while (instance->Next(item))
+            {
+                ReturnErrorOnFailure(encoder.Encode(chip::CharSpan{ item.data(), item.size() }));
+            }
+            return CHIP_NO_ERROR;
+        });
     }
     return CHIP_NO_ERROR;
 }
@@ -124,12 +127,30 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
                 goto exit;
             }
 
-            if (targetTemperature.Value() < minTemperature || targetTemperature.Value() > maxTemperature)
+            if (TemperatureControlHasFeature(endpoint, TemperatureControl::Feature::kTemperatureStep))
             {
-                status = Status::ConstraintError;
-                goto exit;
-            }
+                int16_t step  = 0;
+                emberAfStatus = Step::Get(endpoint, &step);
+                if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
+                {
+                    status = app::ToInteractionModelStatus(emberAfStatus);
+                    goto exit;
+                }
 
+                if ((targetTemperature.Value() - minTemperature) % step != 0)
+                {
+                    status = Status::ConstraintError;
+                    goto exit;
+                }
+            }
+            else
+            {
+                if (targetTemperature.Value() < minTemperature || targetTemperature.Value() > maxTemperature)
+                {
+                    status = Status::ConstraintError;
+                    goto exit;
+                }
+            }
             emberAfStatus = TemperatureSetpoint::Set(endpoint, targetTemperature.Value());
             if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
             {
@@ -145,26 +166,27 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
     {
         if (targetTemperatureLevel.HasValue())
         {
-            bool foundEntryInStruct = false;
-            // TODO: Update implemetation when https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/7005 fixed.
-
-            TemperatureControl::SupportedTemperatureLevelsManager::Iterator iterator(endpoint);
-
-            Structs::TemperatureLevelStruct::Type item;
-
-            while (iterator.Next(item))
+            TemperatureControl::SupportedTemperatureLevelsIterator * instance =
+                TemperatureControl::SupportedTemperatureLevelsIterator::GetInstance();
+            if (instance == nullptr)
             {
-                if (item.temperatureLevel == targetTemperatureLevel.Value())
+                status = Status::NotFound;
+                goto exit;
+            }
+
+            instance->Reset(endpoint);
+
+            uint8_t size = instance->Size();
+
+            if (targetTemperatureLevel.Value() < size)
+            {
+                emberAfStatus = SelectedTemperatureLevel::Set(endpoint, targetTemperatureLevel.Value());
+                if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
                 {
-                    foundEntryInStruct = true;
-                    emberAfStatus      = CurrentTemperatureLevelIndex::Set(endpoint, targetTemperatureLevel.Value());
-                    if (emberAfStatus != EMBER_ZCL_STATUS_SUCCESS)
-                    {
-                        status = app::ToInteractionModelStatus(emberAfStatus);
-                    }
+                    status = app::ToInteractionModelStatus(emberAfStatus);
                 }
             }
-            if (!foundEntryInStruct)
+            else
             {
                 status = Status::ConstraintError;
             }

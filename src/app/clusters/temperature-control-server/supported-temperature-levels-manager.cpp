@@ -16,45 +16,23 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af-enums.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include "supported-temperature-levels-manager.h"
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace TemperatureControl {
+static SupportedTemperatureLevelsIterator * sInstance = nullptr;
 
-/**
- * Interface to help manage the supported temperature levels of the Temperature Control Cluster.
- */
-class SupportedTemperatureLevelsIterator
+SupportedTemperatureLevelsIterator * SupportedTemperatureLevelsIterator::GetInstance()
 {
-public:
-    virtual ~SupportedTemperatureLevelsIterator() = default;
+    return sInstance;
+}
 
-    SupportedTemperatureLevelsIterator() {}
-
-    void Reset(EndpointId endpoint)
-    {
-        mEndpoint = endpoint;
-        mIndex    = 0;
-    }
-
-    virtual int Size() = 0;
-
-    virtual bool Next(chip::MutableCharSpan & item) = 0;
-
-    static SupportedTemperatureLevelsIterator * GetInstance();
-
-    static void SetInstance(SupportedTemperatureLevelsIterator * instance);
-
-protected:
-    EndpointId mEndpoint;
-    uint8_t mIndex;
-};
+void SupportedTemperatureLevelsIterator::SetInstance(SupportedTemperatureLevelsIterator * instance)
+{
+    sInstance = instance;
+}
 
 } // namespace TemperatureControl
 } // namespace Clusters
