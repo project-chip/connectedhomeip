@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/AttributeAccessInterface.h>
+#include <app/CommandHandlerInterface.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-delegate.h>
 #include <app/util/af.h>
 #include <map>

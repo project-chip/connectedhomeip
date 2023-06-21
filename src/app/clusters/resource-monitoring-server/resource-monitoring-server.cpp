@@ -22,6 +22,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <map>
 
 // using namespace std;
 using namespace chip;

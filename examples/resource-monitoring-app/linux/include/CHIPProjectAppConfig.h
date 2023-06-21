@@ -45,4 +45,4 @@
 
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
 
-#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test Bulb"
+#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test Resource Monitoring Device"

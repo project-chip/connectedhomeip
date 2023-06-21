@@ -48,21 +48,6 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &s
 } // namespace
 #endif
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                       uint8_t * value)
-{
-    if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
-    {
-        // LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
-    }
-}
-void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
-                                                             const chip::Access::SubjectDescriptor & subjectDescriptor)
-{
-
-    ChipLogError(Zcl, "HepaFilterMonitoringDelegate::MatterPostCommandReceivedCallback()");
-}
-
 
 Clusters::ResourceMonitoring::HepaFilterMonitoringDelegate hepaFilterDelegate;
 Clusters::ResourceMonitoring::Instance HepafilterInstance(0x1, Clusters::HepaFilterMonitoring::Id, &hepaFilterDelegate);
