@@ -56,7 +56,6 @@ public:
 
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
-
 private:
     static AppTask sAppTask;
 

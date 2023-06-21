@@ -76,7 +76,8 @@ CHIP_ERROR AppTask::Init()
 
     err = WindowManager::sWindow.Init();
 
-    if(err != CHIP_NO_ERROR){
+    if (err != CHIP_NO_ERROR)
+    {
         SILABS_LOG("WindowMgr::Init() failed");
         appError(err);
     }

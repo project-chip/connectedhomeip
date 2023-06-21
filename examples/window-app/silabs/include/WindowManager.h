@@ -22,8 +22,8 @@
 
 #include "AppEvent.h"
 
-#include <FreeRTOS.h>
 #include "LEDWidget.h"
+#include <FreeRTOS.h>
 #include <string>
 #include <task.h>
 #include <timers.h>
@@ -36,7 +36,6 @@ using namespace chip::app::Clusters::WindowCovering;
 class WindowManager
 {
 public:
-
     static WindowManager sWindow;
     struct Timer
     {
@@ -48,9 +47,9 @@ public:
         void Stop();
         void Timeout();
 
-        Callback mCallback    = nullptr;
-        void * mContext       = nullptr;
-        bool mIsActive        = false;
+        Callback mCallback = nullptr;
+        void * mContext    = nullptr;
+        bool mIsActive     = false;
 
         TimerHandle_t mHandler = nullptr;
 
@@ -85,8 +84,8 @@ public:
 
         chip::EndpointId mEndpoint = 0;
 
-        Timer * mLiftTimer            = nullptr;
-        Timer * mTiltTimer            = nullptr;
+        Timer * mLiftTimer = nullptr;
+        Timer * mTiltTimer = nullptr;
 
         OperationalState mLiftOpState = OperationalState::Stall;
         OperationalState mTiltOpState = OperationalState::Stall;

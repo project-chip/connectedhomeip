@@ -82,7 +82,6 @@ struct AppEvent
         {
             void * Context;
         } WindowEvent;
-
     };
 
     EventHandler Handler;

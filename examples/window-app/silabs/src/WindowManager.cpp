@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
+#include "AppEvent.h"
+#include "AppTask.h"
 #include <AppConfig.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
-#include "AppEvent.h"
-#include "AppTask.h"
 
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -62,11 +62,12 @@ using namespace chip::app::Clusters::WindowCovering;
 
 WindowManager WindowManager::sWindow;
 
-AppEvent CreateNewEvent(AppEvent::AppEventTypes type){
+AppEvent CreateNewEvent(AppEvent::AppEventTypes type)
+{
     AppEvent aEvent;
-    aEvent.Type = type;
-    aEvent.Handler = WindowManager::GeneralEventHandler;
-    WindowManager * window = static_cast<WindowManager *>(&WindowManager::sWindow);
+    aEvent.Type                = type;
+    aEvent.Handler             = WindowManager::GeneralEventHandler;
+    WindowManager * window     = static_cast<WindowManager *>(&WindowManager::sWindow);
     aEvent.WindowEvent.Context = window;
     return aEvent;
 }
@@ -119,7 +120,6 @@ WindowManager::Cover * WindowManager::GetCover(chip::EndpointId endpoint)
     }
     return nullptr;
 }
-
 
 void WindowManager::DispatchEventAttributeChange(chip::EndpointId endpoint, chip::AttributeId attribute)
 {
@@ -188,8 +188,8 @@ void WindowManager::HandleLongPress()
 {
 
     AppEvent event;
-    event.Handler = GeneralEventHandler;
-    WindowManager * window = static_cast<WindowManager *>(&WindowManager::sWindow);
+    event.Handler             = GeneralEventHandler;
+    WindowManager * window    = static_cast<WindowManager *>(&WindowManager::sWindow);
     event.WindowEvent.Context = window;
 
     if (mUpPressed && mDownPressed)
@@ -197,7 +197,7 @@ void WindowManager::HandleLongPress()
         // Long press both buttons: Cycle between window coverings
         mUpSuppressed = mDownSuppressed = true;
         mCurrentCover                   = mCurrentCover < WINDOW_COVER_COUNT - 1 ? mCurrentCover + 1 : 0;
-        event.Type = AppEvent::kEventType_CoverChange;
+        event.Type                      = AppEvent::kEventType_CoverChange;
         AppTask::GetAppTask().PostEvent(&event);
     }
     else if (mUpPressed)
@@ -534,10 +534,9 @@ void WindowManager::Cover::CallbackOperationalStateSet(intptr_t arg)
 // Timers
 //------------------------------------------------------------------------------
 
-WindowManager::Timer::Timer(uint32_t timeoutInMs, Callback callback, void * context) :
-    mCallback(callback), mContext(context)
+WindowManager::Timer::Timer(uint32_t timeoutInMs, Callback callback, void * context) : mCallback(callback), mContext(context)
 {
-    mHandler = xTimerCreate("",                       // Just a text name, not used by the RTOS kernel
+    mHandler = xTimerCreate("",                         // Just a text name, not used by the RTOS kernel
                             pdMS_TO_TICKS(timeoutInMs), // == default timer period (mS)
                             false,                      // no timer reload (==one-shot)
                             (void *) this,              // init timer id = app task obj context
@@ -568,7 +567,6 @@ void WindowManager::Timer::TimerCallback(TimerHandle_t xTimer)
         timer->Timeout();
     }
 }
-
 
 WindowManager & WindowManager::Instance()
 {
@@ -616,11 +614,10 @@ CHIP_ERROR WindowManager::Init()
     return CHIP_NO_ERROR;
 }
 
-
 void WindowManager::PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId)
 {
-    AppEvent event = CreateNewEvent(AppEvent::kEventType_AttributeChange);
-    event.mEndpoint = endpoint;
+    AppEvent event     = CreateNewEvent(AppEvent::kEventType_AttributeChange);
+    event.mEndpoint    = endpoint;
     event.mAttributeId = attributeId;
     AppTask::GetAppTask().PostEvent(&event);
 }
@@ -653,8 +650,14 @@ void WindowManager::UpdateLEDs()
 
             mStatusLED.Blink(950, 50);
         }
-        else if (mState.haveBLEConnections) { mStatusLED.Blink(100, 100); }
-        else { mStatusLED.Blink(50, 950); }
+        else if (mState.haveBLEConnections)
+        {
+            mStatusLED.Blink(100, 100);
+        }
+        else
+        {
+            mStatusLED.Blink(50, 950);
+        }
 
         // Action LED
         NPercent100ths current;
@@ -731,7 +734,7 @@ void WindowManager::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 
     if (btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
-        event = CreateNewEvent(button ? AppEvent::kEventType_DownPressed : AppEvent::kEventType_UpPressed );
+        event = CreateNewEvent(button ? AppEvent::kEventType_DownPressed : AppEvent::kEventType_UpPressed);
     }
     else
     {
@@ -746,137 +749,136 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
     WindowManager * window = static_cast<WindowManager *>(aEvent->WindowEvent.Context);
 
     switch (aEvent->Type)
+    {
+    case AppEvent::kEventType_ResetWarning:
+        window->mResetWarning = true;
+        if (window->mLongPressTimer)
         {
-        case AppEvent::kEventType_ResetWarning:
-            window->mResetWarning = true;
-            if (window->mLongPressTimer)
-            {
-                window->mLongPressTimer->Start();
-            }
-            SILABS_LOG("Factory Reset Triggered. Release button within %ums to cancel.", LONG_PRESS_TIMEOUT);
-            // Turn off all LEDs before starting blink to make sure blink is
-            // co-ordinated.
-            window->UpdateLEDs();
-            break;
+            window->mLongPressTimer->Start();
+        }
+        SILABS_LOG("Factory Reset Triggered. Release button within %ums to cancel.", LONG_PRESS_TIMEOUT);
+        // Turn off all LEDs before starting blink to make sure blink is
+        // co-ordinated.
+        window->UpdateLEDs();
+        break;
 
-        case AppEvent::kEventType_ResetCanceled:
-            window->mResetWarning = false;
-            SILABS_LOG("Factory Reset has been Canceled");
-            window->UpdateLEDs();
-            break;
+    case AppEvent::kEventType_ResetCanceled:
+        window->mResetWarning = false;
+        SILABS_LOG("Factory Reset has been Canceled");
+        window->UpdateLEDs();
+        break;
 
-        case AppEvent::kEventType_Reset:
-            chip::Server::GetInstance().ScheduleFactoryReset();
-            break;
+    case AppEvent::kEventType_Reset:
+        chip::Server::GetInstance().ScheduleFactoryReset();
+        break;
 
-        case AppEvent::kEventType_UpPressed:
-            window->mUpPressed = true;
-            if (window->mLongPressTimer)
-            {
-                window->mLongPressTimer->Start();
-            }
-            break;
+    case AppEvent::kEventType_UpPressed:
+        window->mUpPressed = true;
+        if (window->mLongPressTimer)
+        {
+            window->mLongPressTimer->Start();
+        }
+        break;
 
-        case AppEvent::kEventType_UpReleased:
-            window->mUpPressed = false;
-            if (window->mLongPressTimer)
-            {
-                window->mLongPressTimer->Stop();
-            }
-            if (window->mResetWarning)
-            {
-                aEvent->Type = AppEvent::kEventType_ResetCanceled;
-                AppTask::GetAppTask().PostEvent(aEvent);
-            }
-            if (window->mUpSuppressed)
-            {
-                window->mUpSuppressed = false;
-            }
-            else if (window->mDownPressed)
-            {
-                window->mTiltMode     = !(window->mTiltMode);
-                window->mUpSuppressed = window->mDownSuppressed = true;
-                aEvent->Type = AppEvent::kEventType_TiltModeChange;
-                AppTask::GetAppTask().PostEvent(aEvent);
-            }
-            else
-            {
-                window->GetCover().UpdateTargetPosition(OperationalState::MovingUpOrOpen, window->mTiltMode);
-            }
-            break;
+    case AppEvent::kEventType_UpReleased:
+        window->mUpPressed = false;
+        if (window->mLongPressTimer)
+        {
+            window->mLongPressTimer->Stop();
+        }
+        if (window->mResetWarning)
+        {
+            aEvent->Type = AppEvent::kEventType_ResetCanceled;
+            AppTask::GetAppTask().PostEvent(aEvent);
+        }
+        if (window->mUpSuppressed)
+        {
+            window->mUpSuppressed = false;
+        }
+        else if (window->mDownPressed)
+        {
+            window->mTiltMode     = !(window->mTiltMode);
+            window->mUpSuppressed = window->mDownSuppressed = true;
+            aEvent->Type                                    = AppEvent::kEventType_TiltModeChange;
+            AppTask::GetAppTask().PostEvent(aEvent);
+        }
+        else
+        {
+            window->GetCover().UpdateTargetPosition(OperationalState::MovingUpOrOpen, window->mTiltMode);
+        }
+        break;
 
-        case AppEvent::kEventType_DownPressed:
-            window->mDownPressed = true;
-            if (window->mLongPressTimer)
-            {
-                window->mLongPressTimer->Start();
-            }
-            break;
+    case AppEvent::kEventType_DownPressed:
+        window->mDownPressed = true;
+        if (window->mLongPressTimer)
+        {
+            window->mLongPressTimer->Start();
+        }
+        break;
 
-        case AppEvent::kEventType_DownReleased:
-            window->mDownPressed = false;
-            if (window->mLongPressTimer)
-            {
-                window->mLongPressTimer->Stop();
-            }
-            if (window->mResetWarning)
-            {
-                aEvent->Type = AppEvent::kEventType_ResetCanceled;
-                AppTask::GetAppTask().PostEvent(aEvent);
-            }
-            if (window->mDownSuppressed)
-            {
-                window->mDownSuppressed = false;
-            }
-            else if (window->mUpPressed)
-            {
-                window->mTiltMode     = !(window->mTiltMode);
-                window->mUpSuppressed = window->mDownSuppressed = true;
-                aEvent->Type = AppEvent::kEventType_TiltModeChange;
-            }
-            else
-            {
-                window->GetCover().UpdateTargetPosition(OperationalState::MovingDownOrClose, window->mTiltMode);
-            }
-            break;
-        case AppEvent::kEventType_AttributeChange:
-            window->DispatchEventAttributeChange(aEvent->mEndpoint, aEvent->mAttributeId);
-            break;
+    case AppEvent::kEventType_DownReleased:
+        window->mDownPressed = false;
+        if (window->mLongPressTimer)
+        {
+            window->mLongPressTimer->Stop();
+        }
+        if (window->mResetWarning)
+        {
+            aEvent->Type = AppEvent::kEventType_ResetCanceled;
+            AppTask::GetAppTask().PostEvent(aEvent);
+        }
+        if (window->mDownSuppressed)
+        {
+            window->mDownSuppressed = false;
+        }
+        else if (window->mUpPressed)
+        {
+            window->mTiltMode     = !(window->mTiltMode);
+            window->mUpSuppressed = window->mDownSuppressed = true;
+            aEvent->Type                                    = AppEvent::kEventType_TiltModeChange;
+        }
+        else
+        {
+            window->GetCover().UpdateTargetPosition(OperationalState::MovingDownOrClose, window->mTiltMode);
+        }
+        break;
+    case AppEvent::kEventType_AttributeChange:
+        window->DispatchEventAttributeChange(aEvent->mEndpoint, aEvent->mAttributeId);
+        break;
 
-        case AppEvent::kEventType_ProvisionedStateChanged:
-            window->UpdateLEDs();
-            window->UpdateLCD();
-            break;
+    case AppEvent::kEventType_ProvisionedStateChanged:
+        window->UpdateLEDs();
+        window->UpdateLCD();
+        break;
 
-        case AppEvent::kEventType_WinkOn:
-        case AppEvent::kEventType_WinkOff:
-            window->mState.isWinking = (AppEvent::kEventType_WinkOn == aEvent->Type);
-            window->UpdateLEDs();
-            break;
+    case AppEvent::kEventType_WinkOn:
+    case AppEvent::kEventType_WinkOff:
+        window->mState.isWinking = (AppEvent::kEventType_WinkOn == aEvent->Type);
+        window->UpdateLEDs();
+        break;
 
-        case AppEvent::kEventType_ConnectivityStateChanged:
-        case AppEvent::kEventType_BLEConnectionsChanged:
-            window->UpdateLEDs();
-            break;
+    case AppEvent::kEventType_ConnectivityStateChanged:
+    case AppEvent::kEventType_BLEConnectionsChanged:
+        window->UpdateLEDs();
+        break;
 
 #ifdef DISPLAY_ENABLED
-        case AppEvent::kEventType_CoverTypeChange:
-            window->UpdateLCD();
-            break;
-        case AppEvent::kEventType_CoverChange:
-            window->mIconTimer.Start();
-            window->mIcon = (window->GetCover().mEndpoint == 1) ? LcdIcon::One : LcdIcon::Two;
-            window->UpdateLCD();
-            break;
-        case AppEvent::kEventType_TiltModeChange:
-            window->mIconTimer.Start();
-            window->mIcon = window->mTiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
-            window->UpdateLCD();
-            break;
+    case AppEvent::kEventType_CoverTypeChange:
+        window->UpdateLCD();
+        break;
+    case AppEvent::kEventType_CoverChange:
+        window->mIconTimer.Start();
+        window->mIcon = (window->GetCover().mEndpoint == 1) ? LcdIcon::One : LcdIcon::Two;
+        window->UpdateLCD();
+        break;
+    case AppEvent::kEventType_TiltModeChange:
+        window->mIconTimer.Start();
+        window->mIcon = window->mTiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
+        window->UpdateLCD();
+        break;
 #endif
 
-        default:
-            break;
-        }
-
+    default:
+        break;
+    }
 }
