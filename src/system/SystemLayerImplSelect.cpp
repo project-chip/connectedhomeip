@@ -210,7 +210,7 @@ CHIP_ERROR LayerImplSelect::ExtendTimerTo(Clock::Timeout delay, TimerCompleteCal
         if (remainingTime == Clock::kZero)
         {
             // If remaining time is Clock::kZero, it might possible that our timer is in
-            // the mExpiredTimers list and about to be fired remove it from that list as we are extending it.
+            // the mExpiredTimers list and about to be fired. Remove it from that list, since we are extending it.
             mExpiredTimers.Remove(onComplete, appState);
         }
         return StartTimer(delay, onComplete, appState);
