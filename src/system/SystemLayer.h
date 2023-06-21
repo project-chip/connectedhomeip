@@ -139,7 +139,7 @@ public:
     /**
      * @brief
      *   This method searches for the timer matching the provided parameters.
-     *   and returns if it is still "running" and waiting to trigger or not.
+     *   and returns whether it is still "running" and waiting to trigger or not.
      *
      *   @param[in]  onComplete         A pointer to the function called when timer expires.
      *   @param[in]  appState           A pointer to the application state object used when timer expires.
