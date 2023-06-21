@@ -264,7 +264,7 @@
         "Test_TC_DRLK_3_3"
     ],
     "LocalizationConfiguration": ["Test_TC_LCFG_2_1"],
-    "LevelControl": ["Test_TC_LVL_7_1", "Test_TC_LVL_8_1"],
+    "LevelControl": ["Test_TC_LVL_8_1"],
     "OnOff": ["Test_TC_OO_2_3"],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
     "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],

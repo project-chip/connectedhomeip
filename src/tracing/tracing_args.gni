@@ -17,4 +17,28 @@ declare_args() {
   # the impact minimal (the backends themselves add some size), however
   # for now tracing is opt-in
   matter_enable_tracing_support = target_os == "linux"
+
+  # Defines the trace backend. Current matter tracing splits the logic
+  # into two parts:
+  #   - data logging, well defined and using type-safe data
+  #   - trace begin/end/instant states for monitoring execution and
+  #     checking execution time and performance
+  # For tracing specifically, due to performance constraints, several
+  # backends prefer to be the one and only tracing provider (e.g.
+  # pw_tracing uses tokenization to reduce string sizes and allow
+  # for fast tracing even when the communication channels are slow).
+  #
+  # The setting below controls the destination of the tracing macros
+  # with the following values available:
+  #    - "none" makes tracing completely disabled
+  #    - "multiplexed" allows using the "backend.h" for tracing, which
+  #      will multiplex however will only work on fast backends (e.g.
+  #      large systems with fast logging when writing to logs)
+  #    - any other value will provide a tracing config, which
+  #      MUST include a path to `matter/tracing/macros_impl.h`
+  if (target_os == "linux") {
+    matter_trace_config = "multiplexed"
+  } else {
+    matter_trace_config = "none"
+  }
 }

@@ -1,6 +1,7 @@
-name: "\U0001F41B Bug report"
-description: Create a report to help Matter
-title: "[BUG] "
+name: "\U0001F9EA SVE Issue"
+description: Create an issue that is required for SVE
+title: "[SVE] "
+labels: [bug, "sve", "request sve", "needs triage"]
 body:
     - type: markdown
       attributes:
@@ -12,13 +13,13 @@ body:
           label: Reproduction steps
           description: "How do you trigger this bug? Please walk us through it step by step."
           placeholder: |
-            Please list reproduction steps step by step.
-            Place shell commands between ```.
-            Attach logs as files instead of pasting them in.
-            1.
-            2.
-            3.
-            ...
+              Please list reproduction steps step by step.
+              Place shell commands between ```.
+              Attach logs as files instead of pasting them in.
+              1.
+              2.
+              3.
+              ...
       validations:
           required: true
     - type: input
@@ -50,13 +51,14 @@ body:
               - freeRTOS
               - IMX8
               - k32w
+              - nrf connect
               - nrf
               - python
               - raspi
               - vscode
               - windows
               - other
-              - core
+              - core (please add to version below)
       validations:
           required: true
     - type: input
@@ -65,6 +67,44 @@ body:
           label: Platform Version(s)
           description: "What platform version(s) are affected [optional]"
           placeholder: "eg: 1.0.1, N/A"
+    - type: dropdown
+      attributes:
+          label: Type
+          description: What type of issue is this?
+          multiple: true
+          options:
+              - Test Improvement
+              - Common Cluster Logic
+              - Spec Compliance Issue
+              - Security Issue
+              - Platform Issue
+              - Core SDK Memory Issue
+              - Core SDK Crash
+              - Core SDK Performance Improvement
+              - Core SDK Interopability Issue
+      validations:
+          required: true
+    - type: dropdown
+      attributes:
+          label: Testing
+          description: How was this tested?
+          multiple: true
+          options:
+              - Unit tested
+              - YAML tested
+              - Manually tested with SDK
+              - CI tested
+              - Hardware validated
+              - Platform validated
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: (Optional) If manually tested please explain why this is only manually tested
+          description: |
+              Please explain how you tested it
+      validations:
+          required: false
     - type: textarea
       attributes:
           label: Anything else?
@@ -76,4 +116,4 @@ body:
           required: false
     - type: markdown
       attributes:
-          value: "Thanks for submitting a bug!"
+          value: "Thanks for helping our SVE!"

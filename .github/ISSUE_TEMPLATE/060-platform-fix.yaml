@@ -1,24 +1,25 @@
-name: "\U0001F3C3 Tooling Fix/Feature"
-description: Create an issue for a tooling specific fix/feature
+name: "\U0001F9F0 Platform Fix"
+description: Create an issue for a platform specific fix
 title: "[Platform] "
+labels: ["platform", "needs triage"]
 body:
     - type: markdown
       attributes:
           value: |
-              Thanks for taking the time to submit a an issue for our tooling, can you please please help us understand this change in this quick form?
+              Thanks for taking the time to submit a an issue for a platform, can you please please help us understand this change in this quick form?
     - type: textarea
       id: repro
       attributes:
-          label: Reproduction steps / Feature
-          description: "How do you trigger this issue and/or can you please explain this new feature? Please walk us through it step by step."
+          label: Reproduction steps
+          description: "How do you trigger this issue? Please walk us through it step by step."
           placeholder: |
-            Please list reproduction steps step by step.
-            Place shell commands between ```.
-            Attach logs as files instead of pasting them in.
-            1.
-            2.
-            3.
-            ...
+              Please list reproduction steps step by step.
+              Place shell commands between ```.
+              Attach logs as files instead of pasting them in.
+              1.
+              2.
+              3.
+              ...
       validations:
           required: true
     - type: dropdown
@@ -84,4 +85,4 @@ body:
           required: false
     - type: markdown
       attributes:
-          value: "Thanks for help our tooling!"
+          value: "Thanks for submitting a platform issue!"

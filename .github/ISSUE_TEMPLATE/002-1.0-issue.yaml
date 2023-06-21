@@ -1,6 +1,7 @@
 name: "\U0001F680 1.0 Issue"
 description: Create an issue that is required for Matter 1.0 release
 title: "[1.0] "
+labels: [bug, "V1.0", "needs triage"]
 body:
     - type: markdown
       attributes:
@@ -12,13 +13,13 @@ body:
           label: Reproduction steps
           description: "How do you trigger this bug? Please walk us through it step by step."
           placeholder: |
-            Please list reproduction steps step by step.
-            Place shell commands between ```.
-            Attach logs as files instead of pasting them in.
-            1.
-            2.
-            3.
-            ...
+              Please list reproduction steps step by step.
+              Place shell commands between ```.
+              Attach logs as files instead of pasting them in.
+              1.
+              2.
+              3.
+              ...
       validations:
           required: true
     - type: input

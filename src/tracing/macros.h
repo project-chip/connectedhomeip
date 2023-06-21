@@ -17,16 +17,17 @@
  */
 #pragma once
 
-#ifndef MATTER_TRACING_ENABLED
+#include <matter/tracing/build_config.h>
 
 #define _MATTER_TRACE_DISABLE(...)                                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
     } while (false)
 
+#ifndef MATTER_TRACING_ENABLED
+
 #define MATTER_TRACE_BEGIN(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_END(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-
 #define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
 #define MATTER_LOG_MESSAGE_SEND(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
@@ -40,11 +41,33 @@
 
 #include <tracing/log_declares.h>
 #include <tracing/registry.h>
-#include <tracing/scopes.h>
 
-#define MATTER_TRACE_BEGIN(scope) ::chip::Tracing::Internal::Begin(scope)
-#define MATTER_TRACE_END(scope) ::chip::Tracing::Internal::End(scope)
-#define MATTER_TRACE_INSTANT(scope) ::chip::Tracing::Internal::Instant(scope)
+////////////////////// TRACE MESSAGES
+
+#ifdef MATTER_TRACE_NONE
+
+#define MATTER_TRACE_BEGIN(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_TRACE_END(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+
+#elif defined(MATTER_TRACE_MULTIPLEXED)
+
+// This gets forwarded to the multiplexed instance
+#define MATTER_TRACE_BEGIN(label, group) ::chip::Tracing::Internal::Begin(label, group)
+#define MATTER_TRACE_END(label, group) ::chip::Tracing::Internal::End(label, group)
+#define MATTER_TRACE_INSTANT(label, group) ::chip::Tracing::Internal::Instant(label, group)
+
+#else
+// if matter trace config is set, macros for this have to be provided
+//
+// Expected macros provided by implementations:
+//    MATTER_TRACE_BEGIN(label, group)
+//    MATTER_TRACE_END(label, group)
+//    MATTER_TRACE_INSTANT(label, group)
+#include <matter/tracing/macros_impl.h>
+#endif
+
+////////////////////// DATA LOGGING
 
 #define MATTER_LOG_MESSAGE_SEND(...)                                                                                               \
     do                                                                                                                             \
