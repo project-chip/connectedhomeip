@@ -33,7 +33,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #ifdef ENABLE_TRACING
-#include <TracingCommandLineArgument.h>
+#include <TracingCommandLineArgument.h> // nogncheck
 #endif
 
 using namespace chip;
