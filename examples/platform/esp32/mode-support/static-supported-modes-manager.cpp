@@ -35,14 +35,27 @@ SupportedModesManager::ModeOptionsProvider * StaticSupportedModesManager::epMode
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
-void StaticSupportedModesManager::InitEndpointArray(int size)
+int StaticSupportedModesManager::mSize = 0;
+
+CHIP_ERROR StaticSupportedModesManager::InitEndpointArray(int size)
 {
+    if (epModeOptionsProviderList != nullptr)
+    {
+        ChipLogError(Zcl, "Cannot allocate epModeOptionsProviderList");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
     mSize                     = size;
     epModeOptionsProviderList = new SupportedModesManager::ModeOptionsProvider[mSize];
+    if (epModeOptionsProviderList == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to allocate memory to epModeOptionsProviderList");
+        return CHIP_ERROR_NO_MEMORY;
+    }
     for (int i = 0; i < mSize; i++)
     {
         epModeOptionsProviderList[i] = ModeOptionsProvider();
     }
+    return CHIP_NO_ERROR;
 }
 
 SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
@@ -183,7 +196,7 @@ Status StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointI
 
 const ModeSelect::SupportedModesManager * ModeSelect::getSupportedModesManager()
 {
-    return &StaticSupportedModesManager::instance;
+    return &StaticSupportedModesManager::getStaticSupportedModesManagerInstance();
 }
 
 void StaticSupportedModesManager::FreeSupportedModes(EndpointId endpointId) const

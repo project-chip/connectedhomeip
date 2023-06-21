@@ -114,9 +114,6 @@ static void InitServer(intptr_t context)
 {
     Esp32AppServer::Init(&sCallbacks); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
-    app::Clusters::ModeSelect::StaticSupportedModesManager instance;
-    instance.InitEndpointArray(FIXED_ENDPOINT_COUNT);
-
 #if !(CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_THREAD)
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
@@ -131,6 +128,12 @@ static void InitServer(intptr_t context)
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
+    err = app::Clusters::ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance().InitEndpointArray(
+        FIXED_ENDPOINT_COUNT);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize endpoint array for supported-modes, err:%" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 extern "C" void app_main()

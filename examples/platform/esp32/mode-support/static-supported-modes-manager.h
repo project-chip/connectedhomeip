@@ -31,16 +31,27 @@ class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::Supp
 private:
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
     using SemanticTag          = Structs::SemanticTagStruct::Type;
-    int mSize;
+    static int mSize;
 
     static ModeOptionsProvider * epModeOptionsProviderList;
 
     void FreeSupportedModes(EndpointId endpointId) const;
 
-public:
-    void InitEndpointArray(int size);
-
     static const StaticSupportedModesManager instance;
+
+public:
+    // InitEndpointArray should be called only once in the application. Memory allocated to the
+    // epModeOptionsProviderList will be needed till the lifetime of the program.
+    static CHIP_ERROR InitEndpointArray(int size);
+
+    // DeInitEndpointArray should be called only when application need to reallocate memory of
+    // epModeOptionsProviderList ( Eg. Bridges ).
+    static void DeInitEndpointArray()
+    {
+        delete[] epModeOptionsProviderList;
+        epModeOptionsProviderList = nullptr;
+        mSize                     = 0;
+    }
 
     SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
 
