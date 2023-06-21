@@ -20,7 +20,11 @@
 
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/af.h>
+<<<<<<< HEAD
 #include <zap-generated/gen_config.h>
+=======
+#include <app/util/config.h>
+>>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
 
 namespace chip {
 namespace app {
@@ -31,7 +35,11 @@ namespace TemperatureControl {
  * This implementation statically defines the options.
  */
 
+<<<<<<< HEAD
 class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsIteratorDelegate
+=======
+class StaticSupportedTemperatureLevels : public SupportedTemperatureLevelsIterator
+>>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
 {
     struct EndpointPair
     {
@@ -51,11 +59,19 @@ class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsI
 public:
     static const EndpointPair supportedOptionsByEndpoints[EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
+<<<<<<< HEAD
     uint8_t Size() override;
 
     CHIP_ERROR Next(chip::MutableCharSpan & item) override;
 
     ~AppSupportedTemperatureLevelsDelegate() {}
+=======
+    int Size() override;
+
+    bool Next(chip::MutableCharSpan & item) override;
+
+    ~StaticSupportedTemperatureLevels() {}
+>>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
 };
 
 } // namespace TemperatureControl

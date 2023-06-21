@@ -62,7 +62,11 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointMain /* Endpoint Id */,
                                       &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
 
+<<<<<<< HEAD
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+=======
+app::Clusters::TemperatureControl::StaticSupportedTemperatureLevels instance;
+>>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
 } // namespace
 
 void NetWorkCommissioningInstInit()
@@ -144,7 +148,11 @@ static void InitServer(intptr_t context)
 #if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
 #endif
+<<<<<<< HEAD
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+=======
+    app::Clusters::TemperatureControl::SupportedTemperatureLevelsIterator::SetInstance(&instance);
+>>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
 }
 
 extern "C" void ChipTest(void)
