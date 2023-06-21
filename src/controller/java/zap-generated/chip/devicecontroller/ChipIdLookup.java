@@ -2499,6 +2499,9 @@ public final class ChipIdLookup {
       if (attributeId == 11L) {
         return "SensitivityLevel";
       }
+      if (attributeId == 12L) {
+        return "ExpiryDate";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }

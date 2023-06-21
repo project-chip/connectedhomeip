@@ -65,15 +65,18 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 
-            - name: Bootstrap cache
-              uses: buildjet/cache@v3
-              timeout-minutes: 10
-              if: ${{ !env.ACT }}
+            - uses: Wandalen/wretry.action@v1.0.41
+              name: Bootstrap cache
+              timeout-minutes: 20
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 15
               run: |
@@ -87,11 +90,15 @@ jobs:
             - name: Get Cirque Bootstrap cache key
               id: cirque-bootstrap-cache-key
               run: echo "val=$(scripts/tests/cirque_tests.sh cachekeyhash)" >> $GITHUB_OUTPUT
-            - name: Cirque Bootstrap cache
-              uses: buildjet/cache@v3
-              timeout-minutes: 10
+            - uses: Wandalen/wretry.action@v1.0.41
+              name: Cirque Bootstrap cache
               if: ${{ !env.ACT }}
+              timeout-minutes: 20
               with:
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
                   key: ${{ runner.os }}-cirque-${{ steps.cirque-bootstrap-cache-key.outputs.val }}
                   restore-keys: ${{ runner.os }}-cirque-
                   path: ${{ env.GITHUB_CACHE_PATH }}

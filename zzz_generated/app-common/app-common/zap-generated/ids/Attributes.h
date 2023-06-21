@@ -2920,6 +2920,10 @@ namespace SensitivityLevel {
 static constexpr AttributeId Id = 0x0000000B;
 } // namespace SensitivityLevel
 
+namespace ExpiryDate {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace ExpiryDate
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
