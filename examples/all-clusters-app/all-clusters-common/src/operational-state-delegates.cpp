@@ -17,58 +17,84 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
-#include <operational-state-delegates.h>
+#include <app/clusters/operational-state-server/operational-state-delegate-impl.h>
+#include <app/clusters/operational-state-server/operational-state-server.h>
 
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::OperationalState;
-using chip::Protocols::InteractionModel::Status;
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace OperationalState {
 
-static GenericOperationalErrorState & setOperationalNoError(GenericOperationalErrorState & error)
+/**
+ * class to present Enquriy Table of Delegates
+ */
+struct DelegatesEnquiryTable {
+    /**
+     * Endpoint Id
+     */
+    chip::EndpointId mEndpointId;
+    /**
+     * Cluster Id
+     */
+    chip::ClusterId mClusterId;
+    /**
+     * point of Array(Items)
+     */
+    Delegate *pItems;
+    /**
+     * ArraySize of Array(Items)
+     */
+    size_t numOfItems;
+};
+
+/**
+ * Enquriy Table of Operational State Delegate
+ * Note: User Define
+ */
+static OperationalStateDelegate opStateDelegate(1, Clusters::OperationalState::Id,
+        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+        GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)));
+
+/**
+ * Enquriy Table of Operational State Cluster and alias Cluter Delegate corresponding to endpointId and clusterId
+ * Note: User Define
+ */
+constexpr DelegatesEnquiryTable kDelegatesEnquiryTable[] = {
+    //EndpointId, ClusterId, Delegate
+    {1, Clusters::OperationalState::Id, &opStateDelegate},
+};
+
+/**
+ * Get the pointer of target delegate for target endpoint and cluster
+ * @param[in] aEndpiontId The endpointId
+ * @param[in] aClusterID  The clusterId
+ * @return the pointer of target delegate
+ */
+Delegate *getGenericDelegateTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId)
 {
-    char opNoError[64]        = "No Error";
-    char opNoErrorDetails[64] = "No Error Details";
-
-    error.ErrorStateID = chip::to_underlying(ErrorStateEnum::kNoError);
-    memset(error.ErrorStateLabel, 0, sizeof(error.ErrorStateLabel));
-    memset(error.ErrorStateDetails, 0, sizeof(error.ErrorStateDetails));
-    memcpy(error.ErrorStateLabel, opNoError, sizeof(opNoError));
-    memcpy(error.ErrorStateDetails, opNoErrorDetails, sizeof(opNoErrorDetails));
-    error.ErrorStateDetailsHasValue = true;
-    error.ErrorStateLabelHasValue = true;
-
-    return error;
+    for (size_t i = 0; i < ArraySize(kDelegatesEnquiryTable); ++i)
+    {
+        if (kDelegatesEnquiryTable[i].mEndpointId == aEndpointId && kDelegatesEnquiryTable[i].mClusterId == aClusterId)
+        {
+            return kDelegatesEnquiryTable[i].pItems;
+        }
+    }
+    return nullptr;
 }
-//-- Operational state delegate functions
 
-CHIP_ERROR OperationalStateDelegate::Init()
+Delegate * GetOperationalStateDelegate(chip::EndpointId endpointId, chip::ClusterId clusterId)
 {
-    return CHIP_NO_ERROR;
+    return getGenericDelegateTable(endpointId, clusterId);
 }
 
-void OperationalStateDelegate::HandlePauseState(GenericOperationalState & state, GenericOperationalErrorState & error)
-{
-    ChipLogDetail(Zcl, "Op: HandlePauseState");
-    state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kPaused);
-    setOperationalNoError(error);
-}
 
-void OperationalStateDelegate::HandleResumeState(GenericOperationalState & state, GenericOperationalErrorState & error)
-{
-    ChipLogDetail(Zcl, "Op: HandleResumeState");
-    state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kRunning);
-    setOperationalNoError(error);
-}
+} // namespace OperationalState
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
-void OperationalStateDelegate::HandleStartState(GenericOperationalState & state, GenericOperationalErrorState & error)
-{
-    ChipLogDetail(Zcl, "Op: HandleStartState");
-    state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kRunning);
-    setOperationalNoError(error);
-}
-
-void OperationalStateDelegate::HandleStopState(GenericOperationalState & state, GenericOperationalErrorState & error)
-{
-    ChipLogDetail(Zcl, "Op: HandleStopState");
-    state.OperationalStateID = chip::to_underlying(OperationalStateEnum::kStopped);
-    setOperationalNoError(error);
+void MatterOperationalStatePluginServerInitCallback() {
+    using namespace chip::app;
+    static Clusters::OperationalState::OperationalStateServer operationalstateServer(0x01, Clusters::OperationalState::Id);
+    operationalstateServer.Init();
 }
