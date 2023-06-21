@@ -50,22 +50,27 @@ public:
 
     // Generic accessor functions
     EmberAfStatus GetFeature(uint32_t * value) const;
-    EmberAfStatus SetFeatureMap(uint32_t value) const;
-    EmberAfStatus GetCurrentMode(uint8_t *) const;
-    EmberAfStatus SetCurrentMode(uint8_t) const;
-    EmberAfStatus GetStartUpMode(DataModel::Nullable<uint8_t> &) const;
-    EmberAfStatus SetStartUpMode(uint8_t value) const;
-    EmberAfStatus SetStartUpModeNull() const;
-    EmberAfStatus GetOnMode(DataModel::Nullable<uint8_t> &) const;
-    EmberAfStatus SetOnMode(uint8_t value) const;
-    EmberAfStatus SetOnModeNull() const;
     bool HasFeature(Feature feature) const;
+
+    void UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode);
+    void UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode);
+    void UpdateCurrentMode(uint8_t aNewMode);
+
+    DataModel::Nullable<uint8_t> GetStartUpMode();
+    DataModel::Nullable<uint8_t> GetOnMode();
+    uint8_t GetCurrentMode();
+
     EndpointId GetEndpointId() const {return endpointId;}
 
 private:
     EndpointId endpointId{};
     ClusterId clusterId{};
     Delegate *delegate;
+
+    // Attribute data store
+    uint8_t mCurrentMode;
+    DataModel::Nullable<uint8_t> mStartUpMode;
+    DataModel::Nullable<uint8_t> mOnMode;
 
     /**
      * This checks to see if this clusters instance is a valid ModeBase aliased cluster based on the AliasedClusters list.

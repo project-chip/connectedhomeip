@@ -16,6 +16,7 @@
 *    limitations under the License.
 */
 
+#include <app/reporting/reporting.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
@@ -50,138 +51,6 @@ EmberAfStatus Instance::GetFeature(uint32_t * value) const
    }
    *value = Traits::StorageToWorking(temp);
    return status;
-}
-
-EmberAfStatus Instance::SetFeatureMap(uint32_t value) const
-{
-   using Traits = NumericAttributeTraits<uint32_t>;
-   if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-   {
-       return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-   }
-   Traits::StorageType storageValue;
-   Traits::WorkingToStorage(value, storageValue);
-   uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-   return emberAfWriteAttribute(endpointId, clusterId, ModeBase::Attributes::FeatureMap::Id, writable,
-                                ZCL_BITMAP32_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Instance::GetCurrentMode(uint8_t * value) const
-{
-   using Traits = NumericAttributeTraits<uint8_t>;
-   Traits::StorageType temp;
-   uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-   EmberAfStatus status =
-       emberAfReadAttribute(endpointId, clusterId, ModeBase::Attributes::CurrentMode::Id, readable, sizeof(temp));
-   VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-   if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-   {
-       return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-   }
-   *value = Traits::StorageToWorking(temp);
-   return status;
-}
-
-EmberAfStatus Instance::SetCurrentMode(uint8_t value) const
-{
-   using Traits = NumericAttributeTraits<uint8_t>;
-   if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-   {
-       return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-   }
-   Traits::StorageType storageValue;
-   Traits::WorkingToStorage(value, storageValue);
-   uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-   return emberAfWriteAttribute(endpointId, clusterId, ModeBase::Attributes::CurrentMode::Id, writable,
-                                ZCL_INT8U_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Instance::GetOnMode(DataModel::Nullable<uint8_t> & value) const
-{
-   using Traits = NumericAttributeTraits<uint8_t>;
-   Traits::StorageType temp;
-   uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-   EmberAfStatus status = emberAfReadAttribute(endpointId, clusterId, ModeBase::Attributes::OnMode::Id, readable, sizeof(temp));
-   VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-   if (Traits::IsNullValue(temp))
-   {
-       value.SetNull();
-   }
-   else
-   {
-       value.SetNonNull(Traits::StorageToWorking(temp));
-   }
-   return status;
-}
-
-EmberAfStatus Instance::SetOnMode(uint8_t value) const
-{
-   using Traits = NumericAttributeTraits<uint8_t>;
-   if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-   {
-       return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-   }
-   Traits::StorageType storageValue;
-   Traits::WorkingToStorage(value, storageValue);
-   uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-   return emberAfWriteAttribute(endpointId, clusterId, ModeBase::Attributes::OnMode::Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Instance::SetOnModeNull() const
-{
-   using Traits = NumericAttributeTraits<uint8_t>;
-   Traits::StorageType value;
-   Traits::SetNull(value);
-   uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-   return emberAfWriteAttribute(endpointId, clusterId, ModeBase::Attributes::OnMode::Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Instance::GetStartUpMode(DataModel::Nullable<uint8_t> & value) const
-{
-
-//   todo maybe change how we access and store the data?
-//   AttributeValueEncoder aEncoder(aAttributeReports, aAccessingFabricIndex, aPath, version, aIsFabricFiltered, state);
-//   this->Read(this->GetPath(ModeBase::Attributes::StartUpMode::Id), aEncoder);
-
-   using Traits = NumericAttributeTraits<uint8_t>;
-   Traits::StorageType temp;
-   uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-   EmberAfStatus status =
-       emberAfReadAttribute(endpointId, clusterId, ModeBase::Attributes::StartUpMode::Id, readable, sizeof(temp));
-   VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-   if (Traits::IsNullValue(temp))
-   {
-       value.SetNull();
-   }
-   else
-   {
-       value.SetNonNull(Traits::StorageToWorking(temp));
-   }
-   return status;
-}
-
-EmberAfStatus Instance::SetStartUpMode(uint8_t value) const
-{
-   using Traits = NumericAttributeTraits<uint8_t>;
-   if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-   {
-       return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-   }
-   Traits::StorageType storageValue;
-   Traits::WorkingToStorage(value, storageValue);
-   uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-   return emberAfWriteAttribute(endpointId, clusterId, ModeBase::Attributes::StartUpMode::Id, writable,
-                                ZCL_INT8U_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Instance::SetStartUpModeNull() const
-{
-   using Traits = NumericAttributeTraits<uint8_t>;
-   Traits::StorageType value;
-   Traits::SetNull(value);
-   uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-   return emberAfWriteAttribute(endpointId, clusterId, ModeBase::Attributes::StartUpMode::Id, writable,
-                                ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 bool Instance::HasFeature(Feature feature) const
@@ -237,9 +106,8 @@ CHIP_ERROR Instance::Init()
        // reflected in the CurrentMode attribute.  The values of the StartUpMode
        // attribute are listed below.
 
-       DataModel::Nullable<uint8_t> startUpMode;
-       EmberAfStatus status = GetStartUpMode(startUpMode);
-       if (status == EMBER_ZCL_STATUS_SUCCESS && !startUpMode.IsNull())
+       DataModel::Nullable<uint8_t> startUpMode = GetStartUpMode();
+       if (!startUpMode.IsNull())
        {
 #ifdef EMBER_AF_PLUGIN_ON_OFF
            // OnMode with Power Up
@@ -251,10 +119,9 @@ CHIP_ERROR Instance::Init()
                emberAfContainsAttribute(endpointId, clusterId, ModeBase::Attributes::OnMode::Id) &&
                HasFeature(ModeBase::Feature::kOnOff))
            {
-               DataModel::Nullable<uint8_t> onMode;
+               DataModel::Nullable<uint8_t> onMode = GetOnMode();
                bool onOffValueForStartUp = false;
-               if (GetOnMode(onMode) == EMBER_ZCL_STATUS_SUCCESS &&
-                   !emberAfIsKnownVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
+               if (!emberAfIsKnownVolatileAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
                    OnOffServer::Instance().getOnOffValueForStartUp(endpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
                {
                    if (onOffValueForStartUp && !onMode.IsNull())
@@ -283,21 +150,18 @@ CHIP_ERROR Instance::Init()
            }
 
            // Initialise currentMode to 0
-           uint8_t currentMode = 0;
-           status              = GetCurrentMode(&currentMode);
+           uint8_t currentMode = GetCurrentMode();
 
-           if ((status == EMBER_ZCL_STATUS_SUCCESS) && (startUpMode.Value() != currentMode))
+           if (startUpMode.Value() != currentMode)
            {
-               status = SetCurrentMode(startUpMode.Value());
-               if (status != EMBER_ZCL_STATUS_SUCCESS)
+               if (!delegate->IsSupportedMode(startUpMode.Value()))
                {
-                   ChipLogError(Zcl, "ModeBase: Error initializing CurrentMode, EmberAfStatus code 0x%02x", status);
-                   // todo return some error
+                   ChipLogError(Zcl, "ModeBase: Start-up_mode is not set to a valid mode.");
+                   return CHIP_ERROR_INVALID_ARGUMENT; // todo is thins the correct error?
                }
-               else
-               {
-                   ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to %u", startUpMode.Value());
-               }
+
+               UpdateCurrentMode(startUpMode.Value());
+               ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to %u", startUpMode.Value());
            }
        }
    }
@@ -352,7 +216,7 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
 
    if (response.status == static_cast<uint8_t>(StatusCode::kSuccess))
    {
-       SetCurrentMode(newMode);
+       UpdateCurrentMode(newMode);
        ChipLogProgress(Zcl, "ModeBase: HandleChangeToMode changed to mode %u", newMode);
    }
 
@@ -387,6 +251,23 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 {
    switch (aPath.mAttributeId)
    {
+   case Attributes::CurrentMode::Id:
+       ReturnErrorOnFailure(aEncoder.Encode(mCurrentMode));
+       break ;
+   case Attributes::StartUpMode::Id:
+       if (mStartUpMode.IsNull()) {
+           ReturnErrorOnFailure(aEncoder.EncodeNull());
+       } else {
+           ReturnErrorOnFailure(aEncoder.Encode(mStartUpMode));
+       }
+       break ;
+   case Attributes::OnMode::Id:
+       if (mOnMode.IsNull()) {
+           ReturnErrorOnFailure(aEncoder.EncodeNull());
+       } else {
+           ReturnErrorOnFailure(aEncoder.Encode(mOnMode));
+       }
+       break ;
    case Attributes::SupportedModes::Id:
        if (delegate->NumberOfModes() == 0)
        {
@@ -430,6 +311,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
            return CHIP_NO_ERROR;
        });
        ReturnErrorOnFailure(err);
+       break ;
    }
    return CHIP_NO_ERROR;
 }
@@ -437,7 +319,6 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 // Implements checking before attribute writes.
 CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, AttributeValueDecoder & aDecoder)
 {
-   EmberAfStatus result;
    DataModel::Nullable<uint8_t> newMode;
    ReturnErrorOnFailure(aDecoder.Decode(newMode));
 
@@ -446,11 +327,11 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
        switch (attributePath.mAttributeId)
        {
        case ModeBase::Attributes::StartUpMode::Id:
-           result = SetStartUpModeNull();
-           break;
+           UpdateStartUpMode(newMode);
+           return CHIP_NO_ERROR;
        case ModeBase::Attributes::OnMode::Id:
-           result = SetOnModeNull();
-           break;
+           UpdateOnMode(newMode);
+           return CHIP_NO_ERROR;
        }
    }
    else
@@ -463,20 +344,64 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
        switch (attributePath.mAttributeId)
        {
        case ModeBase::Attributes::StartUpMode::Id:
-           result = SetStartUpMode(newMode.Value());
-           break;
+           UpdateStartUpMode(newMode);
+           return CHIP_NO_ERROR;
        case ModeBase::Attributes::OnMode::Id:
-           result = SetOnMode(newMode.Value());
-           break;
+           UpdateOnMode(newMode);
+           return CHIP_NO_ERROR;
        }
    }
 
-   if (result == EMBER_ZCL_STATUS_SUCCESS)
-   {
-       return CHIP_NO_ERROR;
-   }
-
    return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
+}
+
+void Instance::UpdateCurrentMode(uint8_t aNewMode)
+{
+   uint8_t oldMode = mCurrentMode;
+   mCurrentMode = aNewMode;
+   if (mCurrentMode != oldMode)
+   {
+       // The Administrator Commissioning cluster is always on the root endpoint.
+       MatterReportingAttributeChangeCallback(endpointId, clusterId, Attributes::CurrentMode::Id);
+   }
+}
+
+void Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
+{
+   DataModel::Nullable<uint8_t> oldStartUpMode = mStartUpMode;
+   mStartUpMode = aNewStartUpMode;
+   if (mStartUpMode != oldStartUpMode)
+   {
+       // The Administrator Commissioning cluster is always on the root endpoint.
+       MatterReportingAttributeChangeCallback(endpointId, clusterId, Attributes::StartUpMode::Id);
+   }
+}
+
+void Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
+{
+   DataModel::Nullable<uint8_t> oldOnMode = mOnMode;
+   mOnMode = aNewOnMode;
+   if (mOnMode != oldOnMode)
+   {
+       // The Administrator Commissioning cluster is always on the root endpoint.
+       MatterReportingAttributeChangeCallback(endpointId, clusterId, Attributes::OnMode::Id);
+   }
+}
+
+// todo ensure that these functions return copies
+DataModel::Nullable<uint8_t> Instance::GetStartUpMode()
+{
+        return mStartUpMode;
+}
+
+DataModel::Nullable<uint8_t> Instance::GetOnMode()
+{
+        return mOnMode;
+}
+
+uint8_t Instance::GetCurrentMode()
+{
+   return mCurrentMode;
 }
 
 } // namespace ModeBase
