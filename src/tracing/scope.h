@@ -51,9 +51,10 @@ class Scoped
 {
 public:
     inline Scoped(const char * label, const char * group) : mLabel(label), mGroup(group) { MATTER_TRACE_BEGIN(label, group); }
-    inline ~Scoped() {
-        (void)mLabel;
-        (void)mGroup;
+    inline ~Scoped()
+    {
+        (void) mLabel;
+        (void) mGroup;
         MATTER_TRACE_END(mLabel, mGroup);
     }
 
