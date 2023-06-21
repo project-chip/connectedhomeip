@@ -215,20 +215,6 @@ public:
     {
         return StorageKeyName::Formatted("f/%x/e/%x/sc/%x", fabric, endpoint, idx);
     }
-    // Stores the OperationalStateList for each endpoint and each cluster with operational state aliases cluster.
-    // Advantages: It will save the RAM memory if there are many operational states in list.Besides this attribute
-    // only need to be read in few times.
-    static StorageKeyName OperationalStateOpStateList(EndpointId endpoint, ClusterId clusterId)
-    {
-        return StorageKeyName::Formatted("g/ops/sl/%x/%" PRIx32, endpoint, clusterId);
-    }
-    // Stores the OperationalPhaseList for each endpoint and each cluster with operational state aliases cluster.
-    // Advantages: It will save the RAM memory if there are many phases in list. Besides this attribute only
-    // need to be read in few times.
-    static StorageKeyName OperationalStatePhaseList(EndpointId endpoint, ClusterId clusterId)
-    {
-        return StorageKeyName::Formatted("g/ops/pl/%x/%" PRIx32, endpoint, clusterId);
-    }
 };
 
 } // namespace chip

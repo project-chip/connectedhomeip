@@ -21,18 +21,14 @@
 #include "WindowCoveringManager.h"
 #include "include/tv-callbacks.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-enums.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/clusters/operational-state-server/operational-state-delegate.h>
-#include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
-#include <operational-state-delegates.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
@@ -201,12 +197,6 @@ CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::B
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
 } // namespace
-namespace {
-// operational state cluster
-Clusters::OperationalState::OperationalStateDelegate operationalStateDelegate;
-Clusters::OperationalState::OperationalStateServer operationalstateServer(0x01, Clusters::OperationalState::Id,
-                                                                          &operationalStateDelegate);
-} // namespace
 
 void ApplicationInit()
 {
@@ -268,69 +258,6 @@ void ApplicationInit()
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
-    }
-
-    {
-        // operational state cluster
-        using OperationalStateStructType     = Clusters::OperationalState::Structs::OperationalStateStruct::Type;
-        using OperationalStateStructTypeList = DataModel::List<OperationalStateStructType>;
-        using PhaseListType                  = chip::CharSpan;
-        using PhaseList                      = chip::app::DataModel::List<const chip::CharSpan>;
-        using namespace Clusters::OperationalState;
-
-        const auto makeOperationalStateStructType = [](Clusters::OperationalState::OperationalStateEnum stateId, char * stateLabel,
-                                                       size_t len = 0) {
-            OperationalStateStructType state;
-            state.operationalStateID = stateId;
-            if (len)
-                state.operationalStateLabel = chip::CharSpan(stateLabel, len);
-            return state;
-        };
-
-        char opStopped[8]  = "Stopped";
-        char opRunning[32] = "Running";
-        char opPaused[64]  = "Paused";
-
-        OperationalStateStructType opS[3] = {
-            makeOperationalStateStructType(Clusters::OperationalState::OperationalStateEnum::kStopped, opStopped,
-                                           sizeof(opStopped)),
-            makeOperationalStateStructType(Clusters::OperationalState::OperationalStateEnum::kRunning, opRunning,
-                                           sizeof(opRunning)),
-            makeOperationalStateStructType(Clusters::OperationalState::OperationalStateEnum::kPaused, opPaused, sizeof(opPaused))
-        };
-        OperationalStateStructTypeList opL(opS);
-        Clusters::OperationalState::GenericOperationalState op;
-        Clusters::OperationalState::GenericOperationalErrorState opErr;
-
-        operationalstateServer.Init();
-        // set operational state list
-        operationalstateServer.SetOperationalStateList<OperationalStateStructType>(opL);
-        op.OperationalStateID = static_cast<uint8_t>(OperationalStateEnum::kRunning);
-        // set operational state
-        operationalstateServer.SetOperationalState(op);
-
-        // set operational error
-        char opNoError[64]        = "No Error";
-        char opNoErrorDetails[64] = "No Error Details";
-        opErr.ErrorStateID        = static_cast<uint8_t>(ErrorStateEnum::kNoError);
-        memcpy(opErr.ErrorStateLabel, opNoError, sizeof(opNoError));
-        memcpy(opErr.ErrorStateDetails, opNoErrorDetails, sizeof(opNoErrorDetails));
-        opErr.ErrorStateLabelHasValue = true;
-        opErr.ErrorStateDetailsHasValue = true;
-        operationalstateServer.SetOperationalError(opErr);
-
-        // set phase list
-        char opPauseList[][32]   = { "pre-soak", "rinse", "spin" };
-        const auto makePhaseType = [](char * str, size_t len = 0) { return CharSpan::fromCharString(str); };
-
-        PhaseListType phase[3] = {
-            makePhaseType(opPauseList[0]),
-            makePhaseType(opPauseList[1]),
-            makePhaseType(opPauseList[2]),
-        };
-
-        PhaseList phaseList(phase);
-        operationalstateServer.SetPhaseList(phaseList);
     }
 
     auto * defaultProvider = GetDeviceInstanceInfoProvider();

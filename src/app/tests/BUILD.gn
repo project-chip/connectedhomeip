@@ -78,14 +78,6 @@ source_set("ota-requestor-test-srcs") {
     "${chip_root}/src/lib/core",
   ]
 }
-source_set("operational-state-test-srcs") {
-  sources = [ "${chip_root}/src/app/clusters/operational-state-server/OperationalStateDataProvider.cpp" ]
-
-  public_deps = [
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/lib/core",
-  ]
-}
 
 source_set("scenes-table-test-srcs") {
   sources = [
@@ -130,7 +122,6 @@ chip_test_suite("tests") {
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
-    "TestOperationalStateDataProvider.cpp",
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
@@ -169,7 +160,6 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":binding-test-srcs",
-    ":operational-state-test-srcs",
     ":icd-management-test-srcs",
     ":ota-requestor-test-srcs",
     ":scenes-table-test-srcs",

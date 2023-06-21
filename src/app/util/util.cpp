@@ -150,7 +150,6 @@ void MatterUvFilterMonitoringPluginServerInitCallback() {}
 void MatterWaterTankMonitoringPluginServerInitCallback() {}
 void MatterZeoliteFilterMonitoringPluginServerInitCallback() {}
 void MatterAirQualityPluginServerInitCallback() {}
-void MatterOperationalStatePluginServerInitCallback() {}
 void MatterCarbonMonoxideConcentrationMeasurementPluginServerInitCallback() {}
 void MatterCarbonDioxideConcentrationMeasurementPluginServerInitCallback() {}
 void MatterFormaldehydeConcentrationMeasurementPluginServerInitCallback() {}
