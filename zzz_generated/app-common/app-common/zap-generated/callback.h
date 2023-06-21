@@ -11760,7 +11760,7 @@ bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
 /**
- * @brief Robotic Vacuum Operational State Cluster Pause Command callback (from client)
+ * @brief RVC Operational State Cluster Pause Command callback (from client)
  */
 bool emberAfRvcOperationalStateClusterPauseCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
