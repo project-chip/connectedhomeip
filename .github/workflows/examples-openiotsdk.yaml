@@ -31,6 +31,11 @@ env:
 
 jobs:
     openiotsdk:
+        strategy:
+            fail-fast: false
+            matrix:
+                cryptoBackend: ["psa", "mbedtls"]
+
         name: Open IoT SDK examples building
         timeout-minutes: 90
 
@@ -47,7 +52,7 @@ jobs:
             options: --privileged
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.0.41
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
@@ -64,14 +69,18 @@ jobs:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
-            - name: Bootstrap cache
-              uses: buildjet/cache@v3
-              timeout-minutes: 10
+            - uses: Wandalen/wretry.action@v1.0.41
+              name: Bootstrap cache
+              timeout-minutes: 20
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: bash scripts/bootstrap.sh
@@ -85,7 +94,7 @@ jobs:
               id: build_shell
               timeout-minutes: 10
               run: |
-                  scripts/examples/openiotsdk_example.sh shell
+                  scripts/examples/openiotsdk_example.sh -b ${{ matrix.cryptoBackend }} shell
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     openiotsdk release shell \
                     examples/shell/openiotsdk/build/chip-openiotsdk-shell-example.elf \
@@ -95,7 +104,7 @@ jobs:
               id: build_lock_app
               timeout-minutes: 10
               run: |
-                  scripts/examples/openiotsdk_example.sh lock-app
+                  scripts/examples/openiotsdk_example.sh -b ${{ matrix.cryptoBackend }} lock-app
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     openiotsdk release lock-app \
                     examples/lock-app/openiotsdk/build/chip-openiotsdk-lock-app-example.elf \
@@ -105,7 +114,7 @@ jobs:
               id: build_unit_tests
               timeout-minutes: 10
               run: |
-                  scripts/examples/openiotsdk_example.sh unit-tests
+                  scripts/examples/openiotsdk_example.sh -b ${{ matrix.cryptoBackend }} unit-tests
 
             - name: "Test: shell example"
               if: steps.build_shell.outcome == 'success'
