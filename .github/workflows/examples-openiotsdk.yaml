@@ -32,7 +32,7 @@ env:
 jobs:
     openiotsdk:
         name: Open IoT SDK examples building
-        timeout-minutes: 90
+        timeout-minutes: 120
 
         env:
             TEST_NETWORK_NAME: OIStest
@@ -97,21 +97,21 @@ jobs:
                     examples/shell/openiotsdk/build/chip-openiotsdk-shell-example.elf \
                     /tmp/bloat_reports/
 
-            - name: Build lock-app example
-              id: build_lock_app
+            - name: Build lock-app example (mbedtls)
+              id: build_lock_app_mbedtls
               timeout-minutes: 10
               run: |
-                  scripts/examples/openiotsdk_example.sh lock-app
+                  scripts/examples/openiotsdk_example.sh -b mbedtls lock-app
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    openiotsdk release lock-app \
+                    openiotsdk release lock-app-mbedtls \
                     examples/lock-app/openiotsdk/build/chip-openiotsdk-lock-app-example.elf \
                     /tmp/bloat_reports/
 
-            - name: Build unit tests
-              id: build_unit_tests
+            - name: Build unit tests (mbedtls)
+              id: build_unit_tests_mbedtls
               timeout-minutes: 10
               run: |
-                  scripts/examples/openiotsdk_example.sh unit-tests
+                  scripts/examples/openiotsdk_example.sh -b mbedtls unit-tests
 
             - name: "Test: shell example"
               if: steps.build_shell.outcome == 'success'
@@ -120,8 +120,8 @@ jobs:
                   scripts/run_in_python_env.sh out/venv \
                     'scripts/examples/openiotsdk_example.sh --no-activate -C test shell'
 
-            - name: "Test: lock-app example"
-              if: steps.build_lock_app.outcome == 'success'
+            - name: "Test: lock-app example (mbedtls)"
+              if: steps.build_lock_app_mbedtls.outcome == 'success'
               timeout-minutes: 5
               run: |
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
@@ -129,8 +129,40 @@ jobs:
                     'scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh --no-activate -C test -n ${TEST_NETWORK_NAME}tap lock-app'
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
 
-            - name: "Test: unit-tests"
-              if: steps.build_unit_tests.outcome == 'success'
+            - name: "Test: unit-tests (mbedtls)"
+              if: steps.build_unit_tests_mbedtls.outcome == 'success'
+              timeout-minutes: 40
+              run: |
+                  scripts/run_in_python_env.sh out/venv \
+                    'scripts/examples/openiotsdk_example.sh --no-activate -C test unit-tests'
+
+            - name: Build lock-app example (psa)
+              id: build_lock_app_psa
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/openiotsdk_example.sh -c -b psa lock-app
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    openiotsdk release lock-app-psa \
+                    examples/lock-app/openiotsdk/build/chip-openiotsdk-lock-app-example.elf \
+                    /tmp/bloat_reports/
+
+            - name: Build unit tests (psa)
+              id: build_unit_tests_psa
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/openiotsdk_example.sh -b psa unit-tests
+
+            - name: "Test: lock-app example (psa)"
+              if: steps.build_lock_app_psa.outcome == 'success'
+              timeout-minutes: 5
+              run: |
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
+                  scripts/run_in_python_env.sh out/venv \
+                    'scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh --no-activate -C test -n ${TEST_NETWORK_NAME}tap lock-app'
+                  scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
+
+            - name: "Test: unit-tests (psa)"
+              if: steps.build_unit_tests_psa.outcome == 'success'
               timeout-minutes: 40
               run: |
                   scripts/run_in_python_env.sh out/venv \
