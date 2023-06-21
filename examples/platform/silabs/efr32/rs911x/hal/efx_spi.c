@@ -203,7 +203,7 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
 {
     if (spi_enabled)
     {
-        if (ECODE_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
+        if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
         {
             xSemaphoreGive(spi_sem_sync_hdl);
             return SL_STATUS_FAIL;
@@ -233,7 +233,7 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     if (spi_enabled)
     {
-        if (ECODE_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
+        if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
         {
             xSemaphoreGive(spi_sem_sync_hdl);
             return SL_STATUS_FAIL;
@@ -273,7 +273,7 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
     if (spi_enabled)
     {
-        if (ECODE_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
+        if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
         {
             xSemaphoreGive(spi_sem_sync_hdl);
             return SL_STATUS_FAIL;
