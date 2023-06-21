@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/lib/lib.gni")
 
 declare_args() {
@@ -28,8 +29,15 @@ config("default_config") {
   include_dirs = [ "." ]
 }
 
-config("enable_perfetto") {
-  defines = [ "ENABLE_PERFETTO_TRACING" ]
+buildconfig_header("tracing_features") {
+  header = "enabled_features.h"
+  header_dir = "tracing"
+
+  defines = []
+
+  if (matter_commandline_enable_perfetto_tracing) {
+    defines = [ "ENABLE_PERFETTO_TRACING=1" ]
+  }
 }
 
 source_set("commandline") {
@@ -44,11 +52,14 @@ source_set("commandline") {
     "${chip_root}/src/tracing/log_json",
   ]
 
+  public_deps = [
+    ":tracing_features"
+  ]
+
   public_configs = [ ":default_config" ]
 
   if (matter_commandline_enable_perfetto_tracing) {
     deps += [ "${chip_root}/src/tracing/perfetto" ]
-    public_configs += [ ":enable_perfetto" ]
   }
 
   cflags = [ "-Wconversion" ]

@@ -19,6 +19,7 @@
 
 /// A string with supported command line tracing targets
 /// to be pretty-printed in help strings if needed
+#include "tracing/enabled_features.h"
 
 #ifdef ENABLE_PERFETTO_TRACING
 #define SUPPORTED_COMMAND_LINE_TRACING_TARGETS "log, perfetto, perfetto:<path>"
