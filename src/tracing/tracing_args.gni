@@ -43,9 +43,8 @@ declare_args() {
   #
   # since tracing is very noisy, we generally expect it to be explicitly
   # set up
-  if (current_os == "linux") {
-    matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
-  } else {
-    matter_trace_config = "none"
-  }
+  matter_trace_config = "none"
+
+  # Example for perfetto enabling:
+  # matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
 }

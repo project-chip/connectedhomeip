@@ -17,7 +17,9 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/lib/lib.gni")
 
 declare_args() {
-  matter_commandline_enable_perfetto_tracing = current_os == "linux"
+  # Default to false as enabling requires C++17 and likely
+  # setting `matter_trace_config`
+  matter_commandline_enable_perfetto_tracing = false
 }
 
 config("default_config") {
