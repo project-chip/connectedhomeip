@@ -24,14 +24,10 @@
 #ifdef MATTER_TRACING_ENABLED
 
 #ifdef MATTER_TRACE_NONE
-
 #define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-
-#else
-
-#ifndef MATTER_TRACE_MULTIPLEXED
+#elif !defined(MATTER_TRACE_MULTIPLEXED)
 #include <matter/tracing/macros_impl.h>
-#endif
+#else
 
 namespace chip {
 namespace Tracing {
@@ -51,12 +47,7 @@ class Scoped
 {
 public:
     inline Scoped(const char * label, const char * group) : mLabel(label), mGroup(group) { MATTER_TRACE_BEGIN(label, group); }
-    inline ~Scoped()
-    {
-        (void) mLabel;
-        (void) mGroup;
-        MATTER_TRACE_END(mLabel, mGroup);
-    }
+    inline ~Scoped() { MATTER_TRACE_END(mLabel, mGroup); }
 
 private:
     const char * mLabel;
