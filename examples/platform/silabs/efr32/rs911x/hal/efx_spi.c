@@ -190,13 +190,9 @@ sl_status_t sl_wfx_host_spi_cs_assert(void)
 {
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 
-    if (!spi_enabled) // Reduce SPIDRV_Init
+    if (!spi_enabled) // Reduce sl_spidrv_init_instances
     {
-        if (ECODE_OK != SPIDRV_Init(SL_SPIDRV_HANDLE, &sl_spidrv_eusart_init_exp))
-        {
-            xSemaphoreGive(spi_sem_sync_hdl);
-            return SL_STATUS_FAIL;
-        }
+        sl_spidrv_init_instances();
         spi_enabled = true;
     }
     GPIO_PinOutClear(SL_SPIDRV_EUSART_EXP_CS_PORT, SL_SPIDRV_EUSART_EXP_CS_PIN);

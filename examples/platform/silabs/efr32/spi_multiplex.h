@@ -26,6 +26,7 @@ extern "C" {
 #include "semphr.h"
 #include "sl_memlcd_display.h"
 #include "sl_mx25_flash_shutdown_usart_config.h"
+#include "sl_spidrv_instances.h"
 #include "spidrv.h"
 
 #define SL_SPIDRV_LCD_BITRATE SL_MEMLCD_SCLK_FREQ
@@ -37,10 +38,8 @@ extern "C" {
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
 #define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_EUSART_VCOM_BAUDRATE
 #define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EUSART_EXP_FRAME_LENGTH
-extern SPIDRV_Handle_t sl_spidrv_eusart_exp_handle;
 #define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
-// TODO: (MATTER-1907) Replace use of extern variable
-extern SPIDRV_Init_t sl_spidrv_eusart_init_exp;
+
 #elif WF200_WIFI
 #include "sl_spidrv_exp_config.h"
 #include "sl_wfx_host_api.h"
@@ -50,9 +49,8 @@ extern SPIDRV_Init_t sl_spidrv_eusart_init_exp;
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED 10000000
 #define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_USART_VCOM_BAUDRATE
 #define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EXP_FRAME_LENGTH
-extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 #define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-#endif
+#endif /* RS911X_WIFI || WF200_WIFI */
 
 /****************************************************************************
  * @fn  void SPIDRV_SetBaudrate()
