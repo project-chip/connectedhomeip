@@ -248,7 +248,7 @@ void WindowManager::Cover::Init(chip::EndpointId endpoint)
     Attributes::InstalledOpenLimitTilt::Set(endpoint, TILT_OPEN_LIMIT);
     Attributes::InstalledClosedLimitTilt::Set(endpoint, TILT_CLOSED_LIMIT);
 
-    // Note: All Current Positions are preset via Zap config and kept accross reboot via NVM: no need to init them
+    // Note: All Current Positions are preset via Zap config and kept across reboot via NVM: no need to init them
 
     // Attribute: Id  0 Type
     TypeSet(endpoint, Type::kTiltBlindLiftAndTilt);
