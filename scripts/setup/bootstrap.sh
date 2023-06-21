@@ -39,7 +39,7 @@ _install_additional_pip_requirements() {
             setopt sh_word_split
         fi
 
-        for platform in "$_SETUP_PLATFORM"; do
+        for platform in ${_SETUP_PLATFORM}; do
             # Allow none as an alias of nothing extra installed (like -p none)
             if [ "$platform" != "none" ]; then
                 echo "Installing pip requirements for $platform..."
