@@ -143,7 +143,7 @@ jobs:
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl702l bl702l lighting-app \
-              out/artifacts/bouffalolab-xt-zb6-devkit-light/chip-bl702l-lighting-example.out \
+              out/artifacts/bouffalolab-bl702l-devk-light/chip-bl702l-lighting-example.out \
               /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
