@@ -32,6 +32,11 @@
 
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#ifdef ENABLE_TRACING
+#include <TracingCommandLineArgument.h>
+#endif
+
+
 using namespace chip;
 using namespace chip::ArgParser;
 
@@ -78,6 +83,7 @@ enum
     kOptionCSRResponseCSRExistingKeyPair                = 0x101e,
     kDeviceOption_TestEventTriggerEnableKey             = 0x101f,
     kCommissionerOption_FabricID                        = 0x1020,
+    kTraceTo                                            = 0x1021,
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -128,6 +134,9 @@ OptionDef sDeviceOptionDefs[] = {
     { "cert_error_attestation_signature_invalid", kNoArgument, kOptionCSRResponseAttestationSignatureInvalid },
     { "enable-key", kArgumentRequired, kDeviceOption_TestEventTriggerEnableKey },
     { "commissioner-fabric-id", kArgumentRequired, kCommissionerOption_FabricID },
+#ifdef ENABLE_TRACING
+    { "trace-to", kArgumentRequired, kTraceTo },
+#endif
     {}
 };
 
@@ -238,6 +247,10 @@ const char * sDeviceOptionHelp =
     "       Configure the CSRResponse to be build with an AttestationSignature that does not match what is expected.\n"
     "  --enable-key <key>\n"
     "       A 16-byte, hex-encoded key, used to validate TestEventTrigger command of Generial Diagnostics cluster\n"
+#ifdef ENABLE_TRACING
+    "  --trace-to <destination>\n"
+    "       Trace destinations, comma separated (" SUPPORTED_COMMAND_LINE_TRACING_TARGETS ")\n"
+#endif
     "\n";
 
 bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
@@ -483,7 +496,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().commissionerFabricId = (chip::FabricId) strtoull(aValue, &eptr, 0);
         break;
     }
-
+#ifdef ENABLE_TRACING
+    case kTraceTo:
+        chip::CommandLineApp::EnableTracingFor(aValue);
+        break;
+#endif
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
