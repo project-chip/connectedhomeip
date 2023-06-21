@@ -65,14 +65,18 @@ jobs:
           GH_CONTEXT: ${{ toJson(github) }}
         run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
-      - name: Bootstrap cache
-        uses: buildjet/cache@v3
-        timeout-minutes: 10
+      - uses: Wandalen/wretry.action@v1.0.41
+        name: Bootstrap cache
+        timeout-minutes: 20
         with:
-          key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-          path: |
-            .environment
-            build_overrides/pigweed_environment.gni
+          action: buildjet/cache@v3
+          attempt_limit: 3
+          attempt_delay: 2000
+          with: |
+              key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+              path: |
+                  .environment
+                  build_overrides/pigweed_environment.gni
       - name: Bootstrap
         timeout-minutes: 25
         run: bash scripts/bootstrap.sh
