@@ -51,14 +51,15 @@ class Scoped
 {
 public:
     inline Scoped(const char * label, const char * group) : mLabel(label), mGroup(group) { MATTER_TRACE_BEGIN(label, group); }
-    inline ~Scoped() { MATTER_TRACE_END(mLabel, mGroup); }
+    inline ~Scoped() {
+        (void)mLabel;
+        (void)mGroup;
+        MATTER_TRACE_END(mLabel, mGroup);
+    }
 
 private:
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-private-field"
     const char * mLabel;
     const char * mGroup;
-#pragma GCC diagnostic pop
 };
 
 } // namespace Tracing
