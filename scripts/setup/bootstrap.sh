@@ -36,7 +36,7 @@ _install_additional_pip_requirements() {
         _OLD_IFS=$IFS
         IFS=","
         if [ -n "$ZSH_VERSION" ]; then
-            setopt local_options sh_word_split
+            setopt local_options shwordsplit
         fi
 
         for platform in ${_SETUP_PLATFORM}; do
