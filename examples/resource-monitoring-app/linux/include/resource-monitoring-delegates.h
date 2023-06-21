@@ -18,51 +18,5 @@
 
 #pragma once
 
-
-#include <app/clusters/resource-monitoring-server/resource-monitoring-delegate.h>
-#include <app/util/af.h>
-#include <app/util/config.h>
-#include <cstring>
-#include <utility>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-
-
-// Defining mode select delegates for all mode select aliased clusters.
-namespace ResourceMonitoring {
-
-
-/// This is an application level delegate to handle HepaFilterMonitoringDelegate commands according to the specific business logic.
-//class HepaFilterMonitoringDelegate : public Delegate
-class HepaFilterMonitoringDelegate : public Delegate
-{
-private:
-    CHIP_ERROR Init() override;
-    Status HandleResetCondition() override;
-
-public:
-    explicit HepaFilterMonitoringDelegate() : Delegate() {}
-
-    ~HepaFilterMonitoringDelegate() override = default;
-};
-
-/// This is an application level delegate to handle ActivatedCarbonFilterMonitoringDelegate commands according to the specific business logic.
-//class ActivatedCarbonFilterMonitoringDelegate : public Delegate
-class ActivatedCarbonFilterMonitoringDelegate : public Delegate
-{
-private:
-    CHIP_ERROR Init() override;
-    Status HandleResetCondition() override;
-
-public:
-    explicit ActivatedCarbonFilterMonitoringDelegate() : Delegate() {}
-
-    ~ActivatedCarbonFilterMonitoringDelegate() override = default;
-};
-
-} // namespace ResourceMonitoring
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+#include <delegates/ActivatedCarbonFilterMonitoringDelegate.h>
+#include <delegates/HepaFilterMonitoringDelegate.h>
