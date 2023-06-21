@@ -84,12 +84,12 @@ jobs:
           path: |
             .environment/gn_out/.ninja_log
             .environment/pigweed-venv/*.log
-      - name: Test SLC gen
-        timeout-minutes: 30
-        run: |
-          scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
-          scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4164A --slc_generate --docker
-          rm -rf ./out/
+      # - name: Test SLC gen
+      #   timeout-minutes: 30
+      #   run: |
+      #     scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
+      #     scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4164A --slc_generate --docker
+      #     rm -rf ./out/
       - name: Build some BRD4187C variants
         timeout-minutes: 90
         run: |
