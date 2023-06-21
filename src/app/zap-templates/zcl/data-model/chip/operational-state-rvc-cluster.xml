@@ -38,7 +38,7 @@ limitations under the License.
 
   <cluster>
     <domain>Robots</domain>
-    <name>Robotic Vacuum Operational State</name>
+    <name>RVC Operational State</name>
     <code>0x0061</code>
     <define>OPERATIONAL_STATE_RVC_CLUSTER</define>
     <client init="false" tick="false">true</client>

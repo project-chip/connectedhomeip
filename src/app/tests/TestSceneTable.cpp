@@ -159,7 +159,7 @@ public:
                 clusterBuffer.reduce_size(2);
             }
         }
-        else if (endpoint == kTestEndpoint1)
+        else if (endpoint == kTestEndpoint2)
         {
             if (clusterBuffer.size() >= 2)
             {
@@ -168,7 +168,7 @@ public:
                 clusterBuffer.reduce_size(2);
             }
         }
-        else if (endpoint == kTestEndpoint1)
+        else if (endpoint == kTestEndpoint3)
         {
             if (clusterBuffer.size() >= 3)
             {
@@ -177,6 +177,10 @@ public:
                 buffer[2] = kColorControlClusterId;
                 clusterBuffer.reduce_size(3);
             }
+        }
+        else
+        {
+            clusterBuffer.reduce_size(0);
         }
     }
 
@@ -432,6 +436,18 @@ void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
     {
         sceneTable->RegisterHandler(&tmpHandler[i]);
     }
+
+    // Emptying Handler array
+    sceneTable->UnregisterAllHandlers();
+
+    // Verify the handler num has been updated properly
+    NL_TEST_ASSERT(aSuite, sceneTable->HandlerListEmpty());
+
+    for (uint8_t i = 0; i < scenes::kMaxClustersPerScene; i++)
+    {
+        sceneTable->RegisterHandler(&tmpHandler[i]);
+    }
+
     // Hanlder order in table : [H0, H1, H2]
 
     NL_TEST_ASSERT(aSuite, !sceneTable->HandlerListEmpty());

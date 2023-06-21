@@ -59,6 +59,7 @@ source_set("app-main") {
   include_dirs = [
     "${chip_root}/examples/platform/linux",
     "${chip_root}/examples/platform/nxp/se05x",
+    "${chip_root}/src/platform/nxp/crypto/se05x",
   ]
 
   defines = []

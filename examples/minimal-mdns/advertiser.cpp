@@ -35,6 +35,7 @@ enum class AdvertisingMode
 {
     kCommissionableNode,
     kOperational,
+    kOperationalMultiAdmin,
     kCommissioner,
 };
 
@@ -99,6 +100,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         if (strcmp(aValue, "operational") == 0)
         {
             gOptions.advertisingMode = AdvertisingMode::kOperational;
+        }
+        else if (strcmp(aValue, "operational-multi-admin") == 0)
+        {
+            gOptions.advertisingMode = AdvertisingMode::kOperationalMultiAdmin;
         }
         else if (strcmp(aValue, "commissionable-node") == 0)
         {
@@ -196,48 +201,50 @@ OptionDef cmdLineOptionsDef[] = {
     {},
 };
 
-OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
+OptionSet cmdLineOptions = {
+    HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
 #if INET_CONFIG_ENABLE_IPV4
-                             "  -4\n"
-                             "  --enable-ip-v4\n"
-                             "        enable listening on IPv4\n"
+    "  -4\n"
+    "  --enable-ip-v4\n"
+    "        enable listening on IPv4\n"
 #endif
-                             "  -m <mode>\n"
-                             "  --advertising-mode <mode>\n"
-                             "        Advertise in this mode (operational or commissionable-node or commissioner).\n"
-                             "  --short-discriminator <value>\n"
-                             "  -s <value>\n"
-                             "        Commissioning/commissionable short discriminator.\n"
-                             "  --long-discriminator <value>\n"
-                             "  -l <value>\n"
-                             "        Commissioning/commissionable long discriminator.\n"
-                             "  --vendor-id <value>\n"
-                             "        Commissioning/commissionable vendor id.\n"
-                             "  --product-id <value>\n"
-                             "  -p <value>\n"
-                             "        Commissioning/commissionable product id.\n"
-                             "  --commissioning-mode <value>\n"
-                             "        Commissioning Mode (0=disabled, 1=basic, 2=enhanced).\n"
-                             "  --device-type <value>\n"
-                             "        Device type id.\n"
-                             "  --device-name <value>\n"
-                             "        Name of device.\n"
-                             "  --rotating-id <value>\n"
-                             "        Rotating Id.\n"
-                             "  --pairing-instruction <value>\n"
-                             "        Commissionable pairing instruction.\n"
-                             "  --pairing-hint <value>\n"
-                             "        Commissionable pairing hint.\n"
-                             "  --fabric-id <value>\n"
-                             "  -f <value>\n"
-                             "        Operational fabric id.\n"
-                             "  --node-id <value>\n"
-                             "  -n <value>\n"
-                             "        Operational node id.\n"
-                             "  -t <dest>\n"
-                             "  --trace-to <dest>\n"
-                             "        trace to the given destination (supported: " SUPPORTED_COMMAND_LINE_TRACING_TARGETS ").\n"
-                             "\n" };
+    "  -m <mode>\n"
+    "  --advertising-mode <mode>\n"
+    "        Advertise in this mode (operational, operational-multi-admin, commissionable-node or commissioner).\n"
+    "  --short-discriminator <value>\n"
+    "  -s <value>\n"
+    "        Commissioning/commissionable short discriminator.\n"
+    "  --long-discriminator <value>\n"
+    "  -l <value>\n"
+    "        Commissioning/commissionable long discriminator.\n"
+    "  --vendor-id <value>\n"
+    "        Commissioning/commissionable vendor id.\n"
+    "  --product-id <value>\n"
+    "  -p <value>\n"
+    "        Commissioning/commissionable product id.\n"
+    "  --commissioning-mode <value>\n"
+    "        Commissioning Mode (0=disabled, 1=basic, 2=enhanced).\n"
+    "  --device-type <value>\n"
+    "        Device type id.\n"
+    "  --device-name <value>\n"
+    "        Name of device.\n"
+    "  --rotating-id <value>\n"
+    "        Rotating Id.\n"
+    "  --pairing-instruction <value>\n"
+    "        Commissionable pairing instruction.\n"
+    "  --pairing-hint <value>\n"
+    "        Commissionable pairing hint.\n"
+    "  --fabric-id <value>\n"
+    "  -f <value>\n"
+    "        Operational fabric id.\n"
+    "  --node-id <value>\n"
+    "  -n <value>\n"
+    "        Operational node id.\n"
+    "  -t <dest>\n"
+    "  --trace-to <dest>\n"
+    "        trace to the given destination (supported: " SUPPORTED_COMMAND_LINE_TRACING_TARGETS ").\n"
+    "\n"
+};
 
 HelpOptions helpOptions("advertiser", "Usage: advertiser [options]", "1.0");
 
@@ -303,6 +310,35 @@ int main(int argc, char ** args)
                 .SetPort(CHIP_PORT)
                 .SetMac(chip::ByteSpan(gOptions.mac, 6))
                 .SetPeerId(PeerId().SetCompressedFabricId(gOptions.fabricId).SetNodeId(gOptions.nodeId)));
+    }
+    else if (gOptions.advertisingMode == AdvertisingMode::kOperationalMultiAdmin)
+    {
+        err = chip::Dnssd::ServiceAdvertiser::Instance().Advertise(
+            chip::Dnssd::OperationalAdvertisingParameters()
+                .EnableIpV4(gOptions.enableIpV4)
+                .SetPort(CHIP_PORT)
+                .SetMac(chip::ByteSpan(gOptions.mac, 6))
+                .SetPeerId(PeerId().SetCompressedFabricId(gOptions.fabricId).SetNodeId(gOptions.nodeId)));
+
+        if (err == CHIP_NO_ERROR)
+        {
+            err = chip::Dnssd::ServiceAdvertiser::Instance().Advertise(
+                chip::Dnssd::OperationalAdvertisingParameters()
+                    .EnableIpV4(gOptions.enableIpV4)
+                    .SetPort(CHIP_PORT + 1)
+                    .SetMac(chip::ByteSpan(gOptions.mac, 6))
+                    .SetPeerId(PeerId().SetCompressedFabricId(gOptions.fabricId + 1).SetNodeId(gOptions.nodeId + 1)));
+        }
+
+        if (err == CHIP_NO_ERROR)
+        {
+            err = chip::Dnssd::ServiceAdvertiser::Instance().Advertise(
+                chip::Dnssd::OperationalAdvertisingParameters()
+                    .EnableIpV4(gOptions.enableIpV4)
+                    .SetPort(CHIP_PORT + 2)
+                    .SetMac(chip::ByteSpan(gOptions.mac, 6))
+                    .SetPeerId(PeerId().SetCompressedFabricId(gOptions.fabricId + 2).SetNodeId(gOptions.nodeId + 2)));
+        }
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kCommissioner)
     {

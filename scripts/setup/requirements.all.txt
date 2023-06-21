@@ -1,0 +1,52 @@
+pip-tools
+virtualenv
+
+# core build requirements
+-r requirements.build.txt
+
+# esp-idf
+-c constraints.esp32.txt
+-r requirements.esp32.txt
+
+-r requirements.mbed.txt
+-r requirements.bouffalolab.txt
+-r requirements.openiotsdk.txt
+-r requirements.infineon.txt
+-r requirements.ti.txt
+-r requirements.telink.txt
+-r requirements.zephyr.txt
+-r requirements.cirque.txt
+-r requirements.memory.txt
+-r requirements.yaml_tests.txt
+
+# device controller wheel package
+wheel; sys_platform == 'linux'
+pgi; sys_platform == 'linux'
+pyobjc-core; sys_platform == 'darwin'
+pyobjc-framework-cocoa; sys_platform == 'darwin'
+pyobjc-framework-corebluetooth; sys_platform == 'darwin'
+
+# mobly tests
+portpicker
+mobly
+
+# pigweed
+ipython
+appnope
+appdirs
+coloredlogs
+watchdog
+build==0.8.0
+mypy==0.971
+mypy-protobuf==3.2.0
+protobuf==3.20.1
+types-protobuf==3.19.22
+
+cryptography
+
+# python unit tests
+colorama
+
+# update tornado for pw_watch
+tornado
+

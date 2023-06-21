@@ -80,9 +80,33 @@ protected:
     }
 
     template <typename T>
+    bool CheckConstraintMinLength(const char * itemName, const chip::app::DataModel::Nullable<chip::Span<T>> & current,
+                                  uint64_t expected)
+    {
+        if (current.IsNull())
+        {
+            return true;
+        }
+
+        return CheckConstraintMinLength(itemName, current.Value(), expected);
+    }
+
+    template <typename T>
     bool CheckConstraintMaxLength(const char * itemName, const chip::Span<T> & current, uint64_t expected)
     {
         return CheckConstraintMaxLength(itemName, current.size(), expected);
+    }
+
+    template <typename T>
+    bool CheckConstraintMaxLength(const char * itemName, const chip::app::DataModel::Nullable<chip::Span<T>> & current,
+                                  uint64_t expected)
+    {
+        if (current.IsNull())
+        {
+            return true;
+        }
+
+        return CheckConstraintMaxLength(itemName, current.Value(), expected);
     }
 
     template <typename T>

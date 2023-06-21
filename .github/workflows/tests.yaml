@@ -55,7 +55,7 @@ jobs:
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.0.41
               if: ${{ !env.ACT }}
               name: Checkout
               with:
@@ -82,14 +82,18 @@ jobs:
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
+            - uses: Wandalen/wretry.action@v1.0.41
+              name: Bootstrap cache
+              timeout-minutes: 20
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: bash scripts/bootstrap.sh
@@ -140,7 +144,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-select-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/fan-control-cluster.xml \
@@ -155,12 +159,13 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/laundry-washer-mode-select-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/laundry-washer-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/level-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/localization-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/low-power-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/media-input-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/media-playback-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/mode-base-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/mode-select-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/network-commissioning-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/occupancy-sensing-cluster.xml \
@@ -176,11 +181,11 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/proxy-valid-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pump-configuration-and-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pwm-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/refrigerator-and-temperature-controlled-cabinet-mode-select-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/refrigerator-and-temperature-controlled-cabinet-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/refrigerator-alarm.xml \
                       src/app/zap-templates/zcl/data-model/chip/relative-humidity-measurement-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-select-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-select-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/scene.xml \
                       src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/switch-cluster.xml \
@@ -330,7 +335,7 @@ jobs:
         runs-on: macos-latest
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.0.41
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
@@ -351,14 +356,18 @@ jobs:
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
+            - uses: Wandalen/wretry.action@v1.0.41
+              name: Bootstrap cache
+              timeout-minutes: 20
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh
@@ -474,14 +483,18 @@ jobs:
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
+            - uses: Wandalen/wretry.action@v1.0.41
+              name: Bootstrap cache
+              timeout-minutes: 20
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: bash scripts/bootstrap.sh
@@ -567,14 +580,18 @@ jobs:
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
+            - uses: Wandalen/wretry.action@v1.0.41
+              name: Bootstrap cache
+              timeout-minutes: 20
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh

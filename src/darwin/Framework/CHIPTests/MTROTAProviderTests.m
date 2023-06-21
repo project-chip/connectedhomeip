@@ -26,9 +26,16 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
+// TODO: Disable test005_DoBDXTransferAllowUpdateRequest until PR #26040 is merged.
+// Currently the poll interval causes delays in the BDX transfer and
+// results in the test taking a long time.
+#ifdef ENABLE_TEST_005
+#undef ENABLE_TEST_005
+#endif
+
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
-static const uint16_t kTimeoutWithUpdateInSeconds = 10;
+static const uint16_t kTimeoutWithUpdateInSeconds = 60;
 static const uint64_t kDeviceId1 = 0x12341234;
 static const uint64_t kDeviceId2 = 0x12341235;
 // NOTE: These onboarding payloads are for the chip-ota-requestor-app, not chip-all-clusters-app
@@ -47,6 +54,12 @@ static MTRDeviceController * sController = nil;
 
 // Keys we can use to restart the controller.
 static MTRTestKeys * sTestKeys = nil;
+
+static NSString * kOtaDownloadedFilePath1 = @"/tmp/chip-ota-requestor-downloaded-image1";
+
+static NSNumber * kUpdatedSoftwareVersion = @5;
+
+static NSString * kUpdatedSoftwareVersionString = @"5.0";
 
 @interface MTROTAProviderTestControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, readonly) XCTestExpectation * expectation;
@@ -229,8 +242,8 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
     responseParams.imageURI = uri;
     // TODO: Figure out whether we need better
     // SoftwareVersion/SoftwareVersionString/UpdateToken bits.
-    responseParams.softwareVersion = @(18);
-    responseParams.softwareVersionString = @"18";
+    responseParams.softwareVersion = kUpdatedSoftwareVersion;
+    responseParams.softwareVersionString = kUpdatedSoftwareVersionString;
     responseParams.updateToken = updateToken;
     completion(responseParams, nil);
 }
@@ -242,10 +255,11 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
     }];
 }
 
-- (void)respondWithDiscontinueToApplyUpdateRequestWithCompletion:(ApplyUpdateRequestCompletion)completion
+- (void)respondToApplyUpdateRequestWithAction:(MTROTASoftwareUpdateProviderOTAApplyUpdateAction)action
+                                   completion:(ApplyUpdateRequestCompletion)completion
 {
     __auto_type * params = [[MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
-    params.action = @(MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue);
+    params.action = @(action);
     params.delayedActionTime = @(0);
     completion(params, nil);
 }
@@ -286,6 +300,172 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
 @end
 
 static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
+
+/**
+ * Helper that, given a raw image, creates an image-with-header from it, drives
+ * a BDX transfer, etc.
+ */
+@interface MTROTAProviderTransferChecker : NSObject
+
+- (instancetype)initWithRawImagePath:(NSString *)rawImagePath
+                              nodeID:(NSNumber *)nodeID
+                   applyUpdateAction:(MTROTASoftwareUpdateProviderOTAApplyUpdateAction)applyUpdateAction
+                            testcase:(XCTestCase *)testcase;
+
+@property (nonatomic, readonly) XCTestExpectation * queryExpectation;
+@property (nonatomic, readonly) XCTestExpectation * bdxBeginExpectation;
+@property (nonatomic, readonly) XCTestExpectation * bdxQueryExpectation;
+@property (nonatomic, readonly) XCTestExpectation * bdxEndExpectation;
+@property (nonatomic, readonly) XCTestExpectation * applyUpdateRequestExpectation;
+@property (nonatomic, readonly) XCTestExpectation * notifyUpdateAppliedExpectation;
+@end
+
+@implementation MTROTAProviderTransferChecker
+
+- (instancetype)initWithRawImagePath:(NSString *)rawImagePath
+                              nodeID:(NSNumber *)nodeID
+                   applyUpdateAction:(MTROTASoftwareUpdateProviderOTAApplyUpdateAction)applyUpdateAction
+                            testcase:(XCTestCase *)testcase
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _queryExpectation = [testcase expectationWithDescription:@"handleQueryImageForNodeID called"];
+    _bdxBeginExpectation = [testcase expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called"];
+    _bdxQueryExpectation = [testcase expectationWithDescription:@"handleBDXQueryForNodeID called"];
+    _bdxEndExpectation = [testcase expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
+    _applyUpdateRequestExpectation = [testcase expectationWithDescription:@"handleApplyUpdateRequestForNodeID called"];
+    _notifyUpdateAppliedExpectation = [testcase expectationWithDescription:@"handleNotifyUpdateAppliedForNodeID called"];
+
+    NSString * imagePath = [rawImagePath stringByReplacingOccurrencesOfString:@"raw-image" withString:@"image"];
+
+    // Find the right absolute path to our ota_image_tool.py script.  PWD should
+    // point to our src/darwin/Framework, while the script is in
+    // src/app/ota_image_tool.py.
+    NSString * pwd = [[NSProcessInfo processInfo] environment][@"PWD"];
+    NSString * imageToolPath = [NSString
+        pathWithComponents:@[ [pwd substringToIndex:(pwd.length - @"darwin/Framework".length)], @"app", @"ota_image_tool.py" ]];
+
+    NSTask * task = [[NSTask alloc] init];
+    [task setLaunchPath:imageToolPath];
+    [task setArguments:@[
+        @"create", @"-v", @"0xFFF1", @"-p", @"0x8001", @"-vn", [kUpdatedSoftwareVersion stringValue], @"-vs",
+        kUpdatedSoftwareVersionString, @"-da", @"sha256", rawImagePath, imagePath
+    ]];
+    NSError * launchError = nil;
+    [task launchAndReturnError:&launchError];
+    XCTAssertNil(launchError);
+    [task waitUntilExit];
+    XCTAssertEqual([task terminationStatus], 0);
+
+    NSData * updateToken = [sOTAProviderDelegate generateUpdateToken];
+
+    __block NSFileHandle * readHandle;
+    __block uint64_t imageSize;
+    __block uint32_t lastBlockIndex = UINT32_MAX;
+
+    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        XCTAssertEqualObjects(nodeID, nodeID);
+        XCTAssertEqual(controller, sController);
+
+        sOTAProviderDelegate.queryImageHandler = nil;
+        [sOTAProviderDelegate respondAvailableWithDelay:@(0) uri:imagePath updateToken:updateToken completion:completion];
+        [self.queryExpectation fulfill];
+    };
+    sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
+        NSNumber * offset, MTRStatusCompletion completion) {
+        XCTAssertEqualObjects(nodeID, nodeID);
+        XCTAssertEqual(controller, sController);
+        XCTAssertEqualObjects(fileDesignator, imagePath);
+        XCTAssertEqualObjects(offset, @(0));
+
+        readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
+        XCTAssertNotNil(readHandle);
+
+        NSError * endSeekError;
+        XCTAssertTrue([readHandle seekToEndReturningOffset:&imageSize error:&endSeekError]);
+        XCTAssertNil(endSeekError);
+
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        [sOTAProviderDelegate respondSuccess:completion];
+        [self.bdxBeginExpectation fulfill];
+    };
+    sOTAProviderDelegate.blockQueryHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSNumber * blockSize,
+        NSNumber * blockIndex, NSNumber * bytesToSkip, BlockQueryCompletion completion) {
+        XCTAssertEqualObjects(nodeID, nodeID);
+        XCTAssertEqual(controller, sController);
+        XCTAssertEqualObjects(blockSize, @(1024)); // Seems to always be 1024.
+        XCTAssertEqualObjects(blockIndex, @(lastBlockIndex + 1));
+        XCTAssertEqualObjects(bytesToSkip, @(0)); // Don't expect to see skips here.
+        // Make sure we actually end up with multiple blocks.
+        XCTAssertTrue(blockSize.unsignedLongLongValue < imageSize);
+
+        XCTAssertNotNil(readHandle);
+        uint64_t offset = blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
+        NSError * seekError = nil;
+        [readHandle seekToOffset:offset error:&seekError];
+        XCTAssertNil(seekError);
+
+        NSError * readError = nil;
+        NSData * data = [readHandle readDataUpToLength:blockSize.unsignedLongValue error:&readError];
+        XCTAssertNil(readError);
+        XCTAssertNotNil(data);
+
+        BOOL isEOF = offset + blockSize.unsignedLongValue >= imageSize;
+
+        ++lastBlockIndex;
+
+        if (isEOF) {
+            sOTAProviderDelegate.blockQueryHandler = nil;
+        }
+
+        completion(data, isEOF);
+
+        if (isEOF) {
+            [self.bdxQueryExpectation fulfill];
+        }
+    };
+    sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error) {
+        XCTAssertEqualObjects(nodeID, nodeID);
+        XCTAssertEqual(controller, sController);
+        XCTAssertNil(error);
+
+        sOTAProviderDelegate.transferEndHandler = nil;
+        [self.bdxEndExpectation fulfill];
+    };
+    sOTAProviderDelegate.applyUpdateRequestHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * params, ApplyUpdateRequestCompletion completion) {
+        XCTAssertEqualObjects(nodeID, nodeID);
+        XCTAssertEqual(controller, sController);
+        XCTAssertEqualObjects(params.updateToken, updateToken);
+        XCTAssertEqualObjects(params.newVersion, kUpdatedSoftwareVersion); // TODO: Factor this out better!
+
+        XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:rawImagePath andPath:kOtaDownloadedFilePath1]);
+
+        sOTAProviderDelegate.applyUpdateRequestHandler = nil;
+        [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:applyUpdateAction completion:completion];
+        [self.applyUpdateRequestExpectation fulfill];
+    };
+
+    if (applyUpdateAction == MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed) {
+        sOTAProviderDelegate.notifyUpdateAppliedHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+            MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * params, MTRStatusCompletion completion) {
+            XCTAssertEqualObjects(nodeID, nodeID);
+            XCTAssertEqual(controller, sController);
+            XCTAssertEqualObjects(params.updateToken, updateToken);
+            XCTAssertEqualObjects(params.softwareVersion, kUpdatedSoftwareVersion);
+
+            sOTAProviderDelegate.notifyUpdateAppliedHandler = nil;
+            [sOTAProviderDelegate respondSuccess:completion];
+            [self.notifyUpdateAppliedExpectation fulfill];
+        };
+    }
+
+    return self;
+}
+@end
 
 @interface MTROTAProviderTests : XCTestCase
 @end
@@ -604,15 +784,6 @@ static BOOL sNeedsStackShutdown = YES;
     //    that the update does not actually proceed.
     __auto_type * device = sConnectedDevice1;
 
-    XCTestExpectation * queryExpectation = [self expectationWithDescription:@"handleQueryImageForNodeID called"];
-    XCTestExpectation * bdxBeginExpectation = [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called"];
-    XCTestExpectation * bdxQueryExpectation = [self expectationWithDescription:@"handleBDXQueryForNodeID called"];
-    XCTestExpectation * bdxEndExpectation = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
-    XCTestExpectation * applyUpdateRequestExpectation =
-        [self expectationWithDescription:@"handleApplyUpdateRequestForNodeID called"];
-
-    NSData * updateToken = [sOTAProviderDelegate generateUpdateToken];
-
     // First, create an image.  Make it at least 4096 bytes long, so we get
     // multiple BDX blocks going.
     const size_t rawImageSize = 4112;
@@ -622,144 +793,92 @@ static BOOL sNeedsStackShutdown = YES;
     while (fakeImage.length < rawImageSize) {
         [fakeImage appendData:rawImagePiece];
     }
-    NSString * rawImagePath = @"/tmp/test004-raw-image";
-    NSString * imagePath = @"/tmp/test004-image";
+    NSString * rawImagePath = @"/tmp/ota-test004-raw-image";
 
     [[NSFileManager defaultManager] createFileAtPath:rawImagePath contents:fakeImage attributes:nil];
 
-    // Find the right absolute path to our ota_image_tool.py script.  PWD should
-    // point to our src/darwin/Framework, while the script is in
-    // src/app/ota_image_tool.py.
-    NSString * pwd = [[NSProcessInfo processInfo] environment][@"PWD"];
-    NSString * imageToolPath = [NSString
-        pathWithComponents:@[ [pwd substringToIndex:(pwd.length - @"darwin/Framework".length)], @"app", @"ota_image_tool.py" ]];
-
-    NSTask * task = [[NSTask alloc] init];
-    [task setLaunchPath:imageToolPath];
-    [task setArguments:@[
-        @"create", @"-v", @"0xFFF1", @"-p", @"0x8001", @"-vn", @"2", @"-vs", @"2.0", @"-da", @"sha256", rawImagePath, imagePath
-    ]];
-    NSError * launchError = nil;
-    [task launchAndReturnError:&launchError];
-    XCTAssertNil(launchError);
-    [task waitUntilExit];
-    XCTAssertEqual([task terminationStatus], 0);
-
-    __block NSFileHandle * readHandle;
-    __block uint64_t imageSize;
-    __block uint32_t lastBlockIndex = UINT32_MAX;
-
-    // TODO: Maybe we should move more of this logic into sOTAProviderDelegate
-    // or some other helper, once we have multiple tests sending images?  For
-    // example, we could have something where you can do one of two things:
-    //
-    // 1) register a "raw image" with it, and it generates the
-    //    image-with header.
-    // 2) register a pre-generated image with it and it uses "ota_image_tool.py
-    //    extract" to extract the raw image.
-    //
-    // Once that's done the helper could track the transfer state for a
-    // particular image, etc, with us just forwarding our notifications to it.
-    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
-        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
-        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
-        XCTAssertEqual(controller, sController);
-
-        sOTAProviderDelegate.queryImageHandler = nil;
-        [sOTAProviderDelegate respondAvailableWithDelay:@(0) uri:imagePath updateToken:updateToken completion:completion];
-        [queryExpectation fulfill];
-    };
-    sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
-        NSNumber * offset, MTRStatusCompletion completion) {
-        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
-        XCTAssertEqual(controller, sController);
-        XCTAssertEqualObjects(fileDesignator, imagePath);
-        XCTAssertEqualObjects(offset, @(0));
-
-        readHandle = [NSFileHandle fileHandleForReadingAtPath:fileDesignator];
-        XCTAssertNotNil(readHandle);
-
-        NSError * endSeekError;
-        XCTAssertTrue([readHandle seekToEndReturningOffset:&imageSize error:&endSeekError]);
-        XCTAssertNil(endSeekError);
-
-        sOTAProviderDelegate.transferBeginHandler = nil;
-        [sOTAProviderDelegate respondSuccess:completion];
-        [bdxBeginExpectation fulfill];
-    };
-    sOTAProviderDelegate.blockQueryHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSNumber * blockSize,
-        NSNumber * blockIndex, NSNumber * bytesToSkip, BlockQueryCompletion completion) {
-        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
-        XCTAssertEqual(controller, sController);
-        XCTAssertEqualObjects(blockSize, @(1024)); // Seems to always be 1024.
-        XCTAssertEqualObjects(blockIndex, @(lastBlockIndex + 1));
-        XCTAssertEqualObjects(bytesToSkip, @(0)); // Don't expect to see skips here.
-        // Make sure we actually end up with multiple blocks.
-        XCTAssertTrue(blockSize.unsignedLongLongValue < rawImageSize);
-
-        XCTAssertNotNil(readHandle);
-        uint64_t offset = blockSize.unsignedLongLongValue * blockIndex.unsignedLongLongValue;
-        NSError * seekError = nil;
-        [readHandle seekToOffset:offset error:&seekError];
-        XCTAssertNil(seekError);
-
-        NSError * readError = nil;
-        NSData * data = [readHandle readDataUpToLength:blockSize.unsignedLongValue error:&readError];
-        XCTAssertNil(readError);
-        XCTAssertNotNil(data);
-
-        BOOL isEOF = offset + blockSize.unsignedLongValue >= imageSize;
-
-        ++lastBlockIndex;
-
-        if (isEOF) {
-            sOTAProviderDelegate.blockQueryHandler = nil;
-        }
-
-        completion(data, isEOF);
-
-        if (isEOF) {
-            [bdxQueryExpectation fulfill];
-        }
-    };
-    sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSError * _Nullable error) {
-        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
-        XCTAssertEqual(controller, sController);
-        XCTAssertNil(error);
-
-        sOTAProviderDelegate.transferEndHandler = nil;
-        [bdxEndExpectation fulfill];
-    };
-    sOTAProviderDelegate.applyUpdateRequestHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
-        MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams * params, ApplyUpdateRequestCompletion completion) {
-        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
-        XCTAssertEqual(controller, sController);
-        XCTAssertEqualObjects(params.updateToken, updateToken);
-        XCTAssertEqualObjects(params.newVersion, @(18)); // TODO: Factor this out better!
-
-        XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:rawImagePath
-                                                                  andPath:@"/tmp/chip-ota-requestor-downloaded-image1"]);
-
-        sOTAProviderDelegate.applyUpdateRequestHandler = nil;
-        [sOTAProviderDelegate respondWithDiscontinueToApplyUpdateRequestWithCompletion:completion];
-        [applyUpdateRequestExpectation fulfill];
-    };
+    __auto_type * checker =
+        [[MTROTAProviderTransferChecker alloc] initWithRawImagePath:rawImagePath
+                                                             nodeID:@(kDeviceId1)
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue
+                                                           testcase:self];
+    // We do not expect the update to actually be applied here.
+    checker.notifyUpdateAppliedExpectation.inverted = YES;
 
     // Advertise ourselves as an OTA provider.
     XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
 
     // Make sure we get our callbacks in order.  Give it a bit more time, because
     // we want to allow time for the BDX download.
-    [self waitForExpectations:@[ queryExpectation, bdxBeginExpectation, bdxQueryExpectation ]
+    [self waitForExpectations:@[ checker.queryExpectation, checker.bdxBeginExpectation, checker.bdxQueryExpectation ]
                       timeout:(kTimeoutWithUpdateInSeconds) enforceOrder:YES];
 
     // Nothing really defines the ordering of bdxEndExpectation and
     // applyUpdateRequestExpectation with respect to each other, and nothing
     // defines the ordering of announceResponseExpectation with respect to _any_
     // of the above expectations.
-    [self waitForExpectations:@[ bdxEndExpectation, applyUpdateRequestExpectation, announceResponseExpectation ]
+    [self waitForExpectations:@[ checker.bdxEndExpectation, checker.applyUpdateRequestExpectation, announceResponseExpectation ]
                       timeout:kTimeoutInSeconds];
+
+    // We are not expecting checker.notifyUpdateAppliedExpectation to actually
+    // be called fulfilled, but we still need to wait on it here.  Since we set
+    // inverted = YES, on it, this is basically a no-op, except for making
+    // XCTest not complain about unwaited expectations.
+    [self waitForExpectations:@[ checker.notifyUpdateAppliedExpectation ] timeout:kTimeoutInSeconds];
 }
+
+// TODO: Enable this test when PR #26040 is merged. Currently the poll interval causes delays in the BDX transfer and
+// results in the test taking a long time. With PR #26040 we eliminate the poll interval completely and hence the test
+// can run in a short time.
+#ifdef ENABLE_TEST_005
+- (void)test005_DoBDXTransferAllowUpdateRequest
+{
+    // In this test we do the following:
+    //
+    // 1) Check if the ota image file and raw image file required for this test exist.
+    // 2) Advertise ourselves to device.
+    // 3) When device queries for an image, pass the image path for the ota file generated beforehand as a pre-requisite
+    // 4) When device tries to start a bdx transfer, respond with success.
+    // 5) Send the data as the BDX transfer proceeds.
+    // 6) Confirm the downloaded ota image matches the raw image file that was generated before the test was run as a pre-requisite
+    // 7) When device invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds
+    // 8) Wait for the app to restart and wait for the NotifyUpdateApplied message to confirm the app has updated to the new version
+
+    // This test expects a pre-generated raw image at otaRawImagePath.
+    NSString * otaRawImagePath = @"/tmp/ota-test005-raw-image";
+
+    // Check if the ota raw image exists at kOtaRawImagePath
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath]);
+
+    __auto_type * device = sConnectedDevice1;
+
+    __auto_type * checker =
+        [[MTROTAProviderTransferChecker alloc] initWithRawImagePath:otaRawImagePath
+                                                             nodeID:@(kDeviceId1)
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed
+                                                           testcase:self];
+
+    // Advertise ourselves as an OTA provider.
+    XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
+
+    // Make sure we get our callbacks in order.  Give it a bit more time, because
+    // we want to allow time for the BDX download.
+    [self waitForExpectations:@[
+        checker.queryExpectation, checker.bdxBeginExpectation, checker.bdxQueryExpectation, checker.bdxEndExpectation
+    ]
+                      timeout:(kTimeoutWithUpdateInSeconds) enforceOrder:YES];
+
+    // Nothing really defines the ordering of bdxEndExpectation and
+    // applyUpdateRequestExpectation with respect to each other.
+    [self waitForExpectations:@[ checker.applyUpdateRequestExpectation, checker.notifyUpdateAppliedExpectation ]
+                      timeout:kTimeoutInSeconds
+                 enforceOrder:YES];
+
+    // Nothing defines the ordering of announceResponseExpectation with respect
+    // to _any_ of the above expectations.
+    [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
+}
+#endif // ENABLE_TEST_005
 
 - (void)test999_TearDown
 {

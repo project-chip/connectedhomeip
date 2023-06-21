@@ -12,16 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
 from matter_idl.matter_idl_types import AccessPrivilege, Attribute, AttributeQuality, DataType, Field, FieldQuality
 
 
-def ParseInt(value: str) -> int:
-    """Convert a string that is a known integer into an actual number.
+def ParseInt(value: str, data_type: DataType = None) -> int:
+    """
+    Convert a string that is a known integer into an actual number.
 
-       Supports decimal or hex values prefixed with '0x'
+    Supports decimal or hex values prefixed with '0x'
     """
     if value.startswith('0x'):
-        return int(value[2:], 16)
+        value = int(value[2:], 16)
+        if data_type and IsSignedDataType(data_type):
+            bits = GetDataTypeSizeInBits(data_type)
+            if value & (1 << (bits - 1)):
+                value -= 1 << bits
+        return value
     else:
         return int(value)
 
@@ -60,8 +67,17 @@ def AttrsToAttribute(attrs) -> Attribute:
     else:
         data_type = DataType(name=attrs['type'])
 
+    if 'minLength' in attrs:
+        data_type.min_length = ParseInt(attrs['minLength'])
+
     if 'length' in attrs:
         data_type.max_length = ParseInt(attrs['length'])
+
+    if 'min' in attrs:
+        data_type.min_value = ParseInt(attrs['min'], data_type)
+
+    if 'max' in attrs:
+        data_type.max_value = ParseInt(attrs['max'], data_type)
 
     field = Field(
         data_type=data_type,

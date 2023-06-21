@@ -1305,11 +1305,11 @@ public @Nullable Optional<Long> pausedTime;
   }
 }
 
-public static class RoboticVacuumOperationalStateClusterOperationalErrorEvent {
-public ChipStructs.RoboticVacuumOperationalStateClusterErrorStateStruct errorState;
+public static class RvcOperationalStateClusterOperationalErrorEvent {
+public ChipStructs.RvcOperationalStateClusterErrorStateStruct errorState;
 
-  public RoboticVacuumOperationalStateClusterOperationalErrorEvent(
-    ChipStructs.RoboticVacuumOperationalStateClusterErrorStateStruct errorState
+  public RvcOperationalStateClusterOperationalErrorEvent(
+    ChipStructs.RvcOperationalStateClusterErrorStateStruct errorState
   ) {
     this.errorState = errorState;
   }
@@ -1317,7 +1317,7 @@ public ChipStructs.RoboticVacuumOperationalStateClusterErrorStateStruct errorSta
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("RoboticVacuumOperationalStateClusterOperationalErrorEvent {\n");
+    output.append("RvcOperationalStateClusterOperationalErrorEvent {\n");
     output.append("\terrorState: ");
     output.append(errorState);
         output.append("\n");
@@ -1326,12 +1326,12 @@ public ChipStructs.RoboticVacuumOperationalStateClusterErrorStateStruct errorSta
   }
 }
 
-public static class RoboticVacuumOperationalStateClusterOperationCompletionEvent {
+public static class RvcOperationalStateClusterOperationCompletionEvent {
 public Integer completionErrorCode;
 public @Nullable Optional<Long> totalOperationalTime;
 public @Nullable Optional<Long> pausedTime;
 
-  public RoboticVacuumOperationalStateClusterOperationCompletionEvent(
+  public RvcOperationalStateClusterOperationCompletionEvent(
     Integer completionErrorCode
       , @Nullable Optional<Long> totalOperationalTime
       , @Nullable Optional<Long> pausedTime
@@ -1344,7 +1344,7 @@ public @Nullable Optional<Long> pausedTime;
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("RoboticVacuumOperationalStateClusterOperationCompletionEvent {\n");
+    output.append("RvcOperationalStateClusterOperationCompletionEvent {\n");
     output.append("\tcompletionErrorCode: ");
     output.append(completionErrorCode);
         output.append("\n");
