@@ -36,7 +36,6 @@
 #include <TracingCommandLineArgument.h>
 #endif
 
-
 using namespace chip;
 using namespace chip::ArgParser;
 

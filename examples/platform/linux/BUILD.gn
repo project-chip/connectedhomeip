@@ -80,8 +80,8 @@ source_set("app-main") {
 
   if (matter_enable_tracing_support) {
     deps += [
-      "${chip_root}/src/tracing",
       "${chip_root}/examples/common/tracing:commandline",
+      "${chip_root}/src/tracing",
     ]
     defines += [ "ENABLE_TRACING" ]
   }
