@@ -1950,6 +1950,9 @@ static BOOL AttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
     case Attributes::SensitivityLevel::Id: {
         return YES;
     }
+    case Attributes::ExpiryDate::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

@@ -16014,6 +16014,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SensitivityLevel
+namespace ExpiryDate {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::SmokeCoAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ExpiryDate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ExpiryDate
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -16080,6 +16092,7 @@ struct TypeInfo
             static_cast<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum>(0);
         Attributes::SensitivityLevel::TypeInfo::DecodableType sensitivityLevel =
             static_cast<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum>(0);
+        Attributes::ExpiryDate::TypeInfo::DecodableType expiryDate = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

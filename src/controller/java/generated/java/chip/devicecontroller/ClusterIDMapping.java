@@ -7379,6 +7379,7 @@ public class ClusterIDMapping {
             InterconnectCOAlarm(9L),
             ContaminationState(10L),
             SensitivityLevel(11L),
+            ExpiryDate(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

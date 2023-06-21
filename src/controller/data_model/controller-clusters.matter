@@ -3245,6 +3245,7 @@ client cluster SmokeCoAlarm = 92 {
   readonly attribute optional AlarmStateEnum interconnectCOAlarm = 9;
   readonly attribute optional ContaminationStateEnum contaminationState = 10;
   attribute optional SensitivityEnum sensitivityLevel = 11;
+  readonly attribute optional epoch_s expiryDate = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
