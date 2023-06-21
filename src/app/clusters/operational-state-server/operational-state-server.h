@@ -17,12 +17,15 @@
  */
 
 #pragma once
-
+#if 0
 #include "OperationalStateDataProvider.h"
+#endif
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#if 0
 #include <app/clusters/operational-state-server/operational-state-delegate.h>
+#endif
 #include <app/util/af.h>
 
 namespace chip {
@@ -50,11 +53,6 @@ class OperationalStateServer : public CommandHandlerInterface, public AttributeA
 {
 
 public:
-    template <typename T>
-    using DataModelListTemplate          = app::DataModel::List<T>;
-    using OperationalStateStructType     = app::Clusters::OperationalState::Structs::OperationalStateStruct::Type;
-    using OperationalStateStructTypeList = app::DataModel::List<OperationalStateStructType>;
-    using PhaseList                      = chip::app::DataModel::List<const chip::CharSpan>;
     /**
      * Init the operational state server.
      * This function must be called after define a OperationalStateServer class object.
@@ -62,6 +60,13 @@ public:
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     CHIP_ERROR Init();
+
+    /**
+     * Shut down the operational state server.
+     * This function must be called before destory a OperationalStateServer class object.
+     * @param void
+     */
+    void Shutdown();
 
     // Inherited from CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
@@ -71,97 +76,16 @@ public:
     /// Returns appropriately mapped CHIP_ERROR if applicable (may return CHIP_IM_GLOBAL_STATUS errors)
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-    /**
-     * Set operational state list.
-     * @param operationalStateList The operational state list for which to save into Storage.
-     *  Template for save operational state alias cluster.
-     *  The param just need temporary object lifetime.
-     *  Before Reading the operational state list, it will reduce the use of RAM.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    template <typename T>
-    CHIP_ERROR SetOperationalStateList(const DataModelListTemplate<T> & operationalStateList);
-
-    /**
-     * Get operational state list.
-     * @param[out] operationalStateList The pointer to load operational state list.
-     * @param[out] size The number of operational state list's item.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     * After a successful return the caller is responsible for calling ReleaseOperationalStateList on the outparam.
-     */
-    CHIP_ERROR GetOperationalStateList(OperationalStateStructDynamicList ** operationalStateList, size_t & size);
-
-    /**
-     * Release OperationalStateStructDynamicList
-     * @param operationalStateList The pointer for which to clear the OperationalStateStructDynamicList.
-     * @return void
-     */
-    void ReleaseOperationalStateList(OperationalStateStructDynamicList * operationalStateList);
-
-    /**
-     * Clear operational state list.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    CHIP_ERROR ClearOperationalStateList();
-
-    /**
-     * Set phase list.
-     * @param phaseList The phase list for which to save into Storage.
-     *  Before Reading the phase list, it will reduce the use of RAM.
-     *  The param just need temporary object lifetime.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    CHIP_ERROR SetPhaseList(const PhaseList & phaseList);
-
-    /**
-     * Get phase list.
-     * @param[out] phaseList The pointer to load phase list.
-     * @param[out] size The number of phase list's item.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    CHIP_ERROR GetPhaseList(PhaseListCharSpan ** phaseList, size_t & size);
-
-    /**
-     * Rlease PhaseListCharSpan
-     * @param phaseList The pointer for which to clear the PhaseListCharSpan.
-     * @return void
-     */
-    void ReleasePhaseList(PhaseListCharSpan * phaseList);
-
-    /**
-     * Clear phase list.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    CHIP_ERROR ClearPhaseStateList();
-
-    /**
-     * Set operational state.
-     * @param opState The operational state for which to save.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    CHIP_ERROR SetOperationalState(GenericOperationalState & opState);
-
-    /**
-     * Get operational state.
-     * @param void.
-     * @return the const reference of operational state.
-     */
-    const GenericOperationalState & GetOperationalState();
-
-    /**
-     * Set operational error.
-     * @param the reference of operational error.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    CHIP_ERROR SetOperationalError(GenericOperationalErrorState & opErrState);
 
 private:
     EndpointId mEndpointId;
     ClusterId mClusterId;
+#if 0
     Delegate * mDelegate;
     OperationalStateDataProvider mOperationalStateDataProvider;
     GenericOperationalState mOperationalState;
     GenericOperationalErrorState mOperationalError;
+#endif
 
     /**
      * Handle Command: Pause.
@@ -183,6 +107,7 @@ private:
      */
     void HandleStopState(HandlerContext & ctx, const Commands::Stop::DecodableType & req);
 
+
 public:
     /**
      * Creates an operational state cluster instance. The Init() function needs to be called for this instance to be registered and
@@ -191,14 +116,16 @@ public:
      * @param aClusterId The ID of the ModeSelect aliased cluster to be instantiated.
      * @param aDelegate A pointer to a delegate that will handle application layer logic.
      */
-    OperationalStateServer(EndpointId aEndpointId, ClusterId aClusterId, Delegate * aDelegate) :
+    OperationalStateServer(EndpointId aEndpointId, ClusterId aClusterId) :
         CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
         AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId)
     {
 
         mEndpointId = aEndpointId;
         mClusterId  = aClusterId;
+#if 0
         mDelegate   = aDelegate;
+#endif
     }
 
     // Inherited from CommandHandlerInterface
@@ -207,12 +134,6 @@ public:
 
     ~OperationalStateServer() override {}
 };
-
-template <typename T>
-CHIP_ERROR OperationalStateServer::SetOperationalStateList(const DataModelListTemplate<T> & operationalStateList)
-{
-    return mOperationalStateDataProvider.StoreOperationalStateList<T>(mEndpointId, mClusterId, operationalStateList);
-}
 
 } // namespace OperationalState
 } // namespace Clusters

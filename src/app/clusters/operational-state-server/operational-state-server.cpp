@@ -34,7 +34,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/operational-state-server/operational-state-delegate.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/server/Server.h>
 #include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
@@ -46,6 +45,7 @@ using namespace chip::app::Clusters::OperationalState::Attributes;
 
 using Status = Protocols::InteractionModel::Status;
 
+
 CHIP_ERROR OperationalStateServer::Init()
 {
     // Check if the cluster has been selected in zap
@@ -55,15 +55,16 @@ CHIP_ERROR OperationalStateServer::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    mOperationalStateDataProvider.Init(Server::GetInstance().GetPersistentStorage());
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
 
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrReturnError(mDelegate, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDelegate->Init());
-
     return CHIP_NO_ERROR;
+}
+
+void OperationalStateServer::Shutdown()
+{
+    InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
 }
 
 // This function is called by the interaction model engine when a command destined for this instance is received.
@@ -106,25 +107,19 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
 {
     ChipLogDetail(Zcl, "OperationalState: HandlePauseState");
     Commands::OperationalCommandResponse::Type response;
+    Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
 
-    // callback
-    mDelegate->HandlePauseState(mOperationalState, mOperationalError);
+    VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    SetOperationalState(mOperationalState);
-
-    // return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
-
-    if (mOperationalError.ErrorStateLabelHasValue)
+    if (delegate->GetOperationalState().getStateID() == to_underlying(OperationalStateEnum::kPaused))
     {
-        response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, sizeof(mOperationalError.ErrorStateLabel));
+        response.commandResponseState = err;
     }
     else
     {
-        response.commandResponseState.errorStateLabel.SetNull();
+        response.commandResponseState = delegate->HandlePauseStateCallback(err);
     }
-
-    response.commandResponseState.errorStateDetails = mOperationalError.ErrorStateDetailsHasValue ? Optional<chip::CharSpan>::Value(mOperationalError.ErrorStateDetails) : Optional<chip::CharSpan>::Missing();
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -133,24 +128,27 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
 {
     ChipLogDetail(Zcl, "OperationalState: HandleResumeState");
     Commands::OperationalCommandResponse::Type response;
+    Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
 
-    // callback
-    mDelegate->HandleResumeState(mOperationalState, mOperationalError);
+    VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    SetOperationalState(mOperationalState);
+    uint8_t currentStateId = delegate->GetOperationalState().getStateID();
 
-    // return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
-
-    if (mOperationalError.ErrorStateLabelHasValue)
+    if (currentStateId == to_underlying(OperationalStateEnum::kRunning))
     {
-        response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, sizeof(mOperationalError.ErrorStateLabel));
+        response.commandResponseState = err;
+    }
+    else if (currentStateId != to_underlying(OperationalStateEnum::kPaused)
+          && currentStateId != to_underlying(OperationalStateEnum::kRunning))
+    {
+        err.set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+        response.commandResponseState = err;
     }
     else
     {
-        response.commandResponseState.errorStateLabel.SetNull();
+        response.commandResponseState = delegate->HandleResumeStateCallback(err);
     }
-    response.commandResponseState.errorStateDetails = mOperationalError.ErrorStateDetailsHasValue ? Optional<chip::CharSpan>::Value(mOperationalError.ErrorStateDetails) : Optional<chip::CharSpan>::Missing();
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -159,24 +157,19 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
 {
     ChipLogDetail(Zcl, "OperationalState: HandleStartState");
     Commands::OperationalCommandResponse::Type response;
+    Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
 
-    // callback
-    mDelegate->HandleStartState(mOperationalState, mOperationalError);
+    VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    SetOperationalState(mOperationalState);
-
-    // return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
-
-    if (mOperationalError.ErrorStateLabelHasValue)
+    if (delegate->GetOperationalState().getStateID() == to_underlying(OperationalStateEnum::kRunning))
     {
-        response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, sizeof(mOperationalError.ErrorStateLabel));
+        response.commandResponseState = err;
     }
     else
     {
-        response.commandResponseState.errorStateLabel.SetNull();
+        response.commandResponseState = delegate->HandleStartStateCallback(err);
     }
-    response.commandResponseState.errorStateDetails = mOperationalError.ErrorStateDetailsHasValue ? Optional<chip::CharSpan>::Value(mOperationalError.ErrorStateDetails) : Optional<chip::CharSpan>::Missing();
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -185,24 +178,19 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
 {
     ChipLogDetail(Zcl, "OperationalState: HandleStopState");
     Commands::OperationalCommandResponse::Type response;
+    Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
 
-    // callback
-    mDelegate->HandleStopState(mOperationalState, mOperationalError);
+    VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    SetOperationalState(mOperationalState);
-
-    // return operational error
-    response.commandResponseState.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
-
-    if (mOperationalError.ErrorStateLabelHasValue)
+    if (delegate->GetOperationalState().getStateID() == to_underlying(OperationalStateEnum::kStopped))
     {
-        response.commandResponseState.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, sizeof(mOperationalError.ErrorStateLabel));
+        response.commandResponseState = err;
     }
     else
     {
-        response.commandResponseState.errorStateLabel.SetNull();
+        response.commandResponseState = delegate->HandleStopStateCallback(err);
     }
-    response.commandResponseState.errorStateDetails = mOperationalError.ErrorStateDetailsHasValue ? Optional<chip::CharSpan>::Value(mOperationalError.ErrorStateDetails) : Optional<chip::CharSpan>::Missing();
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -233,93 +221,6 @@ void OperationalStateServer::HandleCommand(HandlerContext & handlerContext, Func
     }
 }
 
-CHIP_ERROR OperationalStateServer::GetOperationalStateList(OperationalStateStructDynamicList ** operationalStateList, size_t & size)
-{
-    return mOperationalStateDataProvider.LoadOperationalStateList(mEndpointId, mClusterId, operationalStateList, size);
-}
-
-void OperationalStateServer::ReleaseOperationalStateList(OperationalStateStructDynamicList * operationalStateList)
-{
-    mOperationalStateDataProvider.ReleaseOperationalStateList(operationalStateList);
-}
-
-CHIP_ERROR OperationalStateServer::ClearOperationalStateList()
-{
-    return mOperationalStateDataProvider.ClearOperationalStateList(mEndpointId, mClusterId);
-}
-
-CHIP_ERROR OperationalStateServer::SetPhaseList(const PhaseList & phaseList)
-{
-    return mOperationalStateDataProvider.StorePhaseList(mEndpointId, mClusterId, phaseList);
-}
-
-CHIP_ERROR OperationalStateServer::GetPhaseList(PhaseListCharSpan ** phaseList, size_t & size)
-{
-    return mOperationalStateDataProvider.LoadPhaseList(mEndpointId, mClusterId, phaseList, size);
-}
-
-void OperationalStateServer::ReleasePhaseList(PhaseListCharSpan * phaseList)
-{
-    mOperationalStateDataProvider.ReleasePhaseList(phaseList);
-}
-
-CHIP_ERROR OperationalStateServer::ClearPhaseStateList()
-{
-    return mOperationalStateDataProvider.ClearPhaseStateList(mEndpointId, mClusterId);
-}
-
-CHIP_ERROR OperationalStateServer::SetOperationalState(GenericOperationalState & opState)
-{
-    OperationalStateStructDynamicList op;
-
-    op.operationalStateID = static_cast<Clusters::OperationalState::OperationalStateEnum>(opState.OperationalStateID);
-
-    ReturnErrorOnFailure(mOperationalStateDataProvider.UseOpStateIDGetOpStateStruct(mEndpointId, mClusterId, op));
-
-    if (&mOperationalState != &opState)
-    {
-        char * dest = mOperationalState.OperationalStateLabel;
-        size_t len  = op.operationalStateLabel.size();
-        memset(dest, 0, sizeof(mOperationalState.OperationalStateLabel));
-        memcpy(dest, op.operationalStateLabel.data(), len);
-        mOperationalState.OperationalStateID = static_cast<uint8_t>(op.operationalStateID);
-    }
-    return CHIP_NO_ERROR;
-}
-
-const GenericOperationalState & OperationalStateServer::GetOperationalState()
-{
-    return mOperationalState;
-}
-
-CHIP_ERROR OperationalStateServer::SetOperationalError(GenericOperationalErrorState & op)
-{
-    mOperationalError.ErrorStateID = op.ErrorStateID;
-
-    memset(mOperationalError.ErrorStateLabel, 0, sizeof(mOperationalError.ErrorStateLabel));
-    memset(mOperationalError.ErrorStateDetails, 0, sizeof(mOperationalError.ErrorStateDetails));
-
-    if (op.ErrorStateLabelHasValue)
-    {
-        memcpy(mOperationalError.ErrorStateLabel, op.ErrorStateLabel, sizeof(op.ErrorStateLabel));
-        mOperationalError.ErrorStateLabelHasValue = true;
-    }
-    else
-    {
-        mOperationalError.ErrorStateLabelHasValue = false;
-    }
-    if (op.ErrorStateDetailsHasValue)
-    {
-       memcpy(mOperationalError.ErrorStateDetails, op.ErrorStateDetails, sizeof(op.ErrorStateDetails));
-       mOperationalError.ErrorStateDetailsHasValue = true;
-    }
-    else
-    {
-        mOperationalError.ErrorStateDetailsHasValue = false;
-    }
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -327,9 +228,13 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     switch (aPath.mAttributeId)
     {
     case OperationalState::Attributes::OperationalStateList::Id: {
-        OperationalStateStructDynamicList * pOpList = nullptr;
-        size_t size                                 = 0;
-        err = GetOperationalStateList(&pOpList, size);
+        Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        GenericOperationalStateList * pOpList = nullptr;
+        size_t size                           = 0;
+
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+        err = delegate->GetOperationalStateList(&pOpList, size);
         if (err != CHIP_NO_ERROR)
         {
             err = aEncoder.EncodeNull();
@@ -337,11 +242,17 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         else
         {
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                for (OperationalStateStructDynamicList * pHead = pOpList; pHead != nullptr; pHead = pHead->Next)
+                for (GenericOperationalStateList * pHead = pOpList; pHead != nullptr; pHead = pHead->next)
                 {
-                    ReturnErrorOnFailure(encoder.Encode(*pHead));
+                    err = encoder.Encode(*pHead);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        delegate->ReleaseOperationalStateList(pOpList);
+                        pOpList = nullptr;
+                        return err;
+                    }
                 }
-                ReleaseOperationalStateList(pOpList);
+                delegate->ReleaseOperationalStateList(pOpList);
                 pOpList = nullptr;
                 return CHIP_NO_ERROR;
             });
@@ -350,56 +261,97 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     break;
 
     case OperationalState::Attributes::OperationalState::Id: {
-        OperationalState::Structs::OperationalStateStruct::Type opState;
 
-        opState.operationalStateID    = static_cast<OperationalState::OperationalStateEnum>(mOperationalState.OperationalStateID);
-        opState.operationalStateLabel = CharSpan::fromCharString(mOperationalState.OperationalStateLabel);
+        Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
 
-        return aEncoder.Encode(opState);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+        return aEncoder.Encode(delegate->GetOperationalState());
     }
     break;
 
     case OperationalState::Attributes::OperationalError::Id: {
+        Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
 
-        OperationalState::Structs::ErrorStateStruct::Type opError;
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-        opError.errorStateID = static_cast<OperationalState::ErrorStateEnum>(mOperationalError.ErrorStateID);
-
-        if (mOperationalError.ErrorStateLabelHasValue)
-        {
-            opError.errorStateLabel.SetNonNull(mOperationalError.ErrorStateLabel, sizeof(mOperationalError.ErrorStateLabel));
-        }
-        else
-        {
-            opError.errorStateLabel.SetNull();
-        }
-        opError.errorStateDetails = mOperationalError.ErrorStateDetailsHasValue ? Optional<chip::CharSpan>::Value(mOperationalError.ErrorStateDetails) : Optional<chip::CharSpan>::Missing();
-        return aEncoder.Encode(opError);
+        return aEncoder.Encode(delegate->GetOperationalError());
     }
     break;
 
     case OperationalState::Attributes::PhaseList::Id: {
-        PhaseListCharSpan * phaseList = nullptr;
+        Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        GenericOperationalPhaseList * phaseList = nullptr;
         size_t size                   = 0;
-        err = GetPhaseList(&phaseList, size);
+
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+        err = delegate->GetOperationalPhaseList(&phaseList, size);
         if (err != CHIP_NO_ERROR)
         {
             err = aEncoder.EncodeNull();
         }
+        else if (phaseList->isNullable())
+        {
+            err = aEncoder.EncodeNull();
+            delegate->ReleaseOperationalPhaseList(phaseList);
+            phaseList = nullptr;
+        }
         else
         {
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                for (PhaseListCharSpan * pHead = phaseList; pHead != nullptr; pHead = pHead->Next)
+                for (GenericOperationalPhaseList * pHead = phaseList; pHead != nullptr; pHead = pHead->next)
                 {
-                    ReturnErrorOnFailure(encoder.Encode(pHead->phase));
+                    err = encoder.Encode(pHead->phaseName);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        delegate->ReleaseOperationalPhaseList(phaseList);
+                        phaseList = nullptr;
+                        return err;
+                    }
+
                 }
-                ReleasePhaseList(phaseList);
+                delegate->ReleaseOperationalPhaseList(phaseList);
                 phaseList = nullptr;
                 return CHIP_NO_ERROR;
             });
         }
     }
     break;
+
+    case OperationalState::Attributes::CurrentPhase::Id: {
+        DataModel::Nullable<uint8_t> currentPhase;
+        GenericOperationalPhaseList * phaseList = nullptr;
+        size_t size                   = 0;
+
+        Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+        err = delegate->GetOperationalPhaseList(&phaseList, size);
+        if (err != CHIP_NO_ERROR)
+        {
+            err = aEncoder.EncodeNull();
+        }
+        else if (phaseList->isNullable())
+        {
+            err = aEncoder.EncodeNull();
+            delegate->ReleaseOperationalPhaseList(phaseList);
+            phaseList = nullptr;
+        }
+        else
+        {
+            delegate->ReleaseOperationalPhaseList(phaseList);
+            phaseList = nullptr;
+            CurrentPhase::Get(mEndpointId, currentPhase);
+            err = aEncoder.Encode(currentPhase);
+        }
     }
-    return CHIP_NO_ERROR;
+    break;
+
+    }
+    return err;
 }
+
+
+
