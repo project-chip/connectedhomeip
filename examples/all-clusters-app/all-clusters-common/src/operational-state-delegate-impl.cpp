@@ -370,10 +370,8 @@ bool OperationalStateDelegate::sendOperationalErrorEvent(const GenericOperationa
 
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Unable to send operational error event [ep=%d]", mEndpointId);
         return false;
     }
-    ChipLogProgress(Zcl, "Emit opertional error event [ep=%d]", mEndpointId);
 
     // set OperationalState attribute to Error
     mOperationalState.set(to_underlying(OperationalStateEnum::kError));
@@ -390,10 +388,8 @@ bool OperationalStateDelegate::sendOperationCompletion(const GenericOperationCom
 
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Unable to send operation completion event [ep=%d]", mEndpointId);
         return false;
     }
-    ChipLogProgress(Zcl, "Emit opertion completion event [ep=%d]", mEndpointId);
 
     return true;
 }
