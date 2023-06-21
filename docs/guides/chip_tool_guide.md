@@ -1055,20 +1055,25 @@ the following steps:
     $ ./chiptool interactive start
     ```
 
+   All of the commands that follow will be executed in the interactive mode (``>>>``).
 1. Run the following command to display all the available attributes you can
    subscribe to for the given `<cluster-name>`:
 
     ```
-    $ ./chiptool <cluster-name> subscribe
+    >>> <cluster-name> subscribe
     ```
 
-    For example:
+    The list of all available attributes for the cluster will appears.
+
+    > **Note:** Your accessory might not support all of these attributes. You will get an error if the controller sends an unsupported attribute.
+
+    For example, for the door lock cluster:
 
     ```bash
-    $ ./chiptool doorlock subscribe
+    >>> doorlock subscribe
     ```
 
-    The list of available attributes appears:
+    The following list will appear:
 
     ```
     +-------------------------------------------------------------------------------------+
@@ -1123,7 +1128,7 @@ the following steps:
    following pattern:
 
     ```bash
-    $ ./chiptool <cluster-name> subscribe <argument> <min-interval> <max-interval> <node_id> <endpoint_id>
+    >>> <cluster-name> subscribe <argument> <min-interval> <max-interval> <node_id> <endpoint_id>
     ```
 
     In this command:
@@ -1141,8 +1146,10 @@ the following steps:
     For example:
 
     ```bash
-    $ ./chiptool doorlock subscribe lock-state 5 10 node_1 0
+    >>> doorlock subscribe lock-state 5 10 1 1
     ```
+
+    > **Tip:** You can also set the ``$NODE_ID`` and ``$ENDPOINT_ID`` variables for the _<node-id\>_ and _<endpoint_id\>_, respectively, and use them in your commands.
 
 After this command is run, the CHIP Tool will check the state of the door lock
 every time it changes (for example, as a result of a button press or an external
@@ -1163,20 +1170,25 @@ the following steps:
     $ ./chiptool interactive start
     ```
 
+   All of the commands that follow will be executed in the interactive mode (``>>>``).
 1. Run the following command to display all the available events you can
    subscribe to for the given `<cluster-name>`:
 
     ```
-    $ ./chiptool <cluster-name> subscribe-event
+    >>> <cluster-name> subscribe-event
     ```
 
-    For example:
+    The list of all available events for the cluster will appears.
+
+    > **Note:** Your accessory might not support all of these events. You will get an error if the controller sends an unsupported event.
+
+    For example, for the door lock cluster:
 
     ```bash
-    $ ./chiptool doorlock subscribe-event
+    >>> doorlock subscribe-event
     ```
 
-    The list of available attributes appears:
+    The following list will appear:
 
     ```
     +-------------------------------------------------------------------------------------+
@@ -1194,7 +1206,7 @@ the following steps:
    pattern:
 
     ```bash
-    $ ./chiptool <cluster-name> subscribe-event <event-name> <min-interval> <max-interval> <node_id> <endpoint_id>
+    >>> <cluster-name> subscribe-event <event-name> <min-interval> <max-interval> <node_id> <endpoint_id>
     ```
 
     In this command:
@@ -1212,8 +1224,10 @@ the following steps:
     For example:
 
     ```bash
-    $ ./chiptool doorlock subscribe-event door-lock-alarm 5 10 node_1 0
+    >>> doorlock subscribe-event door-lock-alarm 5 10 1 1
     ```
+
+    > **Tip:** You can also set the ``$NODE_ID`` and ``$ENDPOINT_ID`` variables for the _<node-id\>_ and _<endpoint_id\>_, respectively, and use them in your commands.
 
 After this command is run, the CHIP Tool will check the state of the door lock
 every time it changes (for example, as a result of a button press or an external
