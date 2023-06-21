@@ -52,9 +52,7 @@ source_set("commandline") {
     "${chip_root}/src/tracing/log_json",
   ]
 
-  public_deps = [
-    ":tracing_features"
-  ]
+  public_deps = [ ":tracing_features" ]
 
   public_configs = [ ":default_config" ]
 
