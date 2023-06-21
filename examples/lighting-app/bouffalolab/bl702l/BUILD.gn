@@ -152,7 +152,7 @@ bouffalolab_executable("lighting_app") {
       "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
       "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
     ]
-  } 
+  }
 
   include_dirs = [
     "${chip_root}/src/platform/bouffalolab/BL702L",

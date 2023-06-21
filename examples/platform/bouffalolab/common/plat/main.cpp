@@ -213,28 +213,27 @@ extern "C" void __attribute__((weak)) user_vAssertCalled(void)
         ;
 }
 
-extern "C" void __attribute__((weak)) user_vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName )
+extern "C" void __attribute__((weak)) user_vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
 {
     puts("Stack Overflow checked\r\n");
-    if(pcTaskName){
+    if (pcTaskName)
+    {
         printf("Stack name %s\r\n", pcTaskName);
     }
-    while (1) {
+    while (1)
+    {
         /*empty here*/
     }
 }
 
 extern "C" void __attribute__((weak)) user_vApplicationMallocFailedHook(void)
 {
-    printf("Memory Allocate Failed. Current left size is %d bytes\r\n",
-        xPortGetFreeHeapSize()
-    );
+    printf("Memory Allocate Failed. Current left size is %d bytes\r\n", xPortGetFreeHeapSize());
 #if defined(CFG_USE_PSRAM)
-    printf("Current psram left size is %d bytes\r\n",
-        xPortGetFreeHeapSizePsram()
-    );
+    printf("Current psram left size is %d bytes\r\n", xPortGetFreeHeapSizePsram());
 #endif
-    while (1) {
+    while (1)
+    {
         /*empty here*/
     }
 }

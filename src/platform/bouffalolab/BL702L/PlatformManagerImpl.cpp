@@ -60,8 +60,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SuccessOrExit(err);
 
     otRadio_opt_t opt;
-    
-    opt.byte = 0;
+
+    opt.byte            = 0;
     opt.bf.isCoexEnable = true;
 
     ot_utils_init();

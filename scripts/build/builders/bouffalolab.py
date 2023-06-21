@@ -91,8 +91,8 @@ class BouffalolabBuilder(GnBuilder):
         elif "BL70" in module_type:
             bouffalo_chip = 'bl702'
         else:
-            raise Exception("module_type %s is not supported" % module_type);
-        
+            raise Exception("module_type %s is not supported" % module_type)
+
         super(BouffalolabBuilder, self).__init__(
             root=os.path.join(root, 'examples',
                               app.ExampleName(), 'bouffalolab', bouffalo_chip),

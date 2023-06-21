@@ -29,7 +29,6 @@ using namespace ::chip::app::Clusters::GeneralDiagnostics;
 namespace chip {
 namespace DeviceLayer {
 
-
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
     // BL_RST_REASON_E bootCause = bl_sys_rstinfo_get();
