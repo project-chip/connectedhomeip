@@ -76,7 +76,6 @@ public:
     /// Returns appropriately mapped CHIP_ERROR if applicable (may return CHIP_IM_GLOBAL_STATUS errors)
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
-
 private:
     EndpointId mEndpointId;
     ClusterId mClusterId;
@@ -106,7 +105,6 @@ private:
      * Handle Command: Stop.
      */
     void HandleStopState(HandlerContext & ctx, const Commands::Stop::DecodableType & req);
-
 
 public:
     /**

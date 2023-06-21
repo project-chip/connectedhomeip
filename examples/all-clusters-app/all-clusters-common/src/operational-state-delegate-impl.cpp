@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/EventLogging.h>
 #include <app/util/config.h>
 #include <operational-state-delegate-impl.h>
-#include <app/EventLogging.h>
 
 namespace chip {
 namespace app {
@@ -27,15 +27,15 @@ namespace OperationalState {
 
 using chip::Protocols::InteractionModel::Status;
 
-
-constexpr const char * kWasherPreSoak                = "pre-soak";
-constexpr const char * kWasherRinse                  = "rinse";
-constexpr const char * kWasherSpin                   = "spin";
+constexpr const char * kWasherPreSoak = "pre-soak";
+constexpr const char * kWasherRinse   = "rinse";
+constexpr const char * kWasherSpin    = "spin";
 /**
  * Template class to present Enquriy Table
  */
 template <typename T>
-struct EnquiryTable {
+struct EnquiryTable
+{
     /**
      * Endpoint Id
      */
@@ -47,7 +47,7 @@ struct EnquiryTable {
     /**
      * point of Array(Items)
      */
-    T *pItems;
+    T * pItems;
     /**
      * ArraySize of Array(Items)
      */
@@ -66,19 +66,18 @@ GenericOperationalPhase opPhaseList[] = {
     /**
      * Phase List isn't null
      */
-    //GenericOperationalPhase(kWasherPreSoak, strlen(kWasherPreSoak)),
-    //GenericOperationalPhase(kWasherRinse, strlen(kWasherRinse)),
-    //GenericOperationalPhase(kWasherSpin, strlen(kWasherSpin)),
+    // GenericOperationalPhase(kWasherPreSoak, strlen(kWasherPreSoak)),
+    // GenericOperationalPhase(kWasherRinse, strlen(kWasherRinse)),
+    // GenericOperationalPhase(kWasherSpin, strlen(kWasherSpin)),
 };
-
 
 /**
  * Enquriy Table of Phase List corresponding to endpointId and clusterId
  * Note: User Define
  */
 constexpr EnquiryTable<GenericOperationalPhase> kPhaseListEnquiryTable[] = {
-    //EndpointId, ClusterId, Array of phaseList, ArraySize of phaseList
-    {1, Clusters::OperationalState::Id, opPhaseList, ArraySize(opPhaseList)},
+    // EndpointId, ClusterId, Array of phaseList, ArraySize of phaseList
+    { 1, Clusters::OperationalState::Id, opPhaseList, ArraySize(opPhaseList) },
 };
 
 /**
@@ -90,7 +89,8 @@ GenericOperationalState opStateList[] = {
     GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
     GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
     GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
-    GenericOperationalState(to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock), kChildSafetyLockLabel, strlen(kChildSafetyLockLabel)),
+    GenericOperationalState(to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock), kChildSafetyLockLabel,
+                            strlen(kChildSafetyLockLabel)),
 };
 
 /**
@@ -98,8 +98,8 @@ GenericOperationalState opStateList[] = {
  * Note: User Define
  */
 constexpr EnquiryTable<GenericOperationalState> kOpStateListEnquiryTable[] = {
-    //EndpointId, ClusterId, Array of Operational State List, ArraySize of Operational State List
-    {1, Clusters::OperationalState::Id, opStateList, ArraySize(opStateList)},
+    // EndpointId, ClusterId, Array of Operational State List, ArraySize of Operational State List
+    { 1, Clusters::OperationalState::Id, opStateList, ArraySize(opStateList) },
 };
 
 /**
@@ -109,7 +109,7 @@ constexpr EnquiryTable<GenericOperationalState> kOpStateListEnquiryTable[] = {
  * @param[out] size  The ArraySize of target Array(PhaseList)
  * @return the pointer of target Array(PhaseList)
  */
-const GenericOperationalPhase *getGenericPhaseListTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId, size_t & size)
+const GenericOperationalPhase * getGenericPhaseListTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId, size_t & size)
 {
     for (size_t i = 0; i < ArraySize(kPhaseListEnquiryTable); ++i)
     {
@@ -130,7 +130,8 @@ const GenericOperationalPhase *getGenericPhaseListTable(chip::EndpointId aEndpoi
  * @param[out] size  The ArraySize of target Array(Operational State)
  * @return the pointer of target Array(Operational State)
  */
-const GenericOperationalState *getGenericOperationalStateTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId, size_t & size)
+const GenericOperationalState * getGenericOperationalStateTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId,
+                                                                size_t & size)
 {
     for (size_t i = 0; i < ArraySize(kOpStateListEnquiryTable); ++i)
     {
@@ -168,10 +169,10 @@ const GenericOperationalError OperationalStateDelegate::GetOperationalError() co
 
 CHIP_ERROR OperationalStateDelegate::GetOperationalStateList(GenericOperationalStateList ** operationalStateList, size_t & size)
 {
-    CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
-    size           = 0;
-    size_t   i     = 0;
-    size_t opStateListNumOfItems  = 0;
+    CHIP_ERROR err                     = CHIP_ERROR_NO_MEMORY;
+    size                               = 0;
+    size_t i                           = 0;
+    size_t opStateListNumOfItems       = 0;
     GenericOperationalStateList * head = nullptr;
 
     if (!operationalStateList)
@@ -179,7 +180,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalStateList(GenericOperationalS
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    const GenericOperationalState *src = getGenericOperationalStateTable(mEndpointId, mClusterId, opStateListNumOfItems);
+    const GenericOperationalState * src = getGenericOperationalStateTable(mEndpointId, mClusterId, opStateListNumOfItems);
     if (!src || !opStateListNumOfItems)
     {
         ChipLogError(Zcl, "Unable to find Operational State List for [ep=%d],[cid=%d]", mEndpointId, mClusterId);
@@ -188,9 +189,9 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalStateList(GenericOperationalS
 
     for (i = 0; i < opStateListNumOfItems; i++)
     {
-        GenericOperationalStateList * des = chip::Platform::New<GenericOperationalStateList>(src->operationalStateID,
-                src->operationalStateLabel.HasValue() ? src->OperationalStateLabel : nullptr,
-                src->operationalStateLabel.HasValue() ? sizeof(src->OperationalStateLabel) : 0);
+        GenericOperationalStateList * des = chip::Platform::New<GenericOperationalStateList>(
+            src->operationalStateID, src->operationalStateLabel.HasValue() ? src->OperationalStateLabel : nullptr,
+            src->operationalStateLabel.HasValue() ? sizeof(src->OperationalStateLabel) : 0);
         des->operationalStateID = src->operationalStateID;
 
         if (des == nullptr)
@@ -227,17 +228,17 @@ void OperationalStateDelegate::ReleaseOperationalStateList(GenericOperationalSta
     while (operationalStateList)
     {
         GenericOperationalStateList * del = operationalStateList;
-        operationalStateList                    = operationalStateList->next;
+        operationalStateList              = operationalStateList->next;
         chip::Platform::Delete(del);
     }
 }
 
 CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseList(GenericOperationalPhaseList ** operationalPhaseList, size_t & size)
 {
-    CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
-    size           = 0;
-    size_t   i     = 0;
-    size_t phaseListNumOfItems  = 0;
+    CHIP_ERROR err                     = CHIP_ERROR_NO_MEMORY;
+    size                               = 0;
+    size_t i                           = 0;
+    size_t phaseListNumOfItems         = 0;
     GenericOperationalPhaseList * head = nullptr;
 
     if (!operationalPhaseList)
@@ -245,7 +246,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseList(GenericOperationalP
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    const GenericOperationalPhase *src = getGenericPhaseListTable(mEndpointId, mClusterId, phaseListNumOfItems);
+    const GenericOperationalPhase * src = getGenericPhaseListTable(mEndpointId, mClusterId, phaseListNumOfItems);
     if (!src || !phaseListNumOfItems)
     {
         ChipLogError(Zcl, "Unable to find Phase List for [ep=%d],[cid=%d]", mEndpointId, mClusterId);
@@ -291,7 +292,6 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseList(GenericOperationalP
 exit:
     ReleaseOperationalPhaseList(head);
     return err;
-
 }
 
 void OperationalStateDelegate::ReleaseOperationalPhaseList(GenericOperationalPhaseList * operationalPhaseList)
@@ -375,7 +375,7 @@ bool OperationalStateDelegate::sendOperationalErrorEvent(const GenericOperationa
     }
     ChipLogProgress(Zcl, "Emit opertional error event [ep=%d]", mEndpointId);
 
-    //set OperationalState attribute to Error
+    // set OperationalState attribute to Error
     mOperationalState.set(to_underlying(OperationalStateEnum::kError));
     return true;
 }
@@ -396,7 +396,6 @@ bool OperationalStateDelegate::sendOperationCompletion(const GenericOperationCom
     ChipLogProgress(Zcl, "Emit opertion completion event [ep=%d]", mEndpointId);
 
     return true;
-
 }
 
 } // namespace OperationalState

@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/util/config.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
+#include <app/util/config.h>
 #include <operational-state-delegate-impl.h>
 
 namespace chip {
@@ -28,7 +28,8 @@ namespace OperationalState {
 /**
  * class to present Enquriy Table of Delegates
  */
-struct DelegatesEnquiryTable {
+struct DelegatesEnquiryTable
+{
     /**
      * Endpoint Id
      */
@@ -40,7 +41,7 @@ struct DelegatesEnquiryTable {
     /**
      * point of Array(Items)
      */
-    Delegate *pItems;
+    Delegate * pItems;
     /**
      * ArraySize of Array(Items)
      */
@@ -52,16 +53,16 @@ struct DelegatesEnquiryTable {
  * Note: User Define
  */
 static OperationalStateDelegate opStateDelegate(1, Clusters::OperationalState::Id,
-        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-        GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)));
+                                                GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+                                                GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)));
 
 /**
  * Enquriy Table of Operational State Cluster and alias Cluter Delegate corresponding to endpointId and clusterId
  * Note: User Define
  */
 constexpr DelegatesEnquiryTable kDelegatesEnquiryTable[] = {
-    //EndpointId, ClusterId, Delegate
-    {1, Clusters::OperationalState::Id, &opStateDelegate},
+    // EndpointId, ClusterId, Delegate
+    { 1, Clusters::OperationalState::Id, &opStateDelegate },
 };
 
 /**
@@ -70,7 +71,7 @@ constexpr DelegatesEnquiryTable kDelegatesEnquiryTable[] = {
  * @param[in] aClusterID  The clusterId
  * @return the pointer of target delegate
  */
-Delegate *getGenericDelegateTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId)
+Delegate * getGenericDelegateTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId)
 {
     for (size_t i = 0; i < ArraySize(kDelegatesEnquiryTable); ++i)
     {
@@ -87,13 +88,13 @@ Delegate * GetOperationalStateDelegate(chip::EndpointId endpointId, chip::Cluste
     return getGenericDelegateTable(endpointId, clusterId);
 }
 
-
 } // namespace OperationalState
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
-void MatterOperationalStatePluginServerInitCallback() {
+void MatterOperationalStatePluginServerInitCallback()
+{
     using namespace chip::app;
     static Clusters::OperationalState::OperationalStateServer operationalstateServer(0x01, Clusters::OperationalState::Id);
     operationalstateServer.Init();

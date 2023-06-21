@@ -19,17 +19,16 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/operational-state-server/operational-state-delegate.h>
 #include <app/util/af-enums.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <app/clusters/operational-state-server/operational-state-delegate.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace OperationalState {
 
-
-constexpr const char * kChildSafetyLockLabel                = "child safety lock";
+constexpr const char * kChildSafetyLockLabel = "child safety lock";
 enum class ManufactureOperationalStateEnum : uint8_t
 {
     kChildSafetyLock = 0x80,
@@ -88,14 +87,14 @@ public:
      */
     CHIP_ERROR SetOperationalError(const GenericOperationalError & opErrState) override;
 
- /**
+    /**
      * Set operational state.
      * @param opState The operational state for which to set.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     CHIP_ERROR SetOperationalState(const GenericOperationalState & opState) override;
 
-    //command callback
+    // command callback
     /**
      * Handle Command Callback in application: Pause
      * @param[out] get operational error after callback.
@@ -138,14 +137,17 @@ public:
      */
     bool sendOperationCompletion(const GenericOperationCompletion & op) override;
 
-    OperationalStateDelegate(EndpointId aEndpointId, ClusterId aClusterId, GenericOperationalState aOperationalState, GenericOperationalError aOperationalError) : Delegate(aEndpointId, aClusterId), mOperationalState(aOperationalState), mOperationalError(aOperationalError) {}
+    OperationalStateDelegate(EndpointId aEndpointId, ClusterId aClusterId, GenericOperationalState aOperationalState,
+                             GenericOperationalError aOperationalError) :
+        Delegate(aEndpointId, aClusterId),
+        mOperationalState(aOperationalState), mOperationalError(aOperationalError)
+    {}
     ~OperationalStateDelegate() = default;
+
 private:
     GenericOperationalState mOperationalState;
     GenericOperationalError mOperationalError;
 };
-
-
 
 } // namespace OperationalState
 } // namespace Clusters

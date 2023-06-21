@@ -20,42 +20,36 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af-enums.h>
-#include <protocols/interaction_model/StatusCode.h>
 #include <lib/support/CommonIterator.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace OperationalState {
 
-constexpr size_t kOperationalStateLabelMaxSize      = 64u;
-constexpr size_t kOperationalErrorLabelMaxSize = 64u;
+constexpr size_t kOperationalStateLabelMaxSize   = 64u;
+constexpr size_t kOperationalErrorLabelMaxSize   = 64u;
 constexpr size_t kOperationalErrorDetailsMaxSize = 64u;
-constexpr size_t kOperationalPhaseNameMaxSize = 64u;
+constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
 
 /**
  * A class wrap the operational state of operational state cluster
  */
 struct GenericOperationalState : public chip::app::Clusters::detail::Structs::OperationalStateStruct::Type
 {
-    GenericOperationalState(uint8_t state, const char * label = nullptr, size_t labelLen = 0)
-    {
-        set(state, label, labelLen);
-    }
+    GenericOperationalState(uint8_t state, const char * label = nullptr, size_t labelLen = 0) { set(state, label, labelLen); }
 
     GenericOperationalState(const GenericOperationalState & op)
     {
-        set(op.operationalStateID,
-                op.operationalStateLabel.HasValue() ? op.OperationalStateLabel : nullptr,
-                op.operationalStateLabel.HasValue() ? sizeof(op.OperationalStateLabel) : 0);
-
+        set(op.operationalStateID, op.operationalStateLabel.HasValue() ? op.OperationalStateLabel : nullptr,
+            op.operationalStateLabel.HasValue() ? sizeof(op.OperationalStateLabel) : 0);
     }
 
-    GenericOperationalState& operator = (const GenericOperationalState& op)
+    GenericOperationalState & operator=(const GenericOperationalState & op)
     {
-        set(op.operationalStateID,
-                op.operationalStateLabel.HasValue() ? op.OperationalStateLabel : nullptr,
-                op.operationalStateLabel.HasValue() ? sizeof(op.OperationalStateLabel) : 0);
+        set(op.operationalStateID, op.operationalStateLabel.HasValue() ? op.OperationalStateLabel : nullptr,
+            op.operationalStateLabel.HasValue() ? sizeof(op.OperationalStateLabel) : 0);
 
         return *this;
     }
@@ -65,7 +59,7 @@ struct GenericOperationalState : public chip::app::Clusters::detail::Structs::Op
         operationalStateID = state;
         if (label == nullptr)
         {
-           operationalStateLabel = Optional<chip::CharSpan>::Missing();
+            operationalStateLabel = Optional<chip::CharSpan>::Missing();
         }
         else
         {
@@ -81,12 +75,8 @@ struct GenericOperationalState : public chip::app::Clusters::detail::Structs::Op
 
             operationalStateLabel.SetValue(chip::CharSpan(OperationalStateLabel, sizeof(OperationalStateLabel)));
         }
-
     }
-    uint8_t getStateID() const
-    {
-        return operationalStateID;
-    }
+    uint8_t getStateID() const { return operationalStateID; }
     char OperationalStateLabel[kOperationalStateLabelMaxSize];
 };
 
@@ -95,7 +85,9 @@ struct GenericOperationalState : public chip::app::Clusters::detail::Structs::Op
  */
 struct GenericOperationalStateList : public GenericOperationalState
 {
-    GenericOperationalStateList(uint8_t state, const char * label = nullptr, size_t labelLen = 0) : GenericOperationalState(state, label, labelLen){}
+    GenericOperationalStateList(uint8_t state, const char * label = nullptr, size_t labelLen = 0) :
+        GenericOperationalState(state, label, labelLen)
+    {}
     GenericOperationalStateList * next = nullptr;
 };
 
@@ -104,36 +96,36 @@ struct GenericOperationalStateList : public GenericOperationalState
  */
 struct GenericOperationalError : public chip::app::Clusters::detail::Structs::ErrorStateStruct::Type
 {
-    GenericOperationalError(uint8_t state, const char * label = nullptr, size_t labelLen = 0, const char *details = nullptr, size_t detailsLen = 0)
+    GenericOperationalError(uint8_t state, const char * label = nullptr, size_t labelLen = 0, const char * details = nullptr,
+                            size_t detailsLen = 0)
     {
         set(state, label, labelLen, details, detailsLen);
     }
 
     GenericOperationalError(const GenericOperationalError & error)
     {
-        set(error.errorStateID,
-                error.errorStateLabel.HasValue() ? error.ErrorStateLabel : nullptr,
-                error.errorStateLabel.HasValue() ? sizeof(error.ErrorStateLabel) : 0,
-                error.errorStateDetails.HasValue() ? error.ErrorStateDetails : nullptr,
-                error.errorStateDetails.HasValue() ? sizeof(error.ErrorStateDetails) : 0);
+        set(error.errorStateID, error.errorStateLabel.HasValue() ? error.ErrorStateLabel : nullptr,
+            error.errorStateLabel.HasValue() ? sizeof(error.ErrorStateLabel) : 0,
+            error.errorStateDetails.HasValue() ? error.ErrorStateDetails : nullptr,
+            error.errorStateDetails.HasValue() ? sizeof(error.ErrorStateDetails) : 0);
     }
 
-    GenericOperationalError& operator = (const GenericOperationalError& error)
+    GenericOperationalError & operator=(const GenericOperationalError & error)
     {
-        set(error.errorStateID,
-                error.errorStateLabel.HasValue() ? error.ErrorStateLabel : nullptr,
-                error.errorStateLabel.HasValue() ? sizeof(error.ErrorStateLabel) : 0,
-                error.errorStateDetails.HasValue() ? error.ErrorStateDetails : nullptr,
-                error.errorStateDetails.HasValue() ? sizeof(error.ErrorStateDetails) : 0);
+        set(error.errorStateID, error.errorStateLabel.HasValue() ? error.ErrorStateLabel : nullptr,
+            error.errorStateLabel.HasValue() ? sizeof(error.ErrorStateLabel) : 0,
+            error.errorStateDetails.HasValue() ? error.ErrorStateDetails : nullptr,
+            error.errorStateDetails.HasValue() ? sizeof(error.ErrorStateDetails) : 0);
         return *this;
     }
 
-    void set(uint8_t state, const char * label = nullptr, size_t labelLen = 0, const char *details = nullptr, size_t detailsLen = 0)
+    void set(uint8_t state, const char * label = nullptr, size_t labelLen = 0, const char * details = nullptr,
+             size_t detailsLen = 0)
     {
         errorStateID = state;
         if (label == nullptr)
         {
-           errorStateLabel = Optional<chip::CharSpan>::Missing();
+            errorStateLabel = Optional<chip::CharSpan>::Missing();
         }
         else
         {
@@ -152,7 +144,7 @@ struct GenericOperationalError : public chip::app::Clusters::detail::Structs::Er
 
         if (details == nullptr)
         {
-           errorStateDetails = Optional<chip::CharSpan>::Missing();
+            errorStateDetails = Optional<chip::CharSpan>::Missing();
         }
         else
         {
@@ -168,12 +160,8 @@ struct GenericOperationalError : public chip::app::Clusters::detail::Structs::Er
 
             errorStateDetails.SetValue(chip::CharSpan(ErrorStateDetails, sizeof(ErrorStateDetails)));
         }
-
     }
-    uint8_t getStateID() const
-    {
-        return errorStateID;
-    }
+    uint8_t getStateID() const { return errorStateID; }
     char ErrorStateLabel[kOperationalErrorLabelMaxSize];
     char ErrorStateDetails[kOperationalErrorDetailsMaxSize];
 };
@@ -186,10 +174,7 @@ struct GenericOperationalPhase
     char PhaseName[kOperationalPhaseNameMaxSize];
     chip::app::DataModel::Nullable<chip::CharSpan> phaseName;
 
-    GenericOperationalPhase(const char *name = nullptr, size_t nameLen = 0)
-    {
-        set(name, nameLen);
-    }
+    GenericOperationalPhase(const char * name = nullptr, size_t nameLen = 0) { set(name, nameLen); }
 
     GenericOperationalPhase(const GenericOperationalPhase & ph)
     {
@@ -203,7 +188,7 @@ struct GenericOperationalPhase
         }
     }
 
-    GenericOperationalPhase& operator = (const GenericOperationalPhase& ph)
+    GenericOperationalPhase & operator=(const GenericOperationalPhase & ph)
     {
         if (ph.isNullable())
         {
@@ -216,9 +201,9 @@ struct GenericOperationalPhase
         return *this;
     }
 
-    void set(const char *name = nullptr, size_t nameLen = 0)
+    void set(const char * name = nullptr, size_t nameLen = 0)
     {
-        if(name == nullptr)
+        if (name == nullptr)
         {
             phaseName.SetNull();
         }
@@ -236,10 +221,7 @@ struct GenericOperationalPhase
             phaseName = chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan(PhaseName, sizeof(PhaseName)));
         }
     }
-    bool isNullable() const
-    {
-        return phaseName.IsNull();
-    }
+    bool isNullable() const { return phaseName.IsNull(); }
 };
 
 /**
@@ -247,7 +229,7 @@ struct GenericOperationalPhase
  */
 struct GenericOperationalPhaseList : public GenericOperationalPhase
 {
-    GenericOperationalPhaseList(const char *name = nullptr, size_t nameLen = 0) : GenericOperationalPhase(name, nameLen){}
+    GenericOperationalPhaseList(const char * name = nullptr, size_t nameLen = 0) : GenericOperationalPhase(name, nameLen) {}
     GenericOperationalPhaseList * next = nullptr;
 };
 
@@ -287,9 +269,7 @@ struct GenericOperationCompletion : public chip::app::Clusters::OperationalState
         totalOperationalTime.SetValue(chip::app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
         pausedTime.SetValue(chip::app::DataModel::Nullable<uint32_t>(aPausedTime));
     }
-
 };
-
 
 /**
  * A delegate to handle application logic of the Operational State aliased Cluster.
@@ -297,7 +277,6 @@ struct GenericOperationCompletion : public chip::app::Clusters::OperationalState
 class Delegate
 {
 public:
-
     /**
      * Get operational state.
      * @param void.
@@ -354,7 +333,7 @@ public:
      */
     virtual CHIP_ERROR SetOperationalError(const GenericOperationalError & opErrState) = 0;
 
-    //command callback
+    // command callback
     /**
      * Handle Command Callback in application: Pause
      * @param[out] get operational error after callback.
@@ -400,6 +379,7 @@ public:
     Delegate(EndpointId aEndpointId, ClusterId aClusterId) : mEndpointId(aEndpointId), mClusterId(aClusterId) {}
 
     virtual ~Delegate() = default;
+
 protected:
     EndpointId mEndpointId;
     ClusterId mClusterId;

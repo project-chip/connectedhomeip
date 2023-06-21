@@ -45,7 +45,6 @@ using namespace chip::app::Clusters::OperationalState::Attributes;
 
 using Status = Protocols::InteractionModel::Status;
 
-
 CHIP_ERROR OperationalStateServer::Init()
 {
     // Check if the cluster has been selected in zap
@@ -107,7 +106,7 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
 {
     ChipLogDetail(Zcl, "OperationalState: HandlePauseState");
     Commands::OperationalCommandResponse::Type response;
-    Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+    Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
@@ -128,7 +127,7 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
 {
     ChipLogDetail(Zcl, "OperationalState: HandleResumeState");
     Commands::OperationalCommandResponse::Type response;
-    Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+    Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
@@ -139,8 +138,8 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     {
         response.commandResponseState = err;
     }
-    else if (currentStateId != to_underlying(OperationalStateEnum::kPaused)
-          && currentStateId != to_underlying(OperationalStateEnum::kRunning))
+    else if (currentStateId != to_underlying(OperationalStateEnum::kPaused) &&
+             currentStateId != to_underlying(OperationalStateEnum::kRunning))
     {
         err.set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
         response.commandResponseState = err;
@@ -157,7 +156,7 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
 {
     ChipLogDetail(Zcl, "OperationalState: HandleStartState");
     Commands::OperationalCommandResponse::Type response;
-    Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+    Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
@@ -178,7 +177,7 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
 {
     ChipLogDetail(Zcl, "OperationalState: HandleStopState");
     Commands::OperationalCommandResponse::Type response;
-    Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+    Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
@@ -228,7 +227,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     switch (aPath.mAttributeId)
     {
     case OperationalState::Attributes::OperationalStateList::Id: {
-        Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        Delegate * delegate                   = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
         GenericOperationalStateList * pOpList = nullptr;
         size_t size                           = 0;
 
@@ -262,7 +261,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
     case OperationalState::Attributes::OperationalState::Id: {
 
-        Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -271,7 +270,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     break;
 
     case OperationalState::Attributes::OperationalError::Id: {
-        Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -280,9 +279,9 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     break;
 
     case OperationalState::Attributes::PhaseList::Id: {
-        Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        Delegate * delegate                     = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
         GenericOperationalPhaseList * phaseList = nullptr;
-        size_t size                   = 0;
+        size_t size                             = 0;
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -309,7 +308,6 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
                         phaseList = nullptr;
                         return err;
                     }
-
                 }
                 delegate->ReleaseOperationalPhaseList(phaseList);
                 phaseList = nullptr;
@@ -322,9 +320,9 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     case OperationalState::Attributes::CurrentPhase::Id: {
         DataModel::Nullable<uint8_t> currentPhase;
         GenericOperationalPhaseList * phaseList = nullptr;
-        size_t size                   = 0;
+        size_t size                             = 0;
 
-        Delegate *delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -348,7 +346,6 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         }
     }
     break;
-
     }
     return err;
 }
