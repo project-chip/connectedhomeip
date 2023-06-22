@@ -119,6 +119,9 @@ class CodeGenerator:
         if not loader:
             if not fs_loader_searchpath:
                 fs_loader_searchpath = os.path.dirname(__file__)
+
+            print("DEBUG: LOAD PATH: %s" % fs_loader_searchpath)
+
             loader = jinja2.FileSystemLoader(searchpath=fs_loader_searchpath)
 
         self.storage = storage
