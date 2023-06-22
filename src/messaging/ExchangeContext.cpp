@@ -237,7 +237,10 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             {
                 session->AsSecureSession()->MarkAsDefunct();
             }
+        }
 
+        if (err == CHIP_NO_ERROR)
+        {
 #if CONFIG_DEVICE_LAYER
             DeviceLayer::ChipDeviceEvent event;
             event.Type        = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
@@ -247,16 +250,16 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
                 ChipLogError(DeviceLayer, "Failed to post Message sent event %" CHIP_ERROR_FORMAT, status.Format());
             }
 #endif // CONFIG_DEVICE_LAYER
-        }
 
-        // Standalone acks are not application-level message sends.
-        if (!isStandaloneAck && err == CHIP_NO_ERROR)
-        {
-            //
-            // Once we've sent the message successfully, we can clear out the WillSendMessage flag.
-            //
-            mFlags.Clear(Flags::kFlagWillSendMessage);
-            MessageHandled();
+            // Standalone acks are not application-level message sends.
+            if (!isStandaloneAck)
+            {
+                //
+                // Once we've sent the message successfully, we can clear out the WillSendMessage flag.
+                //
+                mFlags.Clear(Flags::kFlagWillSendMessage);
+                MessageHandled();
+            }
         }
 
         return err;
@@ -628,6 +631,16 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         SetResponseExpected(false);
     }
 
+#if CONFIG_DEVICE_LAYER
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type        = DeviceLayer::DeviceEventType::kChipMsgReceivedEvent;
+    CHIP_ERROR status = DeviceLayer::PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post Message received event %" CHIP_ERROR_FORMAT, status.Format());
+    }
+#endif // CONFIG_DEVICE_LAYER
+
     // Don't send messages on to our delegate if our dispatch does not allow
     // those messages.
     if (mDelegate != nullptr && mDispatch.MessagePermitted(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType()))
@@ -645,15 +658,6 @@ void ExchangeContext::MessageHandled()
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
     UpdateSEDIntervalMode();
 #endif
-#if CONFIG_DEVICE_LAYER
-    DeviceLayer::ChipDeviceEvent event;
-    event.Type        = DeviceLayer::DeviceEventType::kChipMsgReceivedEvent;
-    CHIP_ERROR status = DeviceLayer::PlatformMgr().PostEvent(&event);
-    if (status != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to post Message sent event %" CHIP_ERROR_FORMAT, status.Format());
-    }
-#endif // CONFIG_DEVICE_LAYER
 
     if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())
     {

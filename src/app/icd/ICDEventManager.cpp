@@ -51,16 +51,16 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
     switch (event->Type)
     {
     case DeviceEventType::kCommissioningWindowStatusChanged:
-        pIcdManager->SetKeepActiveModeRequirements(ICDManager::kCommissioningWindowOpen, event->CommissioningWindowStatus.open);
+        pIcdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kCommissioningWindowOpen,
+                                                   event->CommissioningWindowStatus.open);
         break;
     case DeviceEventType::kFailSafeStateChanged:
-        pIcdManager->SetKeepActiveModeRequirements(ICDManager::kFailSafeArmed, event->FailSafeState.armed);
+        pIcdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kFailSafeArmed, event->FailSafeState.armed);
         break;
-    case DeviceEventType::kSubcriptionReportSent:
     case DeviceEventType::kChipMsgSentEvent:
     case DeviceEventType::kChipMsgReceivedEvent:
     case DeviceEventType::kAppWakeUpEvent:
-        pIcdManager->UpdateOperationStates(ICDManager::ActiveMode);
+        pIcdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
         break;
     default:
         break;

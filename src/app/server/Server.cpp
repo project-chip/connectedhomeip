@@ -492,6 +492,7 @@ void Server::Shutdown()
     Credentials::SetGroupDataProvider(nullptr);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     mICDEventManager.Shutdown();
+    mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code

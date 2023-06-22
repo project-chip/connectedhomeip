@@ -35,30 +35,39 @@ using namespace chip::app::Clusters::IcdManagement;
 void ICDManager::ICDManager::Init()
 {
     uint32_t activeModeInterval;
-    IcdManagement::Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval);
+    Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval);
     VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
     UpdateIcdMode();
-    UpdateOperationStates(ActiveMode);
+    UpdateOperationState(OperationalState::ActiveMode);
 }
 
-bool ICDManager::SupportCheckInProtocol()
+void ICDManager::ICDManager::Shutdown()
+{
+    // cancel any running timer of the icd
+    DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
+    DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
+    mIcdMode          = ICDMode::SIT;
+    mOperationalState = OperationalState::IdleMode;
+}
+
+bool ICDManager::SupportsCheckInProtocol()
 {
     bool success;
     uint32_t featureMap;
-    success = (IcdManagement::Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+    success = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
 
-    return success ? ((featureMap & to_underlying(IcdManagement::Feature::kCheckInProtocolSupport)) != 0) : false;
+    return success ? ((featureMap & to_underlying(Feature::kCheckInProtocolSupport)) != 0) : false;
 }
 
 void ICDManager::UpdateIcdMode()
 {
     assertChipStackLockedByCurrentThread();
 
-    ICDMode tempMode = SIT;
+    ICDMode tempMode = ICDMode::SIT;
 
     // The Check In Protocol Feature is required and the slow polling interval shall also be greater than 15 seconds
     // to run an ICD in LIT mode.
-    // if (kSlowPollingInterval > kICDSitModePollingThreashold && SupportCheckInProtocol())
+    // if (kSlowPollingInterval > kICDSitModePollingThreashold && SupportsCheckInProtocol())
     // {
     //     TODO ICD LIT FIX DEPENDENCY ISSUE with app/util/IcdMonitoringTable.h and app/server:server
     //     Check In protocol not implented yet.
@@ -70,7 +79,7 @@ void ICDManager::UpdateIcdMode()
     //         IcdMonitoringTable table(storage, fabricInfo.GetFabricIndex(), 1);
     //         if (!table.IsEmpty())
     //         {
-    //             tempMode = LIT;
+    //             tempMode = ICDMode::LIT;
     //             break;
     //         }
     //     }
@@ -78,47 +87,48 @@ void ICDManager::UpdateIcdMode()
     mIcdMode = tempMode;
 }
 
-void ICDManager::UpdateOperationStates(OperationalState state)
+void ICDManager::UpdateOperationState(OperationalState state)
 {
     assertChipStackLockedByCurrentThread();
-    VerifyOrReturn(mOperationalState == IdleMode && state == IdleMode);
+    // Active mode can be re-trigger
+    VerifyOrReturn(mOperationalState != state || state == OperationalState::ActiveMode);
 
-    if (state == IdleMode)
+    if (state == OperationalState::IdleMode)
     {
-        mOperationalState         = IdleMode;
+        mOperationalState         = OperationalState::IdleMode;
         uint32_t idleModeInterval = 0;
-        IcdManagement::Attributes::IdleModeInterval::Get(kRootEndpointId, &idleModeInterval);
+        Attributes::IdleModeInterval::Get(kRootEndpointId, &idleModeInterval);
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(idleModeInterval), OnIdleModeDone, this);
 
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetSlowPollingInterval());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "Failed to set Polling Interval: err %s", ErrorStr(err));
+            ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
-    else if (state == ActiveMode)
+    else if (state == OperationalState::ActiveMode)
     {
-        if (mOperationalState == IdleMode)
+        if (mOperationalState == OperationalState::IdleMode)
         {
-            // An event could have brought use to the active mode.
+            // An event could have brought us to the active mode.
             // Make sure the idle mode timer is stopped
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
-            mOperationalState           = ActiveMode;
+            mOperationalState           = OperationalState::ActiveMode;
             uint32_t activeModeInterval = 0;
-            IcdManagement::Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval);
+            Attributes::ActiveModeInterval::Get(kRootEndpointId, &activeModeInterval);
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval), OnActiveModeDone, this);
 
             CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetFastPollingInterval());
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(AppServer, "Failed to set Polling Interval: err %s", ErrorStr(err));
+                ChipLogError(AppServer, "Failed to set Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
         else
         {
             uint16_t activeModeThreshold = 0;
-            IcdManagement::Attributes::ActiveModeThreshold::Get(kRootEndpointId, &activeModeThreshold);
+            Attributes::ActiveModeThreshold::Get(kRootEndpointId, &activeModeThreshold);
             DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
         }
     }
@@ -129,22 +139,22 @@ void ICDManager::SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state)
     assertChipStackLockedByCurrentThread();
 
     mKeepActiveFlags.Set(flag, state);
-    if (mOperationalState == IdleMode && mKeepActiveFlags.HasAny())
+    if (mOperationalState == OperationalState::IdleMode && mKeepActiveFlags.HasAny())
     {
-        UpdateOperationStates(ActiveMode);
+        UpdateOperationState(OperationalState::ActiveMode);
     }
-    else if (mOperationalState == ActiveMode && !mKeepActiveFlags.HasAny() &&
+    else if (mOperationalState == OperationalState::ActiveMode && !mKeepActiveFlags.HasAny() &&
              !DeviceLayer::SystemLayer().IsTimerActive(OnActiveModeDone, this))
     {
         // The normal active period had ended and nothing else requires the system to be active.
-        UpdateOperationStates(IdleMode);
+        UpdateOperationState(OperationalState::IdleMode);
     }
 }
 
 void ICDManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
 {
     ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(appState);
-    pIcdManager->UpdateOperationStates(ActiveMode);
+    pIcdManager->UpdateOperationState(OperationalState::ActiveMode);
 }
 
 void ICDManager::OnActiveModeDone(System::Layer * aLayer, void * appState)
@@ -154,7 +164,7 @@ void ICDManager::OnActiveModeDone(System::Layer * aLayer, void * appState)
     // Don't go to idle mode when we have a keep active requirement
     if (!pIcdManager->mKeepActiveFlags.HasAny())
     {
-        pIcdManager->UpdateOperationStates(IdleMode);
+        pIcdManager->UpdateOperationState(OperationalState::IdleMode);
     }
 }
 } // namespace app

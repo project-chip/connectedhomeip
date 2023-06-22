@@ -212,7 +212,7 @@ enum PublicEventTypes
     kFailSafeTimerExpired,
 
     /**
-     * Signals that the fail-safe state changed (Armed/Unarmed)
+     * Signals that the fail-safe state changed (Armed/Disarmed)
      */
     kFailSafeStateChanged,
 
@@ -270,7 +270,6 @@ enum InternalEventTypes
     kCHIPoBLEIndicateConfirm,
     kCHIPoBLEConnectionError,
     kCHIPoBLENotifyConfirm,
-    kSubcriptionReportSent,
     kChipMsgSentEvent,
     kChipMsgReceivedEvent,
     kAppWakeUpEvent,
@@ -540,11 +539,6 @@ struct ChipDeviceEvent final
         {
             OtaState newState;
         } OtaStateChanged;
-
-        struct
-        {
-            uint64_t subjectId;
-        } SubscriptionChanged;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

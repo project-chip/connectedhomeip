@@ -30,19 +30,19 @@ namespace app {
 class ICDManager
 {
 public:
-    enum OperationalState : uint8_t
+    enum class OperationalState : uint8_t
     {
         IdleMode,
         ActiveMode,
     };
 
-    enum ICDMode : uint8_t
+    enum class ICDMode : uint8_t
     {
         SIT, // Short Interval Time ICD
         LIT, // Long Interval Time ICD
     };
 
-    enum KeepActiveFlags : uint8_t
+    enum class KeepActiveFlags : uint8_t
     {
         kCommissioningWindowOpen = 0x01,
         kFailSafeArmed           = 0x02,
@@ -50,8 +50,9 @@ public:
 
     ICDManager() {}
     void Init();
+    void Shutdown();
     void UpdateIcdMode();
-    void UpdateOperationStates(OperationalState state);
+    void UpdateOperationState(OperationalState state);
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
     ICDMode GetIcdMode() { return mIcdMode; }
@@ -69,11 +70,11 @@ private:
     static constexpr System::Clock::Milliseconds32 kSlowPollingInterval         = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
     static constexpr System::Clock::Milliseconds32 kFastPollingInterval         = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
-    bool SupportCheckInProtocol();
+    bool SupportsCheckInProtocol();
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
-    OperationalState mOperationalState = IdleMode;
-    ICDMode mIcdMode                   = SIT;
+    OperationalState mOperationalState = OperationalState::IdleMode;
+    ICDMode mIcdMode                   = ICDMode::SIT;
 };
 
 } // namespace app
