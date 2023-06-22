@@ -36,7 +36,7 @@ tests:
       attribute: "ClusterRevision"
       PICS: PMHCONC.S.Afffd
       response:
-          value: 1
+          value: 3
           constraints:
               type: int16u
 
