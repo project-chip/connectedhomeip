@@ -59,6 +59,9 @@ constexpr uint16_t kOptionListenPort   = 'p';
 constexpr uint16_t kOptionInstanceName = 'i';
 constexpr uint16_t kOptionTraceTo      = 't';
 
+// Only used for argument parsing. Tracing setup owned by the main loop.
+chip::CommandLineApp::TracingSetup * tracing_setup_for_argparse = nullptr;
+
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
     switch (aIdentifier)
@@ -72,7 +75,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         return true;
 
     case kOptionTraceTo:
-        CommandLineApp::EnableTracingFor(aValue);
+        tracing_setup_for_argparse->EnableTracingFor(aValue);
         return true;
 
     case kOptionListenPort:
@@ -203,10 +206,14 @@ int main(int argc, char ** args)
         return 1;
     }
 
+    chip::CommandLineApp::TracingSetup tracing_setup;
+
+    tracing_setup_for_argparse = &tracing_setup;
     if (!ArgParser::ParseArgs(args[0], argc, args, allOptions))
     {
         return 1;
     }
+    tracing_setup_for_argparse = nullptr;
 
     // This forces the global MDNS instance to be loaded in, effectively setting
     // built in policies for addresses.
@@ -217,11 +224,11 @@ int main(int argc, char ** args)
     mdns::Minimal::QueryResponder<16 /* maxRecords */> queryResponder;
 
     mdns::Minimal::QNamePart tcpServiceName[]       = { Dnssd::kOperationalServiceName, Dnssd::kOperationalProtocol,
-                                                  Dnssd::kLocalDomain };
+                                                        Dnssd::kLocalDomain };
     mdns::Minimal::QNamePart tcpServerServiceName[] = { gOptions.instanceName, Dnssd::kOperationalServiceName,
                                                         Dnssd::kOperationalProtocol, Dnssd::kLocalDomain };
     mdns::Minimal::QNamePart udpServiceName[]       = { Dnssd::kCommissionableServiceName, Dnssd::kCommissionProtocol,
-                                                  Dnssd::kLocalDomain };
+                                                        Dnssd::kLocalDomain };
     mdns::Minimal::QNamePart udpServerServiceName[] = { gOptions.instanceName, Dnssd::kCommissionableServiceName,
                                                         Dnssd::kCommissionProtocol, Dnssd::kLocalDomain };
 
@@ -292,7 +299,8 @@ int main(int argc, char ** args)
     signal(SIGINT, StopSignalHandler);
 
     DeviceLayer::PlatformMgr().RunEventLoop();
-    CommandLineApp::StopTracing();
+
+    tracing_setup.StopTracing();
     DeviceLayer::PlatformMgr().Shutdown();
 
     printf("Done...\n");

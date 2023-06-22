@@ -24,8 +24,6 @@
 
 #if ENABLE_PERFETTO_TRACING
 #include <tracing/perfetto/event_storage.h>     // nogncheck
-#include <tracing/perfetto/file_output.h>       // nogncheck
-#include <tracing/perfetto/perfetto_tracing.h>  // nogncheck
 #include <tracing/perfetto/simple_initialize.h> // nogncheck
 #endif
 
@@ -36,19 +34,7 @@ namespace chip {
 namespace CommandLineApp {
 
 namespace {
-using ::chip::Tracing::ScopedRegistration;
-using ::chip::Tracing::LogJson::LogJsonBackend;
-
-// currently supported backends
-LogJsonBackend log_json_backend;
-
 #if ENABLE_PERFETTO_TRACING
-
-using ::chip::Tracing::Perfetto::FileTraceOutput;
-using ::chip::Tracing::Perfetto::PerfettoBackend;
-
-FileTraceOutput perfetto_file_output;
-PerfettoBackend perfetto_backend;
 
 bool StartsWith(CharSpan argument, const char * prefix)
 {
@@ -66,7 +52,7 @@ bool StartsWith(CharSpan argument, const char * prefix)
 
 } // namespace
 
-void EnableTracingFor(const char * cliArg)
+void TracingSetup::EnableTracingFor(const char * cliArg)
 {
     chip::StringSplitter splitter(cliArg, ',');
     chip::CharSpan value;
@@ -75,17 +61,14 @@ void EnableTracingFor(const char * cliArg)
     {
         if (value.data_equal(CharSpan::fromCharString("log")))
         {
-            if (!log_json_backend.IsInList())
-            {
-                chip::Tracing::Register(log_json_backend);
-            }
+            chip::Tracing::Register(mLogJsonBackend);
         }
 #if ENABLE_PERFETTO_TRACING
         else if (value.data_equal(CharSpan::fromCharString("perfetto")))
         {
             chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
             chip::Tracing::Perfetto::RegisterEventTrackingStorage();
-            chip::Tracing::Register(perfetto_backend);
+            chip::Tracing::Register(mPerfettoBackend);
         }
         else if (StartsWith(value, "perfetto:"))
         {
@@ -94,12 +77,12 @@ void EnableTracingFor(const char * cliArg)
             chip::Tracing::Perfetto::Initialize(perfetto::kInProcessBackend);
             chip::Tracing::Perfetto::RegisterEventTrackingStorage();
 
-            CHIP_ERROR err = perfetto_file_output.Open(fileName.c_str());
+            CHIP_ERROR err = mPerfettoFileOutput.Open(fileName.c_str());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to open perfetto trace output: %" CHIP_ERROR_FORMAT, err.Format());
             }
-            chip::Tracing::Register(perfetto_backend);
+            chip::Tracing::Register(mPerfettoBackend);
         }
 #endif // ENABLE_PERFETTO_TRACING
         else
@@ -109,16 +92,16 @@ void EnableTracingFor(const char * cliArg)
     }
 }
 
-void StopTracing()
+void TracingSetup::StopTracing()
 {
 #if ENABLE_PERFETTO_TRACING
     chip::Tracing::Perfetto::FlushEventTrackingStorage();
-    perfetto_file_output.Close();
-    chip::Tracing::Unregister(perfetto_backend);
+    mPerfettoFileOutput.Close();
+    chip::Tracing::Unregister(mPerfettoBackend);
 
 #endif
 
-    chip::Tracing::Unregister(log_json_backend);
+    chip::Tracing::Unregister(mLogJsonBackend);
 }
 
 } // namespace CommandLineApp

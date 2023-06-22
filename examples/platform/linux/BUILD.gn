@@ -30,7 +30,7 @@ source_set("ota-test-event-trigger") {
 }
 
 source_set("app-main") {
-  defines = []
+  defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
   sources = [
     "AppMain.cpp",
     "AppMain.h",
@@ -83,7 +83,6 @@ source_set("app-main") {
       "${chip_root}/examples/common/tracing:commandline",
       "${chip_root}/src/tracing",
     ]
-    defines += [ "ENABLE_TRACING" ]
   }
 
   public_configs = [ ":app-main-config" ]

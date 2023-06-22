@@ -32,7 +32,7 @@
 
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#ifdef ENABLE_TRACING
+#if ENABLE_TRACING
 #include <TracingCommandLineArgument.h> // nogncheck
 #endif
 
@@ -497,7 +497,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     }
 #ifdef ENABLE_TRACING
     case kTraceTo:
-        chip::CommandLineApp::EnableTracingFor(aValue);
+        LinuxDeviceOptions::GetInstance().traceTo.push_back(aValue);
         break;
 #endif
     default:
