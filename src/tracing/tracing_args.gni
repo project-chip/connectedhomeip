@@ -22,7 +22,7 @@ declare_args() {
   #
   # Additionally, if tracing is enabled, the main() function has to add
   # backends explicitly
-  matter_enable_tracing_support = false
+  matter_enable_tracing_support = (current_os == "android")
 
   # Defines the trace backend. Current matter tracing splits the logic
   # into two parts:
@@ -48,7 +48,7 @@ declare_args() {
   #
   # TODO: cpp_standard check is not ideal, it should be >= 17,
   #       however for now this is what we use in compilations
-  if (current_os == "linux" && cpp_standard == "gnu++17") {
+  if ((current_os == "linux" || current_os == "android") && cpp_standard == "gnu++17") {
     matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
   } else {
     matter_trace_config = "none"
