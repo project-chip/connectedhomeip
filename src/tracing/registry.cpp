@@ -31,8 +31,11 @@ IntrusiveList<Backend> gTracingBackends;
 void Register(Backend & backend)
 {
     assertChipStackLockedByCurrentThread();
-    backend.Open();
-    gTracingBackends.PushBack(&backend);
+    if (!backend.IsInList())
+    {
+        backend.Open();
+        gTracingBackends.PushBack(&backend);
+    }
 }
 
 void Unregister(Backend & backend)

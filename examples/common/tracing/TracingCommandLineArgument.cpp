@@ -83,29 +83,23 @@ void EnableTracingFor(const char * cliArg)
 #if ENABLE_PERFETTO_TRACING
         else if (value.data_equal(CharSpan::fromCharString("perfetto")))
         {
-            if (!perfetto_backend.IsInList())
-            {
-                chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
-                chip::Tracing::Perfetto::RegisterEventTrackingStorage();
-                chip::Tracing::Register(perfetto_backend);
-            }
+            chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
+            chip::Tracing::Perfetto::RegisterEventTrackingStorage();
+            chip::Tracing::Register(perfetto_backend);
         }
         else if (StartsWith(value, "perfetto:"))
         {
-            if (!perfetto_backend.IsInList())
+            std::string fileName(value.data() + 9, value.size() - 9);
+
+            chip::Tracing::Perfetto::Initialize(perfetto::kInProcessBackend);
+            chip::Tracing::Perfetto::RegisterEventTrackingStorage();
+
+            CHIP_ERROR err = perfetto_file_output.Open(fileName.c_str());
+            if (err != CHIP_NO_ERROR)
             {
-                std::string fileName(value.data() + 9, value.size() - 9);
-
-                chip::Tracing::Perfetto::Initialize(perfetto::kInProcessBackend);
-                chip::Tracing::Perfetto::RegisterEventTrackingStorage();
-
-                CHIP_ERROR err = perfetto_file_output.Open(fileName.c_str());
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(AppServer, "Failed to open perfetto trace output: %" CHIP_ERROR_FORMAT, err.Format());
-                }
-                chip::Tracing::Register(perfetto_backend);
+                ChipLogError(AppServer, "Failed to open perfetto trace output: %" CHIP_ERROR_FORMAT, err.Format());
             }
+            chip::Tracing::Register(perfetto_backend);
         }
 #endif // ENABLE_PERFETTO_TRACING
         else
