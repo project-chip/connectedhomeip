@@ -41,7 +41,7 @@ private:
 
 public:
     // InitEndpointArray should be called only once in the application. Memory allocated to the
-    // epModeOptionsProviderList will be needed till the lifetime of the program.
+    // epModeOptionsProviderList will be needed for the lifetime of the program, so it's never deallocated.
     static CHIP_ERROR InitEndpointArray(int size);
 
     // DeInitEndpointArray should be called only when application need to reallocate memory of
