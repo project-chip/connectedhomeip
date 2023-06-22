@@ -103,6 +103,7 @@ jobs:
               working-directory: src/darwin/Framework
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
+              continue-on-error: true
             - name: Run macOS Build
               timeout-minutes: 70
               # Enable -Werror by hand here, because the Xcode config can't
@@ -143,6 +144,7 @@ jobs:
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
+              continue-on-error: true
             - name: Run Framework Tests
               timeout-minutes: 30
               # For now disable unguarded-availability-new warnings because we

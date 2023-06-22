@@ -95,6 +95,7 @@ jobs:
 
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
+              continue-on-error: true
             - name: Build Apps
               timeout-minutes: 90
               run: |
