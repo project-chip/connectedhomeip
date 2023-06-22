@@ -74,9 +74,9 @@ public:
     EmberAfStatus SetFeatureMap(uint32_t value) const;
 
 private:
-    EndpointId endpointId{};
-    ClusterId clusterId{};
-    Delegate * delegate;
+    EndpointId mEndpointId{};
+    ClusterId mClusterId{};
+    Delegate * mDelegate;
 
     void HandleResetCondition(HandlerContext & ctx,
                               const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData);
@@ -91,14 +91,14 @@ public:
      */
     Instance(EndpointId aEndpointId, ClusterId aClusterId, Delegate * aDelegate) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), delegate(aDelegate)
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate)
     {
-        endpointId = aEndpointId;
-        clusterId  = aClusterId;
-        delegate   = aDelegate;
+        mEndpointId = aEndpointId;
+        mClusterId  = aClusterId;
+        mDelegate   = aDelegate;
     }
 
-    ~Instance() override { ResourceMonitoringAliasesInstanceMap.erase(clusterId); }
+    ~Instance() override { ResourceMonitoringAliasesInstanceMap.erase(mClusterId); }
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);

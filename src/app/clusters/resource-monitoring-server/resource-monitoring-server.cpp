@@ -45,7 +45,7 @@ EmberAfStatus Instance::GetFeature(uint32_t * value) const
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
-        emberAfReadAttribute(endpointId, clusterId, ResourceMonitoring::Attributes::FeatureMap::Id, readable, sizeof(temp));
+        emberAfReadAttribute(mEndpointId, mClusterId, ResourceMonitoring::Attributes::FeatureMap::Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -65,7 +65,7 @@ EmberAfStatus Instance::SetFeatureMap(uint32_t value) const
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpointId, clusterId, ResourceMonitoring::Attributes::FeatureMap::Id, writable,
+    return emberAfWriteAttribute(mEndpointId, mClusterId, ResourceMonitoring::Attributes::FeatureMap::Id, writable,
                                  ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
@@ -75,25 +75,25 @@ CHIP_ERROR Instance::Init()
 {
     ChipLogError(Zcl, "ResourceMonitoring: Init");
     // Check that the cluster ID given is a valid mode select alias cluster ID.
-    if (!std::any_of(AliasedClusters.begin(), AliasedClusters.end(), [this](ClusterId i) { return i == clusterId; }))
+    if (!std::any_of(AliasedClusters.begin(), AliasedClusters.end(), [this](ClusterId i) { return i == mClusterId; }))
     {
-        ChipLogError(Zcl, "ResourceMonitoring: The cluster with ID %lu is not a mode select alias.", long(clusterId));
+        ChipLogError(Zcl, "ResourceMonitoring: The cluster with ID %lu is not a mode select alias.", long(mClusterId));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     // Check if the cluster has been selected in zap
-    if (!emberAfContainsServer(endpointId, clusterId))
+    if (!emberAfContainsServer(mEndpointId, mClusterId))
     {
-        ChipLogError(Zcl, "ResourceMonitoring: The cluster with ID %lu was not enabled in zap.", long(clusterId));
+        ChipLogError(Zcl, "ResourceMonitoring: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ChipLogError(Zcl, "ResourceMonitoring: calling delegate->init()");
-    ReturnErrorOnFailure(delegate->Init());
+    ReturnErrorOnFailure(mDelegate->Init());
 
-    ResourceMonitoringAliasesInstanceMap[clusterId] = this;
+    ResourceMonitoringAliasesInstanceMap[mClusterId] = this;
 
     return CHIP_NO_ERROR;
 }
@@ -130,7 +130,7 @@ void Instance::HandleResetCondition(HandlerContext & ctx,
 {
     // uint8_t newMode = commandData.newMode;
 
-    Status checkIsChangeToThisModeAllowed = delegate->HandleResetCondition();
+    Status checkIsChangeToThisModeAllowed = mDelegate->HandleResetCondition();
     if (Status::Success != checkIsChangeToThisModeAllowed)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, checkIsChangeToThisModeAllowed);
