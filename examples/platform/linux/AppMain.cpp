@@ -66,7 +66,7 @@
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 #ifdef ENABLE_TRACING
-#include <TracingCommandLineArgument.h>
+#include <TracingCommandLineArgument.h> // nogncheck
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
