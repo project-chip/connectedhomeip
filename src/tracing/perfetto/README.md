@@ -20,7 +20,7 @@ where the trace file is available through the Perfetto UI
 An example capturing all `track_event` entries is available in `matter.cfg` and
 the perfetto repo has more examples.
 
-The `traced` and `perfetto` tools should be installed, can follow the 
+The `traced` and `perfetto` tools should be installed, can follow the
 [perfetto getting started guide](https://perfetto.dev/docs/quickstart/linux-tracing).
 Short form of instructions:
 
@@ -38,6 +38,7 @@ traced --background
 ```
 
 Then start perfetto (using a config in text format):
+
 ```
 perfetto -o ~/tmp/example.log --txt -c src/tracing/perfetto/matter.cfg
 ```
