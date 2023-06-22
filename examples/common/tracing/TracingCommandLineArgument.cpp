@@ -123,8 +123,11 @@ void EnableTracingFor(const char * cliArg)
 
 void StopTracing()
 {
+#ifdef ENABLE_PERFETTO_TRACING
     chip::Tracing::Perfetto::FlushEventTrackingStorage();
     perfetto_file_output.Close();
+#endif
+
     tracing_backends.clear();
 }
 
