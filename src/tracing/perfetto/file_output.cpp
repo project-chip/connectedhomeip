@@ -18,15 +18,12 @@
 #include "file_output.h"
 
 #include <lib/support/CodeUtils.h>
-#include <matter/tracing/macros_impl.h>
 #include <system/SystemError.h>
 
 #include <perfetto.h>
 
 #include <errno.h>
 #include <fcntl.h>
-
-PERFETTO_TRACK_EVENT_STATIC_STORAGE();
 
 namespace chip {
 namespace Tracing {
@@ -39,8 +36,6 @@ CHIP_ERROR FileTraceOutput::Open(const char * file_name)
 
     // Close any existing files
     Close();
-
-    perfetto::TrackEvent::Register();
 
     // Create a trace file and start sending data to it
     mTraceFileId = open(file_name, O_RDWR | O_CREAT | O_TRUNC, 0640);
@@ -67,7 +62,6 @@ void FileTraceOutput::Close()
 {
     if (mTracingSession)
     {
-        perfetto::TrackEvent::Flush();
         mTracingSession->FlushBlocking();
         mTracingSession->StopBlocking();
         mTracingSession.reset();

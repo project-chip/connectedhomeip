@@ -23,6 +23,7 @@
 #include <tracing/registry.h>
 
 #ifdef ENABLE_PERFETTO_TRACING
+#include <tracing/perfetto/event_storage.h> // nogncheck
 #include <tracing/perfetto/file_output.h>       // nogncheck
 #include <tracing/perfetto/perfetto_tracing.h>  // nogncheck
 #include <tracing/perfetto/simple_initialize.h> // nogncheck
@@ -90,6 +91,7 @@ void EnableTracingFor(const char * cliArg)
             if (!perfetto_backend.IsInList())
             {
                 chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
+                chip::Tracing::Perfetto::RegisterEventTrackingStorage();
                 tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend));
             }
         }
@@ -100,6 +102,7 @@ void EnableTracingFor(const char * cliArg)
                 std::string fileName(value.data() + 9, value.size() - 9);
 
                 chip::Tracing::Perfetto::Initialize(perfetto::kInProcessBackend);
+                chip::Tracing::Perfetto::RegisterEventTrackingStorage();
 
                 CHIP_ERROR err = perfetto_file_output.Open(fileName.c_str());
                 if (err != CHIP_NO_ERROR)
@@ -120,6 +123,7 @@ void EnableTracingFor(const char * cliArg)
 
 void StopTracing()
 {
+    chip::Tracing::Perfetto::FlushEventTrackingStorage();
     perfetto_file_output.Close();
     tracing_backends.clear();
 }

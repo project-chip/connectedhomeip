@@ -56,6 +56,18 @@ source_set("simple_initialization") {
   ]
 }
 
+source_set("event_storage") {
+  sources = [
+    "event_storage.h",
+    "event_storage.cpp",
+  ]
+
+  public_deps = [
+    ":perfetto_tracing",
+    "${chip_root}/third_party/perfetto:sdk",
+  ]
+}
+
 static_library("perfetto") {
   sources = [
     "perfetto_tracing.cpp",
