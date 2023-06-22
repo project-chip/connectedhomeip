@@ -1753,6 +1753,7 @@
 					CoreBluetooth,
 					"-lnetwork",
 					"-Wl,-unexported_symbol,\"__Z*\"",
+					"-Wl,-hidden-lCHIP",
 				);
 				"OTHER_LDFLAGS[sdk=macosx*]" = (
 					"-framework",
@@ -1767,11 +1768,14 @@
 					"-framework",
 					CoreData,
 					"-Wl,-unexported_symbol,\"__Z*\"",
+					"-Wl,-hidden-lCHIP",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
+				TAPI_VERIFY_MODE = Pedantic;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
+				VERSION_INFO_EXPORT_DECL = "__attribute__((visibility(\"hidden\")))";
 			};
 			name = Debug;
 		};
@@ -1905,6 +1909,7 @@
 					CoreBluetooth,
 					"-lnetwork",
 					"-Wl,-unexported_symbol,\"__Z*\"",
+					"-Wl,-hidden-lCHIP",
 				);
 				"OTHER_LDFLAGS[sdk=macosx*]" = (
 					"-framework",
@@ -1919,12 +1924,15 @@
 					"-framework",
 					CoreData,
 					"-Wl,-unexported_symbol,\"__Z*\"",
+					"-Wl,-hidden-lCHIP",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				STRIP_STYLE = "non-global";
+				TAPI_VERIFY_MODE = Pedantic;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
+				VERSION_INFO_EXPORT_DECL = "__attribute__((visibility(\"hidden\")))";
 			};
 			name = Release;
 		};
