@@ -37,7 +37,7 @@ jobs:
             image: connectedhomeip/chip-build-esp32:0.7.3
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
@@ -48,7 +48,7 @@ jobs:
                   attempt_delay: 2000
                   ref: "${{ github.event.inputs.releaseTag }}"
 
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               timeout-minutes: 20
               with:
@@ -96,7 +96,7 @@ jobs:
         container:
             image: connectedhomeip/chip-build-efr32:0.7.3
         steps:
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
@@ -107,7 +107,7 @@ jobs:
                   attempt_delay: 2000
                   ref: "${{ github.event.inputs.releaseTag }}"
 
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               timeout-minutes: 20
               with:
