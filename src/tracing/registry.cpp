@@ -38,8 +38,11 @@ void Register(Backend & backend)
 void Unregister(Backend & backend)
 {
     assertChipStackLockedByCurrentThread();
-    gTracingBackends.Remove(&backend);
-    backend.Close();
+    if (backend.IsInList())
+    {
+        gTracingBackends.Remove(&backend);
+        backend.Close();
+    }
 }
 
 #if MATTER_TRACING_ENABLED

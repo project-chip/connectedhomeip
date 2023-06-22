@@ -120,17 +120,11 @@ void StopTracing()
 #if ENABLE_PERFETTO_TRACING
     chip::Tracing::Perfetto::FlushEventTrackingStorage();
     perfetto_file_output.Close();
-    if (perfetto_backend.IsInList())
-    {
-        chip::Tracing::Unregister(perfetto_backend);
-    }
+    chip::Tracing::Unregister(perfetto_backend);
 
 #endif
 
-    if (log_json_backend.IsInList())
-    {
-        chip::Tracing::Unregister(log_json_backend);
-    }
+    chip::Tracing::Unregister(log_json_backend);
 }
 
 } // namespace CommandLineApp
