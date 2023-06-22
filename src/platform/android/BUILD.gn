@@ -24,15 +24,15 @@ assert(chip_device_platform == "android")
 
 source_set("tracing") {
   sources = [
-    "tracing.h",
     "tracing.cpp",
+    "tracing.h",
   ]
 
   deps = [
-     "${chip_root}/src/lib/support",
-     "${chip_root}/src/tracing",
-     "${chip_root}/src/tracing/perfetto:event_storage",
-     "${chip_root}/src/tracing/perfetto:simple_initialization",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing/perfetto:event_storage",
+    "${chip_root}/src/tracing/perfetto:simple_initialization",
   ]
 }
 
