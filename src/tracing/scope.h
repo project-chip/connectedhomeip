@@ -21,9 +21,9 @@
 
 #include <tracing/macros.h>
 
-#ifdef MATTER_TRACING_ENABLED
+#if MATTER_TRACING_ENABLED
 
-#ifdef MATTER_TRACE_NONE
+#if MATTER_TRACE_NONE
 #define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #elif !defined(MATTER_TRACE_MULTIPLEXED)
 #include <matter/tracing/macros_impl.h>
@@ -74,7 +74,7 @@ private:
 
 #endif
 
-#else // ifdef MATTER_TRACING_ENABLED
+#else // if MATTER_TRACING_ENABLED
 
 #define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 

@@ -31,7 +31,6 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace chip {
 namespace CommandLineApp {
@@ -65,10 +64,6 @@ bool StartsWith(CharSpan argument, const char * prefix)
 
 #endif
 
-// ScopedRegistration ensures register/unregister is met, as long
-// as the vector is cleared (and we do so when stopping tracing).
-std::vector<std::unique_ptr<ScopedRegistration>> tracing_backends;
-
 } // namespace
 
 void EnableTracingFor(const char * cliArg)
@@ -82,7 +77,7 @@ void EnableTracingFor(const char * cliArg)
         {
             if (!log_json_backend.IsInList())
             {
-                tracing_backends.push_back(std::make_unique<ScopedRegistration>(log_json_backend));
+                chip::Tracing::Register(log_json_backend);
             }
         }
 #if ENABLE_PERFETTO_TRACING
@@ -92,7 +87,7 @@ void EnableTracingFor(const char * cliArg)
             {
                 chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
                 chip::Tracing::Perfetto::RegisterEventTrackingStorage();
-                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend));
+                chip::Tracing::Register(perfetto_backend);
             }
         }
         else if (StartsWith(value, "perfetto:"))
@@ -109,8 +104,7 @@ void EnableTracingFor(const char * cliArg)
                 {
                     ChipLogError(AppServer, "Failed to open perfetto trace output: %" CHIP_ERROR_FORMAT, err.Format());
                 }
-
-                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend));
+                chip::Tracing::Register(perfetto_backend);
             }
         }
 #endif // ENABLE_PERFETTO_TRACING
@@ -126,9 +120,10 @@ void StopTracing()
 #if ENABLE_PERFETTO_TRACING
     chip::Tracing::Perfetto::FlushEventTrackingStorage();
     perfetto_file_output.Close();
+    chip::Tracing::Unregister(perfetto_backend);
 #endif
 
-    tracing_backends.clear();
+    chip::Tracing::Unregister(log_json_backend);
 }
 
 } // namespace CommandLineApp

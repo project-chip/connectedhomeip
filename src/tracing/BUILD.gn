@@ -22,20 +22,26 @@ buildconfig_header("tracing_buildconfig") {
   header = "build_config.h"
   header_dir = "matter/tracing"
 
-  defines = []
-
-  if (matter_enable_tracing_support) {
-    defines += [ "MATTER_TRACING_ENABLED=1" ]
-  }
-
   if (matter_trace_config == "multiplexed") {
-    defines += [ "MATTER_TRACE_MULTIPLEXED=1" ]
-  } else if (matter_trace_config == "none") {
-    defines += [ "MATTER_TRACE_NONE=1" ]
+    _matter_trace_multiplexed = 1
   } else {
-    # Expect a separate config to be set, that provides
-    # matter/tracing/macros_impl.h
+    _matter_trace_multiplexed = 0
   }
+
+  if (matter_trace_config == "none") {
+    _matter_trace_none = 1
+  } else {
+    _matter_trace_none = 0
+  }
+
+  # When neither none nor multiplexed is set, expect a separate config
+  #  to be set, that provides matter/tracing/macros_impl.h
+
+  defines = [
+    "MATTER_TRACING_ENABLED=${matter_enable_tracing_support}",
+    "MATTER_TRACE_MULTIPLEXED=${_matter_trace_multiplexed}",
+    "MATTER_TRACE_NONE=${_matter_trace_none}",
+  ]
 }
 
 static_library("tracing") {

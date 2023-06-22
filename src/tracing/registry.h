@@ -67,7 +67,7 @@ private:
     Backend * mBackend;
 };
 
-#ifdef MATTER_TRACING_ENABLED
+#if MATTER_TRACING_ENABLED
 
 // Internal calls, that will delegate to appropriate backends as needed
 namespace Internal {

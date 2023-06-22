@@ -42,7 +42,7 @@ void Unregister(Backend & backend)
     backend.Close();
 }
 
-#ifdef MATTER_TRACING_ENABLED
+#if MATTER_TRACING_ENABLED
 
 namespace Internal {
 
