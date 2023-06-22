@@ -120,6 +120,7 @@ void EnableTracingFor(const char * cliArg)
 
 void StopTracing()
 {
+    perfetto_file_output.Close();
     tracing_backends.clear();
 }
 
