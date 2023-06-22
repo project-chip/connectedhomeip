@@ -303,7 +303,43 @@
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
         "Operational State": ["OperationalState", "OperationalError"],
-        "RVC Operational State": ["OperationalState", "OperationalError"]
+        "RVC Operational State": ["OperationalState", "OperationalError"],
+        "Mode Base": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode"
+        ],
+        "Dishwasher Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode"
+        ],
+        "Laundry Washer Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode"
+        ],
+        "Refrigerator And Temperature Controlled Cabinet Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode"
+        ],
+        "RVC Clean Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode"
+        ],
+        "RVC Run Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "StartUpMode",
+            "OnMode"
+        ]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
