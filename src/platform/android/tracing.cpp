@@ -22,7 +22,6 @@
 #include <tracing/perfetto/event_storage.h>
 #include <tracing/perfetto/simple_initialize.h>
 
-
 namespace chip {
 namespace Android {
 
@@ -33,13 +32,15 @@ namespace Android {
 //   For that to work, we need to first fix data type dependencies as
 //   `platform` is a very low layer compared to data logging backends which
 //   need access to dnssd and messaging.
-void InitializeTracing() {
+void InitializeTracing()
+{
     ChipLogProgress(DeviceLayer, "Initializing tracing for android");
     chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
     chip::Tracing::Perfetto::RegisterEventTrackingStorage();
 }
 
-void ShutdownTracing() {
+void ShutdownTracing()
+{
     ChipLogProgress(DeviceLayer, "Cleaning up tracing for android");
     chip::Tracing::Perfetto::FlushEventTrackingStorage();
 }
