@@ -30,6 +30,32 @@ source_set("perfetto_tracing") {
   public_configs = [ ":tracing" ]
 }
 
+source_set("file_output") {
+  sources = [
+    "file_output.h",
+    "file_output.cpp",
+  ]
+
+  public_deps = [
+    ":perfetto_tracing",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/system",
+    "${chip_root}/third_party/perfetto:sdk",
+  ]
+}
+
+source_set("simple_initialization") {
+  sources = [
+    "simple_initialize.h",
+    "simple_initialize.cpp",
+  ]
+
+  public_deps = [
+    "${chip_root}/third_party/perfetto:sdk",
+  ]
+}
+
 static_library("perfetto") {
   sources = [
     "perfetto_tracing.cpp",

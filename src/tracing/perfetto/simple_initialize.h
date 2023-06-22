@@ -17,34 +17,17 @@
  */
 #pragma once
 
-#include <tracing/backend.h>
-
-#include <memory>
 #include <perfetto.h>
 
 namespace chip {
 namespace Tracing {
 namespace Perfetto {
 
-/// A Backend that outputs data to chip logging.
+/// Simplified register, equivalent of setting up
+/// `perfetto::Tracing::Initialize` with the single given backend(s).
 ///
-/// Structured data is formatted as json strings.
-class PerfettoBackend : public ::chip::Tracing::Backend
-{
-public:
-    PerfettoBackend() = default;
-
-    // TraceBegin/End/Instant are EXPLICITLY not provided
-    // as they would be slower than expected. Perfetto trace macros
-    // are expected to be set exclusively (via matter_trace_config)
-
-    void LogMessageSend(MessageSendInfo &) override;
-    void LogMessageReceived(MessageReceivedInfo &) override;
-
-    void LogNodeLookup(NodeLookupInfo &) override;
-    void LogNodeDiscovered(NodeDiscoveredInfo &) override;
-    void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
-};
+/// typically called with perfetto::kSystemBackend or perfetto::kInProcessBackend or both.
+void Initialize(uint32_t backends);
 
 } // namespace Perfetto
 } // namespace Tracing

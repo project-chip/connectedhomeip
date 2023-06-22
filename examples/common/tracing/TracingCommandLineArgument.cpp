@@ -23,7 +23,9 @@
 #include <tracing/registry.h>
 
 #ifdef ENABLE_PERFETTO_TRACING
-#include <tracing/perfetto/perfetto_tracing.h> // nogncheck
+#include <tracing/perfetto/file_output.h>       // nogncheck
+#include <tracing/perfetto/perfetto_tracing.h>  // nogncheck
+#include <tracing/perfetto/simple_initialize.h> // nogncheck
 #endif
 
 #include <memory>
@@ -42,8 +44,10 @@ LogJsonBackend log_json_backend;
 
 #ifdef ENABLE_PERFETTO_TRACING
 
+using ::chip::Tracing::Perfetto::FileTraceOutput;
 using ::chip::Tracing::Perfetto::PerfettoBackend;
 
+FileTraceOutput perfetto_file_output;
 PerfettoBackend perfetto_backend;
 
 bool StartsWith(CharSpan argument, const char * prefix)
@@ -85,7 +89,8 @@ void EnableTracingFor(const char * cliArg)
         {
             if (!perfetto_backend.IsInList())
             {
-                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend.Init(nullptr)));
+                chip::Tracing::Perfetto::Initialize(perfetto::kSystemBackend);
+                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend));
             }
         }
         else if (StartsWith(value, "perfetto:"))
@@ -93,7 +98,16 @@ void EnableTracingFor(const char * cliArg)
             if (!perfetto_backend.IsInList())
             {
                 std::string fileName(value.data() + 9, value.size() - 9);
-                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend.Init(fileName.c_str())));
+
+                chip::Tracing::Perfetto::Initialize(perfetto::kInProcessBackend);
+
+                CHIP_ERROR err = perfetto_file_output.Open(fileName.c_str());
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Failed to open perfetto trace output: %" CHIP_ERROR_FORMAT, err.Format());
+                }
+
+                tracing_backends.push_back(std::make_unique<ScopedRegistration>(perfetto_backend));
             }
         }
 #endif // ENABLE_PERFETTO_TRACING

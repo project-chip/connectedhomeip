@@ -17,33 +17,32 @@
  */
 #pragma once
 
-#include <tracing/backend.h>
+#include <lib/core/CHIPError.h>
 
-#include <memory>
 #include <perfetto.h>
 
 namespace chip {
 namespace Tracing {
 namespace Perfetto {
 
-/// A Backend that outputs data to chip logging.
-///
-/// Structured data is formatted as json strings.
-class PerfettoBackend : public ::chip::Tracing::Backend
+/// Registers a perfetto data source to output to a file.
+class FileTraceOutput
 {
 public:
-    PerfettoBackend() = default;
+    FileTraceOutput() = default;
+    ~FileTraceOutput() { Close(); }
 
-    // TraceBegin/End/Instant are EXPLICITLY not provided
-    // as they would be slower than expected. Perfetto trace macros
-    // are expected to be set exclusively (via matter_trace_config)
+    /// Starts a new tracing output, closing the existing one
+    CHIP_ERROR Open(const char * file_name);
 
-    void LogMessageSend(MessageSendInfo &) override;
-    void LogMessageReceived(MessageReceivedInfo &) override;
+    /// Closes the tracing/session (assuming it is open)
+    void Close();
 
-    void LogNodeLookup(NodeLookupInfo &) override;
-    void LogNodeDiscovered(NodeDiscoveredInfo &) override;
-    void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
+private:
+    static constexpr int kInvalidFileId = -1;
+
+    int mTraceFileId = kInvalidFileId;
+    std::unique_ptr<perfetto::TracingSession> mTracingSession;
 };
 
 } // namespace Perfetto
