@@ -33,11 +33,7 @@ buildconfig_header("tracing_features") {
   header = "enabled_features.h"
   header_dir = "tracing"
 
-  defines = []
-
-  if (matter_commandline_enable_perfetto_tracing) {
-    defines = [ "ENABLE_PERFETTO_TRACING=1" ]
-  }
+  defines = [ "ENABLE_PERFETTO_TRACING=${matter_commandline_enable_perfetto_tracing}" ]
 }
 
 source_set("commandline") {

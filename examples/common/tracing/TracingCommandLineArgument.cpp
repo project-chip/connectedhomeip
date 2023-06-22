@@ -22,7 +22,7 @@
 #include <tracing/log_json/log_json_tracing.h>
 #include <tracing/registry.h>
 
-#ifdef ENABLE_PERFETTO_TRACING
+#if ENABLE_PERFETTO_TRACING
 #include <tracing/perfetto/event_storage.h>     // nogncheck
 #include <tracing/perfetto/file_output.h>       // nogncheck
 #include <tracing/perfetto/perfetto_tracing.h>  // nogncheck
@@ -43,7 +43,7 @@ using ::chip::Tracing::LogJson::LogJsonBackend;
 // currently supported backends
 LogJsonBackend log_json_backend;
 
-#ifdef ENABLE_PERFETTO_TRACING
+#if ENABLE_PERFETTO_TRACING
 
 using ::chip::Tracing::Perfetto::FileTraceOutput;
 using ::chip::Tracing::Perfetto::PerfettoBackend;
@@ -85,7 +85,7 @@ void EnableTracingFor(const char * cliArg)
                 tracing_backends.push_back(std::make_unique<ScopedRegistration>(log_json_backend));
             }
         }
-#ifdef ENABLE_PERFETTO_TRACING
+#if ENABLE_PERFETTO_TRACING
         else if (value.data_equal(CharSpan::fromCharString("perfetto")))
         {
             if (!perfetto_backend.IsInList())
@@ -123,7 +123,7 @@ void EnableTracingFor(const char * cliArg)
 
 void StopTracing()
 {
-#ifdef ENABLE_PERFETTO_TRACING
+#if ENABLE_PERFETTO_TRACING
     chip::Tracing::Perfetto::FlushEventTrackingStorage();
     perfetto_file_output.Close();
 #endif
