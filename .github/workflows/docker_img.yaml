@@ -42,7 +42,7 @@ jobs:
                     - "-esp32"
                     - "-esp32-qemu"
                     - "-infineon"
-                    - "-imx"
+                    # - "-imx"
                     - "-k32w"
                     - "-mbed-os"
                     - "-nrf-platform"
