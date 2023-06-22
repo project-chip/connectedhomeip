@@ -43,10 +43,7 @@ jobs:
                     - "-esp32-qemu"
                     - "-infineon"
                     # NOTE: imx image requires too much space for GitHub-hosted runners. It fails with:
-                    # ```
-                    # ....
                     # ApplyLayer exit status 1 stdout:  stderr: write /opt/fsl-imx-xwayland/5.15-kirkstone/sysroots/armv8a-poky-linux/opt/ltp/testcases/bin/fanotify15: no space left on device
-                    # ```
                     # - "-imx"
                     - "-k32w"
                     - "-mbed-os"
