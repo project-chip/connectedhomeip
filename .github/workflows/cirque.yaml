@@ -67,6 +67,7 @@ jobs:
 
             - uses: Wandalen/wretry.action@v1.0.41
               name: Bootstrap cache
+              continue-on-error: true
               timeout-minutes: 20
               with:
                 action: buildjet/cache@v3
@@ -94,6 +95,7 @@ jobs:
               name: Cirque Bootstrap cache
               if: ${{ !env.ACT }}
               timeout-minutes: 20
+              continue-on-error: true
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3

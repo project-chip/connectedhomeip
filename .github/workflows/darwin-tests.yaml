@@ -70,6 +70,7 @@ jobs:
 
             - uses: Wandalen/wretry.action@v1.0.41
               name: Bootstrap cache
+              continue-on-error: true
               timeout-minutes: 20
               with:
                 action: buildjet/cache@v3
@@ -94,7 +95,6 @@ jobs:
 
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
-              continue-on-error: true
             - name: Build Apps
               timeout-minutes: 90
               run: |
