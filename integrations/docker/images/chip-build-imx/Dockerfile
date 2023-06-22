@@ -13,9 +13,11 @@ RUN set -x \
     && chmod a+x fsl-imx-xwayland-glibc-x86_64-imx-image-multimedia-armv8a-imx8mmevk-toolchain-5.15-kirkstone.sh \
     && ./fsl-imx-xwayland-glibc-x86_64-imx-image-multimedia-armv8a-imx8mmevk-toolchain-5.15-kirkstone.sh -y \
     && rm -rf fsl-imx-xwayland-glibc-x86_64-imx-image-multimedia-armv8a-imx8mmevk-toolchain-5.15-kirkstone.sh \
+    && : # last line
+RUN set -x \
     && cd /opt/fsl-imx-xwayland \
-    && find . -iname debug -exec rm -rf {} ';' \
-    && find . -iname debug -exec rm -rf {} ';' \
+    # && find . -iname debug -exec rm -rf "{}" + || true  \
+    && find . -iname ".debug" -exec rm -rf "{}" + || true \
     && : # last line
 
 FROM connectedhomeip/chip-build:${VERSION}
