@@ -32,8 +32,8 @@ source_set("perfetto_tracing") {
 
 source_set("file_output") {
   sources = [
-    "file_output.h",
     "file_output.cpp",
+    "file_output.h",
   ]
 
   public_deps = [
@@ -47,19 +47,17 @@ source_set("file_output") {
 
 source_set("simple_initialization") {
   sources = [
-    "simple_initialize.h",
     "simple_initialize.cpp",
+    "simple_initialize.h",
   ]
 
-  public_deps = [
-    "${chip_root}/third_party/perfetto:sdk",
-  ]
+  public_deps = [ "${chip_root}/third_party/perfetto:sdk" ]
 }
 
 source_set("event_storage") {
   sources = [
-    "event_storage.h",
     "event_storage.cpp",
+    "event_storage.h",
   ]
 
   public_deps = [
