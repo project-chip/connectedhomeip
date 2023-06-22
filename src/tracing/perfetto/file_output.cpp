@@ -40,6 +40,8 @@ CHIP_ERROR FileTraceOutput::Open(const char * file_name)
     // Close any existing files
     Close();
 
+    perfetto::TrackEvent::Register();
+
     // Create a trace file and start sending data to it
     mTraceFileId = open(file_name, O_RDWR | O_CREAT | O_TRUNC, 0640);
     if (mTraceFileId < 0)
