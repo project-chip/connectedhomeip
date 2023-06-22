@@ -44,7 +44,7 @@ enum class TimeState : uint8_t
     kInvalid = 0, // No valid offset available
     kActive  = 1, // An offset is currently being used
     kChanged = 2, // An offset expired or changed to a new value
-    kStopped = 2, // Offset is 0
+    kStopped = 3, // Permanent item in use
 };
 
 /**
@@ -81,7 +81,7 @@ public:
     CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp);
 
     CHIP_ERROR SetUTCTime(chip::EndpointId ep, uint64_t utcTime, GranularityEnum granularity, TimeSourceEnum source);
-    CHIP_ERROR GetLocalTime(chip::EndpointId ep, uint64_t & localTime);
+    CHIP_ERROR GetLocalTime(chip::EndpointId ep, DataModel::Nullable<uint64_t> & localTime);
     GranularityEnum & GetGranularity() { return mGranularity; }
 
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);

@@ -44,6 +44,8 @@ public:
         return success ? (map & to_underlying(feature)) : false;
     }
 
+    inline chip::EndpointId GetEndpoint() { return mEndpoint; }
+
     /**
      * @brief Notifies through the delegate that time zone has changed.
      *
@@ -70,6 +72,9 @@ public:
     virtual bool IsNTPAddressDomain(const chip::CharSpan ntp) = 0;
 
     virtual ~Delegate() = default;
+
+private:
+    chip::EndpointId mEndpoint = 0;
 };
 
 } // namespace TimeSynchronization
