@@ -44,7 +44,7 @@ jobs:
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
@@ -61,7 +61,7 @@ jobs:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               timeout-minutes: 20
               with:

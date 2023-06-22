@@ -42,7 +42,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
@@ -53,7 +53,7 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               timeout-minutes: 20
               with:

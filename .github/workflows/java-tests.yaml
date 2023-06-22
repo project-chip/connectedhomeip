@@ -59,7 +59,7 @@ jobs:
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
 
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               timeout-minutes: 20
               with:
