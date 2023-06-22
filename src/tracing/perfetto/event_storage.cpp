@@ -29,11 +29,13 @@ namespace chip {
 namespace Tracing {
 namespace Perfetto {
 
-void RegisterEventTrackingStorage() {
+void RegisterEventTrackingStorage()
+{
     perfetto::TrackEvent::Register();
 }
 
-void FlushEventTrackingStorage() {
+void FlushEventTrackingStorage()
+{
     perfetto::TrackEvent::Flush();
 }
 
