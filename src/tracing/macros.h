@@ -24,7 +24,7 @@
     {                                                                                                                              \
     } while (false)
 
-#ifndef MATTER_TRACING_ENABLED
+#if !MATTER_TRACING_ENABLED
 
 #define MATTER_TRACE_BEGIN(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_END(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
@@ -37,7 +37,7 @@
 #define MATTER_LOG_NODE_DISCOVERED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_NODE_DISCOVERY_FAILED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
-#else // MATTER_TRACING_ENABLED
+#else // !MATTER_TRACING_ENABLED
 
 #include <tracing/log_declares.h>
 #include <tracing/registry.h>
