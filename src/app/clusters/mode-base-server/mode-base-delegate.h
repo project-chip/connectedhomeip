@@ -85,21 +85,92 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 // Commands
 using Feature = chip::app::Clusters::LaundryWasherMode::Feature;
+
 namespace Commands {
 
 namespace ChangeToMode {
-using Type                    = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::Type;
-using DecodableType           = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::DecodableType;
-static constexpr CommandId Id = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::Id;
-}
+
+static constexpr CommandId Id = 0x00000000;
+
+enum class Fields : uint8_t
+{
+    kNewMode = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+
+    uint8_t newMode = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToMode::Id; }
+    uint8_t newMode = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToMode
 
 namespace ChangeToModeResponse {
 
-using Type                    = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::Type;
-using DecodableType           = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType;
-static constexpr CommandId Id = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::Id;
+static constexpr CommandId Id = 0x00000001;
 
-}
+enum class Fields : uint8_t
+{
+    kStatus     = 0,
+    kStatusText = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
+
+    uint8_t status = static_cast<uint8_t>(0);
+    Optional<chip::CharSpan> statusText;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ChangeToModeResponse
+
+
+
+//namespace ChangeToMode {
+//using Type                    = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::Type;
+//using DecodableType           = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::DecodableType;
+//static constexpr CommandId Id = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToMode::Id;
+//}
+//
+//namespace ChangeToModeResponse {
+//
+//using Type                    = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::Type;
+//using DecodableType           = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType;
+//static constexpr CommandId Id = chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::Id;
+//
+//}
 
 }
 

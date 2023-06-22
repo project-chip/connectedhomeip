@@ -59,8 +59,6 @@ public:
 
     EndpointId GetEndpointId() const {return mEndpointId;}
 
-//    struct Type;
-
 private:
     EndpointId mEndpointId{};
     ClusterId mClusterId{};

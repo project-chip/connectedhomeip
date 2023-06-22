@@ -383,25 +383,6 @@ uint8_t Instance::GetCurrentMode()
    return mCurrentMode;
 }
 
-// todo is this possible?
-//struct Instance::Type
-//{
-//   public:
-//   // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-//   static constexpr CommandId GetCommandId() { return Commands::ChangeToModeResponse::Id; }
-//   ClusterId GetClusterId() { return clusterId; }
-//
-//   uint8_t status = static_cast<uint8_t>(0);
-//   Optional<chip::CharSpan> statusText;
-//
-//   CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-//
-//   using ResponseType = DataModel::NullObjectType;
-//
-//   static constexpr bool MustUseTimedInvoke() { return false; }
-//};
-
-
 } // namespace ModeBase
 } // namespace Clusters
 } // namespace app
