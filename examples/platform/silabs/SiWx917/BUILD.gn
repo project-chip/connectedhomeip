@@ -33,7 +33,7 @@ declare_args() {
   sl_wfx_config_scan = true
 
   # Argument to force enable WPA3 security on rs91x
-  rs91x_wpa3_only = false
+  rs91x_wpa3_transition = false
 
   # use commissionable data for SiWx917
   siwx917_commissionable_data = false
@@ -219,8 +219,8 @@ config("silabs-wifi-config") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
   }
 
-  if (rs91x_wpa3_only) {
-    defines += [ "WIFI_ENABLE_SECURITY_WPA3=1" ]
+  if (rs91x_wpa3_transition) {
+    defines += [ "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1" ]
   }
 }
 

@@ -1,6 +1,7 @@
-name: "\U0001F680 1.0 Issue"
-description: Create an issue that is required for Matter 1.0 release
-title: "[1.0] "
+name: "\U0001F41B Bug report"
+description: Create a report to help Matter
+title: "[BUG] "
+labels: [bug, "needs triage"]
 body:
     - type: markdown
       attributes:
@@ -12,13 +13,13 @@ body:
           label: Reproduction steps
           description: "How do you trigger this bug? Please walk us through it step by step."
           placeholder: |
-            Please list reproduction steps step by step.
-            Place shell commands between ```.
-            Attach logs as files instead of pasting them in.
-            1.
-            2.
-            3.
-            ...
+              Please list reproduction steps step by step.
+              Place shell commands between ```.
+              Attach logs as files instead of pasting them in.
+              1.
+              2.
+              3.
+              ...
       validations:
           required: true
     - type: input
@@ -50,7 +51,6 @@ body:
               - freeRTOS
               - IMX8
               - k32w
-              - nrf connect
               - nrf
               - python
               - raspi
@@ -66,23 +66,6 @@ body:
           label: Platform Version(s)
           description: "What platform version(s) are affected [optional]"
           placeholder: "eg: 1.0.1, N/A"
-    - type: dropdown
-      attributes:
-          label: Type
-          description: What type of issue is this?
-          multiple: true
-          options:
-              - Test Improvement
-              - Common Cluster Logic
-              - Spec Compliance Issue
-              - Security Issue
-              - Platform Issue
-              - Core SDK Memory Issue
-              - Core SDK Crash
-              - Core SDK Performance Improvement
-              - Core SDK Interopability Issue
-      validations:
-          required: true
     - type: textarea
       attributes:
           label: Anything else?
@@ -94,4 +77,4 @@ body:
           required: false
     - type: markdown
       attributes:
-          value: "Thanks for helping us get to 1.0!"
+          value: "Thanks for submitting a bug!"

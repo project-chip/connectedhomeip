@@ -15,10 +15,27 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
-config("tracing_enabled") {
-  defines = [ "MATTER_TRACING_ENABLED" ]
+buildconfig_header("tracing_buildconfig") {
+  header = "build_config.h"
+  header_dir = "matter/tracing"
+
+  defines = []
+
+  if (matter_enable_tracing_support) {
+    defines += [ "MATTER_TRACING_ENABLED=1" ]
+  }
+
+  if (matter_trace_config == "multiplexed") {
+    defines += [ "MATTER_TRACE_MULTIPLEXED=1" ]
+  } else if (matter_trace_config == "none") {
+    defines += [ "MATTER_TRACE_NONE=1" ]
+  } else {
+    # Expect a separate config to be set, that provides
+    # matter/tracing/macros_impl.h
+  }
 }
 
 static_library("tracing") {
@@ -29,12 +46,16 @@ static_library("tracing") {
     "registry.cpp",
     "registry.h",
     "scope.h",
-    "scopes.h",
   ]
 
-  public_deps = [ "${chip_root}/src/lib/support" ]
+  public_deps = [
+    ":tracing_buildconfig",
+    "${chip_root}/src/lib/support",
+  ]
 
   if (matter_enable_tracing_support) {
-    public_configs = [ ":tracing_enabled" ]
+    if (matter_trace_config != "multiplexed" && matter_trace_config != "none") {
+      public_configs += [ matter_trace_config ]
+    }
   }
 }

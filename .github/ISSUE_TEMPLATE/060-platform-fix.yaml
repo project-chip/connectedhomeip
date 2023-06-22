@@ -1,37 +1,33 @@
-name: "\U0001F3C3 Trivial Fix"
-description: Create an issue for a trivial fix
-title: "[Trivial] "
+name: "\U0001F3D7 Platform Fix"
+description: Create an issue for a platform specific fix
+title: "[Platform] "
+labels: ["platform", "needs triage"]
 body:
     - type: markdown
       attributes:
           value: |
-              Thanks for taking the time to submit a trivial fix, can you please please help us understand this change in this quick form?
-    - type: dropdown
-      attributes:
-          label: Type
-          description: What type of trivial fix is this?
-          multiple: true
-          options:
-              - Comment fix
-              - Typo fix
-              - Rename
-              - Other
-      validations:
-          required: true
+              Thanks for taking the time to submit a an issue for a platform, can you please please help us understand this change in this quick form?
     - type: textarea
       id: repro
       attributes:
-          label: Explanation
-          description: "(Optional) If other, why do you think this is trivial?"
+          label: Reproduction steps
+          description: "How do you trigger this issue? Please walk us through it step by step."
+          placeholder: |
+              Please list reproduction steps step by step.
+              Place shell commands between ```.
+              Attach logs as files instead of pasting them in.
+              1.
+              2.
+              3.
+              ...
       validations:
-          required: false
+          required: true
     - type: dropdown
       attributes:
           label: Platform
           description: What platforms are affected?
           multiple: true
           options:
-              - all
               - ameba
               - android
               - cc13x2_cc26x2
@@ -89,4 +85,4 @@ body:
           required: false
     - type: markdown
       attributes:
-          value: "Thanks for submitting a trivial issue!"
+          value: "Thanks for submitting a platform issue!"

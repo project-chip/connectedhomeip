@@ -57,6 +57,16 @@
     "DiagnosticsLogs": ["Test_TC_DLOG_1_1"],
     "FlowMeasurement": ["Test_TC_FLW_1_1", "Test_TC_FLW_2_1"],
     "FixedLabel": ["Test_TC_FLABEL_1_1", "Test_TC_FLABEL_2_1"],
+    "FanControl": [
+        "Test_TC_FAN_1_1",
+        "Test_TC_FAN_2_1",
+        "Test_TC_FAN_2_2",
+        "Test_TC_FAN_2_3",
+        "Test_TC_FAN_2_4",
+        "Test_TC_FAN_3_1",
+        "Test_TC_FAN_3_2",
+        "Test_TC_FAN_3_4"
+    ],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1", "Test_TC_DGGEN_2_1"],
     "Identify": [
@@ -82,7 +92,8 @@
         "Test_TC_LVL_3_1",
         "Test_TC_LVL_4_1",
         "Test_TC_LVL_5_1",
-        "Test_TC_LVL_6_1"
+        "Test_TC_LVL_6_1",
+        "Test_TC_LVL_7_1"
     ],
     "LocalizationConfiguration": ["Test_TC_LCFG_1_1"],
     "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
@@ -264,7 +275,8 @@
         "Test_TC_DRLK_2_6",
         "Test_TC_DRLK_2_7",
         "Test_TC_DRLK_2_9",
-        "Test_TC_DRLK_2_11"
+        "Test_TC_DRLK_2_11",
+        "Test_TC_DRLK_2_12"
     ],
     "Groups": [
         "TestGroupMessaging",
@@ -339,6 +351,7 @@
         "EthernetNetworkDiagnostics",
         "FlowMeasurement",
         "FixedLabel",
+        "FanControl",
         "GeneralCommissioning",
         "GeneralDiagnostics",
         "Identify",

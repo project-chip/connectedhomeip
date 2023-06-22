@@ -1,17 +1,21 @@
-name: "\U0001F4A1 Feature Request"
-description: Create an feature to be considered future release
-title: "[Feature] "
+name: "\U0001F477 GitHub / CI / Workflow"
+description: Create an issue to improve CI / Workflows
+title: "[Workflow] "
+labels: ["workflows", "needs triage"]
 body:
     - type: markdown
       attributes:
           value: |
-              Thanks for submitting a feature request to the Matter SDK! We need information about the feature to follow up, so please help us out by filling out this information.
+              Thanks for reporting an issue against the Matter SDK's workflows! We need information about the bug report to follow up, so please help us out by filling out this information.
     - type: textarea
       id: repro
       attributes:
-          label: Feature description
-          description: "What feature are you looking to add? Please walk us through it!"
+          label: Workflow issues
+          description: "What updates to the workflows are needed?"
           value: |
+              1.
+              2.
+              3.
               ...
       validations:
           required: true
@@ -21,7 +25,6 @@ body:
           description: What platforms are affected?
           multiple: true
           options:
-              - all
               - ameba
               - android
               - cc13x2_cc26x2
@@ -38,15 +41,10 @@ body:
               - vscode
               - windows
               - other
-              - core
+              - core (please add to version below)
+              - all
       validations:
-          required: true
-    - type: input
-      id: platform-versions
-      attributes:
-          label: Platform Version(s)
-          description: "What platform version(s) are affected [optional]"
-          placeholder: "eg: 1.0.1, N/A"
+          required: false
     - type: textarea
       attributes:
           label: Anything else?
@@ -58,4 +56,4 @@ body:
           required: false
     - type: markdown
       attributes:
-          value: "Thanks for submitting a new feature request."
+          value: "Thanks for helping improve our development workflows"

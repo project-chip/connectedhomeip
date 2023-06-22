@@ -16152,6 +16152,18 @@ public class ChipClusters {
       subscribeSensitivityLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readExpiryDateAttribute(
+      LongAttributeCallback callback
+    ) {
+      readExpiryDateAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeExpiryDateAttribute(
+        LongAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeExpiryDateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
       GeneratedCommandListAttributeCallback callback
     ) {
@@ -16308,6 +16320,13 @@ public class ChipClusters {
     private native void writeSensitivityLevelAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
     private native void subscribeSensitivityLevelAttribute(long chipClusterPtr,
         IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
+
+    private native void readExpiryDateAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
+    );
+    private native void subscribeExpiryDateAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
 , int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr,

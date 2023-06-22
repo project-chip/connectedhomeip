@@ -355,11 +355,11 @@ static void wfx_rsi_save_ap_info()
         /*
          * Scan is done - failed
          */
-#if WIFI_ENABLE_SECURITY_WPA3
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         wfx_rsi.sec.security = WFX_SEC_WPA3;
-#else  /* !WIFI_ENABLE_SECURITY_WPA3 */
+#else  /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         wfx_rsi.sec.security = WFX_SEC_WPA2;
-#endif /* WIFI_ENABLE_SECURITY_WPA3 */
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         SILABS_LOG("%s: warn: failed with status: %02x", __func__, status);
         return;
     }
@@ -386,9 +386,13 @@ static void wfx_rsi_save_ap_info()
     case SME_WEP:
         wfx_rsi.sec.security = WFX_SEC_WEP;
         break;
-    case SME_WPA3:
     case SME_WPA3_TRANSITION:
-        wfx_rsi.sec.security = WFX_SEC_WPA3;
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
+    case SME_WPA3:
+        wfx_rsi.sec.security = RSI_WPA3;
+#else
+        wfx_rsi.sec.security = WFX_SEC_WPA2;
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         break;
     default:
         wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
@@ -425,9 +429,11 @@ static void wfx_rsi_do_join(void)
         case WFX_SEC_WPA2:
             connect_security_mode = RSI_WPA_WPA2_MIXED;
             break;
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         case WFX_SEC_WPA3:
-            connect_security_mode = RSI_WPA3;
+            connect_security_mode = RSI_WPA3_TRANSITION;
             break;
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANS */
         case WFX_SEC_NONE:
             connect_security_mode = RSI_OPEN;
             break;

@@ -7182,6 +7182,17 @@ public class ClusterReadMapping {
           readSmokeCoAlarmSensitivityLevelCommandParams
         );
         result.put("readSensitivityLevelAttribute", readSmokeCoAlarmSensitivityLevelAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readSmokeCoAlarmExpiryDateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readSmokeCoAlarmExpiryDateAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.SmokeCoAlarmCluster) cluster).readExpiryDateAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readSmokeCoAlarmExpiryDateCommandParams
+        );
+        result.put("readExpiryDateAttribute", readSmokeCoAlarmExpiryDateAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readSmokeCoAlarmGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readSmokeCoAlarmGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

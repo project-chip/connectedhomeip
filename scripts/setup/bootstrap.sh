@@ -19,7 +19,7 @@ _install_additional_pip_requirements() {
     shift
 
     # figure out additional pip install items
-    while [[ $# -gt 0 ]]; do
+    while [ $# -gt 0 ]; do
         case $1 in
             -p | --platform)
                 _SETUP_PLATFORM=$2
@@ -32,9 +32,14 @@ _install_additional_pip_requirements() {
         esac
     done
 
-    if ! [ -z "$_SETUP_PLATFORM" ]; then
-        IFS="," read -r -a _PLATFORMS <<<"$_SETUP_PLATFORM"
-        for platform in "${_PLATFORMS[@]}"; do
+    if [ -n "$_SETUP_PLATFORM" ]; then
+        _OLD_IFS=$IFS
+        IFS=","
+        if [ -n "$ZSH_VERSION" ]; then
+            setopt local_options shwordsplit
+        fi
+
+        for platform in ${_SETUP_PLATFORM}; do
             # Allow none as an alias of nothing extra installed (like -p none)
             if [ "$platform" != "none" ]; then
                 echo "Installing pip requirements for $platform..."
@@ -43,7 +48,12 @@ _install_additional_pip_requirements() {
                     -c "$_CHIP_ROOT/scripts/setup/constraints.txt"
             fi
         done
+        IFS=$_OLD_IFS
+        unset _OLD_IFS
+        unset _PLATFORMS
     fi
+
+    unset _SETUP_PLATFORM
 }
 
 _bootstrap_or_activate() {
