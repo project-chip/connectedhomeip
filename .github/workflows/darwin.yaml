@@ -32,7 +32,7 @@ env:
 jobs:
     darwin:
         name: Build Darwin
-        timeout-minutes: 210
+        timeout-minutes: 300
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -167,7 +167,7 @@ jobs:
                   xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-incomplete-umbrella -Wno-unguarded-availability-new' CHIP_IS_TSAN=YES > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
               working-directory: src/darwin/Framework
             - name: Build Matter TV Casting Bridge
-              timeout-minutes: 20
+              timeout-minutes: 35
               run: |
                   xcodebuild -target "MatterTvCastingBridge" -sdk iphoneos
               working-directory: examples/tv-casting-app/darwin/MatterTvCastingBridge
