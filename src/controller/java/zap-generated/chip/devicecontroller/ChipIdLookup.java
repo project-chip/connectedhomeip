@@ -2251,7 +2251,7 @@ public final class ChipIdLookup {
         return "NumberOfRinses";
       }
       if (attributeId == 3L) {
-        return "MaxRinses";
+        return "SupportedRinses";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
