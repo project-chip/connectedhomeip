@@ -50,7 +50,7 @@
 #define MATTER_TRACE_END(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
-#elif defined(MATTER_TRACE_MULTIPLEXED)
+#elif MATTER_TRACE_MULTIPLEXED
 
 // This gets forwarded to the multiplexed instance
 #define MATTER_TRACE_BEGIN(label, group) ::chip::Tracing::Internal::Begin(label, group)

@@ -25,7 +25,7 @@
 
 #if MATTER_TRACE_NONE
 #define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#elif !defined(MATTER_TRACE_MULTIPLEXED)
+#elif !MATTER_TRACE_MULTIPLEXED
 #include <matter/tracing/macros_impl.h>
 #else
 
