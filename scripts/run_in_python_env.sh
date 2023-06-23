@@ -22,7 +22,7 @@ set -e
 _VENV_PATH="$1"
 shift
 
-source "${_VENV_PATH}/bin/activate"
+source "$_VENV_PATH/bin/activate"
 
-echo "Executing in python environment ${VENV_PATH}: $*"
+echo "Executing in python environment $VENV_PATH: $*"
 bash -c -- "$@"

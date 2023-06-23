@@ -177,8 +177,8 @@ if [ -n "$install_virtual_env" ]; then
     ENVIRONMENT_ROOT="$install_virtual_env"
 
     if [ "$clean_virtual_env" = "yes" ]; then
-      # Create a virtual environment that has access to the built python tools
-      virtualenv --clear "$ENVIRONMENT_ROOT"
+        # Create a virtual environment that has access to the built python tools
+        virtualenv --clear "$ENVIRONMENT_ROOT"
     fi
 
     source "$ENVIRONMENT_ROOT"/bin/activate
