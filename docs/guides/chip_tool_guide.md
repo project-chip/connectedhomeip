@@ -1249,9 +1249,12 @@ The steps are the same as for the `subscribe` or `subscribe-event` commands.
 
 ## Using wildcards
 
-The CHIP Tool supports command wildcards for parameter values for clusters, attributes or events, or endpoints, or any combination of these.
-With the wildcards, you can for example read all attributes for the cluster `0x101` on a specific endpoint with a specific node ID on all devices in the Matter network.
-This allows you to parse and gather cluster information faster and more efficiently.
+The CHIP Tool supports command wildcards for parameter values for clusters,
+attributes or events, or endpoints, or any combination of these. With the
+wildcards, you can for example read all attributes for the cluster `0x101` on a
+specific endpoint with a specific node ID on all devices in the Matter network.
+This allows you to parse and gather cluster information faster and more
+efficiently.
 
 The following wildcards are available:
 
@@ -1260,7 +1263,8 @@ The following wildcards are available:
 -   For all endpoints: `0xFFFF`
 
 You can combine these wildcards within a single command. Wildcards can be used
-in both [single-command](#single-command-mode-default) and [interactive](#interactive-mode) modes.
+in both [single-command](#single-command-mode-default) and
+[interactive](#interactive-mode) modes.
 
 You can use the following command pattern:
 
@@ -1270,50 +1274,54 @@ $ ./chip-tool <cluster_name> <command> <attribute_event_name> <node_id> <endpoin
 
 In this command:
 
-- _<cluster-name\>_ is the name of the cluster.
-- _<command\>_ is the name of the command supported by wildcards:
+-   _<cluster-name\>_ is the name of the cluster.
+-   _<command\>_ is the name of the command supported by wildcards:
 
-  ```
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * read                                                                              |
-  | * read-by-id                                                                        |
-  | * subscribe                                                                         |
-  | * subscribe-by-id                                                                   |
-  +-------------------------------------------------------------------------------------+
-  ```
+    ```
+    +-------------------------------------------------------------------------------------+
+    | Commands:                                                                           |
+    +-------------------------------------------------------------------------------------+
+    | * read                                                                              |
+    | * read-by-id                                                                        |
+    | * subscribe                                                                         |
+    | * subscribe-by-id                                                                   |
+    +-------------------------------------------------------------------------------------+
+    ```
 
-- _<attribute_event_name\>_ is the name of the chosen attribute or event.
-- _<node_id\>_ is the user-defined ID of the commissioned node.
-- _<endpoint_id\>_ is the ID of the endpoint where the chosen cluster is
-  implemented.
-
+-   _<attribute_event_name\>_ is the name of the chosen attribute or event.
+-   _<node_id\>_ is the user-defined ID of the commissioned node.
+-   _<endpoint_id\>_ is the ID of the endpoint where the chosen cluster is
+    implemented.
 
 **Examples of commands:**
 
-- To read all attributes (wildcard `0xFFFFFFFF`) from the cluster `doorlock` for the node with ID `1` and on the endpoint `1`, run the following command:
+-   To read all attributes (wildcard `0xFFFFFFFF`) from the cluster `doorlock`
+    for the node with ID `1` and on the endpoint `1`, run the following command:
 
-  ```
-  $ ./chip-tool doorlock read-by-id 0xFFFFFFFF 1 1
-  ```
+    ```
+    $ ./chip-tool doorlock read-by-id 0xFFFFFFFF 1 1
+    ```
 
-- To read the `lock-state` attribute from the cluster `doorlock` for the node with ID `1` and on all endpoints (wildcard `0xFFFF`), run the following command:
+-   To read the `lock-state` attribute from the cluster `doorlock` for the node
+    with ID `1` and on all endpoints (wildcard `0xFFFF`), run the following
+    command:
 
-  ```
-  $ ./chip-tool doorlock read lock-state 1 0xFFFF
-  ```
+    ```
+    $ ./chip-tool doorlock read lock-state 1 0xFFFF
+    ```
 
-- To read all attributes (wildcard `0xFFFFFFFF`) from the cluster `doorlock` for the node with ID `1` and on all endpoints (wildcard `0xFFFF`), run the following command:
+-   To read all attributes (wildcard `0xFFFFFFFF`) from the cluster `doorlock`
+    for the node with ID `1` and on all endpoints (wildcard `0xFFFF`), run the
+    following command:
 
-  ```
-  $ ./chip-tool doorlock read-by-id 0xFFFFFFFF 1 0xFFFF
-  ```
+    ```
+    $ ./chip-tool doorlock read-by-id 0xFFFFFFFF 1 0xFFFF
+    ```
 
 ### Using wildcards with `any` command
 
-Using the `any` command lets you use wildcards also for the cluster names.
-The `any` command can be combined with the following commands:
+Using the `any` command lets you use wildcards also for the cluster names. The
+`any` command can be combined with the following commands:
 
 ```
 +-------------------------------------------------------------------------------------+
@@ -1338,9 +1346,11 @@ $ ./chip-tool any <command_name> [parameters of the <command_name>]
 
 In this command:
 
--   _<command_name\>_ is one of the commands supported for the `any` command, as listed above.
--   _[parameters of the <command_name\>]_ are the parameters required by _<command_name\>_.
-    You can check them by running the command without any parameters.
+-   _<command_name\>_ is one of the commands supported for the `any` command, as
+    listed above.
+-   _[parameters of the <command_name\>]_ are the parameters required by
+    _<command_name\>_. You can check them by running the command without any
+    parameters.
 
 **Example of command pattern for `read-by-id`:**
 
@@ -1350,26 +1360,34 @@ $ ./chip-tool any read-by-id <cluster-ids> <attribute-ids> <destination-id> <end
 
 **Examples of commands:**
 
-- To read the `0x0` attribute (`lock state`) on the cluster `0x101` (`doorlock`) for the node with ID `1` and on the endpoint `1`, run the following command:
+-   To read the `0x0` attribute (`lock state`) on the cluster `0x101`
+    (`doorlock`) for the node with ID `1` and on the endpoint `1`, run the
+    following command:
 
-  ```
-  $ ./chip-tool any read-by-id 0x101 0x0 1 1
-  ```
+    ```
+    $ ./chip-tool any read-by-id 0x101 0x0 1 1
+    ```
 
-- To read all attributes (wildcard `0xFFFFFFFF`) from the cluster `0x101` (`doorlock`) for the node with ID `1` and on the endpoint `1`, run the following command:
+-   To read all attributes (wildcard `0xFFFFFFFF`) from the cluster `0x101`
+    (`doorlock`) for the node with ID `1` and on the endpoint `1`, run the
+    following command:
 
-  ```
-  $ ./chip-tool any read-by-id 0x101 0xFFFFFFFF 1 1
-  ```
+    ```
+    $ ./chip-tool any read-by-id 0x101 0xFFFFFFFF 1 1
+    ```
 
-- To read all attributes (wildcard `0xFFFFFFFF`) on all clusters (wildcard `0xFFFFFFFF`) for the node with ID `1` and on the endpoint `1`, run the following command:
+-   To read all attributes (wildcard `0xFFFFFFFF`) on all clusters (wildcard
+    `0xFFFFFFFF`) for the node with ID `1` and on the endpoint `1`, run the
+    following command:
 
-  ```
-  ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 1
-  ```
+    ```
+    ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 1
+    ```
 
-- To read all attributes (wildcard `0xFFFFFFFF`) on all clusters (wildcard `0xFFFFFFFF`) for the node with ID `1` and on all endpoints (wildcard `0xFFFF`), run the following command:
+-   To read all attributes (wildcard `0xFFFFFFFF`) on all clusters (wildcard
+    `0xFFFFFFFF`) for the node with ID `1` and on all endpoints (wildcard
+    `0xFFFF`), run the following command:
 
-  ```
-  ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
-  ```
+    ```
+    ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+    ```
