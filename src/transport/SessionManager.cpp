@@ -682,8 +682,6 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Optional<SessionHandle> session = mSecureSessions.FindSecureSessionByLocalKey(partialPacketHeader.GetSessionId());
-
     PayloadHeader payloadHeader;
 
     // Drop secure unicast messages with privacy enabled.
@@ -696,13 +694,26 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     PacketHeader packetHeader;
     ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
-    SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
-
     if (msg.IsNull())
     {
         ChipLogError(Inet, "Secure transport received Unicast NULL packet, discarding");
         return;
     }
+
+    SessionMessageDelegate::DuplicateMessage isDuplicate = SessionMessageDelegate::DuplicateMessage::No;
+
+    Optional<SessionHandle> session = mSecureSessions.FindSecureSessionByLocalKey(partialPacketHeader.GetSessionId());
+
+#if CHIP_CONFIG_SECURITY_FUZZ_MODE
+    // If no valid existing session was found - try to use test session instead.
+    if (!session.HasValue())
+    {
+#warning "Warning: CHIP_CONFIG_SECURITY_FUZZ_MODE=1 using default session!"
+        ChipLogError(SecureChannel, "Warning: CHIP_CONFIG_SECURITY_FUZZ_MODE=1 using default session... ");
+        uint16_t kLocalSessionId = 1;
+        session                  = mSecureSessions.FindSecureSessionByLocalKey(kLocalSessionId);
+    }
+#endif
 
     if (!session.HasValue())
     {

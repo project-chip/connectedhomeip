@@ -41,7 +41,17 @@ class SecureSessionTable
 public:
     ~SecureSessionTable() { mEntries.ReleaseAll(); }
 
-    void Init() { mNextSessionId = chip::Crypto::GetRandU16(); }
+    void Init()
+    {
+#if CHIP_CONFIG_SECURITY_FUZZ_MODE
+#warning "Warning: CHIP_CONFIG_SECURITY_FUZZ_MODE=1 bypassing random sessionId!"
+        ChipLogError(SecureChannel, "Warning: CHIP_CONFIG_SECURITY_FUZZ_MODE=1 bypassing random sessionId... ");
+        static uint16_t manualSessionId = 1;
+        mNextSessionId                  = ++manualSessionId;
+#else
+        mNextSessionId = chip::Crypto::GetRandU16();
+#endif
+    }
 
     /**
      * Allocate a new secure session out of the internal resource pool.
