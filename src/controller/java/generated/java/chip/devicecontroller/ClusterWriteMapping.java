@@ -862,52 +862,52 @@ public class ClusterWriteMapping {
     );
     writeRefrigeratorAndTemperatureControlledCabinetModeInteractionInfo.put("writeOnModeAttribute", writeRefrigeratorAndTemperatureControlledCabinetModeOnModeAttributeInteractionInfo);
     writeAttributeMap.put("refrigeratorAndTemperatureControlledCabinetMode", writeRefrigeratorAndTemperatureControlledCabinetModeInteractionInfo);
-    Map<String, InteractionInfo> writeWasherControlsInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeWasherControlsSpinSpeedCurrentCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo washerControlsspinSpeedCurrentCommandParameterInfo =
+    Map<String, InteractionInfo> writeLaundryWasherControlsInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeLaundryWasherControlsSpinSpeedCurrentCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo laundryWasherControlsspinSpeedCurrentCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeWasherControlsSpinSpeedCurrentCommandParams.put(
+    writeLaundryWasherControlsSpinSpeedCurrentCommandParams.put(
         "value",
-        washerControlsspinSpeedCurrentCommandParameterInfo
+        laundryWasherControlsspinSpeedCurrentCommandParameterInfo
     );
-    InteractionInfo writeWasherControlsSpinSpeedCurrentAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeLaundryWasherControlsSpinSpeedCurrentAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.WasherControlsCluster) cluster).writeSpinSpeedCurrentAttribute(
+        ((ChipClusters.LaundryWasherControlsCluster) cluster).writeSpinSpeedCurrentAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeWasherControlsSpinSpeedCurrentCommandParams
+      writeLaundryWasherControlsSpinSpeedCurrentCommandParams
     );
-    writeWasherControlsInteractionInfo.put("writeSpinSpeedCurrentAttribute", writeWasherControlsSpinSpeedCurrentAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeWasherControlsNumberOfRinsesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo washerControlsnumberOfRinsesCommandParameterInfo =
+    writeLaundryWasherControlsInteractionInfo.put("writeSpinSpeedCurrentAttribute", writeLaundryWasherControlsSpinSpeedCurrentAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeLaundryWasherControlsNumberOfRinsesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo laundryWasherControlsnumberOfRinsesCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeWasherControlsNumberOfRinsesCommandParams.put(
+    writeLaundryWasherControlsNumberOfRinsesCommandParams.put(
         "value",
-        washerControlsnumberOfRinsesCommandParameterInfo
+        laundryWasherControlsnumberOfRinsesCommandParameterInfo
     );
-    InteractionInfo writeWasherControlsNumberOfRinsesAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeLaundryWasherControlsNumberOfRinsesAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.WasherControlsCluster) cluster).writeNumberOfRinsesAttribute(
+        ((ChipClusters.LaundryWasherControlsCluster) cluster).writeNumberOfRinsesAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeWasherControlsNumberOfRinsesCommandParams
+      writeLaundryWasherControlsNumberOfRinsesCommandParams
     );
-    writeWasherControlsInteractionInfo.put("writeNumberOfRinsesAttribute", writeWasherControlsNumberOfRinsesAttributeInteractionInfo);
-    writeAttributeMap.put("washerControls", writeWasherControlsInteractionInfo);
+    writeLaundryWasherControlsInteractionInfo.put("writeNumberOfRinsesAttribute", writeLaundryWasherControlsNumberOfRinsesAttributeInteractionInfo);
+    writeAttributeMap.put("laundryWasherControls", writeLaundryWasherControlsInteractionInfo);
     Map<String, InteractionInfo> writeRvcRunModeInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeRvcRunModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo rvcRunModestartUpModeCommandParameterInfo =

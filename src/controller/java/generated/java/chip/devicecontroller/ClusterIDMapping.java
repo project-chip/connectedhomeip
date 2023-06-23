@@ -160,8 +160,8 @@ public class ClusterIDMapping {
         if (clusterId == RefrigeratorAndTemperatureControlledCabinetMode.ID) {
             return new RefrigeratorAndTemperatureControlledCabinetMode();
         }
-        if (clusterId == WasherControls.ID) {
-            return new WasherControls();
+        if (clusterId == LaundryWasherControls.ID) {
+            return new LaundryWasherControls();
         }
         if (clusterId == RvcRunMode.ID) {
             return new RvcRunMode();
@@ -6562,7 +6562,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class WasherControls implements BaseCluster {
+    public static class LaundryWasherControls implements BaseCluster {
         public static final long ID = 83L;
         public long getID() {
             return ID;
@@ -6572,7 +6572,7 @@ public class ClusterIDMapping {
             SpinSpeeds(0L),
             SpinSpeedCurrent(1L),
             NumberOfRinses(2L),
-            MaxRinses(3L),
+            SupportedRinses(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

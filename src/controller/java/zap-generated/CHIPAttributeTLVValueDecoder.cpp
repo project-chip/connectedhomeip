@@ -12805,8 +12805,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::WasherControls::Id: {
-        using namespace app::Clusters::WasherControls;
+    case app::Clusters::LaundryWasherControls::Id: {
+        using namespace app::Clusters::LaundryWasherControls;
         switch (aPath.mAttributeId)
         {
         case Attributes::SpinSpeeds::Id: {
@@ -12870,12 +12870,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string valueClassName     = "java/lang/Integer";
                 std::string valueCtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                              cppValue.Value(), value);
+                                                                              static_cast<uint8_t>(cppValue.Value()), value);
             }
             return value;
         }
-        case Attributes::MaxRinses::Id: {
-            using TypeInfo = Attributes::MaxRinses::TypeInfo;
+        case Attributes::SupportedRinses::Id: {
+            using TypeInfo = Attributes::SupportedRinses::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -12883,10 +12883,27 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                chip::JniReferences::GetInstance().CreateArrayList(value);
+
+                auto iter_value_1 = cppValue.Value().begin();
+                while (iter_value_1.Next())
+                {
+                    auto & entry_1 = iter_value_1.GetValue();
+                    jobject newElement_1;
+                    std::string newElement_1ClassName     = "java/lang/Integer";
+                    std::string newElement_1CtorSignature = "(I)V";
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_1ClassName.c_str(),
+                                                                                  newElement_1CtorSignature.c_str(),
+                                                                                  static_cast<uint8_t>(entry_1), newElement_1);
+                    chip::JniReferences::GetInstance().AddToList(value, newElement_1);
+                }
+            }
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {

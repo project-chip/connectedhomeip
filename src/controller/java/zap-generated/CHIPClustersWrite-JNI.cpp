@@ -2584,12 +2584,12 @@ JNI_METHOD(void, RefrigeratorAndTemperatureControlledCabinetModeCluster, writeOn
     onFailure.release();
 }
 
-JNI_METHOD(void, WasherControlsCluster, writeSpinSpeedCurrentAttribute)
+JNI_METHOD(void, LaundryWasherControlsCluster, writeSpinSpeedCurrentAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::WasherControls::Attributes::SpinSpeedCurrent::TypeInfo;
+    using TypeInfo = chip::app::Clusters::LaundryWasherControls::Attributes::SpinSpeedCurrent::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2618,8 +2618,8 @@ JNI_METHOD(void, WasherControlsCluster, writeSpinSpeedCurrentAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    WasherControlsCluster * cppCluster = reinterpret_cast<WasherControlsCluster *>(clusterPtr);
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    LaundryWasherControlsCluster * cppCluster = reinterpret_cast<LaundryWasherControlsCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -2644,12 +2644,12 @@ JNI_METHOD(void, WasherControlsCluster, writeSpinSpeedCurrentAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, WasherControlsCluster, writeNumberOfRinsesAttribute)
+JNI_METHOD(void, LaundryWasherControlsCluster, writeNumberOfRinsesAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::WasherControls::Attributes::NumberOfRinses::TypeInfo;
+    using TypeInfo = chip::app::Clusters::LaundryWasherControls::Attributes::NumberOfRinses::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -2678,8 +2678,90 @@ JNI_METHOD(void, WasherControlsCluster, writeNumberOfRinsesAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    WasherControlsCluster * cppCluster = reinterpret_cast<WasherControlsCluster *>(clusterPtr);
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    LaundryWasherControlsCluster * cppCluster = reinterpret_cast<LaundryWasherControlsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, LaundryWasherControlsCluster, writeSupportedRinsesAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::LaundryWasherControls::Attributes::SupportedRinses::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    if (value == nullptr)
+    {
+        cppValue.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = cppValue.SetNonNull();
+        {
+            using ListType_1       = std::remove_reference_t<decltype(nonNullValue_0)>;
+            using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+            jint valueSize;
+            chip::JniReferences::GetInstance().GetListSize(value, valueSize);
+            if (valueSize != 0)
+            {
+                auto * listHolder_1 = new ListHolder<ListMemberType_1>(valueSize);
+                listFreer.add(listHolder_1);
+
+                for (jint i_1 = 0; i_1 < valueSize; ++i_1)
+                {
+                    jobject element_1;
+                    chip::JniReferences::GetInstance().GetListItem(value, i_1, element_1);
+                    listHolder_1->mList[i_1] = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1])>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_1));
+                }
+                nonNullValue_0 = ListType_1(listHolder_1->mList, valueSize);
+            }
+            else
+            {
+                nonNullValue_0 = ListType_1();
+            }
+        }
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    LaundryWasherControlsCluster * cppCluster = reinterpret_cast<LaundryWasherControlsCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));

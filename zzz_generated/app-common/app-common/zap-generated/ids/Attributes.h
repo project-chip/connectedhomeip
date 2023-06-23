@@ -2559,7 +2559,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace RefrigeratorAndTemperatureControlledCabinetMode
 
-namespace WasherControls {
+namespace LaundryWasherControls {
 namespace Attributes {
 
 namespace SpinSpeeds {
@@ -2574,9 +2574,9 @@ namespace NumberOfRinses {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace NumberOfRinses
 
-namespace MaxRinses {
+namespace SupportedRinses {
 static constexpr AttributeId Id = 0x00000003;
-} // namespace MaxRinses
+} // namespace SupportedRinses
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -2603,7 +2603,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace WasherControls
+} // namespace LaundryWasherControls
 
 namespace RvcRunMode {
 namespace Attributes {

@@ -76,7 +76,7 @@
 | ModeSelect                                                          | 0x0050 |
 | LaundryWasherMode                                                   | 0x0051 |
 | RefrigeratorAndTemperatureControlledCabinetMode                     | 0x0052 |
-| WasherControls                                                      | 0x0053 |
+| LaundryWasherControls                                               | 0x0053 |
 | RvcRunMode                                                          | 0x0054 |
 | RvcCleanMode                                                        | 0x0055 |
 | TemperatureControl                                                  | 0x0056 |
@@ -4188,7 +4188,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster WasherControls                                              | 0x0053 |
+| Cluster LaundryWasherControls                                       | 0x0053 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -4196,7 +4196,7 @@ private:
 | * SpinSpeeds                                                        | 0x0000 |
 | * SpinSpeedCurrent                                                  | 0x0001 |
 | * NumberOfRinses                                                    | 0x0002 |
-| * MaxRinses                                                         | 0x0003 |
+| * SupportedRinses                                                   | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -14761,11 +14761,11 @@ void registerClusterRefrigeratorAndTemperatureControlledCabinetMode(Commands & c
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterWasherControls(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterLaundryWasherControls(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::WasherControls;
+    using namespace chip::app::Clusters::LaundryWasherControls;
 
-    const char * clusterName = "WasherControls";
+    const char * clusterName = "LaundryWasherControls";
 
     commands_list clusterCommands = {
         //
@@ -14779,7 +14779,7 @@ void registerClusterWasherControls(Commands & commands, CredentialIssuerCommands
         make_unique<ReadAttribute>(Id, "spin-speeds", Attributes::SpinSpeeds::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "spin-speed-current", Attributes::SpinSpeedCurrent::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "number-of-rinses", Attributes::NumberOfRinses::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "max-rinses", Attributes::MaxRinses::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "supported-rinses", Attributes::SupportedRinses::Id, credsIssuerConfig),            //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -14792,10 +14792,11 @@ void registerClusterWasherControls(Commands & commands, CredentialIssuerCommands
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "spin-speed-current", 0, UINT8_MAX,
                                                                              Attributes::SpinSpeedCurrent::Id,
                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>>>(
             Id, "number-of-rinses", 0, UINT8_MAX, Attributes::NumberOfRinses::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "max-rinses", 0, UINT8_MAX, Attributes::MaxRinses::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>>>>(
+            Id, "supported-rinses", Attributes::SupportedRinses::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -14813,7 +14814,7 @@ void registerClusterWasherControls(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, "spin-speeds", Attributes::SpinSpeeds::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "spin-speed-current", Attributes::SpinSpeedCurrent::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "number-of-rinses", Attributes::NumberOfRinses::Id, credsIssuerConfig),             //
-        make_unique<SubscribeAttribute>(Id, "max-rinses", Attributes::MaxRinses::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "supported-rinses", Attributes::SupportedRinses::Id, credsIssuerConfig),            //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -24449,7 +24450,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterModeSelect(commands, credsIssuerConfig);
     registerClusterLaundryWasherMode(commands, credsIssuerConfig);
     registerClusterRefrigeratorAndTemperatureControlledCabinetMode(commands, credsIssuerConfig);
-    registerClusterWasherControls(commands, credsIssuerConfig);
+    registerClusterLaundryWasherControls(commands, credsIssuerConfig);
     registerClusterRvcRunMode(commands, credsIssuerConfig);
     registerClusterRvcCleanMode(commands, credsIssuerConfig);
     registerClusterTemperatureControl(commands, credsIssuerConfig);

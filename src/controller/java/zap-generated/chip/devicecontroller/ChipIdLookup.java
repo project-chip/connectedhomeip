@@ -157,7 +157,7 @@ public final class ChipIdLookup {
       return "RefrigeratorAndTemperatureControlledCabinetMode";
     }
     if (clusterId == 83L) {
-      return "WasherControls";
+      return "LaundryWasherControls";
     }
     if (clusterId == 84L) {
       return "RvcRunMode";

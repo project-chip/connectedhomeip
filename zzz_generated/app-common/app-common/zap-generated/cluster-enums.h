@@ -1519,7 +1519,21 @@ enum class Feature : uint32_t
 };
 } // namespace RefrigeratorAndTemperatureControlledCabinetMode
 
-namespace WasherControls {
+namespace LaundryWasherControls {
+
+// Enum for NumberOfRinsesEnum
+enum class NumberOfRinsesEnum : uint8_t
+{
+    kNone   = 0x00,
+    kNormal = 0x01,
+    kExtra  = 0x02,
+    kMax    = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -1527,7 +1541,7 @@ enum class Feature : uint32_t
     kSpin  = 0x1,
     kRinse = 0x2,
 };
-} // namespace WasherControls
+} // namespace LaundryWasherControls
 
 namespace RvcRunMode {
 
