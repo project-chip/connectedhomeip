@@ -24,5 +24,5 @@ shift
 
 source "$_VENV_PATH/bin/activate"
 
-echo "Executing in python environment $VENV_PATH: $*"
+echo "Executing in python environment $_VENV_PATH: $*"
 bash -c -- "$@"
