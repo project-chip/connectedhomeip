@@ -36,12 +36,13 @@ declare_args() {
   #
   # The setting below controls the destination of the tracing macros
   # with the following values available:
-  #    - "none" makes tracing completely disabled
-  #    - "multiplexed" allows using the "backend.h" for tracing, which
+  #    - empty allows using the "backend.h" for tracing, which
   #      will multiplex however will only work on fast backends (e.g.
   #      large systems with fast logging when writing to logs)
   #    - any other value will provide a tracing config, which
   #      MUST include a path to `matter/tracing/macros_impl.h`
+  #      in particular `src/tracing/none` provides a config where tracing
+  #      macros and scope are disabled
   #
   # since tracing is very noisy, we generally expect it to be explicitly
   # set up
@@ -52,6 +53,6 @@ declare_args() {
       cpp_standard == "gnu++17") {
     matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
   } else {
-    matter_trace_config = "none"
+    matter_trace_config = "${chip_root}/src/tracing:none"
   }
 }

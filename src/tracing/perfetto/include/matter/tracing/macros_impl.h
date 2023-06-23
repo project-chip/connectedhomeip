@@ -17,6 +17,11 @@
  */
 #pragma once
 
+/* Ensure we do not have double tracing macros defined */
+#if defined(MATTER_TRACE_BEGIN)
+#error "Tracing macros seem to be double defined"
+#endif
+
 #include <perfetto.h>
 
 PERFETTO_DEFINE_CATEGORIES(perfetto::Category("Matter").SetDescription("Matter trace events"));

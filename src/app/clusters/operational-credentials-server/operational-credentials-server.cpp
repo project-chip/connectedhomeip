@@ -48,7 +48,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <string.h>
-#include <tracing/scope.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace ::chip::Transport;

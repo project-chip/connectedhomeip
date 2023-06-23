@@ -67,7 +67,7 @@
 #include <platform/LockTracker.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
-#include <tracing/scope.h>
+#include <tracing/macros.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>

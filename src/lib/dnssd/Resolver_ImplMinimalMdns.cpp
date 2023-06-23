@@ -32,7 +32,7 @@
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <tracing/scope.h>
+#include <tracing/macros.h>
 
 // MDNS servers will receive all broadcast packets over the network.
 // Disable 'invalid packet' messages because the are expected and common

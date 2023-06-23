@@ -55,10 +55,13 @@ source_set("commandline") {
   public_configs = [ ":default_config" ]
 
   if (matter_commandline_enable_perfetto_tracing) {
-    deps += [
+    public_deps += [
       "${chip_root}/src/tracing/perfetto",
-      "${chip_root}/src/tracing/perfetto:event_storage",
       "${chip_root}/src/tracing/perfetto:file_output",
+    ]
+
+    deps += [
+      "${chip_root}/src/tracing/perfetto:event_storage",
       "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
   }

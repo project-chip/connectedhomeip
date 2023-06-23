@@ -41,7 +41,6 @@
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <tracing/macros.h>
-#include <tracing/scope.h>
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/SecureMessageCodec.h>
