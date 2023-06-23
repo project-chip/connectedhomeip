@@ -2307,18 +2307,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::AirflowDire
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::DirectionEnum val)
-{
-    using EnumType = FanControl::DirectionEnum;
-    switch (val)
-    {
-    case EnumType::kIncrease:
-    case EnumType::kDecrease:
-        return val;
-    default:
-        return static_cast<EnumType>(2);
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeEnum val)
 {
     using EnumType = FanControl::FanModeEnum;
@@ -2350,6 +2338,18 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeSequ
         return val;
     default:
         return static_cast<EnumType>(6);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::StepDirectionEnum val)
+{
+    using EnumType = FanControl::StepDirectionEnum;
+    switch (val)
+    {
+    case EnumType::kIncrease:
+    case EnumType::kDecrease:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
     }
 }
 

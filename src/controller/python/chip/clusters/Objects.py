@@ -26536,15 +26536,6 @@ class FanControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
-        class DirectionEnum(MatterIntEnum):
-            kIncrease = 0x00
-            kDecrease = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 2,
-
         class FanModeEnum(MatterIntEnum):
             kOff = 0x00
             kLow = 0x01
@@ -26571,6 +26562,15 @@ class FanControl(Cluster):
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 6,
+
+        class StepDirectionEnum(MatterIntEnum):
+            kIncrease = 0x00
+            kDecrease = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 2,
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -26602,12 +26602,12 @@ class FanControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="direction", Tag=0, Type=FanControl.Enums.DirectionEnum),
+                        ClusterObjectFieldDescriptor(Label="direction", Tag=0, Type=FanControl.Enums.StepDirectionEnum),
                         ClusterObjectFieldDescriptor(Label="wrap", Tag=1, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="lowestOff", Tag=2, Type=typing.Optional[bool]),
                     ])
 
-            direction: 'FanControl.Enums.DirectionEnum' = 0
+            direction: 'FanControl.Enums.StepDirectionEnum' = 0
             wrap: 'typing.Optional[bool]' = None
             lowestOff: 'typing.Optional[bool]' = None
 

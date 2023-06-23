@@ -4871,11 +4871,6 @@ client cluster FanControl = 514 {
     kReverse = 1;
   }
 
-  enum DirectionEnum : ENUM8 {
-    kIncrease = 0;
-    kDecrease = 1;
-  }
-
   enum FanModeEnum : ENUM8 {
     kOff = 0;
     kLow = 1;
@@ -4893,6 +4888,11 @@ client cluster FanControl = 514 {
     kOffLowHighAuto = 3;
     kOffOnAuto = 4;
     kOffOn = 5;
+  }
+
+  enum StepDirectionEnum : ENUM8 {
+    kIncrease = 0;
+    kDecrease = 1;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4935,7 +4935,7 @@ client cluster FanControl = 514 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct StepRequest {
-    DirectionEnum direction = 0;
+    StepDirectionEnum direction = 0;
     optional boolean wrap = 1;
     optional boolean lowestOff = 2;
   }

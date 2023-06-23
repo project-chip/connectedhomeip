@@ -3044,18 +3044,6 @@ enum class AirflowDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Enum for DirectionEnum
-enum class DirectionEnum : uint8_t
-{
-    kIncrease = 0x00,
-    kDecrease = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
-
 // Enum for FanModeEnum
 enum class FanModeEnum : uint8_t
 {
@@ -3087,6 +3075,18 @@ enum class FanModeSequenceEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
+};
+
+// Enum for StepDirectionEnum
+enum class StepDirectionEnum : uint8_t
+{
+    kIncrease = 0x00,
+    kDecrease = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
 };
 
 // Bitmap for Feature

@@ -23628,7 +23628,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
 
-    DirectionEnum direction = static_cast<DirectionEnum>(0);
+    StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
     Optional<bool> wrap;
     Optional<bool> lowestOff;
 
@@ -23645,7 +23645,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
 
-    DirectionEnum direction = static_cast<DirectionEnum>(0);
+    StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
     Optional<bool> wrap;
     Optional<bool> lowestOff;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
