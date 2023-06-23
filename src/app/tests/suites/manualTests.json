@@ -252,11 +252,7 @@
         "Test_TC_CC_9_2",
         "Test_TC_CC_9_3"
     ],
-    "DoorLock": [
-        "Test_TC_DRLK_2_10",
-        "Test_TC_DRLK_3_2",
-        "Test_TC_DRLK_3_3"
-    ],
+    "DoorLock": ["Test_TC_DRLK_2_10", "Test_TC_DRLK_3_2", "Test_TC_DRLK_3_3"],
     "LocalizationConfiguration": ["Test_TC_LCFG_2_1"],
     "LevelControl": ["Test_TC_LVL_8_1"],
     "OnOff": ["Test_TC_OO_2_3"],
