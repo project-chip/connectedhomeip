@@ -84,7 +84,7 @@ jobs:
             - name: Build and install Python controller
               timeout-minutes: 10
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
 
             - name: Build shell example
               id: build_shell
