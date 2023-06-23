@@ -254,7 +254,6 @@
     ],
     "DoorLock": [
         "Test_TC_DRLK_2_10",
-        "Test_TC_DRLK_3_1",
         "Test_TC_DRLK_3_2",
         "Test_TC_DRLK_3_3"
     ],
@@ -266,10 +265,7 @@
     "TemperatureMeasurement": ["Test_TC_TMP_2_2"],
     "Thermostat": ["Test_TC_TSTAT_3_1", "Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": [],
-    "ThreadNetworkDiagnostics": [
-        "Test_TC_DGTHREAD_2_5",
-        "Test_TC_DGTHREAD_3_1"
-    ],
+    "ThreadNetworkDiagnostics": ["Test_TC_DGTHREAD_2_5"],
     "Actions": ["Test_TC_ACT_2_1", "Test_TC_ACT_2_2", "Test_TC_ACT_3_2"],
     "TimeFormatLocalization": ["Test_TC_LTIME_2_1", "Test_TC_LTIME_3_1"],
     "UnitLocalization": [],

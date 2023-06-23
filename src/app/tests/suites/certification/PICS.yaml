@@ -1155,6 +1155,11 @@ PICS:
           attribute implemented on server?"
       id: BRBINFO.C.A0013
 
+    - label:
+          "Does the DUT(client) have access privileges for the ProductAppearance
+          attribute implemented on server?"
+      id: BRBINFO.C.A0014
+
     #
     # client / Events
     #
