@@ -5307,6 +5307,478 @@ private:
     }
 };
 
+class Test_TC_DGTHREAD_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DGTHREAD_3_1_SimulatedSuite() : TestCommand("Test_TC_DGTHREAD_3_1_Simulated", 30)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGTHREAD_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT reads Channel attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id, ThreadNetworkDiagnostics::Attributes::Channel::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT reads RoutingRole attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::RoutingRole::Id);
+        }
+        case 3: {
+            LogStep(3, "DUT reads NetworkName attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::NetworkName::Id);
+        }
+        case 4: {
+            LogStep(4, "DUT reads PanId attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id, ThreadNetworkDiagnostics::Attributes::PanId::Id);
+        }
+        case 5: {
+            LogStep(5, "DUT reads ExtendedPanId attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id);
+        }
+        case 6: {
+            LogStep(6, "DUT reads MeshLocalPrefix attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::Id);
+        }
+        case 7: {
+            LogStep(7, "DUT reads OverrunCount attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::OverrunCount::Id);
+        }
+        case 8: {
+            LogStep(8, "DUT reads NeighborTable attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::NeighborTable::Id);
+        }
+        case 9: {
+            LogStep(9, "DUT reads RouteTable attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::RouteTable::Id);
+        }
+        case 10: {
+            LogStep(10, "DUT reads PartitionId attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0009"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::PartitionId::Id);
+        }
+        case 11: {
+            LogStep(11, "DUT reads Weighting attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A000a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id, ThreadNetworkDiagnostics::Attributes::Weighting::Id);
+        }
+        case 12: {
+            LogStep(12, "DUT reads DataVersion attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A000b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::DataVersion::Id);
+        }
+        case 13: {
+            LogStep(13, "DUT reads StableDataVersion attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A000c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id);
+        }
+        case 14: {
+            LogStep(14, "DUT reads LeaderRouterId attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A000d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id);
+        }
+        case 15: {
+            LogStep(15, "DUT reads DetachedRoleCount attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A000e"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::Id);
+        }
+        case 16: {
+            LogStep(16, "DUT reads ChildRoleCount attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A000f"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::ChildRoleCount::Id);
+        }
+        case 17: {
+            LogStep(17, "DUT reads RouterRoleCount attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::RouterRoleCount::Id);
+        }
+        case 18: {
+            LogStep(18, "DUT reads LeaderRoleCount attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::Id);
+        }
+        case 19: {
+            LogStep(19, "DUT reads AttachAttemptCount attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::Id);
+        }
+        case 20: {
+            LogStep(20, "DUT reads PartitionIdChangeCount attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::Id);
+        }
+        case 21: {
+            LogStep(21, "DUT reads BetterPartitionAttachAttemptCount attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::Id);
+        }
+        case 22: {
+            LogStep(22, "DUT reads ParentChangeCount attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::ParentChangeCount::Id);
+        }
+        case 23: {
+            LogStep(23, "DUT reads ActiveTimestamp attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0038"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id);
+        }
+        case 24: {
+            LogStep(24, "DUT reads PendingTimestamp attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0039"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id);
+        }
+        case 25: {
+            LogStep(25, "DUT reads Delay attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A003a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id, ThreadNetworkDiagnostics::Attributes::Delay::Id);
+        }
+        case 26: {
+            LogStep(26, "DUT reads SecurityPolicy attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A003b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id);
+        }
+        case 27: {
+            LogStep(27, "DUT reads ChannelPage0Mask attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A003c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id);
+        }
+        case 28: {
+            LogStep(28, "DUT reads OperationalDatasetComponents attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A003d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id);
+        }
+        case 29: {
+            LogStep(29, "DUT reads ActiveNetworkFaults attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A003e"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DRLK_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DRLK_3_1_SimulatedSuite() : TestCommand("Test_TC_DRLK_3_1_Simulated", 37)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DRLK_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT reads LockState attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::LockState::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT reads LockType attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::LockType::Id);
+        }
+        case 3: {
+            LogStep(3, "DUT reads ActuatorEnabled attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::ActuatorEnabled::Id);
+        }
+        case 4: {
+            LogStep(4, "DUT reads DoorState attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F05 && DRLK.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::DoorState::Id);
+        }
+        case 5: {
+            LogStep(5, "DUT reads DoorOpenEvents attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F05 && DRLK.C.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::DoorOpenEvents::Id);
+        }
+        case 6: {
+            LogStep(6, "DUT reads DoorClosedEvents attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F05 && DRLK.C.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::DoorClosedEvents::Id);
+        }
+        case 7: {
+            LogStep(7, "DUT reads OpenPeriod attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F05 && DRLK.C.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::OpenPeriod::Id);
+        }
+        case 8: {
+            LogStep(8, "DUT reads NumberOfTotalUsersSupported attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F05 && DRLK.C.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::NumberOfTotalUsersSupported::Id);
+        }
+        case 9: {
+            LogStep(9, "DUT reads NumberofPINUsersSupported attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F00 && DRLK.C.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::NumberOfPINUsersSupported::Id);
+        }
+        case 10: {
+            LogStep(10, "DUT reads NumberofRFIDUsersSupported attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F01 && DRLK.C.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::NumberOfRFIDUsersSupported::Id);
+        }
+        case 11: {
+            LogStep(11, "DUT reads NumberofWeekDaysSchedulesSupported attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F04 && DRLK.C.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id);
+        }
+        case 12: {
+            LogStep(12, "DUT reads NumberofYearDaysSchedulesSupported attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F04 && DRLK.C.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id);
+        }
+        case 13: {
+            LogStep(13, "DUT reads NumberofHolidaySchedulesSupported attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F04 && DRLK.C.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::NumberOfHolidaySchedulesSupported::Id);
+        }
+        case 14: {
+            LogStep(14, "DUT reads MaxPINCodeLength attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F00 && DRLK.C.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::MaxPINCodeLength::Id);
+        }
+        case 15: {
+            LogStep(15, "DUT reads MinPINCodeLength attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F00 && DRLK.C.A0018"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::MinPINCodeLength::Id);
+        }
+        case 16: {
+            LogStep(16, "DUT reads MaxRFIDCodeLength attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F01 && DRLK.C.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::MaxRFIDCodeLength::Id);
+        }
+        case 17: {
+            LogStep(17, "DUT reads MinRFIDCodeLength attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F01 && DRLK.C.A001a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::MinRFIDCodeLength::Id);
+        }
+        case 18: {
+            LogStep(18, "DUT reads CredentialRulesSupport attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F08 && DRLK.C.A001b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::CredentialRulesSupport::Id);
+        }
+        case 19: {
+            LogStep(19, "DUT reads Language attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0021"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::Language::Id);
+        }
+        case 20: {
+            LogStep(20, "DUT reads LEDSettings attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0022"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::LEDSettings::Id);
+        }
+        case 21: {
+            LogStep(21, "DUT reads AutoRelockTime attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0023"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::AutoRelockTime::Id);
+        }
+        case 22: {
+            LogStep(22, "DUT reads SoundVolume attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0024"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::SoundVolume::Id);
+        }
+        case 23: {
+            LogStep(23, "DUT reads OperatingMode attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0025"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::OperatingMode::Id);
+        }
+        case 24: {
+            LogStep(24, "DUT reads SupportedOperatingModes attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0026"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::SupportedOperatingModes::Id);
+        }
+        case 25: {
+            LogStep(25, "DUT reads DefaultConfigurationRegister attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0027"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::DefaultConfigurationRegister::Id);
+        }
+        case 26: {
+            LogStep(26, "DUT reads EnableLocalProgramming attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0028"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::EnableLocalProgramming::Id);
+        }
+        case 27: {
+            LogStep(27, "DUT reads EnableOneTouchLocking attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A0029"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::EnableOneTouchLocking::Id);
+        }
+        case 28: {
+            LogStep(28, "DUT reads EnableInsideStatusLED attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A002a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::EnableInsideStatusLED::Id);
+        }
+        case 29: {
+            LogStep(29, "DUT reads EnablePrivacyModeButton attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A002b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::EnablePrivacyModeButton::Id);
+        }
+        case 30: {
+            LogStep(30, "DUT reads LocalProgrammingFeatures attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.A002c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::LocalProgrammingFeatures::Id);
+        }
+        case 31: {
+            LogStep(31, "DUT reads WrongCodeEntryLimit attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F00 && DRLK.C.F01 && DRLK.C.A0030"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::WrongCodeEntryLimit::Id);
+        }
+        case 32: {
+            LogStep(32, "DUT reads UserCodeTemporaryDisableTime attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F00 && DRLK.C.F01 && DRLK.C.A0031"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::UserCodeTemporaryDisableTime::Id);
+        }
+        case 33: {
+            LogStep(33, "DUT reads SendPINOverTheAir attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F07 && DRLK.C.F00 && DRLK.C.A0032"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::SendPINOverTheAir::Id);
+        }
+        case 34: {
+            LogStep(34, "DUT reads RequirePINForRemoteOperation attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F07 && DRLK.C.F00 && DRLK.C.A0033"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::RequirePINforRemoteOperation::Id);
+        }
+        case 35: {
+            LogStep(35, "DUT reads ExpiringUserTimeOut attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F08 && DRLK.C.A0035"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::ExpiringUserTimeout::Id);
+        }
+        case 36: {
+            LogStep(36, "DUT reads NumberOfCredentialsSupportedPerUser attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DRLK.C.F08 && DRLK.C.A001c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), DoorLock::Id, DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
 {
     if (testName == "Test_TC_BINFO_2_3_Simulated")
@@ -5489,6 +5961,14 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
     {
         return std::unique_ptr<Test_TC_CC_2_2_SimulatedSuite>(new Test_TC_CC_2_2_SimulatedSuite());
     }
+    if (testName == "Test_TC_DGTHREAD_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DGTHREAD_3_1_SimulatedSuite>(new Test_TC_DGTHREAD_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_DRLK_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DRLK_3_1_SimulatedSuite>(new Test_TC_DRLK_3_1_SimulatedSuite());
+    }
 
     return nullptr;
 }
@@ -5541,4 +6021,6 @@ void PrintTestCommands()
     ChipLogError(chipTool, "\t* Test_TC_PCC_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_TMP_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_CC_2_2_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DGTHREAD_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DRLK_3_1_Simulated");
 }
