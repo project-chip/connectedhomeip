@@ -48,6 +48,7 @@ bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, co
 bool AccountLoginManager::HandleLogout()
 {
     // TODO: Insert your code here to send logout request
+    ChipLogProgress(Zcl, "AccountLoginManager::HandleLogout success");
     return true;
 }
 

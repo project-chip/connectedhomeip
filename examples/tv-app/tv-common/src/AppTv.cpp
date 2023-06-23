@@ -19,7 +19,7 @@
  * @file Contains Implementation of the ContentApp and the ContentAppPlatform.
  */
 
-#include "AppImpl.h"
+#include "AppTv.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -39,6 +39,14 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <zap-generated/CHIPClusters.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#include <controller/CHIPDeviceController.h>
+#include <controller/CommissionerDiscoveryController.h>
+using namespace ::chip::Controller;
+extern DeviceCommissioner * GetDeviceCommissioner();
+extern CommissionerDiscoveryController * GetCommissionerDiscoveryController();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 using namespace chip;
 using namespace chip::AppPlatform;
@@ -70,9 +78,7 @@ class MyUserPrompter : public UserPrompter
 };
 
 MyUserPrompter gMyUserPrompter;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 class MyPincodeService : public PincodeService
 {
     uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
@@ -205,6 +211,9 @@ class MyPostCommissioningListener : public PostCommissioningListener
 };
 
 MyPostCommissioningListener gMyPostCommissioningListener;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 ContentAppFactoryImpl gFactory;
 
 ContentAppFactoryImpl * GetContentAppFactoryImpl()
@@ -528,7 +537,7 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
 
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-CHIP_ERROR InitVideoPlayerPlatform()
+CHIP_ERROR AppTvInit()
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentAppPlatform::GetInstance().SetupAppPlatform();
@@ -536,7 +545,7 @@ CHIP_ERROR InitVideoPlayerPlatform()
     uint16_t value;
     if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value) != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Discovery, "AppImpl InitVideoPlayerPlatform Vendor ID not known");
+        ChipLogDetail(Discovery, "AppTvInit Vendor ID not known");
     }
     else
     {

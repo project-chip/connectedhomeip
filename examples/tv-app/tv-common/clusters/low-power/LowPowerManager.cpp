@@ -16,18 +16,11 @@
  *    limitations under the License.
  */
 
-/**
- * @brief Contains shell commands for a ContentApp relating to Content App platform of the Video Player.
- */
+#include "LowPowerManager.h"
 
-#include <platform/CHIPDeviceLayer.h>
-
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-namespace chip {
-namespace Shell {
-
-void RegisterAppPlatformCommands();
-
-} // namespace Shell
-} // namespace chip
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+bool LowPowerManager::HandleSleep()
+{
+    // TODO: Insert code here
+    ChipLogProgress(Zcl, "LowPowerManager::HandleSleep");
+    return true;
+}

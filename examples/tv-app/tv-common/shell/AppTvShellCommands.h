@@ -16,10 +16,16 @@
  *    limitations under the License.
  */
 
-#include "LowPowerManager.h"
+/**
+ * @brief Contains shell commands for a ContentApp relating to Content App platform of the Video Player.
+ */
 
-bool LowPowerManager::HandleSleep()
-{
-    // TODO: Insert code here
-    return true;
-}
+#include <platform/CHIPDeviceLayer.h>
+
+namespace chip {
+namespace Shell {
+
+void RegisterAppTvCommands();
+
+} // namespace Shell
+} // namespace chip

@@ -30,15 +30,15 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "CommissionerMain.h"
-#include "include/account-login/AccountLoginManager.h"
-#include "include/application-basic/ApplicationBasicManager.h"
-#include "include/application-launcher/ApplicationLauncherManager.h"
-#include "include/channel/ChannelManager.h"
-#include "include/content-launcher/ContentLauncherManager.h"
-#include "include/keypad-input/KeypadInputManager.h"
-#include "include/media-playback/MediaPlaybackManager.h"
-#include "include/target-navigator/TargetNavigatorManager.h"
+#include "account-login/AccountLoginManager.h"
+#include "application-basic/ApplicationBasicManager.h"
+#include "application-launcher/ApplicationLauncherManager.h"
+#include "channel/ChannelManager.h"
+#include "content-launcher/ContentLauncherManager.h"
+#include "keypad-input/KeypadInputManager.h"
+#include "media-playback/MediaPlaybackManager.h"
+#include "target-navigator/TargetNavigatorManager.h"
+
 #include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
@@ -47,8 +47,6 @@
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
-
-CHIP_ERROR InitVideoPlayerPlatform();
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -155,3 +153,5 @@ protected:
 chip::AppPlatform::ContentAppFactoryImpl * GetContentAppFactoryImpl();
 
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+CHIP_ERROR AppTvInit(void);
