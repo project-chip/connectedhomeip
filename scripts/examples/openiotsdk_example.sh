@@ -43,6 +43,7 @@ IS_UNIT_TEST=0
 FVP_NETWORK="user"
 KVS_STORAGE_TYPE="tdb"
 KVS_STORAGE_FILE=""
+NO_ACTIVATE=""
 
 declare -A tdb_storage_param=([instance]=sram [memspace]=0 [address]=0x0 [size]=0x100000)
 declare -A ps_storage_param=([instance]=qspi_sram [memspace]=0 [address]=0x660000 [size]=0x12000)
@@ -69,7 +70,7 @@ Options:
     -p,--path       <build_path>        Build path <build_path - default is example_dir/build>
     -K,--kvsfile    <kvs_storage_file>  Path to KVS storage file which will be used to ensure persistence <kvs_storage_file - default is empty which means disable persistence>
     -n,--network    <network_name>      FVP network interface name <network_name - default is "user" which means user network mode>
-
+    --no-activate                       Do not activate the chip build environment
 Examples:
 EOF
 
@@ -269,7 +270,7 @@ function run_test() {
 }
 
 SHORT=C:,p:,d:,l:,n:,k:,K:,c,s,h
-LONG=command:,path:,debug:,lwipdebug:,network:,kvsstore:,kvsfile:,clean,scratch,help
+LONG=command:,path:,debug:,lwipdebug:,network:,kvsstore:,kvsfile:,clean,scratch,help,no-activate
 OPTS=$(getopt -n build --options "$SHORT" --longoptions "$LONG" -- "$@")
 
 eval set -- "$OPTS"
@@ -315,6 +316,10 @@ while :; do
         -n | --network)
             FVP_NETWORK=$2
             shift 2
+            ;;
+        --no-activate)
+            NO_ACTIVATE='YES'
+            shift
             ;;
         -* | --*)
             shift
@@ -386,8 +391,10 @@ if [ -z "$BUILD_PATH" ]; then
     BUILD_PATH="$EXAMPLE_PATH/build"
 fi
 
-# Activate Matter environment
-source "$CHIP_ROOT"/scripts/activate.sh
+if [ -z "$NO_ACTIVATE" ]; then
+    # Activate Matter environment
+    source "$CHIP_ROOT"/scripts/activate.sh
+fi
 
 if [[ $IS_UNIT_TEST -eq 0 ]]; then
     EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE-example.elf"

@@ -110,7 +110,9 @@ jobs:
             - name: Build Java Matter Controller and all clusters app
               timeout-minutes: 60
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+                  scripts/run_in_python_env.sh out/venv 'pip install -r scripts/setup/requirements.build.txt'
+                  scripts/run_in_python_env.sh out/venv 'pip install colorama'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
                       --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
@@ -120,7 +122,7 @@ jobs:
             - name: Run Discover Commissionables Test
               timeout-minutes: 15
               run: |
-                  scripts/run_in_build_env.sh \
+                  scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
                      --app-args "--discriminator 3840 --interface-id -1" \
@@ -132,7 +134,7 @@ jobs:
             - name: Run Pairing Onnetwork Test
               timeout-minutes: 15
               run: |
-                  scripts/run_in_build_env.sh \
+                  scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
                      --app-args "--discriminator 3840 --interface-id -1" \
@@ -144,7 +146,7 @@ jobs:
             - name: Run IM Invoke Test
               timeout-minutes: 15
               run: |
-                  scripts/run_in_build_env.sh \
+                  scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
                      --app-args "--discriminator 3840 --interface-id -1" \
@@ -156,7 +158,7 @@ jobs:
             - name: Run IM Read Test
               timeout-minutes: 15
               run: |
-                  scripts/run_in_build_env.sh \
+                  scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
                      --app-args "--discriminator 3840 --interface-id -1" \
@@ -168,7 +170,7 @@ jobs:
             - name: Run IM Write Test
               timeout-minutes: 15
               run: |
-                  scripts/run_in_build_env.sh \
+                  scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
                      --app-args "--discriminator 3840 --interface-id -1" \
@@ -180,7 +182,7 @@ jobs:
             - name: Run IM Subscribe Test
               timeout-minutes: 15
               run: |
-                  scripts/run_in_build_env.sh \
+                  scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
                      --app-args "--discriminator 3840 --interface-id -1" \
@@ -192,7 +194,7 @@ jobs:
             - name: Run Pairing AlreadyDiscovered Test
               timeout-minutes: 25
               run: |
-                  scripts/run_in_build_env.sh \
+                  scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
                      --app-args "--discriminator 3840 --interface-id -1" \
@@ -205,7 +207,7 @@ jobs:
             # - name: Run Pairing Address-PaseOnly Test
             #   timeout-minutes: 25
             #   run: |
-            #       scripts/run_in_build_env.sh \
+            #      scripts/run_in_python_env.sh out/venv \
             #       './scripts/tests/run_java_test.py \
             #          --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
             #          --app-args "--discriminator 3840 --interface-id -1" \
@@ -217,7 +219,7 @@ jobs:
             - name: Run Pairing SetupQRCode Test
               timeout-minutes: 25
               run: |
-                  scripts/run_in_build_env.sh \
+                  scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
                      --app-args "--discriminator 3840 --interface-id -1" \
@@ -229,7 +231,7 @@ jobs:
             - name: Run Pairing ManualCode Test
               timeout-minutes: 25
               run: |
-                  scripts/run_in_build_env.sh \
+                  scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
                      --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
                      --app-args "--discriminator 3840 --interface-id -1" \
