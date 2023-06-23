@@ -35,17 +35,13 @@ declare_args() {
   # for fast tracing even when the communication channels are slow).
   #
   # The setting below controls the destination of the tracing macros
-  # with the following values available:
-  #    - empty allows using the "backend.h" for tracing, which
-  #      will multiplex however will only work on fast backends (e.g.
-  #      large systems with fast logging when writing to logs)
-  #    - any other value will provide a tracing config, which
-  #      MUST include a path to `matter/tracing/macros_impl.h`
-  #      in particular `src/tracing/none` provides a config where tracing
-  #      macros and scope are disabled
+  #
+  # Notable built-in targets:
+  #    "${chip_root}/src/tracing/none" disables the scopes macros
+  #    "${chip_root}/src/tracing/multiplexed" sends begin/end/instant to backends
   #
   # since tracing is very noisy, we generally expect it to be explicitly
-  # set up
+  # set up.
   #
   # TODO: cpp_standard check is not ideal, it should be >= 17,
   #       however for now this is what we use in compilations
@@ -53,6 +49,6 @@ declare_args() {
       cpp_standard == "gnu++17") {
     matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
   } else {
-    matter_trace_config = "${chip_root}/src/tracing:none"
+    matter_trace_config = "${chip_root}/src/tracing/none"
   }
 }
