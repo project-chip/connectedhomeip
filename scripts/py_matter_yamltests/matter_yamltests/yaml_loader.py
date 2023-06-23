@@ -22,7 +22,7 @@ from .fixes import add_yaml_support_for_scientific_notation_without_dot
 
 try:
     from yaml import CSafeLoader as SafeLoader
-except:
+except ImportError:
     from yaml import SafeLoader
 
 import os
@@ -240,7 +240,7 @@ class YamlLoader:
         if 'verification' in content:
             disabled = content.get('disabled')
             command = content.get('command')
-            if disabled != True and command != 'UserPrompt':
+            if disabled is not True and command != 'UserPrompt':
                 raise TestStepVerificationStandaloneError(content)
 
     def __rule_response_value_and_values_are_mutually_exclusive(self, content):

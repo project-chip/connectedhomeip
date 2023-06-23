@@ -127,15 +127,31 @@ tests:
               - name: "NextCredentialIndex"
                 value: null
 
+    - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
+      PICS: DRLK.S.A0023.Write && PICS_SDK_CI_ONLY
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 10
+
     - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
-      PICS: DRLK.S.A0023
+      PICS: DRLK.S.A0023.Write && PICS_SKIP_SAMPLE_APP
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
           value: 60
 
+    - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
+      PICS: PICS_SDK_CI_ONLY && !DRLK.S.A0023.Write
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 10
+      response:
+          error: UNSUPPORTED_WRITE
+
     - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
-      PICS: " !DRLK.S.A0023 "
+      PICS: PICS_SKIP_SAMPLE_APP && !DRLK.S.A0023.Write
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
@@ -143,8 +159,19 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
+    - label: "TH sends the Unlock with Timeout argument value as 10 seconds"
+      PICS: DRLK.S.C03.Rsp && PICS_SDK_CI_ONLY
+      command: "UnlockWithTimeout"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "Timeout"
+                value: 10
+              - name: "PINCode"
+                value: "123456"
+
     - label: "TH sends the Unlock with Timeout argument value as 60 seconds"
-      PICS: DRLK.S.C03.Rsp
+      PICS: DRLK.S.C03.Rsp && PICS_SKIP_SAMPLE_APP
       command: "UnlockWithTimeout"
       timedInteractionTimeoutMs: 1000
       arguments:
@@ -154,14 +181,24 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
-    - label: "Wait 60s"
-      PICS: DRLK.S.C03.Rsp
+    - label: "Wait for AutoRelockTime Expires"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      PICS: DRLK.S.C03.Rsp && PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "ms"
+                value: 11000
+
+    #https://github.com/project-chip/connectedhomeip/issues/27421#issuecomment-1603541308
+    - label: "Wait for AutoRelockTime Expires"
+      PICS: DRLK.S.C03.Rsp && PICS_SKIP_SAMPLE_APP
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 60000
+                value: 70000
 
     - label: "TH reads LockState attribute"
       PICS: DRLK.S.A0000 && DRLK.S.C03.Rsp

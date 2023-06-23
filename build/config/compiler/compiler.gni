@@ -43,7 +43,11 @@ declare_args() {
   c_standard = "gnu11"
 
   # C++ standard level (value for -std flag).
-  cpp_standard = "gnu++14"
+  if (current_os == "android") {
+    cpp_standard = "gnu++17"
+  } else {
+    cpp_standard = "gnu++14"
+  }
 
   # enable libfuzzer
   is_libfuzzer = false
