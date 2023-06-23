@@ -270,7 +270,7 @@ following command from the CLI:
 ```
 ${MATTER_ROOT}/scripts/run_in_build_env.sh \
     './scripts/build_python.sh --install_virtual_env out/venv'
-    
+
 source out/venv/bin/activate
 ```
 
