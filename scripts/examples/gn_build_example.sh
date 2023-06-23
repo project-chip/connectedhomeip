@@ -22,7 +22,7 @@ set -e
 
 source "$(dirname "$0")/../../scripts/activate.sh"
 
-GN_ARGS=()
+GN_ARGS=("treat_warnings_as_errors=false")
 
 EXAMPLE_DIR=$1
 shift
@@ -32,19 +32,19 @@ shift
 NINJA_ARGS=()
 for arg; do
     case $arg in
-        -v)
-            NINJA_ARGS+=(-v)
-            ;;
-        *=*)
-            GN_ARGS+=("$arg")
-            ;;
-        *import*)
-            GN_ARGS+=("$arg")
-            ;;
-        *)
-            echo >&2 "invalid argument: $arg"
-            exit 2
-            ;;
+    -v)
+        NINJA_ARGS+=(-v)
+        ;;
+    *=*)
+        GN_ARGS+=("$arg")
+        ;;
+    *import*)
+        GN_ARGS+=("$arg")
+        ;;
+    *)
+        echo >&2 "invalid argument: $arg"
+        exit 2
+        ;;
     esac
 done
 

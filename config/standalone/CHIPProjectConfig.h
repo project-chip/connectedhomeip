@@ -56,6 +56,16 @@
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 
+// For convenience, Chip Security Fuzz Mode can be enabled to
+// create deterministic behaviour to better facilitate fuzzing.
+//
+//    WARNING: This option circumvents basic Chip security functionality,
+//    including message encryption. Because of this it MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
+//
+//    To build with this flag, pass 'treat_warnings_as_errors=false' to gn/ninja.
+//
+#define CHIP_CONFIG_SECURITY_FUZZ_MODE 1
+
 #define CHIP_CONFIG_ENABLE_UPDATE 1
 
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0

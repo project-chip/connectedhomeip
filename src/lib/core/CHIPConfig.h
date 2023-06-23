@@ -284,6 +284,22 @@
 #endif // CHIP_CONFIG_SECURITY_TEST_MODE
 
 /**
+ *  @def CHIP_CONFIG_SECURITY_FUZZ_MODE
+ *
+ *  @brief
+ *    Enable various features that facilitate better fuzzing.
+ *
+ *  @note
+ *    WARNING: This option makes it possible to circumvent basic chip security functionality,
+ *    including message encryption. Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+ *
+ *    To build with this flag, pass 'treat_warnings_as_errors=false' to gn/ninja.
+ */
+#ifndef CHIP_CONFIG_SECURITY_FUZZ_MODE
+#define CHIP_CONFIG_SECURITY_FUZZ_MODE 0
+#endif // CHIP_CONFIG_SECURITY_FUZZ_MODE
+
+/**
  *  @def CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
  *
  *  @brief
