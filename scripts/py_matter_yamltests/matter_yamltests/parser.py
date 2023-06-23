@@ -1110,7 +1110,7 @@ class TestParser:
 
     def __apply_config_override(self, config, config_override):
         for key, value in config_override.items():
-            if value is None or not key in config:
+            if value is None or key not in config:
                 continue
 
             is_node_id = key == 'nodeId' or (isinstance(
