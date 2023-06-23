@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,17 +17,17 @@
  */
 #pragma once
 
-#include <matter/tracing/build_config.h>
+/* Ensure we do not have double tracing macros defined */
+#if defined(MATTER_TRACE_BEGIN)
+#error "Tracing macros seem to be double defined"
+#endif
 
-#include <tracing/macros.h>
+#include <tracing/registry.h>
 
-#ifdef MATTER_TRACING_ENABLED
-
-#ifdef MATTER_TRACE_NONE
-
-#define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-
-#elif defined(MATTER_TRACE_MULTIPLEXED)
+// This gets forwarded to the multiplexed instance
+#define MATTER_TRACE_BEGIN(label, group) ::chip::Tracing::Internal::Begin(label, group)
+#define MATTER_TRACE_END(label, group) ::chip::Tracing::Internal::End(label, group)
+#define MATTER_TRACE_INSTANT(label, group) ::chip::Tracing::Internal::Instant(label, group)
 
 namespace chip {
 namespace Tracing {
@@ -42,7 +42,6 @@ namespace Tracing {
 ///      // ... add code here
 ///
 ///   } // TRACE_END called here
-
 class Scoped
 {
 public:
@@ -71,14 +70,3 @@ private:
 ///
 ///   } // TRACE_END called here
 #define MATTER_TRACE_SCOPE(label, group) ::chip::Tracing::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(label, group)
-
-#else
-// backends MUST provide a config for this
-#include <matter/tracing/macros_impl.h>
-#endif
-
-#else // ifdef MATTER_TRACING_ENABLED
-
-#define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-
-#endif

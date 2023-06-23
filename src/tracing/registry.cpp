@@ -31,16 +31,24 @@ IntrusiveList<Backend> gTracingBackends;
 void Register(Backend & backend)
 {
     assertChipStackLockedByCurrentThread();
-    gTracingBackends.PushBack(&backend);
+    if (!backend.IsInList())
+    {
+        backend.Open();
+        gTracingBackends.PushBack(&backend);
+    }
 }
 
 void Unregister(Backend & backend)
 {
     assertChipStackLockedByCurrentThread();
-    gTracingBackends.Remove(&backend);
+    if (backend.IsInList())
+    {
+        gTracingBackends.Remove(&backend);
+        backend.Close();
+    }
 }
 
-#ifdef MATTER_TRACING_ENABLED
+#if MATTER_TRACING_ENABLED
 
 namespace Internal {
 

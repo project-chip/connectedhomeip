@@ -11,7 +11,6 @@
         "Test_TC_G_3_1_Simulated",
         "Test_TC_I_3_1_Simulated",
         "Test_TC_PRS_3_1_Simulated",
-        "Test_TC_PS_3_1_Simulated",
         "Test_TC_PSCFG_3_1_Simulated",
         "Test_TC_RH_3_1_Simulated",
         "Test_TC_SWTCH_3_1_Simulated",
@@ -44,7 +43,10 @@
         "Test_TC_OO_3_2_Simulated",
         "Test_TC_TSUIC_3_1_Simulated",
         "Test_TC_PCC_3_1_Simulated",
-        "Test_TC_TMP_3_1_Simulated"
+        "Test_TC_TMP_3_1_Simulated",
+        "Test_TC_CC_2_2_Simulated",
+        "Test_TC_DGTHREAD_3_1_Simulated",
+        "Test_TC_DRLK_3_1_Simulated"
     ],
     "collection": ["Test"]
 }
