@@ -13080,7 +13080,7 @@
           "name": "Refrigerator Alarm",
           "code": 87,
           "mfgCode": null,
-          "define": "REFRIGERATOR_ALARM",
+          "define": "REFRIGERATOR_ALARM_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -13122,7 +13122,7 @@
           "name": "Refrigerator Alarm",
           "code": 87,
           "mfgCode": null,
-          "define": "REFRIGERATOR_ALARM",
+          "define": "REFRIGERATOR_ALARM_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
