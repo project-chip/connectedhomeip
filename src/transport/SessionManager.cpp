@@ -757,8 +757,15 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
                       "Received a duplicate message with MessageCounter:" ChipLogFormatMessageCounter
                       " on exchange " ChipLogFormatExchangeId,
                       packetHeader.GetMessageCounter(), ChipLogValueExchangeIdFromReceivedHeader(payloadHeader));
+
+#if CHIP_CONFIG_SECURITY_FUZZ_MODE
+#warning "Warning: CHIP_CONFIG_SECURITY_FUZZ_MODE=1 bypassing duplicate message check!"
+        ChipLogError(SecureChannel, "Warning: CHIP_CONFIG_SECURITY_FUZZ_MODE=1 bypassing duplicate message check... ");
+#else
         isDuplicate = SessionMessageDelegate::DuplicateMessage::Yes;
-        err         = CHIP_NO_ERROR;
+#endif
+
+        err = CHIP_NO_ERROR;
     }
     if (err != CHIP_NO_ERROR)
     {
