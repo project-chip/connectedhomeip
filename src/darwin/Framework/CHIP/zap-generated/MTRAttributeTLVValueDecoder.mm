@@ -13211,7 +13211,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::RockSetting::Id: {
@@ -13222,7 +13222,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::WindSupport::Id: {
@@ -13233,7 +13233,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::WindSetting::Id: {
@@ -13244,7 +13244,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::AirflowDirection::Id: {

@@ -2319,25 +2319,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::DirectionEn
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeSequenceType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeEnum val)
 {
-    using EnumType = FanControl::FanModeSequenceType;
-    switch (val)
-    {
-    case EnumType::kOffLowMedHigh:
-    case EnumType::kOffLowHigh:
-    case EnumType::kOffLowMedHighAuto:
-    case EnumType::kOffLowHighAuto:
-    case EnumType::kOffOnAuto:
-    case EnumType::kOffOn:
-        return val;
-    default:
-        return static_cast<EnumType>(6);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeType val)
-{
-    using EnumType = FanControl::FanModeType;
+    using EnumType = FanControl::FanModeEnum;
     switch (val)
     {
     case EnumType::kOff:
@@ -2350,6 +2334,22 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeType
         return val;
     default:
         return static_cast<EnumType>(7);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeSequenceEnum val)
+{
+    using EnumType = FanControl::FanModeSequenceEnum;
+    switch (val)
+    {
+    case EnumType::kOffLowMedHigh:
+    case EnumType::kOffLowHigh:
+    case EnumType::kOffLowMedHighAuto:
+    case EnumType::kOffLowHighAuto:
+    case EnumType::kOffOnAuto:
+    case EnumType::kOffOn:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
     }
 }
 

@@ -57,9 +57,9 @@ private:
 CHIP_ERROR FanAttrAccess::ReadPercentCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     // Return PercentSetting attribute value for now
-    DataModel::Nullable<uint8_t> percentSetting;
+    DataModel::Nullable<chip::Percent> percentSetting;
     PercentSetting::Get(endpoint, percentSetting);
-    uint8_t ret = 0;
+    chip::Percent ret = 0;
     if (!percentSetting.IsNull())
     {
         ret = percentSetting.Value();

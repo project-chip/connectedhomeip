@@ -48,13 +48,13 @@ bool gWriteFromClusterLogic = false;
 
 EmberAfStatus SetFanModeToOff(EndpointId endpointId)
 {
-    FanModeType currentFanMode;
+    FanModeEnum currentFanMode;
     EmberAfStatus status = FanMode::Get(endpointId, &currentFanMode);
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
 
-    if (currentFanMode != FanModeType::kOff)
+    if (currentFanMode != FanModeEnum::kOff)
     {
-        status = FanMode::Set(endpointId, FanModeType::kOff);
+        status = FanMode::Set(endpointId, FanModeEnum::kOff);
     }
 
     return status;
@@ -116,26 +116,26 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
     switch (attributePath.mAttributeId)
     {
     case FanMode::Id: {
-        if (*value == to_underlying(FanModeType::kOn))
+        if (*value == to_underlying(FanModeEnum::kOn))
         {
-            FanMode::Set(attributePath.mEndpointId, FanModeType::kHigh);
+            FanMode::Set(attributePath.mEndpointId, FanModeEnum::kHigh);
             res = Status::WriteIgnored;
         }
-        else if (*value == to_underlying(FanModeType::kSmart))
+        else if (*value == to_underlying(FanModeEnum::kSmart))
         {
-            FanModeSequenceType fanModeSequence;
+            FanModeSequenceEnum fanModeSequence;
             EmberAfStatus status = FanModeSequence::Get(attributePath.mEndpointId, &fanModeSequence);
             VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::Failure);
 
             if (SupportsAuto(attributePath.mEndpointId) &&
-                ((fanModeSequence == FanModeSequenceType::kOffLowHighAuto) ||
-                 (fanModeSequence == FanModeSequenceType::kOffLowMedHighAuto)))
+                ((fanModeSequence == FanModeSequenceEnum::kOffLowHighAuto) ||
+                 (fanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto)))
             {
-                FanMode::Set(attributePath.mEndpointId, FanModeType::kAuto);
+                FanMode::Set(attributePath.mEndpointId, FanModeEnum::kAuto);
             }
             else
             {
-                FanMode::Set(attributePath.mEndpointId, FanModeType::kHigh);
+                FanMode::Set(attributePath.mEndpointId, FanModeEnum::kHigh);
             }
             res = Status::WriteIgnored;
         }
@@ -186,7 +186,7 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
     }
     case PercentSetting::Id: {
         // Check if the PercentSetting is null.
-        if (NumericAttributeTraits<uint8_t>::IsNullValue(*value))
+        if (NumericAttributeTraits<chip::Percent>::IsNullValue(*value))
         {
             if (gWriteFromClusterLogic)
             {
@@ -207,10 +207,11 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
     case RockSetting::Id: {
         if (SupportsRocking(attributePath.mEndpointId))
         {
-            uint8_t rockSupport;
-            EmberAfStatus status = RockSupport::Get(attributePath.mEndpointId, &rockSupport);
+            chip::BitMask<RockBitmap> rockSupport;
+            EmberAfStatus status   = RockSupport::Get(attributePath.mEndpointId, &rockSupport);
+            uint8_t rawRockSupport = rockSupport.Raw();
             VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::ConstraintError);
-            if ((*value & rockSupport) == *value)
+            if ((*value & rawRockSupport) == *value)
             {
                 res = Status::Success;
             }
@@ -228,10 +229,11 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
     case WindSupport::Id: {
         if (SupportsWind(attributePath.mEndpointId))
         {
-            uint8_t windSupport;
-            EmberAfStatus status = WindSupport::Get(attributePath.mEndpointId, &windSupport);
+            chip::BitMask<WindBitmap> windSupport;
+            EmberAfStatus status   = WindSupport::Get(attributePath.mEndpointId, &windSupport);
+            uint8_t rawWindSupport = windSupport.Raw();
             VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::ConstraintError);
-            if ((*value & windSupport) == *value)
+            if ((*value & rawWindSupport) == *value)
             {
                 res = Status::Success;
             }
@@ -270,13 +272,13 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
     switch (attributePath.mAttributeId)
     {
     case FanMode::Id: {
-        FanModeType mode;
+        FanModeEnum mode;
         EmberAfStatus status = FanMode::Get(attributePath.mEndpointId, &mode);
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status);
 
         // Setting the FanMode value to Off SHALL set the values of PercentSetting, PercentCurrent,
         // SpeedSetting, SpeedCurrent attributes to 0 (zero).
-        if (mode == FanModeType::kOff)
+        if (mode == FanModeEnum::kOff)
         {
             status = PercentSetting::Set(attributePath.mEndpointId, 0);
             VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
@@ -300,7 +302,7 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
 
         // Setting the attribute value to Auto SHALL set the values of PercentSetting, SpeedSetting (if present)
         // to null.
-        if (mode == FanModeType::kAuto)
+        if (mode == FanModeEnum::kAuto)
         {
             gWriteFromClusterLogic = true;
             status                 = PercentSetting::SetNull(attributePath.mEndpointId);
@@ -318,7 +320,7 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
         break;
     }
     case PercentSetting::Id: {
-        DataModel::Nullable<uint8_t> percentSetting;
+        DataModel::Nullable<chip::Percent> percentSetting;
         EmberAfStatus status = PercentSetting::Get(attributePath.mEndpointId, percentSetting);
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status && !percentSetting.IsNull());
 
@@ -378,13 +380,13 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
             VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                            ChipLogError(Zcl, "Failed to get SpeedMax with error: 0x%02x", status));
 
-            DataModel::Nullable<uint8_t> currentPercentSetting;
+            DataModel::Nullable<chip::Percent> currentPercentSetting;
             status = PercentSetting::Get(attributePath.mEndpointId, currentPercentSetting);
             VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                            ChipLogError(Zcl, "Failed to get PercentSetting with error: 0x%02x", status));
 
-            float speed            = speedSetting.Value();
-            uint8_t percentSetting = static_cast<uint8_t>(speed / speedMax * 100);
+            float speed                  = speedSetting.Value();
+            chip::Percent percentSetting = static_cast<chip::Percent>(speed / speedMax * 100);
 
             if (currentPercentSetting.IsNull() || percentSetting != currentPercentSetting.Value())
             {
