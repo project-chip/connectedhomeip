@@ -21,7 +21,6 @@
 
 #if MATTER_TRACING_ENABLED
 
-
 // Expected macros provided by implementations:
 //    MATTER_TRACE_BEGIN(label, group)
 //    MATTER_TRACE_END(label, group)
@@ -70,11 +69,10 @@
 
 #else // MATTER_TRACING_ENABLED
 
-#define _MATTER_TRACE_DISABLE(...)              \
-    do                                          \
-        {                                       \
-        } while (false)
-
+#define _MATTER_TRACE_DISABLE(...)                                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (false)
 
 #define MATTER_TRACE_BEGIN(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_TRACE_END(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
@@ -88,4 +86,4 @@
 #define MATTER_LOG_NODE_DISCOVERED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 #define MATTER_LOG_NODE_DISCOVERY_FAILED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
 
-#endif  // MATTER_TRACING_ENABLED
+#endif // MATTER_TRACING_ENABLED

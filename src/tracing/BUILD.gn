@@ -25,9 +25,7 @@ buildconfig_header("tracing_buildconfig") {
   # When neither none nor multiplexed is set, expect a separate config
   #  to be set, that provides matter/tracing/macros_impl.h
 
-  defines = [
-    "MATTER_TRACING_ENABLED=${matter_enable_tracing_support}",
-  ]
+  defines = [ "MATTER_TRACING_ENABLED=${matter_enable_tracing_support}" ]
 }
 
 config("multiplexed_tracing") {
@@ -60,4 +58,3 @@ source_set("macros") {
     public_deps += [ matter_trace_config ]
   }
 }
-
