@@ -48,3 +48,4 @@ limitations under the License.
     <attribute side="server" code="0x0003" define="SUPPORTED_RINSES"          type="ARRAY" entryType="NUMBER_OF_RINSES_ENUM"                      writable="true"  isNullable="true"  optional="true">SupportedRinses</attribute>
   </cluster>
 </configurator>
+ 
