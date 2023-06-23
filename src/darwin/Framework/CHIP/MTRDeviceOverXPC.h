@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#import <Matter/MTRDefines.h>
-
 #import "MTRBaseDevice.h"
 #import "MTRCluster.h" // For MTRSubscriptionEstablishedHandler
 #import "MTRDeviceControllerXPCConnection.h"
@@ -25,7 +23,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_HIDDEN
 @interface MTRDeviceOverXPC : MTRBaseDevice
 
 - (instancetype)init NS_UNAVAILABLE;

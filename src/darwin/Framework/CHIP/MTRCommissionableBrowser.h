@@ -16,13 +16,11 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol MTRCommissionableBrowserDelegate;
 
-MTR_HIDDEN
 @interface MTRCommissionableBrowser : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

@@ -16,7 +16,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <Matter/MTRDefines.h>
 #import <Matter/MTRError.h>
 
 #include <app/MessageDef/StatusIB.h>
@@ -24,7 +23,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_HIDDEN
 @interface MTRError : NSObject
 + (NSError * _Nullable)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
 + (NSError * _Nullable)errorForIMStatus:(const chip::app::StatusIB &)status;
