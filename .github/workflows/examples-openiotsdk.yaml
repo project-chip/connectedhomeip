@@ -85,6 +85,7 @@ jobs:
               timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+                  scripts/run_in_python_env.sh out/venv 'pip install -r scripts/setup/requirements.openiotsdk.txt'
 
             - name: Build shell example
               id: build_shell
@@ -117,7 +118,7 @@ jobs:
               timeout-minutes: 5
               run: |
                   scripts/run_in_python_env.sh out/venv \
-                    'scripts/examples/openiotsdk_example.sh -C test shell'
+                    'scripts/examples/openiotsdk_example.sh --no-activate -C test shell'
 
             - name: "Test: lock-app example"
               if: steps.build_lock_app.outcome == 'success'
@@ -125,7 +126,7 @@ jobs:
               run: |
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
                   scripts/run_in_python_env.sh out/venv \
-                    'scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh -C test -n ${TEST_NETWORK_NAME}tap lock-app'
+                    'scripts/run_in_ns.sh ${TEST_NETWORK_NAME}ns scripts/examples/openiotsdk_example.sh --no-activate -C test -n ${TEST_NETWORK_NAME}tap lock-app'
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
 
             - name: "Test: unit-tests"
@@ -133,4 +134,4 @@ jobs:
               timeout-minutes: 40
               run: |
                   scripts/run_in_python_env.sh out/venv \
-                    'scripts/examples/openiotsdk_example.sh -C test unit-tests'
+                    'scripts/examples/openiotsdk_example.sh --no-activate -C test unit-tests'
