@@ -1,4 +1,4 @@
-name: "\U0001F9F0 Platform Fix"
+name: "\U0001F3D7 Platform Fix"
 description: Create an issue for a platform specific fix
 title: "[Platform] "
 labels: ["platform", "needs triage"]

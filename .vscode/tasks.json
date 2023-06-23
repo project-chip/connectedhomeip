@@ -251,7 +251,6 @@
                 "-Cbuild",
                 "-d${input:openiotsdkDebugMode}",
                 "-l${input:openiotsdkLwipDebug}",
-                "-b${input:openiotsdkCryptoBackend}",
                 "${input:openiotsdkExample}"
             ],
             "group": "build",
@@ -272,7 +271,6 @@
                 "-Cbuild",
                 "-d${input:openiotsdkDebugMode}",
                 "-l${input:openiotsdkLwipDebug}",
-                "-b${input:openiotsdkCryptoBackend}",
                 "unit-tests"
             ],
             "group": "build",
@@ -481,13 +479,6 @@
             "description": "Do you want to use LwIP debug logs?",
             "options": ["false", "true"],
             "default": "false"
-        },
-        {
-            "type": "pickString",
-            "id": "openiotsdkCryptoBackend",
-            "description": "Which Crypto algorithm do you wish to use?",
-            "options": ["mbedtls", "psa"],
-            "default": "mbedtls"
         },
         {
             "type": "command",

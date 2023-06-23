@@ -1,4 +1,4 @@
-name: "\U0001F680 1.0 Issue"
+name: "\u0030\u20e3 1.0 Issue"
 description: Create an issue that is required for Matter 1.0 release
 title: "[1.0] "
 labels: [bug, "V1.0", "needs triage"]

@@ -17341,6 +17341,7 @@ class SmokeCoAlarm(Cluster):
                 ClusterObjectFieldDescriptor(Label="interconnectCOAlarm", Tag=0x00000009, Type=typing.Optional[SmokeCoAlarm.Enums.AlarmStateEnum]),
                 ClusterObjectFieldDescriptor(Label="contaminationState", Tag=0x0000000A, Type=typing.Optional[SmokeCoAlarm.Enums.ContaminationStateEnum]),
                 ClusterObjectFieldDescriptor(Label="sensitivityLevel", Tag=0x0000000B, Type=typing.Optional[SmokeCoAlarm.Enums.SensitivityEnum]),
+                ClusterObjectFieldDescriptor(Label="expiryDate", Tag=0x0000000C, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -17361,6 +17362,7 @@ class SmokeCoAlarm(Cluster):
     interconnectCOAlarm: 'typing.Optional[SmokeCoAlarm.Enums.AlarmStateEnum]' = None
     contaminationState: 'typing.Optional[SmokeCoAlarm.Enums.ContaminationStateEnum]' = None
     sensitivityLevel: 'typing.Optional[SmokeCoAlarm.Enums.SensitivityEnum]' = None
+    expiryDate: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -17645,6 +17647,22 @@ class SmokeCoAlarm(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[SmokeCoAlarm.Enums.SensitivityEnum])
 
             value: 'typing.Optional[SmokeCoAlarm.Enums.SensitivityEnum]' = None
+
+        @dataclass
+        class ExpiryDate(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x005C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

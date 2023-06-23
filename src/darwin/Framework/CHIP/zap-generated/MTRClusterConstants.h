@@ -3794,6 +3794,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeInterconnectCOAlarmID MTR_NEWLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeContaminationStateID MTR_NEWLY_AVAILABLE = 0x0000000A,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeSensitivityLevelID MTR_NEWLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID MTR_NEWLY_AVAILABLE = 0x0000000C,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE

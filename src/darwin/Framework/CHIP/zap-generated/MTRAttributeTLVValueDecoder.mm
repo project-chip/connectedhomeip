@@ -9923,6 +9923,17 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
+    case Attributes::ExpiryDate::Id: {
+        using TypeInfo = Attributes::ExpiryDate::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
     case Attributes::GeneratedCommandList::Id: {
         using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
         TypeInfo::DecodableType cppValue;
