@@ -1891,82 +1891,70 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     CHIP_ERROR return_err = CHIP_NO_ERROR;
     ReadCommissioningInfo info;
 
-    // Using ForEachAttribute because this attribute can be queried on any endpoint.
-    err = mAttributeCache->ForEachAttribute(
-        app::Clusters::GeneralCommissioning::Id, [this, &info](const app::ConcreteAttributePath & path) {
-            switch (path.mAttributeId)
-            {
-            case app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::Id: {
-                app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::TypeInfo::DecodableType basicInfo;
-                ReturnErrorOnFailure(
-                    this->mAttributeCache->Get<app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfo::TypeInfo>(
-                        path, basicInfo));
-                info.general.recommendedFailsafe = basicInfo.failSafeExpiryLengthSeconds;
-            }
-            break;
-            case app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::Id: {
-                ReturnErrorOnFailure(
-                    this->mAttributeCache->Get<app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::TypeInfo>(
-                        path, info.general.currentRegulatoryLocation));
-            }
-            break;
-            case app::Clusters::GeneralCommissioning::Attributes::LocationCapability::Id: {
-                ReturnErrorOnFailure(
-                    this->mAttributeCache->Get<app::Clusters::GeneralCommissioning::Attributes::LocationCapability::TypeInfo>(
-                        path, info.general.locationCapability));
-            }
-            break;
-            case app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::Id: {
-                ReturnErrorOnFailure(
-                    this->mAttributeCache->Get<app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo>(
-                        path, info.general.breadcrumb));
-            }
-            break;
-            default:
-                return CHIP_NO_ERROR;
-            }
+    // Try to parse as much as we can here before returning, even if attributes
+    // are missing or cannot be decoded.
+    {
+        using namespace chip::app::Clusters::GeneralCommissioning;
+        using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 
-            return CHIP_NO_ERROR;
-        });
+        BasicCommissioningInfo::TypeInfo::DecodableType basicInfo;
+        err = mAttributeCache->Get<BasicCommissioningInfo::TypeInfo>(kRootEndpointId, basicInfo);
+        if (err == CHIP_NO_ERROR)
+        {
+            info.general.recommendedFailsafe = basicInfo.failSafeExpiryLengthSeconds;
+        }
+        else
+        {
+            ChipLogError(Controller, "Failed to read BasicCommissioningInfo: %" CHIP_ERROR_FORMAT, err.Format());
+            return_err = err;
+        }
 
-    // Try to parse as much as we can here before returning, even if this is an error.
-    return_err = err == CHIP_NO_ERROR ? return_err : err;
+        err = mAttributeCache->Get<RegulatoryConfig::TypeInfo>(kRootEndpointId, info.general.currentRegulatoryLocation);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to read RegulatoryConfig: %" CHIP_ERROR_FORMAT, err.Format());
+            return_err = err;
+        }
 
-    err = mAttributeCache->ForEachAttribute(
-        app::Clusters::BasicInformation::Id, [this, &info](const app::ConcreteAttributePath & path) {
-            if (path.mAttributeId != app::Clusters::BasicInformation::Attributes::VendorID::Id &&
-                path.mAttributeId != app::Clusters::BasicInformation::Attributes::ProductID::Id)
-            {
-                // Continue on
-                return CHIP_NO_ERROR;
-            }
+        err = mAttributeCache->Get<LocationCapability::TypeInfo>(kRootEndpointId, info.general.locationCapability);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to read LocationCapability: %" CHIP_ERROR_FORMAT, err.Format());
+            return_err = err;
+        }
 
-            switch (path.mAttributeId)
-            {
-            case app::Clusters::BasicInformation::Attributes::VendorID::Id:
-                return this->mAttributeCache->Get<app::Clusters::BasicInformation::Attributes::VendorID::TypeInfo>(
-                    path, info.basic.vendorId);
-            case app::Clusters::BasicInformation::Attributes::ProductID::Id:
-                return this->mAttributeCache->Get<app::Clusters::BasicInformation::Attributes::ProductID::TypeInfo>(
-                    path, info.basic.productId);
-            default:
-                return CHIP_NO_ERROR;
-            }
-        });
+        err = mAttributeCache->Get<Breadcrumb::TypeInfo>(kRootEndpointId, info.general.breadcrumb);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to read Breadcrumb: %" CHIP_ERROR_FORMAT, err.Format());
+            return_err = err;
+        }
+    }
 
-    // Try to parse as much as we can here before returning, even if this is an error.
-    return_err = (err == CHIP_NO_ERROR) ? return_err : err;
+    {
+        using namespace chip::app::Clusters::BasicInformation;
+        using namespace chip::app::Clusters::BasicInformation::Attributes;
 
+        err        = mAttributeCache->Get<VendorID::TypeInfo>(kRootEndpointId, info.basic.vendorId);
+        return_err = err == CHIP_NO_ERROR ? return_err : err;
+
+        err        = mAttributeCache->Get<ProductID::TypeInfo>(kRootEndpointId, info.basic.productId);
+        return_err = err == CHIP_NO_ERROR ? return_err : err;
+    }
+
+    // We might not have requested a Fabrics attribute at all, so not having a
+    // value for it is not an error.
     err = mAttributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
+        using namespace chip::app::Clusters::OperationalCredentials::Attributes;
         // this code is checking if the device is already on the commissioner's fabric.
         // if a matching fabric is found, then remember the nodeId so that the commissioner
         // can, if it decides to, cancel commissioning (before it fails in AddNoc) and know
         // the device's nodeId on its fabric.
         switch (path.mAttributeId)
         {
-        case OperationalCredentials::Attributes::Fabrics::Id: {
-            OperationalCredentials::Attributes::Fabrics::TypeInfo::DecodableType fabrics;
-            ReturnErrorOnFailure(this->mAttributeCache->Get<OperationalCredentials::Attributes::Fabrics::TypeInfo>(path, fabrics));
+        case Fabrics::Id: {
+            Fabrics::TypeInfo::DecodableType fabrics;
+            ReturnErrorOnFailure(this->mAttributeCache->Get<Fabrics::TypeInfo>(path, fabrics));
             // this is a best effort attempt to find a matching fabric, so no error checking on iter
             auto iter = fabrics.begin();
             while (iter.Next())
@@ -2014,32 +2002,36 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     // Try to parse as much as we can here before returning, even if this is an error.
     return_err = err == CHIP_NO_ERROR ? return_err : err;
 
-    // Set the network cluster endpoints first so we can match up the connection times.
+    // Set the network cluster endpoints first so we can match up the connection
+    // times.  Note that here we don't know what endpoints the network
+    // commissioning clusters might be on.
     err = mAttributeCache->ForEachAttribute(
         app::Clusters::NetworkCommissioning::Id, [this, &info](const app::ConcreteAttributePath & path) {
-            if (path.mAttributeId != app::Clusters::NetworkCommissioning::Attributes::FeatureMap::Id)
+            using namespace chip::app::Clusters;
+            using namespace chip::app::Clusters::NetworkCommissioning::Attributes;
+            if (path.mAttributeId != FeatureMap::Id)
             {
                 return CHIP_NO_ERROR;
             }
             TLV::TLVReader reader;
             if (this->mAttributeCache->Get(path, reader) == CHIP_NO_ERROR)
             {
-                BitFlags<app::Clusters::NetworkCommissioning::Feature> features;
+                BitFlags<NetworkCommissioning::Feature> features;
                 if (app::DataModel::Decode(reader, features) == CHIP_NO_ERROR)
                 {
-                    if (features.Has(app::Clusters::NetworkCommissioning::Feature::kWiFiNetworkInterface))
+                    if (features.Has(NetworkCommissioning::Feature::kWiFiNetworkInterface))
                     {
                         ChipLogProgress(Controller, "----- NetworkCommissioning Features: has WiFi. endpointid = %u",
                                         path.mEndpointId);
                         info.network.wifi.endpoint = path.mEndpointId;
                     }
-                    else if (features.Has(app::Clusters::NetworkCommissioning::Feature::kThreadNetworkInterface))
+                    else if (features.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
                     {
                         ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Thread. endpointid = %u",
                                         path.mEndpointId);
                         info.network.thread.endpoint = path.mEndpointId;
                     }
-                    else if (features.Has(app::Clusters::NetworkCommissioning::Feature::kEthernetNetworkInterface))
+                    else if (features.Has(NetworkCommissioning::Feature::kEthernetNetworkInterface))
                     {
                         ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Ethernet. endpointid = %u",
                                         path.mEndpointId);
@@ -2066,14 +2058,13 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
 
     err = mAttributeCache->ForEachAttribute(
         app::Clusters::NetworkCommissioning::Id, [this, &info](const app::ConcreteAttributePath & path) {
-            if (path.mAttributeId != app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id)
+            using namespace chip::app::Clusters::NetworkCommissioning::Attributes;
+            if (path.mAttributeId != ConnectMaxTimeSeconds::Id)
             {
                 return CHIP_NO_ERROR;
             }
-            app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableArgType time;
-            ReturnErrorOnFailure(
-                this->mAttributeCache->Get<app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo>(path,
-                                                                                                                             time));
+            ConnectMaxTimeSeconds::TypeInfo::DecodableArgType time;
+            ReturnErrorOnFailure(this->mAttributeCache->Get<ConnectMaxTimeSeconds::TypeInfo>(path, time));
             if (path.mEndpointId == info.network.wifi.endpoint)
             {
                 info.network.wifi.minConnectionTime = time;
