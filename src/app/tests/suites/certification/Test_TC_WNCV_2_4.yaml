@@ -31,22 +31,36 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue #10811 if condition is required, need YAML support for this
-    - label: "Reads Type attribute from DUT"
-      verification: |
-          ./chip-tool windowcovering read type 1 1
+    - label:
+          "Reads Type attribute from DUT, If (WNCV.S.F00(LF) & !WNCV.S.F01(TL))
+          value must be between [min=0, max=5] or equals to 9"
+      command: "readAttribute"
+      attribute: "Type"
+      PICS: WNCV.S.A0000 && WNCV.S.F00 && !WNCV.S.F01
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
 
-          Verify "Type " attribute   If (WNCV.S.F00(LF) &!WNCV.S.F01(TL)) supports value must be between [min=0, max=5] or equals to 9, If (!WNCV.S.F00(LF) &
-          WNCV.S.F01(TL)) supports value must be only equal to 7, If (WNCV.S.F00(LF) & WNCV.S.F01(TL)) supports value is either 6 or 8 on the TH(Chip-tool) Log:
+    - label:
+          "Reads Type attribute from DUT, If (!WNCV.S.F00(LF) & WNCV.S.F01(TL))
+          value must be only equal to 7"
+      command: "readAttribute"
+      attribute: "Type"
+      PICS: WNCV.S.A0000 && !WNCV.S.F00 && WNCV.S.F01
+      response:
+          value: 7
+          constraints:
+              type: enum8
 
-          [1650882457.304607][8640:8645] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0000 DataVersion: 366273182
-          [1650882457.304694][8640:8645] CHIP:TOO:   Type: 8
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && WNCV.S.A0000
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label:
+          "Reads Type attribute from DUT, If (WNCV.S.F00(LF) & WNCV.S.F01(TL))
+          value is either 6 or 8"
+      command: "readAttribute"
+      attribute: "Type"
+      PICS: WNCV.S.A0000 && WNCV.S.F00 && WNCV.S.F01
+      response:
+          constraints:
+              type: enum8
+              anyOf: [6, 8]
