@@ -2,7 +2,7 @@
 
 The tv-app common-api module defines the interface to interact with the Matter
 agent service for the content apps. This module defines the AIDL interfaces,
-clusters and command abstractions accessible. It also defines various contants
+clusters and command abstractions accessible. It also defines various constants
 and intent field definitions that would be used by the content app while
 interacting with the Matter SDK. The interface provided by this module helps
 content app to register dynamic endpoints as well as report any attribute
@@ -49,7 +49,7 @@ associated with each one.
 ## Intents
 
 The supported intents are defined under the
-`com.matter.tv.app.api.MatterIntentContants`. This helper class defines the
+`com.matter.tv.app.api.MatterIntentConstants`. This helper class defines the
 relevant intents used while interacting with the Matter app agent service. This
 includes the android permission strings to as well as command and attribute
 intent fields to be used.
