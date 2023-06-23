@@ -408,7 +408,7 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
 
     auto newDstL   = dstL.begin();
     auto & dstList = mDstOffsetObj.dstOffsetList;
-    uint8_t i      = 0;
+    size_t i       = 0;
 
     while (newDstL.Next())
     {
