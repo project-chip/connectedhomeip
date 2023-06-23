@@ -23,7 +23,6 @@
 #include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
 #include <tracing/macros.h>
-#include <tracing/scope.h>
 
 namespace chip {
 namespace Dnssd {
@@ -240,8 +239,6 @@ IncrementalResolver::RequiredInformationFlags IncrementalResolver::GetMissingReq
 
 CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const ResourceData & data, BytesRange packetRange)
 {
-    MATTER_TRACE_SCOPE("Incremental record parse", "Resolver");
-
     if (!IsActive())
     {
         return CHIP_NO_ERROR; // nothing to parse

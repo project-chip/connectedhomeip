@@ -1179,6 +1179,8 @@ typedef void (*TemperatureControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*RefrigeratorAlarmMaskAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
 typedef void (*RefrigeratorAlarmStateAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
+typedef void (*RefrigeratorAlarmSupportedAttributeCallback)(void *,
+                                                            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
 typedef void (*RefrigeratorAlarmGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*RefrigeratorAlarmAcceptedCommandListListAttributeCallback)(
@@ -8929,6 +8931,36 @@ public:
     void OnSubscriptionEstablished();
     using MTRRefrigeratorAlarmStateAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRRefrigeratorAlarmStateAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRRefrigeratorAlarmSupportedAttributeCallbackBridge : public MTRCallbackBridge<RefrigeratorAlarmSupportedAttributeCallback>
+{
+public:
+    MTRRefrigeratorAlarmSupportedAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<RefrigeratorAlarmSupportedAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRRefrigeratorAlarmSupportedAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<RefrigeratorAlarmSupportedAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+};
+
+class MTRRefrigeratorAlarmSupportedAttributeCallbackSubscriptionBridge : public MTRRefrigeratorAlarmSupportedAttributeCallbackBridge
+{
+public:
+    MTRRefrigeratorAlarmSupportedAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action,
+                                                                     MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRRefrigeratorAlarmSupportedAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRRefrigeratorAlarmSupportedAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRRefrigeratorAlarmSupportedAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

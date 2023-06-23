@@ -3068,6 +3068,7 @@ client cluster RefrigeratorAlarm = 87 {
 
   readonly attribute AlarmMap mask = 0;
   readonly attribute AlarmMap state = 2;
+  readonly attribute AlarmMap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

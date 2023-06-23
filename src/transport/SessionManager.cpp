@@ -145,6 +145,8 @@ void SessionManager::FabricRemoved(FabricIndex fabricIndex)
 CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
 {
+    MATTER_TRACE_SCOPE("PrepareMessage", "SessionManager");
+
     PacketHeader packetHeader;
     bool isControlMsg = IsControlMessage(payloadHeader);
     if (isControlMsg)
@@ -579,6 +581,8 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
 void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partialPacketHeader,
                                                     const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
+    MATTER_TRACE_SCOPE("Unauthenticated Message Dispatch", "SessionManager");
+
     // Drop unsecured messages with privacy enabled.
     if (partialPacketHeader.HasPrivacyFlag())
     {
@@ -667,6 +671,8 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
 void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPacketHeader,
                                                   const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
+    MATTER_TRACE_SCOPE("Secure Unicast Message Dispatch", "SessionManager");
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     Optional<SessionHandle> session = mSecureSessions.FindSecureSessionByLocalKey(partialPacketHeader.GetSessionId());
@@ -835,6 +841,8 @@ static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, Pac
 void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPacketHeader,
                                                 const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
+    MATTER_TRACE_SCOPE("Group Message Dispatch", "SessionManager");
+
     PayloadHeader payloadHeader;
     PacketHeader packetHeaderCopy; /// Packet header decoded per group key, with privacy decrypted fields
     System::PacketBufferHandle msgCopy;

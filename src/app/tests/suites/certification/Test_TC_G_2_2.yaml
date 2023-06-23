@@ -318,54 +318,6 @@ tests:
             [1683797474.815508][38909:38911] CHIP:DMG:
             [1683797474.815512][38909:38911] CHIP:DMG:         InteractionModelRevision = 1
             [1683797474.815515][38909:38911] CHIP:DMG: }
-
-            Before adding the Groups(MaxGroup+1) execute below command which is used to check the  Resource_Exhausted Condition
-
-            ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 13, "groupKeySetID": 1, "fabricIndex": 1} ]' 1 0
-
-            Verify the "status is success" on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
-
-            [1683799348.785746][39651:39653] CHIP:DMG: WriteResponseMessage =
-            [1683799348.785751][39651:39653] CHIP:DMG: {
-            [1683799348.785755][39651:39653] CHIP:DMG:         AttributeStatusIBs =
-            [1683799348.785763][39651:39653] CHIP:DMG:         [
-            [1683799348.785767][39651:39653] CHIP:DMG:                 AttributeStatusIB =
-            [1683799348.785771][39651:39653] CHIP:DMG:                 {
-            [1683799348.785775][39651:39653] CHIP:DMG:                         AttributePathIB =
-            [1683799348.785780][39651:39653] CHIP:DMG:                         {
-            [1683799348.785785][39651:39653] CHIP:DMG:                                 Endpoint = 0x0,
-            [1683799348.785789][39651:39653] CHIP:DMG:                                 Cluster = 0x3f,
-            [1683799348.785794][39651:39653] CHIP:DMG:                                 Attribute = 0x0000_0000,
-            [1683799348.785798][39651:39653] CHIP:DMG:                         }
-            [1683799348.785804][39651:39653] CHIP:DMG:
-            [1683799348.785811][39651:39653] CHIP:DMG:                         StatusIB =
-            [1683799348.785816][39651:39653] CHIP:DMG:                         {
-            [1683799348.785821][39651:39653] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-            [1683799348.785825][39651:39653] CHIP:DMG:                         },
-            [1683799348.785831][39651:39653] CHIP:DMG:
-            [1683799348.785835][39651:39653] CHIP:DMG:                 },
-            [1683799348.785844][39651:39653] CHIP:DMG:
-            [1683799348.785848][39651:39653] CHIP:DMG:                 AttributeStatusIB =
-            [1683799348.785852][39651:39653] CHIP:DMG:                 {
-            [1683799348.785856][39651:39653] CHIP:DMG:                         AttributePathIB =
-            [1683799348.785860][39651:39653] CHIP:DMG:                         {
-            [1683799348.785865][39651:39653] CHIP:DMG:                                 Endpoint = 0x0,
-            [1683799348.785869][39651:39653] CHIP:DMG:                                 Cluster = 0x3f,
-            [1683799348.785874][39651:39653] CHIP:DMG:                                 Attribute = 0x0000_0000,
-            [1683799348.785878][39651:39653] CHIP:DMG:                                 ListIndex = Null,
-            [1683799348.785882][39651:39653] CHIP:DMG:                         }
-            [1683799348.785889][39651:39653] CHIP:DMG:
-            [1683799348.785894][39651:39653] CHIP:DMG:                         StatusIB =
-            [1683799348.785898][39651:39653] CHIP:DMG:                         {
-            [1683799348.785904][39651:39653] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-            [1683799348.785909][39651:39653] CHIP:DMG:                         },
-            [1683799348.785914][39651:39653] CHIP:DMG:
-            [1683799348.785918][39651:39653] CHIP:DMG:                 },
-            [1683799348.785924][39651:39653] CHIP:DMG:
-            [1683799348.785927][39651:39653] CHIP:DMG:         ],
-            [1683799348.785936][39651:39653] CHIP:DMG:
-            [1683799348.785940][39651:39653] CHIP:DMG:         InteractionModelRevision = 1
-            [1683799348.785943][39651:39653] CHIP:DMG: }
       disabled: true
 
     - label:
@@ -654,6 +606,57 @@ tests:
           [1683799060.033928][39543:39545] CHIP:TOO:       GroupName: grp12
           [1683799060.033930][39543:39545] CHIP:TOO:       FabricIndex: 1
           [1683799060.033932][39543:39545] CHIP:TOO:      }
+      disabled: true
+
+    - label: "TH binds GroupId (maxgroups+1) with GroupKeySetID 1"
+      verification: |
+          Before adding the Groups(MaxGroup+1) execute below command which is used to check the  Resource_Exhausted Condition
+
+            ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 13, "groupKeySetID": 1, "fabricIndex": 1} ]' 1 0
+
+            Verify the "status is success" on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
+
+            [1683799348.785746][39651:39653] CHIP:DMG: WriteResponseMessage =
+            [1683799348.785751][39651:39653] CHIP:DMG: {
+            [1683799348.785755][39651:39653] CHIP:DMG:         AttributeStatusIBs =
+            [1683799348.785763][39651:39653] CHIP:DMG:         [
+            [1683799348.785767][39651:39653] CHIP:DMG:                 AttributeStatusIB =
+            [1683799348.785771][39651:39653] CHIP:DMG:                 {
+            [1683799348.785775][39651:39653] CHIP:DMG:                         AttributePathIB =
+            [1683799348.785780][39651:39653] CHIP:DMG:                         {
+            [1683799348.785785][39651:39653] CHIP:DMG:                                 Endpoint = 0x0,
+            [1683799348.785789][39651:39653] CHIP:DMG:                                 Cluster = 0x3f,
+            [1683799348.785794][39651:39653] CHIP:DMG:                                 Attribute = 0x0000_0000,
+            [1683799348.785798][39651:39653] CHIP:DMG:                         }
+            [1683799348.785804][39651:39653] CHIP:DMG:
+            [1683799348.785811][39651:39653] CHIP:DMG:                         StatusIB =
+            [1683799348.785816][39651:39653] CHIP:DMG:                         {
+            [1683799348.785821][39651:39653] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+            [1683799348.785825][39651:39653] CHIP:DMG:                         },
+            [1683799348.785831][39651:39653] CHIP:DMG:
+            [1683799348.785835][39651:39653] CHIP:DMG:                 },
+            [1683799348.785844][39651:39653] CHIP:DMG:
+            [1683799348.785848][39651:39653] CHIP:DMG:                 AttributeStatusIB =
+            [1683799348.785852][39651:39653] CHIP:DMG:                 {
+            [1683799348.785856][39651:39653] CHIP:DMG:                         AttributePathIB =
+            [1683799348.785860][39651:39653] CHIP:DMG:                         {
+            [1683799348.785865][39651:39653] CHIP:DMG:                                 Endpoint = 0x0,
+            [1683799348.785869][39651:39653] CHIP:DMG:                                 Cluster = 0x3f,
+            [1683799348.785874][39651:39653] CHIP:DMG:                                 Attribute = 0x0000_0000,
+            [1683799348.785878][39651:39653] CHIP:DMG:                                 ListIndex = Null,
+            [1683799348.785882][39651:39653] CHIP:DMG:                         }
+            [1683799348.785889][39651:39653] CHIP:DMG:
+            [1683799348.785894][39651:39653] CHIP:DMG:                         StatusIB =
+            [1683799348.785898][39651:39653] CHIP:DMG:                         {
+            [1683799348.785904][39651:39653] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+            [1683799348.785909][39651:39653] CHIP:DMG:                         },
+            [1683799348.785914][39651:39653] CHIP:DMG:
+            [1683799348.785918][39651:39653] CHIP:DMG:                 },
+            [1683799348.785924][39651:39653] CHIP:DMG:
+            [1683799348.785927][39651:39653] CHIP:DMG:         ],
+            [1683799348.785936][39651:39653] CHIP:DMG:
+            [1683799348.785940][39651:39653] CHIP:DMG:         InteractionModelRevision = 1
+            [1683799348.785943][39651:39653] CHIP:DMG: }
       disabled: true
 
     - label:

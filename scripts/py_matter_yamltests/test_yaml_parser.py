@@ -23,7 +23,7 @@ import io
 import tempfile
 import unittest
 
-from matter_yamltests.definitions import *
+from matter_yamltests.definitions import ParseSource, SpecDefinitions
 from matter_yamltests.parser import TestParser, TestParserConfig
 
 simple_test_description = '''<?xml version="1.0"?>

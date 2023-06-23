@@ -695,7 +695,8 @@ class TestStep:
             return result
 
         check_type = PostProcessCheckType.RESPONSE_VALIDATION
-        error_failure_wrong_response_number = f'The test expects {len(self.responses)} responses but got {len(received_responses)} responses.'
+        error_failure_wrong_response_number = (f'The test expects {len(self.responses)} responses '
+                                               f'but got {len(received_responses)} responses.')
 
         received_responses_copy = copy.deepcopy(received_responses)
         for expected_response in self.responses:
@@ -743,7 +744,6 @@ class TestStep:
         check_type = PostProcessCheckType.WAIT_VALIDATION
         error_success = 'The test expectation "{wait_for}" for "{cluster}.{wait_type}" on endpoint {endpoint} is true'
         error_failure = 'The test expectation "{expected} == {received}" is false'
-        error_failure_multiple_responses = 'The test expects a single response but got {len(received_responses)} responses.'
 
         if len(received_responses) > 1:
             result.error(check_type, error_failure.multiple_responses)
@@ -758,7 +758,7 @@ class TestStep:
             received_wait_type = received_response.get('event')
         else:
             expected_wait_type = self.command
-            received_wait_type = receive_response.get('command')
+            received_wait_type = received_response.get('command')
 
         expected_values = [
             self.wait_for,
@@ -1110,7 +1110,7 @@ class TestParser:
 
     def __apply_config_override(self, config, config_override):
         for key, value in config_override.items():
-            if value is None or not key in config:
+            if value is None or key not in config:
                 continue
 
             is_node_id = key == 'nodeId' or (isinstance(

@@ -25,11 +25,12 @@ limitations under the License.
     <domain>Appliances</domain>
     <description>Attributes and commands for configuring the Refrigerator alarm.</description>
     <code>0x0057</code>
-    <define>REFRIGERATOR_ALARM</define>
+    <define>REFRIGERATOR_ALARM_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <attribute side="server" code="0x0000" define="MASK" type="AlarmMap" default="0" writable="false" optional="false">Mask</attribute>
     <attribute side="server" code="0x0002" define="STATE" type="AlarmMap" default="0" writable="false" optional="false">State</attribute>
+    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmMap" default="0" writable="false" optional="false">Supported</attribute>
 
     <event side="server" code="0x00" priority="info" name="Notify" optional="false">
         <description>Notify</description>

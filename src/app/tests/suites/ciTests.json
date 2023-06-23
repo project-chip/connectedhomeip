@@ -34,6 +34,7 @@
         "Test_TC_CC_6_1",
         "Test_TC_CC_6_2",
         "Test_TC_CC_6_3",
+        "Test_TC_CC_6_5",
         "Test_TC_CC_7_2",
         "Test_TC_CC_7_3",
         "Test_TC_CC_7_4",
@@ -63,6 +64,7 @@
         "Test_TC_FAN_2_2",
         "Test_TC_FAN_2_3",
         "Test_TC_FAN_2_4",
+        "Test_TC_FAN_2_5",
         "Test_TC_FAN_3_1",
         "Test_TC_FAN_3_2",
         "Test_TC_FAN_3_4"
@@ -172,11 +174,7 @@
     "SecureChannel": ["Test_TC_SC_5_1", "Test_TC_SC_5_2"],
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
-    "Thermostat": [
-        "Test_TC_TSTAT_1_1",
-        "Test_TC_TSTAT_2_1",
-        "Test_TC_TSTAT_2_2"
-    ],
+    "Thermostat": ["Test_TC_TSTAT_1_1", "Test_TC_TSTAT_2_1"],
     "ThermostatUserConfiguration": [
         "Test_TC_TSUIC_1_1",
         "Test_TC_TSUIC_2_1",
@@ -200,7 +198,6 @@
         "Test_TC_WNCV_2_1",
         "Test_TC_WNCV_2_2",
         "Test_TC_WNCV_2_3",
-        "Test_TC_WNCV_2_4",
         "Test_TC_WNCV_2_5",
         "Test_TC_WNCV_3_1",
         "Test_TC_WNCV_3_2",
@@ -274,7 +271,7 @@
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_6",
         "Test_TC_DRLK_2_7",
-        "Test_TC_DRLK_2_9",
+        "Test_TC_DRLK_2_8",
         "Test_TC_DRLK_2_11",
         "Test_TC_DRLK_2_12"
     ],

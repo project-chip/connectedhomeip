@@ -36,19 +36,7 @@ exclude = third_party
           scripts/helpers/bloat_check.py
           scripts/pregenerate/using_codegen.py
           scripts/pregenerate/using_zap.py
-          scripts/py_matter_yamltests/matter_yamltests/constraints.py
-          scripts/py_matter_yamltests/matter_yamltests/definitions.py
-          scripts/py_matter_yamltests/matter_yamltests/fixes.py
-          scripts/py_matter_yamltests/matter_yamltests/parser.py
-          scripts/py_matter_yamltests/matter_yamltests/pics_checker.py
-          scripts/py_matter_yamltests/matter_yamltests/pseudo_clusters/pseudo_clusters.py
-          scripts/py_matter_yamltests/matter_yamltests/yaml_loader.py
-          scripts/py_matter_yamltests/test_pics_checker.py
-          scripts/py_matter_yamltests/test_spec_definitions.py
-          scripts/py_matter_yamltests/test_yaml_loader.py
-          scripts/py_matter_yamltests/test_yaml_parser.py
           scripts/run-clang-tidy-on-compile-commands.py
-          scripts/tests/chiptest/yamltest_with_chip_repl_tester.py
           scripts/tools/check_zcl_file_sync.py
           scripts/tools/convert_ini.py
           scripts/tools/memory/memdf/__init__.py
