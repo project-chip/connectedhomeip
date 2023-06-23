@@ -1388,6 +1388,64 @@ static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair.Pubkey().ECDSA_validate_msg_signature(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
 }
 
+uint8_t raw_keypair[] = { 0x04, 0x38, 0x9b, 0x9e, 0xc4, 0x9e, 0x84, 0x48, 0xc0, 0x8f, 0x34, 0x14, 0x9c, 0x3e, 0xa9, 0x47, 0xd1,
+                          0x49, 0xe2, 0xbb, 0xf5, 0x93, 0x93, 0x47, 0x5f, 0xa9, 0x16, 0x71, 0x3a, 0xc7, 0x81, 0xd2, 0x73, 0xf8,
+                          0xb5, 0x29, 0xb2, 0x8f, 0xbe, 0xba, 0x1e, 0x3a, 0x27, 0xd1, 0x42, 0x67, 0xd4, 0x0c, 0x5e, 0xa7, 0x25,
+                          0x4b, 0x62, 0x57, 0x7d, 0x00, 0x30, 0x30, 0x27, 0xd8, 0xa8, 0x4f, 0xa1, 0x11, 0xa0, 0xe7, 0x8e, 0xa5,
+                          0x02, 0xbd, 0xc4, 0x75, 0x3c, 0x0b, 0x87, 0x68, 0xd4, 0x3b, 0x68, 0x17, 0x40, 0xca, 0x29, 0xc4, 0x41,
+                          0x63, 0xaa, 0xb8, 0x3a, 0x26, 0xfa, 0xa3, 0xf1, 0x4a, 0x11, 0x30, 0xff };
+unsigned int raw_keypair_len = 97;
+
+const uint8_t raw_public_key[65] = {
+    0x04, 0x46, 0x3a, 0xc6, 0x93, 0x42, 0x91, 0x0a, 0x0e, 0x55, 0x88, 0xfc, 0x6f, 0xf5, 0x6b, 0xb6, 0x3e,
+    0x62, 0xec, 0xce, 0xcb, 0x14, 0x8f, 0x7d, 0x4e, 0xb0, 0x3e, 0xe5, 0x52, 0x60, 0x14, 0x15, 0x76, 0x7d,
+    0x16, 0xa5, 0xc6, 0x63, 0xf7, 0x93, 0xe4, 0x91, 0x23, 0x26, 0x0b, 0x82, 0x97, 0xa7, 0xcd, 0x7e, 0x7c,
+    0xfc, 0x7b, 0x31, 0x6b, 0x39, 0xd9, 0x8e, 0x90, 0xd2, 0x93, 0x77, 0x73, 0x8e, 0x82,
+};
+
+const uint8_t raw_private_key[32] = {
+    0xaa, 0xb6, 0x00, 0xae, 0x8a, 0xe8, 0xaa, 0xb7, 0xd7, 0x36, 0x27, 0xc2, 0x17, 0xb7, 0xc2, 0x04,
+    0x70, 0x9c, 0xa6, 0x94, 0x6a, 0xf5, 0xf2, 0xf7, 0x53, 0x08, 0x33, 0xa5, 0x2b, 0x44, 0xfb, 0xff,
+};
+
+static void TestKeypair_LoadFromRaw(nlTestSuite * inSuite, void * inContext)
+{
+    HeapChecker heapChecker(inSuite);
+    Test_P256Keypair keypair1;
+    Test_P256Keypair keypair2;
+    Test_P256Keypair keypair3;
+    Test_P256Keypair keypair4;
+    ByteSpan raw_keypair_bytespan     = ByteSpan(raw_keypair, raw_keypair_len);
+    ByteSpan raw_public_key_bytespan  = ByteSpan(raw_public_key, 65);
+    ByteSpan raw_private_key_bytespan = ByteSpan(raw_private_key, 32);
+
+    NL_TEST_ASSERT(inSuite, keypair1.ImportRawKeypair(raw_keypair_bytespan) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair2.ImportRawKeypair(raw_keypair, raw_keypair_len) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair3.ImportRawKeypair(raw_private_key, 32, raw_public_key, 65) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair4.ImportRawKeypair(raw_private_key_bytespan, raw_public_key_bytespan) == CHIP_NO_ERROR);
+}
+
+static void TestKeypair_Copy(nlTestSuite * inSuite, void * inContext)
+{
+    HeapChecker heapChecker(inSuite);
+    Test_P256Keypair keypair;
+    Test_P256Keypair keypair_dup;
+
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair_dup.Copy(keypair) == CHIP_NO_ERROR);
+
+    const char * msg         = "Test Message for Keygen";
+    const uint8_t * test_msg = Uint8::from_const_char(msg);
+    size_t msglen            = strlen(msg);
+
+    P256ECDSASignature test_sig;
+    NL_TEST_ASSERT(inSuite, keypair.ECDSA_sign_msg(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair_dup.Pubkey().ECDSA_validate_msg_signature(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, keypair_dup.ECDSA_sign_msg(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Pubkey().ECDSA_validate_msg_signature(test_msg, msglen, test_sig) == CHIP_NO_ERROR);
+}
+
 static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
@@ -2687,6 +2745,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test CSR Generation via P256Keypair method", TestCSR_GenByKeypair),
     NL_TEST_DEF("Test Direct CSR Generation", TestCSR_GenDirect),
     NL_TEST_DEF("Test Keypair Serialize", TestKeypair_Serialize),
+    NL_TEST_DEF("Test Keypair Load From Raw", TestKeypair_LoadFromRaw),
+    NL_TEST_DEF("Test Keypair Copy", TestKeypair_Copy),
     NL_TEST_DEF("Test Spake2p_spake2p FEMul", TestSPAKE2P_spake2p_FEMul),
     NL_TEST_DEF("Test Spake2p_spake2p FELoad/FEWrite", TestSPAKE2P_spake2p_FELoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p Mac", TestSPAKE2P_spake2p_Mac),

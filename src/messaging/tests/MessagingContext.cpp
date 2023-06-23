@@ -38,7 +38,9 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 
     ReturnErrorOnFailure(PlatformMemoryUser::Init());
 
+#if !CHIP_CRYPTO_PSA
     ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
+#endif
     ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
 
     chip::FabricTable::InitParams initParams;
@@ -80,7 +82,9 @@ void MessagingContext::Shutdown()
     mSessionManager.Shutdown();
     mFabricTable.Shutdown();
     mOpCertStore.Finish();
+#if !CHIP_CRYPTO_PSA
     mOpKeyStore.Finish();
+#endif
 }
 
 CHIP_ERROR MessagingContext::InitFromExisting(const MessagingContext & existing)

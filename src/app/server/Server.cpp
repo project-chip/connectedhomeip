@@ -548,7 +548,11 @@ void Server::ResumeSubscriptions()
 Credentials::IgnoreCertificateValidityPeriodPolicy Server::sDefaultCertValidityPolicy;
 
 KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
+#if CHIP_CRYPTO_PSA
+Crypto::PSAOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
+#else
 PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
+#endif
 Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
 Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION

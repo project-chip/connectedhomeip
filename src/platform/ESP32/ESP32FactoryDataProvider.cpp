@@ -30,14 +30,6 @@ namespace {
 static constexpr uint32_t kDACPrivateKeySize = 32;
 static constexpr uint32_t kDACPublicKeySize  = 65;
 
-CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serializedKeypair;
-    ReturnErrorOnFailure(serializedKeypair.SetLength(privateKey.size() + publicKey.size()));
-    memcpy(serializedKeypair.Bytes(), publicKey.data(), publicKey.size());
-    memcpy(serializedKeypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serializedKeypair);
-}
 } // namespace
 
 CHIP_ERROR ESP32FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
@@ -148,7 +140,7 @@ CHIP_ERROR ESP32FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
         ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_DACPrivateKey, privKeyBuf, privKeyLen, privKeyLen));
     ReturnErrorOnFailure(ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_DACPublicKey, pubKeyBuf, pubKeyLen, pubKeyLen));
 
-    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(privKeyBuf, privKeyLen), ByteSpan(pubKeyBuf, pubKeyLen), keypair));
+    ReturnErrorOnFailure(keypair.ImportRawKeypair(ByteSpan(privKeyBuf, privKeyLen), ByteSpan(pubKeyBuf, pubKeyLen)));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);

@@ -736,6 +736,24 @@ exit:
     return error;
 }
 
+CHIP_ERROR P256Keypair::ImportRawKeypair(const uint8_t * private_key, const size_t private_key_size, const uint8_t * public_key,
+                                         const size_t public_key_size)
+{
+    Crypto::P256SerializedKeypair serialized_keypair;
+    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key_size + public_key_size));
+    memcpy(serialized_keypair.Bytes(), public_key, public_key_size);
+    memcpy(serialized_keypair.Bytes() + public_key_size, private_key, private_key_size);
+    return this->Deserialize(serialized_keypair);
+}
+
+CHIP_ERROR P256Keypair::ImportRawKeypair(const uint8_t * key_data, size_t key_data_size)
+{
+    Crypto::P256SerializedKeypair serialized_keypair;
+    memcpy(serialized_keypair.Bytes(), key_data, key_data_size);
+    serialized_keypair.SetLength(key_data_size);
+    return this->Deserialize(serialized_keypair);
+}
+
 CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
     const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
@@ -812,6 +830,28 @@ void P256Keypair::Clear()
     }
 }
 
+CHIP_ERROR P256Keypair::Copy(const P256Keypair & other)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    P256SerializedKeypair serialized;
+
+    if (this == &other)
+    {
+        return error;
+    }
+
+    error = other.Serialize(serialized);
+    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+
+    error = this->Deserialize(serialized);
+    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+
+    mInitialized = true;
+
+exit:
+    return error;
+}
+
 P256Keypair::~P256Keypair()
 {
     Clear();
@@ -878,7 +918,8 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
 #if defined(MBEDTLS_X509_CSR_PARSE_C)
     ReturnErrorOnFailure(VerifyCertificateSigningRequestFormat(csr_buf, csr_length));
 
-    // TODO: For some embedded targets, mbedTLS library doesn't have mbedtls_x509_csr_parse_der, and mbedtls_x509_csr_parse_free.
+    // TODO: For some embedded targets, mbedTLS library doesn't have mbedtls_x509_csr_parse_der, and
+    // mbedtls_x509_csr_parse_free.
     //       Taking a step back, embedded targets likely will not process CSR requests. Adding this action item to reevaluate
     //       this if there's a need for this processing for embedded targets.
     CHIP_ERROR error   = CHIP_NO_ERROR;

@@ -1055,6 +1055,24 @@ exit:
     return error;
 }
 
+CHIP_ERROR P256Keypair::ImportRawKeypair(const uint8_t * private_key, const size_t private_key_size, const uint8_t * public_key,
+                                         const size_t public_key_size)
+{
+    Crypto::P256SerializedKeypair serialized_keypair;
+    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key_size + public_key_size));
+    memcpy(serialized_keypair.Bytes(), public_key, public_key_size);
+    memcpy(serialized_keypair.Bytes() + public_key_size, private_key, private_key_size);
+    return this->Deserialize(serialized_keypair);
+}
+
+CHIP_ERROR P256Keypair::ImportRawKeypair(const uint8_t * key_data, size_t key_data_size)
+{
+    Crypto::P256SerializedKeypair serialized_keypair;
+    memcpy(serialized_keypair.Bytes(), key_data, key_data_size);
+    serialized_keypair.SetLength(key_data_size);
+    return this->Deserialize(serialized_keypair);
+}
+
 CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -1175,6 +1193,28 @@ void P256Keypair::Clear()
         EC_KEY_free(ec_key);
         mInitialized = false;
     }
+}
+
+CHIP_ERROR P256Keypair::Copy(const P256Keypair & other)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    P256SerializedKeypair serialized;
+
+    if (this == &other)
+    {
+        return error;
+    }
+
+    error = other.Serialize(serialized);
+    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+
+    error = this->Deserialize(serialized);
+    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+
+    mInitialized = true;
+
+exit:
+    return error;
 }
 
 P256Keypair::~P256Keypair()

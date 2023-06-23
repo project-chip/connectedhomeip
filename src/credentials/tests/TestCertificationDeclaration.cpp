@@ -363,12 +363,11 @@ static void TestCD_CMSSignAndVerify(nlTestSuite * inSuite, void * inContext)
 
     // Test with known key
     P256Keypair keypair2;
-    P256SerializedKeypair serializedKeypair;
-    memcpy(serializedKeypair.Bytes(), sTestCMS_SignerSerializedKeypair, sizeof(sTestCMS_SignerSerializedKeypair));
-    serializedKeypair.SetLength(sizeof(sTestCMS_SignerSerializedKeypair));
     cdContentIn   = ByteSpan(sTestCMS_CDContent02);
     signedMessage = MutableByteSpan(signedMessageBuf);
-    NL_TEST_ASSERT(inSuite, keypair2.Deserialize(serializedKeypair) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   keypair2.ImportRawKeypair(sTestCMS_SignerSerializedKeypair, sizeof(sTestCMS_SignerSerializedKeypair)) ==
+                       CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, CMS_Sign(cdContentIn, signerKeyId, keypair2, signedMessage) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, CMS_Verify(signedMessage, keypair2.Pubkey(), cdContentOut) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, cdContentIn.data_equal(cdContentOut));

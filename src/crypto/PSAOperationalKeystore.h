@@ -49,17 +49,21 @@ protected:
         using P256Keypair::NewCertificateSigningRequest;
         using P256Keypair::Pubkey;
 
-        psa_key_id_t GetKeyId() const;
         bool Exists() const;
-        CHIP_ERROR Generate();
         CHIP_ERROR Destroy();
+        CHIP_ERROR Commit(const P256Keypair & pending);
+
+    private:
+        using P256Keypair::mInitialized;
+        using P256Keypair::mKeypair;
+        psa_key_id_t & mKeyId;
     };
 
     void ReleasePendingKeypair();
 
-    PersistentP256Keypair * mPendingKeypair = nullptr;
-    FabricIndex mPendingFabricIndex         = kUndefinedFabricIndex;
-    bool mIsPendingKeypairActive            = false;
+    P256Keypair * mPendingKeypair   = nullptr;
+    FabricIndex mPendingFabricIndex = kUndefinedFabricIndex;
+    bool mIsPendingKeypairActive    = false;
 };
 
 } // namespace Crypto

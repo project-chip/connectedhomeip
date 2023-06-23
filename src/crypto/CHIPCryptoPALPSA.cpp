@@ -100,6 +100,18 @@ bool isValidTag(const uint8_t * tag, size_t tag_length)
     return tag != nullptr && (tag_length == 8 || tag_length == 12 || tag_length == 16);
 }
 
+psa_key_attributes_t configure_ecc_key_pair_attributes()
+{
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+    psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
+    psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_COPY);
+
+    return attributes;
+}
+
 } // namespace
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
@@ -667,6 +679,8 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
     psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
 
+    psa_set_key_lifetime(&attributes, PSA_KEY_PERSISTENCE_VOLATILE);
+
     if (key_target == ECPKeyTarget::ECDH)
     {
         psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
@@ -675,7 +689,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     else if (key_target == ECPKeyTarget::ECDSA)
     {
         psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
-        psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_EXPORT | PSA_KEY_USAGE_SIGN_MESSAGE);
+        psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_COPY);
     }
     else
     {
@@ -698,22 +712,61 @@ exit:
     return error;
 }
 
+CHIP_ERROR P256Keypair::ImportRawKeypair(const uint8_t * private_key, const size_t private_key_size, const uint8_t * public_key,
+                                         const size_t public_key_size)
+{
+    psa_key_attributes_t attributes = configure_ecc_key_pair_attributes();
+    psa_key_id_t key_id;
+    psa_status_t status;
+
+    status = psa_import_key(&attributes, private_key, private_key_size, &key_id);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    memcpy(mPublicKey.Bytes(), public_key, public_key_size);
+    memcpy(mKeypair.mBytes, &key_id, sizeof(psa_key_id_t));
+    mInitialized = true;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR P256Keypair::ImportRawKeypair(const uint8_t * key_data, size_t key_data_size)
+{
+    CHIP_ERROR error                = CHIP_NO_ERROR;
+    psa_key_attributes_t attributes = configure_ecc_key_pair_attributes();
+    PsaP256KeypairContext & context = ToPsaContext(mKeypair);
+    psa_status_t status;
+
+    VerifyOrExit(key_data_size == kP256_PublicKey_Length + kP256_PrivateKey_Length, error = CHIP_ERROR_INTERNAL);
+
+    status = psa_import_key(&attributes, key_data + kP256_PublicKey_Length, kP256_PrivateKey_Length, &context.key_id);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+
+    memcpy(mPublicKey.Bytes(), key_data, kP256_PublicKey_Length);
+    memcpy(mKeypair.mBytes, &context.key_id, sizeof(psa_key_id_t));
+    mInitialized = true;
+
+exit:
+    logPsaError(status);
+
+    return error;
+}
+
 CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
-    CHIP_ERROR error                      = CHIP_NO_ERROR;
-    psa_status_t status                   = PSA_SUCCESS;
-    const PsaP256KeypairContext & context = ToConstPsaContext(mKeypair);
-    const size_t outputSize               = output.Length() == 0 ? output.Capacity() : output.Length();
+    CHIP_ERROR error        = CHIP_NO_ERROR;
+    psa_status_t status     = PSA_SUCCESS;
+    const size_t outputSize = output.Length() == 0 ? output.Capacity() : output.Length();
     Encoding::BufferWriter bbuf(output.Bytes(), outputSize);
-    uint8_t privateKey[kP256_PrivateKey_Length];
-    size_t privateKeyLength = 0;
+    size_t privateKeyLength = sizeof(psa_key_id_t);
 
-    status = psa_export_key(context.key_id, privateKey, sizeof(privateKey), &privateKeyLength);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(privateKeyLength == kP256_PrivateKey_Length, error = CHIP_ERROR_INTERNAL);
+    // For PSA, private keys should not be passed around directly and thus
+    // the key id should be serialized, alongside the public key, instead.
+    // The key id is guaranteed to be smaller than the full private key size
+    // and thus no changes are required to the default sizes in the
+    // P256SerializedKeypair type.
 
     bbuf.Put(mPublicKey, mPublicKey.Length());
-    bbuf.Put(privateKey, privateKeyLength);
+    bbuf.Put(mKeypair.mBytes, privateKeyLength);
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
     error = output.SetLength(bbuf.Needed());
 
@@ -725,23 +778,28 @@ exit:
 
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
-    VerifyOrReturnError(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, CHIP_ERROR_INVALID_ARGUMENT);
-
     CHIP_ERROR error                = CHIP_NO_ERROR;
     psa_status_t status             = PSA_SUCCESS;
-    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
     PsaP256KeypairContext & context = ToPsaContext(mKeypair);
+    size_t publicKeyLength          = 0;
     Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
     Clear();
 
-    psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
-    psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
-    psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
-    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_EXPORT | PSA_KEY_USAGE_SIGN_MESSAGE);
+    // The serialized data for PSA will provide us with the public key and the private key id.
+    // The private key itself will still be in secure storage and thus we only need to ensure
+    // that the deserialized key id corresponds to a valid, stored key.
 
-    status = psa_import_key(&attributes, input.ConstBytes() + mPublicKey.Length(), kP256_PrivateKey_Length, &context.key_id);
+    // Store the deserialized private key id to the keypair.
+    // This is guaranteed to fit due to the checks made during the serialize function.
+    memcpy(mKeypair.mBytes, input.ConstBytes() + mPublicKey.Length(), sizeof(psa_key_id_t));
+
+    // Check that the deserialized private key id is valid. We can do this by attempting to
+    // export the corresponding public key. We can then also verify that the exported key
+    // matches the deserialized one.
+    status = psa_export_public_key(context.key_id, mPublicKey.Bytes(), mPublicKey.Length(), &publicKeyLength);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(publicKeyLength == mPublicKey.Length(), error = CHIP_ERROR_INTERNAL);
 
     bbuf.Put(input.ConstBytes(), mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
@@ -763,6 +821,33 @@ void P256Keypair::Clear()
         memset(&context, 0, sizeof(context));
         mInitialized = false;
     }
+}
+
+CHIP_ERROR P256Keypair::Copy(const P256Keypair & other)
+{
+    CHIP_ERROR error    = CHIP_NO_ERROR;
+    psa_status_t status = PSA_SUCCESS;
+
+    if (this == &other)
+    {
+        return error;
+    }
+
+    psa_key_attributes_t attributes = configure_ecc_key_pair_attributes();
+
+    Clear();
+
+    status = psa_copy_key(ToPsaContext(other.mKeypair).key_id, &attributes, &ToPsaContext(mKeypair).key_id);
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+
+    memcpy(mPublicKey.Bytes(), other.mPublicKey.ConstBytes(), other.mPublicKey.Length());
+
+    mInitialized = true;
+
+exit:
+    psa_reset_key_attributes(&attributes);
+
+    return error;
 }
 
 P256Keypair::~P256Keypair()

@@ -270,16 +270,10 @@ CHIP_ERROR InitCredentialSets()
     FabricInfo deviceFabric;
 
     {
-        P256SerializedKeypair opKeysSerialized;
-
         auto deviceOpKey = Platform::MakeUnique<Crypto::P256Keypair>();
-        memcpy(opKeysSerialized.Bytes(), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
-        memcpy(opKeysSerialized.Bytes() + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
-               sTestCert_Node01_01_PrivateKey_Len);
 
-        ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
-
-        ReturnErrorOnFailure(deviceOpKey->Deserialize(opKeysSerialized));
+        deviceOpKey->ImportRawKeypair(sTestCert_Node01_01_PrivateKey, sTestCert_Node01_01_PrivateKey_Len,
+                                      sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
 
         // Use an injected operational key for device
         gDeviceOperationalKeystore.Init(1, std::move(deviceOpKey));

@@ -27,7 +27,11 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/DefaultSessionKeystore.h>
+#if CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#else
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#endif
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -70,13 +74,17 @@ public:
     ~FabricTableHolder()
     {
         mFabricTable.Shutdown();
+#if !CHIP_CRYPTO_PSA
         mOpKeyStore.Finish();
+#endif
         mOpCertStore.Finish();
     }
 
     CHIP_ERROR Init()
     {
+#if !CHIP_CRYPTO_PSA
         ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
+#endif
         ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
 
         chip::FabricTable::InitParams initParams;
@@ -92,7 +100,11 @@ public:
 private:
     chip::FabricTable mFabricTable;
     chip::TestPersistentStorageDelegate mStorage;
+#if CHIP_CRYPTO_PSA
+    chip::PSAOperationalKeystore mOpKeyStore;
+#else
     chip::PersistentStorageOperationalKeystore mOpKeyStore;
+#endif
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
 };
 

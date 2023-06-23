@@ -239,9 +239,6 @@ CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
 {
     VerifyOrReturnError(keyPair != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    P256SerializedKeypair serialized;
-    ReturnErrorOnFailure(keyPair->Serialize(serialized));
-
     if (mHasExternallyOwnedOperationalKey)
     {
         // Drop it, so we will allocate an internally owned one.
@@ -254,7 +251,7 @@ CHIP_ERROR FabricInfo::SetOperationalKeypair(const P256Keypair * keyPair)
         mOperationalKey = chip::Platform::New<P256Keypair>();
     }
     VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
-    return mOperationalKey->Deserialize(serialized);
+    return mOperationalKey->Copy(*keyPair);
 }
 
 CHIP_ERROR FabricInfo::SetExternallyOwnedOperationalKeypair(P256Keypair * keyPair)
@@ -683,16 +680,12 @@ CHIP_ERROR FabricTable::AddNewFabricForTest(const ByteSpan & rootCert, const Byt
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
 
     Crypto::P256Keypair injectedOpKey;
-    Crypto::P256SerializedKeypair injectedOpKeysSerialized;
-
     Crypto::P256Keypair * opKey = nullptr;
+
     if (!opKeySpan.empty())
     {
-        VerifyOrReturnError(opKeySpan.size() == injectedOpKeysSerialized.Capacity(), CHIP_ERROR_INVALID_ARGUMENT);
-
-        memcpy(injectedOpKeysSerialized.Bytes(), opKeySpan.data(), opKeySpan.size());
-        SuccessOrExit(err = injectedOpKeysSerialized.SetLength(opKeySpan.size()));
-        SuccessOrExit(err = injectedOpKey.Deserialize(injectedOpKeysSerialized));
+        VerifyOrReturnError(opKeySpan.size() == kP256_PublicKey_Length + kP256_PrivateKey_Length, CHIP_ERROR_INVALID_ARGUMENT);
+        SuccessOrExit(err = injectedOpKey.ImportRawKeypair(opKeySpan));
         opKey = &injectedOpKey;
     }
 

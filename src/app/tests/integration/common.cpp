@@ -26,7 +26,11 @@
 
 #include <app/tests/integration/common.h>
 #include <credentials/PersistentStorageOpCertStore.h>
+#if CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#else
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#endif
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
@@ -41,7 +45,11 @@ chip::SessionManager gSessionManager;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;
 chip::SessionHolder gSession;
 chip::TestPersistentStorageDelegate gStorage;
+#if CHIP_CRYPTO_PSA
+chip::Crypto::PSAOperationalKeystore gOperationalKeystore;
+#else
 chip::PersistentStorageOperationalKeystore gOperationalKeystore;
+#endif
 chip::Credentials::PersistentStorageOpCertStore gOpCertStore;
 chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 
@@ -64,8 +72,10 @@ void InitializeChip()
     err = gOpCertStore.Init(&gStorage);
     SuccessOrExit(err);
 
+#if !CHIP_CRYPTO_PSA
     err = gOperationalKeystore.Init(&gStorage);
     SuccessOrExit(err);
+#endif
 
     fabricTableInitParams.storage             = &gStorage;
     fabricTableInitParams.operationalKeystore = &gOperationalKeystore;
@@ -92,7 +102,9 @@ void ShutdownChip()
     gSessionManager.Shutdown();
 
     gFabricTable.Shutdown();
+#if !CHIP_CRYPTO_PSA
     gOperationalKeystore.Finish();
+#endif
     gOpCertStore.Finish();
 
     chip::DeviceLayer::PlatformMgr().Shutdown();

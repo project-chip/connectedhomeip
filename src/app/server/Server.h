@@ -40,7 +40,11 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/OperationalKeystore.h>
+#if CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#else
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#endif
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
@@ -202,7 +206,11 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         {
             // WARNING: PersistentStorageOperationalKeystore::Finish() is never called. It's fine for
             //          for examples and for now.
+#if !CHIP_CRYPTO_PSA
             ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
+#else
+            // Note: PSA Operational keystore does not require initialization
+#endif
             this->operationalKeystore = &sPersistentStorageOperationalKeystore;
         }
 
@@ -251,7 +259,11 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 
 private:
     static KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
+#if CHIP_CRYPTO_PSA
+    static Crypto::PSAOperationalKeystore sPersistentStorageOperationalKeystore;
+#else
     static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
+#endif
     static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
     static Credentials::GroupDataProviderImpl sGroupDataProvider;
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION

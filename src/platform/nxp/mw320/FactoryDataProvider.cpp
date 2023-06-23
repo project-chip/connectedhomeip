@@ -28,17 +28,6 @@ extern uint8_t * __FACTORY_DATA_START;
 extern uint32_t __FACTORY_DATA_SIZE;
 
 namespace chip {
-namespace {
-
-CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(privateKey.size() + publicKey.size()));
-    memcpy(serialized_keypair.Bytes(), publicKey.data(), publicKey.size());
-    memcpy(serialized_keypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serialized_keypair);
-}
-} // namespace
 
 namespace DeviceLayer {
 
@@ -195,8 +184,8 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     ReturnErrorOnFailure(SearchForId(kDacPrivateKeyId, dacPrivateKeySpan.data(), dacPrivateKeySpan.size(), keySize));
     dacPrivateKeySpan.reduce_size(keySize);
 
-    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()),
-                                            ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
+    ReturnErrorOnFailure(keypair.ImportRawKeypair(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()),
+                                                  ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
     res = CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);

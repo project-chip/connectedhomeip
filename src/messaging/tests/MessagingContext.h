@@ -18,7 +18,11 @@
 
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
+#if CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#else
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#endif
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -182,7 +186,13 @@ private:
     IOContext * mIOContext;
     TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
     chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
+
+#if CHIP_CRYPTO_PSA
+    chip::Crypto::PSAOperationalKeystore mOpKeyStore;
+#else
     chip::PersistentStorageOperationalKeystore mOpKeyStore;
+#endif
+
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
     chip::Crypto::DefaultSessionKeystore mSessionKeystore;
 

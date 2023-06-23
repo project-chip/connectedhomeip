@@ -493,6 +493,20 @@ public:
     CHIP_ERROR Initialize(ECPKeyTarget key_target) override;
 
     /**
+     * @brief Import a raw key pair (bytes) into the keypair
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR ImportRawKeypair(const uint8_t * key_data, size_t key_data_size);
+    CHIP_ERROR ImportRawKeypair(ByteSpan private_key, ByteSpan public_key)
+    {
+        return ImportRawKeypair(private_key.data(), private_key.size(), public_key.data(), public_key.size());
+    }
+
+    CHIP_ERROR ImportRawKeypair(const uint8_t * private_key, const size_t private_key_size, const uint8_t * public_key,
+                                const size_t public_key_size);
+    CHIP_ERROR ImportRawKeypair(const ByteSpan & key_pair) { return ImportRawKeypair(key_pair.data(), key_pair.size()); }
+
+    /**
      * @brief Serialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
@@ -544,6 +558,13 @@ public:
 
     /** Release resources associated with this key pair */
     void Clear();
+
+    /**
+     * @brief Copy the keypair in input into this keypair.
+     * @param other The keypair to copy
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Copy(const P256Keypair & other);
 
 protected:
     P256PublicKey mPublicKey;

@@ -129,16 +129,6 @@ const uint8_t kDacPrivateKey[] = {
     0x70, 0x9c, 0xa6, 0x94, 0x6a, 0xf5, 0xf2, 0xf7, 0x53, 0x08, 0x33, 0xa5, 0x2b, 0x44, 0xfb, 0xff,
 };
 
-// TODO: This should be moved to a method of P256Keypair
-CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
-    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
-    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
-    return keypair.Deserialize(serialized_keypair);
-}
-
 CHIP_ERROR FactoryDataProvider::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -260,13 +250,13 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
         chip::Crypto::P256PublicKey dacPublicKey;
 
         ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
-        ReturnErrorOnFailure(
-            LoadKeypairFromRaw(ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac.dac_key.value), mFactoryData.dac.dac_key.len),
-                               ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
+        ReturnErrorOnFailure(keypair.ImportRawKeypair(
+            ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac.dac_key.value), mFactoryData.dac.dac_key.len),
+            ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
     }
     else
     {
-        ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(kDacPrivateKey), ByteSpan(kDacPublicKey), keypair));
+        ReturnErrorOnFailure(keypair.ImportRawKeypair(ByteSpan(kDacPrivateKey), ByteSpan(kDacPublicKey)));
     }
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));

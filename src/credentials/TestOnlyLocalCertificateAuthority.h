@@ -69,7 +69,7 @@ public:
 
         if (rootKeyPair.Length() != 0)
         {
-            mCurrentStatus = mRootKeypair->Deserialize(rootKeyPair);
+            mCurrentStatus = mRootKeypair->ImportRawKeypair(rootKeyPair.Span());
             SuccessOrExit(mCurrentStatus);
         }
         else
