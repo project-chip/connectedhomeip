@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#import <Matter/MTRDefines.h>
+
 #import "MTRError.h"
 #import "MTRError_Internal.h"
 
@@ -32,6 +34,7 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
 // Class for holding on to a CHIP_ERROR that we can use as the value
 // in a dictionary.
+MTR_HIDDEN
 @interface MTRErrorHolder : NSObject
 @property (nonatomic, readonly) CHIP_ERROR error;
 
