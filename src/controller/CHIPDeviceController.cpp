@@ -1905,17 +1905,30 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
         }
         else
         {
+            ChipLogError(Controller, "Failed to read BasicCommissioningInfo: %" CHIP_ERROR_FORMAT, err.Format());
             return_err = err;
         }
 
-        err        = mAttributeCache->Get<RegulatoryConfig::TypeInfo>(kRootEndpointId, info.general.currentRegulatoryLocation);
-        return_err = err == CHIP_NO_ERROR ? return_err : err;
+        err = mAttributeCache->Get<RegulatoryConfig::TypeInfo>(kRootEndpointId, info.general.currentRegulatoryLocation);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to read RegulatoryConfig: %" CHIP_ERROR_FORMAT, err.Format());
+            return_err = err;
+        }
 
-        err        = mAttributeCache->Get<LocationCapability::TypeInfo>(kRootEndpointId, info.general.locationCapability);
-        return_err = err == CHIP_NO_ERROR ? return_err : err;
+        err = mAttributeCache->Get<LocationCapability::TypeInfo>(kRootEndpointId, info.general.locationCapability);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to read LocationCapability: %" CHIP_ERROR_FORMAT, err.Format());
+            return_err = err;
+        }
 
-        err        = mAttributeCache->Get<Breadcrumb::TypeInfo>(kRootEndpointId, info.general.breadcrumb);
-        return_err = err == CHIP_NO_ERROR ? return_err : err;
+        err = mAttributeCache->Get<Breadcrumb::TypeInfo>(kRootEndpointId, info.general.breadcrumb);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to read Breadcrumb: %" CHIP_ERROR_FORMAT, err.Format());
+            return_err = err;
+        }
     }
 
     {
@@ -1994,7 +2007,7 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     // commissioning clusters might be on.
     err = mAttributeCache->ForEachAttribute(
         app::Clusters::NetworkCommissioning::Id, [this, &info](const app::ConcreteAttributePath & path) {
-            using namespace chip::app::Clusters::NetworkCommissioning;
+            using namespace chip::app::Clusters;
             using namespace chip::app::Clusters::NetworkCommissioning::Attributes;
             if (path.mAttributeId != FeatureMap::Id)
             {
@@ -2003,22 +2016,22 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
             TLV::TLVReader reader;
             if (this->mAttributeCache->Get(path, reader) == CHIP_NO_ERROR)
             {
-                BitFlags<Feature> features;
+                BitFlags<NetworkCommissioning::Feature> features;
                 if (app::DataModel::Decode(reader, features) == CHIP_NO_ERROR)
                 {
-                    if (features.Has(Feature::kWiFiNetworkInterface))
+                    if (features.Has(NetworkCommissioning::Feature::kWiFiNetworkInterface))
                     {
                         ChipLogProgress(Controller, "----- NetworkCommissioning Features: has WiFi. endpointid = %u",
                                         path.mEndpointId);
                         info.network.wifi.endpoint = path.mEndpointId;
                     }
-                    else if (features.Has(Feature::kThreadNetworkInterface))
+                    else if (features.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
                     {
                         ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Thread. endpointid = %u",
                                         path.mEndpointId);
                         info.network.thread.endpoint = path.mEndpointId;
                     }
-                    else if (features.Has(Feature::kEthernetNetworkInterface))
+                    else if (features.Has(NetworkCommissioning::Feature::kEthernetNetworkInterface))
                     {
                         ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Ethernet. endpointid = %u",
                                         path.mEndpointId);
