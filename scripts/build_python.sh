@@ -42,6 +42,7 @@ declare enable_pybindings=false
 declare chip_mdns
 declare case_retry_delta
 declare install_virtual_env
+declare clean_virtual_env=yes
 
 help() {
 
@@ -60,6 +61,8 @@ Input Options:
                                                             Default is 300 ms
   -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
                                                             <path> represents where the virtual environment is to be created.
+  -c, --clean_virtual_env  <yes|no>                         When installing a virtual environment, create/clean it first.
+                                                            Defaults to yes.
   --extra_packages PACKAGES                                 Install extra Python packages from PyPI
   --include_yamltests                                       Whether to install the matter_yamltests wheel.
   -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
@@ -92,6 +95,10 @@ while (($#)); do
             ;;
         --install_virtual_env | -i)
             install_virtual_env=$2
+            shift
+            ;;
+        --clean_virtual_env | -c)
+            clean_virtual_env=$2
             shift
             ;;
         --extra_packages)
@@ -169,12 +176,14 @@ fi
 if [ -n "$install_virtual_env" ]; then
     ENVIRONMENT_ROOT="$install_virtual_env"
 
-    # Create a virtual environment that has access to the built python tools
-    virtualenv --clear "$ENVIRONMENT_ROOT"
+    if [ "$clean_virtual_env" = "yes" ]; then
+      # Create a virtual environment that has access to the built python tools
+      virtualenv --clear "$ENVIRONMENT_ROOT"
+    fi
 
     source "$ENVIRONMENT_ROOT"/bin/activate
     "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-    "$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall "${WHEEL[@]}"
+    "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${WHEEL[@]}"
 
     echo ""
     echo_green "Compilation completed and WHL package installed in: "
