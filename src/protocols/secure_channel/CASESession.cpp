@@ -203,6 +203,27 @@ public:
 
     bool IsCancelled() const { return mSession.load() == nullptr; }
 
+    // This API returns true when background thread fails to schedule the AfterWorkCallback
+    bool SchedulingAfterWorkCallbackFailed() { return mScheduleAfterWorkFailed.load(); }
+
+    // This API runs the AfterWorkCallback. This is supposed to be called from foreground thread
+    // and only call if SchedulingAfterWorkCallbackFailed() returns false.
+    CHIP_ERROR RunAfterWorkCallback()
+    {
+        // Ensure that this function is being called from main Matter thread
+        assertChipStackLockedByCurrentThread();
+
+        // This API is supposed to be called only if scheduling after work callback is failed
+        // If we are are being called, assert
+        VerifyOrDie(SchedulingAfterWorkCallbackFailed());
+
+        if (auto *session = mSession.load())
+        {
+            return (session->*(mAfterWorkCallback))(mData, mStatus);
+        }
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
 private:
     // Create a work helper using the specified session, work callback, after work callback, and data (template arg).
     // Lifetime is not managed, see `Create` for that option.
@@ -226,6 +247,11 @@ private:
         auto status = DeviceLayer::PlatformMgr().ScheduleWork(AfterWorkHandler, reinterpret_cast<intptr_t>(helper));
         if (status != CHIP_NO_ERROR)
         {
+            // We failed to schedule after work callback, so setting mScheduleAfterWorkFailed flag to true
+            // This can be checked from foreground thread and after work callback can be retried
+            ChipLogError(SecureChannel, "Failed to Schedule the AfterWorkCallback on foreground thread");
+            helper->mScheduleAfterWorkFailed.store(true);
+
             // Release strong ptr since scheduling failed
             helper->mStrongPtr.reset();
         }
@@ -262,6 +288,10 @@ private:
 
     // Return value of `mWorkCallback`, passed to `mAfterWorkCallback`.
     CHIP_ERROR mStatus;
+
+    // If background thread fails to schedule AfterWorkCallback then this flag is set to true
+    // and CASEServer then can check this one and run the AfterWorkCallback for us.
+    std::atomic<bool> mScheduleAfterWorkFailed {false};
 
 public:
     // Data passed to `mWorkCallback` and `mAfterWorkCallback`.
@@ -2177,6 +2207,26 @@ System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableM
                                     // Assume peer is idle, as a worst-case assumption.
                                     System::Clock::kZero, Transport::kMinActiveTime) +
         kExpectedHighProcessingTime;
+}
+
+bool CASESession::IsSendSigma3PermanentlyBlockedOnBackgroundWork()
+{
+    return mSendSigma3Helper->SchedulingAfterWorkCallbackFailed();
+}
+
+bool CASESession::IsHandleSigma3PermanentlyBlockedOnBackgroundWork()
+{
+    return mHandleSigma3Helper->SchedulingAfterWorkCallbackFailed();
+}
+
+CHIP_ERROR CASESession::UnblockSendSigma3FromForegroundWork()
+{
+    return mSendSigma3Helper->RunAfterWorkCallback();
+}
+
+CHIP_ERROR CASESession::UnblockHandleSigma3FromForegroundWork()
+{
+    return mHandleSigma3Helper->RunAfterWorkCallback();
 }
 
 } // namespace chip
