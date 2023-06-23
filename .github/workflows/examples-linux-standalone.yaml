@@ -85,21 +85,18 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Build Standalone cert tool
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-cert \
                         build"
             - name: Build minmdns example with platform dns
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-address-resolve-tool-platform-mdns-ipv6only \
                         build"
             - name: Build example Standalone chip tool
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -110,7 +107,6 @@ jobs:
                     out/linux-x64-chip-tool/chip-tool \
                     /tmp/bloat_reports/
             - name: Build example Standalone Shell
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -121,7 +117,6 @@ jobs:
                     out/linux-x64-shell/chip-shell \
                     /tmp/bloat_reports/
             - name: Build example Standalone All Clusters Server
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -132,7 +127,6 @@ jobs:
                     out/linux-x64-all-clusters/chip-all-clusters-app \
                     /tmp/bloat_reports/
             - name: Build example Standalone All Clusters Minimal Server
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -143,7 +137,6 @@ jobs:
                     out/linux-x64-all-clusters-minimal/chip-all-clusters-minimal-app \
                     /tmp/bloat_reports/
             - name: Build example TV app
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -154,7 +147,6 @@ jobs:
                     out/linux-x64-tv-app/chip-tv-app \
                     /tmp/bloat_reports/
             - name: Build example Standalone TV Casting App
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -165,7 +157,6 @@ jobs:
                     out/linux-x64-tv-casting-app/chip-tv-casting-app \
                     /tmp/bloat_reports/
             - name: Build example lighting app with RPCs and UI
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -176,7 +167,6 @@ jobs:
                     out/linux-x64-light-rpc-with-ui/chip-lighting-app \
                     /tmp/bloat_reports/
             - name: Build example Standalone Bridge
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -187,7 +177,6 @@ jobs:
                     out/linux-x64-bridge/chip-bridge-app \
                     /tmp/bloat_reports/
             - name: Build example OTA Provider
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -198,7 +187,6 @@ jobs:
                     out/linux-x64-ota-provider/chip-ota-provider-app \
                     /tmp/bloat_reports/
             - name: Build example OTA Requestor
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -209,7 +197,6 @@ jobs:
                     out/linux-x64-ota-requestor/chip-ota-requestor-app \
                     /tmp/bloat_reports/
             - name: Build example Standalone Lock App
-              timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
