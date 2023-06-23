@@ -16,6 +16,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 
 #import "MTRCommissionableBrowserResult.h"
 
@@ -23,6 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_HIDDEN
 @interface MTRCommissionableBrowserResultInterfaces : NSObject
 
 @property (nonatomic, readwrite) chip::Optional<chip::Dnssd::CommonResolutionData> resolutionData;
