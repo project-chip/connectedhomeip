@@ -392,8 +392,8 @@ if [ -z "$BUILD_PATH" ]; then
 fi
 
 if [ -z "$NO_ACTIVATE" ]; then
-  # Activate Matter environment
-  source "$CHIP_ROOT"/scripts/activate.sh
+    # Activate Matter environment
+    source "$CHIP_ROOT"/scripts/activate.sh
 fi
 
 if [[ $IS_UNIT_TEST -eq 0 ]]; then
