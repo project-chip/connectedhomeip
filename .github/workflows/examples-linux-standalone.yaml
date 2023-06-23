@@ -98,7 +98,7 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-address-resolve-tool-platform-mdns-ipv6only \
                         build"
-            - name: Build example Standalone Echo Client
+            - name: Build example Standalone chip tool
               timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \

@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,23 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/pigweed.gni")
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
-declare_args() {
-  chip_build_pw_trace_lib = false
+config("sdk_config") {
+  include_dirs = [ "repo/sdk" ]
+
+  cflags = [ "-Wno-format-nonliteral" ]
 }
 
-config("config") {
-  defines = [ "PW_TRACE_BACKEND_SET" ]
+config("sdk_private_config") {
+  cflags = [ "-Wno-shadow" ]
 }
 
-source_set("trace") {
+source_set("sdk") {
   sources = [
-    "trace.cpp",
-    "trace.h",
+    "repo/sdk/perfetto.cc",
+    "repo/sdk/perfetto.h",
   ]
-  if (chip_build_pw_trace_lib) {
-    public_configs = [ ":config" ]
-    public_deps = [ "${dir_pigweed}/pw_trace" ]
-  }
+
+  public_configs = [ ":sdk_config" ]
+
+  configs += [ ":sdk_private_config" ]
 }

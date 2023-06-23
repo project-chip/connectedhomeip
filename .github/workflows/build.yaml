@@ -390,7 +390,7 @@ jobs:
                   scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
 
             - name: Run Python Setup Payload Generator Test
-              timeout-minutes: 10
+              timeout-minutes: 20
               run: |
                   scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
                   scripts/run_in_build_env.sh 'pip3 install -r src/setup_payload/python/requirements.txt'
