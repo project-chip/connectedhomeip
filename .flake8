@@ -8,7 +8,6 @@ exclude = third_party
           # temporarily scan only directories with fixed files
           # TODO: Remove the paths below when all bugs are fixed
           src/tools/chip-cert/*
-          src/test_driver/mbed/*
           build/chip/java/tests/*
           build/chip/linux/*
           build/config/linux/*
@@ -16,7 +15,6 @@ exclude = third_party
           docs/_extensions/external_content.py
           examples/common/pigweed/rpc_console/py/chip_rpc/console.py
           examples/lighting-app/python/lighting.py
-          examples/platform/mbed/ota/generate_ota_list_image.py
           scripts/build/build/target.py
           scripts/build/build/targets.py
           scripts/build/builders/android.py
