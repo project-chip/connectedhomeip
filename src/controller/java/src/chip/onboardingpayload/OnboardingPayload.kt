@@ -61,8 +61,8 @@ const val kBPKFSaltTag             = 0x02
 const val kNumberOFDevicesTag      = 0x03
 const val kCommissioningTimeoutTag = 0x04
 
-const val kSetupPINCodeMaximumValue   = 99999998
-const val kSetupPINCodeUndefinedValue = 0
+const val kSetupPINCodeMaximumValue   = 99999998L
+const val kSetupPINCodeUndefinedValue = 0L
 
 const val kTotalPayloadDataSizeInBits: Int =
     kVersionFieldLengthInBits +
@@ -193,6 +193,24 @@ class OnboardingPayload(
     }
 
     return checkPayloadCommonConstraints()
+  }
+
+  fun setShortDiscriminatorValue(discriminator: Int) {
+    if (discriminator != (discriminator and kDiscriminatorShortMask)) {
+      throw OnboardingPayloadException("Invalid argument")
+    }
+
+    this.discriminator = (discriminator and kDiscriminatorShortMask)
+    this.hasShortDiscriminator = true
+  }
+
+  fun setLongDiscriminatorValue(discriminator: Int) {
+    if (discriminator != (discriminator and kDiscriminatorLongMask)) {
+      throw OnboardingPayloadException("Invalid argument")
+    }
+        
+    this.discriminator = (discriminator and kDiscriminatorLongMask)
+    this.hasShortDiscriminator = false;
   }
 
   fun getShortDiscriminatorValue(): Int {
@@ -474,7 +492,7 @@ class OnboardingPayload(
       return false
     }
 
-    if (!isValidSetupPIN(setupPinCode.toInt())) {
+    if (!isValidSetupPIN(setupPinCode)) {
       return false
     }
 
@@ -494,12 +512,14 @@ class OnboardingPayload(
   }     
 
   companion object {
-    private fun isValidSetupPIN(setupPIN: Int): Boolean {
-      return (setupPIN != kSetupPINCodeUndefinedValue && setupPIN <= kSetupPINCodeMaximumValue &&
-              setupPIN != 11111111 && setupPIN != 22222222 && setupPIN != 33333333 &&
-              setupPIN != 44444444 && setupPIN != 55555555 && setupPIN != 66666666 &&
-              setupPIN != 77777777 && setupPIN != 88888888 && setupPIN != 12345678 &&
-              setupPIN != 87654321)
+    private fun isValidSetupPIN(setupPIN: Long): Boolean {
+    // SHALL be restricted to the values 0x0000001 to 0x5F5E0FE (00000001 to 99999998 in decimal),
+    // excluding the invalid Passcode values.    
+    return (setupPIN != kSetupPINCodeUndefinedValue && setupPIN <= kSetupPINCodeMaximumValue &&
+            setupPIN != 11111111L && setupPIN != 22222222L && setupPIN != 33333333L &&
+            setupPIN != 44444444L && setupPIN != 55555555L && setupPIN != 66666666L &&
+            setupPIN != 77777777L && setupPIN != 88888888L && setupPIN != 12345678L &&
+            setupPIN != 87654321L)              
     }
 
     private fun longToShortValue(longValue: Int): Int {

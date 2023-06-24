@@ -106,7 +106,8 @@ jobs:
                    chip.tlv.TlvWriterTest           \
                    chip.tlv.TlvReadWriteTest        \
                    chip.tlv.TlvReaderTest           \
-                   chip.jsontlv.JsonToTlvToJsonTest
+                   chip.jsontlv.JsonToTlvToJsonTest \
+                   chip.onboardingpayload.ManualCodeTest
             - name: Build Java Matter Controller and all clusters app
               timeout-minutes: 60
               run: |
