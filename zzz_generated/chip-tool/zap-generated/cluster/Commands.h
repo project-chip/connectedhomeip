@@ -14792,11 +14792,11 @@ void registerClusterLaundryWasherControls(Commands & commands, CredentialIssuerC
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "spin-speed-current", 0, UINT8_MAX,
                                                                              Attributes::SpinSpeedCurrent::Id,
                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>>>(
+        make_unique<WriteAttribute<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>>(
             Id, "number-of-rinses", 0, UINT8_MAX, Attributes::NumberOfRinses::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
-            chip::app::DataModel::List<const chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>>>>(
-            Id, "supported-rinses", Attributes::SupportedRinses::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>>>(
+            Id, "supported-rinses", Attributes::SupportedRinses::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //

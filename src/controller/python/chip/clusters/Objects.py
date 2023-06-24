@@ -15693,8 +15693,8 @@ class LaundryWasherControls(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="spinSpeeds", Tag=0x00000000, Type=typing.Optional[typing.List[str]]),
                 ClusterObjectFieldDescriptor(Label="spinSpeedCurrent", Tag=0x00000001, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="numberOfRinses", Tag=0x00000002, Type=typing.Union[None, Nullable, LaundryWasherControls.Enums.NumberOfRinsesEnum]),
-                ClusterObjectFieldDescriptor(Label="supportedRinses", Tag=0x00000003, Type=typing.Union[None, Nullable, typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]),
+                ClusterObjectFieldDescriptor(Label="numberOfRinses", Tag=0x00000002, Type=typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum]),
+                ClusterObjectFieldDescriptor(Label="supportedRinses", Tag=0x00000003, Type=typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -15705,8 +15705,8 @@ class LaundryWasherControls(Cluster):
 
     spinSpeeds: 'typing.Optional[typing.List[str]]' = None
     spinSpeedCurrent: 'typing.Union[None, Nullable, uint]' = None
-    numberOfRinses: 'typing.Union[None, Nullable, LaundryWasherControls.Enums.NumberOfRinsesEnum]' = None
-    supportedRinses: 'typing.Union[None, Nullable, typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]' = None
+    numberOfRinses: 'typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum]' = None
+    supportedRinses: 'typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -15776,9 +15776,9 @@ class LaundryWasherControls(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, LaundryWasherControls.Enums.NumberOfRinsesEnum])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum])
 
-            value: 'typing.Union[None, Nullable, LaundryWasherControls.Enums.NumberOfRinsesEnum]' = None
+            value: 'typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum]' = None
 
         @dataclass
         class SupportedRinses(ClusterAttributeDescriptor):
@@ -15792,9 +15792,9 @@ class LaundryWasherControls(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]])
 
-            value: 'typing.Union[None, Nullable, typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]' = None
+            value: 'typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

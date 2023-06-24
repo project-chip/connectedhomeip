@@ -21527,73 +21527,6 @@ void CHIPLaundryWasherControlsSpinSpeedCurrentAttributeCallback::CallbackFn(void
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPLaundryWasherControlsNumberOfRinsesAttributeCallback::CHIPLaundryWasherControlsNumberOfRinsesAttributeCallback(
-    jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPLaundryWasherControlsClusterNumberOfRinsesAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPLaundryWasherControlsNumberOfRinsesAttributeCallback::~CHIPLaundryWasherControlsNumberOfRinsesAttributeCallback()
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-}
-
-void CHIPLaundryWasherControlsNumberOfRinsesAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> & value)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-    std::unique_ptr<CHIPLaundryWasherControlsNumberOfRinsesAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPLaundryWasherControlsNumberOfRinsesAttributeCallback *>(context), maybeDestroy);
-
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
-    VerifyOrReturn(javaCallbackRef != nullptr,
-                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
-
-    jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
-
-    jobject javaValue;
-    if (value.IsNull())
-    {
-        javaValue = nullptr;
-    }
-    else
-    {
-        std::string javaValueClassName     = "java/lang/Integer";
-        std::string javaValueCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
-                                                                      static_cast<uint8_t>(value.Value()), javaValue);
-    }
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
-}
-
 CHIPLaundryWasherControlsSupportedRinsesAttributeCallback::CHIPLaundryWasherControlsSupportedRinsesAttributeCallback(
     jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPLaundryWasherControlsClusterSupportedRinsesAttributeCallbackType>(CallbackFn, this),
@@ -21626,8 +21559,7 @@ CHIPLaundryWasherControlsSupportedRinsesAttributeCallback::~CHIPLaundryWasherCon
 
 void CHIPLaundryWasherControlsSupportedRinsesAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -21649,25 +21581,18 @@ void CHIPLaundryWasherControlsSupportedRinsesAttributeCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
     jobject arrayListObj;
-    if (list.IsNull())
-    {
-        arrayListObj = nullptr;
-    }
-    else
-    {
-        chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
 
-        auto iter_arrayListObj_1 = list.Value().begin();
-        while (iter_arrayListObj_1.Next())
-        {
-            auto & entry_1 = iter_arrayListObj_1.GetValue();
-            jobject newElement_1;
-            std::string newElement_1ClassName     = "java/lang/Integer";
-            std::string newElement_1CtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                newElement_1ClassName.c_str(), newElement_1CtorSignature.c_str(), static_cast<uint8_t>(entry_1), newElement_1);
-            chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_1);
-        }
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
+    {
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        std::string newElement_0ClassName     = "java/lang/Integer";
+        std::string newElement_0CtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+            newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
+        chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 
     env->ExceptionClear();

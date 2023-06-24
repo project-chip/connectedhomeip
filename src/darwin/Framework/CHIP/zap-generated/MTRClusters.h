@@ -2832,11 +2832,6 @@ MTR_NEWLY_AVAILABLE
                                        params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedRinsesWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-- (void)writeAttributeSupportedRinsesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
-- (void)writeAttributeSupportedRinsesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                        params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 

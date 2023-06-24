@@ -12979,25 +12979,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (void)writeAttributeSupportedRinsesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeSupportedRinsesWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeSupportedRinsesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                        params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterIDTypeLaundryWasherControlsID)
-                                  attributeID:@(MTRAttributeIDTypeClusterLaundryWasherControlsAttributeSupportedRinsesID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
-}
-
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)

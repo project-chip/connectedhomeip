@@ -8023,14 +8023,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("SpinSpeedCurrent", 1, value);
         }
         case LaundryWasherControls::Attributes::NumberOfRinses::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> value;
+            chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NumberOfRinses", 1, value);
         }
         case LaundryWasherControls::Attributes::SupportedRinses::Id: {
-            chip::app::DataModel::Nullable<
-                chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>>
-                value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedRinses", 1, value);
         }

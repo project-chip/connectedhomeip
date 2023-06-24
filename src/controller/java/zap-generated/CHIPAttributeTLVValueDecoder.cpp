@@ -12861,17 +12861,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                std::string valueClassName     = "java/lang/Integer";
-                std::string valueCtorSignature = "(I)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                              static_cast<uint8_t>(cppValue.Value()), value);
-            }
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                          static_cast<uint8_t>(cppValue), value);
             return value;
         }
         case Attributes::SupportedRinses::Id: {
@@ -12883,26 +12876,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                chip::JniReferences::GetInstance().CreateArrayList(value);
+            chip::JniReferences::GetInstance().CreateArrayList(value);
 
-                auto iter_value_1 = cppValue.Value().begin();
-                while (iter_value_1.Next())
-                {
-                    auto & entry_1 = iter_value_1.GetValue();
-                    jobject newElement_1;
-                    std::string newElement_1ClassName     = "java/lang/Integer";
-                    std::string newElement_1CtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_1ClassName.c_str(),
-                                                                                  newElement_1CtorSignature.c_str(),
-                                                                                  static_cast<uint8_t>(entry_1), newElement_1);
-                    chip::JniReferences::GetInstance().AddToList(value, newElement_1);
-                }
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
         }

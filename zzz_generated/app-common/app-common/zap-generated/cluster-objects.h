@@ -14750,9 +14750,9 @@ struct TypeInfo
 namespace NumberOfRinses {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> &;
+    using Type             = chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum;
+    using DecodableType    = chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum;
+    using DecodableArgType = chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfRinses::Id; }
@@ -14762,12 +14762,10 @@ struct TypeInfo
 namespace SupportedRinses {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<
-        chip::app::DataModel::List<const chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>>;
-    using DecodableType = chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedRinses::Id; }
@@ -14821,7 +14819,8 @@ struct TypeInfo
 
         Attributes::SpinSpeeds::TypeInfo::DecodableType spinSpeeds;
         Attributes::SpinSpeedCurrent::TypeInfo::DecodableType spinSpeedCurrent;
-        Attributes::NumberOfRinses::TypeInfo::DecodableType numberOfRinses;
+        Attributes::NumberOfRinses::TypeInfo::DecodableType numberOfRinses =
+            static_cast<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>(0);
         Attributes::SupportedRinses::TypeInfo::DecodableType supportedRinses;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;

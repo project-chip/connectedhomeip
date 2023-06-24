@@ -6311,10 +6311,10 @@ public class ClusterReadMapping {
         InteractionInfo readLaundryWasherControlsNumberOfRinsesAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.LaundryWasherControlsCluster) cluster).readNumberOfRinsesAttribute(
-              (ChipClusters.LaundryWasherControlsCluster.NumberOfRinsesAttributeCallback) callback
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedLaundryWasherControlsClusterNumberOfRinsesAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readLaundryWasherControlsNumberOfRinsesCommandParams
         );
         result.put("readNumberOfRinsesAttribute", readLaundryWasherControlsNumberOfRinsesAttributeInteractionInfo);

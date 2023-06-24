@@ -1175,8 +1175,7 @@ typedef void (*LaundryWasherControlsSpinSpeedsListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
 typedef void (*LaundryWasherControlsSupportedRinsesListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> & data);
 typedef void (*LaundryWasherControlsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*LaundryWasherControlsAcceptedCommandListListAttributeCallback)(
@@ -8773,8 +8772,7 @@ public:
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<
-                    chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>> & value);
+                const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> & value);
 };
 
 class MTRLaundryWasherControlsSupportedRinsesListAttributeCallbackSubscriptionBridge

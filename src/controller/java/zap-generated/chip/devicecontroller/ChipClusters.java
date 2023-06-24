@@ -14282,13 +14282,8 @@ public class ChipClusters {
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
-      public interface NumberOfRinsesAttributeCallback {
-        void onSuccess(@Nullable Integer value);
-        void onError(Exception ex);
-        default void onSubscriptionEstablished(long subscriptionId) {}
-      }
       public interface SupportedRinsesAttributeCallback {
-        void onSuccess(@Nullable List<Integer> valueList);
+        void onSuccess( List<Integer> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
@@ -14345,7 +14340,7 @@ public class ChipClusters {
     }
 
     public void readNumberOfRinsesAttribute(
-      NumberOfRinsesAttributeCallback callback
+      IntegerAttributeCallback callback
     ) {
       readNumberOfRinsesAttribute(chipClusterPtr, callback);
     }
@@ -14357,8 +14352,8 @@ public class ChipClusters {
       writeNumberOfRinsesAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
     public void subscribeNumberOfRinsesAttribute(
-        NumberOfRinsesAttributeCallback callback
-      ,
+        IntegerAttributeCallback callback
+,
       int minInterval, int maxInterval) {
       subscribeNumberOfRinsesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
@@ -14367,13 +14362,6 @@ public class ChipClusters {
       SupportedRinsesAttributeCallback callback
     ) {
       readSupportedRinsesAttribute(chipClusterPtr, callback);
-    }
-    public void writeSupportedRinsesAttribute(DefaultClusterCallback callback, ArrayList<Object> value) {
-      writeSupportedRinsesAttribute(chipClusterPtr, callback, value, null);
-    }
-
-    public void writeSupportedRinsesAttribute(DefaultClusterCallback callback, ArrayList<Object> value, int timedWriteTimeoutMs) {
-      writeSupportedRinsesAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
     public void subscribeSupportedRinsesAttribute(
         SupportedRinsesAttributeCallback callback
@@ -14471,19 +14459,17 @@ public class ChipClusters {
       , int minInterval, int maxInterval);
 
     private native void readNumberOfRinsesAttribute(long chipClusterPtr,
-        NumberOfRinsesAttributeCallback callback
+        IntegerAttributeCallback callback
     );
 
     private native void writeNumberOfRinsesAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
     private native void subscribeNumberOfRinsesAttribute(long chipClusterPtr,
-        NumberOfRinsesAttributeCallback callback
-      , int minInterval, int maxInterval);
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
 
     private native void readSupportedRinsesAttribute(long chipClusterPtr,
         SupportedRinsesAttributeCallback callback
     );
-
-    private native void writeSupportedRinsesAttribute(long chipClusterPtr, DefaultClusterCallback callback, ArrayList<Object> value, @Nullable Integer timedWriteTimeoutMs);
     private native void subscribeSupportedRinsesAttribute(long chipClusterPtr,
         SupportedRinsesAttributeCallback callback
       , int minInterval, int maxInterval);

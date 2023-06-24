@@ -4542,7 +4542,6 @@ class ChipClusters:
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",

@@ -1463,13 +1463,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace SpinSpeedCurrent
 
 namespace NumberOfRinses {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    DataModel::Nullable<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> & value); // NumberOfRinsesEnum
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum * value); // NumberOfRinsesEnum
 EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> & value);
 } // namespace NumberOfRinses
 
 namespace FeatureMap {
