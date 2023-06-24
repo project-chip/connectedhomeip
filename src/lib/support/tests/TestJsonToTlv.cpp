@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2023 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,10 +19,9 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/jsontlv/JsonToTlv.h>
 #include <lib/support/jsontlv/TlvToJson.h>
 #include <nlunit-test.h>
-#include <system/SystemPacketBuffer.h>
-#include <system/TLVPacketBufferBackingStore.h>
 
 namespace {
 
@@ -30,77 +29,69 @@ using namespace chip::Encoding;
 using namespace chip;
 using namespace chip::app;
 
-System::TLVPacketBufferBackingStore gStore;
-TLV::TLVWriter gWriter;
-TLV::TLVReader gReader;
+uint8_t gBuf1[1024];
+uint8_t gBuf2[1024];
+TLV::TLVWriter gWriter1;
+TLV::TLVWriter gWriter2;
 nlTestSuite * gSuite;
 
-void SetupBuf()
+void SetupWriters()
 {
-    System::PacketBufferHandle buf;
-
-    buf = System::PacketBufferHandle::New(1024);
-    gStore.Init(std::move(buf));
-
-    gWriter.Init(gStore);
-    gReader.Init(gStore);
+    gWriter1.Init(gBuf1);
+    gWriter2.Init(gBuf2);
 }
 
-CHIP_ERROR SetupReader()
+void PrintBytes(const uint8_t * buf, uint32_t len)
 {
-    gReader.Init(gStore);
-    return gReader.Next();
+    for (uint32_t i = 0; i < len; i++)
+    {
+        printf("%02X ", buf[i]);
+    }
+    printf("\n");
 }
 
-bool Matches(const std::string & referenceString, const std::string & generatedString)
+bool MatcheWriter1and2()
 {
-    auto compactReferenceString = StylizeJsonString(referenceString);
-    auto compactGeneratedString = StylizeJsonString(generatedString);
-
-    auto matches = (compactGeneratedString == compactReferenceString);
+    auto matches =
+        (gWriter1.GetLengthWritten() == gWriter2.GetLengthWritten()) && (memcmp(gBuf1, gBuf2, gWriter1.GetLengthWritten()) == 0);
 
     if (!matches)
     {
         printf("Didn't match!\n");
         printf("Reference:\n");
-        printf("%s\n", compactReferenceString.c_str());
+        PrintBytes(gBuf1, gWriter1.GetLengthWritten());
 
         printf("Generated:\n");
-        printf("%s\n", compactGeneratedString.c_str());
+        PrintBytes(gBuf2, gWriter2.GetLengthWritten());
     }
 
     return matches;
 }
 
 template <typename T>
-void EncodeAndValidate(T val, const std::string & expectedJsonString)
+void ConvertJsonToTlvAndValidate(T val, const std::string & jsonString)
 {
     CHIP_ERROR err;
     TLV::TLVType container;
 
-    SetupBuf();
+    SetupWriters();
 
-    err = gWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container);
+    err = gWriter1.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container);
     NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
 
-    err = DataModel::Encode(gWriter, TLV::ContextTag(1), val);
+    err = DataModel::Encode(gWriter1, TLV::ContextTag(1), val);
     NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
 
-    err = gWriter.EndContainer(container);
+    err = gWriter1.EndContainer(container);
     NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
 
-    err = gWriter.Finalize();
+    err = gWriter1.Finalize();
     NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
 
-    err = SetupReader();
+    err = JsonToTlv(jsonString, gWriter2);
     NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
 
-    std::string jsonString;
-    err = TlvToJson(gReader, jsonString);
-    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
-
-    bool matches = Matches(expectedJsonString, jsonString);
-    NL_TEST_ASSERT(gSuite, matches);
+    NL_TEST_ASSERT(gSuite, MatcheWriter1and2());
 }
 
 void TestConverter(nlTestSuite * inSuite, void * inContext)
@@ -112,38 +103,37 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     jsonString = "{\n"
                  "   \"1:UINT\" : 30\n"
                  "}\n";
-    EncodeAndValidate(static_cast<uint32_t>(30), jsonString);
+    ConvertJsonToTlvAndValidate(static_cast<uint32_t>(30), jsonString);
 
     jsonString = "{\n"
                  "   \"1:INT\" : -30\n"
                  "}\n";
-    EncodeAndValidate(static_cast<int32_t>(-30), jsonString);
+    ConvertJsonToTlvAndValidate(static_cast<int32_t>(-30), jsonString);
 
     jsonString = "{\n"
                  "   \"1:BOOL\" : false\n"
                  "}\n";
-    EncodeAndValidate(false, jsonString);
+    ConvertJsonToTlvAndValidate(false, jsonString);
 
     jsonString = "{\n"
                  "   \"1:BOOL\" : true\n"
                  "}\n";
-    EncodeAndValidate(true, jsonString);
+    ConvertJsonToTlvAndValidate(true, jsonString);
 
     jsonString = "{\n"
                  "   \"1:FLOAT\" : 1.0\n"
                  "}\n";
-    EncodeAndValidate(static_cast<float>(1.0), jsonString);
+    ConvertJsonToTlvAndValidate(static_cast<float>(1.0), jsonString);
 
     jsonString = "{\n"
                  "   \"1:DOUBLE\" : 1.0\n"
                  "}\n";
-    EncodeAndValidate(static_cast<double>(1.0), jsonString);
+    ConvertJsonToTlvAndValidate(static_cast<double>(1.0), jsonString);
 
-    CharSpan charSpan = CharSpan::fromCharString("hello");
-    jsonString        = "{\n"
+    jsonString = "{\n"
                  "   \"1:STRING\" : \"hello\"\n"
                  "}\n";
-    EncodeAndValidate(charSpan, jsonString);
+    ConvertJsonToTlvAndValidate(CharSpan::fromCharString("hello"), jsonString);
 
     // Validated using https://base64.guru/converter/encode/hex
     const uint8_t byteBuf[] = { 0x01, 0x02, 0x03, 0x04, 0xff, 0xfe, 0x99, 0x88, 0xdd, 0xcd };
@@ -151,21 +141,21 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     jsonString = "{\n"
                  "   \"1:BYTES\" : \"AQIDBP/+mYjdzQ==\"\n"
                  "}\n";
-    EncodeAndValidate(byteSpan, jsonString);
+    ConvertJsonToTlvAndValidate(byteSpan, jsonString);
 
     DataModel::Nullable<uint8_t> nullValue;
     jsonString = "{\n"
                  "   \"1:NULL\" : null\n"
                  "}\n";
-    EncodeAndValidate(nullValue, jsonString);
+    ConvertJsonToTlvAndValidate(nullValue, jsonString);
 
     Clusters::UnitTesting::Structs::SimpleStruct::Type structVal;
     structVal.a = 20;
     structVal.b = true;
     structVal.d = byteBuf;
-    structVal.e = charSpan;
-    structVal.g = 1.0;
-    structVal.h = 1.0;
+    structVal.e = CharSpan::fromCharString("hello");
+    structVal.g = static_cast<float>(1.0);
+    structVal.h = static_cast<double>(1.0);
 
     jsonString = "{\n"
                  "   \"1:STRUCT\" : {\n"
@@ -179,7 +169,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                  "      \"7:DOUBLE\" : 1.0\n"
                  "   }\n"
                  "}\n";
-    EncodeAndValidate(structVal, jsonString);
+    ConvertJsonToTlvAndValidate(structVal, jsonString);
 
     uint8_t int8uListData[] = { 1, 2, 3, 4 };
     DataModel::List<uint8_t> int8uList;
@@ -188,19 +178,19 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     jsonString = "{\n"
                  "   \"1:ARRAY-UINT\" : [ 1, 2, 3, 4 ]\n"
                  "}\n";
-    EncodeAndValidate(int8uList, jsonString);
+    ConvertJsonToTlvAndValidate(int8uList, jsonString);
 
     int8uList  = {};
     jsonString = "{\n"
                  "   \"1:ARRAY-?\" : [ ]\n"
                  "}\n";
-    EncodeAndValidate(int8uList, jsonString);
+    ConvertJsonToTlvAndValidate(int8uList, jsonString);
 
     DataModel::Nullable<DataModel::List<uint8_t>> nullValueList;
     jsonString = "{\n"
                  "   \"1:NULL\" : null\n"
                  "}\n";
-    EncodeAndValidate(nullValueList, jsonString);
+    ConvertJsonToTlvAndValidate(nullValueList, jsonString);
 
     Clusters::UnitTesting::Structs::SimpleStruct::Type structListData[2] = { structVal, structVal };
     DataModel::List<Clusters::UnitTesting::Structs::SimpleStruct::Type> structList;
@@ -230,7 +220,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                  "      }\n"
                  "   ]\n"
                  "}\n";
-    EncodeAndValidate(structList, jsonString);
+    ConvertJsonToTlvAndValidate(structList, jsonString);
 }
 
 int Initialize(void * apSuite)
@@ -241,7 +231,6 @@ int Initialize(void * apSuite)
 
 int Finalize(void * aContext)
 {
-    (void) gStore.Release();
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
@@ -250,11 +239,11 @@ const nlTest sTests[] = { NL_TEST_DEF("TestConverter", TestConverter), NL_TEST_S
 
 } // namespace
 
-int TestTlvToJson()
+int TestJsonToTlv()
 {
-    nlTestSuite theSuite = { "TlvToJson", sTests, Initialize, Finalize };
+    nlTestSuite theSuite = { "JsonToTlv", sTests, Initialize, Finalize };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestTlvToJson)
+CHIP_REGISTER_TEST_SUITE(TestJsonToTlv)

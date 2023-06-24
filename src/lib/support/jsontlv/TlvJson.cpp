@@ -85,7 +85,7 @@ template <typename T>
 void InsertKeyValue(Json::Value & json, const KeyContext & keyContext, T val)
 {
     //
-    // This needs to accomodate either the string 'value', or a 32-bit integer.
+    // This needs to accommodate either the string 'value', or a 32-bit integer.
     // The size of the largest 32-bit integer key represented as a string is 11 characters long.
     // Tack on 1 byte for the null character.
     //

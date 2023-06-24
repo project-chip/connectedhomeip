@@ -154,6 +154,7 @@ blocklist
 blockquote
 bluetoothd
 bluez
+BOOL
 BooleanState
 bootable
 Bootloader
