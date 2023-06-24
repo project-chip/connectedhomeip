@@ -180,14 +180,14 @@ def check_chip_ble_devices_advertising(devCtrl, name, deviceDetails=None):
 
     for ble_device in ble_chip_device:
         if deviceDetails is not None:
-            if (ble_device["name"] is name and
-                int(ble_device["discriminator"]) is int(deviceDetails["Discriminator"]) and
-                int(ble_device["vendorId"]) is int(deviceDetails["VendorID"]) and
-                    int(ble_device["productId"]) is int(deviceDetails["ProductID"])):
+            if (ble_device["name"] == name and
+                int(ble_device["discriminator"]) == int(deviceDetails["Discriminator"]) and
+                int(ble_device["vendorId"]) == int(deviceDetails["VendorID"]) and
+                    int(ble_device["productId"]) == int(deviceDetails["ProductID"])):
                 chip_device_found = True
                 break
         else:
-            if (ble_device["name"] is name):
+            if (ble_device["name"] == name):
                 chip_device_found = True
                 break
 

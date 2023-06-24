@@ -35,4 +35,4 @@ def test_echo(device):
     status, payload = pw_client.rpcs.pw.rpc.EchoService.Echo(
         msg=PW_ECHO_TEST_MESSAGE)
     assert status.ok() is True
-    assert payload.msg is PW_ECHO_TEST_MESSAGE
+    assert payload.msg == PW_ECHO_TEST_MESSAGE

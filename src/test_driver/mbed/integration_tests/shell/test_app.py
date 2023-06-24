@@ -199,7 +199,7 @@ def test_wifi_mode(device):
     current_mode = ret[-2].strip()
     assert current_mode in WIFI_MODE_NAME
 
-    for mode in [n for n in WIFI_MODE_NAME if n is not current_mode]:
+    for mode in [n for n in WIFI_MODE_NAME if n == current_mode]:
         print(mode)
         ret = device.send(command="wifi mode {}".format(
             mode), expected_output="Done")
