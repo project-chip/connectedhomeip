@@ -7475,6 +7475,7 @@
               - InterconnectCOAlarm
               - ContaminationState
               - SensitivityLevel
+              - ExpiryDate
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList

@@ -19,53 +19,16 @@
 
 #include <matter/tracing/build_config.h>
 
-#define _MATTER_TRACE_DISABLE(...)                                                                                                 \
-    do                                                                                                                             \
-    {                                                                                                                              \
-    } while (false)
+#if MATTER_TRACING_ENABLED
 
-#ifndef MATTER_TRACING_ENABLED
-
-#define MATTER_TRACE_BEGIN(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_TRACE_END(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-
-#define MATTER_LOG_MESSAGE_SEND(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_LOG_MESSAGE_RECEIVED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-
-#define MATTER_LOG_NODE_LOOKUP(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_LOG_NODE_DISCOVERED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_LOG_NODE_DISCOVERY_FAILED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-
-#else // MATTER_TRACING_ENABLED
-
-#include <tracing/log_declares.h>
-#include <tracing/registry.h>
-
-////////////////////// TRACE MESSAGES
-
-#ifdef MATTER_TRACE_NONE
-
-#define MATTER_TRACE_BEGIN(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_TRACE_END(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-
-#elif defined(MATTER_TRACE_MULTIPLEXED)
-
-// This gets forwarded to the multiplexed instance
-#define MATTER_TRACE_BEGIN(label, group) ::chip::Tracing::Internal::Begin(label, group)
-#define MATTER_TRACE_END(label, group) ::chip::Tracing::Internal::End(label, group)
-#define MATTER_TRACE_INSTANT(label, group) ::chip::Tracing::Internal::Instant(label, group)
-
-#else
-// if matter trace config is set, macros for this have to be provided
-//
 // Expected macros provided by implementations:
 //    MATTER_TRACE_BEGIN(label, group)
 //    MATTER_TRACE_END(label, group)
 //    MATTER_TRACE_INSTANT(label, group)
+//    MATTER_TRACE_SCOPE(label, group)
 #include <matter/tracing/macros_impl.h>
-#endif
+#include <tracing/log_declares.h>
+#include <tracing/registry.h>
 
 ////////////////////// DATA LOGGING
 
@@ -104,4 +67,23 @@
         ::chip::Tracing::Internal::LogNodeDiscoveryFailed(_trace_data);                                                            \
     } while (false)
 
-#endif
+#else // MATTER_TRACING_ENABLED
+
+#define _MATTER_TRACE_DISABLE(...)                                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (false)
+
+#define MATTER_TRACE_BEGIN(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_TRACE_END(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_TRACE_SCOPE(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+
+#define MATTER_LOG_MESSAGE_SEND(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_LOG_MESSAGE_RECEIVED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+
+#define MATTER_LOG_NODE_LOOKUP(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_LOG_NODE_DISCOVERED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_LOG_NODE_DISCOVERY_FAILED(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+
+#endif // MATTER_TRACING_ENABLED

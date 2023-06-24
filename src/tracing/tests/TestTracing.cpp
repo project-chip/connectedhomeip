@@ -16,7 +16,6 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <tracing/backend.h>
 #include <tracing/macros.h>
-#include <tracing/scope.h>
 
 #include <nlunit-test.h>
 

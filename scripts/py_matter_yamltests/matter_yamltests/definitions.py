@@ -18,7 +18,8 @@ import glob
 import io
 from typing import List, Optional
 
-from matter_idl.matter_idl_types import *
+from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, Enum, Event, FieldQuality, Struct, StructQuality,
+                                         StructTag)
 from matter_idl.zapxml import ParseSource, ParseXmls
 
 from .pseudo_clusters.pseudo_clusters import PseudoClusters

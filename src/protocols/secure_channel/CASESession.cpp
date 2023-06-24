@@ -45,8 +45,7 @@
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/SystemClock.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <trace/trace.h>
-#include <tracing/scope.h>
+#include <tracing/macros.h>
 #include <transport/SessionManager.h>
 
 namespace {
@@ -432,7 +431,6 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
                                          Credentials::CertificateValidityPolicy * policy, SessionEstablishmentDelegate * delegate,
                                          Optional<ReliableMessageProtocolConfig> mrpLocalConfig)
 {
-    MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
     MATTER_TRACE_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -581,7 +579,6 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 
 CHIP_ERROR CASESession::SendSigma1()
 {
-    MATTER_TRACE_EVENT_SCOPE("SendSigma1", "CASESession");
     MATTER_TRACE_SCOPE("SendSigma1", "CASESession");
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
@@ -688,7 +685,6 @@ CHIP_ERROR CASESession::SendSigma1()
 
 CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleSigma1_and_SendSigma2", "CASESession");
     MATTER_TRACE_SCOPE("HandleSigma1_and_SendSigma2", "CASESession");
     ReturnErrorOnFailure(HandleSigma1(std::move(msg)));
 
@@ -774,7 +770,6 @@ CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumpti
 
 CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleSigma1", "CASESession");
     MATTER_TRACE_SCOPE("HandleSigma1", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
@@ -859,7 +854,6 @@ exit:
 
 CHIP_ERROR CASESession::SendSigma2Resume()
 {
-    MATTER_TRACE_EVENT_SCOPE("SendSigma2Resume", "CASESession");
     MATTER_TRACE_SCOPE("SendSigma2Resume", "CASESession");
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     size_t max_sigma2_resume_data_len = TLV::EstimateStructOverhead(
@@ -914,7 +908,6 @@ CHIP_ERROR CASESession::SendSigma2Resume()
 
 CHIP_ERROR CASESession::SendSigma2()
 {
-    MATTER_TRACE_EVENT_SCOPE("SendSigma2", "CASESession");
     MATTER_TRACE_SCOPE("SendSigma2", "CASESession");
 
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
@@ -1053,7 +1046,6 @@ CHIP_ERROR CASESession::SendSigma2()
 
 CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleSigma2Resume", "CASESession");
     MATTER_TRACE_SCOPE("HandleSigma2Resume", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
@@ -1120,7 +1112,6 @@ exit:
 
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
     MATTER_TRACE_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
     ReturnErrorOnFailure(HandleSigma2(std::move(msg)));
     ReturnErrorOnFailure(SendSigma3a());
@@ -1130,7 +1121,6 @@ CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle &
 
 CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleSigma2", "CASESession");
     MATTER_TRACE_SCOPE("HandleSigma2", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
@@ -1300,7 +1290,6 @@ exit:
 
 CHIP_ERROR CASESession::SendSigma3a()
 {
-    MATTER_TRACE_EVENT_SCOPE("SendSigma3", "CASESession");
     MATTER_TRACE_SCOPE("SendSigma3", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1515,7 +1504,6 @@ exit:
 
 CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 {
-    MATTER_TRACE_EVENT_SCOPE("HandleSigma3", "CASESession");
     MATTER_TRACE_SCOPE("HandleSigma3", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;

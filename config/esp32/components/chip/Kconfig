@@ -280,6 +280,14 @@ menu "CHIP Device Layer"
             help
                 Enables or Disables the support for Commissionable Device Type.
 
+        config ENABLE_BG_EVENT_PROCESSING
+            bool "Enable Background event processing"
+            default n
+            help
+                Some cryptographic operations requires more time for processing,
+                When this option is enabled, the main matter task can delegate some
+                time consuming operations to a background task so that the main matter
+                task is not blocked and can process other work.
     endmenu
 
     menu "Device Identification Options"

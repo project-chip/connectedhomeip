@@ -2385,6 +2385,9 @@ public final class ChipIdLookup {
       if (attributeId == 2L) {
         return "State";
       }
+      if (attributeId == 3L) {
+        return "Supported";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }

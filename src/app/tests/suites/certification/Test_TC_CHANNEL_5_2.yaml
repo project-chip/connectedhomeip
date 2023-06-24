@@ -37,7 +37,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads the ChannelList attribute"
+    - label: "TH reads the ChannelList attribute from the DUT"
       PICS: CHANNEL.S.A0000
       command: "readAttribute"
       attribute: "ChannelList"
@@ -45,7 +45,9 @@ tests:
           constraints:
               type: list
 
-    - label: "TH sends a ChangeChannelByNumber command"
+    - label:
+          "TH sends a ChangeChannelByNumber command to the DUT with channel
+          information (major and minor numbers) from the list in step 1"
       PICS: CHANNEL.S.C02.Rsp
       command: "ChangeChannelByNumber"
       arguments:
@@ -66,7 +68,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the CurrentChannel attribute"
+    - label: "TH reads the CurrentChannel attribute from the DUT"
       PICS: CHANNEL.S.A0002 && CHANNEL.S.C02.Rsp
       command: "readAttribute"
       attribute: "CurrentChannel"

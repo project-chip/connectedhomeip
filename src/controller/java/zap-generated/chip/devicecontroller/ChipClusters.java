@@ -15387,6 +15387,18 @@ public class ChipClusters {
       subscribeStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readSupportedAttribute(
+      LongAttributeCallback callback
+    ) {
+      readSupportedAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeSupportedAttribute(
+        LongAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeSupportedAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
       GeneratedCommandListAttributeCallback callback
     ) {
@@ -15470,6 +15482,13 @@ public class ChipClusters {
         LongAttributeCallback callback
     );
     private native void subscribeStateAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
+, int minInterval, int maxInterval);
+
+    private native void readSupportedAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
+    );
+    private native void subscribeSupportedAttribute(long chipClusterPtr,
         LongAttributeCallback callback
 , int minInterval, int maxInterval);
 

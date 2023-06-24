@@ -7043,6 +7043,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             Mask(0L),
             State(2L),
+            Supported(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
