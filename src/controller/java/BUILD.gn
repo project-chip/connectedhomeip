@@ -278,10 +278,10 @@ kotlin_library("onboardingpayload_manual_code_test") {
 group("unit_tests") {
   deps = [
     ":json_to_tlv_to_json_test",
+    ":onboardingpayload_manual_code_test",
     ":tlv_read_write_test",
     ":tlv_reader_test",
     ":tlv_writer_test",
-    ":onboardingpayload_manual_code_test",    
   ]
 }
 
