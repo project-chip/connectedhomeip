@@ -93,6 +93,7 @@ jobs:
               name: Cirque Bootstrap cache
               if: ${{ !env.ACT }}
               continue-on-error: true
+              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3
