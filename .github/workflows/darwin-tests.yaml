@@ -70,6 +70,7 @@ jobs:
             - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               continue-on-error: true
+              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3
