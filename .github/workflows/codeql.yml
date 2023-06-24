@@ -120,9 +120,6 @@ jobs:
         uses: github/codeql-action/analyze@v2
         with:
           category: "/language:${{matrix.language}}"
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-        with:
           upload: False
           output: sarif-results
   
@@ -132,13 +129,13 @@ jobs:
           patterns: |
             -**/third_party/**
             -**/scripts/**
-          input: sarif-results/cpp.sarif
-          output: sarif-results/cpp.sarif
+          input: "sarif-results/${{matrix.language}}.sarif"
+          output: "sarif-results/${{matrix.language}}.sarif"
   
       - name: Upload SARIF
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: sarif-results/java.sarif
+          sarif_file: "sarif-results/${{matrix.language}}.sarif"
   
       - name: Upload loc as a Build Artifact
         uses: actions/upload-artifact@v2.2.0
