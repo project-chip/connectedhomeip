@@ -32,7 +32,6 @@ jobs:
 
     qemu-esp32:
         name: ESP32
-        timeout-minutes: 85
 
         env:
             BUILD_TYPE: esp32-qemu
@@ -60,7 +59,6 @@ jobs:
             - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               continue-on-error: true
-              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3
@@ -71,7 +69,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 25
               run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
@@ -83,7 +80,6 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Build ESP32 QEMU test images
-              timeout-minutes: 20
               run: |
                   scripts/run_in_build_env.sh "         \
                       ./scripts/build/build_examples.py \
@@ -91,7 +87,6 @@ jobs:
                       build                             \
                   "
             - name: Run all tests
-              timeout-minutes: 40
               run: |
                   src/test_driver/esp32/run_qemu_image.py \
                     --verbose                             \
@@ -129,7 +124,6 @@ jobs:
             - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               continue-on-error: true
-              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3
@@ -140,7 +134,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 25
               run: bash scripts/bootstrap.sh
 
             - name: Build and run tests

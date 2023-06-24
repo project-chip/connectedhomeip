@@ -52,7 +52,6 @@ jobs:
             - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               continue-on-error: true
-              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3
@@ -63,7 +62,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 10
               run: bash scripts/bootstrap.sh
             - name: CI Examples Linux
               shell: bash
@@ -93,7 +91,6 @@ jobs:
             - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               continue-on-error: true
-              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3
@@ -104,7 +101,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 10
               run: bash scripts/bootstrap.sh
             - name: CI Examples ESP32
               shell: bash
@@ -134,7 +130,6 @@ jobs:
             - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               continue-on-error: true
-              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3
@@ -145,7 +140,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 10
               run: bash scripts/bootstrap.sh
             - name: CI Examples NRFConnect
               shell: bash

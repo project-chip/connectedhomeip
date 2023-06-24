@@ -34,7 +34,6 @@ env:
 jobs:
     java_tests_linux:
         name: Linux
-        timeout-minutes: 130
 
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
@@ -62,7 +61,6 @@ jobs:
             - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
               continue-on-error: true
-              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3
@@ -73,7 +71,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 10
               run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
@@ -84,7 +81,6 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Generate unit tests
-              timeout-minutes: 2
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/build/build_examples.py \
@@ -92,11 +88,9 @@ jobs:
                      gen \
                   '
             - name: Build unit tests
-              timeout-minutes: 30
               run: scripts/run_in_build_env.sh 'ninja -C out/linux-x64-tests src:java_controller_tests'
 
             - name: Run unit tests
-              timeout-minutes: 15
               # TODO: this direct path loading is not maintainable. Our build system should define and
               #       support test classes.
               run: |
@@ -108,7 +102,6 @@ jobs:
                    chip.tlv.TlvReaderTest           \
                    chip.jsontlv.JsonToTlvToJsonTest
             - name: Build Java Matter Controller and all clusters app
-              timeout-minutes: 60
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
                   scripts/run_in_python_env.sh out/venv 'pip install -r scripts/setup/requirements.build.txt'
@@ -120,7 +113,6 @@ jobs:
                       build \
                    "
             - name: Run Discover Commissionables Test
-              timeout-minutes: 15
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -132,7 +124,6 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Onnetwork Test
-              timeout-minutes: 15
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -144,7 +135,6 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Invoke Test
-              timeout-minutes: 15
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -156,7 +146,6 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Read Test
-              timeout-minutes: 15
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -168,7 +157,6 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Write Test
-              timeout-minutes: 15
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -180,7 +168,6 @@ jobs:
                      --factoryreset \
                   '
             - name: Run IM Subscribe Test
-              timeout-minutes: 15
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -192,7 +179,6 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing AlreadyDiscovered Test
-              timeout-minutes: 25
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -205,7 +191,6 @@ jobs:
                   '
             # Disabled due to failure: https://github.com/project-chip/connectedhomeip/issues/27361
             # - name: Run Pairing Address-PaseOnly Test
-            #   timeout-minutes: 25
             #   run: |
             #      scripts/run_in_python_env.sh out/venv \
             #       './scripts/tests/run_java_test.py \
@@ -217,7 +202,6 @@ jobs:
             #          --factoryreset \
             #       '
             - name: Run Pairing SetupQRCode Test
-              timeout-minutes: 25
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
@@ -229,7 +213,6 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing ManualCode Test
-              timeout-minutes: 25
               run: |
                   scripts/run_in_python_env.sh out/venv \
                   './scripts/tests/run_java_test.py \
