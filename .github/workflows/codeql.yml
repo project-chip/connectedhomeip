@@ -18,8 +18,8 @@ on:
 #   push:
 #     branches: [ "master", "sve*", "test_event_*", "v1.*" ]
 #   pull_request:
-#   schedule:
-#     - cron: '27 4 * * 2'
+  schedule:
+    - cron: '0 5 * * *'
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
