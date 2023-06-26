@@ -67,8 +67,9 @@ jobs:
             - name: Bootstrap Cache
               uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+              uses: ./.github/actions/bootstrap
+            - name: Upload Bootstrap Logs
+              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build and install Python controller
               timeout-minutes: 10

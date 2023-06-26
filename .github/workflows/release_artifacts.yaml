@@ -51,8 +51,7 @@ jobs:
             - name: Bootstrap Cache
               uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
-              timeout-minutes: 25
-              run: bash scripts/bootstrap.sh
+              uses: ./.github/actions/bootstrap
             - name: Upload Bootstrap Logs
               uses: ./.github/actions/upload-bootstrap-logs
 
@@ -94,8 +93,7 @@ jobs:
             - name: Bootstrap Cache
               uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
-              timeout-minutes: 25
-              run: bash scripts/bootstrap.sh
+              uses: ./.github/actions/bootstrap
             - name: Upload Bootstrap Logs
               uses: ./.github/actions/upload-bootstrap-logs
 

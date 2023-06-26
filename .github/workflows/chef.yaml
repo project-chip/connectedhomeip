@@ -47,13 +47,10 @@ jobs:
                   token: ${{ github.token }}
                 attempt_limit: 3
                 attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
             - name: CI Examples Linux
               shell: bash
               run: |
@@ -78,12 +75,9 @@ jobs:
                 attempt_limit: 3
                 attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform esp32
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: esp32
             - name: CI Examples ESP32
               shell: bash
               run: |
@@ -107,13 +101,10 @@ jobs:
                   token: ${{ github.token }}
                 attempt_limit: 3
                 attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform nrfconnect
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: nrfconnect
             - name: CI Examples NRFConnect
               shell: bash
               run: |

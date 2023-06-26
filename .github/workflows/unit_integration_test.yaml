@@ -52,15 +52,10 @@ jobs:
                   token: ${{ github.token }}
                 attempt_limit: 3
                 attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: |
-                  mkdir -p /tmp/log_output ;
-                  bash scripts/bootstrap.sh ;
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1

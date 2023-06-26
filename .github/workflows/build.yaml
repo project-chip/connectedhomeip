@@ -66,27 +66,15 @@ jobs:
                   token: ${{ github.token }}
                 attempt_limit: 3
                 attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
-
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
-
-            - name: Initialize CodeQL
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@v2
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  languages: "cpp"
+                platform: linux
             - name: Setup Build
               run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
             - name: Run Build
@@ -201,27 +189,15 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
-
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
-            - name: Initialize CodeQL
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@v2
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  languages: "cpp"
-
+                platform: linux
             - name: Setup and Build Simulated Device
               timeout-minutes: 20
               run: |
@@ -391,14 +367,10 @@ jobs:
                   token: ${{ github.token }}
                 attempt_limit: 3
                 attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
 
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 50
@@ -431,30 +403,24 @@ jobs:
             - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform darwin
+                action: actions/checkout@v3.5.2
+                with: |
+                  token: ${{ github.token }}
+                attempt_limit: 3
+                attempt_delay: 2000
+            #- name: Initialize CodeQL
+            #  if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
+            #  uses: github/codeql-action/init@v1
+            #  with:
+            #     languages: "cpp"
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: darwin
             - name: Try to ensure the directory for diagnostic log collection exists
               run: |
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
 
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
-            - name: Bootstrap
-              timeout-minutes: 25
-              run: bash scripts/bootstrap.sh
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
-
-            - name: Initialize CodeQL
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@v2
-              with:
-                  languages: "cpp"
             - name: Setup and Build Simulated Device
               timeout-minutes: 20
               run: |
@@ -559,16 +525,10 @@ jobs:
                   token: ${{ github.token }}
                 attempt_limit: 3
                 attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
 
             - name: Run Build Coverage
               timeout-minutes: 30

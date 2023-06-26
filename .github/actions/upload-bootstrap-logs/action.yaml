@@ -1,5 +1,10 @@
 name: Upload bootstrap logs
 description: Upload bootstrap logs
+inputs:
+  bootstrap-log-name:
+    description: "Bootstrap log name"
+    required: false
+    default: bootstrap-logs
 runs:
   using: "composite"
   steps:
@@ -7,7 +12,7 @@ runs:
       uses: actions/upload-artifact@v3
       if: ${{ always() && !env.ACT }}
       with:
-        name: bootstrap-logs
+        name: ${{ inputs.bootstrap-log-name }}}
         path: |
           .environment/gn_out/.ninja_log
           .environment/pigweed-venv/*.log
