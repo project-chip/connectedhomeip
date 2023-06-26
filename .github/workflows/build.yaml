@@ -19,7 +19,12 @@ on:
     pull_request:
     merge_group:
     workflow_dispatch:
-
+    workflow_call:
+      inputs:
+        run-codeql:
+          required: false
+          type: boolean
+    
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
@@ -94,6 +99,11 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
 
+            - name: Initialize CodeQL
+              if: ${{ inputs.run-codeql  }}
+              uses: github/codeql-action/init@v2
+              with:
+                  languages: "cpp"
             - name: Setup Build
               run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
             - name: Run Build
@@ -133,6 +143,36 @@ jobs:
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Perform CodeQL Analysis
+              if: ${{ inputs.run-codeql  }}
+              uses: github/codeql-action/analyze@v2
+              with:
+                  category: "/language:cpp"
+                  upload: False
+                  output: sarif-results
+            - name: filter-sarif
+              if: ${{ inputs.run-codeql  }}
+              uses: advanced-security/filter-sarif@v1
+              with:
+                  patterns: |
+                    -**/third_party/**
+                    -**/scripts/**
+                  input: "sarif-results/cpp.sarif"
+                  output: "sarif-results/cpp.sarif"
+        
+            - name: Upload SARIF
+              if: ${{ inputs.run-codeql  }}
+              uses: github/codeql-action/upload-sarif@v2
+              with:
+                  sarif_file: "sarif-results/cpp.sarif"
+        
+            - name: Upload loc as a Build Artifact
+              if: ${{ inputs.run-codeql  }}
+              uses: actions/upload-artifact@v2.2.0
+              with:
+                  name: sarif-results
+                  path: sarif-results
+                  retention-days: 1
             # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
             # having the job timeout.
             #
@@ -178,11 +218,6 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
-            # - name: Initialize CodeQL
-            #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-            #   uses: github/codeql-action/init@v1
-            #   with:
-            #      languages: "cpp"
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
@@ -215,7 +250,11 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-
+            - name: Initialize CodeQL
+              if: ${{ inputs.run-codeql  }}
+              uses: github/codeql-action/init@v2
+              with:
+                  languages: "cpp"
             - name: Setup and Build Simulated Device
               timeout-minutes: 20
               run: |
@@ -302,6 +341,36 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-fake-tests build"
+            - name: Perform CodeQL Analysis
+              if: ${{ inputs.run-codeql  }}
+              uses: github/codeql-action/analyze@v2
+              with:
+                  category: "/language:cpp"
+                  upload: False
+                  output: sarif-results
+            - name: filter-sarif
+              if: ${{ inputs.run-codeql  }}
+              uses: advanced-security/filter-sarif@v1
+              with:
+                  patterns: |
+                    -**/third_party/**
+                    -**/scripts/**
+                  input: "sarif-results/cpp.sarif"
+                  output: "sarif-results/cpp.sarif"
+        
+            - name: Upload SARIF
+              if: ${{ inputs.run-codeql  }}
+              uses: github/codeql-action/upload-sarif@v2
+              with:
+                  sarif_file: "sarif-results/cpp.sarif"
+        
+            - name: Upload loc as a Build Artifact
+              if: ${{ inputs.run-codeql  }}
+              uses: actions/upload-artifact@v2.2.0
+              with:
+                  name: sarif-results
+                  path: sarif-results
+                  retention-days: 1
             - name: Uploading core files
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
@@ -411,11 +480,6 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
-            #- name: Initialize CodeQL
-            #  if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-            #  uses: github/codeql-action/init@v1
-            #  with:
-            #     languages: "cpp"
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform darwin
             - name: Try to ensure the directory for diagnostic log collection exists
@@ -447,6 +511,11 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
 
+            - name: Initialize CodeQL
+              if: ${{ inputs.run-codeql  }}
+              uses: github/codeql-action/init@v2
+              with:
+                  languages: "cpp"
             - name: Setup and Build Simulated Device
               timeout-minutes: 20
               run: |
@@ -495,9 +564,36 @@ jobs:
               with:
                   name: crash-log-darwin
                   path: ~/Library/Logs/DiagnosticReports/
-            # - name: Perform CodeQL Analysis
-            #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-            #   uses: github/codeql-action/analyze@v1
+            - name: Perform CodeQL Analysis
+              if: ${{ inputs.run-codeql  }}
+              uses: github/codeql-action/analyze@v2
+              with:
+                  category: "/language:cpp"
+                  upload: False
+                  output: sarif-results
+            - name: filter-sarif
+              if: ${{ inputs.run-codeql  }}
+              uses: advanced-security/filter-sarif@v1
+              with:
+                  patterns: |
+                    -**/third_party/**
+                    -**/scripts/**
+                  input: "sarif-results/cpp.sarif"
+                  output: "sarif-results/cpp.sarif"
+        
+            - name: Upload SARIF
+              if: ${{ inputs.run-codeql  }}
+              uses: github/codeql-action/upload-sarif@v2
+              with:
+                  sarif_file: "sarif-results/cpp.sarif"
+        
+            - name: Upload loc as a Build Artifact
+              if: ${{ inputs.run-codeql  }}
+              uses: actions/upload-artifact@v2.2.0
+              with:
+                  name: sarif-results
+                  path: sarif-results
+                  retention-days: 1
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
 
