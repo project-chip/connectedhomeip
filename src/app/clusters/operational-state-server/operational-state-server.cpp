@@ -141,7 +141,7 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     else if (currentStateId != to_underlying(OperationalStateEnum::kPaused) &&
              currentStateId != to_underlying(OperationalStateEnum::kRunning))
     {
-        err.set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
         response.commandResponseState = err;
     }
     else

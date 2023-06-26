@@ -304,12 +304,12 @@ GenericOperationalError & OperationalStateDelegate::HandlePauseStateCallback(Gen
 {
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
-        err.set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
     else
     {
         mOperationalState.Set(to_underlying(OperationalStateEnum::kPaused));
-        err.set(to_underlying(ErrorStateEnum::kNoError));
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
     return err;
 }
@@ -318,12 +318,12 @@ GenericOperationalError & OperationalStateDelegate::HandleResumeStateCallback(Ge
 {
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
-        err.set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
+        err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
     }
     else
     {
         mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
-        err.set(to_underlying(ErrorStateEnum::kNoError));
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
     return err;
 }
@@ -332,12 +332,12 @@ GenericOperationalError & OperationalStateDelegate::HandleStartStateCallback(Gen
 {
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
-        err.set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
+        err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
     }
     else
     {
         mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
-        err.set(to_underlying(ErrorStateEnum::kNoError));
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
     return err;
 }
@@ -346,12 +346,12 @@ GenericOperationalError & OperationalStateDelegate::HandleStopStateCallback(Gene
 {
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
-        err.set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
     else
     {
         mOperationalState.Set(to_underlying(OperationalStateEnum::kStopped));
-        err.set(to_underlying(ErrorStateEnum::kNoError));
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
     return err;
 }

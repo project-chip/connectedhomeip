@@ -34,7 +34,7 @@ constexpr size_t kOperationalErrorDetailsMaxSize = 64u;
 constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
 
 /**
- * A class wrap the operational state of operational state cluster
+ * A class which represents the operational state of an Operational State cluster derivation instance.
  */
 struct GenericOperationalState : public app::Clusters::detail::Structs::OperationalStateStruct::Type
 {
@@ -81,7 +81,7 @@ private:
 };
 
 /**
- * A class hold the operational state list of operational state cluster
+ * A class which holds the operational state list of an Operational State cluster derivation.
  */
 struct GenericOperationalStateList : public GenericOperationalState
 {
@@ -92,78 +92,71 @@ struct GenericOperationalStateList : public GenericOperationalState
 };
 
 /**
- * A class wrap the operational error of operational state cluster
+ * A class which represents the operational error of an Operational State cluster derivation instance.
  */
 struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorStateStruct::Type
 {
-    GenericOperationalError(uint8_t state, const char * label = nullptr, size_t labelLen = 0, const char * details = nullptr,
-                            size_t detailsLen = 0)
+    GenericOperationalError(uint8_t state, Optional<chip::CharSpan> label = NullOptional, Optional<chip::CharSpan> details = NullOptional)
     {
-        set(state, label, labelLen, details, detailsLen);
+        Set(state, label, details);
     }
 
     GenericOperationalError(const GenericOperationalError & error)
     {
-        set(error.errorStateID, error.errorStateLabel.HasValue() ? error.ErrorStateLabel : nullptr,
-            error.errorStateLabel.HasValue() ? sizeof(error.ErrorStateLabel) : 0,
-            error.errorStateDetails.HasValue() ? error.ErrorStateDetails : nullptr,
-            error.errorStateDetails.HasValue() ? sizeof(error.ErrorStateDetails) : 0);
+        *this = error;
     }
 
     GenericOperationalError & operator=(const GenericOperationalError & error)
     {
-        set(error.errorStateID, error.errorStateLabel.HasValue() ? error.ErrorStateLabel : nullptr,
-            error.errorStateLabel.HasValue() ? sizeof(error.ErrorStateLabel) : 0,
-            error.errorStateDetails.HasValue() ? error.ErrorStateDetails : nullptr,
-            error.errorStateDetails.HasValue() ? sizeof(error.ErrorStateDetails) : 0);
+        Set(error.errorStateID, error.errorStateLabel,
+            error.errorStateDetails);
         return *this;
     }
 
-    void set(uint8_t state, const char * label = nullptr, size_t labelLen = 0, const char * details = nullptr,
-             size_t detailsLen = 0)
+    void Set(uint8_t state, Optional<chip::CharSpan> label = NullOptional, Optional<chip::CharSpan> details = NullOptional)
     {
         errorStateID = state;
-        if (label == nullptr)
+        if (label.HasValue())
         {
-            errorStateLabel = Optional<CharSpan>::Missing();
-        }
-        else
-        {
-            memset(ErrorStateLabel, 0, sizeof(ErrorStateLabel));
-            if (labelLen > kOperationalErrorLabelMaxSize)
+            memset(mErrorStateLabelBuffer, 0, sizeof(mErrorStateLabelBuffer));
+            if (label.Value().size() > sizeof(mErrorStateLabelBuffer))
             {
-                memcpy(ErrorStateLabel, label, kOperationalErrorLabelMaxSize);
+                memcpy(mErrorStateLabelBuffer, label.Value().data(), sizeof(mErrorStateLabelBuffer));
+                errorStateLabel.SetValue(CharSpan(mErrorStateLabelBuffer, sizeof(mErrorStateLabelBuffer)));
             }
             else
             {
-                memcpy(ErrorStateLabel, label, labelLen);
+                memcpy(mErrorStateLabelBuffer, label.Value().data(), label.Value().size());
+                errorStateLabel.SetValue(CharSpan(mErrorStateLabelBuffer, label.Value().size()));
             }
-
-            errorStateLabel.SetValue(CharSpan(ErrorStateLabel, sizeof(ErrorStateLabel)));
-        }
-
-        if (details == nullptr)
-        {
-            errorStateDetails = Optional<CharSpan>::Missing();
         }
         else
         {
-            memset(ErrorStateDetails, 0, sizeof(ErrorStateDetails));
-            if (labelLen > kOperationalErrorDetailsMaxSize)
+            errorStateLabel = NullOptional;
+        }
+
+        if (details.HasValue())
+        {
+            memset(mErrorStateDetailsBuffer, 0, sizeof(mErrorStateDetailsBuffer));
+            if (details.Value().size() > sizeof(mErrorStateDetailsBuffer))
             {
-                memcpy(ErrorStateDetails, details, kOperationalErrorDetailsMaxSize);
+                memcpy(mErrorStateDetailsBuffer, details.Value().data(), sizeof(mErrorStateDetailsBuffer));
+                errorStateDetails.SetValue(CharSpan(mErrorStateDetailsBuffer, sizeof(mErrorStateDetailsBuffer)));
             }
             else
             {
-                memcpy(ErrorStateDetails, details, detailsLen);
+                memcpy(mErrorStateDetailsBuffer, details.Value().data(), details.Value().size());
+                errorStateDetails.SetValue(CharSpan(mErrorStateDetailsBuffer, details.Value().size()));
             }
-
-            errorStateDetails.SetValue(CharSpan(ErrorStateDetails, sizeof(ErrorStateDetails)));
+        }
+        else
+        {
+            errorStateDetails = NullOptional;
         }
     }
-    uint8_t getStateID() const { return errorStateID; }
-    char ErrorStateLabel[kOperationalErrorLabelMaxSize];
-    char ErrorStateDetails[kOperationalErrorDetailsMaxSize];
+private:
+    char mErrorStateLabelBuffer[kOperationalErrorLabelMaxSize];
+    char mErrorStateDetailsBuffer[kOperationalErrorDetailsMaxSize];
 };
 
 /**
