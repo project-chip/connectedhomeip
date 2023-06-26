@@ -69,7 +69,6 @@ set(IOTSDK_FETCH_LIST
     cmsis-freertos
     mbedtls
     lwip
-    cmsis-sockets-api
     trusted-firmware-m
 )
 
@@ -247,13 +246,6 @@ if("lwip" IN_LIST IOTSDK_FETCH_LIST)
         lwip-cmsis-sys
         lwip-cmsis-port-low-input-latency
         lwipopts
-    )
-endif()
-
-if("cmsis-sockets-api" IN_LIST IOTSDK_FETCH_LIST)
-    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
-        cmsis-sockets-api
-        lwip-sockets
     )
 endif()
 
