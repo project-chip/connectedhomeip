@@ -43,16 +43,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Set up environment for size reports
+        uses: ./.github/actions/setup-size-reports
+        if: ${{ !env.ACT }}
+        with:
+          gh-context: ${{ toJson(github) }}
       - name: Checkout submodules & Bootstrap
         uses: ./.github/actions/checkout-submodules-and-bootstrap
         with:
           platform: bouffalolab
-          extra-submodule-parameters: --recursive
-      - name: Set up environment for size reports
-        if: ${{ !env.ACT }}
-        env:
-          GH_CONTEXT: ${{ toJson(github) }}
-        run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
 
       - name: Build example BL602 Lighting App
@@ -100,9 +99,7 @@ jobs:
         run: rm -rf ./out
 
       - name: Uploading Size Reports
-        uses: actions/upload-artifact@v3
+        uses: ./.github/actions/upload-size-reports
         if: ${{ !env.ACT }}
         with:
-          name: Size,BouffaloLab-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-          path: |
-            /tmp/bloat_reports/
+          platform-name: BouffaloLab
