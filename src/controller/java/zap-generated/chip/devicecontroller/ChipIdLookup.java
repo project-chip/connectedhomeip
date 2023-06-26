@@ -157,7 +157,7 @@ public final class ChipIdLookup {
       return "RefrigeratorAndTemperatureControlledCabinetMode";
     }
     if (clusterId == 83L) {
-      return "WasherControls";
+      return "LaundryWasherControls";
     }
     if (clusterId == 84L) {
       return "RvcRunMode";
@@ -2254,7 +2254,7 @@ public final class ChipIdLookup {
         return "NumberOfRinses";
       }
       if (attributeId == 3L) {
-        return "MaxRinses";
+        return "SupportedRinses";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
