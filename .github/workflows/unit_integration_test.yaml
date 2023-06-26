@@ -44,14 +44,7 @@ jobs:
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - uses: ./.github/actions/checkout
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
             - name: Bootstrap
@@ -59,14 +52,7 @@ jobs:
               run: |
                   mkdir -p /tmp/log_output ;
                   bash scripts/bootstrap.sh ;
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+            - uses: ./.github/actions/upload-bootstrap-logs
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1

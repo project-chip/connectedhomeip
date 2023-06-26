@@ -82,19 +82,7 @@ jobs:
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
 
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
+            - uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 10
               run: bash scripts/bootstrap.sh
@@ -339,14 +327,7 @@ jobs:
         runs-on: macos-latest
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - uses: ./.github/actions/checkout
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform darwin
             - name: Setup Environment
@@ -360,19 +341,7 @@ jobs:
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
 
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
+            - uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh
@@ -488,19 +457,7 @@ jobs:
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
 
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
+            - uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 10
               run: bash scripts/bootstrap.sh
@@ -588,19 +545,7 @@ jobs:
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
 
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
+            - uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh

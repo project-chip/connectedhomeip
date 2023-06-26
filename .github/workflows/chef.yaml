@@ -39,29 +39,10 @@ jobs:
             options: --user root
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - uses: ./.github/actions/checkout
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
+            - uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 10
               run: bash scripts/bootstrap.sh
@@ -80,29 +61,10 @@ jobs:
             options: --user root
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - uses: ./.github/actions/checkout
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform esp32
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
+            - uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 10
               run: bash scripts/bootstrap.sh
@@ -121,29 +83,10 @@ jobs:
             options: --user root
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - uses: ./.github/actions/checkout
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform nrfconnect
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
+            - uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 10
               run: bash scripts/bootstrap.sh

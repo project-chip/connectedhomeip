@@ -65,30 +65,11 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform android
 
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Bootstrap cache
-              continue-on-error: true
-              timeout-minutes: 10
-              with:
-                action: buildjet/cache@v3
-                attempt_limit: 3
-                attempt_delay: 2000
-                with: |
-                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                    path: |
-                        .environment
-                        build_overrides/pigweed_environment.gni
+            - uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 10
               run: bash scripts/bootstrap.sh
-            - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v3
-              if: ${{ always() && !env.ACT }}
-              with:
-                  name: bootstrap-logs
-                  path: |
-                      .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log
+            - uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build Android arm-chip-tool
               run: |
