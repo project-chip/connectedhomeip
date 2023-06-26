@@ -56,9 +56,9 @@ private:
     void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type &response) override;
 
     uint8_t NumberOfModes() override {return 3;};
-    CHIP_ERROR getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label) override;
-    CHIP_ERROR getModeValueByIndex(uint8_t modeIndex, uint8_t &value) override;
-    CHIP_ERROR getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags) override;
+    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label) override;
+    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t &value) override;
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags) override;
 
 public:
     RvcRunModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) : Instance(aEndpointId, aClusterId, aFeature) {};
@@ -93,9 +93,9 @@ private:
     void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type &response) override;
 
     uint8_t NumberOfModes() override {return 3;};
-    CHIP_ERROR getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label) override;
-    CHIP_ERROR getModeValueByIndex(uint8_t modeIndex, uint8_t &value) override;
-    CHIP_ERROR getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags) override;
+    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label) override;
+    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t &value) override;
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags) override;
 
 public:
     RvcCleanModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) : Instance(aEndpointId, aClusterId, aFeature) {};

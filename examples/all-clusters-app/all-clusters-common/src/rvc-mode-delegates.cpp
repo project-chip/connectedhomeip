@@ -44,7 +44,7 @@ void RvcRunModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     response.status = static_cast<uint8_t>(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR RvcRunModeInstance::getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
+CHIP_ERROR RvcRunModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
 {
     if (modeIndex < NumberOfModes()) {
         if (label.size() >= modeOptions[modeIndex].label.size())
@@ -57,7 +57,7 @@ CHIP_ERROR RvcRunModeInstance::getModeLabelByIndex(uint8_t modeIndex, chip::Muta
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcRunModeInstance::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
+CHIP_ERROR RvcRunModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_t &value)
 {
     if (modeIndex < NumberOfModes()) {
         value = modeOptions[modeIndex].mode;
@@ -66,7 +66,7 @@ CHIP_ERROR RvcRunModeInstance::getModeValueByIndex(uint8_t modeIndex, uint8_t &v
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcRunModeInstance::getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags)
+CHIP_ERROR RvcRunModeInstance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags)
 {
     if (modeIndex < NumberOfModes()) {
         if (tags.size() >= modeOptions[modeIndex].modeTags.size())
@@ -100,7 +100,7 @@ void RvcCleanModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Command
     response.status = static_cast<uint8_t>(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR RvcCleanModeInstance::getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
+CHIP_ERROR RvcCleanModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
 {
     if (modeIndex < NumberOfModes()) {
         if (label.size() >= modeOptions[modeIndex].label.size())
@@ -113,7 +113,7 @@ CHIP_ERROR RvcCleanModeInstance::getModeLabelByIndex(uint8_t modeIndex, chip::Mu
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcCleanModeInstance::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
+CHIP_ERROR RvcCleanModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_t &value)
 {
     if (modeIndex < NumberOfModes()) {
         value = modeOptions[modeIndex].mode;
@@ -122,7 +122,7 @@ CHIP_ERROR RvcCleanModeInstance::getModeValueByIndex(uint8_t modeIndex, uint8_t 
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcCleanModeInstance::getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags)
+CHIP_ERROR RvcCleanModeInstance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags)
 {
     if (modeIndex < NumberOfModes()) {
         if (tags.size() >= modeOptions[modeIndex].modeTags.size())

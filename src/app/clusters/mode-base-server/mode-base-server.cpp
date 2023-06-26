@@ -264,14 +264,14 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
                // Get the mode label
                char buffer[64];
                MutableCharSpan label(buffer);
-               err1 = d->getModeLabelByIndex(i, label);
+               err1 = d->GetModeLabelByIndex(i, label);
                if (err1 != CHIP_NO_ERROR) {
                    return err1;
                }
                mode.label = label;
 
                // Get the mode value
-               err1 = d->getModeValueByIndex(i, mode.mode);
+               err1 = d->GetModeValueByIndex(i, mode.mode);
                if (err1 != CHIP_NO_ERROR) {
                    return err1;
                }
@@ -279,7 +279,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
                // Get the mode tags
                ModeTagStructType tagsBuffer[8];
                List<ModeTagStructType> tags(tagsBuffer);
-               err1 = d->getModeTagsByIndex(i, tags);
+               err1 = d->GetModeTagsByIndex(i, tags);
                if (err1 != CHIP_NO_ERROR) {
                    return err1;
                }
@@ -387,7 +387,7 @@ bool Instance::IsSupportedMode(uint8_t modeValue)
 {
    for (uint8_t i = 0; i < NumberOfModes(); i++) {
        uint8_t value;
-       auto err = getModeValueByIndex(i, value);
+       auto err = GetModeValueByIndex(i, value);
        if (err == CHIP_NO_ERROR) {
            if (value == modeValue) {
                return true;
@@ -405,17 +405,17 @@ uint8_t Instance::NumberOfModes()
    return 0;
 }
 
-CHIP_ERROR Instance::getModeLabelByIndex(uint8_t modeIndex, MutableCharSpan &label)
+CHIP_ERROR Instance::GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label)
 {
    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR Instance::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
+CHIP_ERROR Instance::GetModeValueByIndex(uint8_t modeIndex, uint8_t &value)
 {
    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR Instance::getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &modeTags)
+CHIP_ERROR Instance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & modeTags)
 {
    return CHIP_ERROR_NOT_IMPLEMENTED;
 }

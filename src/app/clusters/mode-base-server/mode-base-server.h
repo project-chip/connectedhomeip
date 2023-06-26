@@ -39,8 +39,8 @@ public:
 
     /**
      * This is a helper function to build a mode option structure. It takes the label/name of the mode,
-     * the value of the mode and a list of semantic tags that apply to this mode. NOTE, the caller must
-     * ensure that the lifetime of the label and semanticTags is as long as the returned structure.
+     * the value of the mode and a list of mode tags that apply to this mode. NOTE, the caller must
+     * ensure that the lifetime of the label and modeTags is as long as the returned structure.
      */
     static ModeOptionStructType BuildModeOptionStruct(const char * label, uint8_t mode,
                                                       const List<const ModeTagStructType> modeTags)
@@ -77,6 +77,10 @@ public:
     uint8_t GetCurrentMode();
     EndpointId GetEndpointId() const {return mEndpointId;}
 
+    /**
+     * Returns true if the feature is supported.
+     * @param feature the feature to check.
+     */
     bool HasFeature(Feature feature) const;
 
     /**
@@ -130,24 +134,24 @@ public:
     // The following functions should be implemented by the SDK user to implement the business logic of their application.
 
     /**
-     * This init function will be called during the ModeBase server initialization after the Instance information has been validated
-     * and the Instance has been registered. This can be used to initialise app logic.
+     * This init function will be called during the ModeBase server initialization after the Instance information has been
+     * validated and the Instance has been registered. This can be used to initialise app logic.
      */
     virtual CHIP_ERROR AppInit() = 0;
 
     /**
-     * Returns the number of modes provided and managed by the delegate.
+     * Returns the number of modes managed by this instance.
      */
     virtual uint8_t NumberOfModes();
 
     /**
      * Get the mode label of the Nth mode in the list of modes.
      * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
-     * @param label a reference to the MutableCharSpan that is to contain the mode label. Use CopyCharSpanToMutableCharSpan to copy
-     * into the MutableCharSpan.
+     * @param label a reference to the MutableCharSpan that is to contain the mode label. Use CopyCharSpanToMutableCharSpan
+     * to copy into the MutableCharSpan.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR getModeLabelByIndex(uint8_t modeIndex, MutableCharSpan &label);
+    virtual CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label);
 
     /**
      * Get the mode value of the Nth mode in the list of modes.
@@ -155,7 +159,7 @@ public:
      * @param value a reference to the uint8_t variable that is to contain the mode value.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR getModeValueByIndex(uint8_t modeIndex, uint8_t &value);
+    virtual CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t &value);
 
     /**
      * Get the mode tags of the Nth mode in the list of modes.
@@ -169,7 +173,8 @@ public:
      * to copy into the buffer.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &modeTags);
+    virtual CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
+                                          List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & modeTags);
 
     /**
      * When a ChangeToMode command is received, if the NewMode value is a supported made, this function is called to 1) decide if
