@@ -217,7 +217,7 @@ public:
         // If we are are being called, assert
         VerifyOrDie(SchedulingAfterWorkCallbackFailed());
 
-        if (auto *session = mSession.load())
+        if (auto * session = mSession.load())
         {
             return (session->*(mAfterWorkCallback))(mData, mStatus);
         }
@@ -291,7 +291,7 @@ private:
 
     // If background thread fails to schedule AfterWorkCallback then this flag is set to true
     // and CASEServer then can check this one and run the AfterWorkCallback for us.
-    std::atomic<bool> mScheduleAfterWorkFailed {false};
+    std::atomic<bool> mScheduleAfterWorkFailed{ false };
 
 public:
     // Data passed to `mWorkCallback` and `mAfterWorkCallback`.
