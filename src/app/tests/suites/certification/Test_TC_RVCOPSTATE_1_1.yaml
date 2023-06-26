@@ -73,7 +73,7 @@ tests:
                   ]
 
     - label:
-          "TH reads from the DUT the optional attribute(CountdownTime) in the AttributeList 
+          "TH reads from the DUT the optional attribute(CountdownTime) in the AttributeList
           from the DUT"
       PICS: RVCOPSTATE.S.A0002 && RVCOPSTATE.S.Afffb
       command: "readAttribute"
@@ -92,7 +92,7 @@ tests:
           constraints:
               type: list
               contains: [0x00]
-              
+
     - label:
           "TH reads from the DUT the optional event(OperationCompletion) in EventList."
       PICS: RVCOPSTATE.S.E01 && RVCOPSTATE.S.Afffa
