@@ -1979,6 +1979,45 @@ static BOOL AttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInDishwasherAlarmCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DishwasherAlarm;
+    switch (aAttributeId) {
+    case Attributes::Mask::Id: {
+        return YES;
+    }
+    case Attributes::Latch::Id: {
+        return YES;
+    }
+    case Attributes::State::Id: {
+        return YES;
+    }
+    case Attributes::Supported::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInOperationalStateCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OperationalState;
@@ -5102,6 +5141,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::SmokeCoAlarm::Id: {
         return AttributeIsSpecifiedInSmokeCOAlarmCluster(aAttributeId);
+    }
+    case Clusters::DishwasherAlarm::Id: {
+        return AttributeIsSpecifiedInDishwasherAlarmCluster(aAttributeId);
     }
     case Clusters::OperationalState::Id: {
         return AttributeIsSpecifiedInOperationalStateCluster(aAttributeId);

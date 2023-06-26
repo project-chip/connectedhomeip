@@ -16427,6 +16427,247 @@ public:
 } // namespace AllClear
 } // namespace Events
 } // namespace SmokeCoAlarm
+namespace DishwasherAlarm {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Reset {
+struct Type;
+struct DecodableType;
+} // namespace Reset
+
+namespace ModifyEnabledAlarms {
+struct Type;
+struct DecodableType;
+} // namespace ModifyEnabledAlarms
+
+} // namespace Commands
+
+namespace Commands {
+namespace Reset {
+enum class Fields : uint8_t
+{
+    kAlarms = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+
+    chip::BitMask<AlarmMap> alarms = static_cast<chip::BitMask<AlarmMap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+
+    chip::BitMask<AlarmMap> alarms = static_cast<chip::BitMask<AlarmMap>>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Reset
+namespace ModifyEnabledAlarms {
+enum class Fields : uint8_t
+{
+    kMask = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ModifyEnabledAlarms::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+
+    chip::BitMask<AlarmMap> mask = static_cast<chip::BitMask<AlarmMap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ModifyEnabledAlarms::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+
+    chip::BitMask<AlarmMap> mask = static_cast<chip::BitMask<AlarmMap>>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ModifyEnabledAlarms
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Mask {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Mask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Mask
+namespace Latch {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Latch::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Latch
+namespace State {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::State::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace State
+namespace Supported {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Supported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Supported
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Mask::TypeInfo::DecodableType mask =
+            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>(0);
+        Attributes::Latch::TypeInfo::DecodableType latch =
+            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>(0);
+        Attributes::State::TypeInfo::DecodableType state =
+            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>(0);
+        Attributes::Supported::TypeInfo::DecodableType supported =
+            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace Notify {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kActive   = 0,
+    kInactive = 1,
+    kState    = 2,
+    kMask     = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::Notify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    chip::BitMask<AlarmMap> active   = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> inactive = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::Notify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
+
+    chip::BitMask<AlarmMap> active   = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> inactive = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace Notify
+} // namespace Events
+} // namespace DishwasherAlarm
 namespace OperationalState {
 namespace Structs {
 namespace ErrorStateStruct       = Clusters::detail::Structs::ErrorStateStruct;

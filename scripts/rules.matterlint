@@ -23,6 +23,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/concentration-measurement-clu
 load "../src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml";

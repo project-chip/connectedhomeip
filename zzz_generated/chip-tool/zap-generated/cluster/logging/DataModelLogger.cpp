@@ -3715,6 +3715,46 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const Sm
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DishwasherAlarm::Events::Notify::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Active", indent + 1, value.active);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Active'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Inactive", indent + 1, value.inactive);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Inactive'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("State", indent + 1, value.state);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'State'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Mask", indent + 1, value.mask);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Mask'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const OperationalState::Events::OperationalError::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -8486,6 +8526,62 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case SmokeCoAlarm::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case DishwasherAlarm::Id: {
+        switch (path.mAttributeId)
+        {
+        case DishwasherAlarm::Attributes::Mask::Id: {
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Mask", 1, value);
+        }
+        case DishwasherAlarm::Attributes::Latch::Id: {
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Latch", 1, value);
+        }
+        case DishwasherAlarm::Attributes::State::Id: {
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("State", 1, value);
+        }
+        case DishwasherAlarm::Attributes::Supported::Id: {
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Supported", 1, value);
+        }
+        case DishwasherAlarm::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case DishwasherAlarm::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case DishwasherAlarm::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case DishwasherAlarm::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case DishwasherAlarm::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case DishwasherAlarm::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -17046,6 +17142,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::SmokeCoAlarm::Events::AllClear::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AllClear", 1, value);
+        }
+        }
+        break;
+    }
+    case DishwasherAlarm::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case DishwasherAlarm::Events::Notify::Id: {
+            chip::app::Clusters::DishwasherAlarm::Events::Notify::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Notify", 1, value);
         }
         }
         break;
