@@ -39,11 +39,11 @@ struct EnquiryTable
     /**
      * Endpoint Id
      */
-    chip::EndpointId mEndpointId;
+    EndpointId mEndpointId;
     /**
      * Cluster Id
      */
-    chip::ClusterId mClusterId;
+    ClusterId mClusterId;
     /**
      * point of Array(Items)
      */
@@ -107,7 +107,7 @@ constexpr EnquiryTable<GenericOperationalState> kOpStateListEnquiryTable[] = {
  * @param[out] size  The ArraySize of target Array(PhaseList)
  * @return the pointer of target Array(PhaseList)
  */
-const GenericOperationalPhase * getGenericPhaseListTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId, size_t & size)
+const GenericOperationalPhase * getGenericPhaseListTable(EndpointId aEndpointId, ClusterId aClusterId, size_t & size)
 {
     for (size_t i = 0; i < ArraySize(kPhaseListEnquiryTable); ++i)
     {
@@ -128,7 +128,7 @@ const GenericOperationalPhase * getGenericPhaseListTable(chip::EndpointId aEndpo
  * @param[out] size  The ArraySize of target Array(Operational State)
  * @return the pointer of target Array(Operational State)
  */
-const GenericOperationalState * getGenericOperationalStateTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId,
+const GenericOperationalState * getGenericOperationalStateTable(EndpointId aEndpointId, ClusterId aClusterId,
                                                                 size_t & size)
 {
     for (size_t i = 0; i < ArraySize(kOpStateListEnquiryTable); ++i)
@@ -187,7 +187,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalStateList(GenericOperationalS
 
     for (i = 0; i < opStateListNumOfItems; i++)
     {
-        GenericOperationalStateList * des = chip::Platform::New<GenericOperationalStateList>(
+        GenericOperationalStateList * des = Platform::New<GenericOperationalStateList>(
             src->operationalStateID, src->operationalStateLabel);
 
         if (des == nullptr)
@@ -225,7 +225,7 @@ void OperationalStateDelegate::ReleaseOperationalStateList(GenericOperationalSta
     {
         GenericOperationalStateList * del = operationalStateList;
         operationalStateList              = operationalStateList->next;
-        chip::Platform::Delete(del);
+        Platform::Delete(del);
     }
 }
 
@@ -254,11 +254,11 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseList(GenericOperationalP
         GenericOperationalPhaseList * des = nullptr;
         if (src->isNullable())
         {
-            des = chip::Platform::New<GenericOperationalPhaseList>();
+            des = Platform::New<GenericOperationalPhaseList>();
         }
         else
         {
-            des = chip::Platform::New<GenericOperationalPhaseList>(src->PhaseName, sizeof(src->PhaseName));
+            des = Platform::New<GenericOperationalPhaseList>(src->PhaseName, sizeof(src->PhaseName));
         }
 
         if (des == nullptr)
@@ -296,7 +296,7 @@ void OperationalStateDelegate::ReleaseOperationalPhaseList(GenericOperationalPha
     {
         GenericOperationalPhaseList * del = operationalPhaseList;
         operationalPhaseList              = operationalPhaseList->next;
-        chip::Platform::Delete(del);
+        Platform::Delete(del);
     }
 }
 
@@ -362,7 +362,7 @@ bool OperationalStateDelegate::sendOperationalErrorEvent(const GenericOperationa
     EventNumber eventNumber;
 
     event.errorState = err;
-    CHIP_ERROR error = chip::app::LogEvent(event, mEndpointId, eventNumber);
+    CHIP_ERROR error = app::LogEvent(event, mEndpointId, eventNumber);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -380,7 +380,7 @@ bool OperationalStateDelegate::sendOperationCompletion(const GenericOperationCom
     EventNumber eventNumber;
     event = op;
 
-    CHIP_ERROR error = chip::app::LogEvent(event, mEndpointId, eventNumber);
+    CHIP_ERROR error = app::LogEvent(event, mEndpointId, eventNumber);
 
     if (error != CHIP_NO_ERROR)
     {

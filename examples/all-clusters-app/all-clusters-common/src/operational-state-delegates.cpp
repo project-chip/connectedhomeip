@@ -33,11 +33,11 @@ struct DelegatesEnquiryTable
     /**
      * Endpoint Id
      */
-    chip::EndpointId mEndpointId;
+    EndpointId mEndpointId;
     /**
      * Cluster Id
      */
-    chip::ClusterId mClusterId;
+    ClusterId mClusterId;
     /**
      * point of Array(Items)
      */
@@ -71,7 +71,7 @@ constexpr DelegatesEnquiryTable kDelegatesEnquiryTable[] = {
  * @param[in] aClusterID  The clusterId
  * @return the pointer of target delegate
  */
-Delegate * getGenericDelegateTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId)
+Delegate * getGenericDelegateTable(EndpointId aEndpointId, ClusterId aClusterId)
 {
     for (size_t i = 0; i < ArraySize(kDelegatesEnquiryTable); ++i)
     {
@@ -83,7 +83,7 @@ Delegate * getGenericDelegateTable(chip::EndpointId aEndpointId, chip::ClusterId
     return nullptr;
 }
 
-Delegate * GetOperationalStateDelegate(chip::EndpointId endpointId, chip::ClusterId clusterId)
+Delegate * GetOperationalStateDelegate(EndpointId endpointId, ClusterId clusterId)
 {
     return getGenericDelegateTable(endpointId, clusterId);
 }

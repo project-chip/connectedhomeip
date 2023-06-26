@@ -36,9 +36,9 @@ constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
 /**
  * A class wrap the operational state of operational state cluster
  */
-struct GenericOperationalState : public chip::app::Clusters::detail::Structs::OperationalStateStruct::Type
+struct GenericOperationalState : public app::Clusters::detail::Structs::OperationalStateStruct::Type
 {
-    GenericOperationalState(uint8_t state, Optional<chip::CharSpan> label = NullOptional)
+    GenericOperationalState(uint8_t state, Optional<CharSpan> label = NullOptional)
     {
         Set(state, label);
     }
@@ -54,7 +54,7 @@ struct GenericOperationalState : public chip::app::Clusters::detail::Structs::Op
         return *this;
     }
 
-    void Set(uint8_t state, Optional<chip::CharSpan> label = NullOptional)
+    void Set(uint8_t state, Optional<CharSpan> label = NullOptional)
     {
         operationalStateID = state;
         if (label.HasValue())
@@ -63,12 +63,12 @@ struct GenericOperationalState : public chip::app::Clusters::detail::Structs::Op
             if (label.Value().size() > sizeof(mOperationalStateLabelBuffer))
             {
                 memcpy(mOperationalStateLabelBuffer, label.Value().data(), sizeof(mOperationalStateLabelBuffer));
-                operationalStateLabel.SetValue(chip::CharSpan(mOperationalStateLabelBuffer, sizeof(mOperationalStateLabelBuffer)));
+                operationalStateLabel.SetValue(CharSpan(mOperationalStateLabelBuffer, sizeof(mOperationalStateLabelBuffer)));
             }
             else
             {
                 memcpy(mOperationalStateLabelBuffer, label.Value().data(), label.Value().size());
-                operationalStateLabel.SetValue(chip::CharSpan(mOperationalStateLabelBuffer, label.Value().size()));
+                operationalStateLabel.SetValue(CharSpan(mOperationalStateLabelBuffer, label.Value().size()));
             }
         }
         else
@@ -85,7 +85,7 @@ private:
  */
 struct GenericOperationalStateList : public GenericOperationalState
 {
-    GenericOperationalStateList(uint8_t state, Optional<chip::CharSpan> label = NullOptional) :
+    GenericOperationalStateList(uint8_t state, Optional<CharSpan> label = NullOptional) :
         GenericOperationalState(state, label)
     {}
     GenericOperationalStateList * next = nullptr;
@@ -94,7 +94,7 @@ struct GenericOperationalStateList : public GenericOperationalState
 /**
  * A class wrap the operational error of operational state cluster
  */
-struct GenericOperationalError : public chip::app::Clusters::detail::Structs::ErrorStateStruct::Type
+struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorStateStruct::Type
 {
     GenericOperationalError(uint8_t state, const char * label = nullptr, size_t labelLen = 0, const char * details = nullptr,
                             size_t detailsLen = 0)
@@ -125,7 +125,7 @@ struct GenericOperationalError : public chip::app::Clusters::detail::Structs::Er
         errorStateID = state;
         if (label == nullptr)
         {
-            errorStateLabel = Optional<chip::CharSpan>::Missing();
+            errorStateLabel = Optional<CharSpan>::Missing();
         }
         else
         {
@@ -139,12 +139,12 @@ struct GenericOperationalError : public chip::app::Clusters::detail::Structs::Er
                 memcpy(ErrorStateLabel, label, labelLen);
             }
 
-            errorStateLabel.SetValue(chip::CharSpan(ErrorStateLabel, sizeof(ErrorStateLabel)));
+            errorStateLabel.SetValue(CharSpan(ErrorStateLabel, sizeof(ErrorStateLabel)));
         }
 
         if (details == nullptr)
         {
-            errorStateDetails = Optional<chip::CharSpan>::Missing();
+            errorStateDetails = Optional<CharSpan>::Missing();
         }
         else
         {
@@ -158,7 +158,7 @@ struct GenericOperationalError : public chip::app::Clusters::detail::Structs::Er
                 memcpy(ErrorStateDetails, details, detailsLen);
             }
 
-            errorStateDetails.SetValue(chip::CharSpan(ErrorStateDetails, sizeof(ErrorStateDetails)));
+            errorStateDetails.SetValue(CharSpan(ErrorStateDetails, sizeof(ErrorStateDetails)));
         }
     }
     uint8_t getStateID() const { return errorStateID; }
@@ -172,7 +172,7 @@ struct GenericOperationalError : public chip::app::Clusters::detail::Structs::Er
 struct GenericOperationalPhase
 {
     char PhaseName[kOperationalPhaseNameMaxSize];
-    chip::app::DataModel::Nullable<chip::CharSpan> phaseName;
+    app::DataModel::Nullable<CharSpan> phaseName;
 
     GenericOperationalPhase(const char * name = nullptr, size_t nameLen = 0) { set(name, nameLen); }
 
@@ -218,7 +218,7 @@ struct GenericOperationalPhase
             {
                 memcpy(PhaseName, name, nameLen);
             }
-            phaseName = chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan(PhaseName, sizeof(PhaseName)));
+            phaseName = app::DataModel::Nullable<CharSpan>(CharSpan(PhaseName, sizeof(PhaseName)));
         }
     }
     bool isNullable() const { return phaseName.IsNull(); }
@@ -236,13 +236,13 @@ struct GenericOperationalPhaseList : public GenericOperationalPhase
 /**
  * A class wrap the operation completion of operational state cluster
  */
-struct GenericOperationCompletion : public chip::app::Clusters::OperationalState::Events::OperationCompletion::Type
+struct GenericOperationCompletion : public app::Clusters::OperationalState::Events::OperationCompletion::Type
 {
     GenericOperationCompletion(uint8_t aCompletionErrorCode)
     {
 
-        chip::app::DataModel::Nullable<uint32_t> __totalOperationalTime;
-        chip::app::DataModel::Nullable<uint32_t> __pausedTime;
+        app::DataModel::Nullable<uint32_t> __totalOperationalTime;
+        app::DataModel::Nullable<uint32_t> __pausedTime;
 
         completionErrorCode = aCompletionErrorCode;
 
@@ -255,10 +255,10 @@ struct GenericOperationCompletion : public chip::app::Clusters::OperationalState
 
     GenericOperationCompletion(uint8_t aCompletionErrorCode, uint32_t aTotalOperationalTime)
     {
-        chip::app::DataModel::Nullable<uint32_t> __pausedTime;
+        app::DataModel::Nullable<uint32_t> __pausedTime;
 
         completionErrorCode = aCompletionErrorCode;
-        totalOperationalTime.SetValue(chip::app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
+        totalOperationalTime.SetValue(app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
         __pausedTime.SetNull();
         pausedTime.SetValue(__pausedTime);
     }
@@ -266,8 +266,8 @@ struct GenericOperationCompletion : public chip::app::Clusters::OperationalState
     GenericOperationCompletion(uint8_t aCompletionErrorCode, uint32_t aTotalOperationalTime, uint32_t aPausedTime)
     {
         completionErrorCode = aCompletionErrorCode;
-        totalOperationalTime.SetValue(chip::app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
-        pausedTime.SetValue(chip::app::DataModel::Nullable<uint32_t>(aPausedTime));
+        totalOperationalTime.SetValue(app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
+        pausedTime.SetValue(app::DataModel::Nullable<uint32_t>(aPausedTime));
     }
 };
 
