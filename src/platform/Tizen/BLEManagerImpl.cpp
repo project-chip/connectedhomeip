@@ -671,7 +671,7 @@ int BLEManagerImpl::StartBLEAdvertising()
 
     err = SystemInfo::GetPlatformVersion(version);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "GetPlatformVersion() failed. %s", ErrorStr(err)));
-    if (version.mMajor >= 7 && version.mMinor >= 5)
+    if (version.mMajor >= 8)
     {
         ret = bt_adapter_le_set_advertising_flags(
             mAdvertiser, BT_ADAPTER_LE_ADVERTISING_FLAGS_GEN_DISC | BT_ADAPTER_LE_ADVERTISING_FLAGS_BREDR_UNSUP);

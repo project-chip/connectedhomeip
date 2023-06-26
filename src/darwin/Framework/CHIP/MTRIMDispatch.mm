@@ -33,6 +33,7 @@
 #include <app/WriteHandler.h>
 #include <app/att-storage.h>
 #include <app/data-model/Decode.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
@@ -223,6 +224,11 @@ namespace app {
         }
     }
 
+    Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedEvent;
+    }
+
 } // namespace app
 } // namespace chip
 
@@ -230,9 +236,9 @@ namespace app {
  * Called by the OTA provider cluster server to determine an index
  * into its array.
  */
-uint16_t emberAfFindClusterServerEndpointIndex(EndpointId endpoint, ClusterId clusterId)
+uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId cluster, uint16_t fixedClusterServerEndpointCount)
 {
-    if (endpoint == kSupportedEndpoint && clusterId == OtaSoftwareUpdateProvider::Id) {
+    if (endpoint == kSupportedEndpoint && cluster == OtaSoftwareUpdateProvider::Id) {
         return 0;
     }
 
@@ -305,3 +311,42 @@ uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClu
 }
 
 bool emberAfEndpointIndexIsEnabled(uint16_t index) { return index == 0; }
+
+namespace {
+const CommandId acceptedCommands[] = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
+    Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
+    Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id, kInvalidCommandId };
+const CommandId generatedCommands[] = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id,
+    Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Id, kInvalidCommandId };
+const EmberAfCluster otaProviderCluster {
+    .clusterId = Clusters::OtaSoftwareUpdateProvider::Id,
+    .attributes = nullptr,
+    .attributeCount = 0,
+    .clusterSize = 0,
+    .mask = CLUSTER_MASK_SERVER,
+    .functions = nullptr,
+    .acceptedCommandList = acceptedCommands,
+    .generatedCommandList = generatedCommands,
+    .eventList = nullptr,
+    .eventCount = 0,
+};
+const EmberAfEndpointType otaProviderEndpoint { .cluster = &otaProviderCluster, .clusterCount = 1, .endpointSize = 0 };
+}
+
+const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpoint)
+{
+    if (endpoint == kSupportedEndpoint) {
+        return &otaProviderEndpoint;
+    }
+
+    return nullptr;
+}
+
+const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId cluster)
+{
+    if (endpoint == kSupportedEndpoint && cluster == Clusters::OtaSoftwareUpdateProvider::Id) {
+        return &otaProviderCluster;
+    }
+
+    return nullptr;
+}

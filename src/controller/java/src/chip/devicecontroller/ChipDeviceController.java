@@ -25,6 +25,7 @@ import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import chip.devicecontroller.model.InvokeElement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -388,9 +389,9 @@ public class ChipDeviceController {
   public void onScanNetworksSuccess(
       Integer networkingStatus,
       Optional<String> debugText,
-      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>>
           wiFiScanResults,
-      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>>
           threadScanResults) {
     if (scanNetworksListener != null) {
       scanNetworksListener.onScanNetworksSuccess(
@@ -925,6 +926,99 @@ public class ChipDeviceController {
         imTimeoutMs);
   }
 
+  /** Create a root (self-signed) X.509 DER encoded certificate */
+  public static byte[] createRootCertificate(
+      KeypairDelegate keypair, long issuerId, @Nullable Long fabricId) {
+    // current time
+    Calendar start = Calendar.getInstance();
+    Calendar end = Calendar.getInstance();
+    // current time + 10 years
+    end.add(Calendar.YEAR, 10);
+    return createRootCertificate(keypair, issuerId, fabricId, start, end);
+  }
+
+  public static native byte[] createRootCertificate(
+      KeypairDelegate keypair,
+      long issuerId,
+      @Nullable Long fabricId,
+      Calendar validityStart,
+      Calendar validityEnd);
+
+  /** Create an intermediate X.509 DER encoded certificate */
+  public static byte[] createIntermediateCertificate(
+      KeypairDelegate rootKeypair,
+      byte[] rootCertificate,
+      byte[] intermediatePublicKey,
+      long issuerId,
+      @Nullable Long fabricId) {
+    // current time
+    Calendar start = Calendar.getInstance();
+    // current time + 10 years
+    Calendar end = Calendar.getInstance();
+    end.add(Calendar.YEAR, 10);
+    return createIntermediateCertificate(
+        rootKeypair, rootCertificate, intermediatePublicKey, issuerId, fabricId, start, end);
+  }
+
+  public static native byte[] createIntermediateCertificate(
+      KeypairDelegate rootKeypair,
+      byte[] rootCertificate,
+      byte[] intermediatePublicKey,
+      long issuerId,
+      @Nullable Long fabricId,
+      Calendar validityStart,
+      Calendar validityEnd);
+
+  /**
+   * Create an X.509 DER encoded certificate that has the right fields to be a valid Matter
+   * operational certificate.
+   *
+   * <p>signingKeypair and signingCertificate are the root or intermediate that is signing the
+   * operational certificate.
+   *
+   * <p>caseAuthenticatedTags may be null to indicate no CASE Authenticated Tags should be used. If
+   * caseAuthenticatedTags is not null, it must contain at most 3 numbers, which are expected to be
+   * 32-bit unsigned Case Authenticated Tag values.
+   */
+  public static byte[] createOperationalCertificate(
+      KeypairDelegate signingKeypair,
+      byte[] signingCertificate,
+      byte[] operationalPublicKey,
+      long fabricId,
+      long nodeId,
+      List<Integer> caseAuthenticatedTags) {
+    // current time
+    Calendar start = Calendar.getInstance();
+    // current time + 10 years
+    Calendar end = Calendar.getInstance();
+    end.add(Calendar.YEAR, 10);
+    return createOperationalCertificate(
+        signingKeypair,
+        signingCertificate,
+        operationalPublicKey,
+        fabricId,
+        nodeId,
+        caseAuthenticatedTags,
+        start,
+        end);
+  }
+
+  public static native byte[] createOperationalCertificate(
+      KeypairDelegate signingKeypair,
+      byte[] signingCertificate,
+      byte[] operationalPublicKey,
+      long fabricId,
+      long nodeId,
+      List<Integer> caseAuthenticatedTags,
+      Calendar validityStart,
+      Calendar validityEnd);
+
+  /**
+   * Extract the public key from the given PKCS#10 certificate signing request. This is the public
+   * key that a certificate issued in response to the request would need to have.
+   */
+  public static native byte[] publicKeyFromCSR(byte[] csr);
+
   /**
    * Converts a given X.509v3 certificate into a Matter certificate.
    *
@@ -1174,9 +1268,9 @@ public class ChipDeviceController {
     void onScanNetworksSuccess(
         Integer networkingStatus,
         Optional<String> debugText,
-        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>>
             wiFiScanResults,
-        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>>
             threadScanResults);
   }
 

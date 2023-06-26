@@ -22,6 +22,9 @@ config:
     nodeId: 0x12344321
     cluster: "Media Input"
     endpoint: 1
+    Index:
+        type: int8u
+        defaultValue: 1
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -40,14 +43,19 @@ tests:
       PICS: MEDIAINPUT.S.A0000
       command: "readAttribute"
       attribute: "InputList"
+      response:
+          constraints:
+              type: list
 
-    - label: "Rename Input Command"
+    - label:
+          "TH sends a RenameInput command to DUT to rename an input from the
+          list returned in step 1"
       PICS: MEDIAINPUT.S.C03.Rsp
       command: "RenameInput"
       arguments:
           values:
               - name: "Index"
-                value: 1
+                value: Index
               - name: "Name"
                 value: "A1"
 

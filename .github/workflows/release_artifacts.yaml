@@ -37,10 +37,10 @@ jobs:
             image: connectedhomeip/chip-build-esp32:0.7.3
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       submodules: true
                       token: ${{ github.token }}
@@ -48,14 +48,19 @@ jobs:
                   attempt_delay: 2000
                   ref: "${{ github.event.inputs.releaseTag }}"
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
+            - uses: Wandalen/wretry.action@v1.3.0
+              name: Bootstrap cache
+              continue-on-error: true
               timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh
@@ -92,10 +97,10 @@ jobs:
         container:
             image: connectedhomeip/chip-build-efr32:0.7.3
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       submodules: true
                       token: ${{ github.token }}
@@ -103,14 +108,19 @@ jobs:
                   attempt_delay: 2000
                   ref: "${{ github.event.inputs.releaseTag }}"
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
+            - uses: Wandalen/wretry.action@v1.3.0
+              name: Bootstrap cache
+              continue-on-error: true
               timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh

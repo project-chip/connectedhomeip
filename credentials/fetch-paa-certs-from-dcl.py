@@ -86,12 +86,15 @@ def write_paa_root_cert(certificate, subject):
     with open(filename + '.pem', 'w+') as outfile:
         outfile.write(certificate)
     # convert pem file to der
-    with open(filename + '.pem', 'rb') as infile:
-        pem_certificate = x509.load_pem_x509_certificate(infile.read())
-    with open(filename + '.der', 'wb+') as outfile:
-        der_certificate = pem_certificate.public_bytes(
-            serialization.Encoding.DER)
-        outfile.write(der_certificate)
+    try:
+        with open(filename + '.pem', 'rb') as infile:
+            pem_certificate = x509.load_pem_x509_certificate(infile.read())
+        with open(filename + '.der', 'wb+') as outfile:
+            der_certificate = pem_certificate.public_bytes(
+                serialization.Encoding.DER)
+            outfile.write(der_certificate)
+    except (IOError, ValueError) as e:
+        print(f"ERROR: Failed to convert {filename + '.pem'}: {str(e)}. Skipping...")
 
 
 def parse_paa_root_cert_from_dcld(cmdpipe):
@@ -160,7 +163,6 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
         parse_paa_root_certs(cmdpipe, paa_list)
 
     for paa in paa_list:
-
         if use_rest:
             response = requests.get(
                 f"{rest_node_url}/dcl/pki/certificates/{paa['subject']}/{paa['subjectKeyId']}").json()["approvedCertificates"]["certs"][0]
@@ -175,6 +177,7 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
 
         certificate = certificate.rstrip('\n')
 
+        print(f"Downloaded certificate with subject: {subject}")
         write_paa_root_cert(certificate, subject)
 
 

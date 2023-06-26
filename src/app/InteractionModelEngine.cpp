@@ -30,10 +30,10 @@
 #include "access/RequestPath.h"
 #include "access/SubjectDescriptor.h"
 #include <app/RequiredPrivilege.h>
+#include <app/util/af-types.h>
+#include <app/util/endpoint-config-api.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
-
-extern bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 namespace chip {
 namespace app {
@@ -351,10 +351,8 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
     aHasValidAttributePath       = false;
     aRequestedAttributePathCount = 0;
 
-    while (CHIP_NO_ERROR == (err = pathReader.Next()))
+    while (CHIP_NO_ERROR == (err = pathReader.Next(TLV::AnonymousTag())))
     {
-        VerifyOrReturnError(TLV::AnonymousTag() == pathReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
-
         AttributePathIB::Parser path;
         //
         // We create an iterator to point to a single item object list that tracks the path we just parsed.
@@ -403,6 +401,152 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
         }
 
         aRequestedAttributePathCount++;
+    }
+
+    if (err == CHIP_ERROR_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+    return err;
+}
+
+static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteClusterPath & aPath,
+                      Access::Privilege aNeededPrivilege)
+{
+    Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+    CHIP_ERROR err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, aNeededPrivilege);
+    return (err == CHIP_NO_ERROR);
+}
+
+static bool CanAccess(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteEventPath & aPath)
+{
+    return CanAccess(aSubjectDescriptor, aPath, RequiredPrivilege::ForReadEvent(aPath));
+}
+
+/**
+ * Helper to handle wildcard events in the event path.
+ */
+static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const EmberAfCluster * aCluster,
+                                                   const EventPathParams & aEventPath,
+                                                   const Access::SubjectDescriptor & aSubjectDescriptor)
+{
+    if (aEventPath.HasWildcardEventId())
+    {
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+        for (decltype(aCluster->eventCount) idx = 0; idx > aCluster->eventCount; ++idx)
+        {
+            ConcreteEventPath path(aEndpoint, aCluster->clusterId, aCluster->eventList[idx]);
+            // If we get here, the path exists.  We just have to do an ACL check for it.
+            bool isValid = CanAccess(aSubjectDescriptor, path);
+            if (isValid)
+            {
+                return true;
+            }
+        }
+
+        return false;
+#else
+        // We have no way to expand wildcards.  Just assume that we would need
+        // View permissions for whatever events are involved.
+        ConcreteClusterPath clusterPath(aEndpoint, aCluster->clusterId);
+        return CanAccess(aSubjectDescriptor, clusterPath, Access::Privilege::kView);
+#endif
+    }
+
+    ConcreteEventPath path(aEndpoint, aCluster->clusterId, aEventPath.mEventId);
+    if (CheckEventSupportStatus(path) != Status::Success)
+    {
+        // Not an existing event path.
+        return false;
+    }
+    return CanAccess(aSubjectDescriptor, path);
+}
+
+/**
+ * Helper to handle wildcard clusters in the event path.
+ */
+static bool HasValidEventPathForEndpoint(EndpointId aEndpoint, const EventPathParams & aEventPath,
+                                         const Access::SubjectDescriptor & aSubjectDescriptor)
+{
+    if (aEventPath.HasWildcardClusterId())
+    {
+        auto * endpointType = emberAfFindEndpointType(aEndpoint);
+        if (endpointType == nullptr)
+        {
+            // Not going to have any valid paths in here.
+            return false;
+        }
+
+        for (decltype(endpointType->clusterCount) idx = 0; idx < endpointType->clusterCount; ++idx)
+        {
+            bool hasValidPath =
+                HasValidEventPathForEndpointAndCluster(aEndpoint, &endpointType->cluster[idx], aEventPath, aSubjectDescriptor);
+            if (hasValidPath)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    auto * cluster = emberAfFindServerCluster(aEndpoint, aEventPath.mClusterId);
+    if (cluster == nullptr)
+    {
+        // Nothing valid here.
+        return false;
+    }
+    return HasValidEventPathForEndpointAndCluster(aEndpoint, cluster, aEventPath, aSubjectDescriptor);
+}
+
+CHIP_ERROR InteractionModelEngine::ParseEventPaths(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                                   EventPathIBs::Parser & aEventPathListParser, bool & aHasValidEventPath,
+                                                   size_t & aRequestedEventPathCount)
+{
+    TLV::TLVReader pathReader;
+    aEventPathListParser.GetReader(&pathReader);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    aHasValidEventPath       = false;
+    aRequestedEventPathCount = 0;
+
+    while (CHIP_NO_ERROR == (err = pathReader.Next(TLV::AnonymousTag())))
+    {
+        EventPathIB::Parser path;
+        ReturnErrorOnFailure(path.Init(pathReader));
+
+        EventPathParams eventPath;
+        ReturnErrorOnFailure(path.ParsePath(eventPath));
+
+        ++aRequestedEventPathCount;
+
+        if (aHasValidEventPath)
+        {
+            // Can skip all the rest of the checking.
+            continue;
+        }
+
+        // The definition of "valid path" is "path exists and ACL allows
+        // access".  We need to do some expansion of wildcards to handle that.
+        if (eventPath.HasWildcardEndpointId())
+        {
+            for (uint16_t endpointIndex = 0; !aHasValidEventPath && endpointIndex < emberAfEndpointCount(); ++endpointIndex)
+            {
+                if (!emberAfEndpointIndexIsEnabled(endpointIndex))
+                {
+                    continue;
+                }
+                aHasValidEventPath =
+                    HasValidEventPathForEndpoint(emberAfEndpointFromIndex(endpointIndex), eventPath, aSubjectDescriptor);
+            }
+        }
+        else
+        {
+            // No need to check whether the endpoint is enabled, because
+            // emberAfFindEndpointType returns null for disabled endpoints.
+            aHasValidEventPath = HasValidEventPathForEndpoint(eventPath.mEndpointId, eventPath, aSubjectDescriptor);
+        }
     }
 
     if (err == CHIP_ERROR_END_OF_TLV)
@@ -472,6 +616,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             size_t requestedEventPathCount     = 0;
             AttributePathIBs::Parser attributePathListParser;
             bool hasValidAttributePath = false;
+            bool hasValidEventPath     = false;
 
             CHIP_ERROR err = subscribeRequestParser.GetAttributeRequests(&attributePathListParser);
             if (err == CHIP_NO_ERROR)
@@ -489,14 +634,16 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 return Status::InvalidAction;
             }
 
-            EventPathIBs::Parser eventpathListParser;
-            err = subscribeRequestParser.GetEventRequests(&eventpathListParser);
+            EventPathIBs::Parser eventPathListParser;
+            err = subscribeRequestParser.GetEventRequests(&eventPathListParser);
             if (err == CHIP_NO_ERROR)
             {
-                TLV::TLVReader pathReader;
-                eventpathListParser.GetReader(&pathReader);
-                ReturnErrorCodeIf(TLV::Utilities::Count(pathReader, requestedEventPathCount, false) != CHIP_NO_ERROR,
-                                  Status::InvalidAction);
+                auto subjectDescriptor = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetSubjectDescriptor();
+                err = ParseEventPaths(subjectDescriptor, eventPathListParser, hasValidEventPath, requestedEventPathCount);
+                if (err != CHIP_NO_ERROR)
+                {
+                    return Status::InvalidAction;
+                }
             }
             else if (err != CHIP_ERROR_END_OF_TLV)
             {
@@ -512,12 +659,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                 return Status::InvalidAction;
             }
 
-            //
-            // TODO: We don't have an easy way to do a similar 'path expansion' for events to deduce
-            // access so for now, assume that the presence of any path in the event list means they
-            // might have some access to those events.
-            //
-            if (!hasValidAttributePath && requestedEventPathCount == 0)
+            if (!hasValidAttributePath && !hasValidEventPath)
             {
                 ChipLogError(InteractionModel,
                              "Subscription from [%u:" ChipLogFormatX64 "] has no access at all. Rejecting request.",
@@ -646,6 +788,10 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
 
     ReportDataMessage::Parser report;
     VerifyOrReturnError(report.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
+
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    report.PrettyPrint();
+#endif
 
     SubscriptionId subscriptionId = 0;
     VerifyOrReturnError(report.GetSubscriptionId(&subscriptionId) == CHIP_NO_ERROR, Status::InvalidAction);

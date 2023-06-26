@@ -19,6 +19,7 @@
 #include "AppTaskCommon.h"
 #include "AppTask.h"
 
+#include "BLEManagerImpl.h"
 #include "ButtonManager.h"
 
 #include "ThreadUtil.h"
@@ -53,19 +54,19 @@ constexpr int kFactoryResetTriggerCntr = 3;
 constexpr int kAppEventQueueSize       = 10;
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-const struct gpio_dt_spec sFactoryResetButtonDt = BUTTON_FACTORY_RESET;
-const struct gpio_dt_spec sBleStartButtonDt     = BUTTON_BLE_START;
+const struct gpio_dt_spec sFactoryResetButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_1), gpios);
+const struct gpio_dt_spec sBleStartButtonDt     = GPIO_DT_SPEC_GET(DT_NODELABEL(key_2), gpios);
 #if APP_USE_THREAD_START_BUTTON
-const struct gpio_dt_spec sThreadStartButtonDt = BUTTON_THREAD_START;
+const struct gpio_dt_spec sThreadStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_3), gpios);
 #endif
 #if APP_USE_EXAMPLE_START_BUTTON
-const struct gpio_dt_spec sExampleActionButtonDt = BUTTON_EXAMPLE_ACTION;
+const struct gpio_dt_spec sExampleActionButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_4), gpios);
 #endif
 #else
-const struct gpio_dt_spec sButtonCol1Dt = BUTTON_COL_1;
-const struct gpio_dt_spec sButtonCol2Dt = BUTTON_COL_2;
-const struct gpio_dt_spec sButtonRow1Dt = BUTTON_ROW_1;
-const struct gpio_dt_spec sButtonRow2Dt = BUTTON_ROW_2;
+const struct gpio_dt_spec sButtonCol1Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_col1), gpios);
+const struct gpio_dt_spec sButtonCol2Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_col2), gpios);
+const struct gpio_dt_spec sButtonRow1Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_row1), gpios);
+const struct gpio_dt_spec sButtonRow2Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_row2), gpios);
 #endif
 
 #if APP_USE_IDENTIFY_PWM
@@ -77,7 +78,7 @@ constexpr uint32_t kIdentifyFinishOffRateMs     = 50;
 constexpr uint32_t kIdentifyChannelChangeRateMs = 1000;
 constexpr uint32_t kIdentifyBreatheRateMs       = 1000;
 
-const struct pwm_dt_spec sPwmIdentifySpecGreenLed = LIGHTING_PWM_SPEC_IDENTIFY_GREEN;
+const struct pwm_dt_spec sPwmIdentifySpecGreenLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3));
 #endif
 
 #if APP_SET_NETWORK_COMM_ENDPOINT_SEC
@@ -131,6 +132,22 @@ Identify sIdentify = {
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 #endif
+
+class AppCallbacks : public AppDelegate
+{
+    bool isComissioningStarted;
+
+public:
+    void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
+    void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
+    void OnCommissioningWindowClosed() override
+    {
+        if (!isComissioningStarted)
+            chip::DeviceLayer::Internal::BLEMgr().Shutdown();
+    }
+};
+
+AppCallbacks sCallbacks;
 } // namespace
 
 class AppFabricTableDelegate : public FabricTable::Delegate
@@ -230,9 +247,8 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 
     // Initialize status LED
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    LEDWidget::InitGpio(LEDS_PORT);
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
-    sStatusLED.Init(SYSTEM_STATE_LED);
+    sStatusLED.Init(GPIO_DT_SPEC_GET(DT_ALIAS(system_state_led), gpios));
 
     UpdateStatusLED();
 #endif
@@ -276,6 +292,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Init ZCL Data Model and start server
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.appDelegate = &sCallbacks;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
 #if APP_SET_DEVICE_INFO_PROVIDER
@@ -324,6 +341,32 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 
     return CHIP_NO_ERROR;
 }
+
+#ifdef CONFIG_CHIP_PW_RPC
+void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
+{
+    if (!btnPressed)
+    {
+        return;
+    }
+
+    switch (btnId)
+    {
+    case kButtonId_ExampleAction:
+        ExampleActionButtonEventHandler();
+        break;
+    case kButtonId_FactoryReset:
+        FactoryResetButtonEventHandler();
+        break;
+    case kButtonId_StartThread:
+        StartThreadButtonEventHandler();
+        break;
+    case kButtonId_StartBleAdv:
+        StartBleAdvButtonEventHandler();
+        break;
+    }
+}
+#endif
 
 void AppTaskCommon::InitButtons(void)
 {

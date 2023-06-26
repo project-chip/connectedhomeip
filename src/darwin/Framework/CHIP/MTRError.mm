@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#import <Matter/MTRDefines.h>
+
 #import "MTRError.h"
 #import "MTRError_Internal.h"
 
@@ -32,6 +34,7 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
 // Class for holding on to a CHIP_ERROR that we can use as the value
 // in a dictionary.
+MTR_HIDDEN
 @interface MTRErrorHolder : NSObject
 @property (nonatomic, readonly) CHIP_ERROR error;
 
@@ -89,6 +92,9 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
         [userInfo addEntriesFromDictionary:@{
             NSLocalizedDescriptionKey : NSLocalizedString(@"The device is already a member of this fabric.", nil)
         }];
+    } else if (errorCode == CHIP_ERROR_DECODE_FAILED) {
+        code = MTRErrorCodeTLVDecodeFailed;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"TLV decoding failed.", nil) }];
     } else {
         code = MTRErrorCodeGeneralError;
         [userInfo addEntriesFromDictionary:@{

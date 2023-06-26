@@ -26,10 +26,10 @@
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
-const struct pwm_dt_spec sPwmRgbSpecBlueLed = LIGHTING_PWM_SPEC_RGB_BLUE;
+const struct pwm_dt_spec sPwmRgbSpecBlueLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
 #if USE_RGB_PWM
-const struct pwm_dt_spec sPwmRgbSpecGreenLed = LIGHTING_PWM_SPEC_RGB_GREEN;
-const struct pwm_dt_spec sPwmRgbSpecRedLed   = LIGHTING_PWM_SPEC_RGB_RED;
+const struct pwm_dt_spec sPwmRgbSpecGreenLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
+const struct pwm_dt_spec sPwmRgbSpecRedLed   = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led2));
 
 uint8_t sBrightness;
 PWMDevice::Action_t sColorAction = PWMDevice::INVALID_ACTION;
@@ -126,32 +126,6 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
         LOG_INF("Action is in progress or active");
     }
 }
-
-#ifdef CONFIG_CHIP_PW_RPC
-void AppTask::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
-{
-    if (!btnPressed)
-    {
-        return;
-    }
-
-    switch (btnId)
-    {
-    case kButtonId_LightingAction:
-        ExampleActionButtonEventHandler();
-        break;
-    case kButtonId_FactoryReset:
-        FactoryResetButtonEventHandler();
-        break;
-    case kButtonId_StartThread:
-        StartThreadButtonEventHandler();
-        break;
-    case kButtonId_StartBleAdv:
-        StartBleAdvButtonEventHandler();
-        break;
-    }
-}
-#endif
 
 void AppTask::ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor)
 {

@@ -64,6 +64,9 @@ public:
         Layer * GetSystemLayer() const { return mSystemLayer; }
 
     private:
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+        friend class LayerImplSelect;
+#endif
         Layer * mSystemLayer;
         TimerCompleteCallback mOnComplete;
         void * mAppState;
@@ -91,6 +94,9 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     friend class LayerImplSelect;
     dispatch_source_t mTimerSource = nullptr;
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+    friend class LayerImplSelect;
+    struct ev_timer mLibEvTimer;
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     // Not defined
@@ -172,6 +178,13 @@ public:
      * Remove all timers.
      */
     void Clear() { mEarliestTimer = nullptr; }
+
+    /**
+     * Find the timer with the given properties, if present, and return its remaining time
+     *
+     * @return The remaining time on this partifcular timer or 0 if not found.
+     */
+    Clock::Timeout GetRemainingTime(TimerCompleteCallback aOnComplete, void * aAppState);
 
 private:
     Node * mEarliestTimer;

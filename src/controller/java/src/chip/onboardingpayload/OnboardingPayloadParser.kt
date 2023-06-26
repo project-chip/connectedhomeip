@@ -46,6 +46,34 @@ class OnboardingPayloadParser {
     return fetchPayloadFromQrCode(qrCodeString, skipPayloadValidation)
   }
 
+  /** Get QR code string from [OnboardingPayload].  */
+  @Throws(OnboardingPayloadException::class)
+  fun getQrCodeFromPayload(payload: OnboardingPayload): String
+  {
+    return QRCodeOnboardingPayloadGenerator(payload).payloadBase38Representation();
+  }
+
+  @Throws(UnrecognizedQrCodeException::class, OnboardingPayloadException::class)
+  private fun fetchPayloadFromQrCode(
+    qrCodeString: String, skipPayloadValidation: Boolean
+  ): OnboardingPayload {
+    val payload = OnboardingPayload()
+
+    QRCodeOnboardingPayloadParser(qrCodeString).populatePayload(payload)
+
+    if (skipPayloadValidation == false && !payload.isValidQRCodePayload()) {
+      throw OnboardingPayloadException("Invalid payload")
+    }
+
+    return payload
+  }
+
+  /** Get Manual Pairing Code string from [OnboardingPayload].  */
+  @Throws(OnboardingPayloadException::class)
+  fun getManualPairingCodeFromPayload(payload: OnboardingPayload): String {
+    return ManualOnboardingPayloadGenerator(payload).payloadDecimalStringRepresentation()
+  }  
+
   /**
    * Returns [OnboardingPayload] parsed from the Manual Pairing Code string. If an SetupPINCode has
    * invalid value, OnboardingPayloadException occurs. Refer to [OnboardingPayload] for the description
@@ -70,44 +98,19 @@ class OnboardingPayloadParser {
     return parsePayloadFromManualPairingCode(manualPairingCodeString, skipPayloadValidation)
   }
 
-  /** Get QR code string from [OnboardingPayload].  */
-  @Throws(OnboardingPayloadException::class)
-  external fun getQrCodeFromPayload(payload: OnboardingPayload): String
-
-  /** Get Manual Pairing Code string from [OnboardingPayload].  */
-  @Throws(OnboardingPayloadException::class)
-  external fun getManualPairingCodeFromPayload(payload: OnboardingPayload): String
-
-  @Throws(UnrecognizedQrCodeException::class, OnboardingPayloadException::class)
-  private external fun fetchPayloadFromQrCode(
-    qrCodeString: String, skipPayloadValidation: Boolean
-  ): OnboardingPayload
-
   @Throws(InvalidManualPairingCodeFormatException::class, OnboardingPayloadException::class)
-  private external fun parsePayloadFromManualPairingCode(
+  private fun parsePayloadFromManualPairingCode(
     manualPairingCodeString: String, skipPayloadValidation: Boolean
-  ): OnboardingPayload
+  ): OnboardingPayload {
+    val payload = OnboardingPayload()
+    ManualOnboardingPayloadParser(manualPairingCodeString).populatePayload(payload)
 
-  class UnrecognizedQrCodeException(qrCode: String) :
-    Exception(String.format("Invalid QR code string: %s", qrCode), null) {
-    companion object {
-      private const val serialVersionUID = 1L
+    if (skipPayloadValidation == false && !payload.isValidManualCode()) {
+        throw OnboardingPayloadException("Invalid manual entry code")
     }
-  }
 
-  class InvalidManualPairingCodeFormatException(manualPairingCode: String) :
-    Exception(String.format("Invalid format for manual pairing code string: %s", manualPairingCode), null) {
-    companion object {
-      private const val serialVersionUID = 1L
-    }
-  }
-
-  class OnboardingPayloadException(var errorCode: Int, message: String?) :
-    Exception(message ?: String.format("Error Code %d", errorCode)) {
-    companion object {
-      private const val serialVersionUID = 1L
-    }
-  }
+    return payload
+  }  
 
   companion object {
     private val LOGGER: Logger = Logger.getLogger(OnboardingPayloadParser::class.java.getSimpleName())

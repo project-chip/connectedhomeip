@@ -19,8 +19,8 @@
 #include <jni/CHIPCallbackTypes.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <controller/java/zap-generated/CHIPClientCallbacks.h>
 #include <jni.h>
-#include <zap-generated/CHIPClientCallbacks.h>
 
 namespace chip {
 
@@ -464,6 +464,83 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPLaundryWasherModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPLaundryWasherModeClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPLaundryWasherModeClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPLaundryWasherModeClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &
+            data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPRvcRunModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPRvcRunModeClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPRvcRunModeClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPRvcRunModeClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPRvcCleanModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPRvcCleanModeClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPRvcCleanModeClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPRvcCleanModeClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPDishwasherModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPDishwasherModeClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPDishwasherModeClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPDishwasherModeClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPOperationalStateClusterOperationalCommandResponseCallback
     : public Callback::Callback<CHIPOperationalStateClusterOperationalCommandResponseCallbackType>
 {
@@ -474,6 +551,22 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPRvcOperationalStateClusterOperationalCommandResponseCallback
+    : public Callback::Callback<CHIPRvcOperationalStateClusterOperationalCommandResponseCallbackType>
+{
+public:
+    CHIPRvcOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback);
+
+    ~CHIPRvcOperationalStateClusterOperationalCommandResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

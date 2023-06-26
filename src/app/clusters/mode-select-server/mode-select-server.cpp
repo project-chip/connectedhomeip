@@ -98,7 +98,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
                                                   const ModeSelect::Commands::ChangeToMode::DecodableType & commandData)
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Entering emberAfModeSelectClusterChangeToModeCallback");
+    ChipLogProgress(Zcl, "ModeSelect: Entering emberAfModeSelectClusterChangeToModeCallback");
     EndpointId endpointId = commandPath.mEndpointId;
     uint8_t newMode       = commandData.newMode;
     // Check that the newMode matches one of the supported options
@@ -107,13 +107,13 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
         ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
     if (Status::Success != checkSupportedModeStatus)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %u", newMode);
+        ChipLogProgress(Zcl, "ModeSelect: Failed to find the option with mode %u", newMode);
         commandHandler->AddStatus(commandPath, checkSupportedModeStatus);
         return true;
     }
     ModeSelect::Attributes::CurrentMode::Set(endpointId, newMode);
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: ChangeToMode successful");
+    ChipLogProgress(Zcl, "ModeSelect: ChangeToMode successful");
     commandHandler->AddStatus(commandPath, Status::Success);
     return true;
 }
@@ -155,7 +155,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 {
                     if (onOffValueForStartUp && !onMode.IsNull())
                     {
-                        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: CurrentMode is overwritten by OnMode");
+                        ChipLogProgress(Zcl, "ModeSelect: CurrentMode is overwritten by OnMode");
                         return;
                     }
                 }
@@ -173,7 +173,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
             }
             if (bootReason == BootReasonType::kSoftwareUpdateCompleted)
             {
-                ChipLogDetail(Zcl, "ModeSelect: CurrentMode is ignored for OTA reboot");
+                ChipLogProgress(Zcl, "ModeSelect: CurrentMode is ignored for OTA reboot");
                 return;
             }
 
@@ -190,16 +190,14 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 }
                 else
                 {
-                    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Successfully initialized CurrentMode to %u",
-                                   startUpMode.Value());
+                    ChipLogProgress(Zcl, "ModeSelect: Successfully initialized CurrentMode to %u", startUpMode.Value());
                 }
             }
         }
     }
     else
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "ModeSelect: Skipped initializing CurrentMode by StartUpMode because one of them is volatile");
+        ChipLogProgress(Zcl, "ModeSelect: Skipped initializing CurrentMode by StartUpMode because one of them is volatile");
     }
 }
 

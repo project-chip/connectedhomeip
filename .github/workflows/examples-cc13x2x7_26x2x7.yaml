@@ -36,17 +36,20 @@ jobs:
             BUILD_TYPE: gn_cc26x2x7
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        # This CI is disabled because running out of flash and a solution was not found in time, see https://github.com/project-chip/connectedhomeip/pull/26186
+        # An issue was opened at https://github.com/project-chip/connectedhomeip/issues/26957
+        # TODO : Enable this once we have a way to run without out of flash failure or remove platform if it cannot support the SDK
+        if: github.actor != 'restyled-io[bot]' && false
 
         container:
             image: connectedhomeip/chip-build-ti:0.7.14
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3
@@ -59,14 +62,19 @@ jobs:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
+            - uses: Wandalen/wretry.action@v1.3.0
+              name: Bootstrap cache
+              continue-on-error: true
               timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh

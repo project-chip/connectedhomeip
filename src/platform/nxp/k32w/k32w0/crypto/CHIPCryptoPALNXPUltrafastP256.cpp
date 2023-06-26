@@ -644,7 +644,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     secEcp256Status_t st;
     ecp256KeyPair_t * keypair;
     keypair = to_keypair(&mKeypair);
-    if ((st = ECP256_GenerateKeyPair(&keypair->public_key, &keypair->private_key)) != gSecEcp256Success_c)
+    if ((st = ECP256_GenerateKeyPair(&keypair->public_key, &keypair->private_key, NULL)) != gSecEcp256Success_c)
     {
         result = st;
     }
@@ -918,7 +918,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEGenerate(void * fe)
     ecp256Point_t PublicKey;
     ecp256Coordinate_t PrivateKey;
 
-    result = ECP256_GenerateKeyPair(&PublicKey, &PrivateKey);
+    result = ECP256_GenerateKeyPair(&PublicKey, &PrivateKey, NULL);
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
@@ -1016,19 +1016,19 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
 
     secEcp256Status_t result;
     uint8_t * p;
-    uint32_t W1[ECP256_COORDINATE_WLEN];
+    uint32_t W1[SEC_ECP256_COORDINATE_WLEN];
     do
     {
         result = ECP256_ModularReductionN(W1, w1in, w1in_len);
         if (result != gSecEcp256Success_c)
             break;
         ecp256Point_t gen_point;
-        result = ECP256_GeneratePublicKey((uint8_t *) &gen_point, (uint8_t *) &W1);
+        result = ECP256_GeneratePublicKey((uint8_t *) &gen_point, (uint8_t *) &W1, NULL);
         if (result != gSecEcp256Success_c)
             break;
         p    = Lout;
         *p++ = 0x04; /* uncompressed format */
-        memcpy(p, (uint8_t *) &gen_point, ECP256_COORDINATE_LEN * 2);
+        memcpy(p, (uint8_t *) &gen_point, SEC_ECP256_COORDINATE_LEN * 2);
     } while (0);
 
 exit:
@@ -1197,9 +1197,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
 
         if (OID_CMP(sOID_Extension_BasicConstraints, extOID))
         {
-            int isCA                 = 0;
-            int pathLen              = -1;
-            unsigned char * seqStart = p;
+            int isCA    = 0;
+            int pathLen = -1;
 
             VerifyOrExit(extCritical, error = CHIP_ERROR_INTERNAL);
             extBasicPresent = true;
@@ -1208,11 +1207,17 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
             VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
             if (len > 0)
             {
-                result = mbedtls_asn1_get_bool(&p, end, &isCA);
+                unsigned char * seqStart = p;
+                result                   = mbedtls_asn1_get_bool(&p, end, &isCA);
                 VerifyOrExit(result == 0 || result == MBEDTLS_ERR_ASN1_UNEXPECTED_TAG, error = CHIP_ERROR_INTERNAL);
 
-                if (p != seqStart + len)
+                // Check if pathLen is there by validating if the cursor didn't get to the end of
+                // of the internal SEQUENCE for the basic constraints encapsulation.
+                // Missing pathLen optional tag will leave pathLen == -1 for following checks.
+                bool hasPathLen = (p != (seqStart + len));
+                if (hasPathLen)
                 {
+                    // Extract pathLen value, making sure it's a valid format.
                     result = mbedtls_asn1_get_int(&p, end, &pathLen);
                     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
                 }
@@ -1228,7 +1233,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
             }
             else
             {
-                VerifyOrExit(isCA && (pathLen == -1 || pathLen == 0 || pathLen == 1), error = CHIP_ERROR_INTERNAL);
+                // For PAA, pathlen must be absent or equal to 1 (see Matter 1.1 spec 6.2.2.5)
+                VerifyOrExit(isCA && (pathLen == -1 || pathLen == 1), error = CHIP_ERROR_INTERNAL);
             }
         }
         else if (OID_CMP(sOID_Extension_KeyUsage, extOID))
@@ -1461,7 +1467,7 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
 
     keypair                    = (ecp256KeyPair_t *) (mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(pk)).pk_ctx;
     Uint8::to_uchar(pubkey)[0] = 0x04; // uncompressed type
-    memcpy(Uint8::to_uchar(pubkey) + 1, keypair->public_key.raw, 2 * ECP256_COORDINATE_LEN);
+    memcpy(Uint8::to_uchar(pubkey) + 1, keypair->public_key.raw, 2 * SEC_ECP256_COORDINATE_LEN);
 
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 

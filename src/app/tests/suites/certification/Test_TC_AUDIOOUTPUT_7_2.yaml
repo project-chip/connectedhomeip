@@ -34,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads the OutputList attribute from the DUT"
+    - label: "TH reads the OutputList attribute from the DUT"
       PICS: AUDIOOUTPUT.S.A0000
       command: "readAttribute"
       attribute: "OutputList"
@@ -43,7 +43,9 @@ tests:
           constraints:
               type: list
 
-    - label: "Sends a RenameOutput command"
+    - label:
+          "TH sends a RenameOutput command to the DUT with an index from the
+          list in step 1 and the name 'CertTest'"
       PICS: AUDIOOUTPUT.S.C01.Rsp
       command: "RenameOutput"
       arguments:
@@ -55,8 +57,8 @@ tests:
 
     #Disabled due to issue- #13029
     - label:
-          "Reads the OutputList attribute from the DUT Verify that the output at
-          the index provided in step 2 has the name CertTest"
+          "TH reads the OutputList attribute from the DUT. Verify that the
+          output at the index provided in step 2 has the name CertTest"
       verification: |
           ./chip-tool audiooutput read output-list 1 1
           [1651061821.366426][156898:156903] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_050B Attribute 0x0000_0000 DataVersion: 372822880

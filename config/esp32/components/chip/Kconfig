@@ -104,7 +104,7 @@ menu "CHIP Core"
 
         config BUILD_CHIP_TESTS
             bool "Build CHIP tests"
-            default "y"
+            default n
             help
                 Build CHIP test binaries.
 
@@ -112,11 +112,15 @@ menu "CHIP Core"
             int  "Set threshold in ms"
             default 700
             help
-                 Time threshold for warning that dispatched took too long. You can
-		 set this default set to 0 to to disable event dispatching time
-		 measurement and suppress the logs "Long dispatch time:...".
+                Time threshold for warning that dispatched took too long. You can
+                set this default set to 0 to to disable event dispatching time
+                measurement and suppress the logs "Long dispatch time:...".
 
-        # TODO: add log level selection
+        config CHIP_LOG_FILTERING
+            bool "CHIP log level filtering APIs"
+            default n
+            help
+                Option to enable/disable CHIP log level filtering APIs.
 
     endmenu # "General Options"
 
@@ -163,6 +167,13 @@ menu "CHIP Core"
 
                 A value of 0 disables automatic closing of idle connections.
 
+        config ENABLE_ROUTE_HOOK
+            bool "Enable route hook"
+            depends on LWIP_HOOK_IP6_ROUTE_DEFAULT && LWIP_HOOK_ND6_GET_GW_DEFAULT
+            default y
+            help
+                Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
+
     endmenu # "Networking Options"
 
     menu "System Options"
@@ -178,6 +189,13 @@ menu "CHIP Core"
             default n
             help
                 Enable this option to enable OTA Requestor for example
+
+        config ENABLE_ENCRYPTED_OTA
+            bool "Enable pre encrypted OTA"
+            depends on ENABLE_OTA_REQUESTOR
+            default n
+            help
+                Enable this option to use the pre encrypted OTA image
 
         config OTA_AUTO_REBOOT_ON_APPLY
             bool "Reboot the device after applying the OTA image"
@@ -261,6 +279,39 @@ menu "CHIP Device Layer"
             default n
             help
                 Enables or Disables the support for Commissionable Device Type.
+
+        config ENABLE_BG_EVENT_PROCESSING
+            bool "Enable Background event processing"
+            default n
+            help
+                Some cryptographic operations requires more time for processing,
+                When this option is enabled, the main matter task can delegate some
+                time consuming operations to a background task so that the main matter
+                task is not blocked and can process other work.
+
+        config BG_CHIP_TASK_STACK_SIZE
+            depends on ENABLE_BG_EVENT_PROCESSING
+            int "Background CHIP Task Stack Size"
+            range 0 8192
+            default 6144
+            help
+                The size (in bytes) of the background CHIP task stack.
+
+        config BG_CHIP_TASK_PRIORITY
+            depends on ENABLE_BG_EVENT_PROCESSING
+            int "Background CHIP Task Priority"
+            range 0 256
+            default 1
+            help
+                The priority of the background CHIP task.
+
+        config BG_MAX_EVENT_QUEUE_SIZE
+            depends on ENABLE_BG_EVENT_PROCESSING
+            int "Max Event Queue Size"
+            range 1 8
+            default 1
+            help
+                The maximum number of events that can be held in the background CHIP Platform event queue.
 
     endmenu
 
@@ -371,6 +422,39 @@ menu "CHIP Device Layer"
             help
                 The amount of time (in milliseconds) to wait for Internet connectivity to be established on
                 the device's WiFi station interface during a Network Provisioning TestConnectivity operation.
+
+        choice WIFI_POWER_SAVE_MODE
+            prompt "WiFi power-saving mode"
+            default WIFI_POWER_SAVE_MIN
+            depends on ENABLE_WIFI_STATION && !ENABLE_WIFI_AP
+            help
+                The Modem-sleep mode which refers to the legacy power-saving mode in the IEEE 802.11 protocol.
+
+            config WIFI_POWER_SAVE_MIN
+                bool "Minimal power-saving mode"
+                help
+                    In minimum power-saving mode, station wakes up every DTIM to receive beacon.
+
+            config WIFI_POWER_SAVE_MAX
+                bool "Maximum power-saving mode"
+                help
+                    In maximum power-saving mode, station wakes up in every listen interval to receive beacon.
+                    Listen interval can be configured by calling API 'esp_wifi_set_config()' before connecting
+                    to AP.
+
+            config WIFI_POWER_SAVE_NONE
+                bool "No power-saving"
+                help
+                    No power save
+
+        endchoice
+
+        config WIFI_PS_LISTEN_INTERVAL
+            int "Listen interval for maximum power-saving mode"
+            depends on WIFI_POWER_SAVE_MAX
+            default 3
+            help
+                Interval for station to listen to beacon from AP. The unit of listen interval is one beacon interval.
 
     endmenu
 

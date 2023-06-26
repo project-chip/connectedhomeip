@@ -15,14 +15,14 @@
  *    limitations under the License.
  */
 
+#include "lega_wlan_api.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <limits>
 #include <platform/ASR/ASRConfig.h>
 #include <platform/ASR/ASRUtils.h>
 #include <platform/ASR/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
-
-#include <limits>
 #include <string>
 
 using namespace ::chip;
@@ -184,8 +184,7 @@ exit:
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
 }
-// asr wifi
-#include "lega_wlan_api.h"
+
 CHIP_ERROR ASRWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     if (ASRUtils::EnableStationMode() != CHIP_NO_ERROR)

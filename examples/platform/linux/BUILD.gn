@@ -17,6 +17,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 config("app-main-config") {
   include_dirs = [ "." ]
@@ -29,7 +30,7 @@ source_set("ota-test-event-trigger") {
 }
 
 source_set("app-main") {
-  defines = []
+  defines = [ "ENABLE_TRACING=${matter_enable_tracing_support}" ]
   sources = [
     "AppMain.cpp",
     "AppMain.h",
@@ -75,6 +76,13 @@ source_set("app-main") {
 
   if (chip_enable_transport_trace) {
     deps += [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
+  }
+
+  if (matter_enable_tracing_support) {
+    deps += [
+      "${chip_root}/examples/common/tracing:commandline",
+      "${chip_root}/src/tracing",
+    ]
   }
 
   public_configs = [ ":app-main-config" ]
