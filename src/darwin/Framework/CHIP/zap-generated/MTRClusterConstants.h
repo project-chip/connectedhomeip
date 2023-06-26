@@ -276,6 +276,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeProxyValidID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000044,
     MTRClusterIDTypeBooleanStateID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
     MTRClusterIDTypeModeSelectID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000050,
+    MTRClusterIDTypeLaundryWasherControlsID MTR_NEWLY_AVAILABLE = 0x00000053,
     MTRClusterIDTypeTemperatureControlID MTR_NEWLY_AVAILABLE = 0x00000056,
     MTRClusterIDTypeRefrigeratorAlarmID MTR_NEWLY_AVAILABLE = 0x00000057,
     MTRClusterIDTypeAirQualityID MTR_NEWLY_AVAILABLE = 0x0000005B,
@@ -3731,6 +3732,24 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterModeSelectAttributeFeatureMapID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterModeSelectAttributeClusterRevisionID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster LaundryWasherControls attributes
+    MTRAttributeIDTypeClusterLaundryWasherControlsAttributeSpinSpeedsID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterLaundryWasherControlsAttributeSpinSpeedCurrentID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterLaundryWasherControlsAttributeNumberOfRinsesID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterLaundryWasherControlsAttributeSupportedRinsesID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterLaundryWasherControlsAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterLaundryWasherControlsAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterLaundryWasherControlsAttributeEventListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterLaundryWasherControlsAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterLaundryWasherControlsAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterLaundryWasherControlsAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster TemperatureControl attributes

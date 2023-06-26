@@ -499,15 +499,18 @@ typedef void (*RefrigeratorAndTemperatureControlledCabinetModeEventListListAttri
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*RefrigeratorAndTemperatureControlledCabinetModeAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*WasherControlsSpinSpeedsListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
-typedef void (*WasherControlsGeneratedCommandListListAttributeCallback)(
+typedef void (*LaundryWasherControlsSpinSpeedsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
+typedef void (*LaundryWasherControlsSupportedRinsesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> & data);
+typedef void (*LaundryWasherControlsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*WasherControlsAcceptedCommandListListAttributeCallback)(
+typedef void (*LaundryWasherControlsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*WasherControlsEventListListAttributeCallback)(void * context,
-                                                             const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*WasherControlsAttributeListListAttributeCallback)(
+typedef void (*LaundryWasherControlsEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*LaundryWasherControlsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*RvcRunModeSupportedModesListAttributeCallback)(
     void * context,

@@ -15684,7 +15684,7 @@ class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
 
 
 @dataclass
-class WasherControls(Cluster):
+class LaundryWasherControls(Cluster):
     id: typing.ClassVar[int] = 0x0053
 
     @ChipUtility.classproperty
@@ -15693,8 +15693,8 @@ class WasherControls(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="spinSpeeds", Tag=0x00000000, Type=typing.Optional[typing.List[str]]),
                 ClusterObjectFieldDescriptor(Label="spinSpeedCurrent", Tag=0x00000001, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="numberOfRinses", Tag=0x00000002, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="maxRinses", Tag=0x00000003, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="numberOfRinses", Tag=0x00000002, Type=typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum]),
+                ClusterObjectFieldDescriptor(Label="supportedRinses", Tag=0x00000003, Type=typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -15705,14 +15705,26 @@ class WasherControls(Cluster):
 
     spinSpeeds: 'typing.Optional[typing.List[str]]' = None
     spinSpeedCurrent: 'typing.Union[None, Nullable, uint]' = None
-    numberOfRinses: 'typing.Union[None, Nullable, uint]' = None
-    maxRinses: 'typing.Optional[uint]' = None
+    numberOfRinses: 'typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum]' = None
+    supportedRinses: 'typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
+    class Enums:
+        class NumberOfRinsesEnum(MatterIntEnum):
+            kNone = 0x00
+            kNormal = 0x01
+            kExtra = 0x02
+            kMax = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 4,
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -15764,12 +15776,12 @@ class WasherControls(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum])
 
-            value: 'typing.Union[None, Nullable, uint]' = None
+            value: 'typing.Optional[LaundryWasherControls.Enums.NumberOfRinsesEnum]' = None
 
         @dataclass
-        class MaxRinses(ClusterAttributeDescriptor):
+        class SupportedRinses(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0053
@@ -15780,9 +15792,9 @@ class WasherControls(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Optional[typing.List[LaundryWasherControls.Enums.NumberOfRinsesEnum]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

@@ -14719,7 +14719,7 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace RefrigeratorAndTemperatureControlledCabinetMode
-namespace WasherControls {
+namespace LaundryWasherControls {
 
 namespace Attributes {
 
@@ -14730,7 +14730,7 @@ struct TypeInfo
     using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SpinSpeeds::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14742,7 +14742,7 @@ struct TypeInfo
     using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
     using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SpinSpeedCurrent::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -14750,61 +14750,62 @@ struct TypeInfo
 namespace NumberOfRinses {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum;
+    using DecodableType    = chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum;
+    using DecodableArgType = chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfRinses::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumberOfRinses
-namespace MaxRinses {
+namespace SupportedRinses {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MaxRinses::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedRinses::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace MaxRinses
+} // namespace SupportedRinses
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
 };
 } // namespace AcceptedCommandList
 namespace EventList {
 struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
 };
 } // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
 struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
 struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
 };
 } // namespace ClusterRevision
 
@@ -14812,14 +14813,15 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::WasherControls::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::LaundryWasherControls::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::SpinSpeeds::TypeInfo::DecodableType spinSpeeds;
         Attributes::SpinSpeedCurrent::TypeInfo::DecodableType spinSpeedCurrent;
-        Attributes::NumberOfRinses::TypeInfo::DecodableType numberOfRinses;
-        Attributes::MaxRinses::TypeInfo::DecodableType maxRinses = static_cast<uint8_t>(0);
+        Attributes::NumberOfRinses::TypeInfo::DecodableType numberOfRinses =
+            static_cast<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum>(0);
+        Attributes::SupportedRinses::TypeInfo::DecodableType supportedRinses;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -14829,7 +14831,7 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-} // namespace WasherControls
+} // namespace LaundryWasherControls
 namespace RvcRunMode {
 namespace Structs {
 namespace ModeTagStruct    = Clusters::detail::Structs::ModeTagStruct;
