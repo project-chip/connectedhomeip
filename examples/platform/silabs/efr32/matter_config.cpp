@@ -99,7 +99,7 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router));
-#else  // CHIP_DEVICE_CONFIG_THREAD_FTD
+#else // CHIP_DEVICE_CONFIG_THREAD_FTD
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice));
 #else  // CHIP_DEVICE_CONFIG_ENABLE_SED
