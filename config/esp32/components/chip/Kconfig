@@ -288,6 +288,31 @@ menu "CHIP Device Layer"
                 When this option is enabled, the main matter task can delegate some
                 time consuming operations to a background task so that the main matter
                 task is not blocked and can process other work.
+
+        config BG_CHIP_TASK_STACK_SIZE
+            depends on ENABLE_BG_EVENT_PROCESSING
+            int "Background CHIP Task Stack Size"
+            range 0 8192
+            default 6144
+            help
+                The size (in bytes) of the background CHIP task stack.
+
+        config BG_CHIP_TASK_PRIORITY
+            depends on ENABLE_BG_EVENT_PROCESSING
+            int "Background CHIP Task Priority"
+            range 0 256
+            default 1
+            help
+                The priority of the background CHIP task.
+
+        config BG_MAX_EVENT_QUEUE_SIZE
+            depends on ENABLE_BG_EVENT_PROCESSING
+            int "Max Event Queue Size"
+            range 1 8
+            default 1
+            help
+                The maximum number of events that can be held in the background CHIP Platform event queue.
+
     endmenu
 
     menu "Device Identification Options"

@@ -79,6 +79,9 @@
 		03F430A7299410C000166449 /* ExamplePersistentStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03F430A6299410C000166449 /* ExamplePersistentStorage.cpp */; };
 		03F430A82994112B00166449 /* editline.c in Sources */ = {isa = PBXBuildFile; fileRef = 0395470B2992DB37006D42A8 /* editline.c */; };
 		03F430AA2994113500166449 /* sysunix.c in Sources */ = {isa = PBXBuildFile; fileRef = 03F430A92994113500166449 /* sysunix.c */; };
+		03FB93DE2A46200A0048CB35 /* DiscoverCommissionablesCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 03FB93DB2A46200A0048CB35 /* DiscoverCommissionablesCommand.h */; };
+		03FB93DF2A46200A0048CB35 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 03FB93DC2A46200A0048CB35 /* Commands.h */; };
+		03FB93E02A46200A0048CB35 /* DiscoverCommissionablesCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 03FB93DD2A46200A0048CB35 /* DiscoverCommissionablesCommand.mm */; };
 		1E4D654E29C208DD00BC3478 /* MTRCommissionableBrowserResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E4D654B29C208DD00BC3478 /* MTRCommissionableBrowserResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1E4D654F29C208DD00BC3478 /* MTRCommissionableBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E4D654C29C208DD00BC3478 /* MTRCommissionableBrowser.h */; };
 		1E4D655029C208DD00BC3478 /* MTRCommissionableBrowserDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E4D654D29C208DD00BC3478 /* MTRCommissionableBrowserDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -351,6 +354,9 @@
 		0395470C2992DB37006D42A8 /* complete.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = complete.c; path = repo/src/complete.c; sourceTree = "<group>"; };
 		03F430A6299410C000166449 /* ExamplePersistentStorage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExamplePersistentStorage.cpp; sourceTree = "<group>"; };
 		03F430A92994113500166449 /* sysunix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sysunix.c; path = repo/src/sysunix.c; sourceTree = "<group>"; };
+		03FB93DB2A46200A0048CB35 /* DiscoverCommissionablesCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiscoverCommissionablesCommand.h; sourceTree = "<group>"; };
+		03FB93DC2A46200A0048CB35 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
+		03FB93DD2A46200A0048CB35 /* DiscoverCommissionablesCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DiscoverCommissionablesCommand.mm; sourceTree = "<group>"; };
 		1E4D654B29C208DD00BC3478 /* MTRCommissionableBrowserResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCommissionableBrowserResult.h; sourceTree = "<group>"; };
 		1E4D654C29C208DD00BC3478 /* MTRCommissionableBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCommissionableBrowser.h; sourceTree = "<group>"; };
 		1E4D654D29C208DD00BC3478 /* MTRCommissionableBrowserDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCommissionableBrowserDelegate.h; sourceTree = "<group>"; };
@@ -608,6 +614,7 @@
 		037C3D7B2991BD4F00B7EEE2 /* commands */ = {
 			isa = PBXGroup;
 			children = (
+				03FB93DA2A46200A0048CB35 /* discover */,
 				037C3D7C2991BD4F00B7EEE2 /* pairing */,
 				037C3D852991BD4F00B7EEE2 /* clusters */,
 				037C3D8B2991BD4F00B7EEE2 /* tests */,
@@ -818,6 +825,16 @@
 			);
 			name = controller;
 			path = ../../src/controller;
+			sourceTree = "<group>";
+		};
+		03FB93DA2A46200A0048CB35 /* discover */ = {
+			isa = PBXGroup;
+			children = (
+				03FB93DB2A46200A0048CB35 /* DiscoverCommissionablesCommand.h */,
+				03FB93DC2A46200A0048CB35 /* Commands.h */,
+				03FB93DD2A46200A0048CB35 /* DiscoverCommissionablesCommand.mm */,
+			);
+			path = discover;
 			sourceTree = "<group>";
 		};
 		1E857311265519DE0050A4D9 /* app */ = {
@@ -1138,6 +1155,7 @@
 				037C3DB82991BD5000B7EEE2 /* ClusterCommandBridge.h in Headers */,
 				037C3DC82991BD5100B7EEE2 /* CHIPToolKeypair.h in Headers */,
 				037C3DB52991BD5000B7EEE2 /* WriteAttributeCommandBridge.h in Headers */,
+				03FB93DE2A46200A0048CB35 /* DiscoverCommissionablesCommand.h in Headers */,
 				037C3DCD2991BD5100B7EEE2 /* MTRLogging.h in Headers */,
 				037C3DC92991BD5100B7EEE2 /* MTRDevice_Externs.h in Headers */,
 				037C3DC22991BD5100B7EEE2 /* SetupPayloadParseCommand.h in Headers */,
@@ -1155,6 +1173,7 @@
 				037C3DBA2991BD5000B7EEE2 /* TestCommandBridge.h in Headers */,
 				037C3DAD2991BD4F00B7EEE2 /* PairingCommandBridge.h in Headers */,
 				037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */,
+				03FB93DF2A46200A0048CB35 /* Commands.h in Headers */,
 				037C3DB22991BD5000B7EEE2 /* PreWarmCommissioningCommand.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1396,6 +1415,7 @@
 				039145E82993179300257B3E /* GetCommissionerNodeIdCommand.mm in Sources */,
 				0395469F2991DFC5006D42A8 /* json_reader.cpp in Sources */,
 				0395469E2991DFC5006D42A8 /* json_writer.cpp in Sources */,
+				03FB93E02A46200A0048CB35 /* DiscoverCommissionablesCommand.mm in Sources */,
 				037C3DD52991C2E200B7EEE2 /* CHIPCommandBridge.mm in Sources */,
 				039546BC2991E1CB006D42A8 /* LogCommands.cpp in Sources */,
 				039547042992D9BF006D42A8 /* ota-provider.cpp in Sources */,
@@ -1555,6 +1575,7 @@
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					CONFIG_USE_LOCAL_STORAGE,
+					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples/darwin-framework-tool",
@@ -1603,6 +1624,7 @@
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					CONFIG_USE_LOCAL_STORAGE,
+					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples//darwin-framework-tool",

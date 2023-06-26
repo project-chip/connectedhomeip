@@ -2955,6 +2955,52 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace SmokeCoAlarm
 
+namespace DishwasherAlarm {
+namespace Attributes {
+
+namespace Mask {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Mask
+
+namespace Latch {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Latch
+
+namespace State {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace State
+
+namespace Supported {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Supported
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace DishwasherAlarm
+
 namespace OperationalState {
 namespace Attributes {
 

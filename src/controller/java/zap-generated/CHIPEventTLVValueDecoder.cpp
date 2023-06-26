@@ -2866,6 +2866,68 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::DishwasherAlarm::Id: {
+        using namespace app::Clusters::DishwasherAlarm;
+        switch (aPath.mEventId)
+        {
+        case Events::Notify::Id: {
+            Events::Notify::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_active;
+            std::string value_activeClassName     = "java/lang/Long";
+            std::string value_activeCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                value_activeClassName.c_str(), value_activeCtorSignature.c_str(), cppValue.active.Raw(), value_active);
+
+            jobject value_inactive;
+            std::string value_inactiveClassName     = "java/lang/Long";
+            std::string value_inactiveCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                value_inactiveClassName.c_str(), value_inactiveCtorSignature.c_str(), cppValue.inactive.Raw(), value_inactive);
+
+            jobject value_state;
+            std::string value_stateClassName     = "java/lang/Long";
+            std::string value_stateCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                value_stateClassName.c_str(), value_stateCtorSignature.c_str(), cppValue.state.Raw(), value_state);
+
+            jobject value_mask;
+            std::string value_maskClassName     = "java/lang/Long";
+            std::string value_maskCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
+                value_maskClassName.c_str(), value_maskCtorSignature.c_str(), cppValue.mask.Raw(), value_mask);
+
+            jclass notifyStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$DishwasherAlarmClusterNotifyEvent", notifyStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$DishwasherAlarmClusterNotifyEvent");
+                return nullptr;
+            }
+            jmethodID notifyStructCtor = env->GetMethodID(notifyStructClass, "<init>",
+                                                          "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
+            if (notifyStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$DishwasherAlarmClusterNotifyEvent constructor");
+                return nullptr;
+            }
+
+            jobject value =
+                env->NewObject(notifyStructClass, notifyStructCtor, value_active, value_inactive, value_state, value_mask);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::OperationalState::Id: {
         using namespace app::Clusters::OperationalState;
         switch (aPath.mEventId)

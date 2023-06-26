@@ -180,6 +180,9 @@ public final class ChipIdLookup {
     if (clusterId == 92L) {
       return "SmokeCoAlarm";
     }
+    if (clusterId == 93L) {
+      return "DishwasherAlarm";
+    }
     if (clusterId == 96L) {
       return "OperationalState";
     }
@@ -2504,6 +2507,39 @@ public final class ChipIdLookup {
       }
       if (attributeId == 12L) {
         return "ExpiryDate";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65530L) {
+        return "EventList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
+    if (clusterId == 93L) {
+      if (attributeId == 0L) {
+        return "Mask";
+      }
+      if (attributeId == 1L) {
+        return "Latch";
+      }
+      if (attributeId == 2L) {
+        return "State";
+      }
+      if (attributeId == 3L) {
+        return "Supported";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -7387,6 +7423,12 @@ public final class ChipIdLookup {
       }
       if (eventId == 10L) {
         return "AllClear";
+      }
+      return "";
+    }
+    if (clusterId == 93L) {
+      if (eventId == 0L) {
+        return "Notify";
       }
       return "";
     }

@@ -27,6 +27,10 @@
 #include "iotsdk/ip_network_api.h"
 #include "mbedtls/platform.h"
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+#endif
+
 #include <DeviceInfoProviderImpl.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -178,6 +182,15 @@ int openiotsdk_platform_init(void)
         ChipLogError(NotSpecified, "Mbed TLS platform initialization failed: %d", ret);
         return EXIT_FAILURE;
     }
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    ret = psa_crypto_init();
+    if (ret)
+    {
+        ChipLogError(NotSpecified, "PSA crypto initialization failed: %d", ret);
+        return EXIT_FAILURE;
+    }
+#endif
 
 #ifdef TFM_SUPPORT
     ret = get_psa_images_details();

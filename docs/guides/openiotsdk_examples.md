@@ -376,6 +376,42 @@ For `TF-M` protected storage use:
 [Open IoT SDK build script](../../scripts/examples/openiotsdk_example.sh)
 provides the `-K,--kvsfile` option to use the persistence options listed above.
 
+### Crypto backend
+
+Open IoT SDK port supports two crypto backend implementations:
+
+-   [Mbed TLS](../guides/openiotsdk_platform_overview.md#mbed-tls) - it's the
+    default option
+-   [PSA crypto service](https://tf-m-user-guide.trustedfirmware.org/integration_guide/services/tfm_crypto_integration_guide.html)
+    from the
+    [TrustedFirmware-M (TF-M)](../guides/openiotsdk_platform_overview.md#trusted-firmware-m)
+    component
+
+The CMake variable `CONFIG_CHIP_CRYPTO` controls how cryptographic operations
+are implemented in Matter. It accepts two values:
+
+-   `mbedtls`: use Mbed TLS for crypto operations.
+-   `psa`: use
+    [PSA Cryptography API](https://armmbed.github.io/mbed-crypto/html/) for
+    crypto operations.
+
+This variable can be set in the main application `CMakeLists.txt`:
+
+```
+set(CONFIG_CHIP_CRYPTO <mbedtls | psa>)
+```
+
+The variable can also be defined with CMake CLI:
+
+```
+cmake -G <...> -DCONFIG_CHIP_CRYPTO=<mbedtls | psa> <...>
+```
+
+> 💡 **Notes**:
+>
+> The `TF-M PSA crypto` option requires enabling [TF-M](#trusted-firmware-m)
+> support.
+
 ## Building
 
 You can build examples using the dedicated VSCode task or by calling directly
@@ -388,6 +424,7 @@ the build script from the command line.
 -   Select `Build Open IoT SDK example`
 -   Decide on debug mode support
 -   Decide on LwIP debug logs support
+-   Choose crypto algorithm
 -   Choose example name
 
 This will call the script with the selected parameters.
@@ -570,12 +607,12 @@ telnet> close
 
 ## Specific examples
 
-### Build lock-app example and run it in the network namespace
+### Build lock-app example with PSA crypto backend support and run it in the network namespace
 
 **Using CLI**
 
 ```
-${MATTER_ROOT}/scripts/examples/openiotsdk_example.sh lock-app
+${MATTER_ROOT}/scripts/examples/openiotsdk_example.sh -b psa lock-app
 
 export TEST_NETWORK_NAME=OIStest
 
@@ -595,6 +632,7 @@ Build example:
 -   Select `Build Open IoT SDK example`
 -   Deny debug mode support `false`
 -   Deny LwIP debug logs support `false`
+-   Choose crypto algorithm `psa`
 -   Choose example name `lock-app`
 
 Setup network environment:
@@ -616,12 +654,12 @@ Run example:
 
 The example output should be seen in the terminal window.
 
-### Build lock-app example and execute its test in the network namespace
+### Build lock-app example with mbedtls crypto backend support and execute its test in the network namespace
 
 **Using CLI**
 
 ```
-${MATTER_ROOT}/scripts/examples/openiotsdk_example.sh lock-app
+${MATTER_ROOT}/scripts/examples/openiotsdk_example.sh -b mbedtls lock-app
 
 export TEST_NETWORK_NAME=OIStest
 
@@ -641,6 +679,7 @@ Build example:
 -   Select `Build Open IoT SDK example`
 -   Deny debug mode support `false`
 -   Deny LwIP debug logs support `false`
+-   Choose crypto algorithm `mbedtls`
 -   Choose example name `lock-app`
 
 Setup network environment:
@@ -660,7 +699,7 @@ Test example:
 -   Enter network interface `OIStesttap`
 -   Choose example name `lock-app`
 
-### Build lock-app example in debug mode and debug it in the network namespace using the VSCode task
+### Build lock-app example with mbedtls crypto backend support in debug mode and debug it in the network namespace using the VSCode task
 
 Build example:
 
@@ -669,6 +708,7 @@ Build example:
 -   Select `Build Open IoT SDK example`
 -   Confirm debug mode support `true`
 -   Deny LwIP debug logs support `false`
+-   Choose crypto algorithm `mbedtls`
 -   Choose example name `lock-app`
 
 Setup network environment:
@@ -759,7 +799,7 @@ Example:
     id: build_new_example
     timeout-minutes: 10
     run: |
-        scripts/examples/openiotsdk_example.sh new-example
+        scripts/examples/openiotsdk_example.sh -b ${{ matrix.cryptoBackend }} new-example
         .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
         openiotsdk release new-example \
         examples/new-example/openiotsdk/build/chip-openiotsdk-new-example-example.elf \
