@@ -62,7 +62,7 @@ GenericOperationalPhase opPhaseList[] = {
     /**
      * Phase List is null
      */
-    GenericOperationalPhase(),
+    GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     /**
      * Phase List isn't null
      */
@@ -209,16 +209,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseList(GenericOperationalP
 
     for (i = 0; i < phaseListNumOfItems; i++)
     {
-        GenericOperationalPhaseList * des = nullptr;
-        if (src->isNullable())
-        {
-            des = Platform::New<GenericOperationalPhaseList>();
-        }
-        else
-        {
-            des = Platform::New<GenericOperationalPhaseList>(src->PhaseName, sizeof(src->PhaseName));
-        }
-
+        GenericOperationalPhaseList * des = Platform::New<GenericOperationalPhaseList>(src->mPhaseName);
         if (des == nullptr)
         {
             err = CHIP_ERROR_NO_MEMORY;

@@ -153,57 +153,47 @@ private:
  */
 struct GenericOperationalPhase
 {
-    char PhaseName[kOperationalPhaseNameMaxSize];
-    app::DataModel::Nullable<CharSpan> phaseName;
-
-    GenericOperationalPhase(const char * name = nullptr, size_t nameLen = 0) { set(name, nameLen); }
+    GenericOperationalPhase(app::DataModel::Nullable<CharSpan> name)
+    {
+        Set(name);
+    }
 
     GenericOperationalPhase(const GenericOperationalPhase & ph)
     {
-        if (ph.isNullable())
-        {
-            set();
-        }
-        else
-        {
-            set(ph.PhaseName, sizeof(ph.PhaseName));
-        }
+        *this = ph;
     }
 
     GenericOperationalPhase & operator=(const GenericOperationalPhase & ph)
     {
-        if (ph.isNullable())
-        {
-            set();
-        }
-        else
-        {
-            set(ph.PhaseName, sizeof(ph.PhaseName));
-        }
+        Set(ph.mPhaseName);
         return *this;
     }
 
-    void set(const char * name = nullptr, size_t nameLen = 0)
+    void Set(app::DataModel::Nullable<CharSpan> name)
     {
-        if (name == nullptr)
+        if (name.IsNull())
         {
-            phaseName.SetNull();
+            mPhaseName.SetNull();
         }
         else
         {
-            memset(PhaseName, 0, sizeof(PhaseName));
-            if (nameLen > kOperationalPhaseNameMaxSize)
+            memset(mPhaseNameBuffer, 0, sizeof(mPhaseNameBuffer));
+            if (name.Value().size() > sizeof(mPhaseNameBuffer))
             {
-                memcpy(PhaseName, name, kOperationalPhaseNameMaxSize);
+                memcpy(mPhaseNameBuffer, name.Value().data(), sizeof(mPhaseNameBuffer));
+                mPhaseName = app::DataModel::Nullable<CharSpan>(CharSpan(mPhaseNameBuffer, sizeof(mPhaseNameBuffer)));
             }
             else
             {
-                memcpy(PhaseName, name, nameLen);
+                memcpy(mPhaseNameBuffer, name.Value().data(), name.Value().size());
+                mPhaseName = app::DataModel::Nullable<CharSpan>(CharSpan(mPhaseNameBuffer, name.Value().size()));
             }
-            phaseName = app::DataModel::Nullable<CharSpan>(CharSpan(PhaseName, sizeof(PhaseName)));
         }
     }
-    bool isNullable() const { return phaseName.IsNull(); }
+    bool isNullable() const { return mPhaseName.IsNull(); }
+//private:
+    char mPhaseNameBuffer[kOperationalPhaseNameMaxSize];
+    app::DataModel::Nullable<CharSpan> mPhaseName;
 };
 
 /**
@@ -211,7 +201,7 @@ struct GenericOperationalPhase
  */
 struct GenericOperationalPhaseList : public GenericOperationalPhase
 {
-    GenericOperationalPhaseList(const char * name = nullptr, size_t nameLen = 0) : GenericOperationalPhase(name, nameLen) {}
+    GenericOperationalPhaseList(app::DataModel::Nullable<CharSpan> name) : GenericOperationalPhase(name) {}
     GenericOperationalPhaseList * next = nullptr;
 };
 
@@ -260,13 +250,14 @@ class Delegate
 {
 public:
     /**
-     * Get operational state.
+     * Get the current operational state.
      * @param op Put a struct instance on the state, then call the delegate to fill it in.
      * @return void.
      */
     virtual void GetOperationalState(GenericOperationalState & op) = 0;
 
     /**
+     * Get the list of supported operational states.
      * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
      * @param index The state of index starts at 0.

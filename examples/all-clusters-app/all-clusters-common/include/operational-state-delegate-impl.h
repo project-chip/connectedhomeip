@@ -47,6 +47,7 @@ public:
     void GetOperationalState(GenericOperationalState & op) override;
 
     /**
+     * Get the list of supported operational states.
      * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
      * @param index The state of index starts at 0.

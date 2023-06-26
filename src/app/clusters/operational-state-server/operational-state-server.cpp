@@ -307,7 +307,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
                 for (GenericOperationalPhaseList * pHead = phaseList; pHead != nullptr; pHead = pHead->next)
                 {
-                    err = encoder.Encode(pHead->phaseName);
+                    err = encoder.Encode(pHead->mPhaseName);
                     if (err != CHIP_NO_ERROR)
                     {
                         delegate->ReleaseOperationalPhaseList(phaseList);
