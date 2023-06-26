@@ -5,7 +5,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/PlatformManager.h>
-#include <zap-generated/CHIPClientCallbacks.h>
+#include <controller/java/zap-generated/CHIPClientCallbacks.h>
 
 CHIPBooleanAttributeCallback::CHIPBooleanAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<BooleanAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
