@@ -476,7 +476,7 @@ jobs:
                   category: "/language:cpp"
                   upload: False
                   output: sarif-results
-            - name: filter-sarif
+            - name: Filter out Results
               if: ${{ inputs.run-codeql  }}
               uses: advanced-security/filter-sarif@v1
               with:
