@@ -183,7 +183,8 @@ class TC_IDM_1_2(MatterBaseTest):
         # KeySetRead - fabric scoped command, should not be accessible over PASE
         # To get a PASE session, we need an open commissioning window
         pin, _ = self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
+            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=7777, option=1)
+        print(f'commissioning window opened pin = {pin}')
 
         # TH2 = new controller that's not connected over CASE
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -191,9 +192,10 @@ class TC_IDM_1_2(MatterBaseTest):
         TH2 = new_fabric_admin.NewController(nodeId=112233)
 
         devices = TH2.DiscoverCommissionableNodes(
-            filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=1234, stopOnFirst=True)
+            filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=7777, stopOnFirst=True)
         for a in devices[0].addresses:
             try:
+                print(f'establishing pase session to {a}')
                 TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=pin, nodeid=self.dut_node_id+1)
                 break
             except ChipStackError as e:

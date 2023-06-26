@@ -33,9 +33,9 @@ namespace chip {
 namespace app {
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
-                             bool suppressResponse) :
+                             bool aSuppressResponse) :
     mExchangeCtx(*this),
-    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(suppressResponse), mTimedRequest(aIsTimedRequest)
+    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
 {}
 
 CHIP_ERROR CommandSender::AllocateBuffer()
