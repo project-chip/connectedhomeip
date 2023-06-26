@@ -18,6 +18,7 @@
 
 #include "AppTask.h"
 #include "SmokeCoAlarmManager.h"
+#include "platform/CHIPDeviceLayer.h"
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -25,6 +26,9 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
+    #if APP_USE_EXAMPLE_START_BUTTON
+    SetExampleButtonCallbacks(SelfTestEventHandler);
+    #endif
     InitCommonParts();
 
     CHIP_ERROR err = AlarmMgr().Init();
@@ -42,4 +46,20 @@ CHIP_ERROR AppTask::Init(void)
     }
 
     return CHIP_NO_ERROR;
+}
+
+void AppTask::SelfTestEventHandler(AppEvent * aEvent)
+{
+    AppEvent event;
+    if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        event.ButtonEvent.Action = kButtonPushEvent;
+        event.Handler            = FactoryResetHandler;
+        GetAppTask().PostEvent(&event);
+    }
+}
+
+void AppTask::SelfTestHandler(void)
+{
+    AlarmMgr().StartSelfTesting();
 }

@@ -48,7 +48,7 @@ set(CONF_FILE ${CHIP_ROOT}/config/telink/app/zephyr.conf prj.conf)
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
-project(chip-telink-smohe-co-alarm-example)
+project(chip-telink-smoke-co-alarm-example)
 
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)

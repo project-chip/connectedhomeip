@@ -20,6 +20,10 @@
 
 #include "AppTaskCommon.h"
 
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
 
@@ -30,6 +34,10 @@ private:
     friend class AppTaskCommon;
 
     CHIP_ERROR Init(void);
+
+    static void SelfTestEventHandler(AppEvent * aEvent);
+    void SelfTestHandler(void);
+
     static AppTask sAppTask;
 };
 

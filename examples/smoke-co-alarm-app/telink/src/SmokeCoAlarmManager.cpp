@@ -57,3 +57,10 @@ bool SmokeCoAlarmManager::StartSelfTesting()
 
     return success;
 }
+
+// void SmokeCoAlarmManager::COAlarm(uint8_t status)
+// {
+
+//     AlarmStateEnum currentAlarmState = (AlarmStateEnum)status;
+//     SmokeCoAlarmServer::Instance().SetCOState(1,currentAlarmState);
+// }
