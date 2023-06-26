@@ -76,6 +76,7 @@ public:
 private:
     CHIP_ERROR Load(const char * key, MutableByteSpan & buffer);
     PersistentStorageDelegate * mPersistentStorage = nullptr;
+    CHIP_ERROR Clear(const char * key);
 };
 
 } // namespace chip

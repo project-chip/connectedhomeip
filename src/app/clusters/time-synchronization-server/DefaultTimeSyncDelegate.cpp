@@ -17,6 +17,7 @@
  */
 
 #include "DefaultTimeSyncDelegate.h"
+#include "inet/IPAddress.h"
 
 using namespace chip::app::Clusters::TimeSynchronization;
 
@@ -34,7 +35,8 @@ bool DefaultTimeSyncDelegate::HandleUpdateDSTOffset(chip::CharSpan name)
 bool DefaultTimeSyncDelegate::IsNTPAddressValid(chip::CharSpan ntp)
 {
     // placeholder implementation
-    return true;
+    chip::Inet::IPAddress addr;
+    return chip::Inet::IPAddress::FromString(ntp.data(), ntp.size(), addr) && addr.IsIPv6();
 }
 
 bool DefaultTimeSyncDelegate::IsNTPAddressDomain(chip::CharSpan ntp)

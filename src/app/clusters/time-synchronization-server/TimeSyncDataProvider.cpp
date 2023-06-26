@@ -64,7 +64,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadTrustedTimeSource(TrustedTimeSource & timeS
 
 CHIP_ERROR TimeSyncDataProvider::ClearTrustedTimeSource()
 {
-    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::TSTrustedTimeSource().KeyName());
+    return Clear(DefaultStorageKeyAllocator::TSTrustedTimeSource().KeyName());
 }
 
 CHIP_ERROR TimeSyncDataProvider::StoreDefaultNtp(const CharSpan & defaultNtp)
@@ -83,7 +83,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadDefaultNtp(MutableCharSpan & defaultNtp)
 
 CHIP_ERROR TimeSyncDataProvider::ClearDefaultNtp()
 {
-    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::TSDefaultNTP().KeyName());
+    return Clear(DefaultStorageKeyAllocator::TSDefaultNTP().KeyName());
 }
 
 CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const chip::Span<TimeZoneStore> & timeZoneList)
@@ -160,7 +160,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZoneObj & timeZoneObj)
 
 CHIP_ERROR TimeSyncDataProvider::ClearTimeZone()
 {
-    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::TSTimeZone().KeyName());
+    return Clear(DefaultStorageKeyAllocator::TSTimeZone().KeyName());
 }
 
 CHIP_ERROR TimeSyncDataProvider::StoreDSTOffset(const DSTOffsets & dstOffsetList)
@@ -224,7 +224,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffsetObj & dstOffsetObj)
 
 CHIP_ERROR TimeSyncDataProvider::ClearDSTOffset()
 {
-    return mPersistentStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::TSDSTOffset().KeyName());
+    return Clear(DefaultStorageKeyAllocator::TSDSTOffset().KeyName());
 }
 
 CHIP_ERROR TimeSyncDataProvider::Load(const char * key, MutableByteSpan & buffer)
@@ -234,6 +234,17 @@ CHIP_ERROR TimeSyncDataProvider::Load(const char * key, MutableByteSpan & buffer
 
     buffer.reduce_size(size);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TimeSyncDataProvider::Clear(const char * key)
+{
+    CHIP_ERROR err = mPersistentStorage->SyncDeleteKeyValue(key);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        // This value isn't in the storage yet, so consider it deleted
+        return CHIP_NO_ERROR;
+    }
+    return err;
 }
 
 } // namespace chip

@@ -291,6 +291,10 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
+    if (items == 0)
+    {
+        return ClearTimeZone();
+    }
 
     char name[64];
     Structs::TimeZoneStruct::Type lastTz;
@@ -322,6 +326,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
         // first element shall have validAt entry of 0
         if (i == 0 && newTz.validAt != 0)
         {
+            ReturnErrorOnFailure(LoadTimeZone());
             return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
         }
         // if second element, it shall have validAt entry of non-0
@@ -332,14 +337,14 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
         }
         tzStore.timeZone.offset  = newTz.offset;
         tzStore.timeZone.validAt = newTz.validAt;
-        if (newTz.name.HasValue())
+        if (newTz.name.HasValue() && newTz.name.Value().size() > 0)
         {
-            if (newTz.name.Value().size() > sizeof(tzStore.name))
+            size_t len = newTz.name.Value().size();
+            if (len > sizeof(tzStore.name))
             {
                 ReturnErrorOnFailure(LoadTimeZone());
                 return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
             }
-            size_t len = newTz.name.Value().size();
             memset(tzStore.name, 0, sizeof(tzStore.name));
             chip::MutableCharSpan tempSpan(tzStore.name, len);
             if (CHIP_NO_ERROR != CopyCharSpanToMutableCharSpan(newTz.name.Value(), tempSpan))
@@ -359,10 +364,6 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     {
         ReturnErrorOnFailure(LoadTimeZone());
         return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
-    }
-    if (i == 0)
-    {
-        return ClearTimeZone();
     }
 
     mTimeZoneObj.size = i;
@@ -406,6 +407,11 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
+    if (items == 0)
+    {
+        return ClearDSTOffset();
+    }
+
     auto newDstL   = dstL.begin();
     auto & dstList = mDstOffsetObj.dstOffsetList;
     size_t i       = 0;
@@ -420,10 +426,6 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
     {
         mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetObj);
         return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
-    }
-    if (i == 0)
-    {
-        return ClearDSTOffset();
     }
 
     mDstOffsetObj.size = i;
@@ -709,17 +711,7 @@ CHIP_ERROR TimeSynchronizationAttrAccess::ReadLocalTime(EndpointId endpoint, Att
 {
     DataModel::Nullable<uint64_t> localTime;
     CHIP_ERROR err = TimeSynchronizationServer::Instance().GetLocalTime(endpoint, localTime);
-    if (err == CHIP_NO_ERROR)
-    {
-        if (!localTime.IsNull())
-        {
-            err = aEncoder.Encode(localTime);
-        }
-        else
-        {
-            err = aEncoder.EncodeNull();
-        }
-    }
+    err            = aEncoder.Encode(localTime);
     return err;
 }
 
@@ -783,8 +775,19 @@ bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
 {
     const auto & utcTime     = commandData.UTCTime;
     const auto & granularity = commandData.granularity;
+    const auto & timeSource  = commandData.timeSource;
 
     auto currentGranularity = TimeSynchronizationServer::Instance().GetGranularity();
+    if (granularity < GranularityEnum::kNoTimeGranularity || granularity > GranularityEnum::kMicrosecondsGranularity)
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
+    if (timeSource.HasValue() && (timeSource.Value() < TimeSourceEnum::kNone || timeSource.Value() > TimeSourceEnum::kGnss))
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
 
     if (granularity != GranularityEnum::kNoTimeGranularity &&
         (currentGranularity == GranularityEnum::kNoTimeGranularity || granularity >= currentGranularity) &&
@@ -935,7 +938,7 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
     Status status = Status::Success;
     auto dNtpChar = commandData.defaultNTP;
 
-    if (!dNtpChar.IsNull())
+    if (!dNtpChar.IsNull() && dNtpChar.Value().size() > 0)
     {
         size_t len = dNtpChar.Value().size();
         if (len > DefaultNTP::TypeInfo::MaxLength())
@@ -972,11 +975,6 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
 
 void MatterTimeSynchronizationPluginServerInitCallback()
 {
-    static bool attrAccessRegistered = false;
     TimeSynchronizationServer::Instance().Init();
-    if (!attrAccessRegistered)
-    {
-        attrAccessRegistered = true;
-        registerAttributeAccessOverride(&gAttrAccess);
-    }
+    registerAttributeAccessOverride(&gAttrAccess);
 }
