@@ -873,7 +873,8 @@ void SendPrematureBlockForBlockQueryReceived(nlTestSuite * inSuite)
     sResponderExpectedOutputEvent.EventType = TransferSession::OutputEventType::kBlockReceived;
     sResponderExpectedOutputEvent.blockdata = prematureBlock;
 
-    if (sBdxReceiver) {
+    if (sBdxReceiver)
+    {
         CHIP_ERROR err = sBdxReceiver->PrepareBlock(prematureBlock);
         NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
     }
