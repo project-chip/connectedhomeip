@@ -43,16 +43,11 @@ jobs:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              if: ${{ !env.ACT }}
-              name: Checkout
-              with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            # To use act like:
+            - uses: actions/checkout@v3
+            name: Checkout
+            with:
+              token: ${{ github.token }}
+              # To use act like:
             #   act -j full_android
             #
             # Note you likely still need to have non submodules setup for the

@@ -57,14 +57,8 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                action: actions/checkout@v3.5.2
-                with: |
-                  token: ${{ github.token }}
-                attempt_limit: 3
-                attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v3
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -154,14 +148,8 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v3
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -304,14 +292,8 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                action: actions/checkout@v3.5.2
-                with: |
-                  token: ${{ github.token }}
-                attempt_limit: 3
-                attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v3
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -341,14 +323,8 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                action: actions/checkout@v3.5.2
-                with: |
-                  token: ${{ github.token }}
-                attempt_limit: 3
-                attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v3
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -430,14 +406,8 @@ jobs:
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
-              with:
-                action: actions/checkout@v3.5.2
-                with: |
-                  token: ${{ github.token }}
-                attempt_limit: 3
-                attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v3
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
