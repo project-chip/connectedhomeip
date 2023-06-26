@@ -69,6 +69,21 @@ EmberAfStatus RefrigeratorAlarmServer::GetStateValue(EndpointId endpoint, BitMas
     return status;
 }
 
+EmberAfStatus RefrigeratorAlarmServer::GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * supported)
+{
+    EmberAfStatus status = Attributes::Supported::Get(endpoint, supported);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        printf("################################################################\n");
+        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  supported, err:0x%x", status);
+        return status;
+    }
+
+    ChipLogProgress(Zcl, "Refrigerator Alarm: Supported ep%d value: %" PRIu32 "", endpoint, supported->Raw());
+
+    return status;
+}
+
 EmberAfStatus RefrigeratorAlarmServer::SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -133,6 +148,34 @@ EmberAfStatus RefrigeratorAlarmServer::SetStateValue(EndpointId endpoint, BitMas
     }
     SendNotifyEvent(endpoint, becameActive, becameInactive, newState, mask);
 
+    return status;
+}
+
+EmberAfStatus RefrigeratorAlarmServer::SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    status               = Attributes::Supported::Set(endpoint, supported);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: writing supported, err:0x%x", status);
+        return status;
+    }
+
+    ChipLogProgress(Zcl, "Refrigerator Alarm: Supported ep%d value: %" PRIu32 "", endpoint, supported.Raw());
+
+    // Whenever there is change in Supported attribute, Mask, State should change accordingly.
+    BitMask<AlarmMap> mask;
+    status = GetMaskValue(endpoint, &mask);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        return status;
+    }
+
+    if (mask != (supported & mask))
+    {
+        mask   = supported & mask;
+        status = SetMaskValue(endpoint, mask);
+    }
     return status;
 }
 
