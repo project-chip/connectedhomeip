@@ -5141,6 +5141,88 @@ class ChipClusters:
             },
         },
     }
+    _DISHWASHER_ALARM_CLUSTER_INFO = {
+        "clusterName": "DishwasherAlarm",
+        "clusterId": 0x0000005D,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Reset",
+                "args": {
+                    "alarms": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "ModifyEnabledAlarms",
+                "args": {
+                    "mask": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Mask",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "Latch",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "State",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "Supported",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _OPERATIONAL_STATE_CLUSTER_INFO = {
         "clusterName": "OperationalState",
         "clusterId": 0x00000060,
@@ -15634,6 +15716,7 @@ class ChipClusters:
         0x00000059: _DISHWASHER_MODE_CLUSTER_INFO,
         0x0000005B: _AIR_QUALITY_CLUSTER_INFO,
         0x0000005C: _SMOKE_CO_ALARM_CLUSTER_INFO,
+        0x0000005D: _DISHWASHER_ALARM_CLUSTER_INFO,
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000061: _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
@@ -15769,6 +15852,7 @@ class ChipClusters:
         "DishwasherMode": _DISHWASHER_MODE_CLUSTER_INFO,
         "AirQuality": _AIR_QUALITY_CLUSTER_INFO,
         "SmokeCoAlarm": _SMOKE_CO_ALARM_CLUSTER_INFO,
+        "DishwasherAlarm": _DISHWASHER_ALARM_CLUSTER_INFO,
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,
         "RvcOperationalState": _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,

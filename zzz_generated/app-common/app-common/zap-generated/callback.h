@@ -449,6 +449,14 @@ void emberAfAirQualityClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Dishwasher Alarm Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherAlarmClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Operational State Cluster Init
  *
  * Cluster Init
@@ -5106,6 +5114,84 @@ void emberAfSmokeCoAlarmClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfSmokeCoAlarmClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Dishwasher Alarm Cluster
+//
+
+/** @brief Dishwasher Alarm Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherAlarmClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Alarm Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterDishwasherAlarmClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Alarm Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherAlarmClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Alarm Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterDishwasherAlarmClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Dishwasher Alarm Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterDishwasherAlarmClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Dishwasher Alarm Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterDishwasherAlarmClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Dishwasher Alarm Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDishwasherAlarmClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Alarm Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDishwasherAlarmClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Operational State Cluster
@@ -11759,6 +11845,18 @@ bool emberAfDishwasherModeClusterChangeToModeCallback(
 bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
+/**
+ * @brief Dishwasher Alarm Cluster Reset Command callback (from client)
+ */
+bool emberAfDishwasherAlarmClusterResetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherAlarm::Commands::Reset::DecodableType & commandData);
+/**
+ * @brief Dishwasher Alarm Cluster ModifyEnabledAlarms Command callback (from client)
+ */
+bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
  * @brief Operational State Cluster Pause Command callback (from client)
  */

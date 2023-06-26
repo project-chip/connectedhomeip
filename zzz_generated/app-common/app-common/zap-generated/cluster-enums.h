@@ -1765,6 +1765,20 @@ enum class Feature : uint32_t
 };
 } // namespace SmokeCoAlarm
 
+namespace DishwasherAlarm {
+
+// Bitmap for AlarmMap
+enum class AlarmMap : uint32_t
+{
+    kInflowError     = 0x1,
+    kDrainError      = 0x2,
+    kDoorError       = 0x4,
+    kTempTooLow      = 0x8,
+    kTempTooHigh     = 0x10,
+    kWaterLevelError = 0x20,
+};
+} // namespace DishwasherAlarm
+
 namespace OperationalState {
 
 // Enum for ErrorStateEnum

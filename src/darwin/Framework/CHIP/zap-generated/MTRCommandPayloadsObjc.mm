@@ -6507,6 +6507,66 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRDishwasherAlarmClusterResetParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _alarms = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDishwasherAlarmClusterResetParams alloc] init];
+
+    other.alarms = self.alarms;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: alarms:%@; >", NSStringFromClass([self class]), _alarms];
+    return descriptionString;
+}
+
+@end
+@implementation MTRDishwasherAlarmClusterModifyEnabledAlarmsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mask = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDishwasherAlarmClusterModifyEnabledAlarmsParams alloc] init];
+
+    other.mask = self.mask;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mask:%@; >", NSStringFromClass([self class]), _mask];
+    return descriptionString;
+}
+
+@end
 @implementation MTROperationalStateClusterPauseParams
 - (instancetype)init
 {
