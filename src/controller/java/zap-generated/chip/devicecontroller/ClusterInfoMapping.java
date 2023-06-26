@@ -7156,6 +7156,83 @@ public class ClusterInfoMapping {
         }
       }
 
+      public static class DelegatedDishwasherAlarmClusterGeneratedCommandListAttributeCallback implements ChipClusters.DishwasherAlarmCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedDishwasherAlarmClusterAcceptedCommandListAttributeCallback implements ChipClusters.DishwasherAlarmCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedDishwasherAlarmClusterEventListAttributeCallback implements ChipClusters.DishwasherAlarmCluster.EventListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedDishwasherAlarmClusterAttributeListAttributeCallback implements ChipClusters.DishwasherAlarmCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+
       public static class DelegatedOperationalStateClusterPhaseListAttributeCallback implements ChipClusters.OperationalStateCluster.PhaseListAttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
@@ -20000,6 +20077,9 @@ public class ClusterInfoMapping {
       ClusterInfo smokeCoAlarmClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.SmokeCoAlarmCluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("smokeCoAlarm", smokeCoAlarmClusterInfo);
+      ClusterInfo dishwasherAlarmClusterInfo = new ClusterInfo(
+        (ptr, endpointId) -> new ChipClusters.DishwasherAlarmCluster(ptr, endpointId), new HashMap<>());
+      clusterMap.put("dishwasherAlarm", dishwasherAlarmClusterInfo);
       ClusterInfo operationalStateClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.OperationalStateCluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("operationalState", operationalStateClusterInfo);
@@ -20296,6 +20376,7 @@ public class ClusterInfoMapping {
       destination.get("dishwasherMode").combineCommands(source.get("dishwasherMode"));
       destination.get("airQuality").combineCommands(source.get("airQuality"));
       destination.get("smokeCoAlarm").combineCommands(source.get("smokeCoAlarm"));
+      destination.get("dishwasherAlarm").combineCommands(source.get("dishwasherAlarm"));
       destination.get("operationalState").combineCommands(source.get("operationalState"));
       destination.get("rvcOperationalState").combineCommands(source.get("rvcOperationalState"));
       destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
@@ -22377,6 +22458,28 @@ public class ClusterInfoMapping {
        rvcCleanModeClusterInteractionInfoMap.put("changeToMode", rvcCleanModechangeToModeInteractionInfo);
      commandMap.put("rvcCleanMode", rvcCleanModeClusterInteractionInfoMap);
      Map<String, InteractionInfo> temperatureControlClusterInteractionInfoMap = new LinkedHashMap<>();
+     Map<String, CommandParameterInfo> temperatureControlsetTemperatureCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       CommandParameterInfo temperatureControlsetTemperaturetargetTemperatureCommandParameterInfo = new CommandParameterInfo("targetTemperature", Optional.class, Integer.class);
+       temperatureControlsetTemperatureCommandParams.put("targetTemperature",temperatureControlsetTemperaturetargetTemperatureCommandParameterInfo);
+      
+       CommandParameterInfo temperatureControlsetTemperaturetargetTemperatureLevelCommandParameterInfo = new CommandParameterInfo("targetTemperatureLevel", Optional.class, Integer.class);
+       temperatureControlsetTemperatureCommandParams.put("targetTemperatureLevel",temperatureControlsetTemperaturetargetTemperatureLevelCommandParameterInfo);
+     
+       InteractionInfo temperatureControlsetTemperatureInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.TemperatureControlCluster) cluster)
+           .setTemperature((DefaultClusterCallback) callback
+           , (Optional<Integer>)
+           commandArguments.get("targetTemperature")
+           , (Optional<Integer>)
+           commandArguments.get("targetTemperatureLevel")
+           
+           );
+         },
+         () -> new DelegatedDefaultClusterCallback(),
+           temperatureControlsetTemperatureCommandParams
+       );
+       temperatureControlClusterInteractionInfoMap.put("setTemperature", temperatureControlsetTemperatureInteractionInfo);
      commandMap.put("temperatureControl", temperatureControlClusterInteractionInfoMap);
      Map<String, InteractionInfo> refrigeratorAlarmClusterInteractionInfoMap = new LinkedHashMap<>();
      commandMap.put("refrigeratorAlarm", refrigeratorAlarmClusterInteractionInfoMap);
@@ -22415,6 +22518,25 @@ public class ClusterInfoMapping {
        );
        smokeCoAlarmClusterInteractionInfoMap.put("selfTestRequest", smokeCoAlarmselfTestRequestInteractionInfo);
      commandMap.put("smokeCoAlarm", smokeCoAlarmClusterInteractionInfoMap);
+     Map<String, InteractionInfo> dishwasherAlarmClusterInteractionInfoMap = new LinkedHashMap<>();
+     Map<String, CommandParameterInfo> dishwasherAlarmresetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       CommandParameterInfo dishwasherAlarmresetalarmsCommandParameterInfo = new CommandParameterInfo("alarms", Long.class, Long.class);
+       dishwasherAlarmresetCommandParams.put("alarms",dishwasherAlarmresetalarmsCommandParameterInfo);
+     
+       InteractionInfo dishwasherAlarmresetInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.DishwasherAlarmCluster) cluster)
+           .reset((DefaultClusterCallback) callback
+           , (Long)
+           commandArguments.get("alarms")
+           
+           );
+         },
+         () -> new DelegatedDefaultClusterCallback(),
+           dishwasherAlarmresetCommandParams
+       );
+       dishwasherAlarmClusterInteractionInfoMap.put("reset", dishwasherAlarmresetInteractionInfo);
+     commandMap.put("dishwasherAlarm", dishwasherAlarmClusterInteractionInfoMap);
      Map<String, InteractionInfo> operationalStateClusterInteractionInfoMap = new LinkedHashMap<>();
      commandMap.put("operationalState", operationalStateClusterInteractionInfoMap);
      Map<String, InteractionInfo> rvcOperationalStateClusterInteractionInfoMap = new LinkedHashMap<>();

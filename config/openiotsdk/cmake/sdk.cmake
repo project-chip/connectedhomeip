@@ -27,7 +27,7 @@ get_filename_component(OPEN_IOT_SDK_STORAGE_SOURCE ${CHIP_ROOT}/third_party/open
 # Open IoT SDK targets passed to CHIP build
 list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS)
 
-# Additional Open IoT SDK build configuration 
+# Additional Open IoT SDK build configuration
 set(TFM_SUPPORT NO CACHE BOOL "Add Trusted Firmware-M (TF-M) support to application")
 set(TFM_NS_APP_VERSION "0.0.0" CACHE STRING "TF-M non-secure application version (in the x.x.x format)")
 set(CONFIG_CHIP_OPEN_IOT_SDK_LWIP_DEBUG NO CACHE BOOL "Enable LwIP debug logs")
@@ -82,7 +82,7 @@ if(TFM_SUPPORT)
     set(TFM_PLATFORM ${OPEN_IOT_SDK_EXAMPLE_COMMON}/tf-m/targets/an552)
     set(TFM_PSA_FIRMWARE_UPDATE ON)
     set(MCUBOOT_IMAGE_VERSION_NS ${TFM_NS_APP_VERSION})
-    set(TFM_CMAKE_ARGS "-DCONFIG_TFM_ENABLE_FP=ON;-DTFM_PROFILE=profile_medium;-DTFM_EXCEPTION_INFO_DUMP=ON;-DCONFIG_TFM_HALT_ON_CORE_PANIC=ON;-DTFM_ISOLATION_LEVEL=1")
+    set(TFM_CMAKE_ARGS "-DCONFIG_TFM_ENABLE_FP=ON;-DTFM_PROFILE=profile_medium;-DTFM_EXCEPTION_INFO_DUMP=ON;-DCONFIG_TFM_HALT_ON_CORE_PANIC=ON;-DTFM_ISOLATION_LEVEL=1;-DTFM_MBEDCRYPTO_PLATFORM_EXTRA_CONFIG_PATH=${OPEN_IOT_SDK_CONFIG}/mbedtls/mbedtls_config_psa.h;-DMBEDCRYPTO_BUILD_TYPE=${CMAKE_BUILD_TYPE};-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
     if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
         set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DMCUBOOT_LOG_LEVEL=INFO;-DTFM_SPM_LOG_LEVEL=TFM_SPM_LOG_LEVEL_DEBUG;-DTFM_PARTITION_LOG_LEVEL=TFM_PARTITION_LOG_LEVEL_INFO")
     else()
@@ -117,24 +117,24 @@ endif()
 # Add RTOS configuration headers
 # Link cmsis-rtos-api against a concrete implementation
 if(TARGET cmsis-rtos-api)
-    target_include_directories(cmsis-core 
-        INTERFACE 
+    target_include_directories(cmsis-core
+        INTERFACE
             cmsis-config
     )
-    
+
     target_compile_definitions(cmsis-rtos-api
         PUBLIC
             DOMAIN_NS=$<IF:$<BOOL:${TFM_SUPPORT}>,1,0>
     )
 
     if(TARGET freertos-kernel)
-        target_include_directories(freertos-kernel 
-            PUBLIC 
+        target_include_directories(freertos-kernel
+            PUBLIC
                 freertos-config
         )
 
-        target_link_libraries(freertos-kernel 
-            PUBLIC 
+        target_link_libraries(freertos-kernel
+            PUBLIC
                 cmsis-core
         )
 
@@ -250,14 +250,6 @@ if("cmsis-freertos" IN_LIST IOTSDK_FETCH_LIST)
     )
 endif()
 
-if("mbedtls" IN_LIST IOTSDK_FETCH_LIST)
-    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
-        mbedtls
-        mbedtls-config
-        mbedtls-threading-cmsis-rtos 
-    )
-endif()
-
 if("lwip" IN_LIST IOTSDK_FETCH_LIST)
     list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
         lwipcore
@@ -279,6 +271,15 @@ if("trusted-firmware-m" IN_LIST IOTSDK_FETCH_LIST)
     list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
         tfm-ns-interface
         tfm-ns-interface-cmsis-rtos
+    )
+endif()
+
+# Note: Mbed TLS must appear after TF-M otherwise psa from mbed TLS is used
+if("mbedtls" IN_LIST IOTSDK_FETCH_LIST)
+    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
+        mbedtls
+        mbedtls-config
+        mbedtls-threading-cmsis-rtos
     )
 endif()
 

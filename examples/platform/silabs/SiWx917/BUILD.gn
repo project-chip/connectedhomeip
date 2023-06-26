@@ -43,6 +43,13 @@ declare_args() {
 
   #default Wifi Password
   chip_default_wifi_psk = ""
+
+  # Enable TestEventTrigger in GeneralDiagnostics cluster
+  silabs_test_event_trigger_enabled = false
+
+  # The EnableKey in hex string format used by TestEventTrigger command in
+  # GeneralDiagnostics cluster. The length of the string should be 32.
+  silabs_test_event_trigger_enable_key = "00112233445566778899aabbccddeeff"
 }
 
 import("${chip_root}/src/platform/silabs/wifi_args.gni")
@@ -226,6 +233,7 @@ config("silabs-wifi-config") {
 
 source_set("siwx917-common") {
   deps = []
+  defines = []
   public_deps = []
   public_configs = [
     ":siwx917-common-config",
@@ -292,6 +300,12 @@ source_set("siwx917-common") {
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
     public_deps += [ ":silabs-factory-data-provider" ]
+  }
+
+  if (silabs_test_event_trigger_enabled) {
+    sources +=
+        [ "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.cpp" ]
+    defines += [ "SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${silabs_test_event_trigger_enable_key}\"" ]
   }
 
   public_deps += [
