@@ -18,11 +18,15 @@
 
 #pragma once
 
-#include <app/CommandHandlerInterface.h>
+#include "mode-base-cluster-objects.h"
 #include <app/AttributeAccessInterface.h>
-#include "mode-base-delegate.h"
+#include <app/CommandHandlerInterface.h>
 #include <app/util/af.h>
 #include <map>
+
+using chip::Protocols::InteractionModel::Status;
+using ModeOptionStructType  = chip::app::Clusters::detail::Structs::ModeOptionStruct::Type;
+using ModeTagStructType     = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 namespace chip {
 namespace app {
@@ -31,9 +35,25 @@ namespace ModeBase {
 
 class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
-
 public:
+
+    /**
+     * This is a helper function to build a mode option structure. It takes the label/name of the mode,
+     * the value of the mode and a list of semantic tags that apply to this mode. NOTE, the caller must
+     * ensure that the lifetime of the label and semanticTags is as long as the returned structure.
+     */
+    static ModeOptionStructType BuildModeOptionStruct(const char * label, uint8_t mode,
+                                                      const List<const ModeTagStructType> modeTags)
+    {
+        detail::Structs::ModeOptionStruct::Type option;
+        option.label        = CharSpan::fromCharString(label);
+        option.mode         = mode;
+        option.modeTags     = modeTags;
+        return option;
+    }
+
     // This map holds pointers to all initialised ModeBase instances. It provides a way to access all ModeBase clusters.
+    // todo make this private and add accessor functions that returns a const version of the map.
     static std::map<uint32_t, Instance*> ModeBaseAliasesInstanceMap;
 
     CHIP_ERROR Init();
@@ -46,30 +66,35 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
-    // Generic accessor functions
-    bool HasFeature(Feature feature) const;
-
+    // Attribute setters
     void UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode);
     void UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode);
     void UpdateCurrentMode(uint8_t aNewMode);
 
+    // Attribute getters
     DataModel::Nullable<uint8_t> GetStartUpMode();
     DataModel::Nullable<uint8_t> GetOnMode();
     uint8_t GetCurrentMode();
-
     EndpointId GetEndpointId() const {return mEndpointId;}
+
+    bool HasFeature(Feature feature) const;
+
+    /**
+     * This function returns true if the mode value given matches one of the supported modes, otherwise it returns false.
+     * @param mode
+     */
+    bool IsSupportedMode(uint8_t mode);
 
 private:
     EndpointId mEndpointId{};
     ClusterId mClusterId{};
-    Delegate * mDelegate;
-
-    uint32_t mFeature;
 
     // Attribute data store
     uint8_t mCurrentMode;
     DataModel::Nullable<uint8_t> mStartUpMode;
     DataModel::Nullable<uint8_t> mOnMode;
+
+    uint32_t mFeature;
 
     /**
      * This checks to see if this clusters instance is a valid ModeBase aliased cluster based on the AliasedClusters list.
@@ -84,12 +109,10 @@ public:
      * called by the interaction model at the appropriate times.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId The ID of the ModeBase aliased cluster to be instantiated.
-     * @param aDelegate A pointer to a delegate that will handle application layer logic.
      */
-    Instance(EndpointId aEndpointId, ClusterId aClusterId, Delegate * aDelegate, uint32_t aFeature) :
+    Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        mDelegate(aDelegate)
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId)
     {
         mEndpointId = aEndpointId;
         mClusterId  = aClusterId;
@@ -103,6 +126,66 @@ public:
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
+
+    // The following functions should be implemented by the SDK user to implement the business logic of their application.
+
+    /**
+     * This init function will be called during the ModeBase server initialization after the Instance information has been validated
+     * and the Instance has been registered. This can be used to initialise app logic.
+     */
+    virtual CHIP_ERROR AppInit() = 0;
+
+    /**
+     * Returns the number of modes provided and managed by the delegate.
+     */
+    virtual uint8_t NumberOfModes();
+
+    /**
+     * Get the mode label of the Nth mode in the list of modes.
+     * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
+     * @param label a reference to the MutableCharSpan that is to contain the mode label. Use CopyCharSpanToMutableCharSpan to copy
+     * into the MutableCharSpan.
+     * @return Returns a CHIP_NO_ERROR if there was no error.
+     */
+    virtual CHIP_ERROR getModeLabelByIndex(uint8_t modeIndex, MutableCharSpan &label);
+
+    /**
+     * Get the mode value of the Nth mode in the list of modes.
+     * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
+     * @param value a reference to the uint8_t variable that is to contain the mode value.
+     * @return Returns a CHIP_NO_ERROR if there was no error.
+     */
+    virtual CHIP_ERROR getModeValueByIndex(uint8_t modeIndex, uint8_t &value);
+
+    /**
+     * Get the mode tags of the Nth mode in the list of modes.
+     * The caller must make sure the List points to an existing buffer of sufficient size to hold the spec-required number
+     * of tags, and the size of the List is the size of the buffer.
+     *
+     * The implementation must place its desired ModeTagStructType instances in that buffer and call tags.reduce_size
+     * on the list to indicate how many entries were initialized.
+     * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
+     * @param tags a reference to an existing and initialised buffer that is to contain the mode tags. std::copy can be used
+     * to copy into the buffer.
+     * @return Returns a CHIP_NO_ERROR if there was no error.
+     */
+    virtual CHIP_ERROR getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &modeTags);
+
+    /**
+     * When a ChangeToMode command is received, if the NewMode value is a supported made, this function is called to 1) decide if
+     * we should go ahead with transitioning to this mode and 2) formulate the ChangeToModeResponse that will be sent back to the
+     * client. If this function returns a response.status of ChangeToModeResponseStatus success, the change request is accepted
+     * and the CurrentMode is set to the NewMode. Else, the CurrentMode is left untouched. The response is sent as a
+     * ChangeToModeResponse command.
+     *
+     * This function is to be overridden by a user implemented function that makes this decision based on the application logic.
+     * @param NewMode The new made that the device is requested to transition to.
+     * @param response A reference to a response that will be sent to the client. The contents of which con be modified by the
+     * application.
+     *
+     */
+    virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
+
 };
 
 } // namespace ModeSelect

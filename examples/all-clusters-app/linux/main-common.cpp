@@ -199,11 +199,9 @@ CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::B
 
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
-Clusters::RvcRunMode::RvcRunModeDelegate rvcRunDelegate;
-Clusters::ModeBase::Instance rvcRunInstance(0x1, Clusters::RvcRunMode::Id, &rvcRunDelegate, 1);
+Clusters::RvcRunMode::RvcRunModeInstance rvcRunInstance(0x1, Clusters::RvcRunMode::Id, 1);
 
-Clusters::RvcCleanMode::RvcCleanModeDelegate rvcCleanDelegate;
-Clusters::ModeBase::Instance rvcCleanInstance(0x1, Clusters::RvcCleanMode::Id, &rvcCleanDelegate, 1);
+Clusters::RvcCleanMode::RvcCleanModeInstance rvcCleanInstance(0x1, Clusters::RvcCleanMode::Id, 1);
 } // namespace
 
 void ApplicationInit()

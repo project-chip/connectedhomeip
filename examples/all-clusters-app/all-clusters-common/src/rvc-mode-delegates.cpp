@@ -25,22 +25,14 @@ using chip::Protocols::InteractionModel::Status;
 
 //-- Mode Select delegate functions
 
-CHIP_ERROR RvcRunModeDelegate::Init()
+CHIP_ERROR RvcRunModeInstance::AppInit()
 {
     return CHIP_NO_ERROR;
 }
 
-void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type &response)
+void RvcRunModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type &response)
 {
-    uint8_t currentMode;
-    EmberAfStatus status = RvcRunMode::Attributes::CurrentMode::Get(0x1, &currentMode);
-
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        response.status = static_cast<uint8_t>(ModeBase::StatusCode::kGenericFailure);
-        response.statusText.SetValue(chip::CharSpan("Could not get the current mode", 30));
-        return;
-    }
+    uint8_t currentMode = GetCurrentMode();
 
     // Our business logic states that we can only switch into the mapping state from the idle state.
     if (NewMode == RvcRunMode::ModeMapping && currentMode != RvcRunMode::ModeIdle)
@@ -52,7 +44,7 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     response.status = static_cast<uint8_t>(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR RvcRunModeDelegate::getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
+CHIP_ERROR RvcRunModeInstance::getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
 {
     if (modeIndex < NumberOfModes()) {
         if (label.size() >= modeOptions[modeIndex].label.size())
@@ -65,7 +57,7 @@ CHIP_ERROR RvcRunModeDelegate::getModeLabelByIndex(uint8_t modeIndex, chip::Muta
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcRunModeDelegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
+CHIP_ERROR RvcRunModeInstance::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
 {
     if (modeIndex < NumberOfModes()) {
         value = modeOptions[modeIndex].mode;
@@ -74,7 +66,7 @@ CHIP_ERROR RvcRunModeDelegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &v
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcRunModeDelegate::getModeTagsByIndex(uint8_t modeIndex, List<SemanticTagStructType> &tags)
+CHIP_ERROR RvcRunModeInstance::getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags)
 {
     if (modeIndex < NumberOfModes()) {
         if (tags.size() >= modeOptions[modeIndex].modeTags.size())
@@ -90,22 +82,14 @@ CHIP_ERROR RvcRunModeDelegate::getModeTagsByIndex(uint8_t modeIndex, List<Semant
 }
 
 
-CHIP_ERROR RvcCleanModeDelegate::Init()
+CHIP_ERROR RvcCleanModeInstance::AppInit()
 {
     return CHIP_NO_ERROR;
 }
 
-void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type &response)
+void RvcCleanModeInstance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type &response)
 {
-    uint8_t rvcRunCurrentMode;
-    EmberAfStatus status = RvcRunMode::Attributes::CurrentMode::Get(0x1, &rvcRunCurrentMode);
-
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        response.status = static_cast<uint8_t>(ModeBase::StatusCode::kGenericFailure);
-        response.statusText.SetValue(chip::CharSpan("Could not get the current mode", 30));
-        return;
-    }
+    uint8_t rvcRunCurrentMode = GetCurrentMode();
 
     if (rvcRunCurrentMode == RvcRunMode::ModeCleaning)
     {
@@ -116,7 +100,7 @@ void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Command
     response.status = static_cast<uint8_t>(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR RvcCleanModeDelegate::getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
+CHIP_ERROR RvcCleanModeInstance::getModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
 {
     if (modeIndex < NumberOfModes()) {
         if (label.size() >= modeOptions[modeIndex].label.size())
@@ -129,7 +113,7 @@ CHIP_ERROR RvcCleanModeDelegate::getModeLabelByIndex(uint8_t modeIndex, chip::Mu
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcCleanModeDelegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
+CHIP_ERROR RvcCleanModeInstance::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
 {
     if (modeIndex < NumberOfModes()) {
         value = modeOptions[modeIndex].mode;
@@ -138,7 +122,7 @@ CHIP_ERROR RvcCleanModeDelegate::getModeValueByIndex(uint8_t modeIndex, uint8_t 
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR RvcCleanModeDelegate::getModeTagsByIndex(uint8_t modeIndex, List<SemanticTagStructType> &tags)
+CHIP_ERROR RvcCleanModeInstance::getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags)
 {
     if (modeIndex < NumberOfModes()) {
         if (tags.size() >= modeOptions[modeIndex].modeTags.size())

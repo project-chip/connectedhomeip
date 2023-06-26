@@ -224,8 +224,8 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/mode-base-server/mode-base-server.h",
           "${_app_root}/clusters/mode-base-server/mode-base-server.cpp",
-          "${_app_root}/clusters/mode-base-server/mode-base-delegate.h",
-          "${_app_root}/clusters/mode-base-server/mode-base-delegate.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.h",
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.cpp",
         ]
       } else if (cluster == "application-launcher-server") {
         sources += [

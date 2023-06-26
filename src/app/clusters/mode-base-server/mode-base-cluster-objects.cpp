@@ -16,59 +16,15 @@
 *    limitations under the License.
  */
 
-#include "mode-base-delegate.h"
+#include "mode-base-cluster-objects.h"
 
-using namespace std;
-using namespace chip;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ModeBase;
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ModeBase {
 
-using ModeOptionStructType = detail::Structs::ModeOptionStruct::Type;
-
-void Delegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type &response)
-{
-    response.status = to_underlying(StatusCode::kSuccess);
-}
-
-uint8_t Delegate::NumberOfModes()
-{
-    return 0;
-}
-
-CHIP_ERROR Delegate::getModeLabelByIndex(uint8_t modeIndex, MutableCharSpan &label)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR Delegate::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR Delegate::getModeTagsByIndex(uint8_t modeIndex, List<SemanticTagStructType> &tags)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-bool Delegate::IsSupportedMode(uint8_t modeValue)
-{
-    for (uint8_t i = 0; i < NumberOfModes(); i++) {
-        uint8_t value;
-        auto err = getModeValueByIndex(i, value);
-        if (err == CHIP_NO_ERROR) {
-            if (value == modeValue) {
-                return true;
-            }
-        } else {
-            break;
-        }
-    }
-    ChipLogDetail(Zcl, "Cannot find a mode with value %u", modeValue);
-    return false;
-}
-
-namespace chip { namespace app { namespace Clusters { namespace ModeBase {
 namespace Commands {
+
 namespace ChangeToMode {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -146,6 +102,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
+
 } // namespace ChangeToModeResponse.
+
 } // namespace Commands
-} } } }
+
+} // namespace ModeBase
+} // namespace Clusters
+} // namespace app
+} // namespace chip

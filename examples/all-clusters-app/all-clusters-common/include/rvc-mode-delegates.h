@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/mode-base-server/mode-base-delegate.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <cstring>
@@ -40,19 +40,19 @@ const uint8_t ModeCleaning = 1;
 const uint8_t ModeMapping = 2;
 
 /// This is an application level delegate to handle RvcRun commands according to the specific business logic.
-class RvcRunModeDelegate : public ModeBase::Delegate
+class RvcRunModeInstance : public ModeBase::Instance
 {
 private:
     ModeTagStructType ModeTagsIdle[1]     = { { .value = static_cast<uint16_t>(Clusters::RvcRunMode::ModeTag::kIdle) } };
     ModeTagStructType ModeTagsCleaning[1] = { { .value = static_cast<uint16_t>(Clusters::RvcRunMode::ModeTag::kCleaning) } };
 
     const ModeOptionStructType modeOptions[3] = {
-        Delegate::BuildModeOptionStruct("Idle", Clusters::RvcRunMode::ModeIdle, List<const ModeTagStructType>(ModeTagsIdle)),
-        Delegate::BuildModeOptionStruct("Cleaning", Clusters::RvcRunMode::ModeCleaning, List<const ModeTagStructType>(ModeTagsCleaning)),
-        Delegate::BuildModeOptionStruct("Mapping", Clusters::RvcRunMode::ModeMapping, List<const ModeTagStructType>(ModeTagsIdle)), // todo set to no mode tags
+        BuildModeOptionStruct("Idle", Clusters::RvcRunMode::ModeIdle, List<const ModeTagStructType>(ModeTagsIdle)),
+        BuildModeOptionStruct("Cleaning", Clusters::RvcRunMode::ModeCleaning, List<const ModeTagStructType>(ModeTagsCleaning)),
+        BuildModeOptionStruct("Mapping", Clusters::RvcRunMode::ModeMapping, List<const ModeTagStructType>(ModeTagsIdle)), // todo set to no mode tags
     };
 
-    CHIP_ERROR Init() override;
+    CHIP_ERROR AppInit() override;
     void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type &response) override;
 
     uint8_t NumberOfModes() override {return 3;};
@@ -61,9 +61,9 @@ private:
     CHIP_ERROR getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags) override;
 
 public:
-    RvcRunModeDelegate() = default;
+    RvcRunModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) : Instance(aEndpointId, aClusterId, aFeature) {};
 
-    ~RvcRunModeDelegate() override = default;
+    ~RvcRunModeInstance() override = default;
 };
 
 } // namespace RvcRunMode
@@ -75,7 +75,7 @@ const uint8_t ModeWash = 1;
 const uint8_t ModeDeepClean = 2;
 
 /// This is an application level delegate to handle RvcClean commands according to the specific business logic.
-class RvcCleanModeDelegate : public ModeBase::Delegate
+class RvcCleanModeInstance : public ModeBase::Instance
 {
 private:
     ModeTagStructType modeTagsVac[1]   = { { .value = static_cast<uint16_t>(Clusters::RvcCleanMode::ModeTag::kVacuum) } };
@@ -84,12 +84,12 @@ private:
                                           { .value = static_cast<uint16_t>(Clusters::RvcCleanMode::ModeTag::kDeepClean) }};
 
     const ModeOptionStructType modeOptions[3] = {
-        Delegate::BuildModeOptionStruct("Vacuum", Clusters::RvcCleanMode::ModeVacuum, List<const ModeTagStructType>(modeTagsVac)),
-        Delegate::BuildModeOptionStruct("Wash", Clusters::RvcCleanMode::ModeWash, List<const ModeTagStructType>(modeTagsMop)),
-        Delegate::BuildModeOptionStruct("Deep clean", Clusters::RvcCleanMode::ModeDeepClean, List<const ModeTagStructType>(modeTagsBoost)),
+        BuildModeOptionStruct("Vacuum", Clusters::RvcCleanMode::ModeVacuum, List<const ModeTagStructType>(modeTagsVac)),
+        BuildModeOptionStruct("Wash", Clusters::RvcCleanMode::ModeWash, List<const ModeTagStructType>(modeTagsMop)),
+        BuildModeOptionStruct("Deep clean", Clusters::RvcCleanMode::ModeDeepClean, List<const ModeTagStructType>(modeTagsBoost)),
     };
 
-    CHIP_ERROR Init() override;
+    CHIP_ERROR AppInit() override;
     void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type &response) override;
 
     uint8_t NumberOfModes() override {return 3;};
@@ -98,9 +98,9 @@ private:
     CHIP_ERROR getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags) override;
 
 public:
-    RvcCleanModeDelegate() = default;
+    RvcCleanModeInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) : Instance(aEndpointId, aClusterId, aFeature) {};
 
-    ~RvcCleanModeDelegate() override = default;
+    ~RvcCleanModeInstance() override = default;
 };
 
 } // namespace RvcCleanMode

@@ -304,12 +304,6 @@
         "Temperature Control": ["SupportedTemperatureLevels"],
         "Operational State": ["OperationalState", "OperationalError"],
         "RVC Operational State": ["OperationalState", "OperationalError"],
-        "Mode Base": [
-            "SupportedModes",
-            "CurrentMode",
-            "StartUpMode",
-            "OnMode"
-        ],
         "Dishwasher Mode": [
             "SupportedModes",
             "CurrentMode",

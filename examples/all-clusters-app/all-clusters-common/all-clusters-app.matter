@@ -6241,9 +6241,9 @@ endpoint 1 {
 
   server cluster RvcRunMode {
     callback attribute supportedModes;
-    ram      attribute currentMode;
-    ram      attribute startUpMode;
-    ram      attribute onMode;
+    callback attribute currentMode;
+    callback attribute startUpMode;
+    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -6254,9 +6254,9 @@ endpoint 1 {
 
   server cluster RvcCleanMode {
     callback attribute supportedModes;
-    ram      attribute currentMode;
-    ram      attribute startUpMode;
-    ram      attribute onMode;
+    callback attribute currentMode;
+    callback attribute startUpMode;
+    callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

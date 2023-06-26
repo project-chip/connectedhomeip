@@ -71,7 +71,7 @@ CHIP_ERROR Instance::Init()
 
    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-   ReturnErrorOnFailure(mDelegate->Init());
+   ReturnErrorOnFailure(AppInit());
 
    ModeBaseAliasesInstanceMap[mClusterId] = this;
 
@@ -133,7 +133,7 @@ CHIP_ERROR Instance::Init()
 
            if (startUpMode.Value() != currentMode)
            {
-               if (!mDelegate->IsSupportedMode(startUpMode.Value()))
+               if (!IsSupportedMode(startUpMode.Value()))
                {
                    ChipLogError(Zcl, "ModeBase: Start-up_mode is not set to a valid mode.");
                    return CHIP_ERROR_INVALID_ARGUMENT; // todo is thins the correct error?
@@ -183,7 +183,7 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
 
    Commands::ChangeToModeResponse::Type response;
 
-   if (!mDelegate->IsSupportedMode(newMode))
+   if (!IsSupportedMode(newMode))
    {
        ChipLogError(Zcl, "ModeBase: Failed to find the option with mode %u", newMode);
        response.status = static_cast<uint8_t>(StatusCode::kUnsupportedMode);
@@ -191,7 +191,7 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
        return;
    }
 
-   mDelegate->HandleChangeToMode(newMode, response);
+   HandleChangeToMode(newMode, response);
 
    if (response.status == static_cast<uint8_t>(StatusCode::kSuccess))
    {
@@ -248,13 +248,13 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
        }
        break ;
    case Attributes::SupportedModes::Id:
-       if (mDelegate->NumberOfModes() == 0)
+       if (NumberOfModes() == 0)
        {
            aEncoder.EncodeEmptyList();
            return CHIP_NO_ERROR;
        }
 
-       Delegate *d = mDelegate;
+       Instance *d = this;
        CHIP_ERROR err = aEncoder.EncodeList([d](const auto & encoder) -> CHIP_ERROR {
            for (uint8_t i = 0; i < d->NumberOfModes(); i++)
            {
@@ -277,8 +277,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
                }
 
                // Get the mode tags
-               SemanticTagStructType tagsBuffer[8];
-               List<SemanticTagStructType> tags(tagsBuffer);
+               ModeTagStructType tagsBuffer[8];
+               List<ModeTagStructType> tags(tagsBuffer);
                err1 = d->getModeTagsByIndex(i, tags);
                if (err1 != CHIP_NO_ERROR) {
                    return err1;
@@ -315,7 +315,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
    }
    else
    {
-       if (!mDelegate->IsSupportedMode(newMode.Value()))
+       if (!IsSupportedMode(newMode.Value()))
        {
            return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
        }
@@ -381,6 +381,48 @@ DataModel::Nullable<uint8_t> Instance::GetOnMode()
 uint8_t Instance::GetCurrentMode()
 {
    return mCurrentMode;
+}
+
+bool Instance::IsSupportedMode(uint8_t modeValue)
+{
+   for (uint8_t i = 0; i < NumberOfModes(); i++) {
+       uint8_t value;
+       auto err = getModeValueByIndex(i, value);
+       if (err == CHIP_NO_ERROR) {
+           if (value == modeValue) {
+               return true;
+           }
+       } else {
+           break;
+       }
+   }
+   ChipLogDetail(Zcl, "Cannot find a mode with value %u", modeValue);
+   return false;
+}
+
+uint8_t Instance::NumberOfModes()
+{
+   return 0;
+}
+
+CHIP_ERROR Instance::getModeLabelByIndex(uint8_t modeIndex, MutableCharSpan &label)
+{
+   return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR Instance::getModeValueByIndex(uint8_t modeIndex, uint8_t &value)
+{
+   return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR Instance::getModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &modeTags)
+{
+   return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+void Instance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type &response)
+{
+   response.status = to_underlying(StatusCode::kSuccess);
 }
 
 } // namespace ModeBase
