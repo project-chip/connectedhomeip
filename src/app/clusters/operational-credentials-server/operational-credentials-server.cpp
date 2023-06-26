@@ -48,8 +48,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <string.h>
-#include <trace/trace.h>
-#include <tracing/scope.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace ::chip::Transport;
@@ -408,7 +407,6 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
                                                               const app::ConcreteCommandPath & commandPath,
                                                               const Commands::RemoveFabric::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("RemoveFabric", "OperationalCredentials");
     MATTER_TRACE_SCOPE("RemoveFabric", "OperationalCredentials");
     auto & fabricBeingRemoved = commandData.fabricIndex;
 
@@ -469,7 +467,6 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
                                                                    const app::ConcreteCommandPath & commandPath,
                                                                    const Commands::UpdateFabricLabel::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("UpdateFabricLabel", "OperationalCredentials");
     MATTER_TRACE_SCOPE("UpdateFabricLabel", "OperationalCredentials");
     auto & label        = commandData.label;
     auto ourFabricIndex = commandObj->GetAccessingFabricIndex();
@@ -592,7 +589,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
                                                         const app::ConcreteCommandPath & commandPath,
                                                         const Commands::AddNOC::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("AddNOC", "OperationalCredentials");
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     auto & NOCValue          = commandData.NOCValue;
     auto & ICACValue         = commandData.ICACValue;
@@ -766,7 +762,6 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::UpdateNOC::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("UpdateNOC", "OperationalCredentials");
     MATTER_TRACE_SCOPE("UpdateNOC", "OperationalCredentials");
     auto & NOCValue  = commandData.NOCValue;
     auto & ICACValue = commandData.ICACValue;
@@ -859,7 +854,6 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::CertificateChainRequest::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("CertificateChainRequest", "OperationalCredentials");
     MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
     auto & certificateType = commandData.certificateType;
 
@@ -908,7 +902,6 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
                                                                     const app::ConcreteCommandPath & commandPath,
                                                                     const Commands::AttestationRequest::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("AttestationRequest", "OperationalCredentials");
     MATTER_TRACE_SCOPE("AttestationRequest", "OperationalCredentials");
     auto & attestationNonce = commandData.attestationNonce;
 
@@ -1005,7 +998,6 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::CSRRequest::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("CSRRequest", "OperationalCredentials");
     MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
     ChipLogProgress(Zcl, "OpCreds: Received a CSRRequest command");
 
@@ -1141,7 +1133,6 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::AddTrustedRootCertificate::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
     MATTER_TRACE_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
 
     auto & fabricTable = Server::GetInstance().GetFabricTable();

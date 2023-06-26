@@ -1034,6 +1034,9 @@ PICS:
     - label: "Does the DUT(server) support the CapabilityMinima attribute?"
       id: BRBINFO.S.A0013
 
+    - label: "Does the DUT(server) support the ProductAppearance attribute?"
+      id: BRBINFO.S.A0014
+
     #
     # server / Events
     #
@@ -1151,6 +1154,11 @@ PICS:
           "Does the DUT(client) have access privileges for the CapabilityMinima
           attribute implemented on server?"
       id: BRBINFO.C.A0013
+
+    - label:
+          "Does the DUT(client) have access privileges for the ProductAppearance
+          attribute implemented on server?"
+      id: BRBINFO.C.A0014
 
     #
     # client / Events
@@ -1954,6 +1962,10 @@ PICS:
     - label: "Does the DUT(server) support the CapabilityMinima attribute?"
       id: BINFO.S.A0013
 
+    - label: "Does the DUT(server) support the ProductAppearance attribute?"
+      id: BINFO.S.A0014
+
+    #####
     - label: "Does the DUT(server) support the NOC list attribute?"
       id: OPCREDS.S.A0000
 
@@ -1973,6 +1985,7 @@ PICS:
     - label: "Does the DUT(server) support the CurrentFabricIndex attribute?"
       id: OPCREDS.S.A0005
 
+    #########
     - label: "Does the DUT(Server) support MaxNetworks attribute?"
       id: CNET.S.A0000
 
@@ -5248,6 +5261,11 @@ PICS:
           "Does the Mode Select Cluster depend on an On/Off cluster implemented
           on the same DUT?"
       id: MOD.S.F00
+
+    - label:
+          "Does the device implement receiving the ChangeToModeWithStatus
+          command?"
+      id: MOD.S.C01.Rsp
 
     #
     # client / attributes

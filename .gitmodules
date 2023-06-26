@@ -308,3 +308,8 @@
 	url = https://github.com/asriot/ASR595X_Freertos.git
 	branch = matter
 	platforms = asr
+[submodule "perfetto"]
+	path = third_party/perfetto/repo
+	url = https://github.com/google/perfetto.git
+	branch = master
+	platforms = linux,android

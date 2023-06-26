@@ -22,40 +22,39 @@ buildconfig_header("tracing_buildconfig") {
   header = "build_config.h"
   header_dir = "matter/tracing"
 
-  defines = []
+  # When neither none nor multiplexed is set, expect a separate config
+  #  to be set, that provides matter/tracing/macros_impl.h
 
-  if (matter_enable_tracing_support) {
-    defines += [ "MATTER_TRACING_ENABLED=1" ]
-  }
+  defines = [ "MATTER_TRACING_ENABLED=${matter_enable_tracing_support}" ]
+}
 
-  if (matter_trace_config == "multiplexed") {
-    defines += [ "MATTER_TRACE_MULTIPLEXED=1" ]
-  } else if (matter_trace_config == "none") {
-    defines += [ "MATTER_TRACE_NONE=1" ]
-  } else {
-    # Expect a separate config to be set, that provides
-    # matter/tracing/macros_impl.h
-  }
+config("multiplexed_tracing") {
+  include_dirs = [ "multiplexed/include" ]
 }
 
 static_library("tracing") {
   sources = [
     "backend.h",
     "log_declares.h",
-    "macros.h",
     "registry.cpp",
     "registry.h",
-    "scope.h",
   ]
 
   public_deps = [
     ":tracing_buildconfig",
     "${chip_root}/src/lib/support",
   ]
+}
+
+source_set("macros") {
+  sources = [ "macros.h" ]
+
+  public_deps = [
+    ":tracing",
+    ":tracing_buildconfig",
+  ]
 
   if (matter_enable_tracing_support) {
-    if (matter_trace_config != "multiplexed" && matter_trace_config != "none") {
-      public_configs += [ matter_trace_config ]
-    }
+    public_deps += [ matter_trace_config ]
   }
 }

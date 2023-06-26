@@ -1,0 +1,174 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 50.3.1. [TC-DGTHREAD-3.1] Attributes [DUT- Client]
+
+PICS:
+    - DGTHREAD.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Thread Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the device to be commissioned"
+      cluster: "DelayCommands"
+      command: "WaitForCommissioning"
+
+    - label: "DUT reads Channel attribute value from TH"
+      wait: "readAttribute"
+      attribute: "Channel"
+      PICS: DGTHREAD.C.A0000
+
+    - label: "DUT reads RoutingRole attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RoutingRole"
+      PICS: DGTHREAD.C.A0001
+
+    - label: "DUT reads NetworkName attribute value from TH"
+      wait: "readAttribute"
+      attribute: "NetworkName"
+      PICS: DGTHREAD.C.A0002
+
+    - label: "DUT reads PanId attribute value from TH"
+      wait: "readAttribute"
+      attribute: "PanId"
+      PICS: DGTHREAD.C.A0003
+
+    - label: "DUT reads ExtendedPanId attribute value from TH"
+      wait: "readAttribute"
+      attribute: "ExtendedPanId"
+      PICS: DGTHREAD.C.A0004
+
+    - label: "DUT reads MeshLocalPrefix attribute value from TH"
+      wait: "readAttribute"
+      attribute: "MeshLocalPrefix"
+      PICS: DGTHREAD.C.A0005
+
+    - label: "DUT reads OverrunCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "OverrunCount"
+      PICS: DGTHREAD.C.A0006
+
+    - label: "DUT reads NeighborTable attribute value from TH"
+      wait: "readAttribute"
+      attribute: "NeighborTable"
+      PICS: DGTHREAD.C.A0007
+
+    - label: "DUT reads RouteTable attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RouteTable"
+      PICS: DGTHREAD.C.A0008
+
+    - label: "DUT reads PartitionId attribute value from TH"
+      wait: "readAttribute"
+      attribute: "PartitionId"
+      PICS: DGTHREAD.C.A0009
+
+    - label: "DUT reads Weighting attribute value from TH"
+      wait: "readAttribute"
+      attribute: "Weighting"
+      PICS: DGTHREAD.C.A000a
+
+    - label: "DUT reads DataVersion attribute value from TH"
+      wait: "readAttribute"
+      attribute: "DataVersion"
+      PICS: DGTHREAD.C.A000b
+
+    - label: "DUT reads StableDataVersion attribute value from TH"
+      wait: "readAttribute"
+      attribute: "StableDataVersion"
+      PICS: DGTHREAD.C.A000c
+
+    - label: "DUT reads LeaderRouterId attribute value from TH"
+      wait: "readAttribute"
+      attribute: "LeaderRouterId"
+      PICS: DGTHREAD.C.A000d
+
+    - label: "DUT reads DetachedRoleCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "DetachedRoleCount"
+      PICS: DGTHREAD.C.A000e
+
+    - label: "DUT reads ChildRoleCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "ChildRoleCount"
+      PICS: DGTHREAD.C.A000f
+
+    - label: "DUT reads RouterRoleCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "RouterRoleCount"
+      PICS: DGTHREAD.C.A0010
+
+    - label: "DUT reads LeaderRoleCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "LeaderRoleCount"
+      PICS: DGTHREAD.C.A0011
+
+    - label: "DUT reads AttachAttemptCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "AttachAttemptCount"
+      PICS: DGTHREAD.C.A0012
+
+    - label: "DUT reads PartitionIdChangeCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "PartitionIdChangeCount"
+      PICS: DGTHREAD.C.A0013
+
+    - label:
+          "DUT reads BetterPartitionAttachAttemptCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "BetterPartitionAttachAttemptCount"
+      PICS: DGTHREAD.C.A0014
+
+    - label: "DUT reads ParentChangeCount attribute value from TH"
+      wait: "readAttribute"
+      attribute: "ParentChangeCount"
+      PICS: DGTHREAD.C.A0015
+
+    - label: "DUT reads ActiveTimestamp attribute value from TH"
+      wait: "readAttribute"
+      attribute: "ActiveTimestamp"
+      PICS: DGTHREAD.C.A0038
+
+    - label: "DUT reads PendingTimestamp attribute value from TH"
+      wait: "readAttribute"
+      attribute: "PendingTimestamp"
+      PICS: DGTHREAD.C.A0039
+
+    - label: "DUT reads Delay attribute value from TH"
+      wait: "readAttribute"
+      attribute: "Delay"
+      PICS: DGTHREAD.C.A003a
+
+    - label: "DUT reads SecurityPolicy attribute value from TH"
+      wait: "readAttribute"
+      attribute: "SecurityPolicy"
+      PICS: DGTHREAD.C.A003b
+
+    - label: "DUT reads ChannelPage0Mask attribute value from TH"
+      wait: "readAttribute"
+      attribute: "ChannelPage0Mask"
+      PICS: DGTHREAD.C.A003c
+
+    - label: "DUT reads OperationalDatasetComponents attribute value from TH"
+      wait: "readAttribute"
+      attribute: "OperationalDatasetComponents"
+      PICS: DGTHREAD.C.A003d
+
+    - label: "DUT reads ActiveNetworkFaults attribute value from TH"
+      wait: "readAttribute"
+      attribute: "ActiveNetworkFaultsList"
+      PICS: DGTHREAD.C.A003e

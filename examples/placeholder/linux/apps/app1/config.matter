@@ -34,6 +34,54 @@ struct OperationalStateStruct {
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
+client cluster Identify = 3 {
+  enum EffectIdentifierEnum : ENUM8 {
+    kBlink = 0;
+    kBreathe = 1;
+    kOkay = 2;
+    kChannelChange = 11;
+    kFinishEffect = 254;
+    kStopEffect = 255;
+  }
+
+  enum EffectVariantEnum : ENUM8 {
+    kDefault = 0;
+  }
+
+  enum IdentifyTypeEnum : ENUM8 {
+    kNone = 0;
+    kLightOutput = 1;
+    kVisibleIndicator = 2;
+    kAudibleBeep = 3;
+    kDisplay = 4;
+    kActuator = 5;
+  }
+
+  attribute int16u identifyTime = 0;
+  readonly attribute IdentifyTypeEnum identifyType = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct IdentifyRequest {
+    INT16U identifyTime = 0;
+  }
+
+  request struct TriggerEffectRequest {
+    EffectIdentifierEnum effectIdentifier = 0;
+    EffectVariantEnum effectVariant = 1;
+  }
+
+  /** Command description for Identify */
+  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  /** Command description for TriggerEffect */
+  command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
+}
+
+/** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
   enum EffectIdentifierEnum : ENUM8 {
     kBlink = 0;
@@ -2193,6 +2241,7 @@ server cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute long_char_string<256> productURL = 13;
   readonly attribute char_string<64> productLabel = 14;
   readonly attribute char_string<32> serialNumber = 15;
+  readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
   readonly attribute ProductAppearanceStruct productAppearance = 20;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -3783,9 +3832,69 @@ server cluster DoorLock = 257 {
     optional OCTET_STRING PINCode = 1;
   }
 
+  request struct SetWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+    DaysMaskMap daysMask = 2;
+    INT8U startHour = 3;
+    INT8U startMinute = 4;
+    INT8U endHour = 5;
+    INT8U endMinute = 6;
+  }
+
+  request struct ClearWeekDayScheduleRequest {
+    INT8U weekDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct SetYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+    epoch_s localStartTime = 2;
+    epoch_s localEndTime = 3;
+  }
+
+  request struct ClearYearDayScheduleRequest {
+    INT8U yearDayIndex = 0;
+    INT16U userIndex = 1;
+  }
+
+  request struct SetHolidayScheduleRequest {
+    INT8U holidayIndex = 0;
+    epoch_s localStartTime = 1;
+    epoch_s localEndTime = 2;
+    OperatingModeEnum operatingMode = 3;
+  }
+
+  request struct ClearHolidayScheduleRequest {
+    INT8U holidayIndex = 0;
+  }
+
+  request struct SetUserRequest {
+    DataOperationTypeEnum operationType = 0;
+    INT16U userIndex = 1;
+    nullable CHAR_STRING userName = 2;
+    nullable INT32U userUniqueID = 3;
+    nullable UserStatusEnum userStatus = 4;
+    nullable UserTypeEnum userType = 5;
+    nullable CredentialRuleEnum credentialRule = 6;
+  }
+
+  request struct ClearCredentialRequest {
+    nullable CredentialStruct credential = 0;
+  }
+
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
   timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
   timed command UnlockWithTimeout(UnlockWithTimeoutRequest): DefaultSuccess = 3;
+  command access(invoke: administer) SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
+  command access(invoke: administer) ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
+  command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
+  command access(invoke: administer) ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
+  command access(invoke: administer) SetHolidaySchedule(SetHolidayScheduleRequest): DefaultSuccess = 17;
+  command access(invoke: administer) ClearHolidaySchedule(ClearHolidayScheduleRequest): DefaultSuccess = 19;
+  timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
+  timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
 }
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
@@ -6617,20 +6726,21 @@ endpoint 0 {
     emits event StartUp;
     emits event ShutDown;
     emits event Leave;
-    callback attribute vendorName;
-    callback attribute vendorID;
-    callback attribute productName;
+    ram      attribute vendorName;
+    ram      attribute vendorID;
+    ram      attribute productName;
     persist  attribute nodeLabel;
-    callback attribute hardwareVersion;
-    callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
-    callback attribute softwareVersionString;
-    callback attribute manufacturingDate;
-    callback attribute partNumber;
-    callback attribute productURL;
-    callback attribute productLabel;
-    callback attribute serialNumber;
-    callback attribute uniqueID;
+    ram      attribute hardwareVersion default = 0;
+    ram      attribute hardwareVersionString;
+    ram      attribute softwareVersion default = 0;
+    ram      attribute softwareVersionString;
+    ram      attribute manufacturingDate default = "20210614123456ZZ";
+    ram      attribute partNumber;
+    ram      attribute productURL;
+    ram      attribute productLabel;
+    ram      attribute serialNumber;
+    ram      attribute reachable default = 1;
+    ram      attribute uniqueID;
     callback attribute productAppearance;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
@@ -6685,42 +6795,42 @@ endpoint 0 {
   }
 
   server cluster DoorLock {
-    callback attribute lockState;
-    callback attribute lockType;
+    ram      attribute lockState;
+    ram      attribute lockType;
     ram      attribute actuatorEnabled;
-    callback attribute doorState;
-    callback attribute doorOpenEvents;
-    callback attribute doorClosedEvents;
-    callback attribute openPeriod;
-    callback attribute numberOfTotalUsersSupported default = 0;
-    callback attribute numberOfPINUsersSupported default = 0;
-    callback attribute numberOfRFIDUsersSupported default = 0;
-    callback attribute numberOfWeekDaySchedulesSupportedPerUser default = 0;
-    callback attribute numberOfYearDaySchedulesSupportedPerUser default = 0;
-    callback attribute numberOfHolidaySchedulesSupported default = 0;
-    callback attribute maxPINCodeLength;
-    callback attribute minPINCodeLength;
-    callback attribute maxRFIDCodeLength;
-    callback attribute minRFIDCodeLength;
-    callback attribute credentialRulesSupport default = 1;
-    callback attribute numberOfCredentialsSupportedPerUser default = 0;
-    callback attribute language;
-    callback attribute LEDSettings default = 0;
-    callback attribute autoRelockTime;
-    callback attribute soundVolume default = 0;
-    callback attribute operatingMode default = 0;
-    callback attribute supportedOperatingModes default = 65526;
-    callback attribute defaultConfigurationRegister default = 0;
-    callback attribute enableLocalProgramming default = 1;
-    callback attribute enableOneTouchLocking default = 0;
-    callback attribute enableInsideStatusLED default = 0;
-    callback attribute enablePrivacyModeButton default = 0;
-    callback attribute localProgrammingFeatures default = 0;
-    callback attribute wrongCodeEntryLimit;
-    callback attribute userCodeTemporaryDisableTime;
-    callback attribute sendPINOverTheAir default = 0;
-    callback attribute requirePINforRemoteOperation default = 0;
-    callback attribute expiringUserTimeout;
+    ram      attribute doorState;
+    ram      attribute doorOpenEvents;
+    ram      attribute doorClosedEvents;
+    ram      attribute openPeriod;
+    ram      attribute numberOfTotalUsersSupported default = 0;
+    ram      attribute numberOfPINUsersSupported default = 0;
+    ram      attribute numberOfRFIDUsersSupported default = 0;
+    ram      attribute numberOfWeekDaySchedulesSupportedPerUser default = 0;
+    ram      attribute numberOfYearDaySchedulesSupportedPerUser default = 0;
+    ram      attribute numberOfHolidaySchedulesSupported default = 0;
+    ram      attribute maxPINCodeLength;
+    ram      attribute minPINCodeLength;
+    ram      attribute maxRFIDCodeLength;
+    ram      attribute minRFIDCodeLength;
+    ram      attribute credentialRulesSupport default = 1;
+    ram      attribute numberOfCredentialsSupportedPerUser default = 0;
+    ram      attribute language;
+    ram      attribute LEDSettings default = 0;
+    ram      attribute autoRelockTime;
+    ram      attribute soundVolume default = 0;
+    ram      attribute operatingMode default = 0;
+    ram      attribute supportedOperatingModes default = 65526;
+    ram      attribute defaultConfigurationRegister default = 0;
+    ram      attribute enableLocalProgramming default = 1;
+    ram      attribute enableOneTouchLocking default = 0;
+    ram      attribute enableInsideStatusLED default = 0;
+    ram      attribute enablePrivacyModeButton default = 0;
+    ram      attribute localProgrammingFeatures default = 0;
+    ram      attribute wrongCodeEntryLimit;
+    ram      attribute userCodeTemporaryDisableTime;
+    ram      attribute sendPINOverTheAir default = 0;
+    ram      attribute requirePINforRemoteOperation default = 0;
+    ram      attribute expiringUserTimeout;
     ram      attribute clusterRevision default = 6;
   }
 
@@ -6983,6 +7093,7 @@ endpoint 0 {
 }
 endpoint 1 {
   device type anonymousEndpointType = 257, version 1;
+  binding cluster Identify;
   binding cluster OnOff;
   binding cluster LevelControl;
   binding cluster LocalizationConfiguration;
@@ -7127,54 +7238,54 @@ endpoint 1 {
   server cluster ColorControl {
     ram      attribute currentHue default = 0x00;
     ram      attribute currentSaturation default = 0x00;
-    callback attribute remainingTime default = 0x00;
+    ram      attribute remainingTime default = 0x00;
     ram      attribute currentX default = 0x616B;
     ram      attribute currentY default = 0x607D;
-    callback attribute driftCompensation;
-    callback attribute compensationText;
+    ram      attribute driftCompensation;
+    ram      attribute compensationText;
     ram      attribute colorTemperatureMireds default = 0x00FA;
-    callback attribute colorMode default = 1;
+    ram      attribute colorMode default = 1;
     ram      attribute options default = 0x00;
-    callback attribute numberOfPrimaries;
-    callback attribute primary1X;
-    callback attribute primary1Y;
-    callback attribute primary1Intensity;
-    callback attribute primary2X;
-    callback attribute primary2Y;
-    callback attribute primary2Intensity;
-    callback attribute primary3X;
-    callback attribute primary3Y;
-    callback attribute primary3Intensity;
-    callback attribute primary4X;
-    callback attribute primary4Y;
-    callback attribute primary4Intensity;
-    callback attribute primary5X;
-    callback attribute primary5Y;
-    callback attribute primary5Intensity;
-    callback attribute primary6X;
-    callback attribute primary6Y;
-    callback attribute primary6Intensity;
-    callback attribute whitePointX;
-    callback attribute whitePointY;
-    callback attribute colorPointRX;
-    callback attribute colorPointRY;
-    callback attribute colorPointRIntensity;
-    callback attribute colorPointGX;
-    callback attribute colorPointGY;
-    callback attribute colorPointGIntensity;
-    callback attribute colorPointBX;
-    callback attribute colorPointBY;
-    callback attribute colorPointBIntensity;
+    ram      attribute numberOfPrimaries;
+    ram      attribute primary1X;
+    ram      attribute primary1Y;
+    ram      attribute primary1Intensity;
+    ram      attribute primary2X;
+    ram      attribute primary2Y;
+    ram      attribute primary2Intensity;
+    ram      attribute primary3X;
+    ram      attribute primary3Y;
+    ram      attribute primary3Intensity;
+    ram      attribute primary4X;
+    ram      attribute primary4Y;
+    ram      attribute primary4Intensity;
+    ram      attribute primary5X;
+    ram      attribute primary5Y;
+    ram      attribute primary5Intensity;
+    ram      attribute primary6X;
+    ram      attribute primary6Y;
+    ram      attribute primary6Intensity;
+    ram      attribute whitePointX;
+    ram      attribute whitePointY;
+    ram      attribute colorPointRX;
+    ram      attribute colorPointRY;
+    ram      attribute colorPointRIntensity;
+    ram      attribute colorPointGX;
+    ram      attribute colorPointGY;
+    ram      attribute colorPointGIntensity;
+    ram      attribute colorPointBX;
+    ram      attribute colorPointBY;
+    ram      attribute colorPointBIntensity;
     ram      attribute enhancedCurrentHue default = 0x00;
-    callback attribute enhancedColorMode default = 0x01;
+    ram      attribute enhancedColorMode default = 0x01;
     ram      attribute colorLoopActive default = 0x00;
     ram      attribute colorLoopDirection default = 0x00;
     ram      attribute colorLoopTime default = 0x0019;
     ram      attribute colorLoopStartEnhancedHue default = 0x2300;
     ram      attribute colorLoopStoredEnhancedHue default = 0x00;
-    callback attribute colorCapabilities default = 0x00;
-    callback attribute colorTempPhysicalMinMireds default = 0x00;
-    callback attribute colorTempPhysicalMaxMireds default = 0xfeff;
+    ram      attribute colorCapabilities default = 0x00;
+    ram      attribute colorTempPhysicalMinMireds default = 0x00;
+    ram      attribute colorTempPhysicalMaxMireds default = 0xfeff;
     ram      attribute coupleColorTempToLevelMinMireds;
     ram      attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0;

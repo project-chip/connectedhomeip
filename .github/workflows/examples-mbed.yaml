@@ -48,7 +48,7 @@ jobs:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
@@ -75,9 +75,10 @@ jobs:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
-              timeout-minutes: 20
+              continue-on-error: true
+              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3
@@ -107,6 +108,7 @@ jobs:
                     mbed $APP_TARGET+$APP_PROFILE lock-app \
                     examples/lock-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-lock-app-example.elf \
                     /tmp/bloat_reports/
+                  rm -rf ./out
 
             - name: Build lighting-app example
               if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
@@ -117,6 +119,7 @@ jobs:
                     mbed $APP_TARGET+$APP_PROFILE lighting-app \
                     examples/lighting-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-lighting-app-example.elf \
                     /tmp/bloat_reports/
+                  rm -rf ./out
 
             - name: Build pigweed-app example
               if: github.event_name == 'push' || steps.changed_paths.outputs.pigweedapp == 'true'
@@ -127,6 +130,7 @@ jobs:
                     mbed $APP_TARGET+$APP_PROFILE pigweed-app \
                     examples/pigweed-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-pigweed-app-example.elf \
                     /tmp/bloat_reports/
+                  rm -rf ./out
 
             - name: Build all-clusters-app example
               if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
@@ -137,6 +141,7 @@ jobs:
                     mbed $APP_TARGET+$APP_PROFILE all-clusters-app \
                     examples/all-clusters-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-all-clusters-app-example.elf \
                     /tmp/bloat_reports/
+                  rm -rf ./out
 
             - name: Build all-clusters-minimal-app example
               if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
@@ -147,6 +152,7 @@ jobs:
                     mbed $APP_TARGET+$APP_PROFILE all-clusters-minimal-app \
                     examples/all-clusters-minimal-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-all-clusters-minimal-app-example.elf \
                     /tmp/bloat_reports/
+                  rm -rf ./out
 
             - name: Build shell example
               if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
@@ -157,6 +163,7 @@ jobs:
                     mbed $APP_TARGET+$APP_PROFILE shell \
                     examples/shell/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-shell-example.elf \
                     /tmp/bloat_reports/
+                  rm -rf ./out
 
             - name: Build ota-requestor-app example
               if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
@@ -167,6 +174,7 @@ jobs:
                     mbed $APP_TARGET+$APP_PROFILE shell \
                     examples/ota-requestor-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-ota-requestor-app-example.elf \
                     /tmp/bloat_reports/
+                  rm -rf ./out
 
             - name: Build unit tests
               # Temporarily disable build due to running out of flash space

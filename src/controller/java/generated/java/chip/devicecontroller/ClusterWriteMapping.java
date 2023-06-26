@@ -1076,6 +1076,8 @@ public class ClusterWriteMapping {
     );
     writeSmokeCoAlarmInteractionInfo.put("writeSensitivityLevelAttribute", writeSmokeCoAlarmSensitivityLevelAttributeInteractionInfo);
     writeAttributeMap.put("smokeCoAlarm", writeSmokeCoAlarmInteractionInfo);
+    Map<String, InteractionInfo> writeDishwasherAlarmInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("dishwasherAlarm", writeDishwasherAlarmInteractionInfo);
     Map<String, InteractionInfo> writeOperationalStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("operationalState", writeOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeRvcOperationalStateInteractionInfo = new LinkedHashMap<>();

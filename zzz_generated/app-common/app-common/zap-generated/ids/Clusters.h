@@ -181,6 +181,9 @@ static constexpr ClusterId Id = 0x0000005B;
 namespace SmokeCoAlarm {
 static constexpr ClusterId Id = 0x0000005C;
 } // namespace SmokeCoAlarm
+namespace DishwasherAlarm {
+static constexpr ClusterId Id = 0x0000005D;
+} // namespace DishwasherAlarm
 namespace OperationalState {
 static constexpr ClusterId Id = 0x00000060;
 } // namespace OperationalState

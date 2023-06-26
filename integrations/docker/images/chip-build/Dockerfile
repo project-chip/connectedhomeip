@@ -222,7 +222,7 @@ RUN case ${TARGETPLATFORM} in \
 # NodeJS: install a newer version than what apt-get would read
 # This installs the latest LTS version of nodejs
 #
-# NodeJS is required by github actions, we use Wandalen/wretry.action@v1.0.41
+# NodeJS is required by github actions, we use Wandalen/wretry.action@v1.3.0
 # and that seems to use the built-in node installation in the image
 #
 # This is not a CHIP dependency directly, but used by CI

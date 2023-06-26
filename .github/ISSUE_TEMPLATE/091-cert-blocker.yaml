@@ -1,4 +1,4 @@
-name: "\U0001F41B Cert Blocker"
+name: "\U0001F4DC Cert Blocker"
 description: Create a report to identify matter certification blockers
 title: "[CERT-BLOCKER] "
 labels: [bug, "cert blocker", "needs triage"]

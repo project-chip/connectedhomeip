@@ -41,7 +41,7 @@ jobs:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
@@ -56,9 +56,10 @@ jobs:
               run: |
                   mkdir objdir-clone || true
 
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
-              timeout-minutes: 20
+              continue-on-error: true
+              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3
@@ -105,7 +106,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
                   action: actions/checkout@v3.5.2
@@ -120,9 +121,10 @@ jobs:
               run: |
                   mkdir objdir-clone || true
 
-            - uses: Wandalen/wretry.action@v1.0.41
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Bootstrap cache
-              timeout-minutes: 20
+              continue-on-error: true
+              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3

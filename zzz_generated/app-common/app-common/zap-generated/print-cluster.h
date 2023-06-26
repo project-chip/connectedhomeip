@@ -331,10 +331,10 @@
 #define CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER
 #endif
 
-#if defined(ZCL_USING_REFRIGERATOR_ALARM_SERVER) || defined(ZCL_USING_REFRIGERATOR_ALARM_CLIENT)
-#define CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM { chip::app::Clusters::RefrigeratorAlarm::Id, "Refrigerator Alarm" },
+#if defined(ZCL_USING_REFRIGERATOR_ALARM_CLUSTER_SERVER) || defined(ZCL_USING_REFRIGERATOR_ALARM_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM_CLUSTER { chip::app::Clusters::RefrigeratorAlarm::Id, "Refrigerator Alarm" },
 #else
-#define CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM
+#define CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM_CLUSTER
 #endif
 
 #if defined(ZCL_USING_DISHWASHER_MODE_CLUSTER_SERVER) || defined(ZCL_USING_DISHWASHER_MODE_CLUSTER_CLIENT)
@@ -353,6 +353,12 @@
 #define CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER { chip::app::Clusters::SmokeCoAlarm::Id, "Smoke CO Alarm" },
 #else
 #define CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER
+#endif
+
+#if defined(ZCL_USING_DISHWASHER_ALARM_CLUSTER_SERVER) || defined(ZCL_USING_DISHWASHER_ALARM_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER { chip::app::Clusters::DishwasherAlarm::Id, "Dishwasher Alarm" },
+#else
+#define CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER
 #endif
 
 #if defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_CLIENT)
@@ -977,10 +983,11 @@
     CHIP_PRINTCLUSTER_RVC_RUN_MODE_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_RVC_CLEAN_MODE_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER                                                                                  \
-    CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM                                                                                           \
+    CHIP_PRINTCLUSTER_REFRIGERATOR_ALARM_CLUSTER                                                                                   \
     CHIP_PRINTCLUSTER_DISHWASHER_MODE_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
