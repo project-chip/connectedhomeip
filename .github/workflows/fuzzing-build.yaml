@@ -30,7 +30,6 @@ env:
 jobs:
     build_linux_fuzzing:
         name: Build on Linux
-        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -64,7 +63,6 @@ jobs:
               uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build all-clusters-app
-              timeout-minutes: 20
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -83,7 +81,6 @@ jobs:
 
     build_darwin_fuzzing:
         name: Build on Darwin
-        timeout-minutes: 90
         runs-on: macos-latest
         if: github.actor != 'restyled-io[bot]'
 
@@ -111,7 +108,6 @@ jobs:
               uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build all-clusters-app
-              timeout-minutes: 20
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \

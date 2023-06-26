@@ -31,7 +31,6 @@ env:
 jobs:
     linux_standalone:
         name: Linux Standalone
-        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'

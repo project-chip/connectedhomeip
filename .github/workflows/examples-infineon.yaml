@@ -32,7 +32,6 @@ env:
 jobs:
     infineon:
         name: Infineon examples building
-        timeout-minutes: 140
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -62,7 +61,6 @@ jobs:
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
             - name: Build PSoC6 lock-app example
-              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
@@ -76,7 +74,6 @@ jobs:
                       out/artifacts/infineon-psoc6-lock/chip-psoc6-lock-example.out \
                       /tmp/bloat_reports/
             - name: Build PSoC6 all-clusters-app example
-              timeout-minutes: 20
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
@@ -90,7 +87,6 @@ jobs:
                       out/artifacts/infineon-psoc6-all-clusters/chip-psoc6-clusters-example.out \
                       /tmp/bloat_reports/
             - name: Build PSoC6 all-clusters-minimal-app example
-              timeout-minutes: 20
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
@@ -104,7 +100,6 @@ jobs:
                       out/artifacts/infineon-psoc6-all-clusters-minimal/chip-psoc6-clusters-minimal-example.out \
                       /tmp/bloat_reports/
             - name: Build PSoC6 lighting-app example
-              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
@@ -119,7 +114,6 @@ jobs:
                       /tmp/bloat_reports/
 
             - name: Build example CYW30739 Apps
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
@@ -131,28 +125,24 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                     "
             - name: Get light size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cyw30739 cyw930739m2evb_01 light \
                     out/artifacts/cyw30739-cyw930739m2evb_01-light/chip-cyw30739-lighting-example.elf \
                     /tmp/bloat_reports/
             - name: Get lock size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cyw30739 cyw930739m2evb_01 lock \
                     out/artifacts/cyw30739-cyw930739m2evb_01-lock/chip-cyw30739-lock-example.elf \
                     /tmp/bloat_reports/
             - name: Get ota-requestor size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cyw30739 cyw930739m2evb_01 ota-requestor \
                     out/artifacts/cyw30739-cyw930739m2evb_01-ota-requestor/chip-cyw30739-ota-requestor-example.elf \
                     /tmp/bloat_reports/
             - name: Get switch size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cyw30739 cyw930739m2evb_01 switch \

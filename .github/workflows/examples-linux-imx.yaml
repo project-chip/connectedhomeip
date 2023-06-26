@@ -31,7 +31,6 @@ env:
 jobs:
     imx:
         name: Linux i.MX Build
-        timeout-minutes: 70
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -54,7 +53,6 @@ jobs:
                 platform: linux
 
             - name: Build lighting-app
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -63,7 +61,6 @@ jobs:
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build chip-tool
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -72,7 +69,6 @@ jobs:
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build thermostat
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -81,7 +77,6 @@ jobs:
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build all-cluster
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -90,7 +85,6 @@ jobs:
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build all-cluster-minimal
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -99,7 +93,6 @@ jobs:
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build ota-provider-app
-              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \

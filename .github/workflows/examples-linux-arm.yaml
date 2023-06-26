@@ -31,7 +31,6 @@ env:
 jobs:
     arm_crosscompile:
         name: Linux ARM Cross compile
-        timeout-minutes: 70
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -61,15 +60,7 @@ jobs:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
-            - name: Bootstrap Cache
-              uses: ./.github/actions/bootstrap-cache
-            - name: Bootstrap
-              uses: ./.github/actions/bootstrap
-            - name: Upload Bootstrap Logs
-              uses: ./.github/actions/upload-bootstrap-logs
-
             - name: Build Some samples
-              timeout-minutes: 45
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -83,14 +74,12 @@ jobs:
                         build \
                      "
             - name: Bloat report - chip-tool
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux arm64 chip-tool-ipv6only \
                     out/linux-arm64-chip-tool-ipv6only-clang/chip-tool \
                     /tmp/bloat_reports/
             - name: Bloat report - thermostat
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux arm64 thermostat-no-ble \

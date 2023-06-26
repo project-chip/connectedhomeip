@@ -31,7 +31,6 @@ env:
 jobs:
     nrfconnect:
         name: nRF Connect SDK
-        timeout-minutes: 140
 
         env:
             BUILD_TYPE: nrfconnect
@@ -77,16 +76,13 @@ jobs:
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
             - name: Check nRF Connect SDK revision.
-              timeout-minutes: 15
               run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --check"
             - name: Run unit tests of factory data generation script
-              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh 'pip3 install -r scripts/setup/requirements.nrfconnect.txt'
                   scripts/run_in_build_env.sh "./scripts/tools/nrfconnect/tests/test_generate_factory_data.py"
             - name: Build example nRF Connect SDK Lock App on nRF52840 DK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 15
               run: |
                   scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -95,7 +91,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lighting App on nRF52840 Dongle
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 15
               run: |
                   scripts/examples/nrfconnect_example.sh lighting-app nrf52840dongle_nrf52840 -DCONF_FILE=prj_no_dfu.conf -DCONFIG_CHIP_ROTATING_DEVICE_ID=y
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -104,7 +99,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lighting App on nRF52840 DK with RPC
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 20
               run: |
                   scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840 -DOVERLAY_CONFIG=rpc.overlay
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -113,7 +107,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Light Switch App on nRF52840 DK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 15
               run: |
                   scripts/examples/nrfconnect_example.sh light-switch-app nrf52840dk_nrf52840
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -122,7 +115,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Shell on nRF52840 DK
               if: github.event_name == 'push' || steps.changed_paths.outputs.shell == 'true'
-              timeout-minutes: 15
               run: |
                   scripts/examples/nrfconnect_example.sh shell nrf52840dk_nrf52840
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -131,7 +123,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Pump App on nRF52840 DK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 15
               run: |
                   scripts/examples/nrfconnect_example.sh pump-app nrf52840dk_nrf52840
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -140,7 +131,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Pump Controller App on nRF52840 DK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 15
               run: |
                   scripts/examples/nrfconnect_example.sh pump-controller-app nrf52840dk_nrf52840
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -148,7 +138,6 @@ jobs:
                     examples/pump-controller-app/nrfconnect/build/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK All Clusters App on nRF52840 DK
-              timeout-minutes: 20
               run: |
                   scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk_nrf52840 -DCONF_FILE=prj_dfu.conf
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -156,7 +145,6 @@ jobs:
                     examples/all-clusters-app/nrfconnect/build/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK All Clusters Minimal App on nRF52840 DK
-              timeout-minutes: 20
               run: |
                   scripts/examples/nrfconnect_example.sh all-clusters-minimal-app nrf52840dk_nrf52840 -DCONF_FILE=prj_dfu.conf
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -165,7 +153,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lock App on nRF5340 DK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 15
               run: |
                   scripts/examples/nrfconnect_example.sh lock-app nrf5340dk_nrf5340_cpuapp
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -174,7 +161,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lighting App on nRF5340 DK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 15
               run: |
                   scripts/examples/nrfconnect_example.sh lighting-app nrf5340dk_nrf5340_cpuapp
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -183,7 +169,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lock App on nRF7002 PDK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 20
               run: |
                   scripts/examples/nrfconnect_example.sh lock-app nrf7002dk_nrf5340_cpuapp
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -192,7 +177,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Light Switch App on nRF7002 PDK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 20
               run: |
                   scripts/examples/nrfconnect_example.sh light-switch-app nrf7002dk_nrf5340_cpuapp
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -201,7 +185,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lighting App on nRF7002 PDK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 20
               run: |
                   scripts/examples/nrfconnect_example.sh lighting-app nrf7002dk_nrf5340_cpuapp
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -209,7 +192,6 @@ jobs:
                     examples/light-switch-app/nrfconnect/build/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK All Clusters App on nRF7002 PDK
-              timeout-minutes: 20
               run: |
                   scripts/examples/nrfconnect_example.sh all-clusters-app nrf7002dk_nrf5340_cpuapp -DCONF_FILE=prj_release.conf
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -218,7 +200,6 @@ jobs:
                     /tmp/bloat_reports/
             - name: Run unit tests for Zephyr native_posix_64 platform
               if: github.event_name == 'push' || steps.changed_paths.outputs.tests == 'true' || steps.changed_paths.outputs.nrfconnect == 'true'
-              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target nrf-native-posix-64-tests build"
             - name: Uploading Failed Test Logs

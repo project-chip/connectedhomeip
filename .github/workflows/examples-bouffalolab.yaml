@@ -32,7 +32,6 @@ env:
 jobs:
   bouffalolab:
     name: Bouffalo Lab
-    timeout-minutes: 90
 
     runs-on: ubuntu-latest
     if: github.actor != 'restyled-io[bot]'
@@ -67,7 +66,6 @@ jobs:
         uses: ./.github/actions/upload-bootstrap-logs
 
       - name: Build example BL602 Lighting App
-        timeout-minutes: 30
         run: |
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py \
@@ -90,7 +88,6 @@ jobs:
         run: rm -rf ./out
 
       - name: Build example BL702 Lighting App
-        timeout-minutes: 30
         run: |
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py \

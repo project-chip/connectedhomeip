@@ -30,7 +30,6 @@ env:
 jobs:
     full_android:
         name: Run
-        timeout-minutes: 120
 
         env:
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/

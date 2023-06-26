@@ -797,7 +797,6 @@ Example:
 ...
 - name: Build new-example example
     id: build_new_example
-    timeout-minutes: 10
     run: |
         scripts/examples/openiotsdk_example.sh -b ${{ matrix.cryptoBackend }} new-example
         .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \

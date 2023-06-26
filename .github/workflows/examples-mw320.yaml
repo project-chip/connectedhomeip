@@ -31,7 +31,6 @@ env:
 jobs:
     mw320:
         name: MW320
-        timeout-minutes: 60
 
         env:
             BUILD_TYPE: gn_mw320
@@ -64,7 +63,6 @@ jobs:
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
             - name: Build MW320 all clusters example app
-              timeout-minutes: 20
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \

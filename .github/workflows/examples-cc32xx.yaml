@@ -31,7 +31,6 @@ env:
 jobs:
     cc32xx:
         name: cc32xx
-        timeout-minutes: 100
 
         env:
             BUILD_TYPE: gn_cc32xx
@@ -63,7 +62,6 @@ jobs:
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
             - name: Build examples
-              timeout-minutes: 60
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py  \
@@ -71,7 +69,6 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Get lock app size stats
-              timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc32xx CC3235SF_LAUNCHXL lock \

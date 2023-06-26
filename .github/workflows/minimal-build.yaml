@@ -26,7 +26,6 @@ concurrency:
 jobs:
     minimal:
         name: Linux / configure build of all-clusters-app
-        timeout-minutes: 60
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
@@ -48,6 +47,5 @@ jobs:
               with:
                 platform: linux
             - name: Configure and build All Clusters App
-              timeout-minutes: 10
               run: |
                   CC=gcc CXX=g++ scripts/configure --project=examples/all-clusters-app/linux && ./ninja-build
