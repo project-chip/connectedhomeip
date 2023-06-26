@@ -29,7 +29,6 @@ env:
 jobs:
     zap_regeneration:
         name: ZAP Regeneration
-        timeout-minutes: 60
 
         runs-on: ubuntu-20.04
         container:
@@ -66,11 +65,9 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 10
               run: bash scripts/bootstrap.sh
 
             - name: Generate all
-              timeout-minutes: 5
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
             - name: Ensure git works in current working directory
               run: git config --global --add safe.directory `pwd`

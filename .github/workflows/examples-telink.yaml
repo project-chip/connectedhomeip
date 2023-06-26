@@ -74,7 +74,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 25
               run: bash scripts/bootstrap.sh
 
             - name: Build example Telink All Clusters App

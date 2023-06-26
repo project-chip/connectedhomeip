@@ -31,7 +31,6 @@ env:
 jobs:
     zap_templates:
         name: ZAP templates generation
-        timeout-minutes: 90
 
         runs-on: ubuntu-20.04
         container:
@@ -67,7 +66,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 10
               run: bash scripts/bootstrap.sh
 
             - name: Generate all

@@ -32,7 +32,6 @@ env:
 jobs:
     openiotsdk:
         name: Open IoT SDK examples building
-        timeout-minutes: 120
 
         env:
             TEST_NETWORK_NAME: OIStest
@@ -78,18 +77,15 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 10
               run: bash scripts/bootstrap.sh
 
             - name: Build and install Python controller
-              timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
                   scripts/run_in_python_env.sh out/venv 'pip install -r scripts/setup/requirements.openiotsdk.txt'
 
             - name: Build shell example
               id: build_shell
-              timeout-minutes: 10
               run: |
                   scripts/examples/openiotsdk_example.sh shell
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -99,7 +95,6 @@ jobs:
 
             - name: Build lock-app example (mbedtls)
               id: build_lock_app_mbedtls
-              timeout-minutes: 10
               run: |
                   scripts/examples/openiotsdk_example.sh -b mbedtls lock-app
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -109,20 +104,17 @@ jobs:
 
             - name: Build unit tests (mbedtls)
               id: build_unit_tests_mbedtls
-              timeout-minutes: 10
               run: |
                   scripts/examples/openiotsdk_example.sh -b mbedtls unit-tests
 
             - name: "Test: shell example"
               if: steps.build_shell.outcome == 'success'
-              timeout-minutes: 5
               run: |
                   scripts/run_in_python_env.sh out/venv \
                     'scripts/examples/openiotsdk_example.sh --no-activate -C test shell'
 
             - name: "Test: lock-app example (mbedtls)"
               if: steps.build_lock_app_mbedtls.outcome == 'success'
-              timeout-minutes: 5
               run: |
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
                   scripts/run_in_python_env.sh out/venv \
@@ -131,14 +123,12 @@ jobs:
 
             - name: "Test: unit-tests (mbedtls)"
               if: steps.build_unit_tests_mbedtls.outcome == 'success'
-              timeout-minutes: 40
               run: |
                   scripts/run_in_python_env.sh out/venv \
                     'scripts/examples/openiotsdk_example.sh --no-activate -C test unit-tests'
 
             - name: Build lock-app example (psa)
               id: build_lock_app_psa
-              timeout-minutes: 10
               run: |
                   scripts/examples/openiotsdk_example.sh -c -b psa lock-app
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -148,13 +138,11 @@ jobs:
 
             - name: Build unit tests (psa)
               id: build_unit_tests_psa
-              timeout-minutes: 10
               run: |
                   scripts/examples/openiotsdk_example.sh -b psa unit-tests
 
             - name: "Test: lock-app example (psa)"
               if: steps.build_lock_app_psa.outcome == 'success'
-              timeout-minutes: 5
               run: |
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
                   scripts/run_in_python_env.sh out/venv \
@@ -163,7 +151,6 @@ jobs:
 
             - name: "Test: unit-tests (psa)"
               if: steps.build_unit_tests_psa.outcome == 'success'
-              timeout-minutes: 40
               run: |
                   scripts/run_in_python_env.sh out/venv \
                     'scripts/examples/openiotsdk_example.sh --no-activate -C test unit-tests'

@@ -34,7 +34,6 @@ env:
 jobs:
     test_suites_chip_tool_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 150
 
         strategy:
             matrix:
@@ -82,7 +81,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 25
               run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
@@ -112,7 +110,6 @@ jobs:
               run: xcodebuild clean
               working-directory: src/darwin/Framework
             - name: Build Apps
-              timeout-minutes: 90
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -127,7 +124,6 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Run Tests
-              timeout-minutes: 65
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
@@ -144,7 +140,6 @@ jobs:
                      --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
             - name: Run OTA Test
-              timeout-minutes: 5
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_darwin_framework_ota_test.py \

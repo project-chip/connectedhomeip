@@ -31,7 +31,6 @@ env:
 jobs:
     esp32:
         name: ESP32
-        timeout-minutes: 120
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -73,7 +72,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 10
               run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
@@ -85,7 +83,6 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Build some M5Stack variations
-              timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -107,7 +104,6 @@ jobs:
             - name: Clean output
               run: rm -rf ./out
             - name: Build some M5Stack variations with pregen
-              timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -131,7 +127,6 @@ jobs:
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
             - name: Build example All Clusters App C3
-              timeout-minutes: 15
               run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_c3devkit.defaults
             - name: Copy aside build products
               run: |
@@ -143,13 +138,10 @@ jobs:
                      example_binaries/esp32-build/chip-all-clusters-app.elf \
                      /tmp/bloat_reports/
             - name: Build example Pigweed App
-              timeout-minutes: 15
               run: scripts/examples/esp_example.sh pigweed-app sdkconfig.defaults
             - name: Build example Lighting App
-              timeout-minutes: 15
               run: scripts/examples/esp_example.sh lighting-app sdkconfig.defaults
             - name: Build example Lock App
-              timeout-minutes: 15
               run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults
 
             - name: Uploading Size Reports
@@ -161,7 +153,6 @@ jobs:
 
     esp32_1:
         name: ESP32_1
-        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -197,7 +188,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 10
               run: bash scripts/bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
@@ -209,25 +199,19 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Build example Bridge App
-              timeout-minutes: 15
               run: scripts/examples/esp_example.sh bridge-app
 
             - name: Build example Persistent Storage App
-              timeout-minutes: 15
               run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults
 
             - name: Build example Shell App
-              timeout-minutes: 15
               run: scripts/examples/esp_example.sh shell sdkconfig.defaults
 
             - name: Build example Temperature Measurement App
-              timeout-minutes: 15
               run: scripts/examples/esp_example.sh temperature-measurement-app sdkconfig.optimize.defaults
 
             - name: Build example OTA Requestor App
               run: scripts/examples/esp_example.sh ota-requestor-app sdkconfig.defaults
-              timeout-minutes: 15
 
             - name: Build example OTA Provider App
               run: scripts/examples/esp_example.sh ota-provider-app sdkconfig.defaults
-              timeout-minutes: 15

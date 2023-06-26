@@ -32,7 +32,6 @@ env:
 jobs:
     cirque:
         name: Cirque
-        timeout-minutes: 90
 
         env:
             DOCKER_RUN_VERSION: 0.7.3
@@ -79,7 +78,6 @@ jobs:
                         .environment
                         build_overrides/pigweed_environment.gni
             - name: Bootstrap
-              timeout-minutes: 15
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
                     -- sh -c " \
@@ -94,8 +92,8 @@ jobs:
             - uses: Wandalen/wretry.action@v1.3.0
               name: Cirque Bootstrap cache
               if: ${{ !env.ACT }}
-              timeout-minutes: 10
               continue-on-error: true
+              timeout-minutes: 10
               with:
                 action: buildjet/cache@v3
                 attempt_limit: 3
@@ -105,7 +103,6 @@ jobs:
                   restore-keys: ${{ runner.os }}-cirque-
                   path: ${{ env.GITHUB_CACHE_PATH }}
             - name: Cirque Bootstrap
-              timeout-minutes: 15
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
                     --env GITHUB_ACTION_RUN=1 \
@@ -122,7 +119,6 @@ jobs:
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Build Binaries
-              timeout-minutes: 30
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
                     -- sh -c " \
@@ -130,7 +126,6 @@ jobs:
                        && scripts/build/gn_gen_cirque.sh \
                       "
             - name: Run Tests
-              timeout-minutes: 45
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
                      --env LOG_DIR=/tmp/cirque_test_output \
