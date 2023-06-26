@@ -161,7 +161,7 @@ def adjust_includes(
 
 
 def sync_contents(app: Sphinx) -> None:
-    """Synhronize external contents.
+    """Synchronize external contents.
 
     Args:
         app: Sphinx application instance.
