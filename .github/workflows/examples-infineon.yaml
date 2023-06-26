@@ -26,9 +26,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     infineon:
         name: Infineon examples building
@@ -49,10 +47,10 @@ jobs:
                 platform: infineon
 
             - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
-              env:
-                  GH_CONTEXT: ${{ toJson(github) }}
-              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+              with:
+                gh-context: ${{ toJson(github) }}
 
             - name: Build PSoC6 lock-app example
               run: |
@@ -143,9 +141,7 @@ jobs:
                     out/artifacts/cyw30739-cyw930739m2evb_01-switch/chip-cyw30739-light-switch-example.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
-              uses: actions/upload-artifact@v3
+              uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                  name: Size,Infineon-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-                  path: |
-                      /tmp/bloat_reports/
+                platform-name: Infineon

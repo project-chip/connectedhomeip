@@ -25,9 +25,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     mw320:
         name: MW320
@@ -51,10 +49,10 @@ jobs:
                 platform: mw320
 
             - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
-              env:
-                  GH_CONTEXT: ${{ toJson(github) }}
-              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+              with:
+                gh-context: ${{ toJson(github) }}
 
             - name: Build MW320 all clusters example app
               run: |
@@ -65,9 +63,7 @@ jobs:
                         --copy-artifacts-to out/artifacts \
                      "
             - name: Uploading Size Reports
-              uses: actions/upload-artifact@v3
+              uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                  name: Size,MW320-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-                  path: |
-                      /tmp/bloat_reports/
+                platform-name: MW320

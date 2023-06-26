@@ -26,9 +26,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     mbedos:
         name: Mbed OS examples building
@@ -65,10 +63,10 @@ jobs:
                         - 'examples/pigweed-app/mbed/**'
 
             - name: Set up environment for size reports
+              uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
-              env:
-                  GH_CONTEXT: ${{ toJson(github) }}
-              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+              with:
+                gh-context: ${{ toJson(github) }}
 
             - name: Build lock-app example
               run: |
@@ -145,9 +143,7 @@ jobs:
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
 
             - name: Uploading Size Reports
-              uses: actions/upload-artifact@v3
+              uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                  name: Size,Mbed-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-                  path: |
-                      /tmp/bloat_reports/
+                platform-name: Mbed
