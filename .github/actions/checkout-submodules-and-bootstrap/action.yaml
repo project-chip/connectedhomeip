@@ -4,6 +4,10 @@ inputs:
   platform:
     description: "Platform name"
     required: true
+  extra-submodule-parameters:
+    description: "extra submodule parameters"
+    required: false
+    default: ""
   bootstrap-log-name:
     description: "Bootstrap log name"
     required: false
@@ -15,6 +19,7 @@ runs:
       uses: ./.github/actions/checkout-submodules
       with:
         platform: ${{ inputs.platform }}
+        extra-parameters: ${{ inputs.extra-submodule-parameters }}
     - name: Bootstrap Cache
       uses: ./.github/actions/bootstrap-cache
     - name: Bootstrap
