@@ -50,7 +50,8 @@ jobs:
                 attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform asr
-            - uses: ./.github/actions/bootstrap-cache
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               run: bash scripts/bootstrap.sh
             - name: Build all ASR582X examples

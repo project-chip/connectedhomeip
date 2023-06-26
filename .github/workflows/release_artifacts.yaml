@@ -48,11 +48,13 @@ jobs:
                   attempt_delay: 2000
                   ref: "${{ github.event.inputs.releaseTag }}"
 
-            - uses: ./.github/actions/bootstrap-cache
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh
-            - uses: ./.github/actions/upload-bootstrap-logs
+            - name: Upload Bootstrap Logs
+              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build
               run: scripts/examples/esp_example.sh all-clusters-app
@@ -89,11 +91,13 @@ jobs:
                   attempt_delay: 2000
                   ref: "${{ github.event.inputs.releaseTag }}"
 
-            - uses: ./.github/actions/bootstrap-cache
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh
-            - uses: ./.github/actions/upload-bootstrap-logs
+            - name: Upload Bootstrap Logs
+              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build example EFR32 Lock App
               run: scripts/examples/gn_silabs_example.sh examples/lock-app/efr32/

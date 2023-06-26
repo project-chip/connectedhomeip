@@ -51,7 +51,8 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 
-            - uses: ./.github/actions/bootstrap-cache
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               run: bash scripts/bootstrap.sh
 

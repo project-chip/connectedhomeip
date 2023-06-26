@@ -59,11 +59,13 @@ jobs:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
-            - uses: ./.github/actions/bootstrap-cache
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 10
               run: bash scripts/bootstrap.sh
-            - uses: ./.github/actions/upload-bootstrap-logs
+            - name: Upload Bootstrap Logs
+              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build Standalone cert tool
               run: |

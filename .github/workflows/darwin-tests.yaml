@@ -68,7 +68,8 @@ jobs:
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
 
-            - uses: ./.github/actions/bootstrap-cache
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh

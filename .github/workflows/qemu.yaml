@@ -57,11 +57,13 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform esp32
 
-            - uses: ./.github/actions/bootstrap-cache
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh
-            - uses: ./.github/actions/upload-bootstrap-logs
+            - name: Upload Bootstrap Logs
+              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Build ESP32 QEMU test images
               timeout-minutes: 20
@@ -107,7 +109,8 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform tizen
 
-            - uses: ./.github/actions/bootstrap-cache
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh

@@ -51,11 +51,13 @@ jobs:
             - name: Setup Environment
               run: brew install python@3.9
 
-            - uses: ./.github/actions/bootstrap-cache
+            - name: Bootstrap Cache
+              uses: ./.github/actions/bootstrap-cache
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh
-            - uses: ./.github/actions/upload-bootstrap-logs
+            - name: Upload Bootstrap Logs
+              uses: ./.github/actions/upload-bootstrap-logs
 
             - name: Block zap-cli from being used
               # xcodebuild is NOT expected to require zap-cli

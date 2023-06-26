@@ -59,7 +59,8 @@ jobs:
               run: |
                   mkdir -p /tmp/log_output ;
                   bash scripts/bootstrap.sh ;
-            - uses: ./.github/actions/upload-bootstrap-logs
+            - name: Upload Bootstrap Logs
+              uses: ./.github/actions/upload-bootstrap-logs
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1
