@@ -41,10 +41,10 @@ class OperationalStateDelegate : public Delegate
 public:
     /**
      * Get operational state.
-     * @param void.
-     * @return the const reference of operational state.
+     * @param op Put a struct instance on the state, then call the delegate to fill it in.
+     * @return void.
      */
-    const GenericOperationalState & GetOperationalState() const override;
+    void GetOperationalState(GenericOperationalState & op) override;
 
     /**
      * Get operational state list.

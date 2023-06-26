@@ -272,10 +272,10 @@ class Delegate
 public:
     /**
      * Get operational state.
-     * @param void.
-     * @return the const reference of operational state.
+     * @param op Put a struct instance on the state, then call the delegate to fill it in.
+     * @return void.
      */
-    virtual const GenericOperationalState & GetOperationalState() const = 0;
+    virtual void GetOperationalState(GenericOperationalState & op) = 0;
 
     /**
      * Get operational state list.

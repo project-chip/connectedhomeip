@@ -149,9 +149,9 @@ CHIP_ERROR OperationalStateDelegate::SetOperationalState(const GenericOperationa
     return CHIP_NO_ERROR;
 }
 
-const GenericOperationalState & OperationalStateDelegate::GetOperationalState() const
+void OperationalStateDelegate::GetOperationalState(GenericOperationalState & op)
 {
-    return mOperationalState;
+    op = mOperationalState;
 }
 
 CHIP_ERROR OperationalStateDelegate::SetOperationalError(const GenericOperationalError & opErrState)

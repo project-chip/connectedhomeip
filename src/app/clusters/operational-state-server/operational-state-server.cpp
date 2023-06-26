@@ -108,10 +108,12 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
+    delegate->GetOperationalState(opState);
 
-    if (delegate->GetOperationalState().operationalStateID == to_underlying(OperationalStateEnum::kPaused))
+    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kPaused))
     {
         response.commandResponseState = err;
     }
@@ -129,17 +131,18 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    uint8_t currentStateId = delegate->GetOperationalState().operationalStateID;
+    delegate->GetOperationalState(opState);
 
-    if (currentStateId == to_underlying(OperationalStateEnum::kRunning))
+    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kRunning))
     {
         response.commandResponseState = err;
     }
-    else if (currentStateId != to_underlying(OperationalStateEnum::kPaused) &&
-             currentStateId != to_underlying(OperationalStateEnum::kRunning))
+    else if (opState.operationalStateID != to_underlying(OperationalStateEnum::kPaused) &&
+             opState.operationalStateID != to_underlying(OperationalStateEnum::kRunning))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
         response.commandResponseState = err;
@@ -158,10 +161,13 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    if (delegate->GetOperationalState().operationalStateID == to_underlying(OperationalStateEnum::kRunning))
+    delegate->GetOperationalState(opState);
+
+    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kRunning))
     {
         response.commandResponseState = err;
     }
@@ -179,10 +185,13 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    if (delegate->GetOperationalState().operationalStateID == to_underlying(OperationalStateEnum::kStopped))
+    delegate->GetOperationalState(opState);
+
+    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kStopped))
     {
         response.commandResponseState = err;
     }
@@ -262,10 +271,10 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     case OperationalState::Attributes::OperationalState::Id: {
 
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-
+        GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        return aEncoder.Encode(delegate->GetOperationalState());
+        delegate->GetOperationalState(opState);
+        return aEncoder.Encode(opState);
     }
     break;
 
