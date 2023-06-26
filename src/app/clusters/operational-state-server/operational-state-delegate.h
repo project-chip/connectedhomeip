@@ -38,46 +38,46 @@ constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
  */
 struct GenericOperationalState : public chip::app::Clusters::detail::Structs::OperationalStateStruct::Type
 {
-    GenericOperationalState(uint8_t state, const char * label = nullptr, size_t labelLen = 0) { set(state, label, labelLen); }
+    GenericOperationalState(uint8_t state, Optional<chip::CharSpan> label = NullOptional)
+    {
+        Set(state, label);
+    }
 
     GenericOperationalState(const GenericOperationalState & op)
     {
-        set(op.operationalStateID, op.operationalStateLabel.HasValue() ? op.OperationalStateLabel : nullptr,
-            op.operationalStateLabel.HasValue() ? sizeof(op.OperationalStateLabel) : 0);
+        *this = op;
     }
 
     GenericOperationalState & operator=(const GenericOperationalState & op)
     {
-        set(op.operationalStateID, op.operationalStateLabel.HasValue() ? op.OperationalStateLabel : nullptr,
-            op.operationalStateLabel.HasValue() ? sizeof(op.OperationalStateLabel) : 0);
-
+        Set(op.operationalStateID, op.operationalStateLabel);
         return *this;
     }
 
-    void set(uint8_t state, const char * label = nullptr, size_t labelLen = 0)
+    void Set(uint8_t state, Optional<chip::CharSpan> label = NullOptional)
     {
         operationalStateID = state;
-        if (label == nullptr)
+        if (label.HasValue())
         {
-            operationalStateLabel = Optional<chip::CharSpan>::Missing();
-        }
-        else
-        {
-            memset(OperationalStateLabel, 0, sizeof(OperationalStateLabel));
-            if (labelLen > kOperationalStateLabelMaxSize)
+            memset(mOperationalStateLabelBuffer, 0, sizeof(mOperationalStateLabelBuffer));
+            if (label.Value().size() > sizeof(mOperationalStateLabelBuffer))
             {
-                memcpy(OperationalStateLabel, label, kOperationalStateLabelMaxSize);
+                memcpy(mOperationalStateLabelBuffer, label.Value().data(), sizeof(mOperationalStateLabelBuffer));
+                operationalStateLabel.SetValue(chip::CharSpan(mOperationalStateLabelBuffer, sizeof(mOperationalStateLabelBuffer)));
             }
             else
             {
-                memcpy(OperationalStateLabel, label, labelLen);
+                memcpy(mOperationalStateLabelBuffer, label.Value().data(), label.Value().size());
+                operationalStateLabel.SetValue(chip::CharSpan(mOperationalStateLabelBuffer, label.Value().size()));
             }
-
-            operationalStateLabel.SetValue(chip::CharSpan(OperationalStateLabel, sizeof(OperationalStateLabel)));
+        }
+        else
+        {
+            operationalStateLabel = NullOptional;
         }
     }
-    uint8_t getStateID() const { return operationalStateID; }
-    char OperationalStateLabel[kOperationalStateLabelMaxSize];
+private:
+    char mOperationalStateLabelBuffer[kOperationalStateLabelMaxSize];
 };
 
 /**
@@ -85,8 +85,8 @@ struct GenericOperationalState : public chip::app::Clusters::detail::Structs::Op
  */
 struct GenericOperationalStateList : public GenericOperationalState
 {
-    GenericOperationalStateList(uint8_t state, const char * label = nullptr, size_t labelLen = 0) :
-        GenericOperationalState(state, label, labelLen)
+    GenericOperationalStateList(uint8_t state, Optional<chip::CharSpan> label = NullOptional) :
+        GenericOperationalState(state, label)
     {}
     GenericOperationalStateList * next = nullptr;
 };

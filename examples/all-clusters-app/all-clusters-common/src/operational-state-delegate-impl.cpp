@@ -89,8 +89,6 @@ GenericOperationalState opStateList[] = {
     GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
     GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
     GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
-    GenericOperationalState(to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock), kChildSafetyLockLabel,
-                            strlen(kChildSafetyLockLabel)),
 };
 
 /**
@@ -190,9 +188,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalStateList(GenericOperationalS
     for (i = 0; i < opStateListNumOfItems; i++)
     {
         GenericOperationalStateList * des = chip::Platform::New<GenericOperationalStateList>(
-            src->operationalStateID, src->operationalStateLabel.HasValue() ? src->OperationalStateLabel : nullptr,
-            src->operationalStateLabel.HasValue() ? sizeof(src->OperationalStateLabel) : 0);
-        des->operationalStateID = src->operationalStateID;
+            src->operationalStateID, src->operationalStateLabel);
 
         if (des == nullptr)
         {
@@ -306,13 +302,13 @@ void OperationalStateDelegate::ReleaseOperationalPhaseList(GenericOperationalPha
 
 GenericOperationalError & OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
-    if (mOperationalState.getStateID() == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
+    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
     else
     {
-        mOperationalState.set(to_underlying(OperationalStateEnum::kPaused));
+        mOperationalState.Set(to_underlying(OperationalStateEnum::kPaused));
         err.set(to_underlying(ErrorStateEnum::kNoError));
     }
     return err;
@@ -320,13 +316,13 @@ GenericOperationalError & OperationalStateDelegate::HandlePauseStateCallback(Gen
 
 GenericOperationalError & OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
-    if (mOperationalState.getStateID() == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
+    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
     }
     else
     {
-        mOperationalState.set(to_underlying(OperationalStateEnum::kRunning));
+        mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
         err.set(to_underlying(ErrorStateEnum::kNoError));
     }
     return err;
@@ -334,13 +330,13 @@ GenericOperationalError & OperationalStateDelegate::HandleResumeStateCallback(Ge
 
 GenericOperationalError & OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
-    if (mOperationalState.getStateID() == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
+    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
     }
     else
     {
-        mOperationalState.set(to_underlying(OperationalStateEnum::kRunning));
+        mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
         err.set(to_underlying(ErrorStateEnum::kNoError));
     }
     return err;
@@ -348,13 +344,13 @@ GenericOperationalError & OperationalStateDelegate::HandleStartStateCallback(Gen
 
 GenericOperationalError & OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
-    if (mOperationalState.getStateID() == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
+    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
     else
     {
-        mOperationalState.set(to_underlying(OperationalStateEnum::kStopped));
+        mOperationalState.Set(to_underlying(OperationalStateEnum::kStopped));
         err.set(to_underlying(ErrorStateEnum::kNoError));
     }
     return err;
@@ -374,7 +370,7 @@ bool OperationalStateDelegate::sendOperationalErrorEvent(const GenericOperationa
     }
 
     // set OperationalState attribute to Error
-    mOperationalState.set(to_underlying(OperationalStateEnum::kError));
+    mOperationalState.Set(to_underlying(OperationalStateEnum::kError));
     return true;
 }
 

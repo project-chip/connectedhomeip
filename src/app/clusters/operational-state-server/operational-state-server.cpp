@@ -111,7 +111,7 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    if (delegate->GetOperationalState().getStateID() == to_underlying(OperationalStateEnum::kPaused))
+    if (delegate->GetOperationalState().operationalStateID == to_underlying(OperationalStateEnum::kPaused))
     {
         response.commandResponseState = err;
     }
@@ -132,7 +132,7 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    uint8_t currentStateId = delegate->GetOperationalState().getStateID();
+    uint8_t currentStateId = delegate->GetOperationalState().operationalStateID;
 
     if (currentStateId == to_underlying(OperationalStateEnum::kRunning))
     {
@@ -161,7 +161,7 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    if (delegate->GetOperationalState().getStateID() == to_underlying(OperationalStateEnum::kRunning))
+    if (delegate->GetOperationalState().operationalStateID == to_underlying(OperationalStateEnum::kRunning))
     {
         response.commandResponseState = err;
     }
@@ -182,7 +182,7 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    if (delegate->GetOperationalState().getStateID() == to_underlying(OperationalStateEnum::kStopped))
+    if (delegate->GetOperationalState().operationalStateID == to_underlying(OperationalStateEnum::kStopped))
     {
         response.commandResponseState = err;
     }
