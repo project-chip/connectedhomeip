@@ -8390,7 +8390,7 @@
           - RVCRunMode
           - RVCCleanMode
           - DishwasherMode
-          - WasherControls
+          - LaundryWasherControls
           - RVCOperationalState
       # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
