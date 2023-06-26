@@ -103,12 +103,6 @@ jobs:
         uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
-          # If you wish to specify custom queries, you can do so here or in a config file.
-          # By default, queries listed here will override any specified in a config file.
-          # Prefix the list here with "+" to use these queries and those in the config file.
-
-          # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
-          # queries: security-extended,security-and-quality
 
       - name: Setup Build
         run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
@@ -127,6 +121,7 @@ jobs:
         uses: advanced-security/filter-sarif@v1
         with:
           patterns: |
+            -**/app/tests/**
             -**/third_party/**
             -**/scripts/**
           input: "sarif-results/${{matrix.language}}.sarif"
