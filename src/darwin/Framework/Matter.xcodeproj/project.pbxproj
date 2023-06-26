@@ -1576,6 +1576,7 @@
 					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					CONFIG_USE_LOCAL_STORAGE,
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+					"CONFIG_USE_INTERACTIVE_MODE=1",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples/darwin-framework-tool",
@@ -1594,6 +1595,10 @@
 					"$(CHIP_ROOT)/examples/chip-tool",
 					"$(CHIP_ROOT)/examples/chip-tool/commands/clusters",
 					"$(CHIP_ROOT)/zzz_generated/chip-tool",
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path",
+					"$(BUILT_PRODUCTS_DIR)",
 				);
 				"LIBRARY_SEARCH_PATHS[arch=*]" = (
 					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/lib",
@@ -1625,6 +1630,7 @@
 					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					CONFIG_USE_LOCAL_STORAGE,
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+					"CONFIG_USE_INTERACTIVE_MODE=1",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples//darwin-framework-tool",
@@ -1644,6 +1650,10 @@
 					"$(CHIP_ROOT)/examples/chip-tool/commands/clusters",
 					"$(CHIP_ROOT)/examples/chip-tool",
 					"$(CHIP_ROOT)/zzz_generated/chip-tool",
+				);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path",
+					"$(BUILT_PRODUCTS_DIR)",
 				);
 				"LIBRARY_SEARCH_PATHS[arch=*]" = (
 					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/lib",
