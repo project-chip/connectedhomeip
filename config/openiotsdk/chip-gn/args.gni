@@ -30,6 +30,7 @@ chip_config_network_layer_ble = false
 chip_system_config_use_lwip = true
 lwip_platform = "external"
 chip_system_config_use_sockets = false
+chip_inet_config_enable_ipv4 = false
 
 chip_external_mbedtls = true
 

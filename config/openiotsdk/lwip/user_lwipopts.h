@@ -50,6 +50,11 @@
 #define LWIP_RAW (1)
 
 /**
+ * Disable IPv4 support. Only IPv6 should be used in the Matter.
+ */
+#define LWIP_IPV4 0
+
+/**
  * Disable DHCP as the IP6 link local address can be used.
  */
 #define LWIP_DHCP 0
