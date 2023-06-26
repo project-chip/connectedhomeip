@@ -47,17 +47,12 @@ public:
     void GetOperationalState(GenericOperationalState & op) override;
 
     /**
-     * Get operational state list.
-     * @param operationalStateList The pointer to operational state list.
+     * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
+     * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
+     * @param index The state of index starts at 0.
+     * @param operationalState  The GenericOperationalState is filled.
      */
-    CHIP_ERROR GetOperationalStateList(GenericOperationalStateList ** operationalStateList, size_t & size) override;
-
-    /**
-     * Release OperationalStateStructDynamicList
-     * @param operationalStateList The pointer for which to clear the OperationalStateStructDynamicList.
-     * @return void
-     */
-    void ReleaseOperationalStateList(GenericOperationalStateList * operationalStateList) override;
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
 
     /**
      * Get operational phase list.

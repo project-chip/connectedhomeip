@@ -237,32 +237,29 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     {
     case OperationalState::Attributes::OperationalStateList::Id: {
         Delegate * delegate                   = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-        GenericOperationalStateList * pOpList = nullptr;
-        size_t size                           = 0;
+        GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
+        size_t index = 0;
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-        err = delegate->GetOperationalStateList(&pOpList, size);
-        if (err != CHIP_NO_ERROR)
+        //operational state list is not found
+        if (delegate->GetOperationalStateAtIndex(index, opState) == CHIP_ERROR_NOT_FOUND)
         {
             err = aEncoder.EncodeNull();
         }
         else
         {
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                for (GenericOperationalStateList * pHead = pOpList; pHead != nullptr; pHead = pHead->next)
-                {
-                    err = encoder.Encode(*pHead);
-                    if (err != CHIP_NO_ERROR)
+                    while(delegate->GetOperationalStateAtIndex(index, opState) != CHIP_ERROR_NOT_FOUND)
                     {
-                        delegate->ReleaseOperationalStateList(pOpList);
-                        pOpList = nullptr;
-                        return err;
+                        err = encoder.Encode(opState);
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            return err;
+                        }
+                        index++;
                     }
-                }
-                delegate->ReleaseOperationalStateList(pOpList);
-                pOpList = nullptr;
-                return CHIP_NO_ERROR;
+                    return CHIP_NO_ERROR;
             });
         }
     }

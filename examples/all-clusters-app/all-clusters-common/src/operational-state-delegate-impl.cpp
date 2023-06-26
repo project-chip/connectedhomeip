@@ -165,68 +165,26 @@ const GenericOperationalError OperationalStateDelegate::GetOperationalError() co
     return mOperationalError;
 }
 
-CHIP_ERROR OperationalStateDelegate::GetOperationalStateList(GenericOperationalStateList ** operationalStateList, size_t & size)
+CHIP_ERROR OperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
-    CHIP_ERROR err                     = CHIP_ERROR_NO_MEMORY;
-    size                               = 0;
-    size_t i                           = 0;
     size_t opStateListNumOfItems       = 0;
-    GenericOperationalStateList * head = nullptr;
-
-    if (!operationalStateList)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
 
     const GenericOperationalState * src = getGenericOperationalStateTable(mEndpointId, mClusterId, opStateListNumOfItems);
     if (!src || !opStateListNumOfItems)
     {
         ChipLogError(Zcl, "Unable to find Operational State List for [ep=%d],[cid=%d]", mEndpointId, mClusterId);
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_NOT_FOUND;
     }
 
-    for (i = 0; i < opStateListNumOfItems; i++)
+    if (index > opStateListNumOfItems - 1)
     {
-        GenericOperationalStateList * des = Platform::New<GenericOperationalStateList>(
-            src->operationalStateID, src->operationalStateLabel);
-
-        if (des == nullptr)
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-            ExitNow();
-        }
-
-        if (head == nullptr)
-        {
-            head = des;
-        }
-        else
-        {
-            GenericOperationalStateList * pList = head;
-            while (pList->next != nullptr)
-            {
-                pList = pList->next;
-            }
-            pList->next = des;
-        }
-        src++;
+        return CHIP_ERROR_NOT_FOUND;
     }
-    size                  = i;
-    *operationalStateList = head;
+    else
+    {
+        operationalState = src[index];
+    }
     return CHIP_NO_ERROR;
-exit:
-    ReleaseOperationalStateList(head);
-    return err;
-}
-
-void OperationalStateDelegate::ReleaseOperationalStateList(GenericOperationalStateList * operationalStateList)
-{
-    while (operationalStateList)
-    {
-        GenericOperationalStateList * del = operationalStateList;
-        operationalStateList              = operationalStateList->next;
-        Platform::Delete(del);
-    }
 }
 
 CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseList(GenericOperationalPhaseList ** operationalPhaseList, size_t & size)

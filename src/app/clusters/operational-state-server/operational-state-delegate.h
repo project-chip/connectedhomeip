@@ -81,17 +81,6 @@ private:
 };
 
 /**
- * A class which holds the operational state list of an Operational State cluster derivation.
- */
-struct GenericOperationalStateList : public GenericOperationalState
-{
-    GenericOperationalStateList(uint8_t state, Optional<CharSpan> label = NullOptional) :
-        GenericOperationalState(state, label)
-    {}
-    GenericOperationalStateList * next = nullptr;
-};
-
-/**
  * A class which represents the operational error of an Operational State cluster derivation instance.
  */
 struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorStateStruct::Type
@@ -278,18 +267,12 @@ public:
     virtual void GetOperationalState(GenericOperationalState & op) = 0;
 
     /**
-     * Get operational state list.
-     * @param operationalStateList The pointer to operational state list.
-     * After a successful return the caller is responsible for calling ReleaseOperationalStateList on the outparam.
+     * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
+     * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
+     * @param index The state of index starts at 0.
+     * @param operationalState  The GenericOperationalState is filled.
      */
-    virtual CHIP_ERROR GetOperationalStateList(GenericOperationalStateList ** operationalStateList, size_t & size) = 0;
-
-    /**
-     * Release operational state list
-     * @param operationalStateList The pointer for which to clear the OperationalStateStructDynamicList.
-     * @return void
-     */
-    virtual void ReleaseOperationalStateList(GenericOperationalStateList * operationalStateList) = 0;
+    virtual CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) = 0;
 
     /**
      * Get operational phase list.
