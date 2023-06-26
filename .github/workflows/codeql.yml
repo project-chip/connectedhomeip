@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   analyze:
-    uses: project-chip/connectedhomeip/.github/workflows/build.yaml@main
+    uses: project-chip/connectedhomeip/.github/workflows/build.yaml@master
     with:
       run-codeql: true
   
