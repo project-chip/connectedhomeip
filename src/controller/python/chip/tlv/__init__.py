@@ -359,7 +359,7 @@ class TLVWriter(object):
             controlByte |= 3
         if tag is None:
             if (
-                type is not TLVEndOfContainer
+                type != TLVEndOfContainer
                 and len(self._containerStack) != 0
                 and self._containerStack[0] == TLV_TYPE_STRUCTURE
             ):
@@ -443,9 +443,9 @@ class TLVWriter(object):
     @staticmethod
     def _verifyValidContainerType(containerType):
         if (
-            containerType is not TLV_TYPE_STRUCTURE
-            and containerType is not TLV_TYPE_ARRAY
-            and containerType is not TLV_TYPE_PATH
+            containerType != TLV_TYPE_STRUCTURE
+            and containerType != TLV_TYPE_ARRAY
+            and containerType != TLV_TYPE_PATH
         ):
             raise ValueError("Invalid TLV container type")
 

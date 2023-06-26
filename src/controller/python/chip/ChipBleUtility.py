@@ -368,7 +368,7 @@ class BleDeviceIdentificationInfo:
 
 
 def ParseServiceData(data):
-    if len(data) is not SERVICE_DATA_LEN:
+    if len(data) != SERVICE_DATA_LEN:
         return None
     return BleDeviceIdentificationInfo(
         int(data[0]),

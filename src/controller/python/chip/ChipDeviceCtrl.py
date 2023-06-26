@@ -295,7 +295,7 @@ class ChipDeviceControllerBase():
             else:
                 print("Established secure session with Device")
 
-            if self.state is not DCState.COMMISSIONING:
+            if self.state != DCState.COMMISSIONING:
                 # During Commissioning, HandlePASEEstablishmentComplete will also be called,
                 # in this case the async operation should be marked as finished by
                 # HandleCommissioningComplete instead this function.
