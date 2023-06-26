@@ -12,7 +12,7 @@ runs:
       uses: actions/upload-artifact@v3
       if: ${{ always() && !env.ACT }}
       with:
-        name: ${{ inputs.bootstrap-log-name }}}
+        name: ${{ inputs.bootstrap-log-name }}
         path: |
           .environment/gn_out/.ninja_log
           .environment/pigweed-venv/*.log
