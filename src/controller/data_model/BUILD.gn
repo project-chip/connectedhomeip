@@ -80,8 +80,6 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/BromodichloromethaneConcentrationMeasurementClient-ReadImpl.cpp",
       "jni/BromoformConcentrationMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/BromoformConcentrationMeasurementClient-ReadImpl.cpp",
-      "jni/CHIPCallbackTypes.h",
-      "jni/CHIPReadCallbacks.h",
       "jni/CarbonDioxideConcentrationMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/CarbonDioxideConcentrationMeasurementClient-ReadImpl.cpp",
       "jni/CarbonMonoxideConcentrationMeasurementClient-InvokeSubscribeImpl.cpp",
