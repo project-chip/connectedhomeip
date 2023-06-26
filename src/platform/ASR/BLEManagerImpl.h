@@ -83,14 +83,12 @@ public:
     // ===== Private members reserved for use by this class only.
     enum class Flags : uint16_t
     {
-        kFlag_AsyncInitCompleted     = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kFlag_StackInitialized       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
         kFlag_AdvertisingEnabled     = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
         kFlag_FastAdvertisingEnabled = 0x0004, /**< The application has enabled fast advertising. */
         kFlag_Advertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
-        kFlag_AdvertisingRefreshNeeded =
+        kFlag_AdvertisingRestarted =
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
-        kFlag_DeviceNameSet    = 0x0020,
-        kFlag_StackInitialized = 0x0040,
     };
 
     enum
@@ -118,17 +116,21 @@ public:
     void SetScanRspData(uint8_t * data, uint8_t * len);
     void SetAdvStartFlag(void);
     void SetAdvEndFlag(void);
+    void SetStackInit(void);
     CHIPoBLEConState * AllocConnectionState(uint16_t conId);
     CHIPoBLEConState * GetConnectionState(uint16_t conId);
     bool ReleaseConnectionState(uint16_t conId);
     void SetConnectionMtu(uint16_t conId, uint16_t mtu);
-
     static void DriveBLEState(intptr_t arg);
-
     void HandleTXCharCCCDRead(uint8_t connection_id, uint16_t * length, uint8_t * value);
     bool HandleRXCharWrite(uint8_t connection_id, uint16_t length, uint8_t * value);
     bool HandleTXCharCCCDWrite(uint8_t connection_id, uint16_t length, uint8_t * value);
     void SendIndicationConfirm(uint16_t conId);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    void HandleC3CharRead(uint8_t connection_id, uint16_t * p_len, uint8_t * p_value);
+#endif
+    static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
+    void HandleFastAdvertisementTimer();
 };
 
 /**

@@ -34,6 +34,7 @@ _EVENT = 'event'
 _ERROR = 'error'
 _CLUSTER_ERROR = 'clusterError'
 _VALUE = 'value'
+_DATA_VERSION = 'dataVersion'
 
 # FabricIndex is a special case where the field is added as a struct field by the SDK
 # if needed but is not part of the XML definition of the struct.
@@ -88,17 +89,20 @@ class Decoder:
                 elif key == _EVENT_ID:
                     key = _EVENT
                     value = specs.get_event_name(payload[_CLUSTER_ID], value)
-                elif key == _VALUE or key == _ERROR or key == _CLUSTER_ERROR:
+                elif key == _VALUE or key == _ERROR or key == _CLUSTER_ERROR or key == _DATA_VERSION:
                     pass
                 else:
                     # Raise an error since the other fields probably needs to be translated too.
                     raise KeyError(f'Error: field "{key}" not supported')
 
-                if value is None and (key == _CLUSTER or key == _RESPONSE or key == _ATTRIBUTE or key == _EVENT):
+                if value is None and (key == _CLUSTER or key == _RESPONSE or key == _ATTRIBUTE or key == _EVENT) and _ERROR not in payload:
                     # If the definition for this cluster/command/attribute/event is missing, there is not
                     # much we can do to convert the response to the proper format. It usually indicates that
                     # the cluster definition is missing something. So we just raise an exception to tell the
                     # user something is wrong and the cluster definition needs to be updated.
+                    # The only exception being when the definition can not be found but the returned payload
+                    # contains an error. It could be because the payload is for an unknown cluster/command/attribute/event
+                    # in which case we obviously don't have a definition for it.
                     cluster_code = hex(payload[_CLUSTER_ID])
                     if key == _CLUSTER:
                         raise KeyError(
@@ -254,7 +258,8 @@ class FloatConverter(BaseConverter):
 
     def maybe_convert(self, typename, value):
         if typename == 'single':
-            value = float('%g' % value)
+            float_representation = float("%.16f" % value)
+            value = float('%g' % float_representation)
         return value
 
 

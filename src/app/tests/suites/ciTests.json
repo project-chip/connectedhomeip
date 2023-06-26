@@ -34,6 +34,7 @@
         "Test_TC_CC_6_1",
         "Test_TC_CC_6_2",
         "Test_TC_CC_6_3",
+        "Test_TC_CC_6_5",
         "Test_TC_CC_7_2",
         "Test_TC_CC_7_3",
         "Test_TC_CC_7_4",
@@ -42,6 +43,7 @@
         "TestColorControl_9_2"
     ],
     "DeviceManagement": [
+        "TestIcdManagementCluster",
         "Test_TC_OPCREDS_1_2",
         "Test_TC_BINFO_1_1",
         "Test_TC_BINFO_2_1",
@@ -56,6 +58,17 @@
     "DiagnosticsLogs": ["Test_TC_DLOG_1_1"],
     "FlowMeasurement": ["Test_TC_FLW_1_1", "Test_TC_FLW_2_1"],
     "FixedLabel": ["Test_TC_FLABEL_1_1", "Test_TC_FLABEL_2_1"],
+    "FanControl": [
+        "Test_TC_FAN_1_1",
+        "Test_TC_FAN_2_1",
+        "Test_TC_FAN_2_2",
+        "Test_TC_FAN_2_3",
+        "Test_TC_FAN_2_4",
+        "Test_TC_FAN_2_5",
+        "Test_TC_FAN_3_1",
+        "Test_TC_FAN_3_2",
+        "Test_TC_FAN_3_4"
+    ],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1", "Test_TC_DGGEN_2_1"],
     "Identify": [
@@ -81,7 +94,8 @@
         "Test_TC_LVL_3_1",
         "Test_TC_LVL_4_1",
         "Test_TC_LVL_5_1",
-        "Test_TC_LVL_6_1"
+        "Test_TC_LVL_6_1",
+        "Test_TC_LVL_7_1"
     ],
     "LocalizationConfiguration": ["Test_TC_LCFG_1_1"],
     "TimeFormatLocalization": ["Test_TC_LTIME_1_2"],
@@ -160,11 +174,7 @@
     "SecureChannel": ["Test_TC_SC_5_1", "Test_TC_SC_5_2"],
     "Switch": ["Test_TC_SWTCH_1_1", "Test_TC_SWTCH_2_1"],
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
-    "Thermostat": [
-        "Test_TC_TSTAT_1_1",
-        "Test_TC_TSTAT_2_1",
-        "Test_TC_TSTAT_2_2"
-    ],
+    "Thermostat": ["Test_TC_TSTAT_1_1", "Test_TC_TSTAT_2_1"],
     "ThermostatUserConfiguration": [
         "Test_TC_TSUIC_1_1",
         "Test_TC_TSUIC_2_1",
@@ -188,7 +198,6 @@
         "Test_TC_WNCV_2_1",
         "Test_TC_WNCV_2_2",
         "Test_TC_WNCV_2_3",
-        "Test_TC_WNCV_2_4",
         "Test_TC_WNCV_2_5",
         "Test_TC_WNCV_3_1",
         "Test_TC_WNCV_3_2",
@@ -262,8 +271,9 @@
         "Test_TC_DRLK_2_5",
         "Test_TC_DRLK_2_6",
         "Test_TC_DRLK_2_7",
-        "Test_TC_DRLK_2_9",
-        "Test_TC_DRLK_2_11"
+        "Test_TC_DRLK_2_8",
+        "Test_TC_DRLK_2_11",
+        "Test_TC_DRLK_2_12"
     ],
     "Groups": [
         "TestGroupMessaging",
@@ -273,20 +283,72 @@
         "Test_TC_G_2_1"
     ],
     "Scenes": ["Test_TC_S_1_1"],
+    "ReplaceableMonitoring": [
+        "Test_TC_ACFREMON_1_1",
+        "Test_TC_ACFREMON_2_1",
+        "Test_TC_CFREMON_1_1",
+        "Test_TC_CFREMON_2_1",
+        "Test_TC_ESFREMON_1_1",
+        "Test_TC_ESFREMON_2_1",
+        "Test_TC_FTREMON_1_1",
+        "Test_TC_FTREMON_2_1",
+        "Test_TC_HEPAFREMON_1_1",
+        "Test_TC_HEPAFREMON_2_1",
+        "Test_TC_INKCREMON_1_1",
+        "Test_TC_INKCREMON_2_1",
+        "Test_TC_IONFREMON_1_1",
+        "Test_TC_IONFREMON_2_1",
+        "Test_TC_OZFREMON_1_1",
+        "Test_TC_OZFREMON_2_1",
+        "Test_TC_TCREMON_1_1",
+        "Test_TC_TCREMON_2_1",
+        "Test_TC_UVFREMON_1_1",
+        "Test_TC_UVFREMON_2_1",
+        "Test_TC_WTREMON_1_1",
+        "Test_TC_WTREMON_2_1",
+        "Test_TC_ZEOFREMON_1_1",
+        "Test_TC_ZEOFREMON_2_1"
+    ],
+    "AirQuality": ["Test_TC_AIRQUAL_1_1", "Test_TC_AIRQUAL_2_1"],
+    "ConcentrationMeasurement": [
+        "Test_TC_CDOCONC_1_1",
+        "Test_TC_CDOCONC_2_1",
+        "Test_TC_CMOCONC_1_1",
+        "Test_TC_CMOCONC_2_1",
+        "Test_TC_FLDCONC_1_1",
+        "Test_TC_FLDCONC_2_1",
+        "Test_TC_NDOCONC_1_1",
+        "Test_TC_NDOCONC_2_1",
+        "Test_TC_OZCONC_1_1",
+        "Test_TC_OZCONC_2_1",
+        "Test_TC_PMHCONC_1_1",
+        "Test_TC_PMHCONC_2_1",
+        "Test_TC_PMICONC_1_1",
+        "Test_TC_PMICONC_2_1",
+        "Test_TC_PMKCONC_1_1",
+        "Test_TC_PMKCONC_2_1",
+        "Test_TC_RNCONC_1_1",
+        "Test_TC_RNCONC_2_1",
+        "Test_TC_TVOCCONC_1_1",
+        "Test_TC_TVOCCONC_2_1"
+    ],
     "collection": [
         "AccessControl",
         "AccessControlEnforcement",
+        "AirQuality",
         "BooleanState",
         "BridgedDeviceBasicInformation",
         "Actions",
         "Binding",
         "ColorControl",
+        "ConcentrationMeasurement",
         "DeviceManagement",
         "Descriptor",
         "DiagnosticsLogs",
         "EthernetNetworkDiagnostics",
         "FlowMeasurement",
         "FixedLabel",
+        "FanControl",
         "GeneralCommissioning",
         "GeneralDiagnostics",
         "Identify",
@@ -322,6 +384,7 @@
         "SoftwareDiagnostics",
         "Subscriptions",
         "DoorLock",
-        "Groups"
+        "Groups",
+        "ReplaceableMonitoring"
     ]
 }

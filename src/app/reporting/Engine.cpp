@@ -84,6 +84,11 @@ Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, bool a
     return CHIP_NO_ERROR;
 }
 
+static bool IsOutOfWriterSpaceError(CHIP_ERROR err)
+{
+    return err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL;
+}
+
 CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & aReportDataBuilder,
                                                            ReadHandler * apReadHandler, bool * apHasMoreChunks,
                                                            bool * apHasEncodedData)
@@ -185,13 +190,17 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                              "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
                              ChipLogValueMEI(pathForRetrieval.mClusterId), err.Format());
 
-                // If error is not CHIP_ERROR_BUFFER_TOO_SMALL and is not CHIP_ERROR_NO_MEMORY, rollback and encode status.
+                // If error is not an "out of writer space" error, rollback and encode status.
                 // Otherwise, if partial data allowed, save the encode state.
                 // Otherwise roll back. If we have already encoded some chunks, we are done; otherwise encode status.
 
-                if (encodeState.AllowPartialData() && ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY)))
+                if (encodeState.AllowPartialData() && IsOutOfWriterSpaceError(err))
                 {
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
+                    // The expectation is that RetrieveClusterData has already reset attributeReportIBs to a good state (rolled
+                    // back any partially-written AttributeReportIB instances, reset its error status).  Since AllowPartialData()
+                    // is true, we may not have encoded a complete attribute value, but we did, if we encoded anything, encode a
+                    // set of complete AttributeReportIB instances that represent part of the attribute value.
                     apReadHandler->SetAttributeEncodeState(encodeState);
                 }
                 else
@@ -201,13 +210,14 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     attributeReportIBs.Rollback(attributeBackup);
                     apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
 
-                    if (err != CHIP_ERROR_NO_MEMORY && err != CHIP_ERROR_BUFFER_TOO_SMALL)
+                    if (!IsOutOfWriterSpaceError(err))
                     {
                         // Try to encode our error as a status response.
                         err = attributeReportIBs.EncodeAttributeStatus(pathForRetrieval, StatusIB(err));
                         if (err != CHIP_NO_ERROR)
                         {
-                            // OK, just roll back again and give up.
+                            // OK, just roll back again and give up; if we still ran out of space we
+                            // will send this status response in the next chunk.
                             attributeReportIBs.Rollback(attributeBackup);
                         }
                     }
@@ -241,15 +251,9 @@ exit:
     // These are are guaranteed to not fail since we've already reserved memory for the remaining 'close out' TLV operations in this
     // function and its callers.
     //
-    if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
+    if (IsOutOfWriterSpaceError(err))
     {
         ChipLogDetail(DataManagement, "<RE:Run> We cannot put more chunks into this report. Enable chunking.");
-
-        //
-        // Reset the error tracked within the builder. Otherwise, any further attempts to write
-        // data through the builder will be blocked by that error.
-        //
-        attributeReportIBs.ResetError();
         err = CHIP_NO_ERROR;
     }
 
@@ -276,7 +280,6 @@ exit:
     if (!attributeDataWritten && err == CHIP_NO_ERROR)
     {
         aReportDataBuilder.Rollback(backup);
-        aReportDataBuilder.ResetError();
     }
 
     // hasMoreChunks + no data encoded is a flag that we have encountered some trouble when processing the attribute.
@@ -292,17 +295,32 @@ exit:
 
 CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & aHasEncodedData, ReadHandler * apReadHandler)
 {
+    using Protocols::InteractionModel::Status;
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     for (auto current = apReadHandler->mpEventPathList; current != nullptr;)
     {
-        if (current->mValue.HasEventWildcard())
+        if (current->mValue.IsWildcardPath())
         {
             current = current->mpNext;
             continue;
         }
 
-        Access::RequestPath requestPath{ .cluster = current->mValue.mClusterId, .endpoint = current->mValue.mEndpointId };
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
+        Status status = CheckEventSupportStatus(path);
+        if (status != Status::Success)
+        {
+            TLV::TLVWriter checkpoint = aWriter;
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(status));
+            if (err != CHIP_NO_ERROR)
+            {
+                aWriter = checkpoint;
+                break;
+            }
+            aHasEncodedData = true;
+        }
+
+        Access::RequestPath requestPath{ .cluster = current->mValue.mClusterId, .endpoint = current->mValue.mEndpointId };
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
         err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
@@ -313,15 +331,14 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         else
         {
             TLV::TLVWriter checkpoint = aWriter;
-            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path,
-                                                        StatusIB(Protocols::InteractionModel::Status::UnsupportedAccess));
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(Status::UnsupportedAccess));
             if (err != CHIP_NO_ERROR)
             {
                 aWriter = checkpoint;
                 break;
             }
             aHasEncodedData = true;
-            ChipLogDetail(InteractionModel, "Acces to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by ACL",
+            ChipLogDetail(InteractionModel, "Access to event (%u, " ChipLogFormatMEI ", " ChipLogFormatMEI ") denied by ACL",
                           current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
                           ChipLogValueMEI(current->mValue.mEventId));
         }
@@ -379,7 +396,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
             err           = CHIP_NO_ERROR;
             hasMoreChunks = false;
         }
-        else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
+        else if (IsOutOfWriterSpaceError(err))
         {
             // when first cluster event is too big to fit in the packet, ignore that cluster event.
             // However, we may have encoded some attributes before, we don't skip it in that case.
@@ -423,11 +440,9 @@ exit:
     }
 
     // Maybe encoding the attributes has already used up all space.
-    if ((err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL) &&
-        !(hasEncodedStatus || (eventCount != 0)))
+    if ((err == CHIP_NO_ERROR || IsOutOfWriterSpaceError(err)) && !(hasEncodedStatus || (eventCount != 0)))
     {
         aReportDataBuilder.Rollback(backup);
-        aReportDataBuilder.ResetError();
         err = CHIP_NO_ERROR;
     }
 
@@ -621,7 +636,7 @@ void Engine::Run()
         ReadHandler * readHandler = imEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) imEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
-        if (readHandler->IsReportable())
+        if (readHandler->IsReportableNow())
         {
             mRunningReadHandler = readHandler;
             CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);
@@ -811,16 +826,16 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
     bool intersectsInterestPath = false;
     InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject(
         [&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
-            // We call SetDirty for both read interactions and subscribe interactions, since we may send inconsistent attribute data
-            // between two chunks. SetDirty will be ignored automatically by read handlers which are waiting for a response to the
-            // last message chunk for read interactions.
+            // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
+            // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
+            // waiting for a response to the last message chunk for read interactions.
             if (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse())
             {
                 for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
                 {
                     if (object->mValue.Intersects(aAttributePath))
                     {
-                        handler->SetDirty(aAttributePath);
+                        handler->AttributePathIsDirty(aAttributePath);
                         intersectsInterestPath = true;
                         break;
                     }
@@ -922,7 +937,7 @@ CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, uint32_t aBy
             if (interestedPath->mValue.IsEventPathSupersetOf(aPath) && interestedPath->mValue.mIsUrgentEvent)
             {
                 isUrgentEvent = true;
-                handler->UnblockUrgentEventDelivery();
+                handler->ForceDirtyState();
                 break;
             }
         }
@@ -952,7 +967,7 @@ void Engine::ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex)
             return Loop::Continue;
         }
 
-        handler->UnblockUrgentEventDelivery();
+        handler->ForceDirtyState();
 
         return Loop::Continue;
     });

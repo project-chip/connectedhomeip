@@ -585,13 +585,24 @@ void AppTask::UpdateClusterState(void)
     auto newValue = BoltLockMgr().IsUnlocked() ? DoorLock::DlLockState::kUnlocked : DoorLock::DlLockState::kLocked;
 
     SystemLayer().ScheduleLambda([newValue] {
-        ChipLogProgress(NotSpecified, "UpdateClusterState");
+        chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> currentLockState;
+        chip::app::Clusters::DoorLock::Attributes::LockState::Get(QPG_LOCK_ENDPOINT_ID, currentLockState);
 
-        EmberAfStatus status = DoorLock::Attributes::LockState::Set(QPG_LOCK_ENDPOINT_ID, newValue);
-
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (currentLockState.IsNull())
         {
-            ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
+            EmberAfStatus status = DoorLock::Attributes::LockState::Set(QPG_LOCK_ENDPOINT_ID, newValue);
+            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
+            }
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Updating LockState attribute");
+            if (!DoorLockServer::Instance().SetLockState(QPG_LOCK_ENDPOINT_ID, newValue))
+            {
+                ChipLogError(NotSpecified, "ERR: updating DoorLock");
+            }
         }
     });
 }

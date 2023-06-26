@@ -540,11 +540,11 @@ public Integer maxCumulativeFailsafeSeconds;
   }
 }
 
-public static class NetworkCommissioningClusterNetworkInfo {
+public static class NetworkCommissioningClusterNetworkInfoStruct {
 public byte[] networkID;
 public Boolean connected;
 
-  public NetworkCommissioningClusterNetworkInfo(
+  public NetworkCommissioningClusterNetworkInfoStruct(
     byte[] networkID
       , Boolean connected
   ) {
@@ -555,7 +555,7 @@ public Boolean connected;
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("NetworkCommissioningClusterNetworkInfo {\n");
+    output.append("NetworkCommissioningClusterNetworkInfoStruct {\n");
     output.append("\tnetworkID: ");
     output.append(Arrays.toString(networkID));
     output.append("\n");
@@ -567,7 +567,7 @@ public Boolean connected;
   }
 }
 
-public static class NetworkCommissioningClusterThreadInterfaceScanResult {
+public static class NetworkCommissioningClusterThreadInterfaceScanResultStruct {
 public Integer panId;
 public Long extendedPanId;
 public String networkName;
@@ -577,7 +577,7 @@ public byte[] extendedAddress;
 public Integer rssi;
 public Integer lqi;
 
-  public NetworkCommissioningClusterThreadInterfaceScanResult(
+  public NetworkCommissioningClusterThreadInterfaceScanResultStruct(
     Integer panId
       , Long extendedPanId
       , String networkName
@@ -600,7 +600,7 @@ public Integer lqi;
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("NetworkCommissioningClusterThreadInterfaceScanResult {\n");
+    output.append("NetworkCommissioningClusterThreadInterfaceScanResultStruct {\n");
     output.append("\tpanId: ");
     output.append(panId);
         output.append("\n");
@@ -630,7 +630,7 @@ public Integer lqi;
   }
 }
 
-public static class NetworkCommissioningClusterWiFiInterfaceScanResult {
+public static class NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
 public Integer security;
 public byte[] ssid;
 public byte[] bssid;
@@ -638,7 +638,7 @@ public Integer channel;
 public Integer wiFiBand;
 public Integer rssi;
 
-  public NetworkCommissioningClusterWiFiInterfaceScanResult(
+  public NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
     Integer security
       , byte[] ssid
       , byte[] bssid
@@ -657,7 +657,7 @@ public Integer rssi;
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("NetworkCommissioningClusterWiFiInterfaceScanResult {\n");
+    output.append("NetworkCommissioningClusterWiFiInterfaceScanResultStruct {\n");
     output.append("\tsecurity: ");
     output.append(security);
         output.append("\n");
@@ -1602,28 +1602,301 @@ public ArrayList<ChipStructs.ModeSelectClusterSemanticTagStruct> semanticTags;
   }
 }
 
-public static class TemperatureControlClusterTemperatureLevelStruct {
-public String label;
-public Integer temperatureLevel;
+public static class LaundryWasherModeClusterModeTagStruct {
+public Optional<Integer> mfgCode;
+public Integer value;
 
-  public TemperatureControlClusterTemperatureLevelStruct(
-    String label
-      , Integer temperatureLevel
+  public LaundryWasherModeClusterModeTagStruct(
+    Optional<Integer> mfgCode
+      , Integer value
   ) {
-    this.label = label;
-    this.temperatureLevel = temperatureLevel;
+    this.mfgCode = mfgCode;
+    this.value = value;
   }
 
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("TemperatureControlClusterTemperatureLevelStruct {\n");
+    output.append("LaundryWasherModeClusterModeTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+        output.append("\n");
+    output.append("\tvalue: ");
+    output.append(value);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class LaundryWasherModeClusterModeOptionStruct {
+public String label;
+public Integer mode;
+public ArrayList<ChipStructs.LaundryWasherModeClusterModeTagStruct> modeTags;
+
+  public LaundryWasherModeClusterModeOptionStruct(
+    String label
+      , Integer mode
+      , ArrayList<ChipStructs.LaundryWasherModeClusterModeTagStruct> modeTags
+  ) {
+    this.label = label;
+    this.mode = mode;
+    this.modeTags = modeTags;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("LaundryWasherModeClusterModeOptionStruct {\n");
     output.append("\tlabel: ");
     output.append(label);
         output.append("\n");
-    output.append("\ttemperatureLevel: ");
-    output.append(temperatureLevel);
+    output.append("\tmode: ");
+    output.append(mode);
         output.append("\n");
+    output.append("\tmodeTags: ");
+    output.append(modeTags);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct {
+public Optional<Integer> mfgCode;
+public Integer value;
+
+  public RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct(
+    Optional<Integer> mfgCode
+      , Integer value
+  ) {
+    this.mfgCode = mfgCode;
+    this.value = value;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+        output.append("\n");
+    output.append("\tvalue: ");
+    output.append(value);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct {
+public String label;
+public Integer mode;
+public ArrayList<ChipStructs.RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct> modeTags;
+
+  public RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
+    String label
+      , Integer mode
+      , ArrayList<ChipStructs.RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct> modeTags
+  ) {
+    this.label = label;
+    this.mode = mode;
+    this.modeTags = modeTags;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct {\n");
+    output.append("\tlabel: ");
+    output.append(label);
+        output.append("\n");
+    output.append("\tmode: ");
+    output.append(mode);
+        output.append("\n");
+    output.append("\tmodeTags: ");
+    output.append(modeTags);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RvcRunModeClusterModeTagStruct {
+public Optional<Integer> mfgCode;
+public Integer value;
+
+  public RvcRunModeClusterModeTagStruct(
+    Optional<Integer> mfgCode
+      , Integer value
+  ) {
+    this.mfgCode = mfgCode;
+    this.value = value;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RvcRunModeClusterModeTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+        output.append("\n");
+    output.append("\tvalue: ");
+    output.append(value);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RvcRunModeClusterModeOptionStruct {
+public String label;
+public Integer mode;
+public ArrayList<ChipStructs.RvcRunModeClusterModeTagStruct> modeTags;
+
+  public RvcRunModeClusterModeOptionStruct(
+    String label
+      , Integer mode
+      , ArrayList<ChipStructs.RvcRunModeClusterModeTagStruct> modeTags
+  ) {
+    this.label = label;
+    this.mode = mode;
+    this.modeTags = modeTags;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RvcRunModeClusterModeOptionStruct {\n");
+    output.append("\tlabel: ");
+    output.append(label);
+        output.append("\n");
+    output.append("\tmode: ");
+    output.append(mode);
+        output.append("\n");
+    output.append("\tmodeTags: ");
+    output.append(modeTags);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RvcCleanModeClusterModeTagStruct {
+public Optional<Integer> mfgCode;
+public Integer value;
+
+  public RvcCleanModeClusterModeTagStruct(
+    Optional<Integer> mfgCode
+      , Integer value
+  ) {
+    this.mfgCode = mfgCode;
+    this.value = value;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RvcCleanModeClusterModeTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+        output.append("\n");
+    output.append("\tvalue: ");
+    output.append(value);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RvcCleanModeClusterModeOptionStruct {
+public String label;
+public Integer mode;
+public ArrayList<ChipStructs.RvcCleanModeClusterModeTagStruct> modeTags;
+
+  public RvcCleanModeClusterModeOptionStruct(
+    String label
+      , Integer mode
+      , ArrayList<ChipStructs.RvcCleanModeClusterModeTagStruct> modeTags
+  ) {
+    this.label = label;
+    this.mode = mode;
+    this.modeTags = modeTags;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RvcCleanModeClusterModeOptionStruct {\n");
+    output.append("\tlabel: ");
+    output.append(label);
+        output.append("\n");
+    output.append("\tmode: ");
+    output.append(mode);
+        output.append("\n");
+    output.append("\tmodeTags: ");
+    output.append(modeTags);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class DishwasherModeClusterModeTagStruct {
+public Optional<Integer> mfgCode;
+public Integer value;
+
+  public DishwasherModeClusterModeTagStruct(
+    Optional<Integer> mfgCode
+      , Integer value
+  ) {
+    this.mfgCode = mfgCode;
+    this.value = value;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DishwasherModeClusterModeTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+        output.append("\n");
+    output.append("\tvalue: ");
+    output.append(value);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class DishwasherModeClusterModeOptionStruct {
+public String label;
+public Integer mode;
+public ArrayList<ChipStructs.DishwasherModeClusterModeTagStruct> modeTags;
+
+  public DishwasherModeClusterModeOptionStruct(
+    String label
+      , Integer mode
+      , ArrayList<ChipStructs.DishwasherModeClusterModeTagStruct> modeTags
+  ) {
+    this.label = label;
+    this.mode = mode;
+    this.modeTags = modeTags;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DishwasherModeClusterModeOptionStruct {\n");
+    output.append("\tlabel: ");
+    output.append(label);
+        output.append("\n");
+    output.append("\tmode: ");
+    output.append(mode);
+        output.append("\n");
+    output.append("\tmodeTags: ");
+    output.append(modeTags);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }
@@ -1631,12 +1904,12 @@ public Integer temperatureLevel;
 
 public static class OperationalStateClusterErrorStateStruct {
 public Integer errorStateID;
-public @Nullable String errorStateLabel;
+public Optional<String> errorStateLabel;
 public Optional<String> errorStateDetails;
 
   public OperationalStateClusterErrorStateStruct(
     Integer errorStateID
-      , @Nullable String errorStateLabel
+      , Optional<String> errorStateLabel
       , Optional<String> errorStateDetails
   ) {
     this.errorStateID = errorStateID;
@@ -1664,11 +1937,11 @@ public Optional<String> errorStateDetails;
 
 public static class OperationalStateClusterOperationalStateStruct {
 public Integer operationalStateID;
-public String operationalStateLabel;
+public Optional<String> operationalStateLabel;
 
   public OperationalStateClusterOperationalStateStruct(
     Integer operationalStateID
-      , String operationalStateLabel
+      , Optional<String> operationalStateLabel
   ) {
     this.operationalStateID = operationalStateID;
     this.operationalStateLabel = operationalStateLabel;
@@ -1678,6 +1951,66 @@ public String operationalStateLabel;
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("OperationalStateClusterOperationalStateStruct {\n");
+    output.append("\toperationalStateID: ");
+    output.append(operationalStateID);
+        output.append("\n");
+    output.append("\toperationalStateLabel: ");
+    output.append(operationalStateLabel);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RvcOperationalStateClusterErrorStateStruct {
+public Integer errorStateID;
+public Optional<String> errorStateLabel;
+public Optional<String> errorStateDetails;
+
+  public RvcOperationalStateClusterErrorStateStruct(
+    Integer errorStateID
+      , Optional<String> errorStateLabel
+      , Optional<String> errorStateDetails
+  ) {
+    this.errorStateID = errorStateID;
+    this.errorStateLabel = errorStateLabel;
+    this.errorStateDetails = errorStateDetails;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RvcOperationalStateClusterErrorStateStruct {\n");
+    output.append("\terrorStateID: ");
+    output.append(errorStateID);
+        output.append("\n");
+    output.append("\terrorStateLabel: ");
+    output.append(errorStateLabel);
+        output.append("\n");
+    output.append("\terrorStateDetails: ");
+    output.append(errorStateDetails);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class RvcOperationalStateClusterOperationalStateStruct {
+public Integer operationalStateID;
+public Optional<String> operationalStateLabel;
+
+  public RvcOperationalStateClusterOperationalStateStruct(
+    Integer operationalStateID
+      , Optional<String> operationalStateLabel
+  ) {
+    this.operationalStateID = operationalStateID;
+    this.operationalStateLabel = operationalStateLabel;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("RvcOperationalStateClusterOperationalStateStruct {\n");
     output.append("\toperationalStateID: ");
     output.append(operationalStateID);
         output.append("\n");

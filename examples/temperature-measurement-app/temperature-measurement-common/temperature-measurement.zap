@@ -1614,7 +1614,7 @@
               "code": 5,
               "mfgCode": null,
               "side": "server",
-              "type": "NetworkCommissioningStatus",
+              "type": "NetworkCommissioningStatusEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,

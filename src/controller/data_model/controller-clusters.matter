@@ -1,14 +1,36 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+}
+
+struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+}
+
 struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
 }
 
+struct ErrorStateStruct {
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
+}
+
 struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
+}
+
+struct OperationalStateStruct {
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -1481,7 +1503,7 @@ client cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 client cluster NetworkCommissioning = 49 {
-  enum NetworkCommissioningStatus : ENUM8 {
+  enum NetworkCommissioningStatusEnum : ENUM8 {
     kSuccess = 0;
     kOutOfRange = 1;
     kBoundsExceeded = 2;
@@ -1497,7 +1519,7 @@ client cluster NetworkCommissioning = 49 {
     kUnknownError = 12;
   }
 
-  enum WiFiBand : ENUM8 {
+  enum WiFiBandEnum : ENUM8 {
     k2g4 = 0;
     k3g65 = 1;
     k5g = 2;
@@ -1512,7 +1534,7 @@ client cluster NetworkCommissioning = 49 {
     kEthernetNetworkInterface = 0x4;
   }
 
-  bitmap WiFiSecurity : BITMAP8 {
+  bitmap WiFiSecurityBitmap : BITMAP8 {
     kUnencrypted = 0x1;
     kWep = 0x2;
     kWpaPersonal = 0x4;
@@ -1520,12 +1542,12 @@ client cluster NetworkCommissioning = 49 {
     kWpa3Personal = 0x10;
   }
 
-  struct NetworkInfo {
+  struct NetworkInfoStruct {
     octet_string<32> networkID = 0;
     boolean connected = 1;
   }
 
-  struct ThreadInterfaceScanResult {
+  struct ThreadInterfaceScanResultStruct {
     int16u panId = 0;
     int64u extendedPanId = 1;
     char_string<16> networkName = 2;
@@ -1536,21 +1558,21 @@ client cluster NetworkCommissioning = 49 {
     int8u lqi = 7;
   }
 
-  struct WiFiInterfaceScanResult {
-    WiFiSecurity security = 0;
+  struct WiFiInterfaceScanResultStruct {
+    WiFiSecurityBitmap security = 0;
     octet_string<32> ssid = 1;
     octet_string<6> bssid = 2;
     int16u channel = 3;
-    WiFiBand wiFiBand = 4;
+    WiFiBandEnum wiFiBand = 4;
     int8s rssi = 5;
   }
 
   readonly attribute access(read: administer) int8u maxNetworks = 0;
-  readonly attribute access(read: administer) NetworkInfo networks[] = 1;
+  readonly attribute access(read: administer) NetworkInfoStruct networks[] = 1;
   readonly attribute optional int8u scanMaxTimeSeconds = 2;
   readonly attribute optional int8u connectMaxTimeSeconds = 3;
   attribute access(write: administer) boolean interfaceEnabled = 4;
-  readonly attribute access(read: administer) nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1566,10 +1588,10 @@ client cluster NetworkCommissioning = 49 {
   }
 
   response struct ScanNetworksResponse = 1 {
-    NetworkCommissioningStatus networkingStatus = 0;
+    NetworkCommissioningStatusEnum networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
-    optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
-    optional ThreadInterfaceScanResult threadScanResults[] = 3;
+    optional WiFiInterfaceScanResultStruct wiFiScanResults[] = 2;
+    optional ThreadInterfaceScanResultStruct threadScanResults[] = 3;
   }
 
   request struct AddOrUpdateWiFiNetworkRequest {
@@ -1589,7 +1611,7 @@ client cluster NetworkCommissioning = 49 {
   }
 
   response struct NetworkConfigResponse = 5 {
-    NetworkCommissioningStatus networkingStatus = 0;
+    NetworkCommissioningStatusEnum networkingStatus = 0;
     optional CHAR_STRING<512> debugText = 1;
     optional INT8U networkIndex = 2;
   }
@@ -1600,7 +1622,7 @@ client cluster NetworkCommissioning = 49 {
   }
 
   response struct ConnectNetworkResponse = 7 {
-    NetworkCommissioningStatus networkingStatus = 0;
+    NetworkCommissioningStatusEnum networkingStatus = 0;
     optional CHAR_STRING debugText = 1;
     nullable INT32S errorValue = 2;
   }
@@ -2596,10 +2618,6 @@ client cluster GroupKeyManagement = 63 {
     INT16U groupKeySetID = 0;
   }
 
-  request struct KeySetReadAllIndicesRequest {
-    INT16U groupKeySetIDs[] = 0;
-  }
-
   response struct KeySetReadAllIndicesResponse = 5 {
     INT16U groupKeySetIDs[] = 0;
   }
@@ -2611,7 +2629,7 @@ client cluster GroupKeyManagement = 63 {
   /** Revoke a Root Key from a Group */
   fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
   /** Return the list of Group Key Sets associated with the accessing fabric */
-  fabric command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
+  fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
@@ -2745,7 +2763,7 @@ client cluster IcdManagement = 70 {
 /** Attributes and commands for selecting a mode from a list of supported options. */
 client cluster ModeSelect = 80 {
   bitmap Feature : BITMAP32 {
-    kDeponoff = 0x1;
+    kOnOff = 0x1;
   }
 
   struct SemanticTagStruct {
@@ -2759,7 +2777,7 @@ client cluster ModeSelect = 80 {
     SemanticTagStruct semanticTags[] = 2;
   }
 
-  readonly attribute char_string<32> description = 0;
+  readonly attribute char_string<64> description = 0;
   readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
@@ -2780,24 +2798,245 @@ client cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** Attributes and commands for selecting a mode from a list of supported options. */
+client cluster LaundryWasherMode = 81 {
+  enum ModeTag : ENUM16 {
+    kNormal = 16384;
+    kDelicate = 16385;
+    kHeavy = 16386;
+    kWhites = 16387;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+client cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
+  enum ModeTag : ENUM16 {
+    kRapidCool = 16384;
+    kRapidFreeze = 16385;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
+client cluster WasherControls = 83 {
+  bitmap Feature : BITMAP32 {
+    kSpin = 0x1;
+    kRinse = 0x2;
+  }
+
+  readonly attribute optional CHAR_STRING spinSpeeds[] = 0;
+  attribute optional nullable int8u spinSpeedCurrent = 1;
+  attribute optional nullable int8u numberOfRinses = 2;
+  readonly attribute optional int8u maxRinses = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+client cluster RvcRunMode = 84 {
+  enum ModeTag : ENUM16 {
+    kIdle = 16384;
+    kCleaning = 16385;
+  }
+
+  enum StatusCode : ENUM8 {
+    kStuck = 65;
+    kDustBinMissing = 66;
+    kDustBinFull = 67;
+    kWaterTankEmpty = 68;
+    kWaterTankMissing = 69;
+    kWaterTankLidOpen = 70;
+    kMopCleaningPadMissing = 71;
+    kBatteryLow = 72;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+client cluster RvcCleanMode = 85 {
+  enum ModeTag : ENUM16 {
+    kDeepClean = 16384;
+    kVacuum = 16385;
+    kMop = 16386;
+  }
+
+  enum StatusCode : ENUM8 {
+    kCleaningInProgress = 64;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
 client cluster TemperatureControl = 86 {
   bitmap Feature : BITMAP32 {
     kTemperatureNumber = 0x1;
     kTemperatureLevel = 0x2;
+    kTemperatureStep = 0x4;
   }
 
-  struct TemperatureLevelStruct {
-    char_string<64> label = 0;
-    int8u temperatureLevel = 1;
-  }
-
-  readonly attribute optional int16s temperatureSetpoint = 0;
-  readonly attribute optional int16s minTemperature = 1;
-  readonly attribute optional int16s maxTemperature = 2;
-  readonly attribute optional int16s step = 3;
-  readonly attribute optional int8u currentTemperatureLevelIndex = 4;
-  readonly attribute optional TemperatureLevelStruct supportedTemperatureLevels[] = 5;
+  readonly attribute optional temperature temperatureSetpoint = 0;
+  readonly attribute optional temperature minTemperature = 1;
+  readonly attribute optional temperature maxTemperature = 2;
+  readonly attribute optional temperature step = 3;
+  readonly attribute optional int8u selectedTemperatureLevel = 4;
+  readonly attribute optional char_string supportedTemperatureLevels[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2806,7 +3045,7 @@ client cluster TemperatureControl = 86 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SetTemperatureRequest {
-    optional INT16S targetTemperature = 0;
+    optional temperature targetTemperature = 0;
     optional INT8U targetTemperatureLevel = 1;
   }
 
@@ -2827,9 +3066,44 @@ client cluster RefrigeratorAlarm = 87 {
     AlarmMap mask = 3;
   }
 
-  attribute AlarmMap mask = 0;
-  readonly attribute AlarmMap latch = 1;
+  readonly attribute AlarmMap mask = 0;
   readonly attribute AlarmMap state = 2;
+  readonly attribute AlarmMap supported = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+client cluster DishwasherMode = 89 {
+  enum ModeTag : ENUM16 {
+    kNormal = 16384;
+    kHeavy = 16385;
+    kLight = 16386;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2837,13 +3111,18 @@ client cluster RefrigeratorAlarm = 87 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct ResetRequest {
-    AlarmMap alarms = 0;
-    optional AlarmMap mask = 1;
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
   }
 
-  /** Reset alarm */
-  command Reset(ResetRequest): DefaultSuccess = 0;
+  response struct ChangeToModeResponse = 1 {
+    ENUM8 status = 0;
+    optional CHAR_STRING statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Attributes for reporting air quality classification */
@@ -2967,6 +3246,7 @@ client cluster SmokeCoAlarm = 92 {
   readonly attribute optional AlarmStateEnum interconnectCOAlarm = 9;
   readonly attribute optional ContaminationStateEnum contaminationState = 10;
   attribute optional SensitivityEnum sensitivityLevel = 11;
+  readonly attribute optional epoch_s expiryDate = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2976,6 +3256,49 @@ client cluster SmokeCoAlarm = 92 {
 
   /** This command SHALL initiate a device self-test. */
   command SelfTestRequest(): DefaultSuccess = 0;
+}
+
+/** Attributes and commands for configuring the Dishwasher alarm. */
+client cluster DishwasherAlarm = 93 {
+  bitmap AlarmMap : BITMAP32 {
+    kInflowError = 0x1;
+    kDrainError = 0x2;
+    kDoorError = 0x4;
+    kTempTooLow = 0x8;
+    kTempTooHigh = 0x10;
+    kWaterLevelError = 0x20;
+  }
+
+  info event Notify = 0 {
+    AlarmMap active = 0;
+    AlarmMap inactive = 1;
+    AlarmMap state = 2;
+    AlarmMap mask = 3;
+  }
+
+  readonly attribute AlarmMap mask = 0;
+  readonly attribute optional AlarmMap latch = 1;
+  readonly attribute AlarmMap state = 2;
+  readonly attribute AlarmMap supported = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ResetRequest {
+    AlarmMap alarms = 0;
+  }
+
+  request struct ModifyEnabledAlarmsRequest {
+    AlarmMap mask = 0;
+  }
+
+  /** Reset alarm */
+  command Reset(ResetRequest): DefaultSuccess = 0;
+  /** Modify enabled alarms */
+  command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
@@ -2995,14 +3318,14 @@ client cluster OperationalState = 96 {
   }
 
   struct ErrorStateStruct {
-    ErrorStateEnum errorStateID = 0;
-    nullable char_string<64> errorStateLabel = 1;
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
     optional char_string<64> errorStateDetails = 2;
   }
 
   struct OperationalStateStruct {
-    OperationalStateEnum operationalStateID = 0;
-    char_string<64> operationalStateLabel = 1;
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
   }
 
   critical event OperationalError = 0 {
@@ -3010,7 +3333,74 @@ client cluster OperationalState = 96 {
   }
 
   info event OperationCompletion = 1 {
-    ErrorStateEnum completionErrorCode = 0;
+    ENUM8 completionErrorCode = 0;
+    optional nullable elapsed_s totalOperationalTime = 1;
+    optional nullable elapsed_s pausedTime = 2;
+  }
+
+  readonly attribute nullable CHAR_STRING phaseList[] = 0;
+  readonly attribute nullable int8u currentPhase = 1;
+  readonly attribute optional nullable elapsed_s countdownTime = 2;
+  readonly attribute OperationalStateStruct operationalStateList[] = 3;
+  readonly attribute OperationalStateStruct operationalState = 4;
+  readonly attribute ErrorStateStruct operationalError = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct OperationalCommandResponse = 4 {
+    ErrorStateStruct commandResponseState = 0;
+  }
+
+  /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
+  command Pause(): OperationalCommandResponse = 0;
+  /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  command Stop(): OperationalCommandResponse = 1;
+  /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
+  command Start(): OperationalCommandResponse = 2;
+  /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
+  command Resume(): OperationalCommandResponse = 3;
+}
+
+/** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
+client cluster RvcOperationalState = 97 {
+  enum ErrorStateEnum : ENUM8 {
+    kFailedToFindChargingDock = 64;
+    kStuck = 65;
+    kDustBinMissing = 66;
+    kDustBinFull = 67;
+    kWaterTankEmpty = 68;
+    kWaterTankMissing = 69;
+    kWaterTankLidOpen = 70;
+    kMopCleaningPadMissing = 71;
+  }
+
+  enum OperationalStateEnum : ENUM8 {
+    kSeekingCharger = 64;
+    kCharging = 65;
+    kDocked = 66;
+  }
+
+  struct ErrorStateStruct {
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
+  }
+
+  struct OperationalStateStruct {
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
+  }
+
+  critical event OperationalError = 0 {
+    ErrorStateStruct errorState = 0;
+  }
+
+  info event OperationCompletion = 1 {
+    ENUM8 completionErrorCode = 0;
     optional nullable elapsed_s totalOperationalTime = 1;
     optional nullable elapsed_s pausedTime = 2;
   }

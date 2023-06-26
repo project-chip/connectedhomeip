@@ -80,6 +80,14 @@ ble_gatt_att_reg_t matter_csvc_atts[CSVC_IDX_NB] = {
                             SONATA_PERM(UUID_LEN, UUID_128) },
                           { 0, 0 } },
     [CSVC_IDX_TX_CFG]  = { { { 0X02, 0X29, 0 }, PRD_NA | PWR_NA, 2, PRI }, { matter_tx_CCCD_write_cb, matter_tx_CCCD_read_cb } },
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    [CSVC_IDX_C3_CHAR] = { { { 0X03, 0X28, 0 }, PRD_NA, 0, 0 }, { 0, 0 } },
+    [CSVC_IDX_C3_VAL]  = { { { 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64 },
+                            PRD_NA,
+                            512,
+                            PRI | SONATA_PERM(UUID_LEN, UUID_128) },
+                          { 0, matter_c3_char_read_cb } },
+#endif
 };
 /*
  * FUNCTION DEFINITIONS
@@ -87,19 +95,41 @@ ble_gatt_att_reg_t matter_csvc_atts[CSVC_IDX_NB] = {
  */
 void matter_ble_stack_open(void)
 {
-    ChipLogProgress(DeviceLayer, "matter_ble_stack_open\r\n");
+    ChipLogProgress(DeviceLayer, "matter_ble_stack_open");
     app_ble_stack_start(USER_MATTER_MODULE_ID);
 }
 
-void matter_ble_start_adv(void)
+void matter_ble_start_adv(bool fast)
 {
     ble_adv_data_t data;
     ble_scan_data_t scan_data;
+    sonata_gap_directed_adv_create_param_t param = { 0 };
+
     memset(&data, 0, sizeof(ble_adv_data_t));
     memset(&scan_data, 0, sizeof(ble_scan_data_t));
     BLEMgrImpl().SetAdvertisingData((uint8_t *) &data.ble_advdata, (uint8_t *) &data.ble_advdataLen);
     BLEMgrImpl().SetScanRspData((uint8_t *) &scan_data.ble_respdata, (uint8_t *) &scan_data.ble_respdataLen);
-    app_ble_advertising_start(APP_MATTER_ADV_IDX, &data, &scan_data);
+
+    param.disc_mode  = SONATA_GAP_ADV_MODE_GEN_DISC;
+    param.prop       = SONATA_GAP_ADV_PROP_UNDIR_CONN_MASK;
+    param.max_tx_pwr = 0xE2;
+    param.filter_pol = SONATA_ADV_ALLOW_SCAN_ANY_CON_ANY;
+    param.addr_type  = SONATA_GAP_STATIC_ADDR;
+    param.chnl_map   = 0x07;
+    param.phy        = SONATA_GAP_PHY_LE_1MBPS;
+    if (fast)
+    {
+        param.adv_intv_min = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        param.adv_intv_max = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+        ChipLogProgress(DeviceLayer, "fast advertising");
+    }
+    else
+    {
+        param.adv_intv_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        param.adv_intv_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+        ChipLogProgress(DeviceLayer, "slow advertising");
+    }
+    app_ble_start_advertising_with_param(APP_MATTER_ADV_IDX, SONATA_GAP_STATIC_ADDR, &param, &data, &scan_data);
 }
 
 void matter_ble_stop_adv(void)
@@ -112,18 +142,27 @@ void matter_ble_add_service()
     ret = app_ble_gatt_add_svc_helper(&service_handle, sizeof(matter_csvc_atts) / sizeof(ble_gatt_att_reg_t), 1, matter_csvc_atts);
     if (ret != 0)
     {
-        ChipLogError(DeviceLayer, "matter_ble_add_service add service failed\r\n");
+        ChipLogError(DeviceLayer, "matter_ble_add_service add service failed");
     }
     else
     {
-        ChipLogProgress(DeviceLayer, "matter_ble_add_service add service service_handle=%d\r\n", service_handle);
+        ChipLogProgress(DeviceLayer, "matter_ble_add_service add service service_handle=%d", service_handle);
     }
 }
 void matter_set_connection_id(uint8_t conId)
 {
-    ChipLogProgress(DeviceLayer, "matter_set_connection_id conId=%d\r\n", conId);
+    ChipLogProgress(DeviceLayer, "matter_set_connection_id conId=%d", conId);
     BLEMgrImpl().AllocConnectionState(conId);
     current_connect_id = conId;
+}
+
+void matter_close_connection(uint8_t conId)
+{
+    if (current_connect_id != SONATA_ADDR_NONE && conId != current_connect_id)
+    {
+        ChipLogError(DeviceLayer, "wrong connection id");
+    }
+    sonata_ble_gap_disconnect(conId, 0);
 }
 
 uint16_t matter_ble_complete_event_handler(int opt_id, uint8_t status, uint16_t param, uint32_t dwparam)
@@ -132,11 +171,14 @@ uint16_t matter_ble_complete_event_handler(int opt_id, uint8_t status, uint16_t 
 
     switch (opt_id)
     {
+    case SONATA_GAP_CMP_BLE_ON:
+        matter_ble_add_service();
+        BLEMgrImpl().SetStackInit();
+        break;
     case SONATA_GAP_CMP_ADVERTISING_START: // 0x0F06
         if (is_matter_activity(param))
         {
             BLEMgrImpl().SetAdvStartFlag();
-            matter_ble_add_service();
         }
         break;
     case SONATA_GAP_CMP_ADVERTISING_STOP:
@@ -189,7 +231,12 @@ void matter_tx_CCCD_read_cb(uint8_t * data, uint16_t * size)
 {
     BLEMgrImpl().HandleTXCharCCCDRead(current_connect_id, size, data);
 }
-
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+void matter_c3_char_read_cb(uint8_t * data, uint16_t * size)
+{
+    BLEMgrImpl().HandleC3CharRead(current_connect_id, size, data);
+}
+#endif
 void matter_tx_char_send_indication(uint8_t conId, uint16_t size, uint8_t * data)
 {
     ChipLogProgress(DeviceLayer, "matter_tx_char_send_indication conId=%d size=%d data=%p service_handle=%d", conId, size, data,

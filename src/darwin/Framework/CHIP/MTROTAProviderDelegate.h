@@ -45,6 +45,13 @@ NS_ASSUME_NONNULL_BEGIN
  * If completion is passed a non-nil error, that will be converted into
  * an error response to the client.  Otherwise it must have a non-nil data,
  * which will be returned to the client.
+ *
+ * When providing an OTA image, the imageURI in the
+ * MTROTASoftwareUpdateProviderClusterQueryImageResponseParams must be set to
+ * the file designator of the image.  The completion will create the right BDX
+ * URI from that file designator, as needed.  The file designator returned here
+ * via imageURI will be the same as the file designator passed to
+ * handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:.
  */
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller

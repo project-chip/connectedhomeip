@@ -19,6 +19,8 @@
 #include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
@@ -138,6 +140,16 @@ namespace app {
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
 {
     return aPath.mClusterId != kTestDeniedClusterId1;
+}
+
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+{
+    if (aPath.mClusterId == kTestDeniedClusterId1)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedCluster;
+    }
+
+    return Protocols::InteractionModel::Status::Success;
 }
 
 class TestAclAttribute

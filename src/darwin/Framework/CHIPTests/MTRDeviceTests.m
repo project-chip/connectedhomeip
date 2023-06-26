@@ -96,10 +96,11 @@ static MTRBaseDevice * GetConnectedDevice(void)
 {
     XCTAssertEqual(error.code, 0);
 
+    __auto_type * params = [[MTRCommissioningParameters alloc] init];
+    params.countryCode = @("au");
+
     NSError * commissionError = nil;
-    [sController commissionNodeWithID:@(kDeviceId)
-                  commissioningParams:[[MTRCommissioningParameters alloc] init]
-                                error:&commissionError];
+    [sController commissionNodeWithID:@(kDeviceId) commissioningParams:params error:&commissionError];
     XCTAssertNil(commissionError);
 
     // Keep waiting for controller:commissioningComplete:
@@ -1454,6 +1455,32 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [device setDelegate:delegate queue:queue];
 
+    // Test batching and duplicate check
+    //   - Read 13 different attributes in a row, expect that the 1st to go out by itself, the next 9 batch, and then the 3 after
+    //     are correctly queued in one batch
+    //   - Then read 3 duplicates and expect them to be filtered
+    //   - Note that these tests can only be verified via logs
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(0) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(1) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(2) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(3) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(4) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(5) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(6) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(7) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(0) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(1) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(2) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(3) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
 
     XCTAssertNotEqual(attributeReportsReceived, 0);
@@ -2026,9 +2053,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     XCTestExpectation * onOffReportExpectation = [self expectationWithDescription:@"report OnOff attribute"];
     XCTestExpectation * attributeErrorReportExpectation = [self expectationWithDescription:@"report nonexistent attribute"];
-    // TODO: Right now the server does not seem to actually produce an error
-    // when trying to subscribe to events on a non-existent endpoint.
-    // XCTestExpectation * eventErrorReportExpectation = [self expectationWithDescription:@"report nonexistent event"];
+    XCTestExpectation * eventErrorReportExpectation = [self expectationWithDescription:@"report nonexistent event"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
@@ -2058,18 +2083,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                 }
             } else if (result[@"eventPath"] != nil) {
                 MTREventPath * path = result[@"eventPath"];
-                XCTAssertEqualObjects(path.endpoint, @1);
-                XCTAssertEqualObjects(path.cluster, failClusterId);
+                XCTAssertEqualObjects(path.endpoint, failEndpointId);
+                XCTAssertEqualObjects(path.cluster, @40);
                 XCTAssertEqualObjects(path.event, @0);
                 XCTAssertNil(result[@"data"]);
                 XCTAssertNotNil(result[@"error"]);
                 XCTAssertEqual(
                     [MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]], MTRInteractionErrorCodeUnsupportedEndpoint);
-                // TODO: Right now the server does not seem to actually produce an error
-                // when trying to subscribe to events on a non-existent
-                // endpoint.  Catch it if it starts doing that.
-                XCTFail("Need to re-enable the eventErrorReportExpectation bits");
-                // [eventErrorReportExpectation fulfill];
+                [eventErrorReportExpectation fulfill];
             } else {
                 XCTFail("Unexpected result dictionary");
             }
@@ -2095,9 +2116,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         resubscriptionScheduled:nil];
 
     // Wait till establishment
-    [self waitForExpectations:@[
-        onOffReportExpectation, attributeErrorReportExpectation, /* eventErrorReportExpectation, */ expectation
-    ]
+    [self waitForExpectations:@[ onOffReportExpectation, attributeErrorReportExpectation, eventErrorReportExpectation, expectation ]
                       timeout:kTimeoutInSeconds];
 
     // Set up expectation for report
@@ -2106,19 +2125,28 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertNil(error);
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
-        NSDictionary * result = values[0];
-        MTRAttributePath * path = result[@"attributePath"];
 
-        // We will only be getting incremental reports for the OnOff attribute.
-        XCTAssertEqualObjects(path.endpoint, @1);
-        XCTAssertEqualObjects(path.cluster, @6);
-        XCTAssertEqualObjects(path.attribute, @0);
+        for (NSDictionary * result in values) {
+            // Note: we will get updates for our event subscription too, each time
+            // with errors.
+            if (result[@"eventPath"] != nil) {
+                continue;
+            }
 
-        XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
-        XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
-        if ([result[@"data"][@"value"] boolValue] == YES) {
-            [reportExpectation fulfill];
-            globalReportHandler = nil;
+            MTRAttributePath * path = result[@"attributePath"];
+            XCTAssertNotNil(path);
+
+            // We will only be getting incremental attribute reports for the OnOff attribute.
+            XCTAssertEqualObjects(path.endpoint, @1);
+            XCTAssertEqualObjects(path.cluster, @6);
+            XCTAssertEqualObjects(path.attribute, @0);
+
+            XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+            XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+            if ([result[@"data"][@"value"] boolValue] == YES) {
+                [reportExpectation fulfill];
+                globalReportHandler = nil;
+            }
         }
     };
 
@@ -2163,16 +2191,26 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertNil(error);
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
-        NSDictionary * result = values[0];
-        MTRAttributePath * path = result[@"attributePath"];
-        XCTAssertEqualObjects(path.endpoint, @1);
-        XCTAssertEqualObjects(path.cluster, @6);
-        XCTAssertEqualObjects(path.attribute, @0);
-        XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
-        XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
-        if ([result[@"data"][@"value"] boolValue] == NO) {
-            [reportExpectation fulfill];
-            globalReportHandler = nil;
+
+        for (NSDictionary * result in values) {
+            // Note: we will get updates for our event subscription too, each time
+            // with errors.
+            if (result[@"eventPath"] != nil) {
+                continue;
+            }
+
+            MTRAttributePath * path = result[@"attributePath"];
+            XCTAssertNotNil(path);
+
+            XCTAssertEqualObjects(path.endpoint, @1);
+            XCTAssertEqualObjects(path.cluster, @6);
+            XCTAssertEqualObjects(path.attribute, @0);
+            XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+            XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+            if ([result[@"data"][@"value"] boolValue] == NO) {
+                [reportExpectation fulfill];
+                globalReportHandler = nil;
+            }
         }
     };
 
@@ -2322,6 +2360,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Wait till establishment
     [self waitForExpectations:@[ startupEventExpectation, expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test026_LocationAttribute
+{
+    __auto_type * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read Basic Information Location attribute"];
+
+    __auto_type * cluster = [[MTRBaseClusterBasicInformation alloc] initWithDevice:device endpointID:@(0) queue:queue];
+    [cluster readAttributeLocationWithCompletion:^(NSString * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+
+        // Matches what we passed in during commissioning.
+        XCTAssertEqualObjects(value, @"au");
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test900_SubscribeAllAttributes

@@ -417,7 +417,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -836,7 +836,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 0,
+              "included": 1,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -2750,7 +2750,7 @@
               "code": 5,
               "mfgCode": null,
               "side": "server",
-              "type": "NetworkCommissioningStatus",
+              "type": "NetworkCommissioningStatusEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -6913,7 +6913,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -8373,7 +8373,7 @@
               "code": 11,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -8381,7 +8381,7 @@
               "code": 12,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -8389,7 +8389,7 @@
               "code": 13,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -8397,7 +8397,7 @@
               "code": 14,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -8405,7 +8405,7 @@
               "code": 15,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -8413,7 +8413,7 @@
               "code": 16,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -8421,7 +8421,7 @@
               "code": 17,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -8429,7 +8429,7 @@
               "code": 18,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -8437,7 +8437,7 @@
               "code": 19,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -8522,7 +8522,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetYearDayScheduleResponse",
@@ -8530,7 +8530,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetHolidayScheduleResponse",
@@ -8538,7 +8538,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetUserResponse",
@@ -8620,7 +8620,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "DoorStateEnum",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -8716,7 +8716,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "int16u",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -8732,7 +8732,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -8748,7 +8748,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -8764,7 +8764,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -8812,7 +8812,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -8828,7 +8828,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -8876,7 +8876,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "char_string",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -8924,7 +8924,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -9004,7 +9004,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "boolean",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -9036,7 +9036,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "boolean",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -9216,7 +9216,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0xDB3",
+              "defaultValue": "0x181",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -9399,5 +9399,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 10
     }
-  ]
+  ],
+  "log": []
 }

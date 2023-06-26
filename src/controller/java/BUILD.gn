@@ -238,43 +238,47 @@ kotlin_library("json_to_tlv_to_json_test") {
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
-shared_library("jni_for_onboarding_payload") {
-  output_name = "libOnboardingPayload"
-  if (matter_enable_java_compilation) {
-    include_dirs = java_matter_controller_dependent_paths
-    output_dir = "${root_out_dir}/lib/jni"
-  } else {
-    output_dir = "${root_out_dir}/lib/jni/${android_abi}"
-  }
-
-  sources = [ "OnboardingPayloadParser-JNI.cpp" ]
-
-  deps = [
-    "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",
-  ]
-}
-
 kotlin_library("onboarding_payload") {
   output_name = "OnboardingPayload.jar"
 
-  data_deps = [ ":jni_for_onboarding_payload" ]
-
-  if (!matter_enable_java_compilation) {
-    data_deps += [ "${chip_root}/build/chip/java:shared_cpplib" ]
-  }
+  deps = [ ":tlv" ]
 
   sources = [
+    "src/chip/onboardingpayload/Base38.kt",
+    "src/chip/onboardingpayload/CommissioningFlow.kt",
     "src/chip/onboardingpayload/DiscoveryCapability.kt",
+    "src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt",
+    "src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt",
     "src/chip/onboardingpayload/OnboardingPayload.kt",
     "src/chip/onboardingpayload/OnboardingPayloadParser.kt",
     "src/chip/onboardingpayload/OptionalQRCodeInfo.kt",
+    "src/chip/onboardingpayload/QRCodeBasicOnboardingPayloadGenerator.kt",
+    "src/chip/onboardingpayload/QRCodeOnboardingPayloadGenerator.kt",
+    "src/chip/onboardingpayload/QRCodeOnboardingPayloadParser.kt",
+    "src/chip/onboardingpayload/VendorId.kt",
+    "src/chip/onboardingpayload/Verhoeff.kt",
+    "src/chip/onboardingpayload/Verhoeff10.kt",
   ]
+}
+
+kotlin_library("onboardingpayload_manual_code_test") {
+  output_name = "OnboardingPayloadManualCodeTest.jar"
+
+  deps = [
+    ":onboarding_payload",
+    "${chip_root}/third_party/java_deps:junit-4",
+    "${chip_root}/third_party/java_deps:truth",
+  ]
+
+  sources = [ "tests/chip/onboardingpayload/ManualCodeTest.kt" ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
 group("unit_tests") {
   deps = [
     ":json_to_tlv_to_json_test",
+    ":onboardingpayload_manual_code_test",
     ":tlv_read_write_test",
     ":tlv_reader_test",
     ":tlv_writer_test",

@@ -56,14 +56,18 @@
 #include <openthread/ip6.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #include <net/if.h>
 #include <netinet/in.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <sys/socket.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#include <zephyr/net/socket.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT && INET_CONFIG_ENABLE_IPV4
 #error Forbidden : native Open Thread implementation with IPV4 enabled
@@ -694,6 +698,14 @@ public:
      *  not be modified by users of the CHIP Inet Layer.
      */
     static IPAddress Any;
+
+    /**
+     * Creates a loopback of the specified type. Type MUST be IPv6/v4.
+     *
+     * If type is anything else (or IPv4 is not available) an IPv6
+     * loopback will be created.
+     */
+    static IPAddress Loopback(IPAddressType type);
 };
 
 static_assert(std::is_trivial<IPAddress>::value, "IPAddress is not trivial");

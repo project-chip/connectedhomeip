@@ -132,6 +132,7 @@ static_library("support") {
     "SetupDiscriminator.h",
     "SortUtils.h",
     "StateMachine.h",
+    "StringSplitter.h",
     "ThreadOperationalDataset.cpp",
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
@@ -144,9 +145,6 @@ static_library("support") {
     "verhoeff/Verhoeff.cpp",
     "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
-    "verhoeff/Verhoeff16.cpp",
-    "verhoeff/Verhoeff32.cpp",
-    "verhoeff/Verhoeff36.cpp",
   ]
 
   if (current_os == "android" || matter_enable_java_compilation) {

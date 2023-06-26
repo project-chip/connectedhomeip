@@ -193,31 +193,33 @@ tests:
               - name: "UserIndex"
                 value: null
 
-    # Need OR condition support
     - label:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
           Set Credential Response command with status as DUPLICATE or OCCUPIED"
-      verification: |
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1 }' 123456 1 null null  1 1 --timedInteractionTimeoutMs 1000
-
-          Verify "DUT sends Set Credential Response command with response as DUPLICATE or OCCUPIED" on the TH(Chip-tool) Log:
-
-          [[1656506733.767451][27276:27281] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
-          [1656506733.767542][27276:27281] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
-          [1656506733.767663][27276:27281] CHIP:TOO:   SetCredentialResponse: {
-          [1656506733.767731][27276:27281] CHIP:TOO:     status: 2
-          [1656506733.767779][27276:27281] CHIP:TOO:     userIndex: null
-          [1656506733.767826][27276:27281] CHIP:TOO:     nextCredentialIndex: 2
-          [1656506733.767871][27276:27281] CHIP:TOO:    }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "OperationType"
+                value: 0
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "CredentialData"
+                value: "123456"
+              - name: "UserIndex"
+                value: 1
+              - name: "UserStatus"
+                value: null
+              - name: "UserType"
+                value: null
+      response:
+          values:
+              - name: "Status"
+                constraints:
+                    anyOf: [0x2, 0x3]
+              - name: "UserIndex"
+                value: null
 
     - label:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
@@ -244,6 +246,35 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
+
+    #- label:
+    #      "TH sends Set Credential Command to DUT and Verify that the DUT sends
+    #      Set Credential Response command with response as OCCUPIED if the
+    #      CredentialIndex is repeated"
+    #  PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+    #  command: "SetCredential"
+    #  timedInteractionTimeoutMs: 10000
+    #  arguments:
+    #      values:
+    #          - name: "OperationType"
+    #            value: 0
+    #          - name: "Credential"
+    #            value: { CredentialType: 1, CredentialIndex: 1 }
+    #          - name: "CredentialData"
+    #            value: "123456"
+    #          - name: "UserIndex"
+    #            value: 1
+    #          - name: "UserStatus"
+    #            value: null
+    #          - name: "UserType"
+    #            value: null
+    #  response:
+    #      values:
+    #          - name: "Status"
+    #            constraints:
+    #                anyOf: [0x2, 0x3]
+    #          - name: "UserIndex"
+    #            value: null
 
     #Issue 19990 expected response OCCUPIED, but CHIP Tool Verification Steps shows status: 2 fix script once the issue is fixed.
     - label:
@@ -273,6 +304,34 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
+
+    #- label:
+    #      "TH sends Set Credential Command to DUT and Verify that the DUT sends
+    #      Set Credential Response command with response as OCCUPIED if the
+    #      CredentialIndex is repeated"
+    #  PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+    #  command: "SetCredential"
+    #  timedInteractionTimeoutMs: 10000
+    #  arguments:
+    #      values:
+    #          - name: "OperationType"
+    #            value: 2
+    #          - name: "Credential"
+    #            value: { CredentialType: 1, CredentialIndex: 3 }
+    #          - name: "CredentialData"
+    #            value: "123456"
+    #          - name: "UserIndex"
+    #            value: 1
+    #          - name: "UserStatus"
+    #            value: null
+    #          - name: "UserType"
+    #            value: null
+    #  response:
+    #      values:
+    #          - name: "Status"
+    #            value: 0x3
+    #          - name: "UserIndex"
+    #            value: null
 
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp

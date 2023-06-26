@@ -721,9 +721,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::R
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::NetworkCommissioningStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::NetworkCommissioningStatusEnum val)
 {
-    using EnumType = NetworkCommissioning::NetworkCommissioningStatus;
+    using EnumType = NetworkCommissioning::NetworkCommissioningStatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
@@ -744,9 +744,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::N
         return static_cast<EnumType>(13);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::WiFiBand val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::WiFiBandEnum val)
 {
-    using EnumType = NetworkCommissioning::WiFiBand;
+    using EnumType = NetworkCommissioning::WiFiBandEnum;
     switch (val)
     {
     case EnumType::k2g4:
@@ -1237,6 +1237,104 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherMode::ModeTag val)
+{
+    using EnumType = LaundryWasherMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kDelicate:
+    case EnumType::kHeavy:
+    case EnumType::kWhites:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(RefrigeratorAndTemperatureControlledCabinetMode::ModeTag val)
+{
+    using EnumType = RefrigeratorAndTemperatureControlledCabinetMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kRapidCool:
+    case EnumType::kRapidFreeze:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunMode::ModeTag val)
+{
+    using EnumType = RvcRunMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kIdle:
+    case EnumType::kCleaning:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunMode::StatusCode val)
+{
+    using EnumType = RvcRunMode::StatusCode;
+    switch (val)
+    {
+    case EnumType::kStuck:
+    case EnumType::kDustBinMissing:
+    case EnumType::kDustBinFull:
+    case EnumType::kWaterTankEmpty:
+    case EnumType::kWaterTankMissing:
+    case EnumType::kWaterTankLidOpen:
+    case EnumType::kMopCleaningPadMissing:
+    case EnumType::kBatteryLow:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcCleanMode::ModeTag val)
+{
+    using EnumType = RvcCleanMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kDeepClean:
+    case EnumType::kVacuum:
+    case EnumType::kMop:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcCleanMode::StatusCode val)
+{
+    using EnumType = RvcCleanMode::StatusCode;
+    switch (val)
+    {
+    case EnumType::kCleaningInProgress:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(DishwasherMode::ModeTag val)
+{
+    using EnumType = DishwasherMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kHeavy:
+    case EnumType::kLight:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(AirQuality::AirQualityEnum val)
 {
     using EnumType = AirQuality::AirQualityEnum;
@@ -1365,6 +1463,38 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::Opera
         return val;
     default:
         return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcOperationalState::ErrorStateEnum val)
+{
+    using EnumType = RvcOperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kFailedToFindChargingDock:
+    case EnumType::kStuck:
+    case EnumType::kDustBinMissing:
+    case EnumType::kDustBinFull:
+    case EnumType::kWaterTankEmpty:
+    case EnumType::kWaterTankMissing:
+    case EnumType::kWaterTankLidOpen:
+    case EnumType::kMopCleaningPadMissing:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(RvcOperationalState::OperationalStateEnum val)
+{
+    using EnumType = RvcOperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kSeekingCharger:
+    case EnumType::kCharging:
+    case EnumType::kDocked:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
     }
 }
 

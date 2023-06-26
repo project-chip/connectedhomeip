@@ -77,10 +77,10 @@ void ReliableMessageMgr::Shutdown()
     mSystemLayer = nullptr;
 }
 
-#if defined(RMP_TICKLESS_DEBUG)
 void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 {
-    ChipLogDetail(ExchangeManager, log);
+#if defined(RMP_TICKLESS_DEBUG)
+    ChipLogDetail(ExchangeManager, "%s", log);
 
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         ChipLogDetail(ExchangeManager,
@@ -89,17 +89,15 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
                       entry->nextRetransTime.count());
         return Loop::Continue;
     });
+#endif
 }
-#else
-void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log) {}
-#endif // RMP_TICKLESS_DEBUG
 
 void ReliableMessageMgr::ExecuteActions()
 {
     System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
 #if defined(RMP_TICKLESS_DEBUG)
-    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions at % " PRIu64 "ms", now.count());
+    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions at %" PRIu64 "ms", now.count());
 #endif
 
     ExecuteForAllContext([&](ReliableMessageContext * rc) {
@@ -180,7 +178,7 @@ void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState)
     VerifyOrDie((aSystemLayer != nullptr) && (manager != nullptr));
 
 #if defined(RMP_TICKLESS_DEBUG)
-    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::Timeout\n");
+    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::Timeout");
 #endif
 
     // Execute any actions that are due this tick
@@ -392,16 +390,17 @@ void ReliableMessageMgr::StartTimer()
         return Loop::Continue;
     });
 
+    StopTimer();
+
     if (nextWakeTime != System::Clock::Timestamp::max())
     {
-#if defined(RMP_TICKLESS_DEBUG)
-        ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer wake at %" PRIu64 "ms", nextWakeTime);
-#endif
-
-        StopTimer();
-
         const System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
         const auto nextWakeDelay           = (nextWakeTime > now) ? nextWakeTime - now : 0_ms;
+
+#if defined(RMP_TICKLESS_DEBUG)
+        ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer at %" PRIu64 "ms wake at %" PRIu64 "ms (in %" PRIu64 "ms)",
+                      now.count(), nextWakeTime.count(), nextWakeDelay.count());
+#endif
         VerifyOrDie(mSystemLayer->StartTimer(nextWakeDelay, Timeout, this) == CHIP_NO_ERROR);
     }
     else
@@ -409,7 +408,6 @@ void ReliableMessageMgr::StartTimer()
 #if defined(RMP_TICKLESS_DEBUG)
         ChipLogDetail(ExchangeManager, "ReliableMessageMgr skipped timer");
 #endif
-        StopTimer();
     }
 
     TicklessDebugDumpRetransTable("ReliableMessageMgr::StartTimer Dumping mRetransTable entries after setting wakeup times");

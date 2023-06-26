@@ -1089,7 +1089,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRNetworkCommissioningClusterNetworkInfo
+@implementation MTRNetworkCommissioningClusterNetworkInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1103,7 +1103,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRNetworkCommissioningClusterNetworkInfo alloc] init];
+    auto other = [[MTRNetworkCommissioningClusterNetworkInfoStruct alloc] init];
 
     other.networkID = self.networkID;
     other.connected = self.connected;
@@ -1121,7 +1121,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRNetworkCommissioningClusterThreadInterfaceScanResult
+@implementation MTRNetworkCommissioningClusterNetworkInfo : MTRNetworkCommissioningClusterNetworkInfoStruct
+@end
+
+@implementation MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1147,7 +1150,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRNetworkCommissioningClusterThreadInterfaceScanResult alloc] init];
+    auto other = [[MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct alloc] init];
 
     other.panId = self.panId;
     other.extendedPanId = self.extendedPanId;
@@ -1173,7 +1176,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRNetworkCommissioningClusterWiFiInterfaceScanResult
+@implementation MTRNetworkCommissioningClusterThreadInterfaceScanResult
+    : MTRNetworkCommissioningClusterThreadInterfaceScanResultStruct
+@end
+
+@implementation MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1195,7 +1202,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRNetworkCommissioningClusterWiFiInterfaceScanResult alloc] init];
+    auto other = [[MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct alloc] init];
 
     other.security = self.security;
     other.ssid = self.ssid;
@@ -1216,6 +1223,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRNetworkCommissioningClusterWiFiInterfaceScanResult : MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct
 @end
 
 @implementation MTRGeneralDiagnosticsClusterNetworkInterface
@@ -2676,37 +2686,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTemperatureControlClusterTemperatureLevelStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _label = @"";
-
-        _temperatureLevel = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRTemperatureControlClusterTemperatureLevelStruct alloc] init];
-
-    other.label = self.label;
-    other.temperatureLevel = self.temperatureLevel;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: label:%@; temperatureLevel:%@; >", NSStringFromClass([self class]), _label, _temperatureLevel];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRRefrigeratorAlarmClusterNotifyEvent
 - (instancetype)init
 {
@@ -2997,6 +2976,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDishwasherAlarmClusterNotifyEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _active = @(0);
+
+        _inactive = @(0);
+
+        _state = @(0);
+
+        _mask = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDishwasherAlarmClusterNotifyEvent alloc] init];
+
+    other.active = self.active;
+    other.inactive = self.inactive;
+    other.state = self.state;
+    other.mask = self.mask;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: active:%@; inactive:%@; state:%@; mask:%@; >",
+                                             NSStringFromClass([self class]), _active, _inactive, _state, _mask];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTROperationalStateClusterErrorStateStruct
 - (instancetype)init
 {
@@ -3038,7 +3054,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationalStateID = @(0);
 
-        _operationalStateLabel = @"";
+        _operationalStateLabel = nil;
     }
     return self;
 }

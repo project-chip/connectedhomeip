@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "connectedhomeip/chip-build-vscode:0.7.18"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               git submodule update --init --recursive
       id: Submodules
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "connectedhomeip/chip-build-vscode:0.7.18"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -22,7 +22,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "connectedhomeip/chip-build-vscode:0.7.18"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -42,7 +42,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "connectedhomeip/chip-build-vscode:0.7.18"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -63,7 +63,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "connectedhomeip/chip-build-vscode:0.7.18"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -85,7 +85,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "connectedhomeip/chip-build-vscode:0.7.18"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -99,7 +99,6 @@ steps:
               --target linux-arm64-bridge-ipv6only-clang
               --target linux-arm64-chip-tool-ipv6only-clang
               --target linux-arm64-chip-tool-nodeps-ipv6only
-              --target linux-arm64-dynamic-bridge-ipv6only-clang
               --target linux-arm64-light-clang-rpc-ipv6only
               --target linux-arm64-light-clang-rpc-ipv6only-minmdns-verbose
               --target linux-arm64-lock-ipv6only-clang
@@ -109,8 +108,6 @@ steps:
               --target linux-arm64-python-bindings-clang
               --target linux-arm64-shell-ipv6only-clang
               --target linux-arm64-thermostat-ipv6only-clang
-              --target linux-arm64-tv-app-ipv6only-clang
-              --target linux-arm64-tv-casting-app-ipv6only-clang
               --target linux-x64-address-resolve-tool
               --target linux-x64-all-clusters-nodeps
               --target linux-x64-all-clusters-coverage
@@ -119,22 +116,18 @@ steps:
               --target linux-x64-chip-tool-ipv6only
               --target linux-x64-chip-tool-ipv6only-minmdns-verbose
               --target linux-x64-contact-sensor-no-ble-with-ui
-              --target linux-x64-dynamic-bridge-ipv6only
               --target linux-x64-efr32-test-runner
               --target linux-x64-light-no-ble-with-ui
               --target linux-x64-light-rpc-ipv6only
               --target linux-x64-light-rpc-ipv6only-minmdns-verbose
               --target linux-x64-lock-ipv6only
               --target linux-x64-minmdns-ipv6only
-              --target linux-x64-minmdns-ipv6only-minmdns-verbose
               --target linux-x64-ota-provider-ipv6only
               --target linux-x64-ota-requestor-ipv6only
               --target linux-x64-python-bindings
               --target linux-x64-rpc-console
               --target linux-x64-shell-ipv6only
               --target linux-x64-thermostat-ipv6only
-              --target linux-x64-tv-app-ipv6only
-              --target linux-x64-tv-casting-app-ipv6only
               build
               --create-archives /workspace/artifacts/
       waitFor:
@@ -145,7 +138,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.7.3"
+    - name: "connectedhomeip/chip-build-vscode:0.7.18"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -166,7 +159,7 @@ steps:
 logsBucket: matter-build-automation-build-logs
 
 # Global timeout for all steps
-timeout: 9000s
+timeout: 14400s
 queueTtl: 21600s
 
 artifacts:
