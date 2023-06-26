@@ -21,6 +21,8 @@
 
 #define MTR_EXPORT __attribute__((visibility("default")))
 
+#define MTR_HIDDEN __attribute__((visibility("hidden")))
+
 #ifdef __cplusplus
 #define MTR_EXTERN extern "C" MTR_EXPORT
 #else

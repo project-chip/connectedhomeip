@@ -1356,16 +1356,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_NUM_CD_KEY_SLOTS
 
 /**
- * @def CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
- *
- * @brief Defines the number of clients that can register for monitoring with a server
- * see ClientMonitoring cluster for specification
- */
-#ifndef CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
-#define CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC 1
-#endif // CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
-
-/**
  * @def CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS
  *
  * @brief Defines the number of simultaneous subscription resumption iterators that can be allocated
@@ -1379,8 +1369,8 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @brief The minimum number of scenes to support according to spec
  */
-#ifndef CHIP_CONFIG_SCENES_MAX_NUMBER
-#define CHIP_CONFIG_SCENES_MAX_NUMBER 16
+#ifndef CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT
+#define CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT 16
 #endif
 
 /**
@@ -1394,7 +1384,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum number of scenes allowed on a single fabric
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_PER_FABRIC
-#define CHIP_CONFIG_SCENES_MAX_PER_FABRIC (CHIP_CONFIG_SCENES_MAX_NUMBER / 2)
+#define CHIP_CONFIG_SCENES_MAX_PER_FABRIC (CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT / 2)
+#endif
+
+/**
+ * @brief The maximum number of attribute value pairs in an extension field set.
+ */
+#ifndef CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS
+#define CHIP_CONFIG_SCENES_MAX_AV_PAIRS_EFS 15
 #endif
 
 /**

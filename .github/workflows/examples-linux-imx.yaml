@@ -37,13 +37,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-imx:0.7.3
+            image: connectedhomeip/chip-build-imx:0.7.19.1
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       token: ${{ github.token }}
                   attempt_limit: 3
@@ -51,14 +51,19 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
+            - uses: Wandalen/wretry.action@v1.3.0
+              name: Bootstrap cache
+              continue-on-error: true
               timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               run: bash scripts/bootstrap.sh
 

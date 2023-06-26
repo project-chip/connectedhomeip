@@ -74,7 +74,7 @@ public:
     /**
      *  @brief Mark the end of this SubscribeResponseMessage
      */
-    SubscribeResponseMessage::Builder & EndOfSubscribeResponseMessage();
+    CHIP_ERROR EndOfSubscribeResponseMessage();
 };
 } // namespace SubscribeResponseMessage
 } // namespace app

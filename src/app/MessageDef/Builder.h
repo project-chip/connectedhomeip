@@ -81,9 +81,13 @@ public:
     /**
      * Rollback the request state to the checkpointed TLVWriter
      *
-     * @param[in] aPoint A that captured the state via Checkpoint() at some point in the past
+     * @param[in] aPoint A writer that captured the state via Checkpoint() at some point in the past
      */
-    void Rollback(const chip::TLV::TLVWriter & aPoint) { *mpWriter = aPoint; }
+    void Rollback(const chip::TLV::TLVWriter & aPoint)
+    {
+        *mpWriter = aPoint;
+        ResetError();
+    }
 
     void EndOfContainer();
 

@@ -36,15 +36,10 @@ constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISC
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
-                                       DiscoveryType discoveryType)
+namespace {
+
+CHIP_ERROR GetPayload(const char * setUpCode, SetupPayload & payload)
 {
-    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    SetupPayload payload;
-    mConnectionType = commission;
-    mDiscoveryType  = discoveryType;
-
     bool isQRCode = strncmp(setUpCode, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
     if (isQRCode)
     {
@@ -57,17 +52,46 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
         VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    mRemoteId     = remoteId;
-    mSetUpPINCode = payload.setUpPINCode;
+    return CHIP_NO_ERROR;
+}
+} // namespace
+
+CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, SetupCodePairerBehaviour commission,
+                                       DiscoveryType discoveryType, Optional<Dnssd::CommonResolutionData> resolutionData)
+{
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    SetupPayload payload;
+    ReturnErrorOnFailure(GetPayload(setUpCode, payload));
+
+    if (resolutionData.HasValue())
+    {
+        VerifyOrReturnError(discoveryType != DiscoveryType::kAll, CHIP_ERROR_INVALID_ARGUMENT);
+        if (mRemoteId == remoteId && mSetUpPINCode == payload.setUpPINCode && mConnectionType == commission &&
+            mDiscoveryType == discoveryType)
+        {
+            NotifyCommissionableDeviceDiscovered(resolutionData.Value());
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    mConnectionType = commission;
+    mDiscoveryType  = discoveryType;
+    mRemoteId       = remoteId;
+    mSetUpPINCode   = payload.setUpPINCode;
 
     ResetDiscoveryState();
 
-    ReturnErrorOnFailure(Connect(payload));
+    if (resolutionData.HasValue())
+    {
+        NotifyCommissionableDeviceDiscovered(resolutionData.Value());
+        return CHIP_NO_ERROR;
+    }
 
+    ReturnErrorOnFailure(Connect(payload));
     return mSystemLayer->StartTimer(System::Clock::Milliseconds32(kDeviceDiscoveredTimeout), OnDeviceDiscoveredTimeoutCallback,
                                     this);
 }
-
 CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -358,20 +382,23 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
 
     ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
 
-    auto & resolutionData = nodeData.resolutionData;
+    NotifyCommissionableDeviceDiscovered(nodeData.resolutionData);
+}
 
+void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonResolutionData & resolutionData)
+{
     if (mDiscoveryType == DiscoveryType::kDiscoveryNetworkOnlyWithoutPASEAutoRetry)
     {
         // If the discovery type does not want the PASE auto retry mechanism, we will just store
         // a single IP. So the discovery process is stopped as it won't be of any help anymore.
         StopConnectOverIP();
-        mDiscoveredParameters.emplace_back(nodeData.resolutionData, 0);
+        mDiscoveredParameters.emplace_back(resolutionData, 0);
     }
     else
     {
         for (size_t i = 0; i < resolutionData.numIPs; i++)
         {
-            mDiscoveredParameters.emplace_back(nodeData.resolutionData, i);
+            mDiscoveredParameters.emplace_back(resolutionData, i);
         }
     }
 

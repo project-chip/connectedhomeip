@@ -125,9 +125,9 @@ public:
     /**
      *  @brief Mark the end of this WriteRequestMessage
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    WriteRequestMessage::Builder & EndOfWriteRequestMessage();
+    CHIP_ERROR EndOfWriteRequestMessage();
 
 private:
     AttributeDataIBs::Builder mWriteRequests;

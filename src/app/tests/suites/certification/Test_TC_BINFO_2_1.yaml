@@ -689,3 +689,28 @@ tests:
       attribute: "CapabilityMinima"
       response:
           value: CapabilityMinimaValue
+
+    - label: "TH reads ProductAppearance from the DUT."
+      PICS: BINFO.S.A0014
+      command: "readAttribute"
+      attribute: "ProductAppearance"
+      response:
+          saveAs: ProductAppearancevalue
+          constraints:
+              type: ProductAppearanceStruct
+
+    - label: "TH writes ProductAppearance to the DUT."
+      PICS: BINFO.S.A0014
+      command: "writeAttribute"
+      attribute: "ProductAppearance"
+      arguments:
+          value: { "Finish": 3, "PrimaryColor": 4 }
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "TH reads ProductAppearance attribute from the DUT."
+      PICS: BINFO.S.A0014
+      command: "readAttribute"
+      attribute: "ProductAppearance"
+      response:
+          value: ProductAppearancevalue

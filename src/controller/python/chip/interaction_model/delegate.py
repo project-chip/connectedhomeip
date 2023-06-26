@@ -92,6 +92,7 @@ class AttributeReadResult:
     path: AttributePath
     status: int
     value: 'typing.Any'
+    dataVersion: int
 
 
 @dataclass

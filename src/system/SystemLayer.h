@@ -43,7 +43,9 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #include <dispatch/dispatch.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+#include <ev.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
 #include <utility>
 
@@ -113,6 +115,40 @@ public:
      *   @return Other Value indicating timer failed to start.
      */
     virtual CHIP_ERROR StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
+
+    /**
+     * @brief
+     *   This method extends the timer expiry to the provided aDelay. This method must be called while in the Matter context
+     *   (from the Matter event loop, or while holding the Matter stack lock).
+     *   aDelay is not added to the Remaining time of the timer. The finish line is pushed back to aDelay.
+     *
+     *   @note The goal of this method is that the timer remaining time cannot be shrunk and only extended to a new time
+     *         If the provided new Delay is smaller than the timer's remaining time, the timer is left untouched.
+     *         In the other case the method acts like StartTimer
+     *
+     *   @param[in]  aDelay             Time before this timer fires.
+     *   @param[in]  aComplete          A pointer to the function called when timer expires.
+     *   @param[in]  aAppState          A pointer to the application state object used when timer expires.
+     *
+     *   @return CHIP_NO_ERROR On success.
+     *   @return CHIP_ERROR_INVALID_ARGUMENT If the provided aDelay value is 0
+     *   @return CHIP_ERROR_NO_MEMORY If a timer cannot be allocated.
+     *   @return Other Value indicating timer failed to start.
+     */
+    virtual CHIP_ERROR ExtendTimerTo(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
+
+    /**
+     * @brief
+     *   This method searches for the timer matching the provided parameters.
+     *   and returns whether it is still "running" and waiting to trigger or not.
+     *
+     *   @param[in]  onComplete         A pointer to the function called when timer expires.
+     *   @param[in]  appState           A pointer to the application state object used when timer expires.
+     *
+     *   @return True if there is a current timer set to call, at some point in the future, the provided onComplete callback
+     *           with the corresponding appState context. False otherwise.
+     */
+    virtual bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) = 0;
 
     /**
      * @brief This method cancels a one-shot timer, started earlier through @p StartTimer().  This method must
@@ -250,7 +286,10 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     virtual void SetDispatchQueue(dispatch_queue_t dispatchQueue) = 0;
     virtual dispatch_queue_t GetDispatchQueue()                   = 0;
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#elif CHIP_SYSTEM_CONFIG_USE_LIBEV
+    virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) = 0;
+    virtual struct ev_loop * GetLibEvLoop()                 = 0;
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 };
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

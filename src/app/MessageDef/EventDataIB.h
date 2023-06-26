@@ -227,9 +227,9 @@ public:
     /**
      *  @brief Mark the end of this EventDataIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    EventDataIB::Builder & EndOfEventDataIB();
+    CHIP_ERROR EndOfEventDataIB();
 
 private:
     EventPathIB::Builder mPath;

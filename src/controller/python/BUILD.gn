@@ -306,7 +306,6 @@ chip_python_wheel_action("chip-core") {
     "pyyaml",
     "ipdb",
     "deprecation",
-    "mobly",
     "cryptography",
     "ecdsa",
   ]
@@ -361,6 +360,7 @@ chip_python_wheel_action("chip-clusters") {
         "chip/clusters/Types.py",
         "chip/clusters/enum.py",
         "chip/tlv/__init__.py",
+        "chip/tlv/tlvlist.py",
       ]
     },
     {
@@ -428,7 +428,6 @@ chip_python_wheel_action("chip-repl") {
     "ipython!=8.1.0",
     "rich",
     "ipykernel",
-    "mobly",
   ]
 
   if (current_os == "mac") {

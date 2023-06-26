@@ -224,7 +224,7 @@ tests:
     - label:
           "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT and
           Verify that the DUT sends Success response"
-      PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0030
+      PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0030.Write
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
@@ -233,7 +233,7 @@ tests:
     - label:
           "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT and
           verify DUT responds with UNSUPPORTED_WRITE"
-      PICS: DRLK.S.F00 && DRLK.S.F01 && ! DRLK.S.A0030
+      PICS: DRLK.S.F00 && DRLK.S.F01 && !DRLK.S.A0030.Write
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
@@ -244,7 +244,7 @@ tests:
     - label:
           "TH writes UserCodeTemporaryDisableTime attribute value as 15 Seconds
           on the DUT and Verify that the DUT sends Success response"
-      PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0031
+      PICS: DRLK.S.F00 && DRLK.S.F01 && DRLK.S.A0031.Write
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       arguments:
@@ -253,7 +253,7 @@ tests:
     - label:
           "TH writes UserCodeTemporaryDisableTime attribute value as 15 Seconds
           on the DUT and Verify that the DUT sends Success response"
-      PICS: DRLK.S.F00 && DRLK.S.F01 && ! DRLK.S.A0031
+      PICS: DRLK.S.F00 && DRLK.S.F01 && !DRLK.S.A0031.Write
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       arguments:
@@ -335,21 +335,21 @@ tests:
                 value: 15000
 
     - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
-      PICS: DRLK.S.A0023 && PICS_SDK_CI_ONLY
+      PICS: DRLK.S.A0023.Write && PICS_SDK_CI_ONLY
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
           value: 10
 
     - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
-      PICS: DRLK.S.A0023 && PICS_SKIP_SAMPLE_APP
+      PICS: DRLK.S.A0023.Write && PICS_SKIP_SAMPLE_APP
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
           value: 60
 
     - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
-      PICS: "!DRLK.S.A0023 && PICS_SDK_CI_ONLY"
+      PICS: " !DRLK.S.A0023.Write && PICS_SDK_CI_ONLY "
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
@@ -358,7 +358,7 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "TH writes AutoRelockTime attribute value as 60 seconds on the DUT"
-      PICS: "!DRLK.S.A0023 && PICS_SKIP_SAMPLE_APP"
+      PICS: " !DRLK.S.A0023.Write && PICS_SKIP_SAMPLE_APP "
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:

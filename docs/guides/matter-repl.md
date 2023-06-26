@@ -54,7 +54,7 @@ choices.
    the -z argument that points to the directory of pre-generated code:
 
     ```
-    scripts/build_python.sh -m platform -i separate -z "/some/pregen/dir"
+    scripts/build_python.sh -m platform -i out/python_env -z "/some/pregen/dir"
     ```
 
     > Note: To get more details about available build configurations, run the

@@ -41,10 +41,10 @@ jobs:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       submodules: true
                       token: ${{ github.token }}
@@ -56,14 +56,19 @@ jobs:
               run: |
                   mkdir objdir-clone || true
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
+            - uses: Wandalen/wretry.action@v1.3.0
+              name: Bootstrap cache
+              continue-on-error: true
               timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: bash scripts/bootstrap.sh
@@ -101,10 +106,10 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
+            - uses: Wandalen/wretry.action@v1.3.0
               name: Checkout
               with:
-                  action: actions/checkout@v3
+                  action: actions/checkout@v3.5.2
                   with: |
                       submodules: true
                       token: ${{ github.token }}
@@ -116,14 +121,19 @@ jobs:
               run: |
                   mkdir objdir-clone || true
 
-            - name: Bootstrap cache
-              uses: actions/cache@v3
+            - uses: Wandalen/wretry.action@v1.3.0
+              name: Bootstrap cache
+              continue-on-error: true
               timeout-minutes: 10
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
+                action: buildjet/cache@v3
+                attempt_limit: 3
+                attempt_delay: 2000
+                with: |
+                    key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                    path: |
+                        .environment
+                        build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: bash scripts/bootstrap.sh

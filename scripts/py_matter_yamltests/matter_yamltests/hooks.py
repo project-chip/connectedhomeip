@@ -14,6 +14,7 @@
 #    limitations under the License.
 
 from .errors import TestStepError
+from .parser import TestStep
 
 
 class TestParserHooks():
@@ -143,18 +144,18 @@ class TestRunnerHooks():
         """
         pass
 
-    def step_start(self, name: str):
+    def step_start(self, request: TestStep):
         """
         This method is called when the runner starts running a step from the test.
 
         Parameters
         ----------
-        name: str
-            The name of the test step that is starting.
+        request: TestStep
+            The original request as defined by the test step.
         """
         pass
 
-    def step_success(self, logger, logs, duration: int, request):
+    def step_success(self, logger, logs, duration: int, request: TestStep):
         """
         This method is called when running a step succeeds.
 
@@ -169,12 +170,12 @@ class TestRunnerHooks():
         duration: int
             How long it took to run the test step, in milliseconds.
 
-        request:
+        request: TestStep
             The original request as defined by the test step.
         """
         pass
 
-    def step_failure(self, logger, logs, duration: int, request, received):
+    def step_failure(self, logger, logs, duration: int, request: TestStep, received):
         """
         This method is called when running a step fails.
 
@@ -189,7 +190,7 @@ class TestRunnerHooks():
         duration: int
             How long it took to run the test step, in milliseconds.
 
-        request:
+        request: TestStep
             The original request as defined by the test step.
 
         received:

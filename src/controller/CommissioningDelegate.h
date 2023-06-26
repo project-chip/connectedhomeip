@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
@@ -86,7 +87,7 @@ struct CompletionStatus
     Optional<CommissioningStage> failedStage;
     Optional<Credentials::AttestationVerificationResult> attestationResult;
     Optional<app::Clusters::GeneralCommissioning::CommissioningErrorEnum> commissioningError;
-    Optional<app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> networkCommissioningStatus;
+    Optional<app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> networkCommissioningStatus;
 };
 
 constexpr uint16_t kDefaultFailsafeTimeout = 60;
@@ -571,10 +572,10 @@ struct CommissioningErrorInfo
 
 struct NetworkCommissioningStatusInfo
 {
-    NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatus result) :
+    NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum result) :
         networkCommissioningStatus(result)
     {}
-    app::Clusters::NetworkCommissioning::NetworkCommissioningStatus networkCommissioningStatus;
+    app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum networkCommissioningStatus;
 };
 
 class CommissioningDelegate

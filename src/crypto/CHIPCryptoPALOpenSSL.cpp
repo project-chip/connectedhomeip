@@ -940,7 +940,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     out_buf_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
     result         = EVP_PKEY_derive(context, out_secret.Bytes(), &out_buf_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    SuccessOrExit(out_secret.SetLength(out_buf_length));
+    SuccessOrExit(error = out_secret.SetLength(out_buf_length));
 
 exit:
     if (ec_key != nullptr)
@@ -1653,7 +1653,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
                 }
                 else
                 {
-                    VerifyOrExit(isCA && (pathLen == -1 || pathLen == 0 || pathLen == 1), err = CHIP_ERROR_INTERNAL);
+                    // For PAA, pathlen must be absent or equal to 1 (see Matter 1.1 spec 6.2.2.5)
+                    VerifyOrExit(isCA && (pathLen == -1 || pathLen == 1), err = CHIP_ERROR_INTERNAL);
                 }
             }
             break;

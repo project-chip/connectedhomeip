@@ -24,6 +24,7 @@
 #include <access/AccessControl.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
@@ -282,8 +283,8 @@ void IncreaseClusterDataVersion(const ConcreteClusterPath & aConcreteClusterPath
 
 CHIP_ERROR SendSuccessStatus(AttributeReportIB::Builder & aAttributeReport, AttributeDataIB::Builder & aAttributeDataIBBuilder)
 {
-    ReturnErrorOnFailure(aAttributeDataIBBuilder.EndOfAttributeDataIB().GetError());
-    return aAttributeReport.EndOfAttributeReportIB().GetError();
+    ReturnErrorOnFailure(aAttributeDataIBBuilder.EndOfAttributeDataIB());
+    return aAttributeReport.EndOfAttributeReportIB();
 }
 
 CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
@@ -598,11 +599,11 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     AttributePathIB::Builder & attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
-        .Cluster(aPath.mClusterId)
-        .Attribute(aPath.mAttributeId)
-        .EndOfAttributePathIB();
-    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
+    CHIP_ERROR err = attributePathIBBuilder.Endpoint(aPath.mEndpointId)
+                         .Cluster(aPath.mClusterId)
+                         .Attribute(aPath.mAttributeId)
+                         .EndOfAttributePathIB();
+    ReturnErrorOnFailure(err);
 
     EmberAfAttributeSearchRecord record;
     record.endpoint           = aPath.mEndpointId;
@@ -957,10 +958,9 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 }
 } // namespace
 
-const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aConcreteClusterPath)
+const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePath & aPath)
 {
-    return emberAfLocateAttributeMetadata(aConcreteClusterPath.mEndpointId, aConcreteClusterPath.mClusterId,
-                                          aConcreteClusterPath.mAttributeId);
+    return emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 }
 
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
@@ -1069,6 +1069,38 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
     }
 
     return false;
+}
+
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+{
+    using Protocols::InteractionModel::Status;
+
+    const EmberAfEndpointType * type = emberAfFindEndpointType(aPath.mEndpointId);
+    if (type == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+
+    const EmberAfCluster * cluster = emberAfFindClusterInType(type, aPath.mClusterId, CLUSTER_MASK_SERVER);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedCluster;
+    }
+
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+    for (size_t i = 0; i < cluster->eventCount; ++i)
+    {
+        if (cluster->eventList[i] == aPath.mEventId)
+        {
+            return Status::Success;
+        }
+    }
+
+    return Status::UnsupportedEvent;
+#else
+    // No way to tell. Just claim supported.
+    return Status::Success;
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
 }
 
 } // namespace app

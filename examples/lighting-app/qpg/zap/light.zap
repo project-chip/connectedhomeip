@@ -433,7 +433,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -1088,7 +1088,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 0,
+              "included": 1,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -2813,7 +2813,7 @@
               "code": 5,
               "mfgCode": null,
               "side": "server",
-              "type": "NetworkCommissioningStatus",
+              "type": "NetworkCommissioningStatusEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -3665,7 +3665,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "RoutingRole",
+              "type": "RoutingRoleEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -6484,7 +6484,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "IdentifyTypeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7030,7 +7030,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -10281,5 +10281,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 269
     }
-  ]
+  ],
+  "log": []
 }

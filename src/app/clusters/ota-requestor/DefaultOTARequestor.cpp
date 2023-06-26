@@ -183,8 +183,8 @@ void DefaultOTARequestor::OnQueryImageResponse(void * context, const QueryImageR
 
         if (update.softwareVersion > requestorCore->mCurrentVersion)
         {
-            ChipLogDetail(SoftwareUpdate, "Update available from version %" PRIu32 " to %" PRIu32, requestorCore->mCurrentVersion,
-                          update.softwareVersion);
+            ChipLogProgress(SoftwareUpdate, "Update available from version %" PRIu32 " to %" PRIu32, requestorCore->mCurrentVersion,
+                            update.softwareVersion);
             MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
             // This function copies the bytespan to mutablebytespan only if size of mutablebytespan buffer is greater or equal to
             // bytespan otherwise we are copying data upto available size.

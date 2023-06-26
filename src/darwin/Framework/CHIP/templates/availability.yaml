@@ -3045,9 +3045,15 @@
                   - fabricIndex
       enums:
           Identify:
-              - IdentifyEffectIdentifier
-              - IdentifyEffectVariant
-              - IdentifyIdentifyType
+              # EffectIdentifierEnum, EffectVariantEnum, and IdentifyTypeEnum
+              # were originally named IdentifyEffectIdentifier,
+              # IdentifyEffectVariant, and IdentifyIdentifyType, but we generate
+              # the same API for the names with/without "Enum" at the end, and
+              # with/without the cluster name at the beginning, so the name can
+              # just change here.
+              - EffectIdentifierEnum
+              - EffectVariantEnum
+              - IdentifyTypeEnum
           OnOff:
               - OnOffDelayedAllOffEffectVariant
               - OnOffDyingLightEffectVariant
@@ -3109,8 +3115,12 @@
               # here.
               - RegulatoryLocationTypeEnum
           NetworkCommissioning:
-              - NetworkCommissioningStatus
-              - WiFiBand
+              # NetworkCommissioningStatusEnum and WiFiBandEnum were originally
+              # just named NetworkCommissioningStatus and WiFiBand, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              - NetworkCommissioningStatusEnum
+              - WiFiBandEnum
           DiagnosticLogs:
               - LogsIntent
               - LogsStatus
@@ -3125,8 +3135,11 @@
               - NetworkFaultType
               - RadioFaultType
           ThreadNetworkDiagnostics:
-              - NetworkFault
-              - RoutingRole
+              # NetworkFaultEnum and RoutingRoleEnum were originally just named
+              # NetworkFault and RoutingRole, but we generate the same API for
+              # both of those names, so the name can just change here.
+              - NetworkFaultEnum
+              - RoutingRoleEnum
               - ThreadConnectionStatus
           WiFiNetworkDiagnostics:
               # AssociationFailureCauseEnum was originally just named
@@ -3207,7 +3220,10 @@
               - SaturationMoveMode
               - SaturationStepMode
           IlluminanceMeasurement:
-              - LightSensorType
+              # LightSensorTypeEnum was originally named LightSensorType, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end, so the name can just change here.
+              - LightSensorTypeEnum
           Channel:
               - ChannelStatusEnum
               - LineupInfoTypeEnum
@@ -3237,16 +3253,22 @@
               - FaultType
       enum values:
           Identify:
-              IdentifyEffectIdentifier:
+              # EffectIdentifierEnum, EffectVariantEnum, and IdentifyTypeEnum
+              # were originally named IdentifyEffectIdentifier,
+              # IdentifyEffectVariant, and IdentifyIdentifyType, but we generate
+              # the same API for the names with/without "Enum" at the end, and
+              # with/without the cluster name at the beginning, so the name can
+              # just change here.
+              EffectIdentifierEnum:
                   - Blink
                   - Breathe
                   - Okay
                   - ChannelChange
                   - FinishEffect
                   - StopEffect
-              IdentifyEffectVariant:
+              EffectVariantEnum:
                   - Default
-              IdentifyIdentifyType:
+              IdentifyTypeEnum:
                   - None
                   - VisibleLight
                   - VisibleLED
@@ -3441,7 +3463,11 @@
                   - Outdoor
                   - IndoorOutdoor
           NetworkCommissioning:
-              NetworkCommissioningStatus:
+              # NetworkCommissioningStatusEnum and WiFiBandEnum were originally
+              # just named NetworkCommissioningStatus and WiFiBand, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              NetworkCommissioningStatusEnum:
                   - Success
                   - OutOfRange
                   - BoundsExceeded
@@ -3455,7 +3481,7 @@
                   - IPV6Failed
                   - IPBindFailed
                   - UnknownError
-              WiFiBand:
+              WiFiBandEnum:
                   - 2G4
                   - 3G65
                   - 5G
@@ -3519,12 +3545,15 @@
                   - BLEFault
                   - EthernetFault
           ThreadNetworkDiagnostics:
-              NetworkFault:
+              # NetworkFaultEnum and RoutingRoleEnum were originally just named
+              # NetworkFault and RoutingRole, but we generate the same API for
+              # both of those names, so the name can just change here.
+              NetworkFaultEnum:
                   - Unspecified
                   - LinkDown
                   - HardwareFailure
                   - NetworkJammed
-              RoutingRole:
+              RoutingRoleEnum:
                   - Unspecified
                   - Unassigned
                   - SleepyEndDevice
@@ -3922,7 +3951,7 @@
                   - Up
                   - Down
           IlluminanceMeasurement:
-              LightSensorType:
+              LightSensorTypeEnum:
                   - Photodiode
                   - CMOS
           Channel:
@@ -7017,29 +7046,34 @@
               PumpFeature:
                   LocalOperation: Local
 
-- release: "TBD"
+- release: "Fall 2023"
   versions: "future"
   introduced:
       clusters:
           - AirQuality
+          # Replaceable Monitoring clusters
           - HEPAFilterMonitoring
           - ActivatedCarbonFilterMonitoring
-          - CeramicFilterMonitoring
-          - ElectrostaticFilterMonitoring
-          - UVFilterMonitoring
-          - IonizingFilterMonitoring
-          - ZeoliteFilterMonitoring
-          - OzoneFilterMonitoring
-          - WaterTankMonitoring
-          - FuelTankMonitoring
-          - InkCartridgeMonitoring
-          - TonerCartridgeMonitoring
+          # Concentration Measurement clusters
+          - CarbonDioxideConcentrationMeasurement
+          - CarbonMonoxideConcentrationMeasurement
+          - FormaldehydeConcentrationMeasurement
+          - NitrogenDioxideConcentrationMeasurement
+          - OzoneConcentrationMeasurement
+          - PM10ConcentrationMeasurement
+          - PM1ConcentrationMeasurement
+          - PM25ConcentrationMeasurement
+          - RadonConcentrationMeasurement
+          - TotalVolatileOrganicCompoundsConcentrationMeasurement
+          - OperationalState
           - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
       attributes:
           Scenes:
               - EventList
+              - SceneTableSize
+              - RemainingCapacity
           OnOff:
               - EventList
           OnOffSwitchConfiguration:
@@ -7124,6 +7158,7 @@
               - EventList
           FanControl:
               - EventList
+              - AirflowDirection
           ThermostatUserInterfaceConfiguration:
               - EventList
           ColorControl:
@@ -7212,110 +7247,193 @@
               - EventList
               - FeatureMap
               - ClusterRevision
-          CeramicFilterMonitoring:
-              - Condition
-              - DegradationDirection
-              - ChangeIndication
-              - InPlaceIndicator
+          CarbonDioxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
               - EventList
               - FeatureMap
               - ClusterRevision
-          ElectrostaticFilterMonitoring:
-              - Condition
-              - DegradationDirection
-              - ChangeIndication
-              - InPlaceIndicator
+          CarbonMonoxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
               - EventList
               - FeatureMap
               - ClusterRevision
-          UVFilterMonitoring:
-              - Condition
-              - DegradationDirection
-              - ChangeIndication
-              - InPlaceIndicator
+          FormaldehydeConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
               - EventList
               - FeatureMap
               - ClusterRevision
-          IonizingFilterMonitoring:
-              - Condition
-              - DegradationDirection
-              - ChangeIndication
-              - InPlaceIndicator
+          NitrogenDioxideConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
               - EventList
               - FeatureMap
               - ClusterRevision
-          ZeoliteFilterMonitoring:
-              - Condition
-              - DegradationDirection
-              - ChangeIndication
-              - InPlaceIndicator
+          OzoneConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
               - EventList
               - FeatureMap
               - ClusterRevision
-          OzoneFilterMonitoring:
-              - Condition
-              - DegradationDirection
-              - ChangeIndication
-              - InPlaceIndicator
+          PM10ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
               - EventList
               - FeatureMap
               - ClusterRevision
-          WaterTankMonitoring:
-              - Condition
-              - DegradationDirection
-              - ChangeIndication
-              - InPlaceIndicator
+          PM1ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
               - EventList
               - FeatureMap
               - ClusterRevision
-          FuelTankMonitoring:
-              - Condition
-              - DegradationDirection
-              - ChangeIndication
-              - InPlaceIndicator
+          PM25ConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
               - EventList
               - FeatureMap
               - ClusterRevision
-          InkCartridgeMonitoring:
-              - Condition
-              - DegradationDirection
-              - ChangeIndication
-              - InPlaceIndicator
+          RadonConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
               - EventList
               - FeatureMap
               - ClusterRevision
-          TonerCartridgeMonitoring:
-              - Condition
-              - DegradationDirection
-              - ChangeIndication
-              - InPlaceIndicator
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - PeakMeasuredValue
+              - PeakMeasuredValueWindow
+              - AverageMeasuredValue
+              - AverageMeasuredValueWindow
+              - Uncertainty
+              - MeasurementUnit
+              - MeasurementMedium
+              - LevelValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - EventList
+              - FeatureMap
+              - ClusterRevision
+          OperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -7324,7 +7442,6 @@
               - ClusterRevision
           RefrigeratorAlarm:
               - Mask
-              - Latch
               - State
               - GeneratedCommandList
               - AcceptedCommandList
@@ -7337,7 +7454,7 @@
               - MinTemperature
               - MaxTemperature
               - Step
-              - CurrentTemperatureLevelIndex
+              - SelectedTemperatureLevel
               - SupportedTemperatureLevels
               - GeneratedCommandList
               - AcceptedCommandList
@@ -7358,6 +7475,7 @@
               - InterconnectCOAlarm
               - ContaminationState
               - SensitivityLevel
+              - ExpiryDate
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -7369,28 +7487,14 @@
               - ResetCondition
           ActivatedCarbonFilterMonitoring:
               - ResetCondition
-          CeramicFilterMonitoring:
-              - ResetCondition
-          ElectrostaticFilterMonitoring:
-              - ResetCondition
-          UVFilterMonitoring:
-              - ResetCondition
-          IonizingFilterMonitoring:
-              - ResetCondition
-          ZeoliteFilterMonitoring:
-              - ResetCondition
-          OzoneFilterMonitoring:
-              - ResetCondition
-          WaterTankMonitoring:
-              - ResetCondition
-          FuelTankMonitoring:
-              - ResetCondition
-          InkCartridgeMonitoring:
-              - ResetCondition
-          TonerCartridgeMonitoring:
-              - ResetCondition
-          RefrigeratorAlarm:
-              - Reset
+          FanControl:
+              - Step
+          OperationalState:
+              - Pause
+              - Stop
+              - Start
+              - Resume
+              - OperationalCommandResponse
           TemperatureControl:
               - SetTemperature
           DoorLock:
@@ -7401,10 +7505,14 @@
           DoorLock:
               UnboltDoor:
                   - pinCode
-          RefrigeratorAlarm:
-              Reset:
-                  - alarms
-                  - mask
+          FanControl:
+              Step:
+                  - direction
+                  - wrap
+                  - lowestOff
+          OperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
           TemperatureControl:
               SetTemperature:
                   - targetTemperature
@@ -7416,8 +7524,16 @@
               - ProductAppearanceStruct
           BridgedDeviceBasicInformation:
               - ProductAppearanceStruct
-          TemperatureControl:
-              - TemperatureLevelStruct
+          NetworkCommissioning:
+              - WiFiInterfaceScanResultStruct
+              - ThreadInterfaceScanResultStruct
+              - NetworkInfoStruct
+          OperationalState:
+              - OperationalStateStruct
+              - ErrorStateStruct
+          ThreadNetworkDiagnostics:
+              - NeighborTableStruct
+              - RouteTableStruct
       struct fields:
           AccessControl:
               AccessControlTargetStruct:
@@ -7432,11 +7548,65 @@
               ProductAppearanceStruct:
                   - finish
                   - primaryColor
-          TemperatureControl:
-              TemperatureLevelStruct:
-                  - label
-                  - temperatureLevel
+          NetworkCommissioning:
+              WiFiInterfaceScanResultStruct:
+                  - security
+                  - ssid
+                  - bssid
+                  - channel
+                  - wiFiBand
+                  - rssi
+              ThreadInterfaceScanResultStruct:
+                  - panId
+                  - extendedPanId
+                  - networkName
+                  - channel
+                  - version
+                  - extendedAddress
+                  - rssi
+                  - lqi
+              NetworkInfoStruct:
+                  - networkID
+                  - connected
+          OperationalState:
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
+          ThreadNetworkDiagnostics:
+              NeighborTableStruct:
+                  - extAddress
+                  - age
+                  - rloc16
+                  - linkFrameCounter
+                  - mleFrameCounter
+                  - lqi
+                  - averageRssi
+                  - lastRssi
+                  - frameErrorRate
+                  - messageErrorRate
+                  - rxOnWhenIdle
+                  - fullThreadDevice
+                  - fullNetworkData
+                  - isChild
+              RouteTableStruct:
+                  - extAddress
+                  - rloc16
+                  - routerId
+                  - nextHop
+                  - pathCost
+                  - lqiIn
+                  - lqiOut
+                  - age
+                  - allocated
+                  - linkEstablished
       events:
+          OperationalState:
+              - OperationalError
+              - OperationCompletion
           RefrigeratorAlarm:
               - Notify
           SmokeCOAlarm:
@@ -7452,6 +7622,13 @@
               - InterconnectCOAlarm
               - AllClear
       event fields:
+          OperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
           RefrigeratorAlarm:
               Notify:
                   - active
@@ -7467,42 +7644,58 @@
           BridgedDeviceBasicInformation:
               - ColorEnum
               - ProductFinishEnum
+          FanControl:
+              - DirectionEnum
+              - AirflowDirectionEnum
           HEPAFilterMonitoring:
               - ChangeIndicationEnum
               - DegradationDirectionEnum
           ActivatedCarbonFilterMonitoring:
               - ChangeIndicationEnum
               - DegradationDirectionEnum
-          CeramicFilterMonitoring:
-              - ChangeIndicationEnum
-              - DegradationDirectionEnum
-          ElectrostaticFilterMonitoring:
-              - ChangeIndicationEnum
-              - DegradationDirectionEnum
-          UVFilterMonitoring:
-              - ChangeIndicationEnum
-              - DegradationDirectionEnum
-          IonizingFilterMonitoring:
-              - ChangeIndicationEnum
-              - DegradationDirectionEnum
-          ZeoliteFilterMonitoring:
-              - ChangeIndicationEnum
-              - DegradationDirectionEnum
-          OzoneFilterMonitoring:
-              - ChangeIndicationEnum
-              - DegradationDirectionEnum
-          WaterTankMonitoring:
-              - ChangeIndicationEnum
-              - DegradationDirectionEnum
-          FuelTankMonitoring:
-              - ChangeIndicationEnum
-              - DegradationDirectionEnum
-          InkCartridgeMonitoring:
-              - ChangeIndicationEnum
-              - DegradationDirectionEnum
-          TonerCartridgeMonitoring:
-              - ChangeIndicationEnum
-              - DegradationDirectionEnum
+          CarbonDioxideConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          CarbonMonoxideConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          FormaldehydeConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          NitrogenDioxideConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          OzoneConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          PM10ConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          PM1ConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          PM25ConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          RadonConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              - LevelValueEnum
+              - MeasurementUnitEnum
+              - MeasurementMediumEnum
+          OperationalState:
+              - OperationalStateEnum
+              - ErrorStateEnum
           SmokeCOAlarm:
               - AlarmStateEnum
               - ContaminationStateEnum
@@ -7580,8 +7773,18 @@
                   - Rugged
                   - Fabric
                   - Other
+          FanControl:
+              DirectionEnum:
+                  - Increase
+                  - Decrease
+              AirflowDirectionEnum:
+                  - Forward
+                  - Reverse
           NetworkCommissioning:
-              WiFiBand:
+              # WiFiBandEnum was originally just named WiFiBand, but we generate
+              # the same API for both of those names, so the name can just
+              # change here.
+              WiFiBandEnum:
                   - 1G
           HEPAFilterMonitoring:
               ChangeIndicationEnum:
@@ -7599,86 +7802,206 @@
               DegradationDirectionEnum:
                   - Up
                   - Down
-          CeramicFilterMonitoring:
-              ChangeIndicationEnum:
-                  - OK
-                  - Warning
+          CarbonDioxideConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
                   - Critical
-              DegradationDirectionEnum:
-                  - Up
-                  - Down
-          ElectrostaticFilterMonitoring:
-              ChangeIndicationEnum:
-                  - OK
-                  - Warning
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          CarbonMonoxideConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
                   - Critical
-              DegradationDirectionEnum:
-                  - Up
-                  - Down
-          UVFilterMonitoring:
-              ChangeIndicationEnum:
-                  - OK
-                  - Warning
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          FormaldehydeConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
                   - Critical
-              DegradationDirectionEnum:
-                  - Up
-                  - Down
-          IonizingFilterMonitoring:
-              ChangeIndicationEnum:
-                  - OK
-                  - Warning
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          NitrogenDioxideConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
                   - Critical
-              DegradationDirectionEnum:
-                  - Up
-                  - Down
-          ZeoliteFilterMonitoring:
-              ChangeIndicationEnum:
-                  - OK
-                  - Warning
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          OzoneConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
                   - Critical
-              DegradationDirectionEnum:
-                  - Up
-                  - Down
-          OzoneFilterMonitoring:
-              ChangeIndicationEnum:
-                  - OK
-                  - Warning
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          PM10ConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
                   - Critical
-              DegradationDirectionEnum:
-                  - Up
-                  - Down
-          WaterTankMonitoring:
-              ChangeIndicationEnum:
-                  - OK
-                  - Warning
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          PM1ConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
                   - Critical
-              DegradationDirectionEnum:
-                  - Up
-                  - Down
-          FuelTankMonitoring:
-              ChangeIndicationEnum:
-                  - OK
-                  - Warning
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          PM25ConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
                   - Critical
-              DegradationDirectionEnum:
-                  - Up
-                  - Down
-          InkCartridgeMonitoring:
-              ChangeIndicationEnum:
-                  - OK
-                  - Warning
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          RadonConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
                   - Critical
-              DegradationDirectionEnum:
-                  - Up
-                  - Down
-          TonerCartridgeMonitoring:
-              ChangeIndicationEnum:
-                  - OK
-                  - Warning
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
+              LevelValueEnum:
+                  - Unknown
+                  - Low
+                  - Medium
+                  - High
                   - Critical
-              DegradationDirectionEnum:
-                  - Up
-                  - Down
+              MeasurementUnitEnum:
+                  - PPM
+                  - PPB
+                  - PPT
+                  - MGM3
+                  - UGM3
+                  - NGM3
+                  - PM3
+                  - BQM3
+              MeasurementMediumEnum:
+                  - Gas
+                  - Liquid
+                  - Soil
           DoorLock:
               DlLockState:
                   - Unlatched
@@ -7686,6 +8009,17 @@
                   - Eurocylinder
               LockOperationTypeEnum:
                   - Unlatch
+          OperationalState:
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
           SmokeCOAlarm:
               AlarmStateEnum:
                   - Normal
@@ -7719,12 +8053,18 @@
           WiFiNetworkDiagnostics:
               WiFiVersionEnum:
                   - Ah
+          Identify:
+              IdentifyTypeEnum:
+                  - LightOutput
+                  - VisibleIndicator
       bitmaps:
           AirQuality:
               - Feature
           Groups:
               - Feature
               - NameSupportBitmap
+          NetworkCommissioning:
+              - WiFiSecurityBitmap
           PressureMeasurement:
               - Feature
           PumpConfigurationAndControl:
@@ -7735,25 +8075,25 @@
               - Feature
           ActivatedCarbonFilterMonitoring:
               - Feature
-          CeramicFilterMonitoring:
+          CarbonDioxideConcentrationMeasurement:
               - Feature
-          ElectrostaticFilterMonitoring:
+          CarbonMonoxideConcentrationMeasurement:
               - Feature
-          UVFilterMonitoring:
+          FormaldehydeConcentrationMeasurement:
               - Feature
-          IonizingFilterMonitoring:
+          NitrogenDioxideConcentrationMeasurement:
               - Feature
-          ZeoliteFilterMonitoring:
+          OzoneConcentrationMeasurement:
               - Feature
-          OzoneFilterMonitoring:
+          PM10ConcentrationMeasurement:
               - Feature
-          WaterTankMonitoring:
+          PM1ConcentrationMeasurement:
               - Feature
-          FuelTankMonitoring:
+          PM25ConcentrationMeasurement:
               - Feature
-          InkCartridgeMonitoring:
+          RadonConcentrationMeasurement:
               - Feature
-          TonerCartridgeMonitoring:
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
               - Feature
           RefrigeratorAlarm:
               - AlarmMap
@@ -7768,11 +8108,25 @@
                   - Moderate
                   - VeryPoor
                   - ExtremelyPoor
+          FanControl:
+              Feature:
+                  - Step
+                  - AirflowDirection
           Groups:
               Feature:
                   - GroupNames
               NameSupportBitmap:
                   - GroupNames
+          ModeSelect:
+              Feature:
+                  - OnOff
+          NetworkCommissioning:
+              WiFiSecurityBitmap:
+                  - Unencrypted
+                  - WEP
+                  - WPAPersonal
+                  - WPA2Personal
+                  - WPA3Personal
           PressureMeasurement:
               Feature:
                   - Extended
@@ -7799,46 +8153,86 @@
               Feature:
                   - Condition
                   - Warning
-          CeramicFilterMonitoring:
+          CarbonDioxideConcentrationMeasurement:
               Feature:
-                  - Condition
-                  - Warning
-          ElectrostaticFilterMonitoring:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          CarbonMonoxideConcentrationMeasurement:
               Feature:
-                  - Condition
-                  - Warning
-          UVFilterMonitoring:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          FormaldehydeConcentrationMeasurement:
               Feature:
-                  - Condition
-                  - Warning
-          IonizingFilterMonitoring:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          NitrogenDioxideConcentrationMeasurement:
               Feature:
-                  - Condition
-                  - Warning
-          ZeoliteFilterMonitoring:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          OzoneConcentrationMeasurement:
               Feature:
-                  - Condition
-                  - Warning
-          OzoneFilterMonitoring:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM10ConcentrationMeasurement:
               Feature:
-                  - Condition
-                  - Warning
-          WaterTankMonitoring:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM1ConcentrationMeasurement:
               Feature:
-                  - Condition
-                  - Warning
-          FuelTankMonitoring:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          PM25ConcentrationMeasurement:
               Feature:
-                  - Condition
-                  - Warning
-          InkCartridgeMonitoring:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          RadonConcentrationMeasurement:
               Feature:
-                  - Condition
-                  - Warning
-          TonerCartridgeMonitoring:
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
+          TotalVolatileOrganicCompoundsConcentrationMeasurement:
               Feature:
-                  - Condition
-                  - Warning
+                  - NumericMeasurement
+                  - LevelIndication
+                  - MediumLevel
+                  - CriticalLevel
+                  - PeakMeasurement
+                  - AverageMeasurement
           DoorLock:
               # Feature was originally named DoorLockFeature, but we generate the
               # same API for both of those names, so the name can just change
@@ -7852,6 +8246,7 @@
               Feature:
                   - TemperatureNumber
                   - TemperatureLevel
+                  - TemperatureStep
           SmokeCOAlarm:
               Feature:
                   - SmokeAlarm
@@ -7869,16 +8264,34 @@
           # We apparently forgot to deprecate BridgedDeviceBasic when we
           # introduced BridgedDeviceBasicInformation.
           - BridgedDeviceBasic
+      enum values:
+          Identify:
+              IdentifyTypeEnum:
+                  - VisibleLight
+                  - VisibleLED
       structs:
           AccessControl:
               - Target
+          NetworkCommissioning:
+              - WiFiInterfaceScanResult
+              - ThreadInterfaceScanResult
+              - NetworkInfo
+          ThreadNetworkDiagnostics:
+              - NeighborTable
+              - RouteTable
       bitmaps:
           Groups:
               - GroupClusterFeature
+          NetworkCommissioning:
+              - WiFiSecurity
           PressureMeasurement:
               - PressureFeature
           PumpConfigurationAndControl:
               - PumpFeature
+      bitmap values:
+          ModeSelect:
+              Feature:
+                  - DEPONOFF
   renames:
       attributes:
           TimeSynchronization:
@@ -7891,6 +8304,13 @@
       structs:
           AccessControl:
               AccessControlTargetStruct: Target
+          NetworkCommissioning:
+              WiFiInterfaceScanResultStruct: WiFiInterfaceScanResult
+              ThreadInterfaceScanResultStruct: ThreadInterfaceScanResult
+              NetworkInfoStruct: NetworkInfo
+          ThreadNetworkDiagnostics:
+              NeighborTableStruct: NeighborTable
+              RouteTableStruct: RouteTable
       enum values:
           TimeSynchronization:
               TimeSourceEnum:
@@ -7906,17 +8326,72 @@
                   MixedNTPNTS: MixedNtpNts
                   PTP: Ptp
                   GNSS: Gnss
+          Identify:
+              IdentifyTypeEnum:
+                  LightOutput: VisibleLight
+                  VisibleIndicator: VisibleLED
       bitmaps:
           Groups:
               Feature: GroupClusterFeature
+          NetworkCommissioning:
+              WiFiSecurityBitmap: WiFiSecurity
           PressureMeasurement:
               Feature: PressureFeature
           PumpConfigurationAndControl:
               Feature: PumpFeature
+      bitmap values:
+          ModeSelect:
+              Feature:
+                  OnOff: DEPONOFF
   provisional:
       clusters:
+          # Officially marked provisional: many concentration measurement clusters
+          - BromateConcentrationMeasurement
+          - BromodichloromethaneConcentrationMeasurement
+          - BromoformConcentrationMeasurement
+          - ChloraminesConcentrationMeasurement
+          - ChlorineConcentrationMeasurement
+          - ChlorodibromomethaneConcentrationMeasurement
+          - ChloroformConcentrationMeasurement
+          - CopperConcentrationMeasurement
+          - DissolvedOxygenConcentrationMeasurement
+          - EthyleneConcentrationMeasurement
+          - EthyleneOxideConcentrationMeasurement
+          - FecalColiformEColiConcentrationMeasurement
+          - FluorideConcentrationMeasurement
+          - HaloaceticAcidsConcentrationMeasurement
+          - HydrogenConcentrationMeasurement
+          - HydrogenSulfideConcentrationMeasurement
+          - LeadConcentrationMeasurement
+          - ManganeseConcentrationMeasurement
+          - NitricOxideConcentrationMeasurement
+          - OxygenConcentrationMeasurement
+          - SodiumConcentrationMeasurement
+          - SulfateConcentrationMeasurement
+          - SulfurDioxideConcentrationMeasurement
+          - TotalColiformBacteriaConcentrationMeasurement
+          - TotalTrihalomethanesConcentrationMeasurement
+          - TurbidityConcentrationMeasurement
+          # Officially marked provisional: many replaceable monitoring clusters
+          - CeramicFilterMonitoring
+          - ElectrostaticFilterMonitoring
+          - UVFilterMonitoring
+          - IonizingFilterMonitoring
+          - ZeoliteFilterMonitoring
+          - OzoneFilterMonitoring
+          - WaterTankMonitoring
+          - FuelTankMonitoring
+          - InkCartridgeMonitoring
+          - TonerCartridgeMonitoring
           # Not ready to be public API yet.
           - ICDManagement
+          - LaundryWasherMode
+          - RefrigeratorAndTemperatureControlledCabinetMode
+          - RVCRunMode
+          - RVCCleanMode
+          - DishwasherMode
+          - WasherControls
+          - RVCOperationalState
       # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
       ids:

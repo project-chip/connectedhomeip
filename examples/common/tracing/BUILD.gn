@@ -14,10 +14,59 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/lib/lib.gni")
+
+declare_args() {
+  # TODO: cpp_standard check is not ideal, it should be >= 17,
+  #       however for now this is what we use in compilations
+  matter_commandline_enable_perfetto_tracing =
+      current_os == "linux" && cpp_standard == "gnu++17"
+}
 
 config("default_config") {
   include_dirs = [ "." ]
+}
+
+buildconfig_header("tracing_features") {
+  header = "enabled_features.h"
+  header_dir = "tracing"
+
+  defines = [
+    "ENABLE_PERFETTO_TRACING=${matter_commandline_enable_perfetto_tracing}",
+  ]
+}
+
+source_set("commandline") {
+  sources = [
+    "TracingCommandLineArgument.cpp",
+    "TracingCommandLineArgument.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing/log_json",
+  ]
+
+  public_deps = [ ":tracing_features" ]
+
+  public_configs = [ ":default_config" ]
+
+  if (matter_commandline_enable_perfetto_tracing) {
+    public_deps += [
+      "${chip_root}/src/tracing/perfetto",
+      "${chip_root}/src/tracing/perfetto:file_output",
+    ]
+
+    deps += [
+      "${chip_root}/src/tracing/perfetto:event_storage",
+      "${chip_root}/src/tracing/perfetto:simple_initialization",
+    ]
+  }
+
+  cflags = [ "-Wconversion" ]
 }
 
 source_set("trace_handlers") {

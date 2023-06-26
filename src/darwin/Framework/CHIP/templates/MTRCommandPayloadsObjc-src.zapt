@@ -5,6 +5,9 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "NSStringSpanConversion.h"
+#import "NSDataSpanConversion.h"
+#import "MTRBackwardsCompatShims.h"
 
 #include <lib/core/TLV.h>
 #include <app/data-model/Decode.h>

@@ -89,9 +89,9 @@ public:
     /**
      *  @brief Mark the end of this AttributeReportIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    AttributeReportIB::Builder & EndOfAttributeReportIB();
+    CHIP_ERROR EndOfAttributeReportIB();
 
 private:
     AttributeStatusIB::Builder mAttributeStatus;

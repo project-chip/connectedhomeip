@@ -18,6 +18,8 @@
 #import "MTREventTLVValueDecoder_Internal.h"
 
 #import "MTRStructsObjc.h"
+#import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -291,8 +293,7 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
                 memberValue = nil;
             } else {
                 memberValue = [MTRAccessControlClusterAccessControlExtensionStruct new];
-                memberValue.data = [NSData dataWithBytes:cppValue.latestValue.Value().data.data()
-                                                  length:cppValue.latestValue.Value().data.size()];
+                memberValue.data = AsData(cppValue.latestValue.Value().data);
                 memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
             }
             value.latestValue = memberValue;
@@ -1045,9 +1046,12 @@ static id _Nullable DecodeEventPayloadForSoftwareDiagnosticsCluster(EventId aEve
         do {
             NSString * _Nullable memberValue;
             if (cppValue.name.HasValue()) {
-                memberValue = [[NSString alloc] initWithBytes:cppValue.name.Value().data()
-                                                       length:cppValue.name.Value().size()
-                                                     encoding:NSUTF8StringEncoding];
+                memberValue = AsString(cppValue.name.Value());
+                if (memberValue == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
             } else {
                 memberValue = nil;
             }
@@ -1056,8 +1060,7 @@ static id _Nullable DecodeEventPayloadForSoftwareDiagnosticsCluster(EventId aEve
         do {
             NSData * _Nullable memberValue;
             if (cppValue.faultRecording.HasValue()) {
-                memberValue = [NSData dataWithBytes:cppValue.faultRecording.Value().data()
-                                             length:cppValue.faultRecording.Value().size()];
+                memberValue = AsData(cppValue.faultRecording.Value());
             } else {
                 memberValue = nil;
             }
@@ -1752,6 +1755,143 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForDishwasherAlarmCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::DishwasherAlarm;
+    switch (aEventId) {
+    case Events::Notify::Id: {
+        Events::Notify::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDishwasherAlarmClusterNotifyEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.active.Raw()];
+            value.active = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.inactive.Raw()];
+            value.inactive = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.state.Raw()];
+            value.state = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.mask.Raw()];
+            value.mask = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::OperationalState;
+    switch (aEventId) {
+    case Events::OperationalError::Id: {
+        Events::OperationalError::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTROperationalStateClusterOperationalErrorEvent new];
+
+        do {
+            MTROperationalStateClusterErrorStateStruct * _Nonnull memberValue;
+            memberValue = [MTROperationalStateClusterErrorStateStruct new];
+            memberValue.errorStateID = [NSNumber numberWithUnsignedChar:cppValue.errorState.errorStateID];
+            if (cppValue.errorState.errorStateLabel.HasValue()) {
+                memberValue.errorStateLabel = AsString(cppValue.errorState.errorStateLabel.Value());
+                if (memberValue.errorStateLabel == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            } else {
+                memberValue.errorStateLabel = nil;
+            }
+            if (cppValue.errorState.errorStateDetails.HasValue()) {
+                memberValue.errorStateDetails = AsString(cppValue.errorState.errorStateDetails.Value());
+                if (memberValue.errorStateDetails == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            } else {
+                memberValue.errorStateDetails = nil;
+            }
+            value.errorState = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::OperationCompletion::Id: {
+        Events::OperationCompletion::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTROperationalStateClusterOperationCompletionEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.completionErrorCode];
+            value.completionErrorCode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.totalOperationalTime.HasValue()) {
+                if (cppValue.totalOperationalTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.totalOperationalTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.totalOperationalTime = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.pausedTime.HasValue()) {
+                if (cppValue.pausedTime.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.pausedTime.Value().Value()];
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.pausedTime = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForHEPAFilterMonitoringCluster(
     EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -1769,133 +1909,6 @@ static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
     EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ActivatedCarbonFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForCeramicFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::CeramicFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForElectrostaticFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::ElectrostaticFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForUVFilterMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::UvFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForIonizingFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::IonizingFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForZeoliteFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::ZeoliteFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForOzoneFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::OzoneFilterMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForWaterTankMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::WaterTankMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForFuelTankMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::FuelTankMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForInkCartridgeMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::InkCartridgeMonitoring;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
-static id _Nullable DecodeEventPayloadForTonerCartridgeMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::TonerCartridgeMonitoring;
     switch (aEventId) {
     default: {
         break;
@@ -2540,6 +2553,136 @@ static id _Nullable DecodeEventPayloadForOccupancySensingCluster(EventId aEventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForCarbonMonoxideConcentrationMeasurementCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CarbonMonoxideConcentrationMeasurement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForCarbonDioxideConcentrationMeasurementCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CarbonDioxideConcentrationMeasurement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForNitrogenDioxideConcentrationMeasurementCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::NitrogenDioxideConcentrationMeasurement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForOzoneConcentrationMeasurementCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::OzoneConcentrationMeasurement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForPM25ConcentrationMeasurementCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Pm25ConcentrationMeasurement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForFormaldehydeConcentrationMeasurementCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::FormaldehydeConcentrationMeasurement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForPM1ConcentrationMeasurementCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Pm1ConcentrationMeasurement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForPM10ConcentrationMeasurementCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Pm10ConcentrationMeasurement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForTotalVolatileOrganicCompoundsConcentrationMeasurementCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForRadonConcentrationMeasurementCluster(
+    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::RadonConcentrationMeasurement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForWakeOnLANCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WakeOnLan;
@@ -2731,10 +2874,13 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
             memberValue.a = [NSNumber numberWithUnsignedChar:cppValue.arg4.a];
             memberValue.b = [NSNumber numberWithBool:cppValue.arg4.b];
             memberValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.arg4.c)];
-            memberValue.d = [NSData dataWithBytes:cppValue.arg4.d.data() length:cppValue.arg4.d.size()];
-            memberValue.e = [[NSString alloc] initWithBytes:cppValue.arg4.e.data()
-                                                     length:cppValue.arg4.e.size()
-                                                   encoding:NSUTF8StringEncoding];
+            memberValue.d = AsData(cppValue.arg4.d);
+            memberValue.e = AsString(cppValue.arg4.e);
+            if (memberValue.e == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
             memberValue.f = [NSNumber numberWithUnsignedChar:cppValue.arg4.f.Raw()];
             memberValue.g = [NSNumber numberWithFloat:cppValue.arg4.g];
             memberValue.h = [NSNumber numberWithDouble:cppValue.arg4.h];
@@ -2752,10 +2898,13 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
                     newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
                     newElement_0.b = [NSNumber numberWithBool:entry_0.b];
                     newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
-                    newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
-                    newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data()
-                                                              length:entry_0.e.size()
-                                                            encoding:NSUTF8StringEncoding];
+                    newElement_0.d = AsData(entry_0.d);
+                    newElement_0.e = AsString(entry_0.e);
+                    if (newElement_0.e == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
                     newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
                     newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
                     newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
@@ -2942,41 +3091,17 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::SmokeCoAlarm::Id: {
         return DecodeEventPayloadForSmokeCOAlarmCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::DishwasherAlarm::Id: {
+        return DecodeEventPayloadForDishwasherAlarmCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::OperationalState::Id: {
+        return DecodeEventPayloadForOperationalStateCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeEventPayloadForHEPAFilterMonitoringCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::CeramicFilterMonitoring::Id: {
-        return DecodeEventPayloadForCeramicFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::ElectrostaticFilterMonitoring::Id: {
-        return DecodeEventPayloadForElectrostaticFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::UvFilterMonitoring::Id: {
-        return DecodeEventPayloadForUVFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::IonizingFilterMonitoring::Id: {
-        return DecodeEventPayloadForIonizingFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::ZeoliteFilterMonitoring::Id: {
-        return DecodeEventPayloadForZeoliteFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::OzoneFilterMonitoring::Id: {
-        return DecodeEventPayloadForOzoneFilterMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::WaterTankMonitoring::Id: {
-        return DecodeEventPayloadForWaterTankMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::FuelTankMonitoring::Id: {
-        return DecodeEventPayloadForFuelTankMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::InkCartridgeMonitoring::Id: {
-        return DecodeEventPayloadForInkCartridgeMonitoringCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::TonerCartridgeMonitoring::Id: {
-        return DecodeEventPayloadForTonerCartridgeMonitoringCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);
@@ -3022,6 +3147,36 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::OccupancySensing::Id: {
         return DecodeEventPayloadForOccupancySensingCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::CarbonMonoxideConcentrationMeasurement::Id: {
+        return DecodeEventPayloadForCarbonMonoxideConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::CarbonDioxideConcentrationMeasurement::Id: {
+        return DecodeEventPayloadForCarbonDioxideConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::NitrogenDioxideConcentrationMeasurement::Id: {
+        return DecodeEventPayloadForNitrogenDioxideConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::OzoneConcentrationMeasurement::Id: {
+        return DecodeEventPayloadForOzoneConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::Pm25ConcentrationMeasurement::Id: {
+        return DecodeEventPayloadForPM25ConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::FormaldehydeConcentrationMeasurement::Id: {
+        return DecodeEventPayloadForFormaldehydeConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::Pm1ConcentrationMeasurement::Id: {
+        return DecodeEventPayloadForPM1ConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::Pm10ConcentrationMeasurement::Id: {
+        return DecodeEventPayloadForPM10ConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id: {
+        return DecodeEventPayloadForTotalVolatileOrganicCompoundsConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::RadonConcentrationMeasurement::Id: {
+        return DecodeEventPayloadForRadonConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WakeOnLan::Id: {
         return DecodeEventPayloadForWakeOnLANCluster(aPath.mEventId, aReader, aError);

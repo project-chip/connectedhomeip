@@ -190,13 +190,14 @@ tests:
                         EpochStartTime2: 1110002,
                     }
 
-    - label: "KeySet Read All Indicers"
-      disabled: true
+    - label: "KeySet Read All Indices"
       command: "KeySetReadAllIndices"
       response:
           values:
               - name: "GroupKeySetIDs"
-                value: [0x01a1, 0x01a2]
+                constraints:
+                    # Note: There's always an IPK keyset with index 0
+                    contains: [0x01a1, 0x01a2, 0]
 
     - label: "Write Group Keys (invalid)"
       command: "writeAttribute"

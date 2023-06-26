@@ -36,13 +36,13 @@ echo_bold_white() {
 
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
-ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
 
 declare chip_detail_logging=false
 declare enable_pybindings=false
 declare chip_mdns
 declare case_retry_delta
-declare install_wheel=no
+declare install_virtual_env
+declare clean_virtual_env=yes
 
 help() {
 
@@ -59,10 +59,11 @@ Input Options:
 
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
-  -i, --install_wheel no|build-env|separate                 Where to install the Python wheel
-                                                            no: Do not install
-                                                            build-env: install to virtual env for build matter
-                                                            separate: install to another virtual env (out/python_env)
+  -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
+                                                            <path> represents where the virtual environment is to be created.
+  -c, --clean_virtual_env  <yes|no>                         When installing a virtual environment, create/clean it first.
+                                                            Defaults to yes.
+  --extra_packages PACKAGES                                 Install extra Python packages from PyPI
   --include_yamltests                                       Whether to install the matter_yamltests wheel.
   -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
 "
@@ -92,8 +93,16 @@ while (($#)); do
             chip_case_retry_delta=$2
             shift
             ;;
-        --install_wheel | -i)
-            install_wheel=$2
+        --install_virtual_env | -i)
+            install_virtual_env=$2
+            shift
+            ;;
+        --clean_virtual_env | -c)
+            clean_virtual_env=$2
+            shift
+            ;;
+        --extra_packages)
+            extra_packages=$2
             shift
             ;;
         --include_yamltests)
@@ -160,15 +169,21 @@ if [ -n "$include_yamltests" ]; then
     )
 fi
 
-if [ "$install_wheel" = "no" ]; then
-    exit 0
-elif [ "$install_wheel" = "separate" ]; then
-    # Create a virtual environment that has access to the built python tools
-    virtualenv --clear "$ENVIRONMENT_ROOT"
+if [ -n "$extra_packages" ]; then
+    WHEEL+=("$extra_packages")
+fi
+
+if [ -n "$install_virtual_env" ]; then
+    ENVIRONMENT_ROOT="$install_virtual_env"
+
+    if [ "$clean_virtual_env" = "yes" ]; then
+        # Create a virtual environment that has access to the built python tools
+        virtualenv --clear "$ENVIRONMENT_ROOT"
+    fi
 
     source "$ENVIRONMENT_ROOT"/bin/activate
     "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-    "$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall "${WHEEL[@]}"
+    "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${WHEEL[@]}"
 
     echo ""
     echo_green "Compilation completed and WHL package installed in: "
@@ -176,12 +191,4 @@ elif [ "$install_wheel" = "separate" ]; then
     echo ""
     echo_green "To use please run:"
     echo_bold_white "  source $ENVIRONMENT_ROOT/bin/activate"
-elif [ "$install_wheel" = "build-env" ]; then
-    pip install --force-reinstall "${WHEEL[@]}"
-
-    echo ""
-    echo_green "Compilation completed and WHL package installed in virtualenv for building sdk"
-    echo ""
-    echo_green "To use please run:"
-    echo_bold_white "  source $CHIP_ROOT/scripts/activate.sh"
 fi
