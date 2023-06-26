@@ -133,18 +133,19 @@ class ZapDistinctOutput:
 class ZAPGenerateTarget:
 
     @staticmethod
-    def MatterIdlTarget(zap_config: ZapInput, client_side=False):
+    def MatterIdlTarget(zap_config: ZapInput, client_side=False, matter_file_name=None):
         if client_side:
-            return ZAPGenerateTarget(zap_config, template="src/app/zap-templates/matter-idl-client.json", output_dir=None)
+            return ZAPGenerateTarget(zap_config, matter_file_name=matter_file_name, template="src/app/zap-templates/matter-idl-client.json", output_dir=None)
         else:
             # NOTE: this assumes `src/app/zap-templates/matter-idl-server.json` is the
             #       DEFAULT generation target and it needs no output_dir
-            return ZAPGenerateTarget(zap_config, template=None, output_dir=None)
+            return ZAPGenerateTarget(zap_config, matter_file_name=matter_file_name, template=None, output_dir=None)
 
-    def __init__(self, zap_config: ZapInput, template,  output_dir=None):
+    def __init__(self, zap_config: ZapInput, template, output_dir=None, matter_file_name=None):
         self.script = './scripts/tools/zap/generate.py'
         self.zap_config = zap_config
         self.template = template
+        self.matter_file_name = matter_file_name
 
         if output_dir:
             # make sure we convert  any os.PathLike object to string
@@ -187,6 +188,10 @@ class ZAPGenerateTarget:
                 os.makedirs(self.output_dir)
             cmd.append('-o')
             cmd.append(self.output_dir)
+
+        if self.matter_file_name:
+            cmd.append('-m')
+            cmd.append(self.matter_file_name)
 
         return cmd
 
@@ -373,7 +378,8 @@ def getGlobalTemplatesTargets():
             'zzz_generated', generate_subdir, 'zap-generated')
         targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
 
-    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZcl('src/app/zap-templates/zcl/zcl.json'), client_side=True))
+    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZcl('src/app/zap-templates/zcl/zcl.json'),
+                   client_side=True, matter_file_name="src/controller/data_model/controller-clusters.matter"))
 
     return targets
 

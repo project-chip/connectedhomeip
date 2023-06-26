@@ -44,6 +44,7 @@ class CmdLineArgs:
     version_check: bool = True
     lock_file: Optional[str] = None
     delete_output_dir: bool = False
+    matter_file_name: Optional[str] = None
 
 
 CHIP_ROOT_DIR = os.path.realpath(
@@ -125,6 +126,8 @@ def runArgumentsParser() -> CmdLineArgs:
                         help='Path to the zcl templates records to use for generating artifacts (default: autodetect read from zap file)')
     parser.add_argument('-o', '--output-dir', default=None,
                         help='Output directory for the generated files (default: a temporary directory in out)')
+    parser.add_argument('-m', '--matter-file-name', default=None,
+                        help='Where to copy any generated .matter file')
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
     parser.add_argument('--parallel', action='store_true')
@@ -143,6 +146,7 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.set_defaults(version_check=True)
     parser.set_defaults(lock_file=None)
     parser.set_defaults(keep_output_dir=False)
+    parser.set_defaults(matter_file_name=None)
     args = parser.parse_args()
 
     delete_output_dir = False
@@ -167,6 +171,11 @@ def runArgumentsParser() -> CmdLineArgs:
     templates_file = getFilePath(args.templates)
     output_dir = getDirPath(output_dir)
 
+    if args.matter_file_name:
+        matter_file_name = getFilePath(args.matter_file_name)
+    else:
+        matter_file_name = None
+
     return CmdLineArgs(
         zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap,
         parallel=args.parallel,
@@ -174,10 +183,24 @@ def runArgumentsParser() -> CmdLineArgs:
         version_check=args.version_check,
         lock_file=args.lock_file,
         delete_output_dir=delete_output_dir,
+        matter_file_name=matter_file_name,
     )
 
 
-def extractGeneratedIdl(output_dir, zap_config_path):
+def matterPathFromZapPath(zap_config_path):
+    if not zap_config_path:
+        return None
+
+    target_path = zap_config_path.replace(".zap", ".matter")
+    if not target_path.endswith(".matter"):
+        # We expect "something.zap" and don't handle corner cases of
+        # multiple extensions. This is to work with existing codebase only
+        raise Error("Unexpected input zap file  %s" % self.zap_config)
+
+    return target_path
+
+
+def extractGeneratedIdl(output_dir, matter_name):
     """Find a file Clusters.matter in the output directory and
        place it along with the input zap file.
 
@@ -187,13 +210,7 @@ def extractGeneratedIdl(output_dir, zap_config_path):
     if not os.path.exists(idl_path):
         return
 
-    target_path = zap_config_path.replace(".zap", ".matter")
-    if not target_path.endswith(".matter"):
-        # We expect "something.zap" and don't handle corner cases of
-        # multiple extensions. This is to work with existing codebase only
-        raise Error("Unexpected input zap file  %s" % self.zap_config)
-
-    shutil.move(idl_path, target_path)
+    shutil.move(idl_path, matter_name)
 
 
 def runGeneration(cmdLineArgs):
@@ -220,21 +237,13 @@ def runGeneration(cmdLineArgs):
 
     tool.run('generate', *args)
 
-    if zap_file:
-        extractGeneratedIdl(output_dir, zap_file)
+    if cmdLineArgs.matter_file_name:
+        matter_name = cmdLineArgs.matter_file_name
     else:
-        # without a zap file, assume we process controller-clusters
-        #
-        # The reason for having a zap file name is that the ".matter" file name is implied
-        # from the zap file name and we still need to generate `controller-clusters.matter`
-        #
-        # TODO: this hardcoding maybe can be extracted in some other way
-        #       like taking it as an argument where to process the IDL
-        #
-        # TODO: controller-clusters.zap should eventually be deleted and so should
-        #       controller-clusters.matter  (or replaced with an equivalent of "import XML"
-        #       statements)
-        extractGeneratedIdl(output_dir, 'src/controller/data_model/controller-clusters.zap')
+        matter_name = matterPathFromZapPath(zap_file)
+
+    if matter_name:
+        extractGeneratedIdl(output_dir, matter_name)
 
 
 def getClangFormatBinaryChoices():
