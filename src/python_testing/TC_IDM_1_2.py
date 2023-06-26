@@ -41,7 +41,7 @@ def client_cmd(cmd_class):
     # here incase we're inspecting a builtin class
     try:
         return cmd_class if cmd_class.is_client else None
-    except:
+    except AttributeError:
         return None
 
 # one of the steps in this test requires sending a command that requires a timed interaction
@@ -79,8 +79,8 @@ class TC_IDM_1_2(MatterBaseTest):
 
         self.print_step(2, "Send Invoke to unsupported cluster")
         all_cluster_ids = list(Clusters.ClusterObjects.ALL_CLUSTERS.keys())
-        unsupported_clusters: Dict[int, list[int]] = {}
-        supported_clusters: Dict[int, list[int]] = {}
+        unsupported_clusters: dict[int, list[int]] = {}
+        supported_clusters: dict[int, list[int]] = {}
         for i in endpoints:
             dut_ep_cluster_ids = wildcard_descriptor[i][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
             unsupported_clusters[i] = list(set(all_cluster_ids) - set(dut_ep_cluster_ids))
@@ -103,7 +103,7 @@ class TC_IDM_1_2(MatterBaseTest):
                     continue
                 # just use the first command with default values
                 name, cmd = members[0]
-                logging.info("Sending {} command to unsupported cluster {} on endpoint".format(name, cluster, i))
+                logging.info(f'Sending {name} command to unsupported cluster {cluster} on endpoint {i}')
                 try:
                     await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=i, payload=cmd())
                     asserts.fail("Unexpected success return from sending command to unsupported cluster")
@@ -124,7 +124,7 @@ class TC_IDM_1_2(MatterBaseTest):
                 break
             for cid in supported_clusters[i]:
                 cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cid]
-                logging.info('Checking cluster {} ({}) on ep {} for supported commands'.format(cluster, cid, i))
+                logging.info(f'Checking cluster {cluster} ({cid}) on ep {i} for supported commands')
                 members = get_all_cmds_for_cluster_id(cid)
                 if not members:
                     continue
@@ -141,7 +141,7 @@ class TC_IDM_1_2(MatterBaseTest):
                 cmd = next(filter(lambda x: x.command_id == id, all_supported_cmds))
                 try:
                     ret = await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=i, payload=cmd())
-                    asserts.fail("Unexpected success sending unsupported cmd {} to {} cluster on ep {}".format(cmd, cluster, i))
+                    asserts.fail(f'Unexpected success sending unsupported cmd {cmd} to {cluster} cluster on ep {i}')
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.UnsupportedCommand, "Unexpected error returned from unsupported command")
                 sent = True
@@ -198,12 +198,12 @@ class TC_IDM_1_2(MatterBaseTest):
                 print(f'establishing pase session to {a}')
                 TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=pin, nodeid=self.dut_node_id+1)
                 break
-            except ChipStackError as e:
+            except ChipStackError:
                 continue
 
         try:
             TH2.GetConnectedDeviceSync(nodeid=self.dut_node_id+1, allowPASE=True, timeoutMs=1000)
-        except TimeoutError as e:
+        except TimeoutError:
             asserts.fail("Unable to establish a PASE session to the device")
 
         try:
@@ -247,7 +247,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # require a timed interaction (ArmFailSafe) and then one that does (RevokeCommissioning)
         try:
             await self.default_controller.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
-            asserts.fail("Unexpected success response from sendint an Invoke with TimedRequest flag and no timed interaction")
+            asserts.fail("Unexpected success response from sending an Invoke with TimedRequest flag and no timed interaction")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.UnsupportedAccess,
                                  "Unexpected error response from Invoke with TimedRequest flag and no TimedInvoke")
@@ -259,7 +259,7 @@ class TC_IDM_1_2(MatterBaseTest):
         cmd = FakeRevokeCommissioning()
         try:
             await self.default_controller.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
-            asserts.fail("Unexpected success response from sendint an Invoke with TimedRequest flag and no timed interaction")
+            asserts.fail("Unexpected success response from sending an Invoke with TimedRequest flag and no timed interaction")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.UnsupportedAccess,
                                  "Unexpected error response from Invoke with TimedRequest flag and no TimedInvoke")
