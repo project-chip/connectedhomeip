@@ -18,6 +18,7 @@
 #pragma once
 
 #include <lib/format/FlatTree.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace FlatTree {
@@ -53,12 +54,11 @@ template <typename CONTENT, size_t DESCEND_DEPTH>
 class Position
 {
 public:
-    Position(const Node<CONTENT> *tree, size_t treeSize) : mTree(tree), mTreeSize(treeSize) {}
-
+    Position(const Node<CONTENT> * tree, size_t treeSize) : mTree(tree), mTreeSize(treeSize) {}
 
     /// Attempt to find a child of the current position that matches
     /// the given matcher
-    template<typename MATCHER>
+    template <typename MATCHER>
     void Enter(MATCHER matcher);
 
     /// Move up the tree, undoes an 'Enter' operation.
@@ -68,15 +68,24 @@ public:
     /// value is not available;
     const CONTENT * Get() const;
 
+    /// Returns the entries visited so far
+    ///
+    /// WILL RETURN EMPTY if the descend depth has been
+    /// exceeded. Callers MUST handle empty return.
+    ///
+    /// Span valid until one of Enter/Exit functions are called
+    /// and as long as the Position is valid (points inside the object).
+    chip::Span<const Entry<CONTENT> *> CurrentPath();
+
 private:
     // actual tree that we visit
-    const Node<CONTENT> * mTree     = nullptr;
-    const size_t mTreeSize          = 0;
+    const Node<CONTENT> * mTree = nullptr;
+    const size_t mTreeSize      = 0;
 
     // Keeping track of descending into the tree, to be able to move back
     // last element in the array is the "current" item
-    const Entry<CONTENT> * mPositions[DESCEND_DEPTH] = {nullptr};
-    size_t mDescendDepth        = 0; // filled amount of mDescendPositions
+    const Entry<CONTENT> * mPositions[DESCEND_DEPTH] = { nullptr };
+    size_t mDescendDepth                             = 0; // filled amount of mDescendPositions
 
     // Descend past remembering memory or in not-found entries.
     size_t mUnknownDescendDepth = 0; // depth in invalid positions
@@ -85,11 +94,13 @@ private:
 template <typename CONTENT, size_t DESCEND_DEPTH>
 const CONTENT * Position<CONTENT, DESCEND_DEPTH>::Get() const
 {
-    if (mUnknownDescendDepth > 0) {
+    if (mUnknownDescendDepth > 0)
+    {
         return nullptr;
     }
 
-    if (mDescendDepth == 0) {
+    if (mDescendDepth == 0)
+    {
         return nullptr;
     }
 
@@ -100,7 +111,8 @@ template <typename CONTENT, size_t DESCEND_DEPTH>
 template <typename MATCHER>
 void Position<CONTENT, DESCEND_DEPTH>::Enter(MATCHER matcher)
 {
-    if (mUnknownDescendDepth > 0) {
+    if (mUnknownDescendDepth > 0)
+    {
         // keep descending into the unknown
         mUnknownDescendDepth++;
         return;
@@ -108,19 +120,22 @@ void Position<CONTENT, DESCEND_DEPTH>::Enter(MATCHER matcher)
 
     // To be able to descend, we have to be able to remember
     // the current position
-    if (mDescendDepth == DESCEND_DEPTH) {
+    if (mDescendDepth == DESCEND_DEPTH)
+    {
         mUnknownDescendDepth = 1;
         return;
     }
 
     size_t nodeIdx = 0; // assume root node
-    if (mDescendDepth > 0) {
+    if (mDescendDepth > 0)
+    {
         nodeIdx = mPositions[mDescendDepth - 1]->node_index;
     }
 
-    const Entry<CONTENT> *child = FindEntry(mTree, mTreeSize, nodeIdx, matcher);
+    const Entry<CONTENT> * child = FindEntry(mTree, mTreeSize, nodeIdx, matcher);
 
-    if (child == nullptr) {
+    if (child == nullptr)
+    {
         mUnknownDescendDepth = 1;
         return;
     }
@@ -131,14 +146,32 @@ void Position<CONTENT, DESCEND_DEPTH>::Enter(MATCHER matcher)
 template <typename CONTENT, size_t DESCEND_DEPTH>
 void Position<CONTENT, DESCEND_DEPTH>::Exit()
 {
-    if (mUnknownDescendDepth > 0) {
+    if (mUnknownDescendDepth > 0)
+    {
         mUnknownDescendDepth--;
         return;
     }
 
-    if (mDescendDepth > 0) {
+    if (mDescendDepth > 0)
+    {
         mDescendDepth--;
     }
+}
+
+template <typename CONTENT, size_t DESCEND_DEPTH>
+chip::Span<const Entry<CONTENT> *> Position<CONTENT, DESCEND_DEPTH>::CurrentPath()
+{
+    if (mUnknownDescendDepth > 0)
+    {
+        return chip::Span<const Entry<CONTENT> *>();
+    }
+
+    // const chip::FlatTree::Entry<{anonymous}::NamedTag>* const* to
+    // const chip::FlatTree::Entry<{anonymous}::NamedTag>**
+    typename chip::Span<const Entry<CONTENT> *>::pointer p = mPositions;
+
+    // return chip::Span<const Entry<CONTENT> *>(mPositions, mDescendDepth);
+    return chip::Span<const Entry<CONTENT> *>(p, mDescendDepth);
 }
 
 } // namespace FlatTree

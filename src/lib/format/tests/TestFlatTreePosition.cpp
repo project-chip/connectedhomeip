@@ -21,6 +21,7 @@
 #include <lib/support/UnitTestRegistration.h>
 
 #include <array>
+#include <vector>
 
 #include <string.h>
 
@@ -104,19 +105,50 @@ private:
     NL_TEST_ASSERT(inSuite, p.Get() != nullptr);                                                                                   \
     NL_TEST_ASSERT(inSuite, p.Get()->tag == ProfileTag(a, b))
 
+template <size_t N>
+std::vector<Tag> GetPath(Position<NamedTag, N> & position)
+{
+    std::vector<Tag> result;
+
+    for (const auto & item : position.CurrentPath())
+    {
+        result.push_back(item->data.tag);
+    }
+
+    return result;
+}
+
+bool HasPath(const std::vector<Tag> & v, Tag a)
+{
+    return (v.size() == 1) && (v[0] == a);
+}
+
+bool HasPath(const std::vector<Tag> & v, Tag a, Tag b)
+{
+    return (v.size() == 2) && (v[0] == a) && (v[1] == b);
+}
+
+bool HasPath(const std::vector<Tag> & v, Tag a, Tag b, Tag c)
+{
+    return (v.size() == 3) && (v[0] == a) && (v[1] == b) && (v[2] == c);
+}
+
 void TestSimpleEnterExit(nlTestSuite * inSuite, void * inContext)
 {
     Position<NamedTag, 10> position(tree.data(), tree.size());
 
     // at start, top of tree has no value
     NL_TEST_ASSERT(inSuite, position.Get() == nullptr);
+    NL_TEST_ASSERT(inSuite, GetPath(position).empty());
 
     // Go to hello, try going to invalid 2x, then go back
     position.Enter(ByTag(ContextTag(1)));
     ASSERT_HAS_NAME(position, "hello");
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(1)));
 
     position.Enter(ByTag(ContextTag(1)));
     NL_TEST_ASSERT(inSuite, position.Get() == nullptr);
+    NL_TEST_ASSERT(inSuite, GetPath(position).empty());
     position.Enter(ByTag(ContextTag(1)));
     NL_TEST_ASSERT(inSuite, position.Get() == nullptr);
     position.Exit();
@@ -124,6 +156,7 @@ void TestSimpleEnterExit(nlTestSuite * inSuite, void * inContext)
     position.Exit();
     NL_TEST_ASSERT(inSuite, position.Get() != nullptr);
     ASSERT_HAS_NAME(position, "hello");
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(1)));
     position.Exit();
     NL_TEST_ASSERT(inSuite, position.Get() == nullptr);
 }
@@ -136,14 +169,18 @@ void TestDeeperEnter(nlTestSuite * inSuite, void * inContext)
 
     position.Enter(ByName("world"));
     ASSERT_HAS_CONTEXT_TAG(position, 2);
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(2)));
 
     position.Enter(ByTag(ProfileTag(123, 1)));
     ASSERT_HAS_NAME(position, "a");
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(2), ProfileTag(123, 1)));
 
     position.Enter(ByTag(AnonymousTag()));
     NL_TEST_ASSERT(inSuite, position.Get() == nullptr);
+    NL_TEST_ASSERT(inSuite, GetPath(position).empty());
     position.Exit();
     ASSERT_HAS_NAME(position, "a");
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(2), ProfileTag(123, 1)));
 
     position.Exit();
     ASSERT_HAS_NAME(position, "world");
@@ -153,20 +190,30 @@ void TestDeeperEnter(nlTestSuite * inSuite, void * inContext)
 
     position.Enter(ByTag(AnonymousTag()));
     ASSERT_HAS_NAME(position, "foo");
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(2), ProfileTag(234, 2), AnonymousTag()));
 
     // test some unknown
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 100; i++)
+    {
         position.Enter(ByTag(AnonymousTag()));
-      NL_TEST_ASSERT(inSuite, position.Get() == nullptr);
-    }
-    for (int i = 0; i < 100; i++) {
         NL_TEST_ASSERT(inSuite, position.Get() == nullptr);
+        NL_TEST_ASSERT(inSuite, GetPath(position).empty());
+    }
+    for (int i = 0; i < 100; i++)
+    {
+        NL_TEST_ASSERT(inSuite, position.Get() == nullptr);
+        NL_TEST_ASSERT(inSuite, GetPath(position).empty());
         position.Exit();
     }
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(2), ProfileTag(234, 2), AnonymousTag()));
     ASSERT_HAS_NAME(position, "foo");
     position.Exit();
+
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(2), ProfileTag(234, 2)));
     ASSERT_HAS_NAME(position, "b");
     position.Exit();
+
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(2)));
     ASSERT_HAS_NAME(position, "world");
 
     // root and stay there
@@ -174,9 +221,11 @@ void TestDeeperEnter(nlTestSuite * inSuite, void * inContext)
     position.Exit();
     position.Exit();
     position.Exit();
+    NL_TEST_ASSERT(inSuite, GetPath(position).empty());
 
     // can still navigate from the root
     position.Enter(ByName("world"));
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(2)));
     ASSERT_HAS_CONTEXT_TAG(position, 2);
 }
 
@@ -193,12 +242,15 @@ void TestDescendLimit(nlTestSuite * inSuite, void * inContext)
     // only 2 positions can be remembered. Running out of space
     position.Enter(ByName("foo"));
     NL_TEST_ASSERT(inSuite, position.Get() == nullptr);
+    NL_TEST_ASSERT(inSuite, GetPath(position).empty());
 
     position.Exit();
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(2), ProfileTag(234, 2)));
     ASSERT_HAS_NAME(position, "b");
     ASSERT_HAS_PROFILE_TAG(position, 234, 2);
 
     position.Exit();
+    NL_TEST_ASSERT(inSuite, HasPath(GetPath(position), ContextTag(2)));
     ASSERT_HAS_NAME(position, "world");
     ASSERT_HAS_CONTEXT_TAG(position, 2);
 }
@@ -206,7 +258,7 @@ void TestDescendLimit(nlTestSuite * inSuite, void * inContext)
 const nlTest sTests[] = {
     NL_TEST_DEF("TestSimpleEnterExit", TestSimpleEnterExit), //
     NL_TEST_DEF("TestDeeperEnter", TestDeeperEnter),         //
-    NL_TEST_DEF("TestDescendLimit", TestDescendLimit),         //
+    NL_TEST_DEF("TestDescendLimit", TestDescendLimit),       //
     NL_TEST_SENTINEL()                                       //
 };
 
