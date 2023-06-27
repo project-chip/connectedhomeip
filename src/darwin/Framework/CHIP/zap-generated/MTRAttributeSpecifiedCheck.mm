@@ -1802,45 +1802,6 @@ static BOOL AttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL AttributeIsSpecifiedInLaundryWasherControlsCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::LaundryWasherControls;
-    switch (aAttributeId) {
-    case Attributes::SpinSpeeds::Id: {
-        return YES;
-    }
-    case Attributes::SpinSpeedCurrent::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfRinses::Id: {
-        return YES;
-    }
-    case Attributes::SupportedRinses::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL AttributeIsSpecifiedInTemperatureControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::TemperatureControl;
@@ -1993,45 +1954,6 @@ static BOOL AttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::ExpiryDate::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
-static BOOL AttributeIsSpecifiedInDishwasherAlarmCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::DishwasherAlarm;
-    switch (aAttributeId) {
-    case Attributes::Mask::Id: {
-        return YES;
-    }
-    case Attributes::Latch::Id: {
-        return YES;
-    }
-    case Attributes::State::Id: {
-        return YES;
-    }
-    case Attributes::Supported::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5169,9 +5091,6 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ModeSelect::Id: {
         return AttributeIsSpecifiedInModeSelectCluster(aAttributeId);
     }
-    case Clusters::LaundryWasherControls::Id: {
-        return AttributeIsSpecifiedInLaundryWasherControlsCluster(aAttributeId);
-    }
     case Clusters::TemperatureControl::Id: {
         return AttributeIsSpecifiedInTemperatureControlCluster(aAttributeId);
     }
@@ -5183,9 +5102,6 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::SmokeCoAlarm::Id: {
         return AttributeIsSpecifiedInSmokeCOAlarmCluster(aAttributeId);
-    }
-    case Clusters::DishwasherAlarm::Id: {
-        return AttributeIsSpecifiedInDishwasherAlarmCluster(aAttributeId);
     }
     case Clusters::OperationalState::Id: {
         return AttributeIsSpecifiedInOperationalStateCluster(aAttributeId);

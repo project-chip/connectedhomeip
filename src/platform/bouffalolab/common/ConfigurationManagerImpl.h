@@ -25,7 +25,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the ConfigurationManager singleton object for the bl702 platform.
+ * Concrete implementation of the ConfigurationManager singleton object for the Bouffalo Lab platform.
  */
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::BLConfig>
 {
