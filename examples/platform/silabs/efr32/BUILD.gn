@@ -41,6 +41,13 @@ declare_args() {
 
   # Use default handler to negotiate subscription max interval
   chip_config_use_icd_subscription_callbacks = enable_sleepy_device
+
+  # Enable TestEventTrigger in GeneralDiagnostics cluster
+  silabs_test_event_trigger_enabled = false
+
+  # The EnableKey in hex string format used by TestEventTrigger command in
+  # GeneralDiagnostics cluster. The length of the string should be 32.
+  silabs_test_event_trigger_enable_key = "00112233445566778899aabbccddeeff"
 }
 
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
@@ -262,6 +269,7 @@ config("silabs-wifi-config") {
 
 source_set("efr32-common") {
   deps = []
+  defines = []
   public_deps = []
   public_configs = [
     ":efr32-common-config",
@@ -349,6 +357,15 @@ source_set("efr32-common") {
 
   if (chip_config_use_icd_subscription_callbacks) {
     public_deps += [ ":efr32-ICD-subscription-callback" ]
+  }
+
+  if (silabs_test_event_trigger_enabled) {
+    sources +=
+        [ "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.cpp" ]
+    defines += [
+      "SILABS_TEST_EVENT_TRIGGER_ENABLED=true",
+      "SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${silabs_test_event_trigger_enable_key}\"",
+    ]
   }
 
   public_deps += [

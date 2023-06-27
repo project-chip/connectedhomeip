@@ -21,7 +21,7 @@
 
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
-# Default CHIP build configuration 
+# Default CHIP build configuration
 set(CONFIG_CHIP_PROJECT_CONFIG "main/include/CHIPProjectConfig.h" CACHE STRING "")
 set(CONFIG_CHIP_LIB_TESTS NO CACHE BOOL "")
 set(CONFIG_CHIP_LIB_SHELL NO CACHE BOOL "")
@@ -32,6 +32,7 @@ set(CONFIG_CHIP_AUTOMATION_LOGGING YES CACHE BOOL "Enable logging at automation 
 set(CONFIG_CHIP_ERROR_LOGGING YES CACHE BOOL "Enable logging at error level")
 
 set(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS NO CACHE BOOL "Enable using PSA Protected Storage")
+set(CONFIG_CHIP_CRYPTO "mbedtls" CACHE STRING "Matter crypto backend. Mbedtls as default")
 
 if(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS AND NOT TFM_SUPPORT)
     message( FATAL_ERROR "You can not use PSA Protected Storage without TF-M support" )
@@ -53,8 +54,14 @@ if(TFM_SUPPORT)
     add_dependencies(chip-gn tfm-ns-interface)
 endif()
 
+if ("${CONFIG_CHIP_CRYPTO}" STREQUAL "psa")
+    target_compile_definitions(chip
+        INTERFACE
+            CONFIG_CHIP_CRYPTO_PSA)
+endif()
+
 function(chip_add_data_model target scope model_name)
-    target_include_directories(${target} 
+    target_include_directories(${target}
         PUBLIC
             ${GEN_DIR}/app-common
             ${GEN_DIR}/${model_name}-app

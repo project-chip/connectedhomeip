@@ -40,11 +40,11 @@ step.
     ```
 
 -   For ESP32C6 & ESP32H2, please use commit
-    [47852846d3](https://github.com/espressif/esp-idf/tree/47852846d3).
+    [ea5e0ff](https://github.com/espressif/esp-idf/tree/ea5e0ff).
 
     ```
     $ cd esp-idf
-    $ git checkout 47852846d3
+    $ git checkout ea5e0ff
     $ git submodule update --init
     $ ./install.sh
     ```
