@@ -428,4 +428,3 @@ void Instance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToM
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
