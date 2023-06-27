@@ -165,6 +165,7 @@ bredr
 BridgedDeviceBasicInformation
 bridgedLightEndpoint
 bringup
+BroadcastReceiver
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
@@ -1362,9 +1363,9 @@ tmp
 tngvndl
 TODO
 toJson
+tokenization
 tokenized
 tokenizer
-tokenization
 toolchain
 toolchains
 topologies
