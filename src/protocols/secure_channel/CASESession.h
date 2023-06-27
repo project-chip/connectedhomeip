@@ -207,8 +207,8 @@ public:
 
     State GetState() { return mState; }
 
-    // Check if any of the work helper is unable to schedule the after work callback
-    // If they are stuck run the after work callback from the foreground thread.
+    // Checks if any of the work helper is unable to schedule the after work callback
+    // If they are stuck, runs the after work callback from the foreground thread.
     bool InvokeBackgroundWorkWatchdog();
 
 private:
