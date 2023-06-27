@@ -124,6 +124,7 @@ chip_test_suite("tests") {
     "TestNumericAttributeTraits.cpp",
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
+    "TestReportScheduler.cpp",
     "TestReportingEngine.cpp",
     "TestSceneTable.cpp",
     "TestStatusIB.cpp",
