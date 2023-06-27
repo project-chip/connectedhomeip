@@ -2,17 +2,13 @@ OUTPUT_ARCH( "riscv" )
 
 ENTRY( bl702_start )
 
-__EM_SIZE = DEFINED(ble_controller_init) ? 8K : 0K;
-__SHA_LINK_CFG_SIZE = DEFINED(mbedtls_sha256_init) ? 72 : 0;
+__EM_SIZE = DEFINED(btble_controller_init) ? 16K : 0K;
 __CACHE_SIZE = DEFINED(__CACHE_SIZE) ? __CACHE_SIZE : 16K;
-__stack_size = DEFINED(__stack_size) ? __stack_size : 2K;
 
 MEMORY
 {
   flash  (rxai!w) : ORIGIN = 0x23000000, LENGTH = (2M)
-  tcm_ocram (wxa) : ORIGIN = 0x42010000 + __CACHE_SIZE, LENGTH = (64K - __CACHE_SIZE + 64K - __EM_SIZE - __stack_size - __SHA_LINK_CFG_SIZE)
-  sha_ocram (wxa) : ORIGIN = ORIGIN(tcm_ocram) + LENGTH(tcm_ocram), LENGTH = __SHA_LINK_CFG_SIZE
-  sys_stack (wxa) : ORIGIN = ORIGIN(tcm_ocram) + LENGTH(tcm_ocram) + __SHA_LINK_CFG_SIZE, LENGTH = __stack_size
+  tcm_ocram (wxa) : ORIGIN = 0x4201C000 + __CACHE_SIZE, LENGTH = (16K - __CACHE_SIZE + 80K - __EM_SIZE)
   hbnram    (wxa) : ORIGIN = 0x40010000, LENGTH = (4K)
   psram     (wxa) : ORIGIN = 0x26000000, LENGTH = (2M)
 }
@@ -20,7 +16,7 @@ MEMORY
 SECTIONS
 {
   __stack_size = DEFINED(__stack_size) ? __stack_size : 2K;
-  BOOT2_PT_ADDR = 0x4202DC00;
+  BOOT2_PT_ADDR = 0x4202e094;
 
   .init :
   {
@@ -41,13 +37,6 @@ SECTIONS
     *(.rodata .rodata.*)
     *(.sdata2.*)
     *(.gcc_except_table.*)
-
-    /* camera driver */
-    . = ALIGN(4);
-    _bl_driver_camera_start = .;
-    KEEP(*(.camera_desc))
-    *(.camera_desc)
-    _bl_driver_camera_end = .;
 
     /* static cli cmds */
     . = ALIGN(4);
@@ -87,56 +76,21 @@ SECTIONS
     __init_array_end = .;
   } >flash
 
-  .bleromro :
-  {
-    KEEP(*(.bleromro))
-  } >flash
-
-  .bleromrw (NOLOAD) :
-  {
-    KEEP(*(.bleromrw))
-  } >tcm_ocram
-
   .hbn : ALIGN(4)
   {
     PROVIDE( _hbn_load = LOADADDR(.hbn) );
     PROVIDE( _hbn_run = ADDR(.hbn) );
-    PROVIDE( _hbn_run_end = ADDR(.hbn) + SIZEOF(.hbn));
+    PROVIDE( _hbn_run_end = ADDR(.hbn) + SIZEOF(.hbn) );
 
-    /* put bl702_rf_private.o in hbnram to avoid ocram conflict during rf calibration */
-    *libbl702_rf.a:bl702_rf_private.o(.retention .retention_noinit)
-    *libbl702_rf.a:bl702_rf_private.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    PROVIDE ( _rf_data_end = . );
-
-    /* tcm code that should be retentive after hbn wakeup */
-    *libbl702_std.a:bl702_romapi.o(.tcm_code.* .sclock_rlt_code.*)
-    *libbl702_std.a:bl702_glb.o(.tcm_code.* .sclock_rlt_code.*)
-    PROVIDE ( _hbn_restore_tcm_run_end = . );
-
-    /* data that should be retentive after hbn wakeup */
-    *liblmac154.a:*(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libbl702_std.a:*(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libhosal.a:bl_adc.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libhosal.a:bl_gpio.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libhosal.a:bl_sys.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libhosal.a:bl_timer.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libhosal.a:bl_uart.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    *libhosal.a:hosal_uart.o(.sdata.* .srodata.* .sbss.* .bss.* COMMON)
-    PROVIDE ( _hbn_restore_data_run_end = . );
     *(.hbn_code.*)
     *(.hbn_data)
     *(.retention)
-  } >hbnram AT > flash
+  } >hbnram AT >flash
 
   .hbn_noinit (NOLOAD) :
   {
     *(.hbn_noinit)
     *(.retention_noinit)
-
-    /* PDS backup address */
-    . = ALIGN(4);
-    PROVIDE ( __ld_pds_bak_addr = . );
-    . = . + 256;
   } >hbnram
 
   .rsvd (NOLOAD) :
@@ -149,31 +103,32 @@ SECTIONS
   {
     PROVIDE( _tcm_load = LOADADDR(.tcmcode) );
     PROVIDE( _tcm_run = ADDR(.tcmcode) );
-    PROVIDE( _tcm_run_end = ADDR(.tcmcode) + SIZEOF(.tcmcode));
+    PROVIDE( _tcm_run_end = ADDR(.tcmcode) + SIZEOF(.tcmcode) );
 
     *(.tcm_code.*)
     *(.tcm_const.*)
     *(.sclock_rlt_code.*)
     *(.sclock_rlt_const.*)
-  } >tcm_ocram AT > flash
+  } >tcm_ocram AT >flash
+
+  .romdata : ALIGN(16)
+  {
+    PROVIDE( _rom_data_run = . );
+    PROVIDE( __global_pointer$ = . + 0x800 );
+    . = . + 0xc98;
+  } >tcm_ocram
 
   .data : ALIGN(4)
   {
     PROVIDE( _data_load = LOADADDR(.data) );
     PROVIDE( _data_run = ADDR(.data) );
-    PROVIDE( _data_run_end = ADDR(.data) + SIZEOF(.data));
+    PROVIDE( _data_run_end = ADDR(.data) + SIZEOF(.data) );
 
     *(.pds_code.*)
     *(.data .data.*)
     *(.gnu.linkonce.d.*)
 
     . = ALIGN(8);
-    /*always put freetos under global_pointer with the following order. No change!*/
-    PROVIDE( __global_pointer$ = . + 0x7F0 );
-    KEEP(*libbl702_freertos.a:*(.sdata.*))
-    KEEP(*libbl702_freertos.a:*(.sbss.*))
-    KEEP(*libbl702_freertos.a:*(.bss.*))
-    KEEP(*libbl702_freertos.a:*(COMMON))
     *(.sdata .sdata.*)
     *(.gnu.linkonce.s.*)
 
@@ -194,7 +149,7 @@ SECTIONS
     _bt_l2cap_fixed_chan_list_start = .;
     KEEP(*(SORT_BY_NAME("._bt_l2cap_fixed_chan.static.*")))
     _bt_l2cap_fixed_chan_list_end = .;
-  } >tcm_ocram AT > flash
+  } >tcm_ocram AT >flash
 
   .boot2 (NOLOAD) :
   {
@@ -205,7 +160,7 @@ SECTIONS
     PROVIDE ( __boot2_flashCfg_start = . );
     *(.bss.boot2_flashCfg)
     PROVIDE ( __boot2_flashCfg_end = . );
-  } >tcm_ocram
+  } >hbnram
 
   .bss_psram (NOLOAD) :
   {
@@ -267,30 +222,42 @@ SECTIONS
     KEEP(*commands.Base64.cpp.o(.bss.*))
 
     . = ALIGN(8);
-/*    KEEP(*shell_common.cmd_*.cpp.o(.bss.*))*/
-
-    . = ALIGN(8);
     KEEP(*shell_core.Engine.cpp.o(.bss.*theEngineRoot*)) 
 
     . = ALIGN(8);
-    /* KEEP(*shell_common.globals.cpp.o(.bss.*))               */
+    KEEP(*sdk_openthread_port.ot_radio.c.o(.bss.otRadio_buffPool)) 
 
     . = ALIGN(8);
-    KEEP(*lwip.memp.c.o(.bss.lwip_PBUF_POOL))
+    KEEP(*BL702L.PlatformManagerImpl.cpp.o(.bss._ZN4chip11DeviceLayer19PlatformManagerImpl9sInstanceE)) 
+
+    . = ALIGN(8);
+    KEEP(*BL702L.ThreadStackManagerImpl.cpp.o(.bss._ZN4chip11DeviceLayer22ThreadStackManagerImpl9sInstanceE)) 
+
+    . = ALIGN(8);
+    KEEP(*libCHIPAppServer.Server.cpp.o(.bss._ZN4chip6Server7sServerE)) 
+
+    . = ALIGN(8);
+    KEEP(*libaccess.ExampleAccessControlDelegate.cpp.o(.bss.*)) 
+
+    . = ALIGN(8);
+    KEEP(*libTransportLayer.SessionManager.cpp.o(.bss.*)) 
+
+    . = ALIGN(8);
+    KEEP(*lwip.memp.c.o(.bss.*))
     . = ALIGN(8);
     KEEP(*sdk_lwip.dns.c.o(.bss.dns_table))
 
     . = ALIGN(8);
     KEEP(*virt_net_spi.c.o(.bss.tx_buffer))
-
+  
     PROVIDE ( __psram_bss_init_end = . );
     . = ALIGN(16);
 
     *(.wifi_ram*)
-  } >psram
+  } > psram
 
   . = ALIGN(8);
-  PROVIDE( _heap3_start = .);
+  PROVIDE( _heap3_start = . );
   PROVIDE( _heap3_size = ORIGIN(psram) + LENGTH(psram) - _heap3_start );
 
   .bss (NOLOAD) :
@@ -305,39 +272,20 @@ SECTIONS
     *(COMMON)
   } >tcm_ocram
 
-  . = ALIGN(8);
-  PROVIDE( _heap_start = . );
-  PROVIDE( _heap_size = ADDR(.stack) - _heap_start );
-
-  PROVIDE( _heap2_start = 0 );
-  PROVIDE( _heap2_size = 0 );
-
-  .psram   (NOLOAD) :
-  {
-    *(.wifi_ram*)
-    . = ALIGN(16);
-  } > psram
-
-  . = ALIGN(8);
-  PROVIDE( _heap3_start = .);
-  PROVIDE( _heap3_size = ORIGIN(psram) + LENGTH(psram) - _heap3_start );
-
-  .sha_ocram (NOLOAD) :
-  {
-    *(.sha_ocram*)
-  } > sha_ocram
-  
-  .stack (NOLOAD) :
+  .stack (NOLOAD) : ALIGN(8)
   {
     PROVIDE ( _sp_base = . );
     . = . + __stack_size;
     PROVIDE( _sp_main = . );
     __freertos_irq_stack_top = .;
-  } > sys_stack
+  } >tcm_ocram
 
-  /* camera driver */
-  PROVIDE( _ld_bl_driver_camera_start = _bl_driver_camera_start );
-  PROVIDE( _ld_bl_driver_camera_end   = _bl_driver_camera_end );
+  . = ALIGN(8);
+  PROVIDE( _heap_start = . );
+  PROVIDE( _heap_size = ORIGIN(tcm_ocram) + LENGTH(tcm_ocram) - _heap_start );
+
+  PROVIDE( _heap2_start = 0 );
+  PROVIDE( _heap2_size = 0 );
 
   /* cli */
   PROVIDE( _ld_bl_static_cli_cmds_start = _bl_static_cli_cmds_start );
@@ -354,7 +302,7 @@ SECTIONS
   /* ram information */
   PROVIDE( _ld_ram_size0 = LENGTH(flash) );
   PROVIDE( _ld_ram_addr0 = ORIGIN(flash) );
-  PROVIDE( _ld_ram_size1 = LENGTH(tcm_ocram) - SIZEOF(.stack) );
+  PROVIDE( _ld_ram_size1 = LENGTH(tcm_ocram) );
   PROVIDE( _ld_ram_addr1 = ORIGIN(tcm_ocram) );
   PROVIDE( _ld_ram_size2 = LENGTH(hbnram) );
   PROVIDE( _ld_ram_addr2 = ORIGIN(hbnram) );
@@ -366,4 +314,10 @@ SECTIONS
 
   /* EM size */
   PROVIDE(__LD_CONFIG_EM_SEL = __EM_SIZE);
+
+  /* rom driver */
+  INCLUDE ../../third_party/bouffalolab/repo/components/platform/soc/bl702l/bl702l/evb/ld/romdriver.ld
+
+  /* rom data & code */
+  INCLUDE ../../third_party/bouffalolab/repo/components/platform/soc/bl702l/bl702l/evb/ld/rom_map.ld
 }

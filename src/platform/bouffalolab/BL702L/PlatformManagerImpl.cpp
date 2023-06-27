@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -25,16 +26,18 @@
 
 #include <lwip/tcpip.h>
 
-#include <openthread_port.h>
-#include <utils_list.h>
 extern "C" {
 #include <bl_sec.h>
+#include <openthread_port.h>
+#include <ot_utils_ext.h>
 }
 
 namespace chip {
 namespace DeviceLayer {
 
+extern "C" void (*ot_otrNotifyEvent_ptr)(ot_system_event_t sevent);
 extern "C" void bl_rand_stream(unsigned char *, int);
+extern "C" void otrNotifyEvent(ot_system_event_t sevent);
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
@@ -51,14 +54,18 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
     TaskHandle_t backup_eventLoopTask;
-    otRadio_opt_t opt;
 
     // Initialize the configuration system.
     err = Internal::BLConfig::Init();
     SuccessOrExit(err);
 
+    otRadio_opt_t opt;
+
     opt.byte            = 0;
     opt.bf.isCoexEnable = true;
+
+    ot_utils_init();
+    ot_otrNotifyEvent_ptr = otrNotifyEvent;
 
     ot_alarmInit();
     ot_radioInit(opt);
