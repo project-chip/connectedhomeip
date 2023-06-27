@@ -16,7 +16,7 @@ client cluster SecureChannelProtocol = 0xFFFF0000 {
     octet_string<32> initiator_random = 1;
     int16u initiator_session_id = 2;
     int16u passcode_id = 3;
-    has_pbkdf_parameters = 4;
+    boolean has_pbkdf_parameters = 4;
     optional ICDParameterStruct initiator_icd_params = 5;
   }
 
@@ -34,16 +34,16 @@ client cluster SecureChannelProtocol = 0xFFFF0000 {
   }
 
   struct PasePake1 {
-    octet_string pA;
+    octet_string pA = 1;
   }
 
   struct PasePake2 {
-    octet_string pB;
-    octet_string cB;
+    octet_string pB = 1;
+    octet_string cB = 2;
   }
 
   struct PasePake3 {
-    octet_string cA;
+    octet_string cA = 1;
   }
 
   struct CaseSigma1 {
