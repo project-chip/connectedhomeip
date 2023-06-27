@@ -25,9 +25,10 @@
 using namespace chip;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters::TimeSynchronization;
+using chip::TimeSyncDataProvider;
 
 using TrustedTimeSource = app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::Type;
-using TimeZoneList      = Span<TimeZoneStore>;
+using TimeZoneList      = Span<TimeSyncDataProvider::TimeSyncDataProvider::TimeZoneStore>;
 using TimeZone          = app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type;
 using DSTOffsetList     = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>;
 using DSTOffset         = app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type;
@@ -104,7 +105,7 @@ void TestTimeZoneStoreLoad(nlTestSuite * inSuite, void * inContext)
     timeSyncDataProv.Init(persistentStorage);
 
     const auto makeTimeZone = [](int32_t offset = 0, uint64_t validAt = 0, char * name = nullptr, uint8_t len = 0) {
-        TimeZoneStore tzS;
+        TimeSyncDataProvider::TimeZoneStore tzS;
         tzS.timeZone.offset  = offset;
         tzS.timeZone.validAt = validAt;
         if (name != nullptr && len)
@@ -117,19 +118,20 @@ void TestTimeZoneStoreLoad(nlTestSuite * inSuite, void * inContext)
     char tzShort[]       = "LA";
     char tzLong[]        = "MunichOnTheLongRiverOfIsarInNiceSummerWeatherWithAugustinerBeer";
     char tzBerlin[]      = "Berlin";
-    TimeZoneStore tzS[3] = { makeTimeZone(1, 1, tzShort, sizeof(tzShort)), makeTimeZone(2, 2, tzLong, sizeof(tzLong)),
-                             makeTimeZone(3, 3, tzBerlin, sizeof(tzBerlin)) };
+    TimeSyncDataProvider::TimeZoneStore tzS[3] = { makeTimeZone(1, 1, tzShort, sizeof(tzShort)),
+                                                   makeTimeZone(2, 2, tzLong, sizeof(tzLong)),
+                                                   makeTimeZone(3, 3, tzBerlin, sizeof(tzBerlin)) };
     TimeZoneList tzL(tzS);
     NL_TEST_ASSERT(inSuite, tzL.size() == 3);
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.StoreTimeZone(tzL));
 
-    TimeZoneStore emptyTzS[3] = { makeTimeZone(), makeTimeZone(), makeTimeZone() };
+    TimeSyncDataProvider::TimeZoneStore emptyTzS[3] = { makeTimeZone(), makeTimeZone(), makeTimeZone() };
 
     tzL = TimeZoneList(emptyTzS);
-    TimeZoneObj tzObj{ tzL, 3 };
+    TimeSyncDataProvider::TimeZoneObj tzObj{ tzL, 3 };
     NL_TEST_ASSERT(inSuite, tzL.size() == 3);
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.LoadTimeZone(tzObj));
-    NL_TEST_ASSERT(inSuite, tzObj.size == 3);
+    NL_TEST_ASSERT(inSuite, tzObj.validSize == 3);
 
     NL_TEST_ASSERT(inSuite, !tzL.empty());
 
@@ -175,11 +177,11 @@ void TestTimeZoneEmpty(nlTestSuite * inSuite, void * inContext)
     TimeSyncDataProvider timeSyncDataProv;
     timeSyncDataProv.Init(persistentStorage);
 
-    TimeZoneObj timeZoneObj;
+    TimeSyncDataProvider::TimeZoneObj timeZoneObj;
 
     NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == timeSyncDataProv.LoadTimeZone(timeZoneObj));
     NL_TEST_ASSERT(inSuite, !timeZoneObj.timeZoneList.begin());
-    NL_TEST_ASSERT(inSuite, timeZoneObj.size == 0);
+    NL_TEST_ASSERT(inSuite, timeZoneObj.validSize == 0);
 }
 
 void TestDSTOffset(nlTestSuite * inSuite, void * inContext)
@@ -198,17 +200,17 @@ void TestDSTOffset(nlTestSuite * inSuite, void * inContext)
     };
     DSTOffset dstS[3] = { makeDSTOffset(1, 1, 2), makeDSTOffset(2, 2, 3), makeDSTOffset(3, 3) };
     DSTOffsetList dstL(dstS);
-    DSTOffsetObj dstObj{ dstL, 3 };
-    NL_TEST_ASSERT(inSuite, dstObj.size == 3);
+    TimeSyncDataProvider::DSTOffsetObj dstObj{ dstL, 3 };
+    NL_TEST_ASSERT(inSuite, dstObj.validSize == 3);
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.StoreDSTOffset(dstL));
 
     DSTOffset emtpyDstS[3] = { makeDSTOffset(), makeDSTOffset(), makeDSTOffset() };
 
     dstObj.dstOffsetList = DSTOffsetList(emtpyDstS);
-    dstObj.size          = 0;
+    dstObj.validSize     = 0;
     NL_TEST_ASSERT(inSuite, dstObj.dstOffsetList.size() == 3);
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == timeSyncDataProv.LoadDSTOffset(dstObj));
-    NL_TEST_ASSERT(inSuite, dstObj.size == 3);
+    NL_TEST_ASSERT(inSuite, dstObj.validSize == 3);
 
     NL_TEST_ASSERT(inSuite, !dstObj.dstOffsetList.empty());
 
@@ -253,11 +255,11 @@ void TestDSTOffsetEmpty(nlTestSuite * inSuite, void * inContext)
     TimeSyncDataProvider timeSyncDataProv;
     timeSyncDataProv.Init(persistentStorage);
 
-    DSTOffsetObj dstObj;
+    TimeSyncDataProvider::DSTOffsetObj dstObj;
 
     NL_TEST_ASSERT(inSuite, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND == timeSyncDataProv.LoadDSTOffset(dstObj));
     NL_TEST_ASSERT(inSuite, !dstObj.dstOffsetList.begin());
-    NL_TEST_ASSERT(inSuite, dstObj.size == 0);
+    NL_TEST_ASSERT(inSuite, dstObj.validSize == 0);
 }
 
 const nlTest sTests[] = { NL_TEST_DEF("Test TrustedTimeSource store load", TestTrustedTimeSourceStoreLoad),

@@ -239,7 +239,7 @@ void TimeSynchronizationServer::Init()
     }
     if (LoadTimeZone() != CHIP_NO_ERROR)
     {
-        mTimeZoneObj.validSize = 1; // initialize default value to {0,0}
+        ClearTimeZone();
     }
     if (mTimeSyncDataProvider.LoadDSTOffset(mDstOffsetObj) != CHIP_NO_ERROR)
     {
