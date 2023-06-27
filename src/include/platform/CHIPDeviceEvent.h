@@ -271,7 +271,7 @@ enum InternalEventTypes
     kCHIPoBLEConnectionError,
     kCHIPoBLENotifyConfirm,
     kChipMsgSentEvent,
-    kChipMsgReceivedEvent,
+    kChipMsgHandledEvent,
     kAppWakeUpEvent,
 };
 
@@ -539,6 +539,17 @@ struct ChipDeviceEvent final
         {
             OtaState newState;
         } OtaStateChanged;
+
+        struct
+        {
+            bool ExpectResponse;
+        } MessageSent;
+
+        struct
+        {
+            bool isReceived;
+            bool isExpectedResponse;
+        } MessageReceived;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

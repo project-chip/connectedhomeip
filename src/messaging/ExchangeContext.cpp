@@ -243,8 +243,9 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         {
 #if CONFIG_DEVICE_LAYER
             DeviceLayer::ChipDeviceEvent event;
-            event.Type        = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
-            CHIP_ERROR status = DeviceLayer::PlatformMgr().PostEvent(&event);
+            event.Type                       = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
+            event.MessageSent.ExpectResponse = IsResponseExpected();
+            CHIP_ERROR status                = DeviceLayer::PlatformMgr().PostEvent(&event);
             if (status != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "Failed to post Message sent event %" CHIP_ERROR_FORMAT, status.Format());
@@ -299,6 +300,18 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     {
         // Cancel the response timer.
         CancelResponseTimer();
+#if CONFIG_DEVICE_LAYER
+        DeviceLayer::ChipDeviceEvent event;
+        event.Type                               = DeviceLayer::DeviceEventType::kChipMsgHandledEvent;
+        event.MessageReceived.isReceived         = false;
+        event.MessageReceived.isExpectedResponse = true;
+        CHIP_ERROR status                        = DeviceLayer::PlatformMgr().PostEvent(&event);
+        if (status != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to post Msg Handled event at ExchangeContext closure %" CHIP_ERROR_FORMAT,
+                         status.Format());
+        }
+#endif // CONFIG_DEVICE_LAYER
     }
 }
 
@@ -509,6 +522,18 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 
 void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
+#if CONFIG_DEVICE_LAYER
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type                               = DeviceLayer::DeviceEventType::kChipMsgHandledEvent;
+    event.MessageReceived.isReceived         = false;
+    event.MessageReceived.isExpectedResponse = true;
+    CHIP_ERROR status                        = DeviceLayer::PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post Message Response Timeout event %" CHIP_ERROR_FORMAT, status.Format());
+    }
+#endif // CONFIG_DEVICE_LAYER
+
     SetResponseExpected(false);
 
     // Hold a ref to ourselves so we can make calls into our delegate that might
@@ -621,6 +646,18 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+#if CONFIG_DEVICE_LAYER
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type                               = DeviceLayer::DeviceEventType::kChipMsgHandledEvent;
+    event.MessageReceived.isReceived         = true;
+    event.MessageReceived.isExpectedResponse = IsResponseExpected();
+    CHIP_ERROR status                        = DeviceLayer::PlatformMgr().PostEvent(&event);
+    if (status != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post Message received event %" CHIP_ERROR_FORMAT, status.Format());
+    }
+#endif // CONFIG_DEVICE_LAYER
+
     if (IsResponseExpected())
     {
         // Since we got the response, cancel the response timer.
@@ -630,16 +667,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         // is implicitly that response.
         SetResponseExpected(false);
     }
-
-#if CONFIG_DEVICE_LAYER
-    DeviceLayer::ChipDeviceEvent event;
-    event.Type        = DeviceLayer::DeviceEventType::kChipMsgReceivedEvent;
-    CHIP_ERROR status = DeviceLayer::PlatformMgr().PostEvent(&event);
-    if (status != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to post Message received event %" CHIP_ERROR_FORMAT, status.Format());
-    }
-#endif // CONFIG_DEVICE_LAYER
 
     // Don't send messages on to our delegate if our dispatch does not allow
     // those messages.

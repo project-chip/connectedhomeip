@@ -46,6 +46,7 @@ public:
     {
         kCommissioningWindowOpen = 0x01,
         kFailSafeArmed           = 0x02,
+        kExpectingMsgResponse    = 0x03,
     };
 
     ICDManager() {}

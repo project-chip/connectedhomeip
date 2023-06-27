@@ -22,6 +22,8 @@ using namespace chip::DeviceLayer;
 namespace chip {
 namespace app {
 
+uint8_t ICDEventManager::expectedMsgCount = 0;
+
 CHIP_ERROR ICDEventManager::Init(ICDManager * icdManager)
 {
     VerifyOrReturnError(icdManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -58,7 +60,43 @@ void ICDEventManager::ICDEventHandler(const ChipDeviceEvent * event, intptr_t ar
         pIcdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kFailSafeArmed, event->FailSafeState.armed);
         break;
     case DeviceEventType::kChipMsgSentEvent:
-    case DeviceEventType::kChipMsgReceivedEvent:
+
+        // When we expect a response to a message sent, We keep the ICD in active mode until it is received
+        // Otherwise, just a kick off an active mode interval/active mode threshold
+        if (event->MessageSent.ExpectResponse)
+        {
+            expectedMsgCount++;
+            pIcdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, true);
+        }
+        else
+        {
+            pIcdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+        }
+        break;
+    case DeviceEventType::kChipMsgHandledEvent:
+        if (event->MessageReceived.isExpectedResponse)
+        {
+            if (expectedMsgCount > 0)
+            {
+                expectedMsgCount--;
+            }
+            else
+            {
+                // SHOULD we assert
+                ChipLogError(DeviceLayer, "No response was expected by the ICD Manager");
+            }
+
+            if (expectedMsgCount == 0)
+            {
+                pIcdManager->SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, false);
+            }
+        }
+        else if (event->MessageReceived.isReceived)
+        {
+            pIcdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+        }
+
+        break;
     case DeviceEventType::kAppWakeUpEvent:
         pIcdManager->UpdateOperationState(ICDManager::OperationalState::ActiveMode);
         break;
