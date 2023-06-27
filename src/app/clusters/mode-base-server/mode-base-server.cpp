@@ -36,8 +36,6 @@ namespace app {
 namespace Clusters {
 namespace ModeBase {
 
-std::map<uint32_t, Instance *> Instance::ModeBaseAliasesInstanceMap;
-
 bool Instance::HasFeature(Feature feature) const
 {
     return (mFeature & to_underlying(feature)) != 0;
@@ -414,6 +412,11 @@ bool Instance::IsSupportedMode(uint8_t modeValue)
     return false;
 }
 
+Instance::~Instance()
+{
+    ModeBaseAliasesInstanceMap.erase(mClusterId);
+}
+
 uint8_t Instance::NumberOfModes()
 {
     return 0;
@@ -437,6 +440,11 @@ CHIP_ERROR Instance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructTyp
 void Instance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     response.status = to_underlying(StatusCode::kSuccess);
+}
+
+std::map<uint32_t, Instance *> GetModeBaseInstances()
+{
+    return ModeBaseAliasesInstanceMap;
 }
 
 } // namespace ModeBase

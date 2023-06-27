@@ -36,9 +36,6 @@ namespace ModeBase {
 class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
-    // This map holds pointers to all initialised ModeBase instances. It provides a way to access all ModeBase clusters.
-    static std::map<uint32_t, Instance *> ModeBaseAliasesInstanceMap;
-
     /**
      * This is a helper function to build a mode option structure. It takes the label/name of the mode,
      * the value of the mode and a list of mode tags that apply to this mode. NOTE, the caller must
@@ -126,7 +123,7 @@ public:
         mFeature    = aFeature;
     }
 
-    ~Instance() override { ModeBaseAliasesInstanceMap.erase(mClusterId); }
+    ~Instance() override;
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
@@ -191,6 +188,12 @@ public:
      */
     virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
 };
+
+// This map holds pointers to all initialised ModeBase instances. It provides a way to access all ModeBase clusters.
+// TODO(#27508)
+static std::map<uint32_t, Instance *> ModeBaseAliasesInstanceMap;
+
+std::map<uint32_t, Instance *> GetModeBaseInstances();
 
 } // namespace ModeBase
 } // namespace Clusters

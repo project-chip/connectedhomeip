@@ -239,7 +239,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
 #endif
 #ifdef EMBER_AF_PLUGIN_MODE_BASE
         // If OnMode is not a null value, then change the current mode to it.
-        for (const auto & element : ModeBase::Instance::ModeBaseAliasesInstanceMap)
+        for (const auto & element : ModeBase::GetModeBaseInstances())
         {
             auto modeBaseAlias = element.second;
             if (modeBaseAlias->GetEndpointId() == endpoint)
@@ -345,7 +345,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 #endif
 #ifdef EMBER_AF_PLUGIN_MODE_BASE
         // If OnMode is not a null value, then change the current mode to it.
-        for (const auto & element : ModeBase::Instance::ModeBaseAliasesInstanceMap)
+        for (const auto & element : ModeBase::GetModeBaseInstances())
         {
             auto modeBaseAlias = element.second;
             if (modeBaseAlias->GetEndpointId() == endpoint)
