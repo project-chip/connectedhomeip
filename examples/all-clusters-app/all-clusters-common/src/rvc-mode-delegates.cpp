@@ -23,8 +23,6 @@ using namespace chip::app::Clusters::RvcRunMode;
 using namespace chip::app::Clusters::RvcCleanMode;
 using chip::Protocols::InteractionModel::Status;
 
-//-- Mode Select delegate functions
-
 CHIP_ERROR RvcRunModeInstance::AppInit()
 {
     return CHIP_NO_ERROR;
