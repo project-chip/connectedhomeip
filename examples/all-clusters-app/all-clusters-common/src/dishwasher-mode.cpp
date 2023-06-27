@@ -16,7 +16,7 @@
 *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <dishwasher-mode-delegates.h>
+#include <dishwasher-mode.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DishwasherMode;

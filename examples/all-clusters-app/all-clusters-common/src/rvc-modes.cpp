@@ -16,7 +16,7 @@
 *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <rvc-mode-delegates.h>
+#include <rvc-modes.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::RvcRunMode;

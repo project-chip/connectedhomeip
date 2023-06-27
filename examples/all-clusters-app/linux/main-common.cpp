@@ -17,14 +17,18 @@
  */
 
 #include "main-common.h"
+#include "dishwasher-mode.h"
+#include "laundry-washer-mode.h"
+#include "rvc-modes.h"
+#include "tcc-mode.h"
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
 #include "include/tv-callbacks.h"
-#include "rvc-mode-delegates.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
@@ -36,11 +40,6 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
-#include <app/clusters/mode-base-server/mode-base-server.h>
-#include "../all-clusters-common/include/rvc-mode-delegates.h"
-#include "../all-clusters-common/include/dishwasher-mode-delegates.h"
-#include "../all-clusters-common/include/laundry-washer-mode.h"
-#include "../all-clusters-common/include/tcc-mode.h"
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/NetworkCommissioningDriver.h>
