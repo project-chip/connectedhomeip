@@ -19,9 +19,10 @@
 #include "DefaultTimeSyncDelegate.h"
 #include "inet/IPAddress.h"
 
+using chip::TimeSyncDataProvider;
 using namespace chip::app::Clusters::TimeSynchronization;
 
-void DefaultTimeSyncDelegate::HandleTimeZoneChanged(const TimeZoneList timeZoneList)
+void DefaultTimeSyncDelegate::TimeZoneListChanged(const Span<TimeSyncDataProvider::TimeZoneStore> timeZoneList)
 {
     // placeholder implementation
 }

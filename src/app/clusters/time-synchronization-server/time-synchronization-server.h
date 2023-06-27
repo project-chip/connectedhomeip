@@ -76,7 +76,7 @@ public:
     CHIP_ERROR SetDSTOffset(const DataModel::DecodableList<Structs::DSTOffsetStruct::Type> & dstL);
     CHIP_ERROR ClearDSTOffset(void);
     DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource(void);
-    Span<TimeZoneStore> GetTimeZone(void);
+    Span<TimeSyncDataProvider::TimeZoneStore> GetTimeZone(void);
     DataModel::List<Structs::DSTOffsetStruct::Type> GetDSTOffset(void);
     CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp);
 
@@ -93,11 +93,11 @@ public:
 
 private:
     DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
-    TimeZoneObj mTimeZoneObj{ Span<TimeZoneStore>(mTz), 0 };
-    DSTOffsetObj mDstOffsetObj{ DataModel::List<Structs::DSTOffsetStruct::Type>(mDst), 0 };
+    TimeSyncDataProvider::TimeZoneObj mTimeZoneObj{ Span<TimeSyncDataProvider::TimeZoneStore>(mTz), 0 };
+    TimeSyncDataProvider::DSTOffsetObj mDstOffsetObj{ DataModel::List<Structs::DSTOffsetStruct::Type>(mDst), 0 };
     GranularityEnum mGranularity;
 
-    TimeZoneStore mTz[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
+    TimeSyncDataProvider::TimeZoneStore mTz[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
     Structs::DSTOffsetStruct::Type mDst[CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE];
 
     TimeSyncDataProvider mTimeSyncDataProvider;

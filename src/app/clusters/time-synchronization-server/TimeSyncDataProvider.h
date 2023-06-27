@@ -25,34 +25,32 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/Span.h>
 
-using TimeZoneStruct = chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type;
-using DSTOffsets     = chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>;
-
-typedef struct
-{
-    TimeZoneStruct timeZone;
-    char name[64];
-} TimeZoneStore;
-
-typedef struct
-{
-    chip::Span<TimeZoneStore> timeZoneList;
-    size_t size;
-} TimeZoneObj;
-
-typedef struct
-{
-    DSTOffsets dstOffsetList;
-    size_t size;
-} DSTOffsetObj;
-
 namespace chip {
 
 class TimeSyncDataProvider
 {
     using TrustedTimeSource = chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::Type;
+    using TimeZoneStruct    = chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type;
+    using DSTOffsets        = chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>;
 
 public:
+    static constexpr size_t kTimeZoneNameLength = 64;
+    struct TimeZoneStore
+    {
+        TimeZoneStruct timeZone;
+        char name[kTimeZoneNameLength];
+    };
+    struct TimeZoneObj
+    {
+        Span<TimeZoneStore> timeZoneList;
+        size_t validSize;
+    };
+    struct DSTOffsetObj
+    {
+        DSTOffsets dstOffsetList;
+        size_t validSize;
+    };
+
     ~TimeSyncDataProvider() {}
 
     void Init(PersistentStorageDelegate & persistentStorage) { mPersistentStorage = &persistentStorage; }

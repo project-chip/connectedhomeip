@@ -24,19 +24,15 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace TimeSynchronization {
-
-using namespace chip::app;
-using chip::app::Clusters::TimeSynchronization::Delegate;
-
 class DefaultTimeSyncDelegate : public Delegate
 {
 
 public:
     DefaultTimeSyncDelegate() : Delegate(){};
-    void HandleTimeZoneChanged(const TimeZoneList timeZoneList) override;
-    bool HandleUpdateDSTOffset(chip::CharSpan name) override;
-    bool IsNTPAddressValid(chip::CharSpan ntp) override;
-    bool IsNTPAddressDomain(chip::CharSpan ntp) override;
+    void TimeZoneListChanged(const Span<TimeSyncDataProvider::TimeZoneStore> timeZoneList) override;
+    bool HandleUpdateDSTOffset(CharSpan name) override;
+    bool IsNTPAddressValid(CharSpan ntp) override;
+    bool IsNTPAddressDomain(CharSpan ntp) override;
 };
 
 } // namespace TimeSynchronization

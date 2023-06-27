@@ -29,52 +29,55 @@ namespace app {
 namespace Clusters {
 namespace TimeSynchronization {
 
-using TimeZoneList = Span<TimeZoneStore>;
-
 /** @brief
  *    Defines methods for implementing application-specific logic for the Time Synchronization Cluster.
  */
 class Delegate
 {
+    // using TimeZoneList = Span<TimeSyncDataProvider::TimeZoneStore>;
+
 public:
-    inline bool HasFeature(chip::EndpointId ep, Feature feature)
+    inline bool HasFeature(Feature feature)
     {
         uint32_t map;
-        bool success = (Attributes::FeatureMap::Get(ep, &map) == EMBER_ZCL_STATUS_SUCCESS);
+        bool success = (Attributes::FeatureMap::Get(mEndpoint, &map) == EMBER_ZCL_STATUS_SUCCESS);
         return success ? (map & to_underlying(feature)) : false;
     }
 
-    inline chip::EndpointId GetEndpoint() { return mEndpoint; }
+    inline EndpointId GetEndpoint() { return mEndpoint; }
+    inline void SetEndpoint(EndpointId ep) { mEndpoint = ep; }
 
     /**
-     * @brief Notifies through the delegate that time zone has changed.
+     * @brief Notifies the delegate that the cluster's configured list of time zones has changed.
      *
      * @param timeZoneList new time zone list
      */
-    virtual void HandleTimeZoneChanged(const TimeZoneList timeZoneList) = 0;
+    virtual void TimeZoneListChanged(const Span<TimeSyncDataProvider::TimeZoneStore> timeZoneList) = 0;
     /**
-     * @brief Give the delegate the chance to populate DNSOffset based on active time zone.
+     * @brief Give the delegate the chance to call SetDSTOffset on the TimeSynchronizationServer with a list of
+     * DST offsets based on the provided time zone name.  If the delegate does so, it should return true.
+     * If the delegate does not want to set DST offsets based on the time zone, it should return false.
      *
      * @param name name of active time zone
      */
-    virtual bool HandleUpdateDSTOffset(const chip::CharSpan name) = 0;
+    virtual bool HandleUpdateDSTOffset(const CharSpan name) = 0;
     /**
-     * @brief Validate NTP address
+     * @brief Returns true if the provided string is a valid NTP address (either domain name or IPv6 address).
      *
      * @param ntp NTP address
      */
-    virtual bool IsNTPAddressValid(const chip::CharSpan ntp) = 0;
+    virtual bool IsNTPAddressValid(const CharSpan ntp) = 0;
     /**
-     * @brief Check if NTP address is domain
+     * @brief Returns true if a valid NTP address is a domain name as opposed to an IPv6 address.
      *
      * @param ntp NTP address
      */
-    virtual bool IsNTPAddressDomain(const chip::CharSpan ntp) = 0;
+    virtual bool IsNTPAddressDomain(const CharSpan ntp) = 0;
 
     virtual ~Delegate() = default;
 
 private:
-    chip::EndpointId mEndpoint = 0;
+    EndpointId mEndpoint = kRootEndpointId;
 };
 
 } // namespace TimeSynchronization

@@ -23,9 +23,9 @@
 namespace chip {
 
 constexpr size_t kTrustedTimeSourceMaxSerializedSize =
-    TLV::EstimateStructOverhead(sizeof(chip::FabricIndex), sizeof(chip::NodeId), sizeof(chip::EndpointId));
+    TLV::EstimateStructOverhead(sizeof(FabricIndex), sizeof(NodeId), sizeof(EndpointId));
 constexpr size_t kTimeZoneMaxSerializedSize =
-    TLV::EstimateStructOverhead(sizeof(int32_t), sizeof(uint64_t), static_cast<size_t>(64)); // 64 for name field
+    TLV::EstimateStructOverhead(sizeof(int32_t), sizeof(uint64_t), TimeSyncDataProvider::kTimeZoneNameLength);
 constexpr size_t kDSTOffsetMaxSerializedSize = TLV::EstimateStructOverhead(sizeof(int32_t), sizeof(uint64_t), sizeof(uint64_t));
 
 // Multiply the serialized size by the maximum number of list size and add 2 bytes for the array start and end.
@@ -86,7 +86,7 @@ CHIP_ERROR TimeSyncDataProvider::ClearDefaultNtp()
     return Clear(DefaultStorageKeyAllocator::TSDefaultNTP().KeyName());
 }
 
-CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const chip::Span<TimeZoneStore> & timeZoneList)
+CHIP_ERROR TimeSyncDataProvider::StoreTimeZone(const Span<TimeZoneStore> & timeZoneList)
 {
     uint8_t buffer[kTimeZoneListMaxSerializedSize];
     TLV::TLVWriter writer;
@@ -110,21 +110,20 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZoneObj & timeZoneObj)
     uint8_t buffer[kTimeZoneListMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     CHIP_ERROR err;
-    timeZoneObj.size   = 0;
+    timeZoneObj.validSize   = 0;
     auto & tzStoreList = timeZoneObj.timeZoneList;
 
     ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::TSTimeZone().KeyName(), bufferSpan));
 
     TLV::TLVReader reader;
     TLV::TLVType outerType;
-    size_t count;
+    size_t count, i = 0;
 
     reader.Init(bufferSpan);
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
     reader.CountRemainingInContainer(&count);
     VerifyOrReturnError(count <= tzStoreList.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    uint8_t i = 0;
 
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
@@ -135,10 +134,9 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZoneObj & timeZoneObj)
         tzStore.timeZone.validAt = tz.validAt;
         if (tz.name.HasValue())
         {
-            size_t len = tz.name.Value().size();
-            chip::MutableCharSpan tempSpan(tzStore.name, len);
-            ReturnErrorOnFailure(chip::CopyCharSpanToMutableCharSpan(tz.name.Value(), tempSpan));
-            tzStore.timeZone.name.SetValue(chip::CharSpan(tzStore.name, len));
+            MutableCharSpan tempSpan(tzStore.name);
+            ReturnErrorOnFailure(CopyCharSpanToMutableCharSpan(tz.name.Value(), tempSpan));
+            tzStore.timeZone.name.SetValue(tempSpan);
         }
         else
         {
@@ -146,14 +144,12 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZoneObj & timeZoneObj)
         }
         i++;
     }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
-
     err = reader.Next();
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
 
-    timeZoneObj.size = i;
+    timeZoneObj.validSize = i;
 
     return CHIP_NO_ERROR;
 }
@@ -181,7 +177,6 @@ CHIP_ERROR TimeSyncDataProvider::StoreDSTOffset(const DSTOffsets & dstOffsetList
 
     return mPersistentStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::TSDSTOffset().KeyName(), buffer,
                                                static_cast<uint16_t>(writer.GetLengthWritten()));
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffsetObj & dstOffsetObj)
@@ -189,35 +184,31 @@ CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffsetObj & dstOffsetObj)
     uint8_t buffer[kDSTOffsetListMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     CHIP_ERROR err;
-    dstOffsetObj.size = 0;
+    dstOffsetObj.validSize = 0;
 
     ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::TSDSTOffset().KeyName(), bufferSpan));
 
     TLV::TLVReader reader;
     TLV::TLVType outerType;
-    size_t count;
+    size_t count, i = 0;
 
     reader.Init(bufferSpan);
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
     reader.CountRemainingInContainer(&count);
     VerifyOrReturnError(count <= dstOffsetObj.dstOffsetList.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    auto dst  = dstOffsetObj.dstOffsetList.begin();
-    uint8_t i = 0;
+    auto dst = dstOffsetObj.dstOffsetList.begin();
 
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(dst[i].Decode(reader));
         i++;
     }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
-
     err = reader.Next();
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-    dstOffsetObj.size = i;
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    dstOffsetObj.validSize = i;
 
     return CHIP_NO_ERROR;
 }
