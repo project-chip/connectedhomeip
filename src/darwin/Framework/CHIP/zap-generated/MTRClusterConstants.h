@@ -280,7 +280,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeRefrigeratorAlarmID MTR_NEWLY_AVAILABLE = 0x00000057,
     MTRClusterIDTypeAirQualityID MTR_NEWLY_AVAILABLE = 0x0000005B,
     MTRClusterIDTypeSmokeCOAlarmID MTR_NEWLY_AVAILABLE = 0x0000005C,
-    MTRClusterIDTypeDishwasherAlarmID MTR_NEWLY_AVAILABLE = 0x0000005D,
     MTRClusterIDTypeOperationalStateID MTR_NEWLY_AVAILABLE = 0x00000060,
     MTRClusterIDTypeHEPAFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000071,
     MTRClusterIDTypeActivatedCarbonFilterMonitoringID MTR_NEWLY_AVAILABLE = 0x00000072,
@@ -3806,23 +3805,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterSmokeCOAlarmAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
-    // Cluster DishwasherAlarm attributes
-    MTRAttributeIDTypeClusterDishwasherAlarmAttributeMaskID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterDishwasherAlarmAttributeLatchID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterDishwasherAlarmAttributeStateID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterDishwasherAlarmAttributeSupportedID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterDishwasherAlarmAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterDishwasherAlarmAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterDishwasherAlarmAttributeEventListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterDishwasherAlarmAttributeAttributeListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterDishwasherAlarmAttributeFeatureMapID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterDishwasherAlarmAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster OperationalState attributes
@@ -9289,10 +9271,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster SmokeCOAlarm commands
     MTRCommandIDTypeClusterSmokeCOAlarmCommandSelfTestRequestID MTR_NEWLY_AVAILABLE = 0x00000000,
 
-    // Cluster DishwasherAlarm commands
-    MTRCommandIDTypeClusterDishwasherAlarmCommandResetID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterDishwasherAlarmCommandModifyEnabledAlarmsID MTR_NEWLY_AVAILABLE = 0x00000001,
-
     // Cluster OperationalState commands
     MTRCommandIDTypeClusterOperationalStateCommandPauseID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterOperationalStateCommandStopID MTR_NEWLY_AVAILABLE = 0x00000001,
@@ -10444,9 +10422,6 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterSmokeCOAlarmEventInterconnectSmokeAlarmID MTR_NEWLY_AVAILABLE = 0x00000008,
     MTREventIDTypeClusterSmokeCOAlarmEventInterconnectCOAlarmID MTR_NEWLY_AVAILABLE = 0x00000009,
     MTREventIDTypeClusterSmokeCOAlarmEventAllClearID MTR_NEWLY_AVAILABLE = 0x0000000A,
-
-    // Cluster DishwasherAlarm events
-    MTREventIDTypeClusterDishwasherAlarmEventNotifyID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster OperationalState events
     MTREventIDTypeClusterOperationalStateEventOperationalErrorID MTR_NEWLY_AVAILABLE = 0x00000000,

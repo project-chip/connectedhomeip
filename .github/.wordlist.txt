@@ -478,6 +478,7 @@ EEE
 eef
 ef
 EFR
+efuse
 eg
 EjQ
 elftools

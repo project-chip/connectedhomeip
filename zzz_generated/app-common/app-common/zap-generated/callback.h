@@ -385,13 +385,13 @@ void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Washer Controls Cluster Init
+/** @brief Laundry Washer Controls Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfWasherControlsClusterInitCallback(chip::EndpointId endpoint);
+void emberAfLaundryWasherControlsClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief RVC Run Mode Cluster Init
  *
@@ -4494,42 +4494,42 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterServerTickCall
 void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Washer Controls Cluster
+// Laundry Washer Controls Cluster
 //
 
-/** @brief Washer Controls Cluster Server Init
+/** @brief Laundry Washer Controls Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfWasherControlsClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfLaundryWasherControlsClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Washer Controls Cluster Server Shutdown
+/** @brief Laundry Washer Controls Cluster Server Shutdown
  *
  * Server Shutdown
  *
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterWasherControlsClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterLaundryWasherControlsClusterServerShutdownCallback(chip::EndpointId endpoint);
 
-/** @brief Washer Controls Cluster Client Init
+/** @brief Laundry Washer Controls Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfWasherControlsClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfLaundryWasherControlsClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Washer Controls Cluster Server Attribute Changed
+/** @brief Laundry Washer Controls Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterWasherControlsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterLaundryWasherControlsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Washer Controls Cluster Server Pre Attribute Changed
+/** @brief Laundry Washer Controls Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -4538,11 +4538,10 @@ void MatterWasherControlsClusterServerAttributeChangedCallback(const chip::app::
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status
-MatterWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Washer Controls Cluster Client Pre Attribute Changed
+/** @brief Laundry Washer Controls Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -4551,25 +4550,24 @@ MatterWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::Co
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status
-MatterWasherControlsClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterLaundryWasherControlsClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Washer Controls Cluster Server Tick
+/** @brief Laundry Washer Controls Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfWasherControlsClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfLaundryWasherControlsClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Washer Controls Cluster Client Tick
+/** @brief Laundry Washer Controls Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfWasherControlsClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfLaundryWasherControlsClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // RVC Run Mode Cluster

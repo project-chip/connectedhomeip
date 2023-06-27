@@ -2445,8 +2445,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::WasherControls::Id: {
-        using namespace app::Clusters::WasherControls;
+    case app::Clusters::LaundryWasherControls::Id: {
+        using namespace app::Clusters::LaundryWasherControls;
         switch (aPath.mEventId)
         {
         default:

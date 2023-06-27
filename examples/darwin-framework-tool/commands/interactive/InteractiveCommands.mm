@@ -22,7 +22,7 @@
 
 #include <editline.h>
 
-constexpr const char * kInteractiveModePrompt = ">>> ";
+constexpr const char * kInteractiveModePrompt = "Stop and restart stack: [Ctrl+_] & [Ctrl+^] \nQuit Interactive: 'quit()'\n>>> ";
 constexpr const char * kInteractiveModeHistoryFilePath = "/tmp/darwin_framework_tool_history";
 constexpr const char * kInteractiveModeStopCommand = "quit()";
 

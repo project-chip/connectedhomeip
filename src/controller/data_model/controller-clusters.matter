@@ -2895,7 +2895,14 @@ client cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 }
 
 /** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
-client cluster WasherControls = 83 {
+client cluster LaundryWasherControls = 83 {
+  enum NumberOfRinsesEnum : ENUM8 {
+    kNone = 0;
+    kNormal = 1;
+    kExtra = 2;
+    kMax = 3;
+  }
+
   bitmap Feature : BITMAP32 {
     kSpin = 0x1;
     kRinse = 0x2;
@@ -2903,8 +2910,8 @@ client cluster WasherControls = 83 {
 
   readonly attribute optional CHAR_STRING spinSpeeds[] = 0;
   attribute optional nullable int8u spinSpeedCurrent = 1;
-  attribute optional nullable int8u numberOfRinses = 2;
-  readonly attribute optional int8u maxRinses = 3;
+  attribute optional NumberOfRinsesEnum numberOfRinses = 2;
+  readonly attribute optional NumberOfRinsesEnum supportedRinses[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

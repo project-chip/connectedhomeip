@@ -11170,10 +11170,10 @@
           ]
         },
         {
-          "name": "Washer Controls",
+          "name": "Laundry Washer Controls",
           "code": 83,
           "mfgCode": null,
-          "define": "WASHER_CONTROLS_CLUSTER",
+          "define": "LAUNDRY_WASHER_CONTROLS_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -11212,10 +11212,10 @@
           ]
         },
         {
-          "name": "Washer Controls",
+          "name": "Laundry Washer Controls",
           "code": 83,
           "mfgCode": null,
-          "define": "WASHER_CONTROLS_CLUSTER",
+          "define": "LAUNDRY_WASHER_CONTROLS_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [

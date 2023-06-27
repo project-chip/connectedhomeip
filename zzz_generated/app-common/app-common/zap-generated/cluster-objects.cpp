@@ -11870,7 +11870,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace RefrigeratorAndTemperatureControlledCabinetMode
-namespace WasherControls {
+namespace LaundryWasherControls {
 
 namespace Commands {} // namespace Commands
 
@@ -11888,8 +11888,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::NumberOfRinses::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, numberOfRinses));
         break;
-    case Attributes::MaxRinses::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, maxRinses));
+    case Attributes::SupportedRinses::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, supportedRinses));
         break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
@@ -11919,7 +11919,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace WasherControls
+} // namespace LaundryWasherControls
 namespace RvcRunMode {
 namespace Structs {} // namespace Structs
 

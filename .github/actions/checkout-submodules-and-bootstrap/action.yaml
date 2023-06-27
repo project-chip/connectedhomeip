@@ -1,0 +1,30 @@
+name: Checkout submodules & Bootstrap
+description: Checkout submodules & Bootstrap
+inputs:
+  platform:
+    description: "Platform name"
+    required: true
+  extra-submodule-parameters:
+    description: "extra submodule parameters"
+    required: false
+    default: ""
+  bootstrap-log-name:
+    description: "Bootstrap log name"
+    required: false
+    default: bootstrap-logs
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout submodules
+      uses: ./.github/actions/checkout-submodules
+      with:
+        platform: ${{ inputs.platform }}
+        extra-parameters: ${{ inputs.extra-submodule-parameters }}
+    - name: Bootstrap Cache
+      uses: ./.github/actions/bootstrap-cache
+    - name: Bootstrap
+      uses: ./.github/actions/bootstrap
+    - name: Upload Bootstrap Logs
+      uses: ./.github/actions/upload-bootstrap-logs
+      with:
+        platform: ${{ inputs.bootstrap-log-name }}

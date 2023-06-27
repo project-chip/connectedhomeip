@@ -4511,8 +4511,8 @@ class ChipClusters:
             },
         },
     }
-    _WASHER_CONTROLS_CLUSTER_INFO = {
-        "clusterName": "WasherControls",
+    _LAUNDRY_WASHER_CONTROLS_CLUSTER_INFO = {
+        "clusterName": "LaundryWasherControls",
         "clusterId": 0x00000053,
         "commands": {
         },
@@ -4538,7 +4538,7 @@ class ChipClusters:
                 "writable": True,
             },
             0x00000003: {
-                "attributeName": "MaxRinses",
+                "attributeName": "SupportedRinses",
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
@@ -15708,7 +15708,7 @@ class ChipClusters:
         0x00000050: _MODE_SELECT_CLUSTER_INFO,
         0x00000051: _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
         0x00000052: _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
-        0x00000053: _WASHER_CONTROLS_CLUSTER_INFO,
+        0x00000053: _LAUNDRY_WASHER_CONTROLS_CLUSTER_INFO,
         0x00000054: _RVC_RUN_MODE_CLUSTER_INFO,
         0x00000055: _RVC_CLEAN_MODE_CLUSTER_INFO,
         0x00000056: _TEMPERATURE_CONTROL_CLUSTER_INFO,
@@ -15844,7 +15844,7 @@ class ChipClusters:
         "ModeSelect": _MODE_SELECT_CLUSTER_INFO,
         "LaundryWasherMode": _LAUNDRY_WASHER_MODE_CLUSTER_INFO,
         "RefrigeratorAndTemperatureControlledCabinetMode": _REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER_INFO,
-        "WasherControls": _WASHER_CONTROLS_CLUSTER_INFO,
+        "LaundryWasherControls": _LAUNDRY_WASHER_CONTROLS_CLUSTER_INFO,
         "RvcRunMode": _RVC_RUN_MODE_CLUSTER_INFO,
         "RvcCleanMode": _RVC_CLEAN_MODE_CLUSTER_INFO,
         "TemperatureControl": _TEMPERATURE_CONTROL_CLUSTER_INFO,

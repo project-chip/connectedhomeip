@@ -220,11 +220,6 @@
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
-@interface MTRBaseClusterDishwasherAlarm ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@property (nonatomic, assign, readonly) chip::EndpointId endpoint;
-@end
-
 @interface MTRBaseClusterOperationalState ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
