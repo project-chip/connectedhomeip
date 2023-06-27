@@ -67,7 +67,7 @@ __TARGET_TYPES__ = {
 
 
 class ZapInput:
-    """ZAP may be run from a .zap configuration or from zcl properties.
+    """ZAP may be run from a .zap configuration or from just cluster XML.
 
     Running from a '.zap' configuration will load the zcl properties from
     the '.zap' file, however it will also load cluster enabling and settings.
