@@ -59,8 +59,8 @@ namespace LaundryWasherControls {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id, EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
+                                                       EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
     if (ep < kLaundryWasherControlsDelegateTableSize)
     {
@@ -78,8 +78,8 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 namespace {
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep =
-        emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id, EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LaundryWasherControls::Id,
+                                                       EMBER_AF_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT);
     return (ep >= kLaundryWasherControlsDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
@@ -185,9 +185,8 @@ void MatterLaundryWasherControlsClusterServerAttributeChangedCallback(const chip
     return;
 }
 
-chip::Protocols::InteractionModel::Status
-MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+chip::Protocols::InteractionModel::Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     // ToDo
     return imcode::Success;

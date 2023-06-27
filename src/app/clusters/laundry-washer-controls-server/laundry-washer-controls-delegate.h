@@ -31,9 +31,9 @@ namespace LaundryWasherControls {
 class Delegate
 {
 public:
-    virtual CHIP_ERROR HandleGetSpinSpeedsList(app::AttributeValueEncoder & aEncoder) = 0;
+    virtual CHIP_ERROR HandleGetSpinSpeedsList(app::AttributeValueEncoder & aEncoder)  = 0;
     virtual CHIP_ERROR HandleGetSupportedRinses(app::AttributeValueEncoder & aEncoder) = 0;
-    virtual ~Delegate()                                                               = default;
+    virtual ~Delegate()                                                                = default;
 };
 
 } // namespace LaundryWasherControls
