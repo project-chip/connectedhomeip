@@ -11,7 +11,7 @@ the esp32 application.
 -   [Build, flash and monitor an example](#build-flash-and-monitor-an-example)
 -   [Commissioning](#commissioning)
     -   [Building Standalone chip-tool](#building-standalone-chip-tool)
-    -   [Commissioning the WiFi devices](#commissioning-the-wifi-devices-esp32-esp32c3-esp32s3)
+    -   [Commissioning the WiFi devices](#commissioning-the-wifi-devices-esp32-esp32c3-esp32s3-esp32c6)
     -   [Commissioning the Thread device](#commissioning-the-thread-device-esp32h2)
     -   [Commissioning Parameters](#commissioning-parameters)
 -   [Flashing app using script](#flashing-app-using-script)
