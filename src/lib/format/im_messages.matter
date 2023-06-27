@@ -1,3 +1,102 @@
+/// Fake cluster for defining structures for secure channel protocol
+///
+/// This follows the `4.10.1. Secure Channel Protocol Messages`
+/// defined in the Matter specification.
+///
+/// This is NOT a real cluster.
+///
+client cluster SecureChannelProtocol = 0xFFFF0000 {
+
+  struct ICDParameterStruct {
+    int32u sleepy_idle_interval = 1;
+    int32u sleepy_active_interval = 2;
+  }
+
+  struct PBKDFParamRequest {
+    octet_string<32> initiator_random = 1;
+    int16u initiator_session_id = 2;
+    int16u passcode_id = 3;
+    has_pbkdf_parameters = 4;
+    optional ICDParameterStruct initiator_icd_params = 5;
+  }
+
+  struct CryptoPBKDFParameterSet {
+    int32u iterations = 1;
+    octet_string<32> salt = 2; // 16..32 in size
+  }
+
+  struct PBKDFParamResponse {
+    octet_string<32> initiator_random = 1;
+    octet_string<32> responder_random = 2;
+    int16u responder_session_id = 3;
+    CryptoPBKDFParameterSet pbkdf_parameters = 4;
+    optional IDCParameterStruct responder_icd_params = 5;
+  }
+
+  struct PasePake1 {
+    octet_string pA;
+  }
+
+  struct PasePake2 {
+    octet_string pB;
+    octet_string cB;
+  }
+
+  struct PasePake3 {
+    octet_string cA;
+  }
+
+  struct CaseSigma1 {
+    octet_string<32> initiator_random = 1;
+    int16u initiator_session_id = 2;
+    octet_string<32> destination_id = 3;
+    octet_string<65> initiator_eph_pub_key = 4;
+    optional ICDParameterStruct initiator_icd_params = 5;
+    optional octet_string<16> resumption_id = 6;
+    optional octet_string initiator_resume_mic = 7;
+  }
+
+  struct CaseSigma2 {
+    octet_string<32> responder_random = 1;
+    int16u responder_sessoion_id = 2;
+    octet_string<65> responder_eph_pub_key = 3;
+    octet_string encrypted2 = 4;
+    optional ICDParameterStruct responder_icd_params = 5;
+  }
+
+  struct CaseSigma3 {
+    octet_string encrypted = 1;
+  }
+
+  struct CaseSigma2Resume {
+    octet_string<16> resumption_id = 1;
+    octet_string<16> sigma2_resume_mic = 2;
+    int16u responder_sessoion_id = 3;
+    optional ICDParameterStruct responder_icd_params = 4;
+  }
+
+  // IDs here are based on Protocol upcodes
+  //
+  // Written here as "attributes" to force code generation
+  // to consider these active structures.
+  //
+  // When data is binary rather than TLV,  no further decoding is
+  // attempted (i.e. type is octet_string)
+  readonly attribute octet_string msg_counter_sync_request = 0x00;
+  readonly attribute octet_string msg_counter_sync_response = 0x01;
+  readonly attribute octet_string mrp_ack = 0x10;
+  readonly attribute PBKDFParamRequest pbkdf_param_request = 0x20;
+  readonly attribute PBKDFParamResponse pbkdf_param_response = 0x21;
+  readonly attribute PasePake1 pase_pake1 = 0x22;
+  readonly attribute PasePake2 pase_pake2 = 0x23;
+  readonly attribute PasePake3 pase_pake3 = 0x24;
+  readonly attribute CaseSigma1 case_sigma1 = 0x30;
+  readonly attribute CaseSigma2 case_sigma2 = 0x31;
+  readonly attribute CaseSigma3 case_sigma3 = 0x32;
+  readonly attribute CaseSigma2Resume case_sigma2_resume = 0x33;
+  readonly attribute octet_string status_report = 0x40;
+}
+
 /// Fake cluster for defining structures for IM data encoding.
 ///
 /// This follows the `10. Interaction Model Encoding Specification`
@@ -5,7 +104,7 @@
 ///
 /// This is NOT a real cluster.
 ///
-client cluster IMProtocol = 0xFFFF0000 {
+client cluster IMProtocol = 0xFFFF0001 {
   struct AttributePathIB {
     boolean enable_tag_compression = 0;
     optional int64u node_id = 1;
