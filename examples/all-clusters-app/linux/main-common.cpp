@@ -39,6 +39,7 @@
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include "../all-clusters-common/include/rvc-mode-delegates.h"
 #include "../all-clusters-common/include/dishwasher-mode-delegates.h"
+#include "../all-clusters-common/include/laundry-washer-mode.h"
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/NetworkCommissioningDriver.h>
@@ -201,10 +202,11 @@ CHIP_ERROR ExampleDeviceInstanceInfoProvider::GetProductPrimaryColor(Clusters::B
 ExampleDeviceInstanceInfoProvider gExampleDeviceInstanceInfoProvider;
 
 Clusters::RvcRunMode::RvcRunModeInstance rvcRunInstance(0x1, Clusters::RvcRunMode::Id, 1);
-
 Clusters::RvcCleanMode::RvcCleanModeInstance rvcCleanInstance(0x1, Clusters::RvcCleanMode::Id, 1);
-
 Clusters::DishwasherMode::DishwasherModeInstance dishwasherInstance(0x1, Clusters::DishwasherMode::Id, 1);
+Clusters::LaundryWasherMode::LaundryWasherModeInstance laundryWasherModeInstance(0x1, Clusters::LaundryWasherMode::Id, 1);
+
+
 } // namespace
 
 void ApplicationInit()
@@ -264,6 +266,7 @@ void ApplicationInit()
     rvcRunInstance.Init();
     rvcCleanInstance.Init();
     dishwasherInstance.Init();
+    laundryWasherModeInstance.Init();
 
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 

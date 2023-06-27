@@ -39,11 +39,10 @@ const uint8_t ModeNormal = 0;
 const uint8_t ModeHeavy = 1;
 const uint8_t ModeLight = 2;
 
-/// This is an application level delegate to handle RvcRun commands according to the specific business logic.
+/// This is an application level delegate to handle DishwasherMode commands according to the specific business logic.
 class DishwasherModeInstance : public ModeBase::Instance
 {
 private:
-    // Dishwasher Mode Select
     ModeTagStructType modeTagsNormal[1] = { { .value = static_cast<uint16_t>(Clusters::DishwasherMode::ModeTag::kNormal) } };
     ModeTagStructType modeTagsHeavy[2] = {{ .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kMax) },
                                                              { .value = static_cast<uint16_t>(Clusters::DishwasherMode::ModeTag::kHeavy) }};
