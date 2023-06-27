@@ -222,10 +222,10 @@ template("chip_data_model") {
         ]
       } else if (cluster == "mode-base-server") {
         sources += [
-          "${_app_root}/clusters/mode-base-server/mode-base-server.h",
-          "${_app_root}/clusters/mode-base-server/mode-base-server.cpp",
-          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.h",
           "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-cluster-objects.h",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.cpp",
+          "${_app_root}/clusters/mode-base-server/mode-base-server.h",
         ]
       } else if (cluster == "application-launcher-server") {
         sources += [
