@@ -52,7 +52,7 @@ struct DelegatesEnquiryTable
  * Enquriy Table of Operational State Delegate
  * Note: User Define
  */
-static OperationalStateDelegate opStateDelegate(1, Clusters::OperationalState::Id,
+static OperationalStateDelegate opStateDelegate(Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id,
                                                 GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
                                                 GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)));
 
@@ -62,7 +62,7 @@ static OperationalStateDelegate opStateDelegate(1, Clusters::OperationalState::I
  */
 constexpr DelegatesEnquiryTable kDelegatesEnquiryTable[] = {
     // EndpointId, ClusterId, Delegate
-    { 1, Clusters::OperationalState::Id, &opStateDelegate },
+    { Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id, &opStateDelegate },
 };
 
 /**
@@ -96,6 +96,6 @@ Delegate * GetOperationalStateDelegate(EndpointId endpointId, ClusterId clusterI
 void MatterOperationalStatePluginServerInitCallback()
 {
     using namespace chip::app;
-    static Clusters::OperationalState::OperationalStateServer operationalstateServer(0x01, Clusters::OperationalState::Id);
+    static Clusters::OperationalState::OperationalStateServer operationalstateServer(Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id);
     operationalstateServer.Init();
 }

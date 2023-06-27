@@ -68,7 +68,7 @@ GenericOperationalPhase opPhaseList[] = {
  */
 constexpr EnquiryTable<GenericOperationalPhase> kPhaseListEnquiryTable[] = {
     // EndpointId, ClusterId, Array of phaseList, ArraySize of phaseList
-    { 1, Clusters::OperationalState::Id, opPhaseList, ArraySize(opPhaseList) },
+    { Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id, opPhaseList, ArraySize(opPhaseList) },
 };
 
 /**
@@ -88,7 +88,7 @@ GenericOperationalState opStateList[] = {
  */
 constexpr EnquiryTable<GenericOperationalState> kOpStateListEnquiryTable[] = {
     // EndpointId, ClusterId, Array of Operational State List, ArraySize of Operational State List
-    { 1, Clusters::OperationalState::Id, opStateList, ArraySize(opStateList) },
+    { Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id, opStateList, ArraySize(opStateList) },
 };
 
 /**
@@ -201,7 +201,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
 void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
     /*
-    * A example state to present a device that is unable to honour the Pause command
+    * An example state to present a device that is unable to honour the Pause command
     */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
@@ -217,7 +217,7 @@ void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError 
 void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
     /*
-    * A example state to present a device that is unable to honour the Resume command
+    * An example state to present a device that is unable to honour the Resume command
     */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
@@ -233,7 +233,7 @@ void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError
 void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
     /*
-    * A example state to present a device that is unable to honour the Start command
+    * An example state to present a device that is unable to honour the Start command
     */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
@@ -249,7 +249,7 @@ void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError 
 void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
     /*
-    * A example state to present a device that is unable to honour the Stop command
+    * An example state to present a device that is unable to honour the Stop command
     */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
