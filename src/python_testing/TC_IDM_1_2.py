@@ -64,15 +64,16 @@ class TC_IDM_1_2(MatterBaseTest):
         self.print_step(0, "Commissioning - already done")
         wildcard_descriptor = await self.default_controller.ReadAttribute(self.dut_node_id, [(Clusters.Descriptor)])
         endpoints = list(wildcard_descriptor.keys())
+        endpoints.sort()
 
         self.print_step(1, "Send Invoke to unsupported endpoint")
-        # First non-existant endpoint is where the index and and endpoint number don't match
-        non_existant_endpoint = next(i for i, e in enumerate(endpoints + [None]) if i != e)
+        # First non-existent endpoint is where the index and and endpoint number don't match
+        non_existent_endpoint = next(i for i, e in enumerate(endpoints + [None]) if i != e)
         # General Commissioning cluster should be supported on all DUTs, so it will recognize this cluster and
-        # command, but it is sent on an unsupported enpoint
+        # command, but it is sent on an unsupported endpoint
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=1)
         try:
-            await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=non_existant_endpoint, payload=cmd)
+            await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=non_existent_endpoint, payload=cmd)
             asserts.fail("Unexpected success return from sending command to unsupported endpoint")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.UnsupportedEndpoint, "Unexpected error returned from unsupported endpoint")
@@ -182,21 +183,22 @@ class TC_IDM_1_2(MatterBaseTest):
         # The only way to have no accessing fabric is to have a PASE session and no added NOC
         # KeySetRead - fabric scoped command, should not be accessible over PASE
         # To get a PASE session, we need an open commissioning window
-        pin, _ = self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=7777, option=1)
-        print(f'commissioning window opened pin = {pin}')
+        discriminator = self.matter_test_config.discriminators[0] + 1
+
+        params = self.default_controller.OpenCommissioningWindow(
+            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
 
         # TH2 = new controller that's not connected over CASE
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
+        new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
         TH2 = new_fabric_admin.NewController(nodeId=112233)
 
         devices = TH2.DiscoverCommissionableNodes(
-            filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=7777, stopOnFirst=True)
+            filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=discriminator, stopOnFirst=True)
         for a in devices[0].addresses:
             try:
-                print(f'establishing pase session to {a}')
-                TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=pin, nodeid=self.dut_node_id+1)
+                TH2.EstablishPASESessionIP(ipaddr=a, setupPinCode=params.setupPinCode, nodeid=self.dut_node_id+1)
+                return
                 break
             except ChipStackError:
                 continue
