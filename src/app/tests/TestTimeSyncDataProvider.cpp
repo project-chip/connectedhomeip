@@ -115,9 +115,9 @@ void TestTimeZoneStoreLoad(nlTestSuite * inSuite, void * inContext)
         }
         return tzS;
     };
-    char tzShort[]       = "LA";
-    char tzLong[]        = "MunichOnTheLongRiverOfIsarInNiceSummerWeatherWithAugustinerBeer";
-    char tzBerlin[]      = "Berlin";
+    char tzShort[]                             = "LA";
+    char tzLong[]                              = "MunichOnTheLongRiverOfIsarInNiceSummerWeatherWithAugustinerBeer";
+    char tzBerlin[]                            = "Berlin";
     TimeSyncDataProvider::TimeZoneStore tzS[3] = { makeTimeZone(1, 1, tzShort, sizeof(tzShort)),
                                                    makeTimeZone(2, 2, tzLong, sizeof(tzLong)),
                                                    makeTimeZone(3, 3, tzBerlin, sizeof(tzBerlin)) };
