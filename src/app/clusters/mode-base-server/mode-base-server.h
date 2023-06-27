@@ -36,6 +36,8 @@ namespace ModeBase {
 class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
+    // This map holds pointers to all initialised ModeBase instances. It provides a way to access all ModeBase clusters.
+    static std::map<uint32_t, Instance*> ModeBaseAliasesInstanceMap;
 
     /**
      * This is a helper function to build a mode option structure. It takes the label/name of the mode,
@@ -51,10 +53,6 @@ public:
         option.modeTags     = modeTags;
         return option;
     }
-
-    // This map holds pointers to all initialised ModeBase instances. It provides a way to access all ModeBase clusters.
-    // todo make this private and add accessor functions that returns a const version of the map.
-    static std::map<uint32_t, Instance*> ModeBaseAliasesInstanceMap;
 
     CHIP_ERROR Init();
 
@@ -72,9 +70,9 @@ public:
     void UpdateCurrentMode(uint8_t aNewMode);
 
     // Attribute getters
-    DataModel::Nullable<uint8_t> GetStartUpMode();
-    DataModel::Nullable<uint8_t> GetOnMode();
-    uint8_t GetCurrentMode();
+    DataModel::Nullable<uint8_t> GetStartUpMode() const;
+    DataModel::Nullable<uint8_t> GetOnMode() const;
+    uint8_t GetCurrentMode() const;
     EndpointId GetEndpointId() const {return mEndpointId;}
 
     /**
@@ -105,7 +103,11 @@ private:
      * @return true if the clusterId of this instance is a valid ModeBase cluster.
      */
     bool isAliasCluster() const;
-    void HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
+
+    /**
+     * Internal change-to-mode command handler function.
+     */
+    void handleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
 
 public:
     /**
@@ -113,6 +115,7 @@ public:
      * called by the interaction model at the appropriate times.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId The ID of the ModeBase aliased cluster to be instantiated.
+     * @param aFeature The bitmask value that identifies which features are supported by this instance.
      */
     Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
@@ -131,7 +134,7 @@ public:
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
-    // The following functions should be implemented by the SDK user to implement the business logic of their application.
+    // The following functions should be overridden by the SDK user to implement the business logic of their application.
 
     /**
      * This init function will be called during the ModeBase server initialization after the Instance information has been
@@ -179,7 +182,7 @@ public:
     /**
      * When a ChangeToMode command is received, if the NewMode value is a supported made, this function is called to 1) decide if
      * we should go ahead with transitioning to this mode and 2) formulate the ChangeToModeResponse that will be sent back to the
-     * client. If this function returns a response.status of ChangeToModeResponseStatus success, the change request is accepted
+     * client. If this function returns a response.status of StatusCode::kSuccess, the change request is accepted
      * and the CurrentMode is set to the NewMode. Else, the CurrentMode is left untouched. The response is sent as a
      * ChangeToModeResponse command.
      *
@@ -193,7 +196,7 @@ public:
 
 };
 
-} // namespace ModeSelect
+} // namespace ModeBase
 } // namespace Clusters
 } // namespace app
 } // namespace chip

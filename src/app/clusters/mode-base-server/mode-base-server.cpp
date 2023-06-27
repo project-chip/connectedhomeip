@@ -36,12 +36,12 @@ namespace app {
 namespace Clusters {
 namespace ModeBase {
 
+std::map<uint32_t, Instance*> Instance::ModeBaseAliasesInstanceMap;
+
 bool Instance::HasFeature(Feature feature) const
 {
    return (mFeature & to_underlying(feature)) != 0;
 }
-
-std::map<uint32_t, Instance*> Instance::ModeBaseAliasesInstanceMap;
 
 bool Instance::isAliasCluster() const
 {
@@ -177,7 +177,7 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
    }
 }
 
-void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
+void Instance::handleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
 {
    uint8_t newMode = commandData.newMode;
 
@@ -196,7 +196,7 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
    if (response.status == static_cast<uint8_t>(StatusCode::kSuccess))
    {
        UpdateCurrentMode(newMode);
-       ChipLogProgress(Zcl, "ModeBase: HandleChangeToMode changed to mode %u", newMode);
+       ChipLogProgress(Zcl, "ModeBase: handleChangeToMode changed to mode %u", newMode);
    }
 
    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -212,7 +212,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
        HandleCommand<Commands::ChangeToMode::DecodableType>(
            handlerContext,
-           [this](HandlerContext & ctx, const auto & commandData) { HandleChangeToMode(ctx, commandData); });
+           [this](HandlerContext & ctx, const auto & commandData) { handleChangeToMode(ctx, commandData); });
    }
 }
 
@@ -367,18 +367,17 @@ void Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
    }
 }
 
-// todo ensure that these functions return copies
-DataModel::Nullable<uint8_t> Instance::GetStartUpMode()
+DataModel::Nullable<uint8_t> Instance::GetStartUpMode() const
 {
         return mStartUpMode;
 }
 
-DataModel::Nullable<uint8_t> Instance::GetOnMode()
+DataModel::Nullable<uint8_t> Instance::GetOnMode() const
 {
         return mOnMode;
 }
 
-uint8_t Instance::GetCurrentMode()
+uint8_t Instance::GetCurrentMode() const
 {
    return mCurrentMode;
 }

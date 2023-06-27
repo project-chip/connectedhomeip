@@ -33,6 +33,9 @@
 #include <app/clusters/level-control/level-control.h>
 #endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
+#include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/mode-base-server/mode-base-cluster-objects.h>
+
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -234,6 +237,26 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
             }
         }
 #endif
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+        // If OnMode is not a null value, then change the current mode to it.
+        for (const auto& element : ModeBase::Instance::ModeBaseAliasesInstanceMap)
+        {
+            auto modeBaseAlias = element.second;
+            if (modeBaseAlias->GetEndpointId() == endpoint)
+            {
+                if (modeBaseAlias->HasFeature(ModeBase::Feature::kOnOff))
+                {
+                    ModeBase::Instance * modeBaseInstance = element.second;
+                    ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance->GetOnMode();
+                    if (!onMode.IsNull())
+                    {
+                        ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
+                        modeBaseInstance->UpdateCurrentMode(onMode.Value());
+                    }
+                }
+            }
+        }
+#endif
     }
     else // Set Off
     {
@@ -317,6 +340,26 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             {
                 ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
                 status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
+            }
+        }
+#endif
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+        // If OnMode is not a null value, then change the current mode to it.
+        for (const auto& element : ModeBase::Instance::ModeBaseAliasesInstanceMap)
+        {
+            auto modeBaseAlias = element.second;
+            if (modeBaseAlias->GetEndpointId() == endpoint)
+            {
+                if (modeBaseAlias->HasFeature(ModeBase::Feature::kOnOff))
+                {
+                    ModeBase::Instance * modeBaseInstance = element.second;
+                    ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance->GetOnMode();
+                    if (!onMode.IsNull())
+                    {
+                        ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
+                        modeBaseInstance->UpdateCurrentMode(onMode.Value());
+                    }
+                }
             }
         }
 #endif
