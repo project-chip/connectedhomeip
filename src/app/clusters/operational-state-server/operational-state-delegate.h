@@ -204,27 +204,16 @@ struct GenericOperationCompletion : public app::Clusters::OperationalState::Even
 {
     GenericOperationCompletion(uint8_t aCompletionErrorCode)
     {
-
-        app::DataModel::Nullable<uint32_t> __totalOperationalTime;
-        app::DataModel::Nullable<uint32_t> __pausedTime;
-
         completionErrorCode = aCompletionErrorCode;
-
-        __totalOperationalTime.SetNull();
-        totalOperationalTime.SetValue(__totalOperationalTime);
-
-        __pausedTime.SetNull();
-        pausedTime.SetValue(__pausedTime);
+        totalOperationalTime.SetValue(app::DataModel::Nullable<uint32_t>());
+        pausedTime.SetValue(app::DataModel::Nullable<uint32_t>());
     }
 
     GenericOperationCompletion(uint8_t aCompletionErrorCode, uint32_t aTotalOperationalTime)
     {
-        app::DataModel::Nullable<uint32_t> __pausedTime;
-
         completionErrorCode = aCompletionErrorCode;
         totalOperationalTime.SetValue(app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
-        __pausedTime.SetNull();
-        pausedTime.SetValue(__pausedTime);
+        pausedTime.SetValue(app::DataModel::Nullable<uint32_t>());
     }
 
     GenericOperationCompletion(uint8_t aCompletionErrorCode, uint32_t aTotalOperationalTime, uint32_t aPausedTime)
