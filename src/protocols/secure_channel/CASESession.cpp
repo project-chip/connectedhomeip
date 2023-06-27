@@ -171,6 +171,9 @@ public:
     // No scheduling, no outstanding work, no shared lifetime management.
     CHIP_ERROR DoWork()
     {
+        // Ensure that this function is being called from main Matter thread
+        assertChipStackLockedByCurrentThread();
+
         VerifyOrReturnError(mSession && mWorkCallback && mAfterWorkCallback, CHIP_ERROR_INCORRECT_STATE);
         auto * helper   = this;
         bool cancel     = false;
@@ -204,24 +207,20 @@ public:
     bool IsCancelled() const { return mSession.load() == nullptr; }
 
     // This API returns true when background thread fails to schedule the AfterWorkCallback
-    bool SchedulingAfterWorkCallbackFailed() { return mScheduleAfterWorkFailed.load(); }
+    bool UnableToScheduleAfterWorkCallback() { return mScheduleAfterWorkFailed.load(); }
 
-    // This API runs the AfterWorkCallback. This is supposed to be called from foreground thread
-    // and only call if SchedulingAfterWorkCallbackFailed() returns false.
-    CHIP_ERROR RunAfterWorkCallback()
+    // Do after work immediately.
+    // No scheduling, no outstanding work, no shared lifetime management.
+    CHIP_ERROR DoAfterWork()
     {
         // Ensure that this function is being called from main Matter thread
         assertChipStackLockedByCurrentThread();
 
-        // This API is supposed to be called only if scheduling after work callback is failed
-        // If we are are being called, assert
-        VerifyOrDie(SchedulingAfterWorkCallbackFailed());
+        VerifyOrReturnError(mSession && mAfterWorkCallback, CHIP_ERROR_INCORRECT_STATE);
 
-        if (auto * session = mSession.load())
-        {
-            return (session->*(mAfterWorkCallback))(mData, mStatus);
-        }
-        return CHIP_ERROR_NOT_FOUND;
+        auto * helper   = this;
+        helper->mStatus = (helper->mSession->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
+        return helper->mStatus;
     }
 
 private:
@@ -2209,24 +2208,33 @@ System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableM
         kExpectedHighProcessingTime;
 }
 
-bool CASESession::IsSendSigma3PermanentlyBlockedOnBackgroundWork()
+bool CASESession::InvokeBackgroundWorkWatchdog()
 {
-    return mSendSigma3Helper->SchedulingAfterWorkCallbackFailed();
-}
+    bool status = false;
 
-bool CASESession::IsHandleSigma3PermanentlyBlockedOnBackgroundWork()
-{
-    return mHandleSigma3Helper->SchedulingAfterWorkCallbackFailed();
-}
+    if (mSendSigma3Helper && mSendSigma3Helper->UnableToScheduleAfterWorkCallback())
+    {
+        ChipLogError(SecureChannel, "SendSigma3Helper was unable to schedule the AfterWorkCallback");
+        if (mSendSigma3Helper->DoAfterWork() != CHIP_NO_ERROR)
+        {
+            SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
+            mState = State::kInitialized;
+        }
+        status = true;
+    }
 
-CHIP_ERROR CASESession::UnblockSendSigma3FromForegroundWork()
-{
-    return mSendSigma3Helper->RunAfterWorkCallback();
-}
+    if (mHandleSigma3Helper && mHandleSigma3Helper->UnableToScheduleAfterWorkCallback())
+    {
+        ChipLogError(SecureChannel, "HandleSigma3Helper was unable to schedule the AfterWorkCallback");
+        if (mHandleSigma3Helper->DoAfterWork() != CHIP_NO_ERROR)
+        {
+            SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
+            mState = State::kInitialized;
+        }
+        status = true;
+    }
 
-CHIP_ERROR CASESession::UnblockHandleSigma3FromForegroundWork()
-{
-    return mHandleSigma3Helper->RunAfterWorkCallback();
+    return status;
 }
 
 } // namespace chip

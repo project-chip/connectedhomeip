@@ -89,9 +89,6 @@ private:
     //
     Optional<SessionHandle> mPinnedSecureSession;
 
-    // Track if we are in the middle of secure session handshake
-    bool mDoingCASEHandshake = false;
-
     CASESession mPairingSession;
     SessionManager * mSessionManager = nullptr;
 

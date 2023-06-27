@@ -191,21 +191,6 @@ public:
      **/
     void Clear();
 
-    // These APIs returns true if background thread fails to schedule the after work callback
-    // Then someone can run the after work callback in foreground thread
-    bool IsSendSigma3PermanentlyBlockedOnBackgroundWork();
-    bool IsHandleSigma3PermanentlyBlockedOnBackgroundWork();
-
-    // If work helper fails to schedule the after work callback then call these function to run the
-    // after work callback from foreground thread.
-    // Please make sure the check if the work is really blocked on background thread
-    // NOTE: These APIs will assert if not called from main matter thread and work is not blocked
-    //       in background thread.
-    CHIP_ERROR UnblockSendSigma3FromForegroundWork();
-    CHIP_ERROR UnblockHandleSigma3FromForegroundWork();
-
-private:
-    friend class TestCASESession;
     enum class State : uint8_t
     {
         kInitialized         = 0,
@@ -219,6 +204,15 @@ private:
         kSendSigma3Pending   = 8,
         kHandleSigma3Pending = 9,
     };
+
+    State GetState() { return mState; }
+
+    // Check if any of the work helper is unable to schedule the after work callback
+    // If they are stuck run the after work callback from the foreground thread.
+    bool InvokeBackgroundWorkWatchdog();
+
+private:
+    friend class TestCASESession;
 
     /*
      * Initialize the object given a reference to the SessionManager, certificate validity policy and a delegate which will be

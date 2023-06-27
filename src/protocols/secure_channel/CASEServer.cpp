@@ -73,15 +73,14 @@ CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloa
 CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && payload)
 {
-    if (mDoingCASEHandshake)
+    if (GetSession().GetState() != CASESession::State::kInitialized)
     {
-        if (GetSession().IsHandleSigma3PermanentlyBlockedOnBackgroundWork())
+        // We are in the middle of CASE handshake
+
+        // Check if we are stuck on background thread, if yes, unblock it, and continue
+        if (GetSession().InvokeBackgroundWorkWatchdog() == false)
         {
-            ChipLogError(Inet, "CASE session helper failed to schedule HandleSigma3c, executing HandleSigma3c");
-            GetSession().UnblockHandleSigma3FromForegroundWork();
-        }
-        else
-        {
+            // TODO: Send Busy response, #27473
             ChipLogError(Inet, "CASE session is in establishing state, returning without responding");
             return CHIP_NO_ERROR;
         }
@@ -98,13 +97,8 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     CHIP_ERROR err = InitCASEHandshake(ec);
     SuccessOrExit(err);
 
-    mDoingCASEHandshake = true;
-
     // TODO - Enable multiple concurrent CASE session establishment
     // https://github.com/project-chip/connectedhomeip/issues/8342
-
-    // Earlier we used to unregister the unsolicit message handler for Sigma1 messages.
-    // Now, we keep it registered and perform the appropriate action in above block
 
     err = GetSession().OnMessageReceived(ec, payloadHeader, std::move(payload));
     SuccessOrExit(err);
@@ -117,8 +111,6 @@ exit:
 
 void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyEstablishedPeer)
 {
-    mDoingCASEHandshake = false;
-
     // Let's re-register for CASE Sigma1 message, so that the next CASE session setup request can be processed.
     // https://github.com/project-chip/connectedhomeip/issues/8342
     ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
