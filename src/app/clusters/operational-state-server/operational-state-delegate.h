@@ -149,7 +149,7 @@ private:
 };
 
 /**
- * A class presents the phase of operational state cluster
+ * A class which represents the operational phase of an Operational State cluster derivation instance.
  */
 struct GenericOperationalPhase
 {
@@ -169,6 +169,9 @@ struct GenericOperationalPhase
         return *this;
     }
 
+    bool isNullable() const { return mPhaseName.IsNull(); }
+    app::DataModel::Nullable<CharSpan> mPhaseName;
+private:
     void Set(app::DataModel::Nullable<CharSpan> name)
     {
         if (name.IsNull())
@@ -190,19 +193,8 @@ struct GenericOperationalPhase
             }
         }
     }
-    bool isNullable() const { return mPhaseName.IsNull(); }
-//private:
-    char mPhaseNameBuffer[kOperationalPhaseNameMaxSize];
-    app::DataModel::Nullable<CharSpan> mPhaseName;
-};
 
-/**
- * A class hold the phase list of operational state cluster
- */
-struct GenericOperationalPhaseList : public GenericOperationalPhase
-{
-    GenericOperationalPhaseList(app::DataModel::Nullable<CharSpan> name) : GenericOperationalPhase(name) {}
-    GenericOperationalPhaseList * next = nullptr;
+    char mPhaseNameBuffer[kOperationalPhaseNameMaxSize];
 };
 
 /**
@@ -266,18 +258,13 @@ public:
     virtual CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) = 0;
 
     /**
-     * Get operational phase list.
-     * @param operationalPhaseList The pointer to operational phase list.
-     * After a successful return the caller is responsible for calling ReleaseOperationalPhaseList on the outparam.
+     * Get the list of supported operational phase.
+     * Fills in the provided GenericOperationalPhase with the state at index `index` if there is one,
+     * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
+     * @param index The state of index starts at 0.
+     * @param operationalPhase  The GenericOperationalPhase is filled.
      */
-    virtual CHIP_ERROR GetOperationalPhaseList(GenericOperationalPhaseList ** operationalPhaseList, size_t & size) = 0;
-
-    /**
-     * Release operational phase list
-     * @param operationalStateList The pointer for which to clear the GenericOperationalPhaseList.
-     * @return void
-     */
-    virtual void ReleaseOperationalPhaseList(GenericOperationalPhaseList * operationalPhaseList) = 0;
+    virtual CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) = 0;
 
     /**
      * Get operational error.

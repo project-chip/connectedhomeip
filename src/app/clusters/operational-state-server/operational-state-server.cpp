@@ -250,16 +250,16 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         else
         {
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                    while(delegate->GetOperationalStateAtIndex(index, opState) != CHIP_ERROR_NOT_FOUND)
+                while(delegate->GetOperationalStateAtIndex(index, opState) != CHIP_ERROR_NOT_FOUND)
+                {
+                    err = encoder.Encode(opState);
+                    if (err != CHIP_NO_ERROR)
                     {
-                        err = encoder.Encode(opState);
-                        if (err != CHIP_NO_ERROR)
-                        {
-                            return err;
-                        }
-                        index++;
+                        return err;
                     }
-                    return CHIP_NO_ERROR;
+                    index++;
+                }
+                return CHIP_NO_ERROR;
             });
         }
     }
@@ -286,37 +286,29 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
     case OperationalState::Attributes::PhaseList::Id: {
         Delegate * delegate                     = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-        GenericOperationalPhaseList * phaseList = nullptr;
-        size_t size                             = 0;
+
+        GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
+        size_t index = 0;
+
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        err = delegate->GetOperationalPhaseList(&phaseList, size);
-        if (err != CHIP_NO_ERROR)
+        err = delegate->GetOperationalPhaseAtIndex(index, phase);
+        if (err == CHIP_ERROR_NOT_FOUND || phase.isNullable())
         {
             err = aEncoder.EncodeNull();
-        }
-        else if (phaseList->isNullable())
-        {
-            err = aEncoder.EncodeNull();
-            delegate->ReleaseOperationalPhaseList(phaseList);
-            phaseList = nullptr;
         }
         else
         {
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                for (GenericOperationalPhaseList * pHead = phaseList; pHead != nullptr; pHead = pHead->next)
+                while(delegate->GetOperationalPhaseAtIndex(index, phase) != CHIP_ERROR_NOT_FOUND)
                 {
-                    err = encoder.Encode(pHead->mPhaseName);
+                    err = encoder.Encode(phase.mPhaseName);
                     if (err != CHIP_NO_ERROR)
                     {
-                        delegate->ReleaseOperationalPhaseList(phaseList);
-                        phaseList = nullptr;
                         return err;
                     }
+                    index++;
                 }
-                delegate->ReleaseOperationalPhaseList(phaseList);
-                phaseList = nullptr;
                 return CHIP_NO_ERROR;
             });
         }
@@ -325,28 +317,18 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
     case OperationalState::Attributes::CurrentPhase::Id: {
         DataModel::Nullable<uint8_t> currentPhase;
-        GenericOperationalPhaseList * phaseList = nullptr;
-        size_t size                             = 0;
-
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
+        size_t index = 0;
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        err = delegate->GetOperationalPhaseList(&phaseList, size);
-        if (err != CHIP_NO_ERROR)
+        err = delegate->GetOperationalPhaseAtIndex(index, phase);
+        if (err == CHIP_ERROR_NOT_FOUND || phase.isNullable())
         {
             err = aEncoder.EncodeNull();
-        }
-        else if (phaseList->isNullable())
-        {
-            err = aEncoder.EncodeNull();
-            delegate->ReleaseOperationalPhaseList(phaseList);
-            phaseList = nullptr;
         }
         else
         {
-            delegate->ReleaseOperationalPhaseList(phaseList);
-            phaseList = nullptr;
             CurrentPhase::Get(mEndpointId, currentPhase);
             err = aEncoder.Encode(currentPhase);
         }

@@ -56,18 +56,13 @@ public:
     CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
 
     /**
-     * Get operational phase list.
-     * @param operationalPhaseList The pointer to operational phase list.
-     * After a successful return the caller is responsible for calling ReleaseOperationalPhaseList on the outparam.
+     * Get the list of supported operational phase.
+     * Fills in the provided GenericOperationalPhase with the state at index `index` if there is one,
+     * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
+     * @param index The state of index starts at 0.
+     * @param operationalPhase  The GenericOperationalPhase is filled.
      */
-    CHIP_ERROR GetOperationalPhaseList(GenericOperationalPhaseList ** operationalPhaseList, size_t & size) override;
-
-    /**
-     * Release operational phase list
-     * @param operationalStateList The pointer for which to clear the GenericOperationalPhaseList.
-     * @return void
-     */
-    void ReleaseOperationalPhaseList(GenericOperationalPhaseList * operationalStateList) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) override;
 
     /**
      * Get operational error.

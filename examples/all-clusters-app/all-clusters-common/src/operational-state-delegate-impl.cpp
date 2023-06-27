@@ -66,9 +66,9 @@ GenericOperationalPhase opPhaseList[] = {
     /**
      * Phase List isn't null
      */
-    // GenericOperationalPhase(kWasherPreSoak, strlen(kWasherPreSoak)),
-    // GenericOperationalPhase(kWasherRinse, strlen(kWasherRinse)),
-    // GenericOperationalPhase(kWasherSpin, strlen(kWasherSpin)),
+    //GenericOperationalPhase(DataModel::Nullable<CharSpan>(CharSpan::fromCharString(kWasherPreSoak))),
+    //GenericOperationalPhase(DataModel::Nullable<CharSpan>(CharSpan::fromCharString(kWasherRinse))),
+    //GenericOperationalPhase(DataModel::Nullable<CharSpan>(CharSpan::fromCharString(kWasherSpin))),
 };
 
 /**
@@ -168,7 +168,6 @@ const GenericOperationalError OperationalStateDelegate::GetOperationalError() co
 CHIP_ERROR OperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
     size_t opStateListNumOfItems       = 0;
-
     const GenericOperationalState * src = getGenericOperationalStateTable(mEndpointId, mClusterId, opStateListNumOfItems);
     if (!src || !opStateListNumOfItems)
     {
@@ -187,19 +186,9 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalStateAtIndex(size_t index, Ge
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseList(GenericOperationalPhaseList ** operationalPhaseList, size_t & size)
+CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase)
 {
-    CHIP_ERROR err                     = CHIP_ERROR_NO_MEMORY;
-    size                               = 0;
-    size_t i                           = 0;
     size_t phaseListNumOfItems         = 0;
-    GenericOperationalPhaseList * head = nullptr;
-
-    if (!operationalPhaseList)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
     const GenericOperationalPhase * src = getGenericPhaseListTable(mEndpointId, mClusterId, phaseListNumOfItems);
     if (!src || !phaseListNumOfItems)
     {
@@ -207,46 +196,15 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseList(GenericOperationalP
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    for (i = 0; i < phaseListNumOfItems; i++)
+    if (index > phaseListNumOfItems - 1)
     {
-        GenericOperationalPhaseList * des = Platform::New<GenericOperationalPhaseList>(src->mPhaseName);
-        if (des == nullptr)
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-            ExitNow();
-        }
-
-        if (head == nullptr)
-        {
-            head = des;
-        }
-        else
-        {
-            GenericOperationalPhaseList * pList = head;
-            while (pList->next != nullptr)
-            {
-                pList = pList->next;
-            }
-            pList->next = des;
-        }
-        src++;
+        return CHIP_ERROR_NOT_FOUND;
     }
-    size                  = i;
-    *operationalPhaseList = head;
+    else
+    {
+        operationalPhase = src[index];
+    }
     return CHIP_NO_ERROR;
-exit:
-    ReleaseOperationalPhaseList(head);
-    return err;
-}
-
-void OperationalStateDelegate::ReleaseOperationalPhaseList(GenericOperationalPhaseList * operationalPhaseList)
-{
-    while (operationalPhaseList)
-    {
-        GenericOperationalPhaseList * del = operationalPhaseList;
-        operationalPhaseList              = operationalPhaseList->next;
-        Platform::Delete(del);
-    }
 }
 
 GenericOperationalError & OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
