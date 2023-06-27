@@ -2208,7 +2208,7 @@ System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableM
 
 bool CASESession::InvokeBackgroundWorkWatchdog()
 {
-    bool wasBlocked = false;
+    bool watchdogFired = false;
 
     if (mSendSigma3Helper && mSendSigma3Helper->UnableToScheduleAfterWorkCallback())
     {
