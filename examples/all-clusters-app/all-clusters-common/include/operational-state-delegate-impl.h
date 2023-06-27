@@ -89,30 +89,26 @@ public:
     /**
      * Handle Command Callback in application: Pause
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    GenericOperationalError & HandlePauseStateCallback(GenericOperationalError & err) override;
+    void HandlePauseStateCallback(GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Resume
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    GenericOperationalError & HandleResumeStateCallback(GenericOperationalError & err) override;
+    void HandleResumeStateCallback(GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Start
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    GenericOperationalError & HandleStartStateCallback(GenericOperationalError & err) override;
+    void HandleStartStateCallback(GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Stop
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    GenericOperationalError & HandleStopStateCallback(GenericOperationalError & err) override;
+    void HandleStopStateCallback(GenericOperationalError & err) override;
 
     /**
      * Send OperationalError Event

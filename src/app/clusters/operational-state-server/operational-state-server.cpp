@@ -119,7 +119,8 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     }
     else
     {
-        response.commandResponseState = delegate->HandlePauseStateCallback(err);
+        delegate->HandlePauseStateCallback(err);
+        response.commandResponseState = err;
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -149,7 +150,8 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     }
     else
     {
-        response.commandResponseState = delegate->HandleResumeStateCallback(err);
+        delegate->HandleResumeStateCallback(err);
+        response.commandResponseState = err;
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -173,7 +175,8 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
     }
     else
     {
-        response.commandResponseState = delegate->HandleStartStateCallback(err);
+        delegate->HandleStartStateCallback(err);
+        response.commandResponseState = err;
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -197,7 +200,8 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
     }
     else
     {
-        response.commandResponseState = delegate->HandleStopStateCallback(err);
+        delegate->HandleStopStateCallback(err);
+        response.commandResponseState = err;
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);

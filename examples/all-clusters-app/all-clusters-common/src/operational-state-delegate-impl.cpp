@@ -207,7 +207,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
     return CHIP_NO_ERROR;
 }
 
-GenericOperationalError & OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
+void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
@@ -218,10 +218,9 @@ GenericOperationalError & OperationalStateDelegate::HandlePauseStateCallback(Gen
         mOperationalState.Set(to_underlying(OperationalStateEnum::kPaused));
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
-    return err;
 }
 
-GenericOperationalError & OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
+void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
@@ -232,10 +231,9 @@ GenericOperationalError & OperationalStateDelegate::HandleResumeStateCallback(Ge
         mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
-    return err;
 }
 
-GenericOperationalError & OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
+void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
@@ -246,10 +244,9 @@ GenericOperationalError & OperationalStateDelegate::HandleStartStateCallback(Gen
         mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
-    return err;
 }
 
-GenericOperationalError & OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
+void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
@@ -260,7 +257,6 @@ GenericOperationalError & OperationalStateDelegate::HandleStopStateCallback(Gene
         mOperationalState.Set(to_underlying(OperationalStateEnum::kStopped));
         err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
-    return err;
 }
 
 bool OperationalStateDelegate::sendOperationalErrorEvent(const GenericOperationalError & err)

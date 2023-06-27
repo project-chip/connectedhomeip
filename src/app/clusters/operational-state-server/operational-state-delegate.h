@@ -291,30 +291,26 @@ public:
     /**
      * Handle Command Callback in application: Pause
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    virtual GenericOperationalError & HandlePauseStateCallback(GenericOperationalError & err) = 0;
+    virtual void HandlePauseStateCallback(GenericOperationalError & err) = 0;
 
     /**
      * Handle Command Callback in application: Resume
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    virtual GenericOperationalError & HandleResumeStateCallback(GenericOperationalError & err) = 0;
+    virtual void HandleResumeStateCallback(GenericOperationalError & err) = 0;
 
     /**
      * Handle Command Callback in application: Start
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    virtual GenericOperationalError & HandleStartStateCallback(GenericOperationalError & err) = 0;
+    virtual void HandleStartStateCallback(GenericOperationalError & err) = 0;
 
     /**
      * Handle Command Callback in application: Stop
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    virtual GenericOperationalError & HandleStopStateCallback(GenericOperationalError & err) = 0;
+    virtual void HandleStopStateCallback(GenericOperationalError & err) = 0;
 
     /**
      * Send OperationalError Event
