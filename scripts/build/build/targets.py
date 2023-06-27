@@ -349,6 +349,7 @@ def BuildMbedTarget():
         TargetPart('all-clusters', app=MbedApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=MbedApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('pigweed', app=MbedApp.PIGWEED),
+        TargetPart('ota-requestor', app=MbedApp.OTA_REQUESTOR),
         TargetPart('shell', app=MbedApp.SHELL),
     ])
 

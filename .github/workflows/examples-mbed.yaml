@@ -26,15 +26,15 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     mbedos:
         name: Mbed OS examples building
 
         env:
-            BUILD_TYPE: mbedos
+            PLATFORM_NAME: mbed
             APP_PROFILE: release
-            APP_TARGET: CY8CPROTO_062_4343W
+            APP_TARGET: cy8cproto_062_4343w
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -52,16 +52,6 @@ jobs:
               with:
                 platform: mbed
 
-            - name: Detect changed paths
-              uses: dorny/paths-filter@v2
-              id: changed_paths
-              with:
-                  filters: |
-                      mbed:
-                        - '**/mbed/**'
-                      pigweedapp:
-                        - 'examples/pigweed-app/mbed/**'
-
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
@@ -70,70 +60,98 @@ jobs:
 
             - name: Build lock-app example
               run: |
-                  scripts/examples/mbed_example.sh -a=lock-app -b=$APP_TARGET -p=$APP_PROFILE
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target $PLATFORM_NAME-$APP_TARGET-lock-$APP_PROFILE \
+                      build \
+                    "
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    mbed $APP_TARGET+$APP_PROFILE lock-app \
-                    examples/lock-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-lock-app-example.elf \
+                    $PLATFORM_NAME $APP_TARGET lock-app-$APP_PROFILE \
+                    out/$PLATFORM_NAME-$APP_TARGET-lock-$APP_PROFILE/chip-mbed-lock-app-example.elf \
                     /tmp/bloat_reports/
                   rm -rf ./out
 
             - name: Build lighting-app example
-              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
+              if: github.event_name == 'push'
               run: |
-                  scripts/examples/mbed_example.sh -a=lighting-app -b=$APP_TARGET -p=$APP_PROFILE
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target $PLATFORM_NAME-$APP_TARGET-light-$APP_PROFILE \
+                      build \
+                    "
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    mbed $APP_TARGET+$APP_PROFILE lighting-app \
-                    examples/lighting-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-lighting-app-example.elf \
+                    $PLATFORM_NAME $APP_TARGET lighting-app-$APP_PROFILE \
+                    out/$PLATFORM_NAME-$APP_TARGET-light-$APP_PROFILE/chip-mbed-lighting-app-example.elf \
                     /tmp/bloat_reports/
                   rm -rf ./out
 
             - name: Build pigweed-app example
-              if: github.event_name == 'push' || steps.changed_paths.outputs.pigweedapp == 'true'
+              if: github.event_name == 'push'
               run: |
-                  scripts/examples/mbed_example.sh -a=pigweed-app -b=$APP_TARGET -p=$APP_PROFILE
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target $PLATFORM_NAME-$APP_TARGET-pigweed-$APP_PROFILE \
+                      build \
+                    "
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    mbed $APP_TARGET+$APP_PROFILE pigweed-app \
-                    examples/pigweed-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-pigweed-app-example.elf \
+                    $PLATFORM_NAME $APP_TARGET pigweed-app-$APP_PROFILE \
+                    out/$PLATFORM_NAME-$APP_TARGET-pigweed-$APP_PROFILE/chip-mbed-pigweed-app-example.elf \
                     /tmp/bloat_reports/
                   rm -rf ./out
 
             - name: Build all-clusters-app example
-              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
+              if: github.event_name == 'push'
               run: |
-                  scripts/examples/mbed_example.sh -a=all-clusters-app -b=$APP_TARGET -p=$APP_PROFILE
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target $PLATFORM_NAME-$APP_TARGET-all-clusters-$APP_PROFILE \
+                      build \
+                    "
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    mbed $APP_TARGET+$APP_PROFILE all-clusters-app \
-                    examples/all-clusters-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-all-clusters-app-example.elf \
+                    $PLATFORM_NAME $APP_TARGET all-clusters-app-$APP_PROFILE \
+                    out/$PLATFORM_NAME-$APP_TARGET-all-clusters-$APP_PROFILE/chip-mbed-all-clusters-app-example.elf \
                     /tmp/bloat_reports/
                   rm -rf ./out
 
             - name: Build all-clusters-minimal-app example
-              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
+              if: github.event_name == 'push'
               run: |
-                  scripts/examples/mbed_example.sh -a=all-clusters-minimal-app -b=$APP_TARGET -p=$APP_PROFILE
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target $PLATFORM_NAME-$APP_TARGET-all-clusters-minimal-$APP_PROFILE \
+                      build \
+                    "
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    mbed $APP_TARGET+$APP_PROFILE all-clusters-minimal-app \
-                    examples/all-clusters-minimal-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-all-clusters-minimal-app-example.elf \
+                    $PLATFORM_NAME $APP_TARGET all-clusters-minimal-app-$APP_PROFILE \
+                    out/$PLATFORM_NAME-$APP_TARGET-all-clusters-minimal-$APP_PROFILE/chip-mbed-all-clusters-minimal-app-example.elf \
                     /tmp/bloat_reports/
                   rm -rf ./out
 
             - name: Build shell example
-              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
+              if: github.event_name == 'push'
               run: |
-                  scripts/examples/mbed_example.sh -a=shell -b=$APP_TARGET -p=$APP_PROFILE
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target $PLATFORM_NAME-$APP_TARGET-shell-$APP_PROFILE \
+                      build \
+                    "
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    mbed $APP_TARGET+$APP_PROFILE shell \
-                    examples/shell/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-shell-example.elf \
+                    $PLATFORM_NAME $APP_TARGET shell-app-$APP_PROFILE \
+                    out/$PLATFORM_NAME-$APP_TARGET-shell-$APP_PROFILE/chip-mbed-shell-example.elf \
                     /tmp/bloat_reports/
                   rm -rf ./out
 
             - name: Build ota-requestor-app example
-              if: github.event_name == 'push' || steps.changed_paths.outputs.mbed == 'true'
+              if: github.event_name == 'push'
               run: |
-                  scripts/examples/mbed_example.sh -a=ota-requestor-app -b=$APP_TARGET -p=$APP_PROFILE
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target $PLATFORM_NAME-$APP_TARGET-ota-requestor-$APP_PROFILE \
+                      build \
+                    "
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    mbed $APP_TARGET+$APP_PROFILE shell \
-                    examples/ota-requestor-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-ota-requestor-app-example.elf \
+                    $PLATFORM_NAME $APP_TARGET ota-requestor-app-$APP_PROFILE \
+                    out/$PLATFORM_NAME-$APP_TARGET-ota-requestor-$APP_PROFILE/chip-mbed-ota-requestor-app-example.elf \
                     /tmp/bloat_reports/
                   rm -rf ./out
 
