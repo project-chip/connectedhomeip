@@ -42,13 +42,12 @@ namespace SupportedModes {
 static constexpr AttributeId Id = 0x00000000;
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::DishwasherMode::Structs::ModeOptionStruct::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::detail::Structs::ModeOptionStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherMode::Structs::ModeOptionStruct::DecodableType>;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::detail::Structs::ModeOptionStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherMode::Structs::ModeOptionStruct::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::detail::Structs::ModeOptionStruct::DecodableType> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -62,7 +61,6 @@ struct TypeInfo
     using DecodableType    = uint8_t;
     using DecodableArgType = uint8_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -76,7 +74,6 @@ struct TypeInfo
     using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
     using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -90,7 +87,6 @@ struct TypeInfo
     using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
     using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -98,50 +94,26 @@ struct TypeInfo
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
-};
 } // namespace GeneratedCommandList
 
 namespace AcceptedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
-};
 } // namespace AcceptedCommandList
 
 namespace EventList {
 static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
-};
 } // namespace EventList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
-};
 } // namespace AttributeList
 
 namespace FeatureMap {
 static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
-};
 } // namespace FeatureMap
 
 namespace ClusterRevision {
 static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::DishwasherMode::Id; }
-};
 } // namespace ClusterRevision
 
 } // namespace Attributes
