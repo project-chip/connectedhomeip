@@ -27,9 +27,6 @@ namespace OperationalState {
 
 using chip::Protocols::InteractionModel::Status;
 
-constexpr const char * kWasherPreSoak = "pre-soak";
-constexpr const char * kWasherRinse   = "rinse";
-constexpr const char * kWasherSpin    = "spin";
 /**
  * Template class to present Enquriy Table
  */
@@ -63,12 +60,6 @@ GenericOperationalPhase opPhaseList[] = {
      * Phase List is null
      */
     GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
-    /**
-     * Phase List isn't null
-     */
-    //GenericOperationalPhase(DataModel::Nullable<CharSpan>(CharSpan::fromCharString(kWasherPreSoak))),
-    //GenericOperationalPhase(DataModel::Nullable<CharSpan>(CharSpan::fromCharString(kWasherRinse))),
-    //GenericOperationalPhase(DataModel::Nullable<CharSpan>(CharSpan::fromCharString(kWasherSpin))),
 };
 
 /**
@@ -209,6 +200,9 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
 
 void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
+    /*
+    * A example state to present a device that is unable to honour the Pause command
+    */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
@@ -222,6 +216,9 @@ void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError 
 
 void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
+    /*
+    * A example state to present a device that is unable to honour the Resume command
+    */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
@@ -235,6 +232,9 @@ void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError
 
 void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
+    /*
+    * A example state to present a device that is unable to honour the Start command
+    */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
@@ -248,6 +248,9 @@ void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError 
 
 void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
+    /*
+    * A example state to present a device that is unable to honour the Stop command
+    */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
