@@ -1,0 +1,215 @@
+/// Fake cluster for defining structures for IM data encoding.
+///
+/// This follows the `10. Interaction Model Encoding Specification`
+/// defined in the Matter specification.
+///
+/// This is NOT a real cluster.
+///
+client cluster IMProtocol = 0xFFFF0000 {
+  struct AttributePathIB {
+    boolean enable_tag_compression = 0;
+    optional int64u node_id = 1;
+    optional int16u endpoint_id = 2;
+    optional int32u cluster_id = 3;
+    optional int32u attribute_id = 4;
+    optional nullable int16u list_index = 5;
+  }
+
+  struct EventPathIB {
+    optional int64u node_id = 0;
+    optional int16u endpoint_id = 1;
+    optional int32u cluster_id = 2;
+    optional int32u event_id = 3;
+    boolean is_urgent = 4;
+  }
+
+  struct EventFilterIB {
+    optional int64u node_id = 0;
+    int64u event_min = 1;
+  }
+
+  struct ClusterPathIB {
+    optional int64u node_id = 0;
+    optional int16u endpoint_id = 1;
+    optional int32u cluster_id = 2;
+  }
+
+  struct DataVersionFilterIB {
+    ClusterPathIB path = 0;
+    int32u data_version = 1;
+  }
+
+  struct StatusResponseMessage {
+   int8u status = 0;
+  }
+
+  struct ReadRequestMessage {
+   optional AttributePathIB attribute_requests[] = 0;
+   optional EventPathIB event_requests[] = 1;
+   optional EventFilterIB event_filters[] = 2;
+   optional boolean fabric_filtered = 3;
+   optional DataVersionFilterIB data_version_filters[] = 4;
+  }
+
+  struct SubscribeRequestMessage {
+    boolean keep_subscriptions = 0;
+    int16u min_minterval_floor = 1;
+    int16u max_minterval_ceiling = 2;
+    optional AttributePathIB attribute_requests = 3;
+    optional EventPathIB event_requests = 4;
+    optional EventFilterIB event_filters = 5;
+    // NOTE: 6 is missing here ...
+    boolean fabric_filtered = 7;
+    optional DataVersionFilterIB data_version_filters = 8;
+  }
+
+  struct SubscribeResponseMessage {
+    int32u subscription_id = 0;
+    // NOTE: 1 missing here
+    int16u max_interval = 1;
+  }
+
+  struct StatusIB {
+    int8u status = 0;
+    int8u cluster_status = 1;
+  }
+
+  struct AttributeStatus {
+    AttributePathIB path = 0;
+    StatusIB status = 1;
+  }
+
+  struct AttributeData {
+    optional int32u data_version = 0;
+    AttributePathIB path = 1;
+
+    // NOTE: this is variable data, actual content
+    //       is NOT defined and is context sensitive based
+    //       on the path
+    LONG_OCTET_STRING data = 2;
+  }
+
+  struct AttributeReportIB {
+    AttributeStatus attribute_status = 0;
+    AttributeData attribute_data = 1;
+  }
+
+  struct EventStatusIB {
+    EventPathIB path = 0;
+    StatusIB status = 1;
+  }
+
+  struct EventDataIB {
+    EventPathIB path = 0;
+    int64u event_number = 1;
+    int8u priority = 2;
+
+    // oneof {
+    int64u epoch_timestamp = 3;
+    int64u system_timestamp = 4;
+    int64u delta_epoch_timestamp = 5;
+    int64u delta_system_timestamp = 6;
+    //  }
+
+    // NOTE: this is variable data, actual content
+    //       is NOT defined and is context sensitive based
+    //       on the path
+    LONG_OCTET_STRING data = 2;
+  }
+
+  struct EventReportIB {
+    EventStatusIB event_status = 0;
+    EventDataIB event_data = 1;
+  }
+
+  struct ReportDataMessage {
+    optional int32u subscription_id = 0;
+    optional AttributeReportIB attribute_reports[] = 1;
+    optional EventReportIB event_reports[] = 2;
+    optional boolean more_cunked_messages = 3;
+    optional boolean suppress_response = 4;
+  }
+
+  struct AttributeDataIB {
+    int32u data_version = 0;
+    AttributePathIB path = 1;
+
+    // NOTE: this is variable data, actual content
+    //       is NOT defined and is context sensitive based
+    //       on the path
+    LONG_OCTET_STRING data = 2;
+  }
+
+  struct WriteRequestMessage {
+    optional boolean suppres_response = 0;
+    boolean timed_request = 1;
+    AttributeDataIB write_requests[] = 2;
+    optional boolean more_chunked_messages = 3;
+  }
+
+  struct AttributeStatusIB {
+    AttributePathIB path = 0;
+    StatusIB status = 1;
+  }
+
+  struct WriteResponseMessage {
+    AttributeStatusIB write_responses[] = 0;
+  }
+
+  struct CommandPathIB {
+    optional int16u endpoint_id = 1;
+    optional int32u cluster_id = 2;
+    optional int32u command_id = 3;
+  }
+
+  struct CommandDataIB {
+    CommandPathIB path = 0;
+
+    // NOTE: this is variable data, actual content
+    //       is NOT defined and is context sensitive based
+    //       on the path
+    LONG_OCTET_STRING data = 2;
+  }
+
+  struct InvokeRequestMessage {
+    boolean suppress_response = 0;
+    boolean timed_request = 1;
+    CommandDataIB invoke_requests[] = 2;
+  }
+
+  struct CommandStatusIB {
+    CommandPathIB path = 0;
+    StatusIB status = 1;
+  }
+
+  struct InvokeResponseIB {
+    CommandDataIB command = 0;
+    CommandStatusIB status = 1;
+  }
+
+  struct InvokeResponseMessage {
+    boolean suppress_response = 0;
+    InvokeResponseIB invoke_responses = 1;
+  }
+
+  struct TimedRequestMessage {
+    int16u timeout = 0;
+  }
+
+  // IDs here are based on Protocol upcodes, defined
+  // in 10.2.1 in the matter spec.
+  //
+  // Written here as "attributes" to force code generation
+  // to consider these active structures.
+  readonly attribute StatusResponseMessage status_response = 1;
+  readonly attribute ReadRequestMessage read_request = 2;
+  readonly attribute SubscribeRequestMessage subscribe_request = 3;
+  readonly attribute SubscribeResponseMessage subscribe_response = 4;
+  readonly attribute ReportDataMessage report_data = 5;
+  readonly attribute WriteRequestMessage write_request = 6;
+  readonly attribute WriteResponseMessage write_response = 7;
+  readonly attribute InvokeRequestMessage invoke_request = 8;
+  readonly attribute InvokeResponseMessage invoke_response = 9;
+  readonly attribute TimedRequestMessage timed_request = 10;
+}
+
