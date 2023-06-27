@@ -25,8 +25,6 @@ concurrency:
 
 env:
   CHIP_NO_LOG_TIMESTAMPS: true
-  # XXX: Workaround for https://github.com/actions/cache/issues/1141
-  SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
 
 jobs:
   efr32:
@@ -44,49 +42,21 @@ jobs:
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
-      - uses: Wandalen/wretry.action@v1.3.0
-        name: Checkout
+      - name: Checkout
+        uses: actions/checkout@v3        
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
         with:
-          action: actions/checkout@v3.5.2
-          with: |
-            token: ${{ github.token }}
-          attempt_limit: 3
-          attempt_delay: 2000
-      - name: Checkout submodules
-        run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform silabs_docker
-
-      # - name: Out of Tree verification
-      #   run: third_party/silabs/out_of_tree_verification.sh
+          platform: silabs_docker
 
       - name: Set up environment for size reports
+        uses: ./.github/actions/setup-size-reports
         if: ${{ !env.ACT }}
-        env:
-          GH_CONTEXT: ${{ toJson(github) }}
-        run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+        with:
+          gh-context: ${{ toJson(github) }}
 
-      - uses: Wandalen/wretry.action@v1.3.0
-        name: Bootstrap cache
-        continue-on-error: true
-        with:
-          action: buildjet/cache@v3
-          attempt_limit: 3
-          attempt_delay: 2000
-          with: |
-              key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-              path: |
-                  .environment
-                  build_overrides/pigweed_environment.gni
-      - name: Bootstrap
-        run: bash scripts/bootstrap.sh
-      - name: Uploading bootstrap logs
-        uses: actions/upload-artifact@v3
-        if: ${{ always() && !env.ACT }}
-        with:
-          name: bootstrap-logs
-          path: |
-            .environment/gn_out/.ninja_log
-            .environment/pigweed-venv/*.log
-      # - name: Test SLC gen
+# - name: Test SLC gen
+      #   timeout-minutes: 30
       #   run: |
       #     scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
       #     scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4164A --slc_generate --docker
@@ -133,9 +103,7 @@ jobs:
       - name: Clean out build output
         run: rm -rf ./out
       - name: Uploading Size Reports
-        uses: actions/upload-artifact@v3
+        uses: ./.github/actions/upload-size-reports
         if: ${{ !env.ACT }}
         with:
-          name: Size,EFR32-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
-          path: |
-            /tmp/bloat_reports/
+          platform-name: EFR32

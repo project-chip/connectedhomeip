@@ -34,16 +34,12 @@ jobs:
             image: connectedhomeip/chip-build-minimal:0.7.3
 
         steps:
-            - uses: Wandalen/wretry.action@v1.3.0
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3.5.2
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
+                platform: linux
             - name: Configure and build All Clusters App
               run: |
                   CC=gcc CXX=g++ scripts/configure --project=examples/all-clusters-app/linux && ./ninja-build
