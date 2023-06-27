@@ -75,7 +75,7 @@ client cluster SecureChannelProtocol = 0xFFFF0000 {
     optional ICDParameterStruct responder_icd_params = 4;
   }
 
-  // IDs here are based on Protocol upcodes
+  // IDs here are based on Protocol opcodes
   //
   // Written here as "attributes" to force code generation
   // to consider these active structures.
@@ -295,7 +295,7 @@ client cluster IMProtocol = 0xFFFF0001 {
     int16u timeout = 0;
   }
 
-  // IDs here are based on Protocol upcodes, defined
+  // IDs here are based on Protocol opcodes, defined
   // in 10.2.1 in the matter spec.
   //
   // Written here as "attributes" to force code generation
@@ -312,3 +312,36 @@ client cluster IMProtocol = 0xFFFF0001 {
   readonly attribute TimedRequestMessage timed_request = 10;
 }
 
+client cluster BdxProtocol = 0xFFFF0002 {
+  // IDs here are based on Protocol opcodes, defined
+  // in 11.21.3.1  in the matter spec.
+  //
+  // Written here as "attributes" to force code generation
+  // to consider these active structures.
+  readonly attribute octet_string send_init = 1;
+  readonly attribute octet_string send_accept = 2;
+
+  readonly attribute octet_string receive_init = 4;
+  readonly attribute octet_string receive_accept = 5;
+
+
+  readonly attribute octet_string block_query = 0x10;
+  readonly attribute octet_string block = 0x11;
+  readonly attribute octet_string block_eof = 0x12;
+  readonly attribute octet_string block_ack = 0x13;
+  readonly attribute octet_string block_ack_eof = 0x14;
+  readonly attribute octet_string block_query_with_skip = 0x15;
+}
+
+client cluster UserDirectedCommissioningProtocol = 0xFFFF0003 {
+  struct IdentificationDeclarationStruct {
+    octet_string<8> instance_name = 1;
+  }
+
+  // IDs here are based on Protocol opcodes, defined
+  // in 5.3.2 in the matter spec.
+  //
+  // Written here as "attributes" to force code generation
+  // to consider these active structures.
+  readonly attribute IdentificationDeclarationStruct identification_declaration = 0;
+}
