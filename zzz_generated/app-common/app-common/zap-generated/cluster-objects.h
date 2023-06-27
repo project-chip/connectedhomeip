@@ -924,8 +924,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<chip::AttributeId> attributeID;
-    uint32_t attributeValue = static_cast<uint32_t>(0);
+    chip::AttributeId attributeID = static_cast<chip::AttributeId>(0);
+    uint32_t attributeValue       = static_cast<uint32_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
