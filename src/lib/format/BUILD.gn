@@ -21,12 +21,7 @@ source_set("flat-tree") {
     "FlatTreePosition.h",
   ]
 
+  public_deps = [ "${chip_root}/src/lib/core" ]
 
-  public_deps = [
-    "${chip_root}/src/lib/core",
-  ]
-
-  public_configs = [
-    "${chip_root}/src:includes",
-  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 }

@@ -67,16 +67,18 @@ class ByTag
 public:
     constexpr ByTag(Tag tag) : mTag(tag) {}
     bool operator()(const NamedTag & item) { return item.tag == mTag; }
+
 private:
     const Tag mTag;
 };
 
 class ByName
 {
-  public:
-    constexpr ByName(const char *name) : mName(name) {}
-    bool operator()(const NamedTag & item) {return strcmp(item.name, mName) == 0; }
-  private:
+public:
+    constexpr ByName(const char * name) : mName(name) {}
+    bool operator()(const NamedTag & item) { return strcmp(item.name, mName) == 0; }
+
+private:
     const char * mName;
 };
 

@@ -75,7 +75,7 @@ struct Node
 /// [idx] is the index of the node to search. If out of bounds, nullptr is returned
 /// [matcher] is the match function.
 template <typename CONTENT, typename MATCHER>
-inline const Entry<CONTENT> * FindEntry(const Node<CONTENT> *content, size_t content_size, size_t idx, MATCHER matcher)
+inline const Entry<CONTENT> * FindEntry(const Node<CONTENT> * content, size_t content_size, size_t idx, MATCHER matcher)
 {
     if (idx >= content_size)
     {
