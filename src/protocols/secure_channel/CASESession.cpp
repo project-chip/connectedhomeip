@@ -211,16 +211,10 @@ public:
 
     // Do after work immediately.
     // No scheduling, no outstanding work, no shared lifetime management.
-    CHIP_ERROR DoAfterWork()
+    void DoAfterWork()
     {
-        // Ensure that this function is being called from main Matter thread
-        assertChipStackLockedByCurrentThread();
-
-        VerifyOrReturnError(mSession && mAfterWorkCallback, CHIP_ERROR_INCORRECT_STATE);
-
-        auto * helper   = this;
-        helper->mStatus = (helper->mSession->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
-        return helper->mStatus;
+        VerifyOrDie(UnableToScheduleAfterWorkCallback());
+        AfterWorkHandler(reinterpret_cast<intptr_t>(this));
     }
 
 private:
@@ -250,6 +244,7 @@ private:
             // This can be checked from foreground thread and after work callback can be retried
             ChipLogError(SecureChannel, "Failed to Schedule the AfterWorkCallback on foreground thread");
             helper->mScheduleAfterWorkFailed.store(true);
+            helper->mStatus = status;
 
             // Release strong ptr since scheduling failed
             helper->mStrongPtr.reset();
@@ -259,6 +254,9 @@ private:
     // Handler for the after work callback.
     static void AfterWorkHandler(intptr_t arg)
     {
+        // Ensure that this function is being called from main Matter thread
+        assertChipStackLockedByCurrentThread();
+
         auto * helper = reinterpret_cast<WorkHelper *>(arg);
         // Hold strong ptr while work is handled
         auto strongPtr(std::move(helper->mStrongPtr));
@@ -2210,31 +2208,23 @@ System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableM
 
 bool CASESession::InvokeBackgroundWorkWatchdog()
 {
-    bool status = false;
+    bool wasBlocked = false;
 
     if (mSendSigma3Helper && mSendSigma3Helper->UnableToScheduleAfterWorkCallback())
     {
         ChipLogError(SecureChannel, "SendSigma3Helper was unable to schedule the AfterWorkCallback");
-        if (mSendSigma3Helper->DoAfterWork() != CHIP_NO_ERROR)
-        {
-            SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-            mState = State::kInitialized;
-        }
-        status = true;
+        mSendSigma3Helper->DoAfterWork();
+        wasBlocked = true;
     }
 
     if (mHandleSigma3Helper && mHandleSigma3Helper->UnableToScheduleAfterWorkCallback())
     {
         ChipLogError(SecureChannel, "HandleSigma3Helper was unable to schedule the AfterWorkCallback");
-        if (mHandleSigma3Helper->DoAfterWork() != CHIP_NO_ERROR)
-        {
-            SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-            mState = State::kInitialized;
-        }
-        status = true;
+        mHandleSigma3Helper->DoAfterWork();
+        wasBlocked = true;
     }
 
-    return status;
+    return wasBlocked;
 }
 
 } // namespace chip

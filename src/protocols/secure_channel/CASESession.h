@@ -207,8 +207,8 @@ public:
 
     State GetState() { return mState; }
 
-    // Checks if any of the work helper is unable to schedule the after work callback
-    // If they are stuck, runs the after work callback from the foreground thread.
+    // Returns true if the CASE session handshake was stuck due to failing to schedule work on the Matter thread.
+    // If this function returns true, the CASE session has been reset and is ready for a new session establishment.
     bool InvokeBackgroundWorkWatchdog();
 
 private:
