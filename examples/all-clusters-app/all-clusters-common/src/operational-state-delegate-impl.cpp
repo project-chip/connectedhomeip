@@ -17,7 +17,6 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
-#include <app/util/config.h>
 #include <operational-state-delegate-impl.h>
 
 namespace chip {
