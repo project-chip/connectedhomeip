@@ -1,0 +1,8 @@
+# scripts/tests
+click
+colorama
+
+# src/python_testing
+mobly
+pyasn1
+pyasn1_modules
