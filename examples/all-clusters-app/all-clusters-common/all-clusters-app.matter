@@ -6239,6 +6239,7 @@ endpoint 1 {
 
   server cluster OperationalState {
     emits event OperationalError;
+    emits event OperationCompletion;
     callback attribute phaseList;
     ram      attribute currentPhase;
     callback attribute operationalStateList;
