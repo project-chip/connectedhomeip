@@ -84,7 +84,7 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
         local = await self.read_ts_attribute_expect_success(local_attr)
         compare_time(received=local, offset=timedelta(), tolerance=timedelta(seconds=5))
 
-        self.print_step(6, "Send SetTimeZone command with 0 offset")
+        self.print_step(6, "Send SetTimeZone command with 3600 offset")
         tz = [tz_struct(offset=3600, validAt=0)]
         ret = await self.send_set_time_zone_cmd(tz)
         asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
