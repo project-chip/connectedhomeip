@@ -13,10 +13,10 @@ RUN set -x \
 RUN set -x \
     && mkdir /opt/telink \
     && cd /opt/telink \
-    && wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/zephyr-sdk-0.16.1_linux-x86_64.tar.gz \
+    && wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/zephyr-sdk-0.16.1_linux-x86_64.tar.xz \
     && wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/sha256.sum | shasum --check --ignore-missing \
-    && tar xvf zephyr-sdk-0.16.1_linux-x86_64.tar.gz \
-    && rm -rf zephyr-sdk-0.16.1_linux-x86_64.tar.gz \
+    && tar xvf zephyr-sdk-0.16.1_linux-x86_64.tar.xz \
+    && rm -rf zephyr-sdk-0.16.1_linux-x86_64.tar.xz \
     && cd zephyr-sdk-0.16.1 \
     && ./setup.sh -t riscv64-zephyr-elf -h -c \
     && cd / \
