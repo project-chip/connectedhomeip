@@ -73,7 +73,14 @@ tests:
       arguments:
           values:
               - name: "TimeZone"
-                value: [{ Offset: 100, ValidAt: 0, Name: "MunichOnTheLongRiverOfIsarInNiceSummerWeatherWithAugustinerBeerss" }]
+                value:
+                    [
+                        {
+                            Offset: 100,
+                            ValidAt: 0,
+                            Name: "MunichOnTheLongRiverOfIsarInNiceSummerWeatherWithAugustinerBeerss",
+                        },
+                    ]
       response:
           error: CONSTRAINT_ERROR
 

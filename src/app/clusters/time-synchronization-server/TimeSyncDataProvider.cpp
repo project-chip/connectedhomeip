@@ -110,8 +110,8 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZoneObj & timeZoneObj)
     uint8_t buffer[kTimeZoneListMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     CHIP_ERROR err;
-    timeZoneObj.validSize   = 0;
-    auto & tzStoreList = timeZoneObj.timeZoneList;
+    timeZoneObj.validSize = 0;
+    auto & tzStoreList    = timeZoneObj.timeZoneList;
 
     ReturnErrorOnFailure(Load(DefaultStorageKeyAllocator::TSTimeZone().KeyName(), bufferSpan));
 
