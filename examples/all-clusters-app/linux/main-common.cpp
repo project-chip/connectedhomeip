@@ -17,13 +17,13 @@
  */
 
 #include "main-common.h"
+#include "AllClustersCommandDelegate.h"
+#include "WindowCoveringManager.h"
 #include "dishwasher-mode.h"
+#include "include/tv-callbacks.h"
 #include "laundry-washer-mode.h"
 #include "rvc-modes.h"
 #include "tcc-mode.h"
-#include "AllClustersCommandDelegate.h"
-#include "WindowCoveringManager.h"
-#include "include/tv-callbacks.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
@@ -205,8 +205,8 @@ Clusters::RvcRunMode::RvcRunModeInstance rvcRunModeInstance(0x1, Clusters::RvcRu
 Clusters::RvcCleanMode::RvcCleanModeInstance rvcCleanModeInstance(0x1, Clusters::RvcCleanMode::Id, 1);
 Clusters::DishwasherMode::DishwasherModeInstance dishwasherModeInstance(0x1, Clusters::DishwasherMode::Id, 1);
 Clusters::LaundryWasherMode::LaundryWasherModeInstance laundryWasherModeInstance(0x1, Clusters::LaundryWasherMode::Id, 1);
-Clusters::RefrigeratorAndTemperatureControlledCabinetMode::TccModeInstance TccModeInstance(0x1, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, 1);
-
+Clusters::RefrigeratorAndTemperatureControlledCabinetMode::TccModeInstance
+    TccModeInstance(0x1, Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id, 1);
 
 } // namespace
 

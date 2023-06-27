@@ -33,8 +33,8 @@
 #include <app/clusters/level-control/level-control.h>
 #endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
-#include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/mode-base-server/mode-base-cluster-objects.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
@@ -239,14 +239,14 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
 #endif
 #ifdef EMBER_AF_PLUGIN_MODE_BASE
         // If OnMode is not a null value, then change the current mode to it.
-        for (const auto& element : ModeBase::Instance::ModeBaseAliasesInstanceMap)
+        for (const auto & element : ModeBase::Instance::ModeBaseAliasesInstanceMap)
         {
             auto modeBaseAlias = element.second;
             if (modeBaseAlias->GetEndpointId() == endpoint)
             {
                 if (modeBaseAlias->HasFeature(ModeBase::Feature::kOnOff))
                 {
-                    ModeBase::Instance * modeBaseInstance = element.second;
+                    ModeBase::Instance * modeBaseInstance               = element.second;
                     ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance->GetOnMode();
                     if (!onMode.IsNull())
                     {
@@ -345,14 +345,14 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 #endif
 #ifdef EMBER_AF_PLUGIN_MODE_BASE
         // If OnMode is not a null value, then change the current mode to it.
-        for (const auto& element : ModeBase::Instance::ModeBaseAliasesInstanceMap)
+        for (const auto & element : ModeBase::Instance::ModeBaseAliasesInstanceMap)
         {
             auto modeBaseAlias = element.second;
             if (modeBaseAlias->GetEndpointId() == endpoint)
             {
                 if (modeBaseAlias->HasFeature(ModeBase::Feature::kOnOff))
                 {
-                    ModeBase::Instance * modeBaseInstance = element.second;
+                    ModeBase::Instance * modeBaseInstance               = element.second;
                     ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance->GetOnMode();
                     if (!onMode.IsNull())
                     {

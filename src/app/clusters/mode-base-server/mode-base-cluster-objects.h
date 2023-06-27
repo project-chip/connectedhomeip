@@ -1,20 +1,20 @@
 /*
-*
-*    Copyright (c) 2023 Project CHIP Authors
-*    All rights reserved.
-*
-*    Licensed under the Apache License, Version 2.0 (the "License");
-*    you may not use this file except in compliance with the License.
-*    You may obtain a copy of the License at
-*
-*        http://www.apache.org/licenses/LICENSE-2.0
-*
-*    Unless required by applicable law or agreed to in writing, software
-*    distributed under the License is distributed on an "AS IS" BASIS,
-*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*    See the License for the specific language governing permissions and
-*    limitations under the License.
-*/
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #pragma once
 
@@ -34,7 +34,7 @@ namespace app {
 namespace Clusters {
 namespace ModeBase {
 
-const std::array<ClusterId , 5> AliasedClusters = {0x51, 0x52, 0x54, 0x55, 0x59};
+const std::array<ClusterId, 5> AliasedClusters = { 0x51, 0x52, 0x54, 0x55, 0x59 };
 
 namespace Attributes {
 
@@ -221,30 +221,30 @@ public:
 };
 }; // namespace ChangeToMode
 
-}
+} // namespace Commands
 
 // enums
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
-    kAuto = 0x0,
-    kQuick = 0x1,
-    kQuiet = 0x2,
-    kLowNoise = 0x3,
+    kAuto      = 0x0,
+    kQuick     = 0x1,
+    kQuiet     = 0x2,
+    kLowNoise  = 0x3,
     kLowEnergy = 0x4,
-    kVacation = 0x5,
-    kMin = 0x6,
-    kMax = 0x7,
-    kNight = 0x8,
-    kDay = 0x9,
+    kVacation  = 0x5,
+    kMin       = 0x6,
+    kMax       = 0x7,
+    kNight     = 0x8,
+    kDay       = 0x9,
 };
 
 // Enum for StatusCode
 enum class StatusCode : uint8_t
 {
-    kSuccess                = 0x0,
-    kUnsupportedMode        = 0x1,
-    kGenericFailure         = 0x2,
+    kSuccess         = 0x0,
+    kUnsupportedMode = 0x1,
+    kGenericFailure  = 0x2,
 };
 
 } // namespace ModeBase

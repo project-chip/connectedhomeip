@@ -1,19 +1,19 @@
 /*
-*
-*    Copyright (c) 2023 Project CHIP Authors
-*    All rights reserved.
-*
-*    Licensed under the Apache License, Version 2.0 (the "License");
-*    you may not use this file except in compliance with the License.
-*    You may obtain a copy of the License at
-*
-*        http://www.apache.org/licenses/LICENSE-2.0
-*
-*    Unless required by applicable law or agreed to in writing, software
-*    distributed under the License is distributed on an "AS IS" BASIS,
-*    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*    See the License for the specific language governing permissions and
-*    limitations under the License.
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 #pragma once
@@ -25,8 +25,8 @@
 #include <map>
 
 using chip::Protocols::InteractionModel::Status;
-using ModeOptionStructType  = chip::app::Clusters::detail::Structs::ModeOptionStruct::Type;
-using ModeTagStructType     = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
+using ModeOptionStructType = chip::app::Clusters::detail::Structs::ModeOptionStruct::Type;
+using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 namespace chip {
 namespace app {
@@ -37,7 +37,7 @@ class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
     // This map holds pointers to all initialised ModeBase instances. It provides a way to access all ModeBase clusters.
-    static std::map<uint32_t, Instance*> ModeBaseAliasesInstanceMap;
+    static std::map<uint32_t, Instance *> ModeBaseAliasesInstanceMap;
 
     /**
      * This is a helper function to build a mode option structure. It takes the label/name of the mode,
@@ -48,9 +48,9 @@ public:
                                                       const List<const ModeTagStructType> modeTags)
     {
         detail::Structs::ModeOptionStruct::Type option;
-        option.label        = CharSpan::fromCharString(label);
-        option.mode         = mode;
-        option.modeTags     = modeTags;
+        option.label    = CharSpan::fromCharString(label);
+        option.mode     = mode;
+        option.modeTags = modeTags;
         return option;
     }
 
@@ -73,7 +73,7 @@ public:
     DataModel::Nullable<uint8_t> GetStartUpMode() const;
     DataModel::Nullable<uint8_t> GetOnMode() const;
     uint8_t GetCurrentMode() const;
-    EndpointId GetEndpointId() const {return mEndpointId;}
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
     /**
      * Returns true if the feature is supported.
@@ -123,13 +123,10 @@ public:
     {
         mEndpointId = aEndpointId;
         mClusterId  = aClusterId;
-        mFeature = aFeature;
+        mFeature    = aFeature;
     }
 
-    ~Instance() override
-    {
-        ModeBaseAliasesInstanceMap.erase(mClusterId);
-    }
+    ~Instance() override { ModeBaseAliasesInstanceMap.erase(mClusterId); }
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
@@ -162,7 +159,7 @@ public:
      * @param value a reference to the uint8_t variable that is to contain the mode value.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t &value);
+    virtual CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value);
 
     /**
      * Get the mode tags of the Nth mode in the list of modes.
@@ -193,7 +190,6 @@ public:
      *
      */
     virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
-
 };
 
 } // namespace ModeBase
