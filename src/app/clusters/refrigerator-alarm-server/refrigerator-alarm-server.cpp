@@ -47,10 +47,11 @@ EmberAfStatus RefrigeratorAlarmServer::GetMaskValue(EndpointId endpoint, BitMask
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  mask, err:0x%x", status);
-        return status;
     }
-
-    ChipLogProgress(Zcl, "Refrigerator Alarm: Mask ep%d value: %" PRIu32 "", endpoint, mask->Raw());
+    else
+    {
+        ChipLogDetail(Zcl, "Refrigerator Alarm: Mask ep%d value: %" PRIx32 "", endpoint, mask->Raw());
+    }
 
     return status;
 }
@@ -61,10 +62,11 @@ EmberAfStatus RefrigeratorAlarmServer::GetStateValue(EndpointId endpoint, BitMas
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading state, err:0x%x", status);
-        return status;
     }
-
-    ChipLogProgress(Zcl, "Refrigerator Alarm: State ep%d value: %" PRIu32 "", endpoint, state->Raw());
+    else
+    {
+        ChipLogDetail(Zcl, "Refrigerator Alarm: State ep%d value: %" PRIx32 "", endpoint, state->Raw());
+    }
 
     return status;
 }
@@ -74,12 +76,12 @@ EmberAfStatus RefrigeratorAlarmServer::GetSupportedValue(EndpointId endpoint, Bi
     EmberAfStatus status = Attributes::Supported::Get(endpoint, supported);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        printf("################################################################\n");
         ChipLogProgress(Zcl, "Refrigerator Alarm: ERR: reading  supported, err:0x%x", status);
-        return status;
     }
-
-    ChipLogProgress(Zcl, "Refrigerator Alarm: Supported ep%d value: %" PRIu32 "", endpoint, supported->Raw());
+    else
+    {
+        ChipLogDetail(Zcl, "Refrigerator Alarm: Supported ep%d value: %" PRIx32 "", endpoint, supported->Raw());
+    }
 
     return status;
 }
@@ -94,7 +96,7 @@ EmberAfStatus RefrigeratorAlarmServer::SetMaskValue(EndpointId endpoint, const B
         return status;
     }
 
-    ChipLogProgress(Zcl, "Refrigerator Alarm: Mask ep%d value: %" PRIu32 "", endpoint, mask.Raw());
+    ChipLogProgress(Zcl, "Refrigerator Alarm: Mask ep%d value: %" PRIx32 "", endpoint, mask.Raw());
 
     // Whenever there is change in Mask, State should change accordingly.
     BitMask<AlarmMap> state;
@@ -131,7 +133,7 @@ EmberAfStatus RefrigeratorAlarmServer::SetStateValue(EndpointId endpoint, BitMas
         return status;
     }
 
-    ChipLogProgress(Zcl, "Refrigerator Alarm: State ep%d value: %" PRIu32 "", endpoint, newState.Raw());
+    ChipLogProgress(Zcl, "Refrigerator Alarm: State ep%d value: %" PRIx32 "", endpoint, newState.Raw());
 
     // Generate Notify event.
     BitMask<AlarmMap> becameActive;
@@ -161,7 +163,7 @@ EmberAfStatus RefrigeratorAlarmServer::SetSupportedValue(EndpointId endpoint, co
         return status;
     }
 
-    ChipLogProgress(Zcl, "Refrigerator Alarm: Supported ep%d value: %" PRIu32 "", endpoint, supported.Raw());
+    ChipLogProgress(Zcl, "Refrigerator Alarm: Supported ep%d value: %" PRIx32 "", endpoint, supported.Raw());
 
     // Whenever there is change in Supported attribute, Mask, State should change accordingly.
     BitMask<AlarmMap> mask;
@@ -171,7 +173,7 @@ EmberAfStatus RefrigeratorAlarmServer::SetSupportedValue(EndpointId endpoint, co
         return status;
     }
 
-    if (mask != (supported & mask))
+    if (!supported.HasAll(mask))
     {
         mask   = supported & mask;
         status = SetMaskValue(endpoint, mask);

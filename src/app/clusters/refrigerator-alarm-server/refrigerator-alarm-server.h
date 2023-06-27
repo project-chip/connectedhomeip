@@ -34,7 +34,7 @@ public:
     EmberAfStatus GetSupportedValue(chip::EndpointId endpoint,
                                     chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * suppported);
 
-    // Whenever there is change on Mask we should change State accordingly.
+    // A change in mask value will result in a corresponding change in state.
     EmberAfStatus SetMaskValue(chip::EndpointId endpoint,
                                const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
 
@@ -42,7 +42,7 @@ public:
     EmberAfStatus SetStateValue(chip::EndpointId endpoint,
                                 chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
 
-    // Whenever there is change on Supported attribute we should change Mask and State accordingly.
+    // A change in supported value will result in a corresponding change in mask and state.
     EmberAfStatus SetSupportedValue(chip::EndpointId endpoint,
                                     const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> supported);
 
