@@ -287,6 +287,7 @@
         "UNIT_TESTING_CLUSTER": ["test-cluster-server"],
         "USER_LABEL_CLUSTER": ["user-label-server"],
         "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
+        "LAUNDRY_WASHER_CONTROLS_CLUSTER": ["laundry-washer-controls-server"],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
         "ZLL_COMMISSIONING_CLUSTER": []
