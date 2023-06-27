@@ -69,8 +69,9 @@ __TARGET_TYPES__ = {
 class ZapInput:
     """ZAP may be run from a .zap configuration or from just cluster XML.
 
-    Running from a '.zap' configuration will load the zcl properties from
-    the '.zap' file, however it will also load cluster enabling and settings.
+    Running from a '.zap' configuration will load the cluster XML and
+    it will also load cluster enabling and settings defined in the .zap
+    configuration.
 
     For `client-side` code generation, CHIP wants to explicitly not depend
     on zap enabling/disabling as everything should be enabled.
@@ -81,20 +82,21 @@ class ZapInput:
         return ZapInput(zap_file=str(f))
 
     @staticmethod
-    def FromZcl(f):
-        return ZapInput(zcl_file=str(f))
+    def FromPropertiesJson(f):
+        """ Build without a ".zap" file, use the `-z/--zclProperties` command in zap. """
+        return ZapInput(properties_json=str(f))
 
-    def __init__(self, zap_file=None,  zcl_file=None):
-        if zap_file and zcl_file:
+    def __init__(self, zap_file=None,  properties_json=None):
+        if zap_file and properties_json:
             raise Exception("only one of zap/zcl should be specified")
         self.zap_file = zap_file
-        self.zcl_file = zcl_file
+        self.properties_json = properties_json
 
     @property
     def value(self) -> str:
         if self.zap_file:
             return f"ZAP:{self.zap_file}"
-        return f"ZCL:{self.zcl_file}"
+        return f"ZCL:{self.properties_json}"
 
     @property
     def is_for_chef_example(self) -> bool:
@@ -107,7 +109,7 @@ class ZapInput:
         """What command to execute for this zap input. """
         if self.zap_file:
             return [script, self.zap_file]
-        return [script, '-z', self.zcl_file]
+        return [script, '-z', self.properties_json]
 
 
 @dataclass
@@ -378,7 +380,7 @@ def getGlobalTemplatesTargets():
             'zzz_generated', generate_subdir, 'zap-generated')
         targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
 
-    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZcl('src/app/zap-templates/zcl/zcl.json'),
+    targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json'),
                    client_side=True, matter_file_name="src/controller/data_model/controller-clusters.matter"))
 
     return targets
@@ -396,7 +398,7 @@ def getCodegenTemplates():
 
 
 def getTestsTemplatesTargets(test_target):
-    zap_input = ZapInput.FromZcl('src/app/zap-templates/zcl/zcl.json')
+    zap_input = ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json')
     templates = {
         'chip-tool': {
             'template': 'examples/chip-tool/templates/tests/templates.json',
@@ -423,7 +425,7 @@ def getGoldenTestImageTargets():
 
 
 def getSpecificTemplatesTargets():
-    zap_input = ZapInput.FromZcl('src/app/zap-templates/zcl/zcl.json')
+    zap_input = ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json')
 
     # Mapping of required template and output directory
     templates = {
