@@ -30,7 +30,7 @@ namespace OperationalState {
 
 /*
  * An example state (not in spec) to present a device that is unable to honour the Pause/Resume/Start/Stop command
-*/
+ */
 enum class ManufactureOperationalStateEnum : uint8_t
 {
     kChildSafetyLock = 0x80,
@@ -70,7 +70,7 @@ public:
      * Get current operational error.
      * @param error.Put a struct instance on the state, then call the delegate to fill it in.
      */
-    void GetOperationalError(GenericOperationalError &error) override;
+    void GetOperationalError(GenericOperationalError & error) override;
 
     /**
      * Set operational error.
@@ -112,12 +112,10 @@ public:
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
     OperationalStateDelegate(EndpointId aEndpointId, ClusterId aClusterId, GenericOperationalState aOperationalState,
-                             GenericOperationalError aOperationalError,
-                             Span<const GenericOperationalState> aOperationalStateList,
+                             GenericOperationalError aOperationalError, Span<const GenericOperationalState> aOperationalStateList,
                              Span<const GenericOperationalPhase> aOperationalPhaseList) :
         Delegate(aEndpointId, aClusterId),
-        mOperationalState(aOperationalState), mOperationalError(aOperationalError),
-        mOperationalStateList(aOperationalStateList),
+        mOperationalState(aOperationalState), mOperationalError(aOperationalError), mOperationalStateList(aOperationalStateList),
         mOperationalPhaseList(aOperationalPhaseList)
     {}
     ~OperationalStateDelegate() = default;

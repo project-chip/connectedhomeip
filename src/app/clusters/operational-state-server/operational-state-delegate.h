@@ -38,15 +38,9 @@ constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
  */
 struct GenericOperationalState : public app::Clusters::detail::Structs::OperationalStateStruct::Type
 {
-    GenericOperationalState(uint8_t state, Optional<CharSpan> label = NullOptional)
-    {
-        Set(state, label);
-    }
+    GenericOperationalState(uint8_t state, Optional<CharSpan> label = NullOptional) { Set(state, label); }
 
-    GenericOperationalState(const GenericOperationalState & op)
-    {
-        *this = op;
-    }
+    GenericOperationalState(const GenericOperationalState & op) { *this = op; }
 
     GenericOperationalState & operator=(const GenericOperationalState & op)
     {
@@ -76,6 +70,7 @@ struct GenericOperationalState : public app::Clusters::detail::Structs::Operatio
             operationalStateLabel = NullOptional;
         }
     }
+
 private:
     char mOperationalStateLabelBuffer[kOperationalStateLabelMaxSize];
 };
@@ -85,20 +80,17 @@ private:
  */
 struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorStateStruct::Type
 {
-    GenericOperationalError(uint8_t state, Optional<chip::CharSpan> label = NullOptional, Optional<chip::CharSpan> details = NullOptional)
+    GenericOperationalError(uint8_t state, Optional<chip::CharSpan> label = NullOptional,
+                            Optional<chip::CharSpan> details = NullOptional)
     {
         Set(state, label, details);
     }
 
-    GenericOperationalError(const GenericOperationalError & error)
-    {
-        *this = error;
-    }
+    GenericOperationalError(const GenericOperationalError & error) { *this = error; }
 
     GenericOperationalError & operator=(const GenericOperationalError & error)
     {
-        Set(error.errorStateID, error.errorStateLabel,
-            error.errorStateDetails);
+        Set(error.errorStateID, error.errorStateLabel, error.errorStateDetails);
         return *this;
     }
 
@@ -143,6 +135,7 @@ struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorSta
             errorStateDetails = NullOptional;
         }
     }
+
 private:
     char mErrorStateLabelBuffer[kOperationalErrorLabelMaxSize];
     char mErrorStateDetailsBuffer[kOperationalErrorDetailsMaxSize];
@@ -153,15 +146,9 @@ private:
  */
 struct GenericOperationalPhase
 {
-    GenericOperationalPhase(app::DataModel::Nullable<CharSpan> name)
-    {
-        Set(name);
-    }
+    GenericOperationalPhase(app::DataModel::Nullable<CharSpan> name) { Set(name); }
 
-    GenericOperationalPhase(const GenericOperationalPhase & ph)
-    {
-        *this = ph;
-    }
+    GenericOperationalPhase(const GenericOperationalPhase & ph) { *this = ph; }
 
     GenericOperationalPhase & operator=(const GenericOperationalPhase & ph)
     {
@@ -171,6 +158,7 @@ struct GenericOperationalPhase
 
     bool isNullable() const { return mPhaseName.IsNull(); }
     app::DataModel::Nullable<CharSpan> mPhaseName;
+
 private:
     void Set(app::DataModel::Nullable<CharSpan> name)
     {
@@ -262,7 +250,7 @@ public:
      * Get current operational error.
      * @param error.Put a struct instance on the state, then call the delegate to fill it in.
      */
-    virtual void GetOperationalError(GenericOperationalError &error) = 0;
+    virtual void GetOperationalError(GenericOperationalError & error) = 0;
 
     /**
      * Set operational state.

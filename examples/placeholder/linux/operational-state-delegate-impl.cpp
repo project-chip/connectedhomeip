@@ -43,7 +43,7 @@ CHIP_ERROR OperationalStateDelegate::SetOperationalError(const GenericOperationa
     return CHIP_NO_ERROR;
 }
 
-void OperationalStateDelegate::GetOperationalError(GenericOperationalError &error)
+void OperationalStateDelegate::GetOperationalError(GenericOperationalError & error)
 {
     error = mOperationalError;
 }
@@ -77,8 +77,8 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Ge
 void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
     /*
-    * An example state to present a device that is unable to honour the Pause command
-    */
+     * An example state to present a device that is unable to honour the Pause command
+     */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
@@ -93,8 +93,8 @@ void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError 
 void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
     /*
-    * An example state to present a device that is unable to honour the Resume command
-    */
+     * An example state to present a device that is unable to honour the Resume command
+     */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
@@ -109,8 +109,8 @@ void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError
 void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
     /*
-    * An example state to present a device that is unable to honour the Start command
-    */
+     * An example state to present a device that is unable to honour the Start command
+     */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
@@ -125,8 +125,8 @@ void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError 
 void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
     /*
-    * An example state to present a device that is unable to honour the Stop command
-    */
+     * An example state to present a device that is unable to honour the Stop command
+     */
     if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));

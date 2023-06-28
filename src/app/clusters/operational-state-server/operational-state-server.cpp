@@ -240,13 +240,13 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     switch (aPath.mAttributeId)
     {
     case OperationalState::Attributes::OperationalStateList::Id: {
-        Delegate * delegate                   = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
         GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
         size_t index = 0;
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-        //operational state list is not found
+        // operational state list is not found
         if (delegate->GetOperationalStateAtIndex(index, opState) == CHIP_ERROR_NOT_FOUND)
         {
             err = aEncoder.EncodeNull();
@@ -254,7 +254,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         else
         {
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                while(delegate->GetOperationalStateAtIndex(index, opState) != CHIP_ERROR_NOT_FOUND)
+                while (delegate->GetOperationalStateAtIndex(index, opState) != CHIP_ERROR_NOT_FOUND)
                 {
                     err = encoder.Encode(opState);
                     if (err != CHIP_NO_ERROR)
@@ -289,11 +289,10 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     break;
 
     case OperationalState::Attributes::PhaseList::Id: {
-        Delegate * delegate                     = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
 
         GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
-        size_t index = 0;
-
+        size_t index                  = 0;
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         err = delegate->GetOperationalPhaseAtIndex(index, phase);
@@ -304,7 +303,7 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
         else
         {
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                while(delegate->GetOperationalPhaseAtIndex(index, phase) != CHIP_ERROR_NOT_FOUND)
+                while (delegate->GetOperationalPhaseAtIndex(index, phase) != CHIP_ERROR_NOT_FOUND)
                 {
                     err = encoder.Encode(phase.mPhaseName);
                     if (err != CHIP_NO_ERROR)
@@ -321,9 +320,9 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
     case OperationalState::Attributes::CurrentPhase::Id: {
         DataModel::Nullable<uint8_t> currentPhase;
-        Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        Delegate * delegate           = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
         GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
-        size_t index = 0;
+        size_t index                  = 0;
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         err = delegate->GetOperationalPhaseAtIndex(index, phase);

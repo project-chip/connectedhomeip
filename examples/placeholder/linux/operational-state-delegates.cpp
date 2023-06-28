@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/operational-state-server/operational-state-server.h>
-#include <app/util/config.h>
 #include <app/EventLogging.h>
+#include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/reporting/reporting.h>
+#include <app/util/config.h>
 #include <operational-state-delegate-impl.h>
 
 namespace chip {
@@ -52,7 +52,7 @@ struct DelegatesEnquiryTable
 
 /*
  * An example to present device's endpointId
-*/
+ */
 constexpr EndpointId kDemoEndpointId = 1;
 
 /**
@@ -114,7 +114,6 @@ Delegate * getGenericDelegateTable(EndpointId aEndpointId, ClusterId aClusterId)
     return nullptr;
 }
 
-
 // @brief Instance getter for the default global delegate for operational state alias cluster
 // The delegate API assumes there will be separate delegate objects for each cluster instance.
 // (i.e. each separate operational state cluster derivation, on each separate endpoint)
@@ -144,7 +143,7 @@ bool LogOperationalErrorEvent(EndpointId aEndpointId, const GenericOperationalEr
         return false;
     }
 
-    //notify operational state need to change
+    // notify operational state need to change
     MatterReportingAttributeChangeCallback(aEndpointId, event.GetClusterId(), OperationalState::Attributes::OperationalState::Id);
     return true;
 }
@@ -179,6 +178,7 @@ bool LogOperationCompletion(EndpointId aEndpointId, const GenericOperationComple
 void MatterOperationalStatePluginServerInitCallback()
 {
     using namespace chip::app;
-    static Clusters::OperationalState::OperationalStateServer operationalstateServer(Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id);
+    static Clusters::OperationalState::OperationalStateServer operationalstateServer(Clusters::OperationalState::kDemoEndpointId,
+                                                                                     Clusters::OperationalState::Id);
     operationalstateServer.Init();
 }
