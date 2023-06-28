@@ -303,20 +303,6 @@ public:
      */
     virtual void HandleStopStateCallback(GenericOperationalError & err) = 0;
 
-    /**
-     * Send OperationalError Event
-     * @param[in] set the operational error to event.
-     * @return true: send event success; fail : send event fail.
-     */
-    virtual bool sendOperationalErrorEvent(const GenericOperationalError & err) = 0;
-
-    /**
-     * Send OperationCompletion Event
-     * @param[in] set the operation comletion to event.
-     * @return true: send event success; fail : send event fail.
-     */
-    virtual bool sendOperationCompletion(const GenericOperationCompletion & op) = 0;
-
     Delegate(EndpointId aEndpointId, ClusterId aClusterId) : mEndpointId(aEndpointId), mClusterId(aClusterId) {}
 
     virtual ~Delegate() = default;

@@ -138,40 +138,6 @@ void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError &
     }
 }
 
-bool OperationalStateDelegate::sendOperationalErrorEvent(const GenericOperationalError & err)
-{
-    Events::OperationalError::Type event;
-    EventNumber eventNumber;
-
-    event.errorState = err;
-    CHIP_ERROR error = app::LogEvent(event, mEndpointId, eventNumber);
-
-    if (error != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    // set OperationalState attribute to Error
-    mOperationalState.Set(to_underlying(OperationalStateEnum::kError));
-    return true;
-}
-
-bool OperationalStateDelegate::sendOperationCompletion(const GenericOperationCompletion & op)
-{
-    Events::OperationCompletion::Type event;
-    EventNumber eventNumber;
-    event = op;
-
-    CHIP_ERROR error = app::LogEvent(event, mEndpointId, eventNumber);
-
-    if (error != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    return true;
-}
-
 } // namespace OperationalState
 } // namespace Clusters
 } // namespace app

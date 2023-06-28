@@ -111,20 +111,6 @@ public:
      */
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
-    /**
-     * Send OperationalError Event
-     * @param[in] set the operational error to event.
-     * @return true: send event success; fail : send event fail.
-     */
-    bool sendOperationalErrorEvent(const GenericOperationalError & err) override;
-
-    /**
-     * Send OperationCompletion Event
-     * @param[in] set the operation comletion to event.
-     * @return true: send event success; fail : send event fail.
-     */
-    bool sendOperationCompletion(const GenericOperationCompletion & op) override;
-
     OperationalStateDelegate(EndpointId aEndpointId, ClusterId aClusterId, GenericOperationalState aOperationalState,
                              GenericOperationalError aOperationalError,
                              Span<const GenericOperationalState> aOperationalStateList,
