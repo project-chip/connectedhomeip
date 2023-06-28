@@ -77,9 +77,11 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     {
         // We are in the middle of CASE handshake
 
-        // Check if we are stuck on background thread, if yes, unblock it, and continue
-        if (GetSession().InvokeBackgroundWorkWatchdog() == false)
+        // Invoke watchdog to fix any stuck handshakes
+        bool watchdogFired = GetSession().InvokeBackgroundWorkWatchdog();
+        if (!watchdogFired)
         {
+            // Handshake wasn't stuck, let it continue its work
             // TODO: Send Busy response, #27473
             ChipLogError(Inet, "CASE session is in establishing state, returning without responding");
             return CHIP_NO_ERROR;
