@@ -26,6 +26,7 @@
 #include <lib/support/UnitTestUtils.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/echo/Echo.h>
 #include <system/SystemPacketBuffer.h>
@@ -36,6 +37,7 @@ namespace {
 using namespace chip;
 using namespace chip::Messaging;
 using namespace chip::System;
+using namespace chip::System::Clock::Literals;
 using namespace chip::Protocols;
 
 using TestContext = Test::LoopbackMessagingContext;
@@ -203,7 +205,13 @@ void CommonCheckAbortAllButOneExchange(nlTestSuite * inSuite, TestContext & ctx,
         // We've set the session into responsive mode by altering the MRP intervals, so we should be able to
         // trigger a MRP failure due to timing out waiting for an ACK.
         //
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1000), [&]() { return false; });
+        auto waitTimeout = System::Clock::Milliseconds32(1000);
+#ifdef CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
+        // Account for the retry delay booster, so that we do not timeout our IO processing before the
+        // retransmission failure is triggered.
+        waitTimeout += CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS * CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
+#endif
+        ctx.GetIOContext().DriveIOUntil(waitTimeout, [&]() { return false; });
     }
     else
     {
@@ -235,32 +243,20 @@ void CheckAbortAllButOneExchangeResponseTimeout(nlTestSuite * inSuite, void * in
     CommonCheckAbortAllButOneExchange(inSuite, ctx, true);
 }
 
-// Test Suite
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("Test aborting all but one exchange",                       CheckAbortAllButOneExchange),
-    NL_TEST_DEF("Test aborting all but one exchange + response timeout",    CheckAbortAllButOneExchangeResponseTimeout),
-
-    NL_TEST_SENTINEL()
+const nlTest sTests[] = {
+    NL_TEST_DEF("Test aborting all but one exchange", CheckAbortAllButOneExchange),
+    NL_TEST_DEF("Test aborting all but one exchange + response timeout", CheckAbortAllButOneExchangeResponseTimeout),
+    NL_TEST_SENTINEL(),
 };
-// clang-format on
 
-// clang-format off
-nlTestSuite sSuite =
-{
+nlTestSuite sSuite = {
     "Test-AbortExchangesForFabric",
     &sTests[0],
     TestContext::Initialize,
-    TestContext::Finalize
+    TestContext::Finalize,
 };
-// clang-format on
 
-} // anonymous namespace
+} // namespace
 
 /**
  *  Main

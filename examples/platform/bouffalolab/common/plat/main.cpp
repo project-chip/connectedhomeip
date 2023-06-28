@@ -38,9 +38,11 @@ extern "C" {
 #ifdef BL702_ENABLE
 #include <bl702_glb.h>
 #include <bl702_hbn.h>
+#elif BL702L_ENABLE
+#include <bl702l_glb.h>
+#include <bl702l_hbn.h>
 #elif defined(BL602_ENABLE)
 #include <wifi_mgmr_ext.h>
-
 #endif
 #include <bl_irq.h>
 #include <bl_rtc.h>
@@ -54,6 +56,12 @@ extern "C" {
 #include <hal_boot2.h>
 
 #include <hosal_uart.h>
+
+#ifdef BL702L_ENABLE
+#include <rom_freertos_ext.h>
+#include <rom_hal_ext.h>
+#include <rom_lmac154_ext.h>
+#endif
 
 #include "board.h"
 }
@@ -97,6 +105,8 @@ extern "C" unsigned int sleep(unsigned int seconds)
     vTaskDelay(xDelay);
     return 0;
 }
+
+#ifndef BL702L_ENABLE
 
 extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
 {
@@ -181,8 +191,7 @@ extern "C" void vApplicationTickHook(void)
 
 void vApplicationSleep(TickType_t xExpectedIdleTime) {}
 
-extern "C" void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));
-void vAssertCalled(void)
+extern "C" void vAssertCalled(void)
 {
     void * ra = (void *) __builtin_return_address(0);
 
@@ -191,6 +200,47 @@ void vAssertCalled(void)
     while (true)
         ;
 }
+#endif
+
+#ifdef BL702L_ENABLE
+extern "C" void __attribute__((weak)) user_vAssertCalled(void)
+{
+    void * ra = (void *) __builtin_return_address(0);
+
+    taskDISABLE_INTERRUPTS();
+    ChipLogProgress(NotSpecified, "vAssertCalled, ra= %p", ra);
+    while (true)
+        ;
+}
+
+extern "C" void __attribute__((weak)) user_vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
+{
+    puts("Stack Overflow checked\r\n");
+    if (pcTaskName)
+    {
+        printf("Stack name %s\r\n", pcTaskName);
+    }
+    while (1)
+    {
+        /*empty here*/
+    }
+}
+
+extern "C" void __attribute__((weak)) user_vApplicationMallocFailedHook(void)
+{
+    printf("Memory Allocate Failed. Current left size is %d bytes\r\n", xPortGetFreeHeapSize());
+#if defined(CFG_USE_PSRAM)
+    printf("Current psram left size is %d bytes\r\n", xPortGetFreeHeapSizePsram());
+#endif
+    while (1)
+    {
+        /*empty here*/
+    }
+}
+
+#else
+extern "C" void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));
+#endif
 
 // ================================================================================
 // Main Code
@@ -207,6 +257,11 @@ static HeapRegion_t xHeapRegions[] = {
     { NULL, 0 } /* Terminates the array. */
 };
 #elif defined(BL702_ENABLE)
+static constexpr HeapRegion_t xHeapRegions[] = {
+    { &_heap_start, (size_t) &_heap_size }, // set on runtime
+    { NULL, 0 }                             /* Terminates the array. */
+};
+#elif defined(BL702L_ENABLE)
 static constexpr HeapRegion_t xHeapRegions[] = {
     { &_heap_start, (size_t) &_heap_size }, // set on runtime
     { NULL, 0 }                             /* Terminates the array. */
@@ -275,12 +330,53 @@ extern "C" void do_psram_test()
 }
 #endif
 
+#ifdef BL702L_ENABLE
+void exception_entry_app(uint32_t mcause, uint32_t mepc, uint32_t mtval, uintptr_t * regs, uintptr_t * tasksp)
+{
+    static const char dbg_str[] = "Exception Entry--->>>\r\n mcause %08lx, mepc %08lx, mtval %08lx\r\n";
+
+    printf(dbg_str, mcause, mepc, mtval);
+
+    while (1)
+    {
+        /*dead loop now*/
+    }
+}
+#endif
+
 extern "C" void setup_heap()
 {
+    bl_sys_init();
+
 #ifdef BL702_ENABLE
     bl_sys_em_config();
+#elif defined(BL702L_ENABLE)
+    bl_sys_em_config();
+
+    // Initialize rom data
+    extern uint8_t _rom_data_run;
+    extern uint8_t _rom_data_load;
+    extern uint8_t _rom_data_size;
+    memcpy((void *) &_rom_data_run, (void *) &_rom_data_load, (size_t) &_rom_data_size);
 #endif
+
     vPortDefineHeapRegions(xHeapRegions);
+
+    bl_sys_early_init();
+
+#ifdef BL702L_ENABLE
+    rom_freertos_init(256, 400);
+    rom_hal_init();
+    rom_lmac154_hook_init();
+
+    exception_entry_ptr = exception_entry_app;
+#endif
+
+#ifdef CFG_USE_PSRAM
+    bl_psram_init();
+    do_psram_test();
+    vPortDefineHeapRegionsPsram(xPsramHeapRegions);
+#endif
 }
 
 extern "C" size_t get_heap_size(void)
@@ -290,41 +386,34 @@ extern "C" size_t get_heap_size(void)
 
 extern "C" void app_init(void)
 {
-    bl_sys_init();
-
-    bl_sys_early_init();
-
     hosal_uart_init(&uart_stdio);
 
     ChipLogProgress(NotSpecified, "==================================================");
     ChipLogProgress(NotSpecified, "bouffalolab chip-lighting-example, built at " __DATE__ " " __TIME__);
     ChipLogProgress(NotSpecified, "==================================================");
 
-    blog_init();
-    bl_irq_init();
-    bl_sec_init();
-#ifdef BL702_ENABLE
-    bl_timer_init();
-#endif
 #ifdef CFG_USE_PSRAM
-    bl_psram_init();
-    do_psram_test();
+    ChipLogProgress(NotSpecified, "Heap %u@[%p:%p], %u@[%p:%p]", (unsigned int) &_heap_size, &_heap_start,
+                    &_heap_start + (unsigned int) &_heap_size, (unsigned int) &_heap3_size, &_heap3_start,
+                    &_heap3_start + (unsigned int) &_heap3_size);
+#else
+    ChipLogProgress(NotSpecified, "Heap %u@[%p:%p]", (unsigned int) &_heap_size, &_heap_start,
+                    &_heap_start + (unsigned int) &_heap_size);
 #endif
 
-    // bl_rtc_init();
+    blog_init();
+    bl_irq_init();
+    bl_rtc_init();
+    bl_sec_init();
+#if defined(BL702_ENABLE)
+    bl_timer_init();
+#endif
+
     hal_boot2_init();
 
     /* board config is set after system is init*/
     hal_board_cfg(0);
-    //    hosal_dma_init();
 
-#ifdef CFG_USE_PSRAM
-    vPortDefineHeapRegionsPsram(xPsramHeapRegions);
-    ChipLogProgress(NotSpecified, "Heap %u@%p, %u@%p", (unsigned int) &_heap_size, &_heap_start, (unsigned int) &_heap3_size,
-                    &_heap3_start);
-#else
-    ChipLogProgress(NotSpecified, "Heap %u@%p", (unsigned int) &_heap_size, &_heap_start);
-#endif
 #ifdef BL602_ENABLE
     wifi_td_diagnosis_init();
 #endif

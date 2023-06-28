@@ -1,0 +1,16 @@
+name: Checkout submodules
+description: Checkout submodules
+inputs:
+  extra-parameters:
+    description: "extra parameters"
+    required: false
+    default: ""
+  platform:
+    description: "Platform name"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout submodules
+      shell: bash
+      run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform ${{ inputs.platform }} ${{ inputs.extra-parameters }}

@@ -1565,35 +1565,63 @@ tests:
     - label: "Writes (sets back) default value of MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0015
+      PICS: TSTAT.S.F01 && TSTAT.S.A0015 && TSTAT.S.A0003
+      arguments:
+          value: AbsMinHeatSetpointLimitValue
+
+    - label: "Writes (sets back) default value of MinHeatSetpointLimit"
+      command: "writeAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: TSTAT.S.F01 && TSTAT.S.A0015 && !TSTAT.S.A0003
       arguments:
           value: 700
 
     - label: "Writes (sets back)default value of MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05
+      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05 && TSTAT.S.A0004
+      arguments:
+          value: AbsMaxHeatSetpointLimitValue
+
+    - label: "Writes (sets back)default value of MaxHeatSetpointLimit"
+      command: "writeAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05 && !TSTAT.S.A0004
       arguments:
           value: 3000
 
     - label: "Writes MaxHeatSetpointLimit That meets the deadband of 2.5C"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05
+      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && TSTAT.S.F05
       arguments:
           value: 2950
 
     - label: "Writes (sets back) default value of MinCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0017
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0005
+      arguments:
+          value: AbsMinCoolSetpointLimitValue
+
+    - label: "Writes (sets back) default value of MinCoolSetpointLimit"
+      command: "writeAttribute"
+      attribute: "MinCoolSetpointLimit"
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017 && !TSTAT.S.A0005
       arguments:
           value: 1600
 
     - label: "Writes (sets back) default value of MaxCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0018
+      PICS: TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0006
+      arguments:
+          value: AbsMaxCoolSetpointLimitValue
+
+    - label: "Writes (sets back) default value of MaxCoolSetpointLimit"
+      command: "writeAttribute"
+      attribute: "MaxCoolSetpointLimit"
+      PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.A0006
       arguments:
           value: 3200
 
@@ -1660,47 +1688,34 @@ tests:
           value: 25
 
     - label:
-          "Reads ControlSequenceOfOperation from Server DUT and verifies that
-          the value is valid"
+          "Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F01 is
+          true"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: TSTAT.S.F00 || TSTAT.S.F01
+      PICS: TSTAT.S.F01 && !TSTAT.S.F00
       response:
           constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 5
+              anyOf: [0, 1]
 
-    #Uncomment once anyOf is supported
-    #- label:
-    #      "Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F01 is
-    #      true"
-    #  command: "readAttribute"
-    #  attribute: "ControlSequenceOfOperation"
-    #  PICS: TSTAT.S.F01 && !TSTAT.S.F00
-    #  response:
-    #      constraints:
-    #          anyOf: [0, 1]
+    - label:
+          "Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F00 is
+          true"
+      command: "readAttribute"
+      attribute: "ControlSequenceOfOperation"
+      PICS: TSTAT.S.F00 && !TSTAT.S.F01
+      response:
+          constraints:
+              anyOf: [2, 3]
 
-    #- label:
-    #      "Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F00 is
-    #      true"
-    #  command: "readAttribute"
-    #  attribute: "ControlSequenceOfOperation"
-    #  PICS: TSTAT.S.F00 && !TSTAT.S.F01
-    #  response:
-    #      constraints:
-    #          anyOf: [2, 3]
-
-    #- label:
-    #      "Reads ControlSequenceOfOperation from Server DUT, if both TSTAT.S.F01
-    #      and TSTAT.S.F01 are true"
-    #  command: "readAttribute"
-    #  attribute: "ControlSequenceOfOperation"
-    #  PICS: TSTAT.S.F00 && TSTAT.S.F01
-    #  response:
-    #      constraints:
-    #          anyOf: [4, 5]
+    - label:
+          "Reads ControlSequenceOfOperation from Server DUT, if both TSTAT.S.F01
+          and TSTAT.S.F01 are true"
+      command: "readAttribute"
+      attribute: "ControlSequenceOfOperation"
+      PICS: TSTAT.S.F00 && TSTAT.S.F01
+      response:
+          constraints:
+              anyOf: [4, 5]
 
     - label:
           "Write Attribute command for ControlSequenceOfOperation with a new

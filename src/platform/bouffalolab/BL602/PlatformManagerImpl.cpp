@@ -1,7 +1,6 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright (c) 2019 Nest Labs, Inc.
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,18 +15,12 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the PlatformManager object
- *          for BL602 platforms using the Bouffalolab BL602 SDK.
- */
-/* this file behaves like a config.h, comes first */
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/PlatformManager.h>
-#include <platform/bouffalolab/BL602/DiagnosticDataProviderImpl.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
@@ -47,8 +40,6 @@ extern "C" {
 
 namespace chip {
 namespace DeviceLayer {
-
-PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 static wifi_conf_t conf = {
     .country_code = "CN",
@@ -237,7 +228,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     TaskHandle_t backup_eventLoopTask;
 
     // Initialize the configuration system.
-    err = Internal::BL602Config::Init();
+    err = Internal::BLConfig::Init();
     SuccessOrExit(err);
 
     // Initialize LwIP.
@@ -267,31 +258,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
-}
-
-void PlatformManagerImpl::_Shutdown()
-{
-    uint64_t upTime = 0;
-
-    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
-    {
-        uint32_t totalOperationalHours = 0;
-
-        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
-        {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
-        }
-        else
-        {
-            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
-        }
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
-    }
-
-    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
 } // namespace DeviceLayer

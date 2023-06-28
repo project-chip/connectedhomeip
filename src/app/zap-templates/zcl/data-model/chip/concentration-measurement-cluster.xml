@@ -27,6 +27,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -74,6 +76,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -96,6 +100,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -120,6 +126,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -142,6 +150,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -166,6 +176,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -188,6 +200,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -212,6 +226,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -234,6 +250,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -258,6 +276,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -280,6 +300,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -304,6 +326,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -326,6 +350,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -350,6 +376,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -372,6 +400,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -396,6 +426,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -418,6 +450,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -442,6 +476,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -464,6 +500,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -488,6 +526,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -510,6 +550,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -534,6 +576,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -556,6 +600,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -580,6 +626,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -602,6 +650,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -626,6 +676,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -648,6 +700,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -672,6 +726,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -694,6 +750,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -718,6 +776,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -740,6 +800,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -764,6 +826,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -786,6 +850,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
@@ -810,6 +876,8 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
+
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="MAX_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MaxMeasuredValue</attribute>
@@ -832,6 +900,8 @@ limitations under the License.
 
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
 
     <attribute side="server" code="0x0000" define="MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="MIN_MEASURED_VALUE" type="single" writable="false" isNullable="true" optional="true">MinMeasuredValue</attribute>

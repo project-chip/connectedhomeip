@@ -15,13 +15,12 @@
  *    limitations under the License.
  */
 
-/* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/bouffalolab/BL702/DiagnosticDataProviderImpl.h>
+#include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
@@ -36,8 +35,6 @@ namespace chip {
 namespace DeviceLayer {
 
 extern "C" void bl_rand_stream(unsigned char *, int);
-
-PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
@@ -57,7 +54,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     otRadio_opt_t opt;
 
     // Initialize the configuration system.
-    err = Internal::BL702Config::Init();
+    err = Internal::BLConfig::Init();
     SuccessOrExit(err);
 
     opt.byte            = 0;

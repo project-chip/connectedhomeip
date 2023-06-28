@@ -19,17 +19,57 @@ from .gn import GnBuilder
 
 
 class ASRApp(Enum):
+    ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
     LIGHT = auto()
+    LIGHT_SWITCH = auto()
+    LOCK = auto()
+    BRIDGE = auto()
+    TEMPERATURE_MEASUREMENT = auto()
+    THERMOSTAT = auto()
+    OTA_REQUESTOR = auto()
 
     def ExampleName(self):
-        if self == ASRApp.LIGHT:
+        if self == ASRApp.ALL_CLUSTERS:
+            return 'all-clusters-app'
+        elif self == ASRApp.ALL_CLUSTERS_MINIMAL:
+            return 'all-clusters-minimal-app'
+        elif self == ASRApp.LIGHT:
             return 'lighting-app'
+        elif self == ASRApp.LIGHT_SWITCH:
+            return 'light-switch-app'
+        elif self == ASRApp.LOCK:
+            return 'lock-app'
+        elif self == ASRApp.BRIDGE:
+            return 'bridge-app'
+        elif self == ASRApp.TEMPERATURE_MEASUREMENT:
+            return 'temperature-measurement-app'
+        elif self == ASRApp.THERMOSTAT:
+            return 'thermostat'
+        elif self == ASRApp.OTA_REQUESTOR:
+            return 'ota-requestor-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
-        if self == ASRApp.LIGHT:
+        if self == ASRApp.ALL_CLUSTERS:
+            return 'chip-asr-all-clusters-app'
+        elif self == ASRApp.ALL_CLUSTERS_MINIMAL:
+            return 'chip-asr-all-clusters-minimal-app'
+        elif self == ASRApp.LIGHT:
             return 'chip-asr-lighting-app'
+        elif self == ASRApp.LIGHT_SWITCH:
+            return 'chip-asr-light-switch-app'
+        elif self == ASRApp.LOCK:
+            return 'chip-asr-lock-example'
+        elif self == ASRApp.BRIDGE:
+            return 'chip-asr-bridge-example'
+        elif self == ASRApp.TEMPERATURE_MEASUREMENT:
+            return 'chip-asr-temperature-measurement-example'
+        elif self == ASRApp.THERMOSTAT:
+            return 'chip-asr-thermostat-example'
+        elif self == ASRApp.OTA_REQUESTOR:
+            return 'chip-asr-ota-requestor-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 

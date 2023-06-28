@@ -304,7 +304,7 @@ void ChipDnssdResolveNoLongerNeeded(const char * instanceName);
  *
  * @param[in] hostname      The hostname the address belongs to.
  * @param[in] address       The address to reconfirm.
- * @param[in] interfaceId   The interfaceId of the address.
+ * @param[in] interface     The interfaceId of the address.
  *
  */
 CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface);

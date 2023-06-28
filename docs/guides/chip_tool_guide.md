@@ -54,13 +54,70 @@ To check if the CHIP Tool runs correctly, execute the following command from the
 $ ./chip-tool
 ```
 
-As a result, the CHIP Tool prints all available commands. These are called
-_clusters_ in this context, but not all listed commands correspond to the
-_clusters_ in the Data Model (for example, pairing or discover commands). Each
-listed command can however become the root of the new more complex command by
-appending it with sub-commands. Examples of specific commands and their use
-cases are described in the
+As a result, the CHIP Tool starts in the default
+[single-command mode](#single-command-mode-default) and prints all available
+commands. These are called _clusters_ in this context, but not all listed
+commands correspond to the _clusters_ in the Data Model (for example, pairing or
+discover commands). Each listed command can however become the root of the new
+more complex command by appending it with sub-commands. Examples of specific
+commands and their use cases are described in the
 [Supported commands and options](#supported-commands-and-options) section.
+
+<hr>
+
+## CHIP Tool modes
+
+The CHIP Tool can run in one of the following modes:
+
+### Single-command mode (default)
+
+In this mode, the CHIP Tool will exit with a timeout error if any single command
+does not complete within a certain timeout period.
+
+The timeout error will look similar to the following one:
+
+```
+[1650992689511] [32397:1415601] CHIP: [TOO] Run command failure: ../../../examples/chip-tool/commands/common/CHIPCommand.cpp:392: CHIP Error 0x00000032: Timeout
+```
+
+Moreover, when using the single-command mode, the CHIP Tool will establish a new
+CASE session with every command sent.
+
+#### Modifying timeout duration in single-command mode
+
+This timeout can be modified for any command execution by supplying the optional
+`--timeout` parameter, which takes a value in seconds, with the maximum being
+65535 seconds.
+
+**Example of command:**
+
+```
+$ ./chip-tool otasoftwareupdaterequestor subscribe-event state-transition 5 10 0x1234567890 0 --timeout 65535
+```
+
+### Interactive mode
+
+In this mode, a command will terminate with an error if it does not complete
+within the timeout period. However, the CHIP Tool will not be terminated and it
+will not terminate processes that previous commands have started. Moreover, when
+using the interactive mode, the CHIP Tool will establish a new CASE session only
+when there is no session available yet. On the following commands, it will use
+the existing session.
+
+#### Starting the interactive mode
+
+For commands such as event subscriptions that need to run for an extended period
+of time, the CHIP Tool can be started in interactive mode first before running
+the command.
+
+To start the interactive mode, run the following command:
+
+```
+$ ./chip-tool interactive start
+```
+
+In this mode, you can subscribe to events or attributes. For detailed steps, see
+[Subscribing to events or attributes](#subscribing-to-events-or-attributes).
 
 <hr>
 
@@ -397,55 +454,6 @@ $ ./chip-tool basic
 
 This section contains a general list of various CHIP Tool commands and options,
 not limited to commissioning procedure and cluster interaction.
-
-### Interactive mode versus single-command mode
-
-The CHIP Tool can run in one of the following modes:
-
--   Single-command mode (default) - In this mode, the CHIP Tool will exit with a
-    timeout error if any single command does not complete within a certain
-    timeout period.
-
-    The timeout error will look similar to the following one:
-
-    ```
-    [1650992689511] [32397:1415601] CHIP: [TOO] Run command failure: ../../../examples/chip-tool/commands/common/CHIPCommand.cpp:392: CHIP Error 0x00000032: Timeout
-    ```
-
-    Moreover, when using the single-command mode, the CHIP Tool will establish a
-    new CASE session with every command sent.
-
--   Interactive mode - In this mode, a command will terminate with an error if
-    it does not complete within the timeout period. However, the CHIP Tool will
-    not be terminated and it will not terminate processes that previous commands
-    have started. Moreover, when using the interactive mode, the CHIP Tool will
-    establish a new CASE session only when there is no session available yet. On
-    the following commands, it will use the existing session.
-
-#### Modifying timeout duration in single-command mode
-
-This timeout can be modified for any command execution by supplying the optional
-`--timeout` parameter, which takes a value in seconds, with the maximum being
-65535 seconds.
-
-**Example of command:**
-
-```
-$ ./chip-tool otasoftwareupdaterequestor subscribe-event state-transition 5 10 0x1234567890 0 --timeout 65535
-```
-
-#### Starting the interactive mode
-
-For commands such as event subscriptions that need to run for an extended period
-of time, the CHIP Tool can be started in interactive mode first before running
-the command.
-
-**Example of command:**
-
-```
-$ ./chip-tool interactive start
-otasoftwareupdaterequestor subscribe-event state-transition 5 10 ${NODE_ID} 0
-```
 
 ### Printing all supported clusters
 
@@ -1013,3 +1021,373 @@ In this command:
 ```
 $ ./chip-tool onoff toggle 1 1 --commissioner-name beta
 ```
+
+<hr>
+
+### Subscribing to events or attributes
+
+Subscribing to an event or an attribute lets you mirror the state of the event
+or the attribute as it changes in the Matter network. The list of events or
+attributes you can subscribe to depends on the chosen cluster.
+
+You can have more than one subscription at any given time and subscribe to more
+than one attribute or event within one subscription (those attributes or events
+can come from different clusters). However, you cannot subscribe to both
+attributes and events as part of a single subscription. In other words, each
+subscription must be dedicated exclusively to either attributes or events.
+
+For more information about subscriptions, see the Matter specification at
+chapter 8, section 5 (Subscribe Interaction).
+
+> **Note:** The subscription behavior will be different if you set the
+> subscription to be sent with the parameter `isUrgent` set to `True`. See the
+> Matter specification for more information.
+
+#### Subscribing to an attribute
+
+The following procedure will use the `doorlock` cluster as an example. Complete
+the following steps:
+
+1. Start the CHIP Tool in [interactive mode](#interactive-mode) by running the
+   following command:
+
+    ```
+    $ ./chiptool interactive start
+    ```
+
+    All of the commands that follow will be executed in the interactive mode
+    (`>>>`).
+
+1. Run the following command to display all the available attributes you can
+   subscribe to for the given `<cluster-name>`:
+
+    ```
+    >>> <cluster-name> subscribe
+    ```
+
+    The list of all available attributes for the cluster will appears.
+
+    > **Note:** Your accessory might not support all of these attributes. You
+    > will get an error if the controller sends an unsupported attribute.
+
+    For example, for the door lock cluster:
+
+    ```bash
+    >>> doorlock subscribe
+    ```
+
+    The following list will appear:
+
+    ```
+    +-------------------------------------------------------------------------------------+
+    | Attributes:                                                                         |
+    +-------------------------------------------------------------------------------------+
+    | * lock-state                                                                        |
+    | * lock-type                                                                         |
+    | * actuator-enabled                                                                  |
+    | * door-state                                                                        |
+    | * door-open-events                                                                  |
+    | * door-closed-events                                                                |
+    | * open-period                                                                       |
+    | * number-of-total-users-supported                                                   |
+    | * number-of-pinusers-supported                                                      |
+    | * number-of-rfidusers-supported                                                     |
+    | * number-of-week-day-schedules-supported-per-user                                   |
+    | * number-of-year-day-schedules-supported-per-user                                   |
+    | * number-of-holiday-schedules-supported                                             |
+    | * max-pincode-length                                                                |
+    | * min-pincode-length                                                                |
+    | * max-rfidcode-length                                                               |
+    | * min-rfidcode-length                                                               |
+    | * credential-rules-support                                                          |
+    | * number-of-credentials-supported-per-user                                          |
+    | * language                                                                          |
+    | * ledsettings                                                                       |
+    | * auto-relock-time                                                                  |
+    | * sound-volume                                                                      |
+    | * operating-mode                                                                    |
+    | * supported-operating-modes                                                         |
+    | * default-configuration-register                                                    |
+    | * enable-local-programming                                                          |
+    | * enable-one-touch-locking                                                          |
+    | * enable-inside-status-led                                                          |
+    | * enable-privacy-mode-button                                                        |
+    | * local-programming-features                                                        |
+    | * wrong-code-entry-limit                                                            |
+    | * user-code-temporary-disable-time                                                  |
+    | * send-pinover-the-air                                                              |
+    | * require-pinfor-remote-operation                                                   |
+    | * expiring-user-timeout                                                             |
+    | * generated-command-list                                                            |
+    | * accepted-command-list                                                             |
+    | * event-list                                                                        |
+    | * attribute-list                                                                    |
+    | * feature-map                                                                       |
+    | * cluster-revision                                                                  |
+    +-------------------------------------------------------------------------------------+
+    ```
+
+1. Add the argument of your choice to the subscription command, using the
+   following pattern:
+
+    ```bash
+    >>> <cluster-name> subscribe <argument> <min-interval> <max-interval> <node_id> <endpoint_id>
+    ```
+
+    In this command:
+
+    - _<cluster-name\>_ is the name of the cluster.
+    - _<argument\>_ is the name of the chosen argument.
+    - _<min-interval\>_ specifies the minimum number of seconds that must elapse
+      since the last report for the server to send a new report.
+    - _<max-interval\>_ specifies the number of seconds that must elapse since
+      the last report for the server to send a new report.
+    - _<node-id\>_ is the user-defined ID of the commissioned node.
+    - _<endpoint_id\>_ is the ID of the endpoint where the chosen cluster is
+      implemented.
+
+    For example:
+
+    ```bash
+    >>> doorlock subscribe lock-state 5 10 1 1
+    ```
+
+After this command is run, the CHIP Tool will check the state of the door lock
+every time it changes (for example, as a result of a button press or an external
+ecosystem action) and update it in its own records.
+
+#### Subscribing to an event
+
+The procedure for subscribing to an event is similar to
+[subscribing to an attribute](#subscribing-to-an-attribute).
+
+The following procedure will use the `doorlock` cluster as an example. Complete
+the following steps:
+
+1. Start the CHIP Tool in [interactive mode](#interactive-mode) by running the
+   following command:
+
+    ```
+    $ ./chiptool interactive start
+    ```
+
+    All of the commands that follow will be executed in the interactive mode
+    (`>>>`).
+
+1. Run the following command to display all the available events you can
+   subscribe to for the given `<cluster-name>`:
+
+    ```
+    >>> <cluster-name> subscribe-event
+    ```
+
+    The list of all available events for the cluster will appears.
+
+    > **Note:** Your accessory might not support all of these events. You will
+    > get an error if the controller sends an unsupported event.
+
+    For example, for the door lock cluster:
+
+    ```bash
+    >>> doorlock subscribe-event
+    ```
+
+    The following list will appear:
+
+    ```
+    +-------------------------------------------------------------------------------------+
+    | Events:                                                                             |
+    +-------------------------------------------------------------------------------------+
+    | * door-lock-alarm                                                                   |
+    | * door-state-change                                                                 |
+    | * lock-operation                                                                    |
+    | * lock-operation-error                                                              |
+    | * lock-user-change                                                                  |
+    +-------------------------------------------------------------------------------------+
+    ```
+
+1. Add the event of your choice to the subscription command, using the following
+   pattern:
+
+    ```bash
+    >>> <cluster-name> subscribe-event <event-name> <min-interval> <max-interval> <node_id> <endpoint_id>
+    ```
+
+    In this command:
+
+    - _<cluster-name\>_ is the name of the cluster.
+    - _<event-name\>_ is the name of the chosen event.
+    - _<min-interval\>_ specifies the minimum number of seconds that must elapse
+      since the last report for the server to send a new report.
+    - _<max-interval\>_ specifies the number of seconds that must elapse since
+      the last report for the server to send a new report.
+    - _<node_id\>_ is the user-defined ID of the commissioned node.
+    - _<endpoint_id\>_ is the ID of the endpoint where the chosen cluster is
+      implemented.
+
+    For example:
+
+    ```bash
+    >>> doorlock subscribe-event door-lock-alarm 5 10 1 1
+    ```
+
+After this command is run, the CHIP Tool will check the state of the door lock
+every time it changes (for example, as a result of a button press or an external
+ecosystem action) and update it in its own records.
+
+#### Subscribing using attribute ID or event ID
+
+You can also use the following commands instead of `subscribe` to subscribe
+using the attribute ID or the event ID:
+
+-   `subscribe-by-id`
+-   `subscribe-event-by-id`
+
+The steps are the same as for the `subscribe` or `subscribe-event` commands.
+
+<hr>
+
+## Using wildcards
+
+The CHIP Tool supports command wildcards for parameter values for clusters,
+attributes or events, or endpoints, or any combination of these. With the
+wildcards, you can for example read all attributes for the cluster `0x101` on a
+specific endpoint with a specific node ID on all devices in the Matter network.
+This allows you to parse and gather cluster information faster and more
+efficiently.
+
+The following wildcards are available:
+
+-   For all attributes: `0xFFFFFFFF`
+-   For all clusters: `0xFFFFFFFF`
+-   For all endpoints: `0xFFFF`
+
+You can combine these wildcards within a single command. Wildcards can be used
+in both [single-command](#single-command-mode-default) and
+[interactive](#interactive-mode) modes.
+
+You can use the following command pattern:
+
+```
+$ ./chip-tool <cluster_name> <command> <attribute_event_name> <node_id> <endpoint_id>
+```
+
+In this command:
+
+-   _<cluster-name\>_ is the name of the cluster.
+-   _<command\>_ is the name of the command supported by wildcards:
+
+    ```
+    +-------------------------------------------------------------------------------------+
+    | Commands:                                                                           |
+    +-------------------------------------------------------------------------------------+
+    | * read                                                                              |
+    | * read-by-id                                                                        |
+    | * subscribe                                                                         |
+    | * subscribe-by-id                                                                   |
+    +-------------------------------------------------------------------------------------+
+    ```
+
+-   _<attribute_event_name\>_ is the name of the chosen attribute or event.
+-   _<node_id\>_ is the user-defined ID of the commissioned node.
+-   _<endpoint_id\>_ is the ID of the endpoint where the chosen cluster is
+    implemented.
+
+**Examples of commands:**
+
+-   To read all attributes (wildcard `0xFFFFFFFF`) from the cluster `doorlock`
+    for the node with ID `1` and on the endpoint `1`, run the following command:
+
+    ```
+    $ ./chip-tool doorlock read-by-id 0xFFFFFFFF 1 1
+    ```
+
+-   To read the `lock-state` attribute from the cluster `doorlock` for the node
+    with ID `1` and on all endpoints (wildcard `0xFFFF`), run the following
+    command:
+
+    ```
+    $ ./chip-tool doorlock read lock-state 1 0xFFFF
+    ```
+
+-   To read all attributes (wildcard `0xFFFFFFFF`) from the cluster `doorlock`
+    for the node with ID `1` and on all endpoints (wildcard `0xFFFF`), run the
+    following command:
+
+    ```
+    $ ./chip-tool doorlock read-by-id 0xFFFFFFFF 1 0xFFFF
+    ```
+
+### Using wildcards with `any` command
+
+Using the `any` command lets you use wildcards also for the cluster names. The
+`any` command can be combined with the following commands:
+
+```
++-------------------------------------------------------------------------------------+
+| Commands:                                                                           |
++-------------------------------------------------------------------------------------+
+| * command-by-id                                                                     |
+| * read-by-id                                                                        |
+| * write-by-id                                                                       |
+| * subscribe-by-id                                                                   |
+| * read-event-by-id                                                                  |
+| * subscribe-event-by-id                                                             |
+| * read-all                                                                          |
+| * subscribe-all                                                                     |
++-------------------------------------------------------------------------------------+
+```
+
+As a result, you can use the following command pattern:
+
+```
+$ ./chip-tool any <command_name> [parameters of the <command_name>]
+```
+
+In this command:
+
+-   _<command_name\>_ is one of the commands supported for the `any` command, as
+    listed above.
+-   _[parameters of the <command_name\>]_ are the parameters required by
+    _<command_name\>_. You can check them by running the command without any
+    parameters.
+
+**Example of command pattern for `read-by-id`:**
+
+```
+$ ./chip-tool any read-by-id <cluster-ids> <attribute-ids> <destination-id> <endpoint-ids>
+```
+
+**Examples of commands:**
+
+-   To read the `0x0` attribute (`lock state`) on the cluster `0x101`
+    (`doorlock`) for the node with ID `1` and on the endpoint `1`, run the
+    following command:
+
+    ```
+    $ ./chip-tool any read-by-id 0x101 0x0 1 1
+    ```
+
+-   To read all attributes (wildcard `0xFFFFFFFF`) from the cluster `0x101`
+    (`doorlock`) for the node with ID `1` and on the endpoint `1`, run the
+    following command:
+
+    ```
+    $ ./chip-tool any read-by-id 0x101 0xFFFFFFFF 1 1
+    ```
+
+-   To read all attributes (wildcard `0xFFFFFFFF`) on all clusters (wildcard
+    `0xFFFFFFFF`) for the node with ID `1` and on the endpoint `1`, run the
+    following command:
+
+    ```
+    ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 1
+    ```
+
+-   To read all attributes (wildcard `0xFFFFFFFF`) on all clusters (wildcard
+    `0xFFFFFFFF`) for the node with ID `1` and on all endpoints (wildcard
+    `0xFFFF`), run the following command:
+
+    ```
+    ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+    ```

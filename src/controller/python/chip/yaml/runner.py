@@ -837,7 +837,7 @@ class ReplTestRunner:
 
     def encode(self, request) -> BaseAction:
         action = None
-        cluster = request.cluster.replace(' ', '').replace('/', '')
+        cluster = request.cluster.replace(' ', '').replace('/', '').replace('.', '')
         command = request.command
         if cluster == 'CommissionerCommands':
             return self._commissioner_command_action_factory(request)

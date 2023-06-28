@@ -474,9 +474,9 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
     // Blocking transmit for the MG24 + WF200 since UART TX is multiplexed with
     // WF200 SPI IRQ
-    pre_uart_transfer();
+    sl_wfx_host_pre_uart_transfer();
     UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) buffer, nbOfBytes);
-    post_uart_transfer();
+    sl_wfx_host_post_uart_transfer();
 #else
     // Non Blocking Transmit
     UARTDRV_Transmit(vcom_handle, (uint8_t *) buffer, nbOfBytes, UART_tx_callback);

@@ -32,9 +32,7 @@ extern "C" {
 #include "hal/serial_api.h"
 }
 
-#ifdef TFM_SUPPORT
 extern "C" uint32_t tfm_ns_interface_init(void);
-#endif // TFM_SUPPORT
 
 #define CALLER_ADDR() __builtin_extract_return_addr(__builtin_return_address(0))
 
@@ -228,7 +226,6 @@ static void main_thread(void * argument)
 
     // It is safe to use printf from this point
 
-#ifdef TFM_SUPPORT
     {
         int ret = tfm_ns_interface_init();
         if (ret != 0)
@@ -237,7 +234,6 @@ static void main_thread(void * argument)
             abort();
         }
     }
-#endif
 
     /* Run the C++ global object constructors */
     __libc_init_array();

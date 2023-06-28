@@ -40,9 +40,9 @@
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
 #include <utils_list.h>
 #endif
 
@@ -506,15 +506,22 @@ void AppTask::ButtonEventHandler(void * arg)
     uint32_t presstime;
     if (ButtonPressed())
     {
+#ifdef BL702L_ENABLE
+        bl_set_gpio_intmod(gpio_key.port, HOSAL_IRQ_TRIG_NEG_LEVEL);
+#else
         bl_set_gpio_intmod(gpio_key.port, 1, HOSAL_IRQ_TRIG_NEG_LEVEL);
+#endif
 
         GetAppTask().mButtonPressedTime = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
         GetAppTask().PostEvent(APP_EVENT_BTN_FACTORY_RESET_PRESS);
     }
     else
     {
+#ifdef BL702L_ENABLE
+        bl_set_gpio_intmod(gpio_key.port, HOSAL_IRQ_TRIG_POS_PULSE);
+#else
         bl_set_gpio_intmod(gpio_key.port, 1, HOSAL_IRQ_TRIG_POS_PULSE);
-
+#endif
         if (GetAppTask().mButtonPressedTime)
         {
             presstime = chip::System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime;

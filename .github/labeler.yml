@@ -44,6 +44,10 @@ integrations:
     - integrations/*
     - integrations/**/*
 
+docker:
+    - integrations/docker/*
+    - integrations/docker/**/*
+
 vscode:
     - .vscode/*
     - .vscode/**/*

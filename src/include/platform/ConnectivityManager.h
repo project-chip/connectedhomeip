@@ -31,7 +31,6 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT

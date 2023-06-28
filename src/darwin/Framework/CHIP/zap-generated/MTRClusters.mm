@@ -1039,10 +1039,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
                                         auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                        if (element_2.attributeID != nil) {
-                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeID.Emplace();
-                                            definedValue_4 = element_2.attributeID.unsignedIntValue;
-                                        }
+                                        listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
                                         listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
                                     }
                                     listHolder_0->mList[i_0].attributeValueList
@@ -1591,10 +1588,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
                                         auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                        if (element_2.attributeID != nil) {
-                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeID.Emplace();
-                                            definedValue_4 = element_2.attributeID.unsignedIntValue;
-                                        }
+                                        listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
                                         listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
                                     }
                                     listHolder_0->mList[i_0].attributeValueList
@@ -12894,141 +12888,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 @end
 
-@implementation MTRClusterWasherControls
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithQueue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _endpoint = [endpointID unsignedShortValue];
-        _device = device;
-    }
-    return self;
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeSpinSpeedsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeSpinSpeedsID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeSpinSpeedCurrentWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeSpinSpeedCurrentID)
-                                             params:params];
-}
-
-- (void)writeAttributeSpinSpeedCurrentWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeSpinSpeedCurrentWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeSpinSpeedCurrentWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                         params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                  attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeSpinSpeedCurrentID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeNumberOfRinsesWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeNumberOfRinsesID)
-                                             params:params];
-}
-
-- (void)writeAttributeNumberOfRinsesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeNumberOfRinsesWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeNumberOfRinsesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                       params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                  attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeNumberOfRinsesID)
-                                        value:dataValueDictionary
-                        expectedValueInterval:expectedValueIntervalMs
-                            timedWriteTimeout:timedWriteTimeout];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeMaxRinsesWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeMaxRinsesID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeGeneratedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeAcceptedCommandListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeEventListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeAttributeListID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeFeatureMapID)
-                                             params:params];
-}
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWasherControlsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWasherControlsAttributeClusterRevisionID)
-                                             params:params];
-}
-
-@end
-
 @implementation MTRClusterTemperatureControl
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
@@ -13249,6 +13108,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
                                         attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeStateID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeSupportedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeSupportedID)
                                              params:params];
 }
 
@@ -13579,6 +13446,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeExpiryDateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeSmokeCOAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID)
+                                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params

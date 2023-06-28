@@ -200,6 +200,46 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
 #endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
 
+CHIP_ERROR LayerImplSelect::ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+{
+    VerifyOrReturnError(delay.count() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    assertChipStackLockedByCurrentThread();
+
+    Clock::Timeout remainingTime = mTimerList.GetRemainingTime(onComplete, appState);
+    if (remainingTime.count() < delay.count())
+    {
+        if (remainingTime == Clock::kZero)
+        {
+            // If remaining time is Clock::kZero, it might possible that our timer is in
+            // the mExpiredTimers list and about to be fired. Remove it from that list, since we are extending it.
+            mExpiredTimers.Remove(onComplete, appState);
+        }
+        return StartTimer(delay, onComplete, appState);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+bool LayerImplSelect::IsTimerActive(TimerCompleteCallback onComplete, void * appState)
+{
+    bool timerIsActive = (mTimerList.GetRemainingTime(onComplete, appState) > Clock::kZero);
+
+    if (!timerIsActive)
+    {
+        // check if the timer is in the mExpiredTimers list about to be fired.
+        for (TimerList::Node * timer = mExpiredTimers.Earliest(); timer != nullptr; timer = timer->mNextTimer)
+        {
+            if (timer->GetCallback().GetOnComplete() == onComplete && timer->GetCallback().GetAppState() == appState)
+            {
+                return true;
+            }
+        }
+    }
+
+    return timerIsActive;
+}
+
 void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();

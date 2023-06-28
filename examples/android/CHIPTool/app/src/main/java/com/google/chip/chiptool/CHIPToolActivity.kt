@@ -210,7 +210,7 @@ class CHIPToolActivity :
       // parse payload from JSON
       val setupPayload = OnboardingPayload()
       // set defaults
-      setupPayload.discoveryCapabilities = setOf()
+      setupPayload.discoveryCapabilities = mutableSetOf()
       setupPayload.optionalQRCodeInfo = HashMap()
 
       // read from payload

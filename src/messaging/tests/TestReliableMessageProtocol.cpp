@@ -29,6 +29,7 @@
 #include <lib/support/UnitTestUtils.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
 #include <transport/SessionManager.h>
@@ -56,6 +57,18 @@ using namespace chip::System::Clock::Literals;
 using TestContext = Test::LoopbackMessagingContext;
 
 const char PAYLOAD[] = "Hello!";
+
+#ifdef CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
+// When the CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST is set, the stack
+// operates under the assumption of a high latency network (like Thread),
+// so it adds extra delays to avoid spurious retransmits.
+//
+// This adds extra I/O time to account for this. See the documentation for
+// CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST for more details.
+constexpr auto retryBoosterTimeout = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS * CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
+#else
+constexpr auto retryBoosterTimeout = System::Clock::Milliseconds32(0);
+#endif
 
 class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
@@ -363,7 +376,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the initial message to fail (should take 330-413ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 2; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #1  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -380,7 +393,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the 1st retry to fail (should take 330-413ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 3; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 3; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #2  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -397,7 +410,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the 2nd retry to fail (should take 528-660ms)
-    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 4; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 4; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #3  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -414,7 +427,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // Wait for the 3rd retry to fail (should take 845-1056ms)
-    ctx.GetIOContext().DriveIOUntil(1500_ms32, [&] { return loopback.mSentMessageCount >= 5; });
+    ctx.GetIOContext().DriveIOUntil(1500_ms32 + retryBoosterTimeout, [&] { return loopback.mSentMessageCount >= 5; });
     now         = System::SystemClock().GetMonotonicTimestamp();
     timeoutTime = now - startTime;
     ChipLogProgress(Test, "Attempt #4  Timeout : %" PRIu32 "ms", timeoutTime.count());
@@ -1655,7 +1668,7 @@ void CheckGetBackoff(nlTestSuite * inSuite, void * inContext)
                             backoff.count());
 
             NL_TEST_ASSERT(inSuite, backoff >= test.backoffMin);
-            NL_TEST_ASSERT(inSuite, backoff <= test.backoffMax);
+            NL_TEST_ASSERT(inSuite, backoff <= test.backoffMax + retryBoosterTimeout);
         }
     }
 }
@@ -1683,38 +1696,37 @@ int InitializeTestCase(void * inContext)
  * 8. A sends message 5 to B.
  */
 
-// Test Suite
-
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-const nlTest sTests[] =
-{
+const nlTest sTests[] = {
     NL_TEST_DEF("Test ReliableMessageMgr::CheckAddClearRetrans", CheckAddClearRetrans),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendApplicationMessage", CheckResendApplicationMessage),
-    NL_TEST_DEF("Test ReliableMessageMgr::CheckCloseExchangeAndResendApplicationMessage", CheckCloseExchangeAndResendApplicationMessage),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckCloseExchangeAndResendApplicationMessage",
+                CheckCloseExchangeAndResendApplicationMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckFailedMessageRetainOnSend", CheckFailedMessageRetainOnSend),
-    NL_TEST_DEF("Test ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange", CheckResendApplicationMessageWithPeerExchange),
-    NL_TEST_DEF("Test ReliableMessageMgr::CheckResendSessionEstablishmentMessageWithPeerExchange", CheckResendSessionEstablishmentMessageWithPeerExchange),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange",
+                CheckResendApplicationMessageWithPeerExchange),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckResendSessionEstablishmentMessageWithPeerExchange",
+                CheckResendSessionEstablishmentMessageWithPeerExchange),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessage", CheckDuplicateMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessageClosedExchange", CheckDuplicateMessageClosedExchange),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateOldMessageClosedExchange", CheckDuplicateOldMessageClosedExchange),
     NL_TEST_DEF("Test that a reply after a standalone ack comes through correctly", CheckReceiveAfterStandaloneAck),
-    NL_TEST_DEF("Test that a reply to a non-MRP message piggybacks an ack if there were MRP things happening on the context before", CheckPiggybackAfterPiggyback),
+    NL_TEST_DEF("Test that a reply to a non-MRP message piggybacks an ack if there were MRP things happening on the context before",
+                CheckPiggybackAfterPiggyback),
     NL_TEST_DEF("Test sending an unsolicited ack-soliciting 'standalone ack' message", CheckSendUnsolicitedStandaloneAckMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", CheckSendStandaloneAckMessage),
-    NL_TEST_DEF("Test command, response, default response, with receiver closing exchange after sending response", CheckMessageAfterClosed),
+    NL_TEST_DEF("Test command, response, default response, with receiver closing exchange after sending response",
+                CheckMessageAfterClosed),
     NL_TEST_DEF("Test that unencrypted message is dropped if exchange requires encryption", CheckUnencryptedMessageReceiveFailure),
-    NL_TEST_DEF("Test that dropping an application-level message with a piggyback ack works ok once both sides retransmit", CheckLostResponseWithPiggyback),
-    NL_TEST_DEF("Test that an application-level response-to-response after a lost standalone ack to the initial message works", CheckLostStandaloneAck),
+    NL_TEST_DEF("Test that dropping an application-level message with a piggyback ack works ok once both sides retransmit",
+                CheckLostResponseWithPiggyback),
+    NL_TEST_DEF("Test that an application-level response-to-response after a lost standalone ack to the initial message works",
+                CheckLostStandaloneAck),
     NL_TEST_DEF("Test MRP backoff algorithm", CheckGetBackoff),
-
-    NL_TEST_SENTINEL()
+    NL_TEST_SENTINEL(),
 };
 
-nlTestSuite sSuite =
-{
+// clang-format off
+nlTestSuite sSuite = {
     "Test-CHIP-ReliableMessageProtocol",
     &sTests[0],
     TestContext::Initialize,
@@ -1725,9 +1737,6 @@ nlTestSuite sSuite =
 
 } // namespace
 
-/**
- *  Main
- */
 int TestReliableMessageProtocol()
 {
     return chip::ExecuteTestsWithContext<TestContext>(&sSuite);

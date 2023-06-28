@@ -508,5 +508,28 @@ IPAddress IPAddress::MakeIPv4Broadcast()
     return ipAddr;
 }
 
+IPAddress IPAddress::Loopback(IPAddressType type)
+{
+    IPAddress address;
+#if INET_CONFIG_ENABLE_IPV4
+    if (type == IPAddressType::kIPv4)
+    {
+        address.Addr[0] = 0;
+        address.Addr[1] = 0;
+        address.Addr[2] = htonl(0xFFFF);
+        address.Addr[3] = htonl(0x7F000001);
+    }
+    else
+#endif
+    {
+        address.Addr[0] = 0;
+        address.Addr[1] = 0;
+        address.Addr[2] = 0;
+        address.Addr[3] = htonl(1);
+    }
+
+    return address;
+}
+
 } // namespace Inet
 } // namespace chip
