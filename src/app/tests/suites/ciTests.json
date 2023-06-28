@@ -145,7 +145,10 @@
         "Test_TC_APBSC_9_1",
         "Test_TC_CONTENTLAUNCHER_10_1",
         "Test_TC_WAKEONLAN_4_1",
-        "Test_TC_ALOGIN_12_1"
+        "Test_TC_ALOGIN_12_1",
+        "Test_TC_CONTENTLAUNCHER_10_3",
+        "Test_TC_CONTENTLAUNCHER_10_5",
+        "Test_TC_CONTENTLAUNCHER_10_7"
     ],
     "ModeSelect": ["Test_TC_MOD_1_1"],
     "MultipleFabrics": [],
