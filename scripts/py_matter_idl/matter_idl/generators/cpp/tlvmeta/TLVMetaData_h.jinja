@@ -11,9 +11,9 @@ namespace TLVMeta {
 /// Fake tags for indexing inside cluster meta data
 /// This is because attributes,commands and events share
 /// a shared ID namespace
-static constexpr Tag kClusterAttributes = ContextTag(1);
-static constexpr Tag kClusterCommands = ContextTag(2);
-static constexpr Tag kClusterEvents = ContextTag(3);
+static constexpr Tag kClusterAttributesTag = ContextTag(1);
+static constexpr Tag kClusterCommandsTag = ContextTag(2);
+static constexpr Tag kClusterEventsTag = ContextTag(3);
 
 struct ItemInfo {
   Tag tag;

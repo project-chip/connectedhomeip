@@ -14,7 +14,7 @@
 # limitations under the License.
 import os
 from dataclasses import dataclass
-from typing import Generator, List, Optional
+from typing import Generator, List, Optional, Set
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import Cluster, ClusterSide, Field, Idl, StructTag
@@ -22,7 +22,7 @@ from matter_idl.matter_idl_types import Cluster, ClusterSide, Field, Idl, Struct
 
 @dataclass
 class TableEntry:
-    code: int                # Unique code for the entry
+    code: str                # Encoding like ContextTag() or AnonymousTag() or similar
     name: str                # human friendly name
     reference: Optional[str]  # reference to full name
     real_type: str           # real type
@@ -48,14 +48,19 @@ class ClusterTablesGenerator:
         if type_reference not in self.known_types:
             type_reference = None
 
-        # TODO: need to generate list logic
-        #       as lists require a second indirection
+        real_type = "%s::%s" % (self.cluster.name, field.data_type.name)
+        if field.is_list:
+            real_type = real_type + "[]"
+
+            if type_reference:
+                self.list_types.add(type_reference)
+                type_reference = type_reference + "_list_";
 
         return TableEntry(
-            code=field.code,
+            code=f'ContextTag({field.code})',
             name=field.name,
             reference=type_reference,
-            real_type="%s::%s" % (self.cluster.name, field.data_type.name)
+            real_type=real_type,
         )
 
     def ComputeKnownTypes(self):
@@ -73,7 +78,9 @@ class ClusterTablesGenerator:
         for c in self.cluster.commands:
             if c.input_param:
                 yield TableEntry(
-                    name=c.input_param, code=c.code, reference="%s_%s" % (
+                    name=c.input_param,
+                    code=f'ContextTag(c.code)',
+                    reference="%s_%s" % (
                         self.cluster.name, c.input_param),
                     real_type="%s::%s::%s" % (
                         self.cluster.name, c.name, c.input_param)
@@ -85,7 +92,9 @@ class ClusterTablesGenerator:
             if c.tag != StructTag.RESPONSE:
                 continue
             yield TableEntry(
-                name=c.name, code=c.code, reference="%s_%s" % (
+                name=c.name,
+                code=f'ContextTag(c.code)',
+                reference="%s_%s" % (
                     self.cluster.name, c.name),
                 real_type="%s::%s" % (self.cluster.name, c.name),
             )
@@ -128,19 +137,32 @@ class ClusterTablesGenerator:
             entries=[entry for entry in self.CommandEntries()],
         )
 
+        # some items have lists, create an intermediate item for those
+        for name in self.list_types:
+            yield Table(
+                full_name="%s_list_" % name,
+                entries = [
+                    TableEntry(
+                        code="AnonymousTag()",
+                        name="[]",
+                        reference=name,
+                        real_type="%s[]" % name,
+                    )
+                ]
+            )
+
         # TODO:
         #  - enums and bitmaps could be decoded with their value (by abusing tags a bit)
-        #  - list indices require one extra indirection
 
 
 def ClusterToTables(cluster: Cluster) -> List[Table]:
 
     cluster_table = Table(full_name=cluster.name, entries=[
-        TableEntry(code=1, name="attributes", reference="%s_attributes" %
+        TableEntry(code="kClusterAttributesTag", name="attributes", reference="%s_attributes" %
                    cluster.name, real_type="%s/attr" % (cluster.name,)),
-        TableEntry(code=2, name="commands", reference="%s_commands" %
+        TableEntry(code="kClusterCommandsTag", name="commands", reference="%s_commands" %
                    cluster.name, real_type="%s/cmd" % (cluster.name,)),
-        TableEntry(code=3, name="events", reference="%s_events" %
+        TableEntry(code="kClusterEventsTag", name="events", reference="%s_events" %
                    cluster.name, real_type="%s/ev" % (cluster.name,)),
     ])
     result = [cluster_table]

@@ -11,7 +11,7 @@ using namespace chip::TLV;
 
 Entry<ItemInfo> _{{table.full_name}}[] = {
   {%-  for entry in table.entries %}
-  { { ContextTag({{entry.code}}), "{{entry.name}}"}, {{entry.reference | indexInTable(sub_tables)}} }, // {{entry.real_type}}
+  { { {{entry.code}}, "{{entry.name}}"}, {{entry.reference | indexInTable(sub_tables)}} }, // {{entry.real_type}}
   {%- endfor %}
 };
 {%- endfor %}
