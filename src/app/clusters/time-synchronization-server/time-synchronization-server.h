@@ -70,14 +70,17 @@ public:
 
     CHIP_ERROR SetTrustedTimeSource(const DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & tts);
     CHIP_ERROR SetDefaultNTP(const DataModel::Nullable<chip::CharSpan> & dntp);
+    void InitTimeZone(void);
     CHIP_ERROR SetTimeZone(const DataModel::DecodableList<Structs::TimeZoneStruct::Type> & tzL);
     CHIP_ERROR LoadTimeZone(void);
     CHIP_ERROR ClearTimeZone(void);
+    void InitDSTOffset(void);
     CHIP_ERROR SetDSTOffset(const DataModel::DecodableList<Structs::DSTOffsetStruct::Type> & dstL);
+    CHIP_ERROR LoadDSTOffset(void);
     CHIP_ERROR ClearDSTOffset(void);
     DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & GetTrustedTimeSource(void);
-    Span<TimeSyncDataProvider::TimeZoneStore> GetTimeZone(void);
-    DataModel::List<Structs::DSTOffsetStruct::Type> GetDSTOffset(void);
+    Span<TimeSyncDataProvider::TimeZoneStore> & GetTimeZone(void);
+    DataModel::List<Structs::DSTOffsetStruct::Type> & GetDSTOffset(void);
     CHIP_ERROR GetDefaultNtp(MutableCharSpan & dntp);
 
     CHIP_ERROR SetUTCTime(chip::EndpointId ep, uint64_t utcTime, GranularityEnum granularity, TimeSourceEnum source);
@@ -86,8 +89,8 @@ public:
 
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 
-    TimeState GetUpdatedTimeZoneState();
-    TimeState GetUpdatedDSTOffsetState();
+    TimeState UpdateTimeZoneState();
+    TimeState UpdateDSTOffsetState();
     TimeSyncEventFlag GetEventFlag(void);
     void ClearEventFlag(TimeSyncEventFlag flag);
 
