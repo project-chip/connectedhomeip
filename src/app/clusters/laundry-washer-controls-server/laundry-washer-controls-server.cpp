@@ -47,7 +47,6 @@ static constexpr size_t kLaundryWasherControlsDelegateTableSize =
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 //
-using chip::app::Clusters::LaundryWasherControls::Delegate;
 namespace {
 Delegate * gDelegateTable[kLaundryWasherControlsDelegateTableSize] = { nullptr };
 }
@@ -185,10 +184,9 @@ void MatterLaundryWasherControlsClusterServerAttributeChangedCallback(const chip
     return;
 }
 
-chip::Protocols::InteractionModel::Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(
+Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    // ToDo
     return imcode::Success;
 }
 
