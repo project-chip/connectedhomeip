@@ -2,7 +2,7 @@
 {{#if generateClientCluster}}client {{else}}server {{/if~}}
 cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
-  enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
+  enum {{asUpperCamelCase name preserveAcronyms=true}} : ENUM{{multiply size 8}} {
     {{#zcl_enum_items}}
     k{{asUpperCamelCase label preserveAcronyms=true}} = {{value}};
     {{/zcl_enum_items}}
@@ -10,7 +10,7 @@ cluster {{asUpperCamelCase name}} = {{code}} {
 
   {{/zcl_enums}}
   {{#zcl_bitmaps}}
-  bitmap {{name}} : BITMAP{{multiply size 8}} {
+  bitmap {{asUpperCamelCase name preserveAcronyms=true}} : BITMAP{{multiply size 8}} {
     {{#zcl_bitmap_items}}
     k{{asUpperCamelCase label preserveAcronyms=true}} = {{asHex mask}};
     {{/zcl_bitmap_items}}
