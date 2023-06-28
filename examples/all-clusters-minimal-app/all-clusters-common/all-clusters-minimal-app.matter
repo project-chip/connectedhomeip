@@ -2792,12 +2792,17 @@ server cluster FanControl = 514 {
     kReverse = 1;
   }
 
-  enum DirectionEnum : ENUM8 {
-    kIncrease = 0;
-    kDecrease = 1;
+  enum FanModeEnum : ENUM8 {
+    kOff = 0;
+    kLow = 1;
+    kMedium = 2;
+    kHigh = 3;
+    kOn = 4;
+    kAuto = 5;
+    kSmart = 6;
   }
 
-  enum FanModeSequenceType : ENUM8 {
+  enum FanModeSequenceEnum : ENUM8 {
     kOffLowMedHigh = 0;
     kOffLowHigh = 1;
     kOffLowMedHighAuto = 2;
@@ -2806,14 +2811,9 @@ server cluster FanControl = 514 {
     kOffOn = 5;
   }
 
-  enum FanModeType : ENUM8 {
-    kOff = 0;
-    kLow = 1;
-    kMedium = 2;
-    kHigh = 3;
-    kOn = 4;
-    kAuto = 5;
-    kSmart = 6;
+  enum StepDirectionEnum : ENUM8 {
+    kIncrease = 0;
+    kDecrease = 1;
   }
 
   bitmap Feature : BITMAP32 {
@@ -2825,26 +2825,21 @@ server cluster FanControl = 514 {
     kAirflowDirection = 0x20;
   }
 
-  bitmap RockSupportMask : BITMAP8 {
+  bitmap RockBitmap : BITMAP8 {
     kRockLeftRight = 0x1;
     kRockUpDown = 0x2;
     kRockRound = 0x4;
   }
 
-  bitmap WindSettingMask : BITMAP8 {
+  bitmap WindBitmap : BITMAP8 {
     kSleepWind = 0x1;
     kNaturalWind = 0x2;
   }
 
-  bitmap WindSupportMask : BITMAP8 {
-    kSleepWind = 0x1;
-    kNaturalWind = 0x2;
-  }
-
-  attribute FanModeType fanMode = 0;
-  attribute FanModeSequenceType fanModeSequence = 1;
-  attribute nullable int8u percentSetting = 2;
-  readonly attribute int8u percentCurrent = 3;
+  attribute FanModeEnum fanMode = 0;
+  attribute FanModeSequenceEnum fanModeSequence = 1;
+  attribute nullable Percent percentSetting = 2;
+  readonly attribute Percent percentCurrent = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
