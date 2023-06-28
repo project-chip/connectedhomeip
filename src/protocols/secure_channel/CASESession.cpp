@@ -2214,17 +2214,17 @@ bool CASESession::InvokeBackgroundWorkWatchdog()
     {
         ChipLogError(SecureChannel, "SendSigma3Helper was unable to schedule the AfterWorkCallback");
         mSendSigma3Helper->DoAfterWork();
-        wasBlocked = true;
+        watchdogFired = true;
     }
 
     if (mHandleSigma3Helper && mHandleSigma3Helper->UnableToScheduleAfterWorkCallback())
     {
         ChipLogError(SecureChannel, "HandleSigma3Helper was unable to schedule the AfterWorkCallback");
         mHandleSigma3Helper->DoAfterWork();
-        wasBlocked = true;
+        watchdogFired = true;
     }
 
-    return wasBlocked;
+    return watchdogFired;
 }
 
 } // namespace chip
