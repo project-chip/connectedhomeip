@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <operational-state-delegate-impl.h>
+#include <app/clusters/operational-state-server/operational-state-delegate.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 
@@ -374,7 +374,7 @@ void TestStructGenericOperationalErrorFuncSet(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, operationalError.errorStateID == to_underlying(ErrorStateEnum::kUnableToStartOrResume));
     NL_TEST_ASSERT(inSuite, operationalError.errorStateLabel.HasValue() == true);
     NL_TEST_ASSERT(inSuite, operationalError.errorStateLabel.Value().size() == kOperationalErrorLabelMaxSize);
-    NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(operationalError.errorStateLabel.Value().data()), labelBuffer, kOperationalErrorLabelMaxSize) == 0);
+    NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(operationalError.errorStateLabel.Value().data()), labelBuffer2, kOperationalErrorLabelMaxSize) == 0);
     NL_TEST_ASSERT(inSuite, operationalError.errorStateDetails.HasValue() == false);
 
     //change state with label and details, details len = kOperationalErrorDetailsMaxSize + 1
@@ -389,12 +389,12 @@ void TestStructGenericOperationalErrorFuncSet(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, operationalError.errorStateID == to_underlying(ErrorStateEnum::kUnableToStartOrResume));
     NL_TEST_ASSERT(inSuite, operationalError.errorStateLabel.HasValue() == true);
     NL_TEST_ASSERT(inSuite, operationalError.errorStateLabel.Value().size() == kOperationalErrorLabelMaxSize);
-    NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(operationalError.errorStateLabel.Value().data()), labelBuffer, kOperationalErrorLabelMaxSize) == 0);
+    NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(operationalError.errorStateLabel.Value().data()), labelBuffer2, kOperationalErrorLabelMaxSize) == 0);
 
     NL_TEST_ASSERT(inSuite, operationalError.errorStateDetails.HasValue() == true);
 
     NL_TEST_ASSERT(inSuite, operationalError.errorStateDetails.Value().size() == kOperationalErrorDetailsMaxSize);
-    NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(operationalError.errorStateDetails.Value().data()), labelBuffer, kOperationalErrorDetailsMaxSize) == 0);
+    NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(operationalError.errorStateDetails.Value().data()), detailBuffer2, kOperationalErrorDetailsMaxSize) == 0);
 }
 
 
