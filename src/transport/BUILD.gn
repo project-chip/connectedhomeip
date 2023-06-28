@@ -45,6 +45,7 @@ static_library("transport") {
     "SessionManager.h",
     "SessionMessageCounter.h",
     "SessionMessageDelegate.h",
+    "TracingStructs.h",
     "TransportMgr.h",
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",
@@ -64,6 +65,8 @@ static_library("transport") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/tracing",
+    "${chip_root}/src/tracing:macros",
     "${chip_root}/src/transport/raw",
     "${nlio_root}:nlio",
   ]

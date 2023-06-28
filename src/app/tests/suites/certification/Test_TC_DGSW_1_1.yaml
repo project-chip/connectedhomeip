@@ -149,7 +149,7 @@ tests:
                 value: "y"
 
     - label: "TH reads EventList from DUT"
-      PICS: DGSW.S.F00 && DGSW.S.Afffa
+      PICS: DGSW.S.E00 && DGSW.S.Afffa
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -158,7 +158,7 @@ tests:
               contains: [0]
 
     - label: "TH reads EventList from DUT"
-      PICS: " !DGSW.S.F00 && DGSW.S.Afffa "
+      PICS: " !DGSW.S.E00 && DGSW.S.Afffa "
       command: "readAttribute"
       attribute: "EventList"
       response:

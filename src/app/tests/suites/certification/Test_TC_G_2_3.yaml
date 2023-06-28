@@ -360,71 +360,6 @@ tests:
           [1683882354.198223][7723:7725] CHIP:DMG:
           [1683882354.198227][7723:7725] CHIP:DMG:         InteractionModelRevision = 1
           [1683882354.198230][7723:7725] CHIP:DMG: }
-
-          Before adding the Groups (Maxgroup+1) by AddGroupIfIdentifying execute below command  which is used to check the  Resource_Exhausted Condition
-
-          ./chip-tool groupkeymanagement write group-key-map '[{"groupId":18, "groupKeySetID": 1, "fabricIndex": 1},{"groupId":19, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
-
-          Verify the "status is success" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
-
-          [1674551849.075921][20994:20996] CHIP:DMG: WriteResponseMessage =
-          [1674551849.075924][20994:20996] CHIP:DMG: {
-          [1674551849.075926][20994:20996] CHIP:DMG:         AttributeStatusIBs =
-          [1674551849.075931][20994:20996] CHIP:DMG:         [
-          [1674551849.075934][20994:20996] CHIP:DMG:                 AttributeStatusIB =
-          [1674551849.075937][20994:20996] CHIP:DMG:                 {
-          [1674551849.075940][20994:20996] CHIP:DMG:                         AttributePathIB =
-          [1674551849.075943][20994:20996] CHIP:DMG:                         {
-          [1674551849.075947][20994:20996] CHIP:DMG:                                 Endpoint = 0x0,
-          [1674551849.075950][20994:20996] CHIP:DMG:                                 Cluster = 0x3f,
-          [1674551849.075953][20994:20996] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1674551849.075956][20994:20996] CHIP:DMG:                         }
-          [1674551849.075961][20994:20996] CHIP:DMG:
-          [1674551849.075964][20994:20996] CHIP:DMG:                         StatusIB =
-          [1674551849.075967][20994:20996] CHIP:DMG:                         {
-          [1674551849.075971][20994:20996] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1674551849.075974][20994:20996] CHIP:DMG:                         },
-          [1674551849.075977][20994:20996] CHIP:DMG:
-          [1674551849.075980][20994:20996] CHIP:DMG:                 },
-          [1674551849.075986][20994:20996] CHIP:DMG:
-          [1674551849.075989][20994:20996] CHIP:DMG:                 AttributeStatusIB =
-          [1674551849.075991][20994:20996] CHIP:DMG:                 {
-          [1674551849.075994][20994:20996] CHIP:DMG:                         AttributePathIB =
-          [1674551849.075997][20994:20996] CHIP:DMG:                         {
-          [1674551849.076000][20994:20996] CHIP:DMG:                                 Endpoint = 0x0,
-          [1674551849.076003][20994:20996] CHIP:DMG:                                 Cluster = 0x3f,
-          [1674551849.076006][20994:20996] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1674551849.076010][20994:20996] CHIP:DMG:                                 ListIndex = Null,
-          [1674551849.076012][20994:20996] CHIP:DMG:                         }
-          [1674551849.076017][20994:20996] CHIP:DMG:
-          [1674551849.076020][20994:20996] CHIP:DMG:                         StatusIB =
-          [1674551849.076022][20994:20996] CHIP:DMG:                         {
-          [1674551849.076025][20994:20996] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1674551849.076028][20994:20996] CHIP:DMG:                         },
-          [1674551849.076031][20994:20996] CHIP:DMG:
-          [1674551849.076034][20994:20996] CHIP:DMG:                 },
-          [1674551849.076040][20994:20996] CHIP:DMG:
-          [1674551849.076043][20994:20996] CHIP:DMG:                 AttributeStatusIB =
-          [1674551849.076046][20994:20996] CHIP:DMG:                 {
-          [1674551849.076048][20994:20996] CHIP:DMG:                         AttributePathIB =
-          [1674551849.076051][20994:20996] CHIP:DMG:                         {
-          [1674551849.076054][20994:20996] CHIP:DMG:                                 Endpoint = 0x0,
-          [1674551849.076057][20994:20996] CHIP:DMG:                                 Cluster = 0x3f,
-          [1674551849.076060][20994:20996] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1674551849.076063][20994:20996] CHIP:DMG:                                 ListIndex = Null,
-          [1674551849.076066][20994:20996] CHIP:DMG:                         }
-          [1674551849.076071][20994:20996] CHIP:DMG:
-          [1674551849.076074][20994:20996] CHIP:DMG:                         StatusIB =
-          [1674551849.076076][20994:20996] CHIP:DMG:                         {
-          [1674551849.076080][20994:20996] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1674551849.076082][20994:20996] CHIP:DMG:                         },
-          [1674551849.076085][20994:20996] CHIP:DMG:
-          [1674551849.076088][20994:20996] CHIP:DMG:                 },
-          [1674551849.076092][20994:20996] CHIP:DMG:
-          [1674551849.076094][20994:20996] CHIP:DMG:         ],
-          [1674551849.076102][20994:20996] CHIP:DMG:
-          [1674551849.076105][20994:20996] CHIP:DMG:         InteractionModelRevision = 1
-          [1674551849.076108][20994:20996] CHIP:DMG: }
       disabled: true
 
     - label: "DUT supports Identify cluster"
@@ -797,6 +732,76 @@ tests:
           [1683882478.955124][7783:7785] CHIP:DMG:                                 {
           [1683882478.955143][7783:7785] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1683882478.955160][7783:7785] CHIP:DMG:                                 },
+      disabled: true
+
+    - label:
+          "TH binds GroupId( 0x0006 + maxgroups to 0x0006 + maxgroups+1) with
+          GroupKeySetID 1"
+      verification: |
+          Before adding the Groups (Maxgroup+1) by AddGroupIfIdentifying execute below command  which is used to check the  Resource_Exhausted Condition
+
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId":18, "groupKeySetID": 1, "fabricIndex": 1},{"groupId":19, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
+
+          Verify the "status is success" on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
+
+          [1674551849.075921][20994:20996] CHIP:DMG: WriteResponseMessage =
+          [1674551849.075924][20994:20996] CHIP:DMG: {
+          [1674551849.075926][20994:20996] CHIP:DMG:         AttributeStatusIBs =
+          [1674551849.075931][20994:20996] CHIP:DMG:         [
+          [1674551849.075934][20994:20996] CHIP:DMG:                 AttributeStatusIB =
+          [1674551849.075937][20994:20996] CHIP:DMG:                 {
+          [1674551849.075940][20994:20996] CHIP:DMG:                         AttributePathIB =
+          [1674551849.075943][20994:20996] CHIP:DMG:                         {
+          [1674551849.075947][20994:20996] CHIP:DMG:                                 Endpoint = 0x0,
+          [1674551849.075950][20994:20996] CHIP:DMG:                                 Cluster = 0x3f,
+          [1674551849.075953][20994:20996] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1674551849.075956][20994:20996] CHIP:DMG:                         }
+          [1674551849.075961][20994:20996] CHIP:DMG:
+          [1674551849.075964][20994:20996] CHIP:DMG:                         StatusIB =
+          [1674551849.075967][20994:20996] CHIP:DMG:                         {
+          [1674551849.075971][20994:20996] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1674551849.075974][20994:20996] CHIP:DMG:                         },
+          [1674551849.075977][20994:20996] CHIP:DMG:
+          [1674551849.075980][20994:20996] CHIP:DMG:                 },
+          [1674551849.075986][20994:20996] CHIP:DMG:
+          [1674551849.075989][20994:20996] CHIP:DMG:                 AttributeStatusIB =
+          [1674551849.075991][20994:20996] CHIP:DMG:                 {
+          [1674551849.075994][20994:20996] CHIP:DMG:                         AttributePathIB =
+          [1674551849.075997][20994:20996] CHIP:DMG:                         {
+          [1674551849.076000][20994:20996] CHIP:DMG:                                 Endpoint = 0x0,
+          [1674551849.076003][20994:20996] CHIP:DMG:                                 Cluster = 0x3f,
+          [1674551849.076006][20994:20996] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1674551849.076010][20994:20996] CHIP:DMG:                                 ListIndex = Null,
+          [1674551849.076012][20994:20996] CHIP:DMG:                         }
+          [1674551849.076017][20994:20996] CHIP:DMG:
+          [1674551849.076020][20994:20996] CHIP:DMG:                         StatusIB =
+          [1674551849.076022][20994:20996] CHIP:DMG:                         {
+          [1674551849.076025][20994:20996] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1674551849.076028][20994:20996] CHIP:DMG:                         },
+          [1674551849.076031][20994:20996] CHIP:DMG:
+          [1674551849.076034][20994:20996] CHIP:DMG:                 },
+          [1674551849.076040][20994:20996] CHIP:DMG:
+          [1674551849.076043][20994:20996] CHIP:DMG:                 AttributeStatusIB =
+          [1674551849.076046][20994:20996] CHIP:DMG:                 {
+          [1674551849.076048][20994:20996] CHIP:DMG:                         AttributePathIB =
+          [1674551849.076051][20994:20996] CHIP:DMG:                         {
+          [1674551849.076054][20994:20996] CHIP:DMG:                                 Endpoint = 0x0,
+          [1674551849.076057][20994:20996] CHIP:DMG:                                 Cluster = 0x3f,
+          [1674551849.076060][20994:20996] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1674551849.076063][20994:20996] CHIP:DMG:                                 ListIndex = Null,
+          [1674551849.076066][20994:20996] CHIP:DMG:                         }
+          [1674551849.076071][20994:20996] CHIP:DMG:
+          [1674551849.076074][20994:20996] CHIP:DMG:                         StatusIB =
+          [1674551849.076076][20994:20996] CHIP:DMG:                         {
+          [1674551849.076080][20994:20996] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1674551849.076082][20994:20996] CHIP:DMG:                         },
+          [1674551849.076085][20994:20996] CHIP:DMG:
+          [1674551849.076088][20994:20996] CHIP:DMG:                 },
+          [1674551849.076092][20994:20996] CHIP:DMG:
+          [1674551849.076094][20994:20996] CHIP:DMG:         ],
+          [1674551849.076102][20994:20996] CHIP:DMG:
+          [1674551849.076105][20994:20996] CHIP:DMG:         InteractionModelRevision = 1
+          [1674551849.076108][20994:20996] CHIP:DMG: }
       disabled: true
 
     - label:

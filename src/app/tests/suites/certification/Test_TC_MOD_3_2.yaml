@@ -16,7 +16,7 @@
 name: 80.3.2. [TC-MOD-3.2] StartUpMode Verification (DUT as Server)
 
 PICS:
-    - MOD.S.A0004
+    - MOD.S
 
 config:
     nodeId: 0x12344321
@@ -43,43 +43,43 @@ tests:
           This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
       disabled: true
 
-    - label: "TH reads the StartUpMode attribute from the DUT"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads from the DUT the StartUpMode attribute."
       PICS: MOD.S.A0004
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
-          On TH(chip-tool), Verify StartUpMode attribute. Record this value for usage in step 2b and below is the sample log provided for the raspi platform:
+          On TH(chip-tool), Verify StartUpMode attribute value is an integer. save the valueas startup_mode_dut and below is the sample log provided for the raspi platform:
 
           [1645777708.406864][4841:4846] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003DataVersion: 3781469721
           [1645777708.406933][4841:4846] CHIP:TOO:   StartUpMode: 0
       disabled: true
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
+    - label: "TH reads from the DUT the CurrentMode attribute."
       PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          On TH(chip-tool) , Verify CurrentMode attribute. Record this value for usage in step 2b and below is the sample log provided for the raspi platform:
+          On TH(chip-tool), Verify CurrentMode attribute value is integer. save the value as old_current_mode_dut and below is the sample log provided for the raspi platform:
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 0
+
+
+          If startup_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
       disabled: true
 
-    - label:
-          "If the StartUpMode and CurrentMode attributes have the same value,
-          proceed to step 2c, Otherwise proceed to step 3a."
-      PICS: MOD.S.A0003 && MOD.S.A0004
-      verification: |
-          NOTE:
-          If the StartUpMode and CurrentMode attributes have the same value, proceed to step 2c, Otherwise proceed to step 3a.
-      disabled: true
-
-    - label: "TH reads the SupportedModes attribute from the DUT"
+    - label: "TH reads from the DUT the SupportedModes attribute."
       PICS: MOD.S.A0002
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          Verify on TH(chip-tool),  Supported modes provides a list of mode, each mode should be a struct containing a label and all of these values should be no larger than 16 bits  for usage in step 2d and below is the sample log provided for the raspi platform:
+          On TH(chip-tool) log, Verify SupportedModes attribute contains two or more ModeOptionsStruct entries. save the Mode field values as supported_modes_dut.Select a value from supported_modes_dut different from startup_mode_dut and Save the value as new_mode_th, below is the sample log provided for the raspi platform:
 
           [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
           [1654595268.854678][14400:14405] CHIP:TOO:   SupportedModes: 3 entries
@@ -115,30 +115,32 @@ tests:
       disabled: true
 
     - label:
-          "Select a value from the list in step 2c with a different value than
-          the StartUpMode value read in step 1. TH sends a ChangeToMode command
-          to the DUT with the selected value."
-      PICS: MOD.S.A0002 && MOD.S.C00.Rsp
+          "TH sends a ChangeToMode command to the DUT with NewMode set to
+          new_mode_th"
+      PICS: MOD.S.C00.Rsp
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
 
 
-          On TH(chip-tool) , Verify that  status has a value  0x00 (success)  and below is the sample log provided for the raspi platform:
+          On TH(chip-tool) , Verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
 
-          [1645778189.045030][4888:4893] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
+          [1684931419.768138][20792:20794] CHIP:DMG:                                 StatusIB =
+          [1684931419.768143][20792:20794] CHIP:DMG:                                 {
+          [1684931419.768148][20792:20794] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1684931419.768152][20792:20794] CHIP:DMG:                                 },
       disabled: true
 
-    - label: "Physically power cycle the device."
+    - label: "Physically power cycle the device"
       verification: |
           Physically power cycle the device.
       disabled: true
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
+    - label: "TH reads from the DUT the CurrentMode attribute."
       PICS: MOD.S.A0003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
-          on TH(chip-tool), Verify that CurrentMode is same as value recorded in step 1 and below is the sample log provided for the raspi platform:
+          on TH(chip-tool), Verify that CurrentMode attribute value is same as value recorded in step 1 and below is the sample log provided for the raspi platform:
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 0

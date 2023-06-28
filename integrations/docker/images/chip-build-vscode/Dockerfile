@@ -97,7 +97,7 @@ ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
 ENV SILABS_BOARD=BRD4161A
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
-ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.15-kirkstone/
+ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/6.1-langdale
 ENV JAVA_PATH=/usr/lib/jvm/java-8-openjdk-amd64
 ENV NRF5_TOOLS_ROOT=/opt/NordicSemiconductor/nRF5_tools
 ENV NXP_K32W0_SDK_ROOT=/opt/k32w_sdk
@@ -110,6 +110,7 @@ ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.15.2
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.13.0
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
+ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.16.0
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 
 ENV TIZEN_VERSION 7.0

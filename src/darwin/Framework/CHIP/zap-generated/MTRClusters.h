@@ -2865,6 +2865,8 @@ MTR_NEWLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeStateWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
+- (NSDictionary<NSString *, id> *)readAttributeSupportedWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
@@ -2961,6 +2963,8 @@ MTR_NEWLY_AVAILABLE
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                          params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
+- (NSDictionary<NSString *, id> *)readAttributeExpiryDateWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
@@ -3025,83 +3029,6 @@ MTR_NEWLY_AVAILABLE
 - (void)resumeWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                       completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributePhaseListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributeCurrentPhaseWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributeCountdownTimeWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributeOperationalStateListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributeOperationalStateWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributeOperationalErrorWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-/**
- * Cluster RVC Operational State
- *    This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum.
- */
-MTR_NEWLY_AVAILABLE
-@interface MTRClusterRVCOperationalState : MTRCluster
-
-- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
-                              endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
-
-- (void)pauseWithParams:(MTRRVCOperationalStateClusterPauseParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-               completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
-                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)stopWithParams:(MTRRVCOperationalStateClusterStopParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-               completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
-                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)stopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                    completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)startWithParams:(MTRRVCOperationalStateClusterStartParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-               completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
-                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)startWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                     completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)resumeWithParams:(MTRRVCOperationalStateClusterResumeParams * _Nullable)params
-           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
-    expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-               completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
-                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)resumeWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                      completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data,
                                      NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePhaseListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;

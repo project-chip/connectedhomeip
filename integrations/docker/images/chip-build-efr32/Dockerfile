@@ -29,8 +29,9 @@ RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
 
 ENV PATH="${PATH}:/slc_cli/"
 
-RUN slc configuration  --sdk="$GSDK_ROOT" && \
-    slc signature trust --sdk "$GSDK_ROOT"
+#  TODO Fix me
+# RUN slc configuration  --sdk="$GSDK_ROOT" && \
+#     slc signature trust --sdk "$GSDK_ROOT"
 
 
 RUN pip3 install lark jinja2 stringcase

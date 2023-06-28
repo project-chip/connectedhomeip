@@ -250,7 +250,7 @@ public:
 
     SceneTable(){};
 
-    virtual ~SceneTable() = default;
+    virtual ~SceneTable(){};
 
     // Not copyable
     SceneTable(const SceneTable &) = delete;

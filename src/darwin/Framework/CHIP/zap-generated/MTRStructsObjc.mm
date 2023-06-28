@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _attributeID = nil;
+        _attributeID = @(0);
 
         _attributeValue = @(0);
     }
@@ -48,12 +48,12 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
-- (void)setAttributeId:(NSNumber * _Nullable)attributeId
+- (void)setAttributeId:(NSNumber * _Nonnull)attributeId
 {
     self.attributeID = attributeId;
 }
 
-- (NSNumber * _Nullable)attributeId
+- (NSNumber * _Nonnull)attributeId
 {
     return self.attributeID;
 }
@@ -2618,12 +2618,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRModeSelectClusterModeTagStruct
+@implementation MTRModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _mfgCode = nil;
+        _mfgCode = @(0);
 
         _value = @(0);
     }
@@ -2632,7 +2632,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRModeSelectClusterModeTagStruct alloc] init];
+    auto other = [[MTRModeSelectClusterSemanticTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
@@ -2649,7 +2649,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRModeSelectClusterSemanticTag : MTRModeSelectClusterModeTagStruct
+@implementation MTRModeSelectClusterSemanticTag : MTRModeSelectClusterSemanticTagStruct
 @end
 
 @implementation MTRModeSelectClusterModeOptionStruct
@@ -2661,7 +2661,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mode = @(0);
 
-        _modeTags = [NSArray array];
+        _semanticTags = [NSArray array];
     }
     return self;
 }
@@ -2672,26 +2672,16 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.label = self.label;
     other.mode = self.mode;
-    other.modeTags = self.modeTags;
+    other.semanticTags = self.semanticTags;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; semanticTags:%@; >",
+                                             NSStringFromClass([self class]), _label, _mode, _semanticTags];
     return descriptionString;
-}
-
-- (void)setSemanticTags:(NSArray * _Nonnull)semanticTags
-{
-    self.modeTags = semanticTags;
-}
-
-- (NSArray * _Nonnull)semanticTags
-{
-    return self.modeTags;
 }
 
 @end
@@ -3096,134 +3086,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTROperationalStateClusterOperationCompletionEvent alloc] init];
-
-    other.completionErrorCode = self.completionErrorCode;
-    other.totalOperationalTime = self.totalOperationalTime;
-    other.pausedTime = self.pausedTime;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: completionErrorCode:%@; totalOperationalTime:%@; pausedTime:%@; >",
-                  NSStringFromClass([self class]), _completionErrorCode, _totalOperationalTime, _pausedTime];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRRVCOperationalStateClusterErrorStateStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorStateID = @(0);
-
-        _errorStateLabel = nil;
-
-        _errorStateDetails = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRRVCOperationalStateClusterErrorStateStruct alloc] init];
-
-    other.errorStateID = self.errorStateID;
-    other.errorStateLabel = self.errorStateLabel;
-    other.errorStateDetails = self.errorStateDetails;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: errorStateID:%@; errorStateLabel:%@; errorStateDetails:%@; >",
-                                             NSStringFromClass([self class]), _errorStateID, _errorStateLabel, _errorStateDetails];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRRVCOperationalStateClusterOperationalStateStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _operationalStateID = @(0);
-
-        _operationalStateLabel = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRRVCOperationalStateClusterOperationalStateStruct alloc] init];
-
-    other.operationalStateID = self.operationalStateID;
-    other.operationalStateLabel = self.operationalStateLabel;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: operationalStateID:%@; operationalStateLabel:%@; >",
-                                             NSStringFromClass([self class]), _operationalStateID, _operationalStateLabel];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRRVCOperationalStateClusterOperationalErrorEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorState = [MTRRVCOperationalStateClusterErrorStateStruct new];
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRRVCOperationalStateClusterOperationalErrorEvent alloc] init];
-
-    other.errorState = self.errorState;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: errorState:%@; >", NSStringFromClass([self class]), _errorState];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRRVCOperationalStateClusterOperationCompletionEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _completionErrorCode = @(0);
-
-        _totalOperationalTime = nil;
-
-        _pausedTime = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRRVCOperationalStateClusterOperationCompletionEvent alloc] init];
 
     other.completionErrorCode = self.completionErrorCode;
     other.totalOperationalTime = self.totalOperationalTime;

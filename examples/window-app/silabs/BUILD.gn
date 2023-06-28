@@ -18,9 +18,17 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
+import("${efr32_sdk_build_root}/silabs_executable.gni")
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
-import("${efr32_sdk_build_root}/silabs_executable.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
 assert(current_os == "freertos")
 
 project_dir = "${chip_root}/examples/window-app"
@@ -106,10 +114,10 @@ silabs_executable("window_app") {
   defines = []
 
   sources = [
-    "${project_dir}/common/src/WindowApp.cpp",
-    "${project_dir}/common/src/ZclCallbacks.cpp",
-    "src/WindowAppImpl.cpp",
-    "src/main.cpp",
+    "${examples_common_plat_dir}/main.cpp",
+    "src/AppTask.cpp",
+    "src/WindowManager.cpp",
+    "src/ZclCallbacks.cpp",
   ]
 
   if (!disable_lcd) {
