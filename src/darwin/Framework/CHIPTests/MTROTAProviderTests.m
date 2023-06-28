@@ -26,7 +26,6 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #define ENABLE_OTA_TESTS 0
 #else
