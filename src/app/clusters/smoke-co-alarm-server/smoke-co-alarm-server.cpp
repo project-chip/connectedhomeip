@@ -86,6 +86,11 @@ bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum new
             Events::SmokeAlarm::Type event{};
             SendEvent(endpointId, event);
         }
+
+        if (success && (newSmokeState == AlarmStateEnum::kCritical))
+        {
+            SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
+        }
     }
 
     return success;
@@ -105,6 +110,11 @@ bool SmokeCoAlarmServer::SetCOState(EndpointId endpointId, AlarmStateEnum newCOS
             Events::COAlarm::Type event{};
             SendEvent(endpointId, event);
         }
+
+        if (success && (newCOState == AlarmStateEnum::kCritical))
+        {
+            SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
+        }
     }
 
     return success;
@@ -123,6 +133,11 @@ bool SmokeCoAlarmServer::SetBatteryAlert(EndpointId endpointId, AlarmStateEnum n
         {
             Events::LowBattery::Type event{};
             SendEvent(endpointId, event);
+        }
+
+        if (success && (newBatteryAlert == AlarmStateEnum::kCritical))
+        {
+            SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
         }
     }
 
@@ -234,6 +249,11 @@ bool SmokeCoAlarmServer::SetInterconnectSmokeAlarm(EndpointId endpointId, AlarmS
             Events::InterconnectSmokeAlarm::Type event{};
             SendEvent(endpointId, event);
         }
+
+        if (success && (newInterconnectSmokeAlarm == AlarmStateEnum::kCritical))
+        {
+            SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
+        }
     }
 
     return success;
@@ -254,6 +274,11 @@ bool SmokeCoAlarmServer::SetInterconnectCOAlarm(EndpointId endpointId, AlarmStat
         {
             Events::InterconnectCOAlarm::Type event{};
             SendEvent(endpointId, event);
+        }
+
+        if (success && (newInterconnectCOAlarm == AlarmStateEnum::kCritical))
+        {
+            SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
         }
     }
 
