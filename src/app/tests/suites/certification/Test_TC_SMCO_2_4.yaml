@@ -1,0 +1,585 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    4.2.4. [TC-SMCO-2.4] Secondary Functionality - Mandatory with DUT as Server
+
+PICS:
+    - SMCO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Smoke CO Alarm"
+    timeout: 300
+    TEST_EVENT_TRIGGER_KEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+    TEST_EVENT_TRIGGER_BATTERY_ALERT:
+        type: int64u
+        defaultValue: "0xffffffff00000095"
+    TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000a5"
+    TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT:
+        type: int64u
+        defaultValue: "0xffffffff00000093"
+    TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000a3"
+    TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT:
+        type: int64u
+        defaultValue: "0xffffffff0000009a"
+    TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000aa"
+
+tests:
+    - label: "Commission DUT to TH"
+      cluster: "DelayCommands"
+      endpoint: 1
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    # Get the latest eventNumber
+    - label: "Generate an event on the accessory"
+      cluster: "Unit Testing"
+      endpoint: 1
+      command: "TestEmitTestEventRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 1
+              - name: "arg2"
+                value: 2
+              - name: "arg3"
+                value: true
+      response:
+          values:
+              - name: "value"
+                saveAs: eventNumber
+
+    - label: "TH reads BatteryAlert attribute from DUT"
+      PICS: SMCO.S.A0003
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "BatteryAlert"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label:
+          "TH reads TestEventTriggersEnabled attribute from General Diagnostics
+          Cluster"
+      PICS: DGGEN.S.A0008
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          value: 1
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Battery Alert Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_BATTERY_ALERT
+
+    - label: "TH subscribes to BatteryAlert attribute from DUT"
+      PICS: SMCO.S.A0003
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "BatteryAlert"
+      minInterval: 3
+      maxInterval: 60
+
+    - label: "TH waits for a report of BatteryAlert attribute from DUT"
+      PICS: SMCO.S.A0003
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "BatteryAlert"
+      response:
+          constraints:
+              type: enum8
+              minValue: 1
+              maxValue: 2
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 3
+          constraints:
+              type: enum8
+
+    - label: "TH reads LowBattery event from DUT"
+      PICS: SMCO.S.E0002
+      endpoint: 1
+      command: "readEvent"
+      event: "LowBattery"
+      eventNumber: eventNumber + 1
+      response:
+          value: {}
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Battery Alert Test Event Clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR
+
+    - label: "TH waits for a report of BatteryAlert attribute from DUT"
+      PICS: SMCO.S.A0003
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "BatteryAlert"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads AllClear event from DUT"
+      PICS: SMCO.S.E00010
+      endpoint: 1
+      command: "readEvent"
+      event: "AllClear"
+      eventNumber: eventNumber + 2
+      response:
+          value: {}
+
+    - label: "TH reads HardwareFaultAlert attribute from DUT"
+      PICS: SMCO.S.A0006
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "HardwareFaultAlert"
+      response:
+          value: 0
+          constraints:
+              type: boolean
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Hardware Fault Alert Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT
+
+    - label: "TH subscribes to HardwareFaultAlert attribute from DUT"
+      PICS: SMCO.S.A0006
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "HardwareFaultAlert"
+      minInterval: 3
+      maxInterval: 60
+      keepSubscriptions: true
+
+    - label: "TH waits for a report of HardwareFaultAlert attribute from DUT"
+      PICS: SMCO.S.A0006
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "HardwareFaultAlert"
+      response:
+          value: 1
+          constraints:
+              type: boolean
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 5
+          constraints:
+              type: enum8
+
+    - label: "TH reads HardwareFault event from DUT"
+      PICS: SMCO.S.E0003
+      endpoint: 1
+      command: "readEvent"
+      event: "HardwareFault"
+      eventNumber: eventNumber + 3
+      response:
+          value: {}
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for Hardware Fault Alert Test Event
+          Clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT_CLEAR
+
+    - label: "TH waits for a report of HardwareFaultAlert attribute from DUT"
+      PICS: SMCO.S.A0006
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "HardwareFaultAlert"
+      response:
+          value: 0
+          constraints:
+              type: boolean
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads AllClear event from DUT"
+      PICS: SMCO.S.E00010
+      endpoint: 1
+      command: "readEvent"
+      event: "AllClear"
+      eventNumber: eventNumber + 4
+      response:
+          value: {}
+
+    - label: "TH reads EndOfServiceAlert attribute from DUT"
+      PICS: SMCO.S.A0007
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "EndOfServiceAlert"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for End of Service Alert Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT
+
+    - label: "TH subscribes to EndOfServiceAlert attribute from DUT"
+      PICS: SMCO.S.A0007
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "EndOfServiceAlert"
+      minInterval: 3
+      maxInterval: 60
+      keepSubscriptions: true
+
+    - label: "TH waits for a report of EndOfServiceAlert attribute from DUT"
+      PICS: SMCO.S.A0007
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "EndOfServiceAlert"
+      response:
+          value: 1
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 6
+          constraints:
+              type: enum8
+
+    - label: "TH reads EndOfService event from DUT"
+      PICS: SMCO.S.E0004
+      endpoint: 1
+      command: "readEvent"
+      event: "EndOfService"
+      eventNumber: eventNumber + 5
+      response:
+          value: {}
+
+    - label:
+          "TH sends TestEventTrigger command to General Diagnostics Cluster on
+          Endpoint 0 with EnableKey field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMCO.TEST_EVENT_TRIGGER for End of Service Alert Test Event
+          Clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT_CLEAR
+
+    - label: "TH waits for a report of EndOfServiceAlert attribute from DUT"
+      PICS: SMCO.S.A0007
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "EndOfServiceAlert"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads AllClear event from DUT"
+      PICS: SMCO.S.E00010
+      endpoint: 1
+      command: "readEvent"
+      event: "AllClear"
+      eventNumber: eventNumber + 6
+      response:
+          value: {}
+
+    - label: "TH reads TestInProgress attribute from DUT"
+      PICS: SMCO.S.A0005
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "TestInProgress"
+      response:
+          value: 0
+          constraints:
+              type: boolean
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Start manually DUT self-test"
+      cluster: "LogCommands"
+      PICS: PICS_USER_PROMPT && SMCO.M.ManuallyControlledTest
+      endpoint: 1
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH subscribes to TestInProgress attribute from DUT"
+      PICS: SMCO.S.A0005
+      endpoint: 1
+      command: "subscribeAttribute"
+      attribute: "TestInProgress"
+      minInterval: 3
+      maxInterval: 60
+      keepSubscriptions: true
+
+    - label: "TH waits for a report of TestInProgress attribute from DUT"
+      PICS: SMCO.S.A0005
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "TestInProgress"
+      response:
+          value: 1
+          constraints:
+              type: boolean
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 4
+          constraints:
+              type: enum8
+
+    - label: "TH waits for a report of TestInProgress attribute from DUT"
+      PICS: SMCO.S.A0005
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "TestInProgress"
+      response:
+          value: 0
+          constraints:
+              type: boolean
+
+    - label: "TH reads SelfTestComplete event from DUT"
+      PICS: SMCO.S.E0005
+      endpoint: 1
+      command: "readEvent"
+      event: "SelfTestComplete"
+      eventNumber: eventNumber + 7
+      response:
+          value: {}
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads AllClear event from DUT"
+      PICS: SMCO.S.E00010
+      endpoint: 1
+      command: "readEvent"
+      event: "AllClear"
+      eventNumber: eventNumber + 8
+      response:
+          value: {}
+
+    - label: "TH sends SelfTestRequest command to DUT"
+      PICS: SMCO.S.C00.Rsp
+      endpoint: 1
+      command: "SelfTestRequest"
+
+    - label: "TH waits for a report of TestInProgress attribute from DUT"
+      PICS: SMCO.S.A0005
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "TestInProgress"
+      response:
+          value: 1
+          constraints:
+              type: boolean
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 4
+          constraints:
+              type: enum8
+
+    - label: "TH waits for a report of TestInProgress attribute from DUT"
+      PICS: SMCO.S.A0005
+      endpoint: 1
+      command: "waitForReport"
+      attribute: "TestInProgress"
+      response:
+          value: 0
+          constraints:
+              type: boolean
+
+    - label: "TH reads SelfTestComplete event from DUT"
+      PICS: SMCO.S.E0005
+      endpoint: 1
+      command: "readEvent"
+      event: "SelfTestComplete"
+      eventNumber: eventNumber + 9
+      response:
+          value: {}
+
+    - label: "TH reads ExpressedState attribute from DUT"
+      PICS: SMCO.S.A0000
+      endpoint: 1
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH reads AllClear event from DUT"
+      PICS: SMCO.S.E00010
+      endpoint: 1
+      command: "readEvent"
+      event: "AllClear"
+      eventNumber: eventNumber + 10
+      response:
+          value: {}

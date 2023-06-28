@@ -1,0 +1,230 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 4.1.1. [TC-SMCO-1.1] Global Attributes with DUT as Server
+
+PICS:
+    - SMCO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Smoke CO Alarm"
+    endpoint: 1
+
+tests:
+    - label: "Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH reads the ClusterRevision attribute from the DUT"
+      PICS: SMCO.S.Afffd
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
+
+    - label: "TH reads from the DUT the FeatureMap attribute"
+      PICS: SMCO.S.Afffc && SMCO.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label: "TH reads from the DUT the FeatureMap attribute"
+      PICS: SMCO.S.Afffc && SMCO.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "TH reads from the DUT the AttributeList attribute"
+      PICS: SMCO.S.Afffb
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 3, 5, 6, 7]
+
+    - label: "TH reads from the DUT the optional AttributeList attribute"
+      PICS: SMCO.S.Afffb && SMCO.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "TH reads from the DUT the optional AttributeList attribute"
+      PICS: SMCO.S.Afffb && SMCO.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label: "TH reads from the DUT the optional AttributeList attribute"
+      PICS: SMCO.S.Afffb && SMCO.S.A0004
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label: "TH reads from the DUT the optional AttributeList attribute"
+      PICS: SMCO.S.Afffb && SMCO.S.A0008
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
+    - label: "TH reads from the DUT the optional AttributeList attribute"
+      PICS: SMCO.S.Afffb && SMCO.S.A0009
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9]
+
+    - label: "TH reads from the DUT the optional AttributeList attribute"
+      PICS: SMCO.S.Afffb && SMCO.S.A00010
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [10]
+
+    - label: "TH reads from the DUT the optional AttributeList attribute"
+      PICS: SMCO.S.Afffb && SMCO.S.A00011
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [11]
+
+    - label: "TH reads from the DUT the optional AttributeList attribute"
+      PICS: SMCO.S.Afffb && SMCO.S.A00012
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [12]
+
+    - label: "TH reads from the DUT the EventList attribute"
+      PICS: SMCO.S.Afffa
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [2, 3, 4, 5, 10]
+
+    - label: "TH reads from the DUT the optional EventList attribute"
+      PICS: SMCO.S.Afffa && SMCO.S.E0000
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "TH reads from the DUT the optional EventList attribute"
+      PICS: SMCO.S.Afffa && SMCO.S.E0001
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "TH reads from the DUT the optional EventList attribute"
+      PICS: SMCO.S.Afffa && SMCO.S.E0006
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+
+    - label: "TH reads from the DUT the optional EventList attribute"
+      PICS: SMCO.S.Afffa && SMCO.S.E0007
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
+    - label: "TH reads from the DUT the optional EventList attribute"
+      PICS: SMCO.S.Afffa && SMCO.S.E0008
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
+    - label: "TH reads from the DUT the optional EventList attribute"
+      PICS: SMCO.S.Afffa && SMCO.S.E0009
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [9]
+
+    - label: "TH reads from the DUT the AcceptedCommandList attribute"
+      PICS: SMCO.S.Afff9
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: []
+
+    - label: "TH reads from the DUT the optional AcceptedCommandList attribute"
+      PICS: SMCO.S.Afff9 && SMCO.S.C00.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "TH reads from the DUT the GeneratedCommandList attribute"
+      PICS: SMCO.S.Afff8
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
