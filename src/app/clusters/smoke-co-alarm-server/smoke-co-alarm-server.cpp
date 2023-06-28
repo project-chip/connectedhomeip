@@ -350,6 +350,11 @@ bool SmokeCoAlarmServer::GetSensitivityLevel(EndpointId endpointId, SensitivityE
     return GetAttribute(endpointId, Attributes::SensitivityLevel::Id, Attributes::SensitivityLevel::Get, sensitivityLevel);
 }
 
+bool SmokeCoAlarmServer::GetExpiryDate(EndpointId endpointId, uint32_t & expiryDate)
+{
+    return GetAttribute(endpointId, Attributes::ExpiryDate::Id, Attributes::ExpiryDate::Get, expiryDate);
+}
+
 chip::BitFlags<Feature> SmokeCoAlarmServer::GetFeatures(EndpointId endpointId)
 {
     chip::BitFlags<Feature> featureMap;
