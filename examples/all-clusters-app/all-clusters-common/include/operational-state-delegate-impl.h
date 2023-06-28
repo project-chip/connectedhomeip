@@ -132,15 +132,21 @@ public:
     bool sendOperationCompletion(const GenericOperationCompletion & op) override;
 
     OperationalStateDelegate(EndpointId aEndpointId, ClusterId aClusterId, GenericOperationalState aOperationalState,
-                             GenericOperationalError aOperationalError) :
+                             GenericOperationalError aOperationalError,
+                             Span<const GenericOperationalState> aOperationalStateList,
+                             Span<const GenericOperationalPhase> aOperationalPhaseList) :
         Delegate(aEndpointId, aClusterId),
-        mOperationalState(aOperationalState), mOperationalError(aOperationalError)
+        mOperationalState(aOperationalState), mOperationalError(aOperationalError),
+        mOperationalStateList(aOperationalStateList),
+        mOperationalPhaseList(aOperationalPhaseList)
     {}
     ~OperationalStateDelegate() = default;
 
 private:
     GenericOperationalState mOperationalState;
     GenericOperationalError mOperationalError;
+    app::DataModel::List<const GenericOperationalState> mOperationalStateList;
+    app::DataModel::List<const GenericOperationalPhase> mOperationalPhaseList;
 };
 
 } // namespace OperationalState

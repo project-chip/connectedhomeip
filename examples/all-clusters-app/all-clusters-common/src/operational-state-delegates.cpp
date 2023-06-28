@@ -49,12 +49,36 @@ struct DelegatesEnquiryTable
 };
 
 /**
+ * Enquriy Table of Operational State List
+ * Note: User Define
+ */
+static const GenericOperationalState opStateList[] = {
+    GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+    GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
+    GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
+    GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
+};
+
+/**
+ * Enquriy Table of Phase List
+ * Note: User Define
+ */
+static const GenericOperationalPhase opPhaseList[] = {
+    /**
+     * Phase List is null
+     */
+    GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
+};
+
+/**
  * Enquriy Table of Operational State Delegate
  * Note: User Define
  */
 static OperationalStateDelegate opStateDelegate(Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id,
                                                 GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-                                                GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)));
+                                                GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
+                                                Span<const GenericOperationalState>(opStateList),
+                                                Span<const GenericOperationalPhase>(opPhaseList));
 
 /**
  * Enquriy Table of Operational State Cluster and alias Cluter Delegate corresponding to endpointId and clusterId

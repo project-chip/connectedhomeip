@@ -26,113 +26,6 @@ namespace OperationalState {
 
 using chip::Protocols::InteractionModel::Status;
 
-/**
- * Template class to present Enquriy Table
- */
-template <typename T>
-struct EnquiryTable
-{
-    /**
-     * Endpoint Id
-     */
-    EndpointId mEndpointId;
-    /**
-     * Cluster Id
-     */
-    ClusterId mClusterId;
-    /**
-     * point of Array(Items)
-     */
-    T * pItems;
-    /**
-     * ArraySize of Array(Items)
-     */
-    size_t numOfItems;
-};
-
-/**
- * Enquriy Table of Phase List
- * Note: User Define
- */
-GenericOperationalPhase opPhaseList[] = {
-    /**
-     * Phase List is null
-     */
-    GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
-};
-
-/**
- * Enquriy Table of Phase List corresponding to endpointId and clusterId
- * Note: User Define
- */
-constexpr EnquiryTable<GenericOperationalPhase> kPhaseListEnquiryTable[] = {
-    // EndpointId, ClusterId, Array of phaseList, ArraySize of phaseList
-    { Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id, opPhaseList, ArraySize(opPhaseList) },
-};
-
-/**
- * Enquriy Table of Operational State List
- * Note: User Define
- */
-GenericOperationalState opStateList[] = {
-    GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-    GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
-    GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
-    GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
-};
-
-/**
- * Enquriy Table of Operational State List corresponding to endpointId and clusterId
- * Note: User Define
- */
-constexpr EnquiryTable<GenericOperationalState> kOpStateListEnquiryTable[] = {
-    // EndpointId, ClusterId, Array of Operational State List, ArraySize of Operational State List
-    { Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id, opStateList, ArraySize(opStateList) },
-};
-
-/**
- * Get the pointer of target Array(PhaseList) for target endpoint and cluster
- * @param[in] aEndpiontId The endpointId
- * @param[in] aClusterID  The clusterId
- * @param[out] size  The ArraySize of target Array(PhaseList)
- * @return the pointer of target Array(PhaseList)
- */
-const GenericOperationalPhase * getGenericPhaseListTable(EndpointId aEndpointId, ClusterId aClusterId, size_t & size)
-{
-    for (size_t i = 0; i < ArraySize(kPhaseListEnquiryTable); ++i)
-    {
-        if (kPhaseListEnquiryTable[i].mEndpointId == aEndpointId && kPhaseListEnquiryTable[i].mClusterId == aClusterId)
-        {
-            size = kPhaseListEnquiryTable[i].numOfItems;
-            return kPhaseListEnquiryTable[i].pItems;
-        }
-    }
-    size = 0;
-    return nullptr;
-}
-
-/**
- * Get the pointer of target Array(Operational State) for target endpoint and cluster
- * @param[in] aEndpiontId The endpointId
- * @param[in] aClusterID  The clusterId
- * @param[out] size  The ArraySize of target Array(Operational State)
- * @return the pointer of target Array(Operational State)
- */
-const GenericOperationalState * getGenericOperationalStateTable(EndpointId aEndpointId, ClusterId aClusterId,
-                                                                size_t & size)
-{
-    for (size_t i = 0; i < ArraySize(kOpStateListEnquiryTable); ++i)
-    {
-        if (kOpStateListEnquiryTable[i].mEndpointId == aEndpointId && kOpStateListEnquiryTable[i].mClusterId == aClusterId)
-        {
-            size = kOpStateListEnquiryTable[i].numOfItems;
-            return kOpStateListEnquiryTable[i].pItems;
-        }
-    }
-    size = 0;
-    return nullptr;
-}
-
 CHIP_ERROR OperationalStateDelegate::SetOperationalState(const GenericOperationalState & opState)
 {
     mOperationalState = opState;
@@ -157,42 +50,26 @@ const GenericOperationalError OperationalStateDelegate::GetOperationalError() co
 
 CHIP_ERROR OperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
-    size_t opStateListNumOfItems       = 0;
-    const GenericOperationalState * src = getGenericOperationalStateTable(mEndpointId, mClusterId, opStateListNumOfItems);
-    if (!src || !opStateListNumOfItems)
-    {
-        ChipLogError(Zcl, "Unable to find Operational State List for [ep=%d],[cid=%d]", mEndpointId, mClusterId);
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
-    if (index > opStateListNumOfItems - 1)
+    if (index > mOperationalStateList.size() - 1)
     {
         return CHIP_ERROR_NOT_FOUND;
     }
     else
     {
-        operationalState = src[index];
+        operationalState = mOperationalStateList.data()[index];
     }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase)
 {
-    size_t phaseListNumOfItems         = 0;
-    const GenericOperationalPhase * src = getGenericPhaseListTable(mEndpointId, mClusterId, phaseListNumOfItems);
-    if (!src || !phaseListNumOfItems)
-    {
-        ChipLogError(Zcl, "Unable to find Phase List for [ep=%d],[cid=%d]", mEndpointId, mClusterId);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    if (index > phaseListNumOfItems - 1)
+    if (index > mOperationalPhaseList.size() - 1)
     {
         return CHIP_ERROR_NOT_FOUND;
     }
     else
     {
-        operationalPhase = src[index];
+        operationalPhase = mOperationalPhaseList.data()[index];
     }
     return CHIP_NO_ERROR;
 }
