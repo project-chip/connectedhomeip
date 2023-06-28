@@ -116,7 +116,7 @@ void TestOperationalStateDelegatelGetOperationalStateList(nlTestSuite * inSuite,
         GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
-        GenericOperationalState(to_underlying(ManufactureOperationalStateEnum::kRebooting), Optional<CharSpan>(CharSpan::fromCharString(buffer))) 
+        GenericOperationalState(to_underlying(ManufactureOperationalStateEnum::kRebooting), Optional<CharSpan>(CharSpan::fromCharString(buffer)))
     };
 
     const GenericOperationalPhase opPhaseList[] = {
@@ -263,7 +263,7 @@ void TestOperationalStateDelegatelGetOperationalPhaseListNull(nlTestSuite * inSu
         GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
-        GenericOperationalState(to_underlying(ManufactureOperationalStateEnum::kRebooting), Optional<CharSpan>(CharSpan::fromCharString(buffer))) 
+        GenericOperationalState(to_underlying(ManufactureOperationalStateEnum::kRebooting), Optional<CharSpan>(CharSpan::fromCharString(buffer)))
     };
 
     const GenericOperationalPhase opPhaseList[] = {
@@ -316,7 +316,7 @@ void TestOperationalStateDelegatelGetOperationalPhaseList(nlTestSuite * inSuite,
         GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
-        GenericOperationalState(to_underlying(ManufactureOperationalStateEnum::kRebooting), Optional<CharSpan>(CharSpan::fromCharString(buffer))) 
+        GenericOperationalState(to_underlying(ManufactureOperationalStateEnum::kRebooting), Optional<CharSpan>(CharSpan::fromCharString(buffer)))
     };
 
     /**
