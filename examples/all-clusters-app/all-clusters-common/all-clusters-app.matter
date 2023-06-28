@@ -575,8 +575,8 @@ server cluster Binding = 30 {
       cluster instances. */
 server cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
-    kPase = 1;
-    kCase = 2;
+    kPASE = 1;
+    kCASE = 2;
     kGroup = 3;
   }
 
@@ -828,7 +828,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   enum OTADownloadProtocol : ENUM8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
-    kHttps = 2;
+    kHTTPS = 2;
     kVendorSpecific = 3;
   }
 
@@ -1105,7 +1105,7 @@ server cluster PowerSource = 47 {
   }
 
   enum BatChargeLevelEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -1119,15 +1119,15 @@ server cluster PowerSource = 47 {
 
   enum BatCommonDesignationEnum : ENUM16 {
     kUnspecified = 0;
-    kAaa = 1;
-    kAa = 2;
+    kAAA = 1;
+    kAA = 2;
     kC = 3;
     kD = 4;
     k4v5 = 5;
     k6v0 = 6;
     k9v0 = 7;
-    k12aa = 8;
-    kAaaa = 9;
+    k12AA = 8;
+    kAAAA = 9;
     kA = 10;
     kB = 11;
     kF = 12;
@@ -1136,9 +1136,9 @@ server cluster PowerSource = 47 {
     kSubC = 15;
     kA23 = 16;
     kA27 = 17;
-    kBa5800 = 18;
+    kBA5800 = 18;
     kDuplex = 19;
-    k4sr44 = 20;
+    k4SR44 = 20;
     k523 = 21;
     k531 = 22;
     k15v0 = 23;
@@ -1147,39 +1147,39 @@ server cluster PowerSource = 47 {
     k45v0 = 26;
     k67v5 = 27;
     kJ = 28;
-    kCr123a = 29;
-    kCr2 = 30;
-    k2cr5 = 31;
-    kCrP2 = 32;
-    kCrV3 = 33;
-    kSr41 = 34;
-    kSr43 = 35;
-    kSr44 = 36;
-    kSr45 = 37;
-    kSr48 = 38;
-    kSr54 = 39;
-    kSr55 = 40;
-    kSr57 = 41;
-    kSr58 = 42;
-    kSr59 = 43;
-    kSr60 = 44;
-    kSr63 = 45;
-    kSr64 = 46;
-    kSr65 = 47;
-    kSr66 = 48;
-    kSr67 = 49;
-    kSr68 = 50;
-    kSr69 = 51;
-    kSr516 = 52;
-    kSr731 = 53;
-    kSr712 = 54;
-    kLr932 = 55;
+    kCR123A = 29;
+    kCR2 = 30;
+    k2CR5 = 31;
+    kCRP2 = 32;
+    kCRV3 = 33;
+    kSR41 = 34;
+    kSR43 = 35;
+    kSR44 = 36;
+    kSR45 = 37;
+    kSR48 = 38;
+    kSR54 = 39;
+    kSR55 = 40;
+    kSR57 = 41;
+    kSR58 = 42;
+    kSR59 = 43;
+    kSR60 = 44;
+    kSR63 = 45;
+    kSR64 = 46;
+    kSR65 = 47;
+    kSR66 = 48;
+    kSR67 = 49;
+    kSR68 = 50;
+    kSR69 = 51;
+    kSR516 = 52;
+    kSR731 = 53;
+    kSR712 = 54;
+    kLR932 = 55;
     kA5 = 56;
     kA10 = 57;
     kA13 = 58;
     kA312 = 59;
     kA675 = 60;
-    kAc41e = 61;
+    kAC41E = 61;
     k10180 = 62;
     k10280 = 63;
     k10440 = 64;
@@ -1189,7 +1189,7 @@ server cluster PowerSource = 47 {
     k14650 = 68;
     k15270 = 69;
     k16340 = 70;
-    kRcr123a = 71;
+    kRCR123A = 71;
     k17500 = 72;
     k17670 = 73;
     k18350 = 74;
@@ -1222,8 +1222,8 @@ server cluster PowerSource = 47 {
   }
 
   enum WiredCurrentTypeEnum : ENUM8 {
-    kAc = 0;
-    kDc = 1;
+    kAC = 0;
+    kDC = 1;
   }
 
   enum WiredFaultEnum : ENUM8 {
@@ -1286,7 +1286,7 @@ server cluster PowerSource = 47 {
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
   enum CommissioningErrorEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -1366,12 +1366,12 @@ server cluster NetworkCommissioning = 49 {
   }
 
   enum WiFiBandEnum : ENUM8 {
-    k2g4 = 0;
-    k3g65 = 1;
-    k5g = 2;
-    k6g = 3;
-    k60g = 4;
-    k1g = 5;
+    k2G4 = 0;
+    k3G65 = 1;
+    k5G = 2;
+    k6G = 3;
+    k60G = 4;
+    k1G = 5;
   }
 
   bitmap Feature : BITMAP32 {
@@ -1382,10 +1382,10 @@ server cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurityBitmap : BITMAP8 {
     kUnencrypted = 0x1;
-    kWep = 0x2;
-    kWpaPersonal = 0x4;
-    kWpa2Personal = 0x8;
-    kWpa3Personal = 0x10;
+    kWEP = 0x2;
+    kWPAPersonal = 0x4;
+    kWPA2Personal = 0x8;
+    kWPA3Personal = 0x10;
   }
 
   struct NetworkInfoStruct {
@@ -1505,7 +1505,7 @@ server cluster DiagnosticLogs = 50 {
 
   enum TransferProtocolEnum : ENUM8 {
     kResponsePayload = 0;
-    kBdx = 1;
+    kBDX = 1;
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1682,7 +1682,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kUnassigned = 1;
     kSleepyEndDevice = 2;
     kEndDevice = 3;
-    kReed = 4;
+    kREED = 4;
     kRouter = 5;
     kLeader = 6;
   }
@@ -1843,10 +1843,10 @@ server cluster WiFiNetworkDiagnostics = 54 {
   enum SecurityTypeEnum : ENUM8 {
     kUnspecified = 0;
     kNone = 1;
-    kWep = 2;
-    kWpa = 3;
-    kWpa2 = 4;
-    kWpa3 = 5;
+    kWEP = 2;
+    kWPA = 3;
+    kWPA2 = 4;
+    kWPA3 = 5;
   }
 
   enum WiFiVersionEnum : ENUM8 {
@@ -1906,7 +1906,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate10M = 0;
     kRate100M = 1;
     kRate1G = 2;
-    kRate25g = 3;
+    kRate25G = 3;
     kRate5G = 4;
     kRate10G = 5;
     kRate40G = 6;
@@ -2041,7 +2041,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -2404,7 +2404,7 @@ server cluster AirQuality = 91 {
 /** Attributes and commands for monitoring HEPA filters in a device */
 server cluster HepaFilterMonitoring = 113 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2434,7 +2434,7 @@ server cluster HepaFilterMonitoring = 113 {
 /** Attributes and commands for monitoring activated carbon filters in a device */
 server cluster ActivatedCarbonFilterMonitoring = 114 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2464,7 +2464,7 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
 /** Attributes and commands for monitoring ceramic filters in a device */
 server cluster CeramicFilterMonitoring = 115 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2494,7 +2494,7 @@ server cluster CeramicFilterMonitoring = 115 {
 /** Attributes and commands for monitoring electrostatic filters in a device */
 server cluster ElectrostaticFilterMonitoring = 116 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2524,7 +2524,7 @@ server cluster ElectrostaticFilterMonitoring = 116 {
 /** Attributes and commands for monitoring UV filters in a device */
 server cluster UvFilterMonitoring = 117 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2554,7 +2554,7 @@ server cluster UvFilterMonitoring = 117 {
 /** Attributes and commands for monitoring ionizing filters in a device */
 server cluster IonizingFilterMonitoring = 118 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2584,7 +2584,7 @@ server cluster IonizingFilterMonitoring = 118 {
 /** Attributes and commands for monitoring zeolite filters in a device */
 server cluster ZeoliteFilterMonitoring = 119 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2614,7 +2614,7 @@ server cluster ZeoliteFilterMonitoring = 119 {
 /** Attributes and commands for monitoring ozone filters in a device */
 server cluster OzoneFilterMonitoring = 120 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2644,7 +2644,7 @@ server cluster OzoneFilterMonitoring = 120 {
 /** Attributes and commands for monitoring water tanks in a device */
 server cluster WaterTankMonitoring = 121 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2674,7 +2674,7 @@ server cluster WaterTankMonitoring = 121 {
 /** Attributes and commands for monitoring fuel tanks in a device */
 server cluster FuelTankMonitoring = 122 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2704,7 +2704,7 @@ server cluster FuelTankMonitoring = 122 {
 /** Attributes and commands for monitoring ink cartridges in a device */
 server cluster InkCartridgeMonitoring = 123 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2734,7 +2734,7 @@ server cluster InkCartridgeMonitoring = 123 {
 /** Attributes and commands for monitoring toner cartridges in a device */
 server cluster TonerCartridgeMonitoring = 124 {
   enum ChangeIndicationEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
@@ -2782,8 +2782,8 @@ server cluster DoorLock = 257 {
 
   enum CredentialTypeEnum : ENUM8 {
     kProgrammingPIN = 0;
-    kPin = 1;
-    kRfid = 2;
+    kPIN = 1;
+    kRFID = 2;
     kFingerprint = 3;
     kFingerVein = 4;
     kFace = 5;
@@ -2894,8 +2894,8 @@ server cluster DoorLock = 257 {
     kWeekDaySchedule = 3;
     kYearDaySchedule = 4;
     kHolidaySchedule = 5;
-    kPin = 6;
-    kRfid = 7;
+    kPIN = 6;
+    kRFID = 7;
     kFingerprint = 8;
     kFingerVein = 9;
     kFace = 10;
@@ -2934,7 +2934,7 @@ server cluster DoorLock = 257 {
     kButton = 5;
     kSchedule = 6;
     kRemote = 7;
-    kRfid = 8;
+    kRFID = 8;
     kBiometric = 9;
   }
 
@@ -3083,8 +3083,8 @@ server cluster DoorLock = 257 {
   }
 
   bitmap Feature : BITMAP32 {
-    kPinCredential = 0x1;
-    kRfidCredential = 0x2;
+    kPINCredential = 0x1;
+    kRFIDCredential = 0x2;
     kFingerCredentials = 0x4;
     kLogging = 0x8;
     kWeekDayAccessSchedules = 0x10;
@@ -3853,7 +3853,7 @@ server cluster ColorControl = 768 {
     kHueAndSaturation = 0x1;
     kEnhancedHue = 0x2;
     kColorLoop = 0x4;
-    kXy = 0x8;
+    kXY = 0x8;
     kColorTemperature = 0x10;
   }
 
@@ -4113,7 +4113,7 @@ server cluster BallastConfiguration = 769 {
 server cluster IlluminanceMeasurement = 1024 {
   enum LightSensorTypeEnum : ENUM8 {
     kPhotodiode = 0;
-    kCmos = 1;
+    kCMOS = 1;
   }
 
   readonly attribute nullable int16u measuredValue = 0;
@@ -4191,7 +4191,7 @@ server cluster RelativeHumidityMeasurement = 1029 {
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 server cluster OccupancySensing = 1030 {
   enum OccupancySensorTypeEnum : ENUM8 {
-    kPir = 0;
+    kPIR = 0;
     kUltrasonic = 1;
     kPIRAndUltrasonic = 2;
     kPhysicalContact = 3;
@@ -4202,7 +4202,7 @@ server cluster OccupancySensing = 1030 {
   }
 
   bitmap OccupancySensorTypeBitmap : BITMAP8 {
-    kPir = 0x1;
+    kPIR = 0x1;
     kUltrasonic = 0x2;
     kPhysicalContact = 0x4;
   }
@@ -4235,14 +4235,14 @@ server cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   }
 
   enum MeasurementUnitEnum : ENUM8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4290,14 +4290,14 @@ server cluster CarbonDioxideConcentrationMeasurement = 1037 {
   }
 
   enum MeasurementUnitEnum : ENUM8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4345,14 +4345,14 @@ server cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   }
 
   enum MeasurementUnitEnum : ENUM8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4400,14 +4400,14 @@ server cluster OzoneConcentrationMeasurement = 1045 {
   }
 
   enum MeasurementUnitEnum : ENUM8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4455,14 +4455,14 @@ server cluster Pm25ConcentrationMeasurement = 1066 {
   }
 
   enum MeasurementUnitEnum : ENUM8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4510,14 +4510,14 @@ server cluster FormaldehydeConcentrationMeasurement = 1067 {
   }
 
   enum MeasurementUnitEnum : ENUM8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4565,14 +4565,14 @@ server cluster Pm1ConcentrationMeasurement = 1068 {
   }
 
   enum MeasurementUnitEnum : ENUM8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4620,14 +4620,14 @@ server cluster Pm10ConcentrationMeasurement = 1069 {
   }
 
   enum MeasurementUnitEnum : ENUM8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4675,14 +4675,14 @@ server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   }
 
   enum MeasurementUnitEnum : ENUM8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4730,14 +4730,14 @@ server cluster RadonConcentrationMeasurement = 1071 {
   }
 
   enum MeasurementUnitEnum : ENUM8 {
-    kPpm = 0;
-    kPpb = 1;
-    kPpt = 2;
-    kMgm3 = 3;
-    kUgm3 = 4;
-    kNgm3 = 5;
-    kPm3 = 6;
-    kBqm3 = 7;
+    kPPM = 0;
+    kPPB = 1;
+    kPPT = 2;
+    kMGM3 = 3;
+    kUGM3 = 4;
+    kNGM3 = 5;
+    kPM3 = 6;
+    kBQM3 = 7;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4788,7 +4788,7 @@ server cluster Channel = 1284 {
   }
 
   enum LineupInfoTypeEnum : ENUM8 {
-    kMso = 0;
+    kMSO = 0;
   }
 
   bitmap Feature : BITMAP32 {
@@ -4904,13 +4904,13 @@ server cluster MediaInput = 1287 {
     kAux = 1;
     kCoax = 2;
     kComposite = 3;
-    kHdmi = 4;
+    kHDMI = 4;
     kInput = 5;
     kLine = 6;
     kOptical = 7;
     kVideo = 8;
-    kScart = 9;
-    kUsb = 10;
+    kSCART = 9;
+    kUSB = 10;
     kOther = 11;
   }
 
@@ -5118,8 +5118,8 @@ server cluster ContentLauncher = 1290 {
   }
 
   bitmap SupportedStreamingProtocol : BITMAP32 {
-    kDash = 0x1;
-    kHls = 0x2;
+    kDASH = 0x1;
+    kHLS = 0x2;
   }
 
   struct DimensionStruct {
@@ -5171,8 +5171,8 @@ server cluster ContentLauncher = 1290 {
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 server cluster AudioOutput = 1291 {
   enum OutputTypeEnum : ENUM8 {
-    kHdmi = 0;
-    kBt = 1;
+    kHDMI = 0;
+    kBT = 1;
     kOptical = 2;
     kHeadphone = 3;
     kInternal = 4;

@@ -409,8 +409,8 @@ server cluster Binding = 30 {
       cluster instances. */
 server cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
-    kPase = 1;
-    kCase = 2;
+    kPASE = 1;
+    kCASE = 2;
     kGroup = 3;
   }
 
@@ -643,7 +643,7 @@ server cluster UnitLocalization = 45 {
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
   enum CommissioningErrorEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -723,12 +723,12 @@ server cluster NetworkCommissioning = 49 {
   }
 
   enum WiFiBandEnum : ENUM8 {
-    k2g4 = 0;
-    k3g65 = 1;
-    k5g = 2;
-    k6g = 3;
-    k60g = 4;
-    k1g = 5;
+    k2G4 = 0;
+    k3G65 = 1;
+    k5G = 2;
+    k6G = 3;
+    k60G = 4;
+    k1G = 5;
   }
 
   bitmap Feature : BITMAP32 {
@@ -739,10 +739,10 @@ server cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurityBitmap : BITMAP8 {
     kUnencrypted = 0x1;
-    kWep = 0x2;
-    kWpaPersonal = 0x4;
-    kWpa2Personal = 0x8;
-    kWpa3Personal = 0x10;
+    kWEP = 0x2;
+    kWPAPersonal = 0x4;
+    kWPA2Personal = 0x8;
+    kWPA3Personal = 0x10;
   }
 
   struct NetworkInfoStruct {
@@ -998,10 +998,10 @@ server cluster WiFiNetworkDiagnostics = 54 {
   enum SecurityTypeEnum : ENUM8 {
     kUnspecified = 0;
     kNone = 1;
-    kWep = 2;
-    kWpa = 3;
-    kWpa2 = 4;
-    kWpa3 = 5;
+    kWEP = 2;
+    kWPA = 3;
+    kWPA2 = 4;
+    kWPA3 = 5;
   }
 
   enum WiFiVersionEnum : ENUM8 {
@@ -1059,7 +1059,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate10M = 0;
     kRate100M = 1;
     kRate1G = 2;
-    kRate25g = 3;
+    kRate25G = 3;
     kRate5G = 4;
     kRate10G = 5;
     kRate40G = 6;
@@ -1141,7 +1141,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -1346,7 +1346,7 @@ client cluster Channel = 1284 {
   }
 
   enum LineupInfoTypeEnum : ENUM8 {
-    kMso = 0;
+    kMSO = 0;
   }
 
   bitmap Feature : BITMAP32 {
@@ -1531,13 +1531,13 @@ client cluster MediaInput = 1287 {
     kAux = 1;
     kCoax = 2;
     kComposite = 3;
-    kHdmi = 4;
+    kHDMI = 4;
     kInput = 5;
     kLine = 6;
     kOptical = 7;
     kVideo = 8;
-    kScart = 9;
-    kUsb = 10;
+    kSCART = 9;
+    kUSB = 10;
     kOther = 11;
   }
 
@@ -1751,8 +1751,8 @@ client cluster ContentLauncher = 1290 {
   }
 
   bitmap SupportedStreamingProtocol : BITMAP32 {
-    kDash = 0x1;
-    kHls = 0x2;
+    kDASH = 0x1;
+    kHLS = 0x2;
   }
 
   struct DimensionStruct {
@@ -1826,8 +1826,8 @@ client cluster ContentLauncher = 1290 {
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 client cluster AudioOutput = 1291 {
   enum OutputTypeEnum : ENUM8 {
-    kHdmi = 0;
-    kBt = 1;
+    kHDMI = 0;
+    kBT = 1;
     kOptical = 2;
     kHeadphone = 3;
     kInternal = 4;
