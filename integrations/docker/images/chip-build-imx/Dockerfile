@@ -9,10 +9,10 @@ RUN set -x \
     && : # last line
 WORKDIR /opt
 RUN set -x \
-    && wget --quiet https://www.nxp.com/lgfiles/IMM/fsl-imx-xwayland-glibc-x86_64-imx-image-multimedia-armv8a-imx8mmevk-toolchain-5.15-kirkstone.sh \
-    && chmod a+x fsl-imx-xwayland-glibc-x86_64-imx-image-multimedia-armv8a-imx8mmevk-toolchain-5.15-kirkstone.sh \
-    && ./fsl-imx-xwayland-glibc-x86_64-imx-image-multimedia-armv8a-imx8mmevk-toolchain-5.15-kirkstone.sh -y \
-    && rm -rf fsl-imx-xwayland-glibc-x86_64-imx-image-multimedia-armv8a-imx8mmevk-toolchain-5.15-kirkstone.sh \
+    && wget --quiet https://www.nxp.com/lgfiles/IMM/6.1-langdale-imx8mm-matter-toolchain.sh \
+    && chmod a+x 6.1-langdale-imx8mm-matter-toolchain.sh \
+    && ./6.1-langdale-imx8mm-matter-toolchain.sh -y \
+    && rm -rf 6.1-langdale-imx8mm-matter-toolchain.sh \
     && : # last line
 RUN set -x \
     && cd /opt/fsl-imx-xwayland \
@@ -22,6 +22,7 @@ RUN set -x \
 
 FROM connectedhomeip/chip-build:${VERSION}
 
+
 COPY --from=build /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
-ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/5.15-kirkstone/
+ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/6.1-langdale/
