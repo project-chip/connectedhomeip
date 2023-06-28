@@ -69,7 +69,7 @@
         return [error containsString:@".mm:"];
     }] anyObject];
     NSString * frameworkSource = [self sourceFileFromErrorString:frameworkError];
-    XCTAssertTrue([frameworkSource scriptingEndsWith:@".mm"]);
+    XCTAssertTrue([frameworkSource hasSuffix:@".mm"]);
     XCTAssertFalse([frameworkSource containsString:@"/"], @"frameworkSource: %@", frameworkSource);
 }
 
