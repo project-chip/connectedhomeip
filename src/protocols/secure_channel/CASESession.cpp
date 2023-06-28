@@ -242,9 +242,9 @@ private:
         {
             // We failed to schedule after work callback, so setting mScheduleAfterWorkFailed flag to true
             // This can be checked from foreground thread and after work callback can be retried
+            helper->mStatus = status;
             ChipLogError(SecureChannel, "Failed to Schedule the AfterWorkCallback on foreground thread");
             helper->mScheduleAfterWorkFailed.store(true);
-            helper->mStatus = status;
 
             // Release strong ptr since scheduling failed
             helper->mStrongPtr.reset();
