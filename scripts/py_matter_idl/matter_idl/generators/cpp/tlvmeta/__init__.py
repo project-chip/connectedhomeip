@@ -36,14 +36,17 @@ class ClusterTablesGenerator:
     """Handles conversion from a cluster to tables."""
     def __init__(self, cluster: Cluster):
         self.cluster = cluster
-        self.known_types = set()
+        self.known_types = set() # all types where we create reference_to
+        self.list_types = set() # all types that require a list entry
 
     def FieldEntry(self, field: Field) -> TableEntry:
         type_reference = "%s_%s" % (self.cluster.name, field.data_type.name)
         if type_reference not in self.known_types:
             type_reference = None
 
-        # FIXME: implement
+        # TODO: need to generate list logic
+        #       as lists require a second indirection
+
         return TableEntry(
             code=field.code,
             name=field.name,
@@ -56,6 +59,10 @@ class ClusterTablesGenerator:
         for s in self.cluster.structs:
             self.known_types.add("%s_%s" % (self.cluster.name, s.name))
 
+        # Events are structures
+        for e in self.cluster.events:
+            self.known_types.add("%s_%s" % (self.cluster.name, e.name))
+
     def GenerateTables(self) -> Generator[Table, None, None]:
         self.ComputeKnownTypes()
 
@@ -65,21 +72,43 @@ class ClusterTablesGenerator:
                 entries = [self.FieldEntry(field) for field in s.fields]
             )
 
+        for e in self.cluster.events:
+            yield Table(
+                full_name="%s_%s" % (self.cluster.name, e.name),
+                entries = [self.FieldEntry(field) for field in s.fields]
+            )
 
-        # TODO: attributes (also structs)
+        # Clusters have attributes. They are direct descendants for
+        # attributes
+        yield Table(
+            full_name=("%s_attributes" % self.cluster.name),
+            entries = [
+                self.FieldEntry(a.definition) for a in self.cluster.attributes
+            ]
+        )
+        yield Table(
+            full_name=("%s_events" % self.cluster.name),
+            entries = [
+                # events always reference an existing struct
+                TableEntry(coden=e.code, name=e.name, reference="%s_%s" % (self.cluster.name, e.name))
+                for e in self.cluster.events
+            ]
+        )
+
         # TODO: commands (also structs)
-        # TODO: events (also structs)
         #
-        # TODO: enums, bitmaps, lists
+        # TODO: enums, bitmaps
+
+        # TODO: add list indices
 
 
 
 def ClusterToTables(cluster: Cluster) -> List[Table]:
 
     cluster_table = Table(full_name=cluster.name, entries=[
-        TableEntry(code=1, name="attributes", reference="%s_attributes"),
-        TableEntry(code=2, name="commands", reference="%s_commands"),
-        TableEntry(code=3, name="events", reference="%s_events"),
+        TableEntry(code=1, name="attributes", reference="%s_attributes" % cluster.name),
+        TableEntry(code=2, name="commands", reference="%s_commands" % cluster.name),
+        TableEntry(code=3, name="events", reference="%s_events" % cluster.name),
     ])
     result = [cluster_table]
     result.extend([ table for table in ClusterTablesGenerator(cluster).GenerateTables()])
