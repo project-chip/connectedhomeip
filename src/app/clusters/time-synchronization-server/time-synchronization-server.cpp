@@ -321,7 +321,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     if (lastTzState != TimeState::kInvalid)
     {
         const auto & tzStore = GetTimeZone()[0];
-        lastTz.offset  = tzStore.timeZone.offset;
+        lastTz.offset        = tzStore.timeZone.offset;
         if (tzStore.timeZone.name.HasValue())
         {
             lastTz.name.SetValue(CharSpan(name));
@@ -389,7 +389,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
 
     if (lastTzState != TimeState::kInvalid && TimeState::kInvalid != UpdateTimeZoneState())
     {
-        bool emit = false;
+        bool emit       = false;
         const auto & tz = GetTimeZone()[0].timeZone;
         if (tz.offset != lastTz.offset)
         {
@@ -440,8 +440,8 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
         return ClearDSTOffset();
     }
 
-    auto newDstL   = dstL.begin();
-    size_t i       = 0;
+    auto newDstL = dstL.begin();
+    size_t i     = 0;
     InitDSTOffset();
 
     while (newDstL.Next())
