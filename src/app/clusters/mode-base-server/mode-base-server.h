@@ -24,10 +24,6 @@
 #include <app/util/af.h>
 #include <map>
 
-using chip::Protocols::InteractionModel::Status;
-using ModeOptionStructType = chip::app::Clusters::detail::Structs::ModeOptionStruct::Type;
-using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -38,19 +34,28 @@ class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 public:
     /**
      * This is a helper function to build a mode option structure. It takes the label/name of the mode,
-     * the value of the mode and a list of mode tags that apply to this mode. NOTE, the caller must
-     * ensure that the lifetime of the label and modeTags is as long as the returned structure.
+     * the value of the mode and a list of mode tags that apply to this mode.
+     *
+     * **NOTE** The caller must ensure that the lifetime of the label and modeTags is as long as the
+     * returned structure.
      */
-    static ModeOptionStructType BuildModeOptionStruct(const char * label, uint8_t mode,
-                                                      const List<const ModeTagStructType> modeTags)
+    static chip::app::Clusters::detail::Structs::ModeOptionStruct::Type BuildModeOptionStruct(
+        const char * label, uint8_t mode,
+        const List<const chip::app::Clusters::detail::Structs::ModeTagStruct::Type> modeTags)
     {
-        detail::Structs::ModeOptionStruct::Type option;
+        chip::app::Clusters::detail::Structs::ModeOptionStruct::Type option;
         option.label    = CharSpan::fromCharString(label);
         option.mode     = mode;
         option.modeTags = modeTags;
         return option;
     }
 
+    /**
+     * Initialise the ModeBase server instance.
+     * @return Returns an error if the cluster ID given is not af a valid ModeBase cluster, if the
+     * given endpoint and cluster ID have not been enabled in zap, if the CommandHandler or
+     * AttributeHandler registration fails or if the AppInit() returns an error.
+     */
     CHIP_ERROR Init();
 
     // CommandHandlerInterface
