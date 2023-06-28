@@ -11,13 +11,10 @@ using namespace chip::TLV;
 
 Entry<ItemInfo> _{{table.full_name}}[] = {
   {%-  for entry in table.entries %}
-  { { ContextTag({{entry.code}}), "{{entry.name}}"}, {{entry.reference | indexInTable(sub_tables)}} },
+  { { ContextTag({{entry.code}}), "{{entry.name}}"}, {{entry.reference | indexInTable(sub_tables)}} }, // {{entry.real_type}}
   {%- endfor %}
 };
 {%- endfor %}
-
-// TODO: reference structures and everything else
-// Figure out IDs
 
 Entry<ItemInfo> _all_clusters[] = {
 {%- for cluster in clusters | sort(attribute='code') %}

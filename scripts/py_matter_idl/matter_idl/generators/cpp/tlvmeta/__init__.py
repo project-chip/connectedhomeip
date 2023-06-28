@@ -24,6 +24,7 @@ class TableEntry:
     code: int                # Unique code for the entry
     name: str                # human friendly name
     reference: Optional[str] # reference to full name
+    real_type: str           # real type
 
 
 @dataclass
@@ -50,7 +51,8 @@ class ClusterTablesGenerator:
         return TableEntry(
             code=field.code,
             name=field.name,
-            reference=type_reference
+            reference=type_reference,
+            real_type="%s::%s" % (self.cluster.name, field.data_type.name)
         )
 
     def ComputeKnownTypes(self):
@@ -67,17 +69,20 @@ class ClusterTablesGenerator:
         # yield entries for every command input
         for c in self.cluster.commands:
             if c.input_param:
-                yield TableEntry(name=c.input_param, code=c.code, reference="%s_%s" % (self.cluster.name, c.input_param))
+                yield TableEntry(
+                    name=c.input_param, code=c.code, reference="%s_%s" % (self.cluster.name, c.input_param),
+                    real_type="%s::%s::%s" % (self.cluster.name, c.name, c.input_param)
+                )
 
         # yield entries for every command output. We use "respons struct"
         # for this to figure out where to tag IDs from.
         for c in self.cluster.structs:
             if c.tag != StructTag.RESPONSE:
                 continue
-            yield TableEntry(name=c.name, code=c.code, reference="%s_%s" % (self.cluster.name, c.name))
-
-        
-
+            yield TableEntry(
+                 name=c.name, code=c.code, reference="%s_%s" % (self.cluster.name, c.name),
+                 real_type="%s::%s" % (self.cluster.name, c.name),
+            )
 
     def GenerateTables(self) -> Generator[Table, None, None]:
         self.ComputeKnownTypes()
@@ -116,19 +121,16 @@ class ClusterTablesGenerator:
             entries = [entry for entry in self.CommandEntries()],
         )
 
-        #
-        # TODO: enums, bitmaps
-
-        # TODO: add list indices
-
-
+        # TODO:
+        #  - enums and bitmaps could be decoded with their value (by abusing tags a bit)
+        #  - list indices require one extra indirection
 
 def ClusterToTables(cluster: Cluster) -> List[Table]:
 
     cluster_table = Table(full_name=cluster.name, entries=[
-        TableEntry(code=1, name="attributes", reference="%s_attributes" % cluster.name),
-        TableEntry(code=2, name="commands", reference="%s_commands" % cluster.name),
-        TableEntry(code=3, name="events", reference="%s_events" % cluster.name),
+        TableEntry(code=1, name="attributes", reference="%s_attributes" % cluster.name, real_type="%s/attr" % (cluster.name,)),
+        TableEntry(code=2, name="commands", reference="%s_commands" % cluster.name, real_type="%s/cmd" % (cluster.name,)),
+        TableEntry(code=3, name="events", reference="%s_events" % cluster.name, real_type="%s/ev" % (cluster.name,)),
     ])
     result = [cluster_table]
     result.extend([ table for table in ClusterTablesGenerator(cluster).GenerateTables()])
@@ -139,8 +141,6 @@ def CreateTables(idl: Idl) -> List[Table]:
     result = []
     for cluster in idl.clusters:
         result.extend(ClusterToTables(cluster))
-
-    # TODO: sort by usage
 
     return result
 
@@ -158,8 +158,7 @@ def IndexInTable(name: Optional[str], table: List[Table]) -> str:
         if t.full_name == name:
             return idx + 1
 
-    # raise Exception("Name %r not found in table" % name)
-    return "kFIXME: %s" % name
+    raise Exception("Name %r not found in table" % name)
 
 
 class TLVMetaDataGenerator(CodeGenerator):
