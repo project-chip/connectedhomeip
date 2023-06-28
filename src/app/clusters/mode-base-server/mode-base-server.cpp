@@ -135,14 +135,15 @@ CHIP_ERROR Instance::Init()
 
             if (startUpMode.Value() != currentMode)
             {
-                if (!IsSupportedMode(startUpMode.Value()))
+                ChipLogProgress(Zcl, "ModeBase: Changing CurrentMode to the StartUpMode value.");
+                Status status = UpdateCurrentMode(startUpMode.Value());
+                if (status != Status::Success)
                 {
-                    ChipLogError(Zcl, "ModeBase: Start-up_mode is not set to a valid mode.");
-                    return CHIP_ERROR_INVALID_ARGUMENT; // todo is thins the correct error?
+                    ChipLogError(Zcl, "ModeBase: Failed to change the CurrentMode to the StartUpMode value: %u", to_underlying(status));
+                    return StatusIB(status).ToChipError();
                 }
 
-                UpdateCurrentMode(startUpMode.Value());
-                ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to %u", startUpMode.Value());
+                ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to the StartUpMode value %u", startUpMode.Value());
             }
         }
     }
@@ -310,42 +311,35 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
 {
     DataModel::Nullable<uint8_t> newMode;
     ReturnErrorOnFailure(aDecoder.Decode(newMode));
+    Status status;
 
-    if (newMode.IsNull()) // This indicates that the new mode is null.
-    {
-        switch (attributePath.mAttributeId)
-        {
-        case ModeBase::Attributes::StartUpMode::Id:
-            UpdateStartUpMode(newMode);
-            return CHIP_NO_ERROR;
-        case ModeBase::Attributes::OnMode::Id:
-            UpdateOnMode(newMode);
-            return CHIP_NO_ERROR;
-        }
-    }
-    else
+    if (!newMode.IsNull()) // This indicates that the new mode is null.
     {
         if (!IsSupportedMode(newMode.Value()))
         {
             return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
         }
+    }
 
-        switch (attributePath.mAttributeId)
-        {
-        case ModeBase::Attributes::StartUpMode::Id:
-            UpdateStartUpMode(newMode);
-            return CHIP_NO_ERROR;
-        case ModeBase::Attributes::OnMode::Id:
-            UpdateOnMode(newMode);
-            return CHIP_NO_ERROR;
-        }
+    switch (attributePath.mAttributeId)
+    {
+    case ModeBase::Attributes::StartUpMode::Id:
+        status = UpdateStartUpMode(newMode);
+        return StatusIB(status).ToChipError();
+    case ModeBase::Attributes::OnMode::Id:
+        status = UpdateOnMode(newMode);
+        return StatusIB(status).ToChipError();
     }
 
     return StatusIB(Protocols::InteractionModel::Status::InvalidCommand).ToChipError();
 }
 
-void Instance::UpdateCurrentMode(uint8_t aNewMode)
+Status Instance::UpdateCurrentMode(uint8_t aNewMode)
 {
+    if (!IsSupportedMode(aNewMode))
+    {
+        return Protocols::InteractionModel::Status::InvalidValue;
+    }
     uint8_t oldMode = mCurrentMode;
     mCurrentMode    = aNewMode;
     if (mCurrentMode != oldMode)
@@ -353,10 +347,18 @@ void Instance::UpdateCurrentMode(uint8_t aNewMode)
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
     }
+    return Protocols::InteractionModel::Status::Success;
 }
 
-void Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
+Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
 {
+    if (!aNewStartUpMode.IsNull())
+    {
+        if (!IsSupportedMode(aNewStartUpMode.Value()))
+        {
+            return Protocols::InteractionModel::Status::InvalidValue;
+        }
+    }
     DataModel::Nullable<uint8_t> oldStartUpMode = mStartUpMode;
     mStartUpMode                                = aNewStartUpMode;
     if (mStartUpMode != oldStartUpMode)
@@ -364,10 +366,18 @@ void Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
     }
+    return Protocols::InteractionModel::Status::Success;
 }
 
-void Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
+Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
 {
+    if (!aNewOnMode.IsNull())
+    {
+        if (!IsSupportedMode(aNewOnMode.Value()))
+        {
+            return Protocols::InteractionModel::Status::InvalidValue;
+        }
+    }
     DataModel::Nullable<uint8_t> oldOnMode = mOnMode;
     mOnMode                                = aNewOnMode;
     if (mOnMode != oldOnMode)
@@ -375,6 +385,7 @@ void Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OnMode::Id);
     }
+    return Protocols::InteractionModel::Status::Success;
 }
 
 DataModel::Nullable<uint8_t> Instance::GetStartUpMode() const

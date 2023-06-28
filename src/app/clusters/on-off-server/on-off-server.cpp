@@ -64,8 +64,15 @@ void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
                 ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance->GetOnMode();
                 if (!onMode.IsNull())
                 {
-                    ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
-                    modeBaseInstance->UpdateCurrentMode(onMode.Value());
+                    Status status = modeBaseInstance->UpdateCurrentMode(onMode.Value());
+                    if (status == Status::Success)
+                    {
+                        ChipLogProgress(Zcl, "Changed the Current Mode to %x", onMode.Value());
+                    }
+                    else
+                    {
+                        ChipLogError(Zcl, "Failed to Changed the Current Mode to %x: %u", onMode.Value(), to_underlying(status));
+                    }
                 }
             }
         }

@@ -67,9 +67,9 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // Attribute setters
-    void UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode);
-    void UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode);
-    void UpdateCurrentMode(uint8_t aNewMode);
+    chip::Protocols::InteractionModel::Status UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode);
+    chip::Protocols::InteractionModel::Status UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode);
+    chip::Protocols::InteractionModel::Status UpdateCurrentMode(uint8_t aNewMode);
 
     // Attribute getters
     DataModel::Nullable<uint8_t> GetStartUpMode() const;
