@@ -17,7 +17,7 @@ from typing import List, Optional, Generator
 from dataclasses import dataclass
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl, Field
+from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl, Field, StructTag
 
 @dataclass
 class TableEntry:
@@ -63,6 +63,22 @@ class ClusterTablesGenerator:
         for e in self.cluster.events:
             self.known_types.add("%s_%s" % (self.cluster.name, e.name))
 
+    def CommandEntries(self) -> Generator[TableEntry, None, None]:
+        # yield entries for every command input
+        for c in self.cluster.commands:
+            if c.input_param:
+                yield TableEntry(name=c.input_param, code=c.code, reference="%s_%s" % (self.cluster.name, c.input_param))
+
+        # yield entries for every command output. We use "respons struct"
+        # for this to figure out where to tag IDs from.
+        for c in self.cluster.structs:
+            if c.tag != StructTag.RESPONSE:
+                continue
+            yield TableEntry(name=c.name, code=c.code, reference="%s_%s" % (self.cluster.name, c.name))
+
+        
+
+
     def GenerateTables(self) -> Generator[Table, None, None]:
         self.ComputeKnownTypes()
 
@@ -95,7 +111,11 @@ class ClusterTablesGenerator:
             ]
         )
 
-        # TODO: commands (also structs)
+        yield Table(
+            full_name=("%s_commands" % self.cluster.name),
+            entries = [entry for entry in self.CommandEntries()],
+        )
+
         #
         # TODO: enums, bitmaps
 
