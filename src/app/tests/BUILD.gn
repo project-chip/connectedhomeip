@@ -138,6 +138,7 @@ chip_test_suite("tests") {
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
     "TestOperationalStateDelegate.cpp",
+    "TestOperationalStateDelegateImpl.cpp",
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
