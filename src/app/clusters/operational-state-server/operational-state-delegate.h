@@ -198,7 +198,7 @@ private:
 };
 
 /**
- * A class wrap the operation completion of operational state cluster
+ * A class which represents the operational completion of an Operational State cluster derivation instance.
  */
 struct GenericOperationCompletion : public app::Clusters::OperationalState::Events::OperationCompletion::Type
 {
