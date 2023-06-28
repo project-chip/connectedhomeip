@@ -367,7 +367,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
     [task waitUntilExit];
     XCTAssertEqual([task terminationStatus], 0);
 #endif
-    
+
     NSData * updateToken = [sOTAProviderDelegate generateUpdateToken];
 
     __block NSFileHandle * readHandle;
