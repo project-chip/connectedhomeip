@@ -78,7 +78,6 @@ concurrency:
 jobs:
     doxygen:
         name: Build Doxygen
-        timeout-minutes: 5
 
         runs-on: ubuntu-latest
         container:

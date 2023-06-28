@@ -88,6 +88,7 @@ mw320_executable("shell_mw320") {
 
   ldflags = [
     "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,-print-memory-usage",
     "-Wl,--no-warn-rwx-segment",
   ]
   defines = [

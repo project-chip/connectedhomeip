@@ -44,6 +44,7 @@ AdvSendAdvert
 AE
 aef
 AES
+AIDL
 AlarmCode
 algs
 alloc
@@ -164,6 +165,7 @@ bredr
 BridgedDeviceBasicInformation
 bridgedLightEndpoint
 bringup
+BroadcastReceiver
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
@@ -478,6 +480,7 @@ EEE
 eef
 ef
 EFR
+efuse
 eg
 EjQ
 elftools
@@ -1072,6 +1075,7 @@ ProxyDiscovery
 ProxyValid
 ProxyView
 PRs
+PSA
 PSCAN
 PSECT
 PSK
@@ -1359,9 +1363,9 @@ tmp
 tngvndl
 TODO
 toJson
+tokenization
 tokenized
 tokenizer
-tokenization
 toolchain
 toolchains
 topologies

@@ -1265,6 +1265,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RefrigeratorAndTemperat
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherControls::NumberOfRinsesEnum val)
+{
+    using EnumType = LaundryWasherControls::NumberOfRinsesEnum;
+    switch (val)
+    {
+    case EnumType::kNone:
+    case EnumType::kNormal:
+    case EnumType::kExtra:
+    case EnumType::kMax:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunMode::ModeTag val)
 {
     using EnumType = RvcRunMode::ModeTag;

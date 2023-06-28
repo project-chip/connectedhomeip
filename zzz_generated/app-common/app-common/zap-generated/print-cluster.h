@@ -307,10 +307,11 @@
 #define CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER
 #endif
 
-#if defined(ZCL_USING_WASHER_CONTROLS_CLUSTER_SERVER) || defined(ZCL_USING_WASHER_CONTROLS_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_WASHER_CONTROLS_CLUSTER { chip::app::Clusters::WasherControls::Id, "Washer Controls" },
+#if defined(ZCL_USING_LAUNDRY_WASHER_CONTROLS_CLUSTER_SERVER) || defined(ZCL_USING_LAUNDRY_WASHER_CONTROLS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_LAUNDRY_WASHER_CONTROLS_CLUSTER                                                                          \
+    { chip::app::Clusters::LaundryWasherControls::Id, "Laundry Washer Controls" },
 #else
-#define CHIP_PRINTCLUSTER_WASHER_CONTROLS_CLUSTER
+#define CHIP_PRINTCLUSTER_LAUNDRY_WASHER_CONTROLS_CLUSTER
 #endif
 
 #if defined(ZCL_USING_RVC_RUN_MODE_CLUSTER_SERVER) || defined(ZCL_USING_RVC_RUN_MODE_CLUSTER_CLIENT)
@@ -353,6 +354,12 @@
 #define CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER { chip::app::Clusters::SmokeCoAlarm::Id, "Smoke CO Alarm" },
 #else
 #define CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER
+#endif
+
+#if defined(ZCL_USING_DISHWASHER_ALARM_CLUSTER_SERVER) || defined(ZCL_USING_DISHWASHER_ALARM_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER { chip::app::Clusters::DishwasherAlarm::Id, "Dishwasher Alarm" },
+#else
+#define CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER
 #endif
 
 #if defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_CLIENT)
@@ -973,7 +980,7 @@
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_LAUNDRY_WASHER_MODE_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER                                                 \
-    CHIP_PRINTCLUSTER_WASHER_CONTROLS_CLUSTER                                                                                      \
+    CHIP_PRINTCLUSTER_LAUNDRY_WASHER_CONTROLS_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_RVC_RUN_MODE_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_RVC_CLEAN_MODE_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_TEMPERATURE_CONTROL_CLUSTER                                                                                  \
@@ -981,6 +988,7 @@
     CHIP_PRINTCLUSTER_DISHWASHER_MODE_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
