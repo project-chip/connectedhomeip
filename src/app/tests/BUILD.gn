@@ -81,8 +81,8 @@ source_set("ota-requestor-test-srcs") {
 
 source_set("operational-state-test-srcs") {
   sources = [
-     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
-     "${chip_root}/src/app/clusters/operational-state-server/operational-state-delegate.h",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
+    "${chip_root}/src/app/clusters/operational-state-server/operational-state-delegate.h",
   ]
 
   public_deps = [
@@ -177,8 +177,8 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":binding-test-srcs",
-    ":operational-state-test-srcs",
     ":icd-management-test-srcs",
+    ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
     ":scenes-table-test-srcs",
     "${chip_root}/src/app",
