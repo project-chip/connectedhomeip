@@ -144,7 +144,7 @@ public:
     /**
      * Returns the number of modes managed by this instance.
      */
-    virtual uint8_t NumberOfModes();
+    virtual uint8_t NumberOfModes()  = 0;
 
     /**
      * Get the mode label of the Nth mode in the list of modes.
@@ -153,7 +153,7 @@ public:
      * to copy into the MutableCharSpan.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label);
+    virtual CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)  = 0;
 
     /**
      * Get the mode value of the Nth mode in the list of modes.
@@ -161,7 +161,7 @@ public:
      * @param value a reference to the uint8_t variable that is to contain the mode value.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value);
+    virtual CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)  = 0;
 
     /**
      * Get the mode tags of the Nth mode in the list of modes.
@@ -176,7 +176,7 @@ public:
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
     virtual CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex,
-                                          List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & modeTags);
+                                          List<chip::app::Clusters::detail::Structs::ModeTagStruct::Type> & modeTags)  = 0;
 
     /**
      * When a ChangeToMode command is received, if the NewMode value is a supported made, this function is called to 1) decide if
@@ -191,7 +191,7 @@ public:
      * application.
      *
      */
-    virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response);
+    virtual void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response) = 0;
 };
 
 // This map holds pointers to all initialised ModeBase instances. It provides a way to access all ModeBase clusters.

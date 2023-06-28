@@ -24,7 +24,6 @@
 #include <app/util/attribute-storage.h>
 #include <platform/DiagnosticDataProvider.h>
 
-// using namespace std;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -428,31 +427,6 @@ bool Instance::IsSupportedMode(uint8_t modeValue)
 Instance::~Instance()
 {
     ModeBaseAliasesInstanceMap.erase(mClusterId);
-}
-
-uint8_t Instance::NumberOfModes()
-{
-    return 0;
-}
-
-CHIP_ERROR Instance::GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR Instance::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR Instance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & modeTags)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-void Instance::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
-{
-    response.status = to_underlying(StatusCode::kSuccess);
 }
 
 std::map<uint32_t, Instance *> GetModeBaseInstances()
