@@ -567,7 +567,7 @@ tests:
               type: epoch_s
 
     - label: "Read OccupiedSetback attribute from the DUT"
-      PICS: TSTAT.S.F02
+      PICS: TSTAT.S.F04
       command: "readAttribute"
       attribute: "OccupiedSetback"
       response:
@@ -577,7 +577,7 @@ tests:
               maxValue: 255
 
     - label: "Read OccupiedSetbackMin attribute from the DUT"
-      PICS: TSTAT.S.F02
+      PICS: TSTAT.S.F04
       command: "readAttribute"
       attribute: "OccupiedSetbackMin"
       response:
@@ -587,7 +587,7 @@ tests:
               maxValue: 255
 
     - label: "Read OccupiedSetbackMax attribute from the DUT"
-      PICS: TSTAT.S.F02
+      PICS: TSTAT.S.F04
       command: "readAttribute"
       attribute: "OccupiedSetbackMax"
       response:

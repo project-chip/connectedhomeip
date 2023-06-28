@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 116.2.1. [TC-DRLK-2.1] Attributes check [DUT - Server]
 
@@ -20,347 +19,199 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Door Lock"
+    endpoint: 1
 
 tests:
-    - label: "Pre-Conditions"
-      verification: |
-          TH is commissioned with the DUT
-          Lock device is the DUT
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
-      verification: |
-          ./chip-tool doorlock read lock-state 1 1
-
-          Verify " LockState " on the TH(Chip-tool) Log:
-
-          [1654673735.820302][3247:3252] CHIP:DMG:        SuppressResponse = true,
-          [1654673735.820328][3247:3252] CHIP:DMG:        InteractionModelRevision = 1
-          [1654673735.820351][3247:3252] CHIP:DMG: }
-          [1654673735.820481][3247:3252] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0000 DataVersion: 3738767914
-          [1654673735.820565][3247:3252] CHIP:TOO:   LockState: 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          saveAs: LockStateValue
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
 
     - label: "TH writes LockState attribute as 1"
       PICS: DRLK.S.A0000
-      verification: |
-          ./chip-tool doorlock write-by-id 0 2 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
-
-
-          [1653634536.813984][2885:2890] CHIP:DMG:                        StatusIB =
-          [1653634536.814041][2885:2890] CHIP:DMG:                        {
-          [1653634536.814087][2885:2890] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653634536.814143][2885:2890] CHIP:DMG:                        },
-          [1653634536.814190][2885:2890] CHIP:DMG:
-          [1653634536.814241][2885:2890] CHIP:DMG:                },
-          [1653634536.814286][2885:2890] CHIP:DMG:
-          [1653634536.814333][2885:2890] CHIP:DMG:        ],
-          [1653634536.814378][2885:2890] CHIP:DMG:
-          [1653634536.814426][2885:2890] CHIP:DMG:        InteractionModelRevision = 1
-          [1653634536.814461][2885:2890] CHIP:DMG: }
-          [1653634536.814564][2885:2890] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
+      command: "writeAttribute"
+      attribute: "LockState"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
-      verification: |
-          ./chip-tool doorlock read lock-state 1 1
-
-          Verify " LockState " on the TH(Chip-tool) Log:
-
-          [1654673735.820302][3247:3252] CHIP:DMG:        SuppressResponse = true,
-          [1654673735.820328][3247:3252] CHIP:DMG:        InteractionModelRevision = 1
-          [1654673735.820351][3247:3252] CHIP:DMG: }
-          [1654673735.820481][3247:3252] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0000 DataVersion: 3738767914
-          [1654673735.820565][3247:3252] CHIP:TOO:   LockState: 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: LockStateValue
 
     - label: "TH sends a Lock Door command to the DUT."
+      PICS: DRLK.S.C00.Rsp
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 1000
+
+    - label: "TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
-      verification: |
-          ./chip-tool doorlock lock-door 1 1  --timedInteractionTimeoutMs 1000
-
-          Verify "DUT performs the door lock action" on the TH(Chip-tool) Log:
-
-          [1658987280.291023][2735:2740] CHIP:DMG:                                CommandPathIB =
-          [1658987280.291057][2735:2740] CHIP:DMG:                                {
-          [1658987280.291091][2735:2740] CHIP:DMG:                                        EndpointId = 0x1,
-          [1658987280.291126][2735:2740] CHIP:DMG:                                        ClusterId = 0x101,
-          [1658987280.291160][2735:2740] CHIP:DMG:                                        CommandId = 0x0,
-          [1658987280.291193][2735:2740] CHIP:DMG:                                },
-          [1658987280.291229][2735:2740] CHIP:DMG:
-          [1658987280.291260][2735:2740] CHIP:DMG:                                StatusIB =
-          [1658987280.291294][2735:2740] CHIP:DMG:                                {
-          [1658987280.291328][2735:2740] CHIP:DMG:                                        status = 0x00 (SUCCESS),
-          [1658987280.291360][2735:2740] CHIP:DMG:                                },
-          [1658987280.291393][2735:2740] CHIP:DMG:
-          [1658987280.291423][2735:2740] CHIP:DMG:                        },
-          [1658987280.291456][2735:2740] CHIP:DMG:
-          [1658987280.291484][2735:2740] CHIP:DMG:                },
-          [1658987280.291517][2735:2740] CHIP:DMG:
-          [1658987280.291541][2735:2740] CHIP:DMG:        ],
-          [1658987280.291570][2735:2740] CHIP:DMG:
-          [1658987280.291595][2735:2740] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987280.291618][2735:2740] CHIP:DMG: },
-          [1658987280.291675][2735:2740] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0000 Status=0x0
-
-
-
-          ./chip-tool doorlock read lock-state 1 1
-
-          Verify " LockState " on the TH(Chip-tool) Log:
-
-          [1658987339.087658][2748:2753] CHIP:DMG:
-          [1658987339.087687][2748:2753] CHIP:DMG:        SuppressResponse = true,
-          [1658987339.087716][2748:2753] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987339.087742][2748:2753] CHIP:DMG: }
-          [1658987339.087894][2748:2753] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0000 DataVersion: 2910399941
-          [1658987339.087972][2748:2753] CHIP:TOO:   LockState: 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
 
     - label: "TH sends a Unlock Door command to the DUT."
+      PICS: DRLK.S.C01.Rsp
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 1000
+
+    - label: "TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
-      verification: |
-          ./chip-tool doorlock  unlock-door 1 1  --timedInteractionTimeoutMs 1000
-
-          Verify "DUT performs the door unlock action" on the TH(Chip-tool) Log:
-
-          [1658987468.977061][2765:2770] CHIP:DMG:                                CommandPathIB =
-          [1658987468.977098][2765:2770] CHIP:DMG:                                {
-          [1658987468.977136][2765:2770] CHIP:DMG:                                        EndpointId = 0x1,
-          [1658987468.977177][2765:2770] CHIP:DMG:                                        ClusterId = 0x101,
-          [1658987468.977216][2765:2770] CHIP:DMG:                                        CommandId = 0x1,
-          [1658987468.977254][2765:2770] CHIP:DMG:                                },
-          [1658987468.977294][2765:2770] CHIP:DMG:
-          [1658987468.977328][2765:2770] CHIP:DMG:                                StatusIB =
-          [1658987468.977365][2765:2770] CHIP:DMG:                                {
-          [1658987468.977402][2765:2770] CHIP:DMG:                                        status = 0x00 (SUCCESS),
-          [1658987468.977438][2765:2770] CHIP:DMG:                                },
-          [1658987468.977475][2765:2770] CHIP:DMG:
-          [1658987468.977507][2765:2770] CHIP:DMG:                        },
-          [1658987468.977545][2765:2770] CHIP:DMG:
-          [1658987468.977573][2765:2770] CHIP:DMG:                },
-          [1658987468.977607][2765:2770] CHIP:DMG:
-          [1658987468.977634][2765:2770] CHIP:DMG:        ],
-          [1658987468.977667][2765:2770] CHIP:DMG:
-          [1658987468.977694][2765:2770] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987468.977721][2765:2770] CHIP:DMG: },
-          [1658987468.977787][2765:2770] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0001 Status=0x0
-
-          ./chip-tool doorlock read lock-state 1 1
-
-          Verify " LockState " on the TH(Chip-tool) Log:
-
-          [1658987519.223710][2773:2778] CHIP:DMG:
-          [1658987519.223741][2773:2778] CHIP:DMG:        SuppressResponse = true,
-          [1658987519.223772][2773:2778] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987519.223801][2773:2778] CHIP:DMG: }
-          [1658987519.223959][2773:2778] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0000 DataVersion: 2910399943
-          [1658987519.224042][2773:2778] CHIP:TOO:   LockState: 2
-      disabled: true
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
 
     - label: "Simulate a not fully locked scenario on the DUT."
-      PICS: DRLK.S.A0000 && DRLK.S.Simulate.NotFullyLocked
+      PICS:
+          DRLK.S.A0000 && DRLK.S.Simulate.NotFullyLocked && PICS_SKIP_SAMPLE_APP
       verification: |
           vendor will give instructions on how to simulate if applicable and if that is possible, then send the below command to read the lock state attribute.
 
           ./chip-tool doorlock read lock-state 1 1
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads LockType attribute from DUT"
       PICS: DRLK.S.A0001
-      verification: |
-          ./chip-tool doorlock read lock-type 1 1
-
-          Verify " LockType " on the TH(Chip-tool) Log:
-
-          [1654674031.529115][3262:3268] CHIP:DMG:        SuppressResponse = true,
-          [1654674031.529142][3262:3268] CHIP:DMG:        InteractionModelRevision = 1
-          [1654674031.529166][3262:3268] CHIP:DMG: }
-          [1654674031.529297][3262:3268] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0001 DataVersion: 3738767914
-          [1654674031.529368][3262:3268] CHIP:TOO:   LockType: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "LockType"
+      response:
+          saveAs: LockTypeValue
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 11
 
     - label: "TH writes LockType attribute as 10"
-      verification: |
-          ./chip-tool doorlock write-by-id 1 10 1 1
-
-          Verify "DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1653634731.595327][2943:2948] CHIP:DMG:                        StatusIB =
-          [1653634731.595374][2943:2948] CHIP:DMG:                        {
-          [1653634731.595419][2943:2948] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653634731.595469][2943:2948] CHIP:DMG:                        },
-          [1653634731.595515][2943:2948] CHIP:DMG:
-          [1653634731.595555][2943:2948] CHIP:DMG:                },
-          [1653634731.595603][2943:2948] CHIP:DMG:
-          [1653634731.595638][2943:2948] CHIP:DMG:        ],
-          [1653634731.595682][2943:2948] CHIP:DMG:
-          [1653634731.595717][2943:2948] CHIP:DMG:        InteractionModelRevision = 1
-          [1653634731.595752][2943:2948] CHIP:DMG: }
-          [1653634731.595841][2943:2948] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
+      PICS: DRLK.S.A0001
+      command: "writeAttribute"
+      attribute: "LockType"
+      arguments:
+          value: 10
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads LockType attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read lock-type 1 1
-          Verify " LockType " on the TH(Chip-tool) Log:
-
-          [1654674031.529115][3262:3268] CHIP:DMG:        SuppressResponse = true,
-          [1654674031.529142][3262:3268] CHIP:DMG:        InteractionModelRevision = 1
-          [1654674031.529166][3262:3268] CHIP:DMG: }
-          [1654674031.529297][3262:3268] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0001 DataVersion: 3738767914
-          [1654674031.529368][3262:3268] CHIP:TOO:   LockType: 0
-      disabled: true
+      PICS: DRLK.S.A0001
+      command: "readAttribute"
+      attribute: "LockType"
+      response:
+          value: LockTypeValue
 
     - label: "TH reads ActuatorEnabled attribute from DUT"
       PICS: DRLK.S.A0002
-      verification: |
-          ./chip-tool doorlock read actuator-enabled 1 1
-          Verify " ActuatorEnabled " on the TH(Chip-tool) Log:
-
-          [1654674122.634081][3275:3280] CHIP:DMG:        SuppressResponse = true,
-          [1654674122.634110][3275:3280] CHIP:DMG:        InteractionModelRevision = 1
-          [1654674122.634136][3275:3280] CHIP:DMG: }
-          [1654674122.634281][3275:3280] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0002 DataVersion: 3738767914
-          [1654674122.634332][3275:3280] CHIP:TOO:   ActuatorEnabled: TRUE
-      disabled: true
+      command: "readAttribute"
+      attribute: "ActuatorEnabled"
+      response:
+          saveAs: ActuatorEnabledValue
+          constraints:
+              type: boolean
+              minValue: 0
+              maxValue: 1
 
     - label: "TH writes ActuatorEnabled attribute as 0"
-      verification: |
-          ./chip-tool doorlock write-by-id 2 0 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1654674810.194674][3309:3314] CHIP:DMG:                        StatusIB =
-          [1654674810.194720][3309:3314] CHIP:DMG:                        {
-          [1654674810.194767][3309:3314] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1654674810.194818][3309:3314] CHIP:DMG:                        },
-          [1654674810.194864][3309:3314] CHIP:DMG:
-          [1654674810.194901][3309:3314] CHIP:DMG:                },
-          [1654674810.194945][3309:3314] CHIP:DMG:
-          [1654674810.194979][3309:3314] CHIP:DMG:        ],
-      disabled: true
+      PICS: DRLK.S.A0002
+      command: "writeAttribute"
+      attribute: "ActuatorEnabled"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads ActuatorEnabled attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read actuator-enabled 1 1
-
-          Verify " ActuatorEnabled " on the TH(Chip-tool) Log:
-
-          [1654674122.634081][3275:3280] CHIP:DMG:        SuppressResponse = true,
-          [1654674122.634110][3275:3280] CHIP:DMG:        InteractionModelRevision = 1
-          [1654674122.634136][3275:3280] CHIP:DMG: }
-          [1654674122.634281][3275:3280] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0002 DataVersion: 3738767914
-          [1654674122.634332][3275:3280] CHIP:TOO:   ActuatorEnabled: TRUE
-      disabled: true
+      PICS: DRLK.S.A0002
+      command: "readAttribute"
+      attribute: "ActuatorEnabled"
+      response:
+          value: ActuatorEnabledValue
 
     - label: "TH reads DoorState attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0003
-      verification: |
-          ./chip-tool doorlock read door-state 1 1
-
-          Verify "  DoorState " on the TH(Chip-tool) Log:
-
-          [1654674869.818923][3316:3321] CHIP:DMG:        SuppressResponse = true,
-          [1654674869.818964][3316:3321] CHIP:DMG:        InteractionModelRevision = 1
-          [1659354792.817953][18100:18105] CHIP:DMG: }
-          [1659354792.818130][18100:18105] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0003 DataVersion: 1502189726
-          [1659354792.818229][18100:18105] CHIP:TOO:   DoorState: 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "DoorState"
+      response:
+          saveAs: DoorStateValue
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 5
 
     - label: "TH writes DoorState attribute as 1"
-      verification: |
-          ./chip-tool doorlock write-by-id 3 1 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1654674934.736017][3324:3330] CHIP:DMG:                        StatusIB =
-          [1654674934.736062][3324:3330] CHIP:DMG:                        {
-          [1654674934.736106][3324:3330] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1654674934.736152][3324:3330] CHIP:DMG:                        },
-          [1654674934.736197][3324:3330] CHIP:DMG:
-          [1654674934.736237][3324:3330] CHIP:DMG:                },
-          [1654674934.736280][3324:3330] CHIP:DMG:
-          [1654674934.736314][3324:3330] CHIP:DMG:        ],
-          [1654674934.736357][3324:3330] CHIP:DMG:
-          [1654674934.736392][3324:3330] CHIP:DMG:        InteractionModelRevision = 1
-          [1654674934.736427][3324:3330] CHIP:DMG: }
-          [1654674934.736522][3324:3330] CHIP:DMG: WriteClient moving to [AwaitingDe]
-      disabled: true
+      PICS: DRLK.S.F05 && DRLK.S.A0003
+      command: "writeAttribute"
+      attribute: "DoorState"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads DoorState attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read door-state 1 1
-
-          Verify "  DoorState " on the TH(Chip-tool) Log:
-
-          [1654674869.818923][3316:3321] CHIP:DMG:        SuppressResponse = true,
-          [1654674869.818964][3316:3321] CHIP:DMG:        InteractionModelRevision = 1
-          [1659354792.817953][18100:18105] CHIP:DMG: }
-          [1659354792.818130][18100:18105] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0003 DataVersion: 1502189726
-          [1659354792.818229][18100:18105] CHIP:TOO:   DoorState: 1
-      disabled: true
+      PICS: DRLK.S.F05 && DRLK.S.A0003
+      command: "readAttribute"
+      attribute: "DoorState"
+      response:
+          value: DoorStateValue
 
     - label: "TH reads DoorOpenEvents attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0004
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read door-open-events 1 1
-
-          Verify "  DoorOpenEvents " on the TH(Chip-tool) Log:
-
-          [1654675019.286903][3337:3342] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654675019.286939][3337:3342] CHIP:DMG:                                },
-          [1654675019.286974][3337:3342] CHIP:DMG:
-          [1654675019.287003][3337:3342] CHIP:DMG:                        },
-          [1654675019.287039][3337:3342] CHIP:DMG:
-          [1654675019.287067][3337:3342] CHIP:DMG:                },
-          [1654675019.287100][3337:3342] CHIP:DMG:
-          [1654675019.287125][3337:3342] CHIP:DMG:        ],
-          [1654675019.287156][3337:3342] CHIP:DMG:
-          [1654675019.287182][3337:3342] CHIP:DMG:        SuppressResponse = true,
-          [1654675019.287209][3337:3342] CHIP:DMG:        InteractionModelRevision = 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "DoorOpenEvents"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967294
 
     - label: "TH writes DoorOpenEvents attribute as 0"
-      PICS: DRLK.S.A0004
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+      PICS: DRLK.S.A0004.Write
+      command: "writeAttribute"
+      attribute: "DoorOpenEvents"
+      arguments:
+          value: 0
 
-          ./chip-tool doorlock write-by-id 4 0 1 1
+    #- label: "TH reads DoorOpenEvents attribute from DUT"
+    #  PICS: DRLK.S.A0004.Write
+    #  command: "readAttribute"
+    #  attribute: "DoorOpenEvents"
+    #  response:
+    #      value: 10
 
-          Verify " DUT sends SUCCESS response " on the TH(Chip-tool) Log:
-
-          [1653376891.000044][2941:2946] CHIP:DMG:                        }
-          [1653376891.000211][2941:2946] CHIP:DMG:
-          [1653376891.000265][2941:2946] CHIP:DMG:                        StatusIB =
-          [1653376891.000315][2941:2946] CHIP:DMG:                        {
-          [1653376891.000367][2941:2946] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653376891.000415][2941:2946] CHIP:DMG:                        },
-          [1653376891.000463][2941:2946] CHIP:DMG:
-          [1653376891.000505][2941:2946] CHIP:DMG:                },
-          [1653376891.000552][2941:2946] CHIP:DMG:
-          [1653376891.000587][2941:2946] CHIP:DMG:        ],
-          [1653376891.000632][2941:2946] CHIP:DMG:
-          [1653376891.000669][2941:2946] CHIP:DMG:        InteractionModelRevision = 1
-          [1653376891.000703][2941:2946] CHIP:DMG: }
-          [1653376891.000795][2941:2946] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
-
+    #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
     - label: "TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.A0004.Write && PICS_SKIP_SAMPLE_APP
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read door-open-events 1 1
 
-          Verify "  DoorOpenEvents " on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify that the DoorOpenEvents attribute value as 10.
 
           [1654675019.286903][3337:3342] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1654675019.286939][3337:3342] CHIP:DMG:                                },
@@ -373,61 +224,48 @@ tests:
           [1654675019.287156][3337:3342] CHIP:DMG:
           [1654675019.287182][3337:3342] CHIP:DMG:        SuppressResponse = true,
           [1654675019.287209][3337:3342] CHIP:DMG:        InteractionModelRevision = 1
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads DoorClosedEvents attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0005
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-           ./chip-tool doorlock read door-closed-events 1 1
-
-          Verify "  DoorClosedEvents " on the TH(Chip-tool) Log:
-
-          [1654675103.637778][3346:3351] CHIP:DMG:                                StatusIB =
-          [1654675103.637816][3346:3351] CHIP:DMG:                                {
-          [1654675103.637853][3346:3351] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654675103.637886][3346:3351] CHIP:DMG:                                },
-          [1654675103.637923][3346:3351] CHIP:DMG:
-          [1654675103.637956][3346:3351] CHIP:DMG:                        },
-          [1654675103.637994][3346:3351] CHIP:DMG:
-          [1654675103.638021][3346:3351] CHIP:DMG:                },
-          [1654675103.638054][3346:3351] CHIP:DMG:
-          [1654675103.638078][3346:3351] CHIP:DMG:        ],
-          [1654675103.638109][3346:3351] CHIP:DMG:
-          [1654675103.638133][3346:3351] CHIP:DMG:        SuppressResponse = true,
-          [1654675103.638159][3346:3351] CHIP:DMG:        InteractionModelRevision = 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "DoorClosedEvents"
+      response:
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967294
 
     - label: "TH writes DoorClosedEvents attribute as 0"
-      PICS: DRLK.S.A0005
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+      PICS: DRLK.S.A0005.Write
+      command: "writeAttribute"
+      attribute: "DoorClosedEvents"
+      arguments:
+          value: 0
 
-          ./chip-tool doorlock write-by-id 5 0 1 1
+    #- label: "TH reads DoorClosedEvents attribute from DUT"
+    #  PICS: DRLK.S.A0005.Write
+    #  command: "readAttribute"
+    #  attribute: "DoorClosedEvents"
+    #  response:
+    #      value: 11
 
-          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
-
-          [1654675152.592730][3355:3360] CHIP:DMG:                        StatusIB =
-          [1654675152.592863][3355:3360] CHIP:DMG:                        {
-          [1654675152.592913][3355:3360] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654675152.592952][3355:3360] CHIP:DMG:                        },
-          [1654675152.592991][3355:3360] CHIP:DMG:
-          [1654675152.593024][3355:3360] CHIP:DMG:                },
-          [1654675152.593061][3355:3360] CHIP:DMG:
-          [1654675152.593090][3355:3360] CHIP:DMG:        ],
-          [1654675152.593126][3355:3360] CHIP:DMG:
-          [1654675152.593155][3355:3360] CHIP:DMG:        InteractionModelRevision = 1
-          [1654675152.593184][3355:3360] CHIP:DMG: }
-      disabled: true
-
-    - label: "TH reads DoorClosedEvents attribute from DUT"
+    #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
+    - label: "TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.A0005.Write && PICS_SKIP_SAMPLE_APP
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read door-closed-events 1 1
 
-          Verify "  DoorClosedEvents " on the TH(Chip-tool) Log:
+          Via the TH (chip-tool), verify that the DoorClosedEvents attribute value as 11.
 
           [1654675103.637778][3346:3351] CHIP:DMG:                                StatusIB =
           [1654675103.637816][3346:3351] CHIP:DMG:                                {
@@ -442,531 +280,328 @@ tests:
           [1654675103.638109][3346:3351] CHIP:DMG:
           [1654675103.638133][3346:3351] CHIP:DMG:        SuppressResponse = true,
           [1654675103.638159][3346:3351] CHIP:DMG:        InteractionModelRevision = 1
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads OpenPeriod attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0006
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read open-period 1 1
-
-          Verify "  OpenPeriod  " on the TH(Chip-tool) Log:
-
-          [1653377163.004837][3008:3013] CHIP:DMG:                                StatusIB =
-          [1653377163.004887][3008:3013] CHIP:DMG:                                {
-          [1653377163.004932][3008:3013] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653377163.004983][3008:3013] CHIP:DMG:                                },
-          [1653377163.005028][3008:3013] CHIP:DMG:
-          [1653377163.005072][3008:3013] CHIP:DMG:                        },
-          [1653377163.005123][3008:3013] CHIP:DMG:
-          [1653377163.005165][3008:3013] CHIP:DMG:                },
-          [1653377163.005210][3008:3013] CHIP:DMG:
-          [1653377163.005246][3008:3013] CHIP:DMG:        ],
-          [1653377163.005291][3008:3013] CHIP:DMG:
-          [1653377163.005329][3008:3013] CHIP:DMG:        SuppressResponse = true,
-          [1653377163.005367][3008:3013] CHIP:DMG:        InteractionModelRevision = 1
-          [1653377163.005402][3008:3013] CHIP:DMG: }
-          [1653377163.005558][3008:3013] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
+      command: "readAttribute"
+      attribute: "OpenPeriod"
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
 
     - label: "TH writes OpenPeriod attribute as 2 minutes"
       PICS: DRLK.S.A0006
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write-by-id 6 2 1 1
-
-          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
-
-          [1653635643.566677][3165:3170] CHIP:DMG:                        StatusIB =
-          [1653635643.566722][3165:3170] CHIP:DMG:                        {
-          [1653635643.566767][3165:3170] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653635643.566818][3165:3170] CHIP:DMG:                        },
-          [1653635643.566864][3165:3170] CHIP:DMG:
-          [1653635643.566902][3165:3170] CHIP:DMG:                },
-          [1653635643.566945][3165:3170] CHIP:DMG:
-          [1653635643.566980][3165:3170] CHIP:DMG:        ],
-          [1653635643.567024][3165:3170] CHIP:DMG:
-          [1653635643.567059][3165:3170] CHIP:DMG:        InteractionModelRevision = 1
-          [1653635643.567093][3165:3170] CHIP:DMG: }
-          [1653635643.567184][3165:3170] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
+      command: "writeAttribute"
+      attribute: "OpenPeriod"
+      arguments:
+          value: 2
 
     - label: "TH reads OpenPeriod attribute from DUT"
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read open-period 1 1
-
-          Verify "  OpenPeriod  " on the TH(Chip-tool) Log:
-
-          [1653377163.004837][3008:3013] CHIP:DMG:                                StatusIB =
-          [1653377163.004887][3008:3013] CHIP:DMG:                                {
-          [1653377163.004932][3008:3013] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653377163.004983][3008:3013] CHIP:DMG:                                },
-          [1653377163.005028][3008:3013] CHIP:DMG:
-          [1653377163.005072][3008:3013] CHIP:DMG:                        },
-          [1653377163.005123][3008:3013] CHIP:DMG:
-          [1653377163.005165][3008:3013] CHIP:DMG:                },
-          [1653377163.005210][3008:3013] CHIP:DMG:
-          [1653377163.005246][3008:3013] CHIP:DMG:        ],
-          [1653377163.005291][3008:3013] CHIP:DMG:
-          [1653377163.005329][3008:3013] CHIP:DMG:        SuppressResponse = true,
-          [1653377163.005367][3008:3013] CHIP:DMG:        InteractionModelRevision = 1
-          [1653377163.005402][3008:3013] CHIP:DMG: }
-          [1653377163.005558][3008:3013] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
+      PICS: DRLK.S.A0006
+      command: "readAttribute"
+      attribute: "OpenPeriod"
+      response:
+          value: 2
 
     - label: "TH reads NumberOfTotal UsersSupported attribute from DUT"
       PICS: DRLK.S.F08 && DRLK.S.A0011
-      verification: |
-          ./chip-tool doorlock read  number-of-total-users-supported 1 1
-
-          Verify " NumberOfTotal UsersSupported " on the TH(Chip-tool) Log:
-
-          [1654679552.707358][3548:3553] CHIP:DMG:        SuppressResponse = true,
-          [1654679552.707396][3548:3553] CHIP:DMG:        InteractionModelRevision = 1
-          [1654679552.707430][3548:3553] CHIP:DMG: }
-          [1654679552.707608][3548:3553] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0011 DataVersion: 3738767914
-          [1654679552.707699][3548:3553] CHIP:TOO:   NumberOfTotalUsersSupported: 10
-      disabled: true
+      command: "readAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      response:
+          saveAs: NumberOfTotalUsersSupportedValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
 
     - label: "TH writes NumberOfTotal UsersSupported attribute as 20"
-      verification: |
-          ./chip-tool doorlock write-by-id 17 20 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1653635760.210005][3203:3208] CHIP:DMG:                        StatusIB =
-          [1653635760.210051][3203:3208] CHIP:DMG:                        {
-          [1653635760.210096][3203:3208] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653635760.210142][3203:3208] CHIP:DMG:                        },
-          [1653635760.210186][3203:3208] CHIP:DMG:
-          [1653635760.210226][3203:3208] CHIP:DMG:                },
-          [1653635760.210269][3203:3208] CHIP:DMG:
-      disabled: true
+      PICS: DRLK.S.F08 && DRLK.S.A0011
+      command: "writeAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      arguments:
+          value: 20
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads NumberOfTotal UsersSupported attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read  number-of-total-users-supported 1 1
-
-          Verify " NumberOfTotal UsersSupported " on the TH(Chip-tool) Log:
-
-          [1654679552.707358][3548:3553] CHIP:DMG:        SuppressResponse = true,
-          [1654679552.707396][3548:3553] CHIP:DMG:        InteractionModelRevision = 1
-          [1654679552.707430][3548:3553] CHIP:DMG: }
-          [1654679552.707608][3548:3553] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0011 DataVersion: 3738767914
-          [1654679552.707699][3548:3553] CHIP:TOO:   NumberOfTotalUsersSupported: 10
-      disabled: true
+      PICS: DRLK.S.F08 && DRLK.S.A0011
+      command: "readAttribute"
+      attribute: "NumberOfTotalUsersSupported"
+      response:
+          value: NumberOfTotalUsersSupportedValue
 
     - label: "TH reads NumberOfPINUsersSupported attribute from DUT"
       PICS: DRLK.S.F00 && DRLK.S.A0012
-      verification: |
-          ./chip-tool doorlock read number-of-pinusers-supported 1 1
-
-          Verify "NumberOfPINUsersSupported " on the TH(Chip-tool) Log:
-
-          [1654679648.080728][3557:3562] CHIP:DMG:        SuppressResponse = true,
-          [1654679648.080765][3557:3562] CHIP:DMG:        InteractionModelRevision = 1
-          [1654679648.080799][3557:3562] CHIP:DMG: }
-          [1654679648.080978][3557:3562] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0012 DataVersion: 3738767914
-          [1654679648.081068][3557:3562] CHIP:TOO:   NumberOfPINUsersSupported: 10
-      disabled: true
+      command: "readAttribute"
+      attribute: "NumberOfPINUsersSupported"
+      response:
+          saveAs: NumberOfPINUsersSupportedValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
 
     - label: "TH writes NumberOfPINUsersSupported attribute as 25"
-      verification: |
-          ./chip-tool doorlock write-by-id 18 25 1 1
-
-          Verify "DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
-
-          [1653635935.885575][3265:3270] CHIP:DMG:                        StatusIB =
-          [1653635935.885605][3265:3270] CHIP:DMG:                        {
-          [1653635935.885635][3265:3270] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653635935.885666][3265:3270] CHIP:DMG:                        },
-          [1653635935.885696][3265:3270] CHIP:DMG:
-          [1653635935.885721][3265:3270] CHIP:DMG:                },
-      disabled: true
+      PICS: DRLK.S.F00 && DRLK.S.A0012
+      command: "writeAttribute"
+      attribute: "NumberOfPINUsersSupported"
+      arguments:
+          value: 25
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads NumberOfPINUsersSupported attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read number-of-pinusers-supported 1 1
-
-          Verify "NumberOfPINUsersSupported " on the TH(Chip-tool) Log:
-
-          [1654679648.080728][3557:3562] CHIP:DMG:        SuppressResponse = true,
-          [1654679648.080765][3557:3562] CHIP:DMG:        InteractionModelRevision = 1
-          [1654679648.080799][3557:3562] CHIP:DMG: }
-          [1654679648.080978][3557:3562] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0012 DataVersion: 3738767914
-          [1654679648.081068][3557:3562] CHIP:TOO:   NumberOfPINUsersSupported: 10
-      disabled: true
+      PICS: DRLK.S.F00 && DRLK.S.A0012
+      command: "readAttribute"
+      attribute: "NumberOfPINUsersSupported"
+      response:
+          value: NumberOfPINUsersSupportedValue
 
     - label: "TH reads NumberOfRFID UsersSupported attribute from DUT"
       PICS: DRLK.S.F01 && DRLK.S.A0013
-      verification: |
-          ./chip-tool doorlock read number-of-rfidusers-supported 1 1
-
-          Verify "NumberOfRFID UsersSupported " on the TH(Chip-tool) Log:
-
-          [1654679746.726086][3567:3572] CHIP:DMG:        SuppressResponse = true,
-          [1654679746.726122][3567:3572] CHIP:DMG:        InteractionModelRevision = 1
-          [1654679746.726153][3567:3572] CHIP:DMG: }
-          [1654679746.726320][3567:3572] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0013 DataVersion: 3738767914
-          [1654679746.726405][3567:3572] CHIP:TOO:   NumberOfRFIDUsersSupported: 10
-      disabled: true
+      command: "readAttribute"
+      attribute: "NumberOfRFIDUsersSupported"
+      response:
+          saveAs: NumberOfRFIDUsersSupportedValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
 
     - label: "TH writes NumberOfRFID UsersSupported attribute as 30"
-      verification: |
-          ./chip-tool doorlock write-by-id 19 30 1 1
-
-          Verify "DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
-
-          [1653636030.425594][3289:3294] CHIP:DMG:                        StatusIB =
-          [1653636030.425635][3289:3294] CHIP:DMG:                        {
-          [1653636030.425675][3289:3294] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653636030.425720][3289:3294] CHIP:DMG:                        },
-          [1653636030.425760][3289:3294] CHIP:DMG:
-          [1653636030.425796][3289:3294] CHIP:DMG:                },
-      disabled: true
+      PICS: DRLK.S.F01 && DRLK.S.A0013
+      command: "writeAttribute"
+      attribute: "NumberOfRFIDUsersSupported"
+      arguments:
+          value: 30
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads NumberOfRFID UsersSupported attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read number-of-rfidusers-supported 1 1
-
-          Verify "NumberOfRFID UsersSupported " on the TH(Chip-tool) Log:
-
-          [1654679746.726086][3567:3572] CHIP:DMG:        SuppressResponse = true,
-          [1654679746.726122][3567:3572] CHIP:DMG:        InteractionModelRevision = 1
-          [1654679746.726153][3567:3572] CHIP:DMG: }
-          [1654679746.726320][3567:3572] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0013 DataVersion: 3738767914
-          [1654679746.726405][3567:3572] CHIP:TOO:   NumberOfRFIDUsersSupported: 10
-      disabled: true
+      PICS: DRLK.S.F01 && DRLK.S.A0013
+      command: "readAttribute"
+      attribute: "NumberOfRFIDUsersSupported"
+      response:
+          value: NumberOfRFIDUsersSupportedValue
 
     - label:
           "TH reads NumberOfWeekDays SchedulesSupporterUser attribute from DUT"
       PICS: DRLK.S.F04 && DRLK.S.A0014
-      verification: |
-          ./chip-tool doorlock read  number-of-week-day-schedules-supported-per-user 1 1
-
-          Verify " NumberOfWeekDaysSchedulesSupporterUser " on the TH(Chip-tool) Log:
-
-          [1654679824.730432][3578:3583] CHIP:DMG:        SuppressResponse = true,
-          [1654679824.730470][3578:3583] CHIP:DMG:        InteractionModelRevision = 1
-          [1654679824.730503][3578:3583] CHIP:DMG: }
-          [1654679824.730680][3578:3583] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0014 DataVersion: 3738767914
-          [1654679824.730771][3578:3583] CHIP:TOO:   NumberOfWeekDaySchedulesSupportedPerUser: 10
-      disabled: true
+      command: "readAttribute"
+      attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
+      response:
+          saveAs: NumberOfWeekDaysSchedulesSupporterUserValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
     - label:
           "TH writes NumberOfWeekDaySchedules SupportedPerUser attribute as 31"
-      verification: |
-          ./chip-tool doorlock write-by-id 20 31 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1653636148.975037][3319:3324] CHIP:DMG:                        StatusIB =
-          [1653636148.975072][3319:3324] CHIP:DMG:                        {
-          [1653636148.975106][3319:3324] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653636148.975140][3319:3324] CHIP:DMG:                        },
-          [1653636148.975175][3319:3324] CHIP:DMG:
-          [1653636148.975204][3319:3324] CHIP:DMG:                },
-          [1653636148.975237][3319:3324] CHIP:DMG:
-      disabled: true
+      PICS: DRLK.S.F04 && DRLK.S.A0014
+      command: "writeAttribute"
+      attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
+      arguments:
+          value: 31
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label:
           "TH reads NumberOfWeekDaySchedules SupportedPerUser attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read  number-of-week-day-schedules-supported-per-user 1 1
-
-          Verify " NumberOfWeekDaysSchedulesSupporterUser " on the TH(Chip-tool) Log:
-
-          [1654679824.730432][3578:3583] CHIP:DMG:        SuppressResponse = true,
-          [1654679824.730470][3578:3583] CHIP:DMG:        InteractionModelRevision = 1
-          [1654679824.730503][3578:3583] CHIP:DMG: }
-          [1654679824.730680][3578:3583] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0014 DataVersion: 3738767914
-          [1654679824.730771][3578:3583] CHIP:TOO:   NumberOfWeekDaySchedulesSupportedPerUser: 10
-      disabled: true
+      PICS: DRLK.S.F04 && DRLK.S.A0014
+      command: "readAttribute"
+      attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
+      response:
+          value: NumberOfWeekDaysSchedulesSupporterUserValue
 
     - label:
           "TH reads NumberOfYearDay SchedulesSupportedPeruser attribute from DUT"
       PICS: DRLK.S.F0a && DRLK.S.A0015
-      verification: |
-          ./chip-tool doorlock read number-of-year-day-schedules-supported-per-user 1 1
-
-          Verify " NumberOfYearDaySchedulesSupportedPeruser " on the TH(Chip-tool) Log:
-
-
-          [1654679926.699808][3597:3602] CHIP:DMG:        SuppressResponse = true,
-          [1654679926.699845][3597:3602] CHIP:DMG:        InteractionModelRevision = 1
-          [1654679926.699879][3597:3602] CHIP:DMG: }
-          [1654679926.700057][3597:3602] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0015 DataVersion: 3738767914
-          [1654679926.700147][3597:3602] CHIP:TOO:   NumberOfYearDaySchedulesSupportedPerUser: 10
-      disabled: true
+      command: "readAttribute"
+      attribute: "NumberOfYearDaySchedulesSupportedPerUser"
+      response:
+          saveAs: NumberOfYearDaySchedulesSupportedPeruserValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
     - label:
           "TH writes NumberOfYearDay SchedulesSupportedPerUser attribute as 35"
-      verification: |
-          ./chip-tool doorlock write-by-id 21 35 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1653636277.664432][3339:3344] CHIP:DMG:                        StatusIB =
-          [1653636277.664473][3339:3344] CHIP:DMG:                        {
-          [1653636277.664507][3339:3344] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653636277.664545][3339:3344] CHIP:DMG:                        },
-          [1653636277.664580][3339:3344] CHIP:DMG:
-          [1653636277.664636][3339:3344] CHIP:DMG:                },
-          [1653636277.664671][3339:3344] CHIP:DMG:
-      disabled: true
+      PICS: DRLK.S.F0a && DRLK.S.A0015
+      command: "writeAttribute"
+      attribute: "NumberOfYearDaySchedulesSupportedPerUser"
+      arguments:
+          value: 35
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label:
           "TH reads NumberOfYearDay SchedulesSupportedPerUser attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read number-of-year-day-schedules-supported-per-user 1 1
-
-          Verify " NumberOfYearDaySchedulesSupportedPeruser " on the TH(Chip-tool) Log:
-
-
-          [1654679926.699808][3597:3602] CHIP:DMG:        SuppressResponse = true,
-          [1654679926.699845][3597:3602] CHIP:DMG:        InteractionModelRevision = 1
-          [1654679926.699879][3597:3602] CHIP:DMG: }
-          [1654679926.700057][3597:3602] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0015 DataVersion: 3738767914
-          [1654679926.700147][3597:3602] CHIP:TOO:   NumberOfYearDaySchedulesSupportedPerUser: 10
-      disabled: true
+      PICS: DRLK.S.F0a && DRLK.S.A0015
+      command: "readAttribute"
+      attribute: "NumberOfYearDaySchedulesSupportedPerUser"
+      response:
+          value: NumberOfYearDaySchedulesSupportedPeruserValue
 
     - label: "TH reads NumberOfHoliDay SchedulesSupported attribute from DUT"
       PICS: DRLK.S.F0b && DRLK.S.A0016
-      verification: |
-          ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
-
-          Verify " NumberOfHoliDaySchedulesSupported " on the TH(Chip-tool) Log:
-
-          [1654680009.422218][3611:3616] CHIP:DMG:        SuppressResponse = true,
-          [1654680009.422246][3611:3616] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680009.422272][3611:3616] CHIP:DMG: }
-          [1654680009.422416][3611:3616] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0016 DataVersion: 3738767914
-          [1654680009.422491][3611:3616] CHIP:TOO:   NumberOfHolidaySchedulesSupported: 10
-      disabled: true
+      command: "readAttribute"
+      attribute: "NumberOfHolidaySchedulesSupported"
+      response:
+          saveAs: NumberOfHoliDaySchedulesSupportedValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
     - label: "TH writes NumberOfHoliday SchedulesSupported attribute as 36"
-      verification: |
-          ./chip-tool doorlock write-by-id 22 36 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
-
-          [1654680084.923185][3619:3624] CHIP:DMG:                        StatusIB =
-          [1654680084.923237][3619:3624] CHIP:DMG:                        {
-          [1654680084.923312][3619:3624] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1654680084.923369][3619:3624] CHIP:DMG:                        },
-          [1654680084.923422][3619:3624] CHIP:DMG:
-          [1654680084.923462][3619:3624] CHIP:DMG:                },
-          [1654680084.923511][3619:3624] CHIP:DMG:
-          [1654680084.923550][3619:3624] CHIP:DMG:        ],
-          [1654680084.923597][3619:3624] CHIP:DMG:
-      disabled: true
+      PICS: DRLK.S.F0b && DRLK.S.A0016
+      command: "writeAttribute"
+      attribute: "NumberOfHolidaySchedulesSupported"
+      arguments:
+          value: 36
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads NumberOfHoliday SchedulesSupported attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
-
-          Verify " NumberOfHoliDaySchedulesSupported " on the TH(Chip-tool) Log:
-
-          [1654680009.422218][3611:3616] CHIP:DMG:        SuppressResponse = true,
-          [1654680009.422246][3611:3616] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680009.422272][3611:3616] CHIP:DMG: }
-          [1654680009.422416][3611:3616] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0016 DataVersion: 3738767914
-          [1654680009.422491][3611:3616] CHIP:TOO:   NumberOfHolidaySchedulesSupported: 10
-      disabled: true
+      PICS: DRLK.S.F0b && DRLK.S.A0016
+      command: "readAttribute"
+      attribute: "NumberOfHolidaySchedulesSupported"
+      response:
+          value: NumberOfHoliDaySchedulesSupportedValue
 
     - label: "TH reads MaxPINCodeLength attribute from DUT"
       PICS: DRLK.S.F00 && DRLK.S.A0017
-      verification: |
-          ./chip-tool doorlock read  max-pincode-length 1 1
-
-          Verify "  MaxPINCodeLength " on the TH(Chip-tool) Log:
-
-          [1654680165.814980][3630:3635] CHIP:DMG:
-          [1654680165.815012][3630:3635] CHIP:DMG:        SuppressResponse = true,
-          [1654680165.815046][3630:3635] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680165.815077][3630:3635] CHIP:DMG: }
-          [1654680165.815239][3630:3635] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0017 DataVersion: 3738767914
-          [1654680165.815374][3630:3635] CHIP:TOO:   MaxPINCodeLength: 8
-      disabled: true
+      command: "readAttribute"
+      attribute: "MaxPINCodeLength"
+      response:
+          saveAs: MaxPINCodeLengthValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
     - label: "TH writes MaxPINCodeLength attribute as 85"
-      verification: |
-          ./chip-tool doorlock write-by-id 23 85 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
-
-          [1653636463.990965][3391:3396] CHIP:DMG:                        StatusIB =
-          [1653636463.991004][3391:3396] CHIP:DMG:                        {
-          [1653636463.991043][3391:3396] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653636463.991084][3391:3396] CHIP:DMG:                        },
-          [1653636463.991125][3391:3396] CHIP:DMG:
-          [1653636463.991159][3391:3396] CHIP:DMG:                },
-          [1653636463.991199][3391:3396] CHIP:DMG:
-      disabled: true
+      PICS: DRLK.S.F00 && DRLK.S.A0017
+      command: "writeAttribute"
+      attribute: "MaxPINCodeLength"
+      arguments:
+          value: 85
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads MaxPINCodeLength attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read  max-pincode-length 1 1
-
-          Verify "  MaxPINCodeLength " on the TH(Chip-tool) Log:
-
-          [1654680165.814980][3630:3635] CHIP:DMG:
-          [1654680165.815012][3630:3635] CHIP:DMG:        SuppressResponse = true,
-          [1654680165.815046][3630:3635] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680165.815077][3630:3635] CHIP:DMG: }
-          [1654680165.815239][3630:3635] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0017 DataVersion: 3738767914
-          [1654680165.815374][3630:3635] CHIP:TOO:   MaxPINCodeLength: 8
-      disabled: true
+      PICS: DRLK.S.F00 && DRLK.S.A0017
+      command: "readAttribute"
+      attribute: "MaxPINCodeLength"
+      response:
+          value: MaxPINCodeLengthValue
 
     - label: "TH reads MinPINCodeLength attribute from DUT"
       PICS: DRLK.S.F00 && DRLK.S.A0018
-      verification: |
-          ./chip-tool doorlock read min-pincode-length 1 1
-
-          Verify "  MinPINCodeLength " on the TH(Chip-tool) Log:
-
-          [1654680280.327216][3639:3644] CHIP:DMG:        SuppressResponse = true,
-          [1654680280.327241][3639:3644] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680280.327274][3639:3644] CHIP:DMG: }
-          [1654680280.327488][3639:3644] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0018 DataVersion: 3738767914
-          [1654680280.327558][3639:3644] CHIP:TOO:   MinPINCodeLength: 6
-      disabled: true
+      command: "readAttribute"
+      attribute: "MinPINCodeLength"
+      response:
+          saveAs: MinPINCodeLengthValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
     - label: "TH writes MinPINCodeLength attribute as 63"
-      verification: |
-          ./chip-tool doorlock write-by-id 24 63 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1653636555.069388][3409:3414] CHIP:DMG:                        StatusIB =
-          [1653636555.069431][3409:3414] CHIP:DMG:                        {
-          [1653636555.069473][3409:3414] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653636555.069520][3409:3414] CHIP:DMG:                        },
-          [1653636555.069563][3409:3414] CHIP:DMG:
-          [1653636555.069600][3409:3414] CHIP:DMG:                },
-          [1653636555.069643][3409:3414] CHIP:DMG:
-          [1653636555.069676][3409:3414] CHIP:DMG:        ],
-      disabled: true
+      PICS: DRLK.S.F00 && DRLK.S.A0018
+      command: "writeAttribute"
+      attribute: "MinPINCodeLength"
+      arguments:
+          value: 63
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads MinPINCodeLength attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read min-pincode-length 1 1
-
-          Verify "  MinPINCodeLength " on the TH(Chip-tool) Log:
-
-          [1654680280.327216][3639:3644] CHIP:DMG:        SuppressResponse = true,
-          [1654680280.327241][3639:3644] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680280.327274][3639:3644] CHIP:DMG: }
-          [1654680280.327488][3639:3644] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0018 DataVersion: 3738767914
-          [1654680280.327558][3639:3644] CHIP:TOO:   MinPINCodeLength: 6
-      disabled: true
+      PICS: DRLK.S.F00 && DRLK.S.A0018
+      command: "readAttribute"
+      attribute: "MinPINCodeLength"
+      response:
+          value: MinPINCodeLengthValue
 
     - label: "TH reads MaxRFIDCodeLength attribute from DUT"
       PICS: DRLK.S.F01 && DRLK.S.A0019
-      verification: |
-          ./chip-tool doorlock read  max-rfidcode-length 1 1
-
-          Verify "  MaxRFIDCodeLength " on the TH(Chip-tool) Log:
-
-          [1654680386.044531][3650:3655] CHIP:DMG:        SuppressResponse = true,
-          [1654680386.044564][3650:3655] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680386.044593][3650:3655] CHIP:DMG: }
-          [1654680386.044748][3650:3655] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0019 DataVersion: 3738767914
-          [1654680386.044824][3650:3655] CHIP:TOO:   MaxRFIDCodeLength: 20
-      disabled: true
+      command: "readAttribute"
+      attribute: "MaxRFIDCodeLength"
+      response:
+          saveAs: MaxRFIDCodeLengthValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
     - label: "TH writes MaxRFIDCodeLength attribute as 46"
-      verification: |
-          ./chip-tool doorlock write-by-id 25 46 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
-
-          [1653636648.222617][3428:3433] CHIP:DMG:
-          [1653636648.222661][3428:3433] CHIP:DMG:                        StatusIB =
-          [1653636648.222705][3428:3433] CHIP:DMG:                        {
-          [1653636648.222750][3428:3433] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653636648.222800][3428:3433] CHIP:DMG:                        },
-          [1653636648.222845][3428:3433] CHIP:DMG:
-          [1653636648.222886][3428:3433] CHIP:DMG:                },
-          [1653636648.222929][3428:3433] CHIP:DMG:
-          [1653636648.222964][3428:3433] CHIP:DMG:        ],
-      disabled: true
+      PICS: DRLK.S.F01 && DRLK.S.A0019
+      command: "writeAttribute"
+      attribute: "MaxRFIDCodeLength"
+      arguments:
+          value: 46
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads MaxRFIDCodeLength attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read  max-rfidcode-length 1 1
-
-          Verify " MaxRFIDCodeLength " on the TH(Chip-tool) Log:
-
-          [1654680386.044531][3650:3655] CHIP:DMG:        SuppressResponse = true,
-          [1654680386.044564][3650:3655] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680386.044593][3650:3655] CHIP:DMG: }
-          [1654680386.044748][3650:3655] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0019 DataVersion: 3738767914
-          [1654680386.044824][3650:3655] CHIP:TOO:   MaxRFIDCodeLength: 20
-      disabled: true
+      PICS: DRLK.S.F01 && DRLK.S.A0019
+      command: "readAttribute"
+      attribute: "MaxRFIDCodeLength"
+      response:
+          value: MaxRFIDCodeLengthValue
 
     - label: "TH reads MinRFIDCodeLength attribute from DUT"
       PICS: DRLK.S.F01 && DRLK.S.A001a
-      verification: |
-          ./chip-tool doorlock read min-rfidcode-length 1 1
-
-          Verify " MinRFIDCodeLength " on the TH(Chip-tool) Log:
-
-          [1654680510.153261][3668:3673] CHIP:DMG:        SuppressResponse = true,
-          [1654680510.153298][3668:3673] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680510.153333][3668:3673] CHIP:DMG: }
-          [1654680510.153513][3668:3673] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_001A DataVersion: 3738767914
-          [1654680510.153602][3668:3673] CHIP:TOO:   MinRFIDCodeLength: 10
-      disabled: true
+      command: "readAttribute"
+      attribute: "MinRFIDCodeLength"
+      response:
+          saveAs: MinRFIDCodeLengthValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
 
     - label: "TH writes MinRFIDCodeLength attribute as 17"
-      verification: |
-          ./chip-tool doorlock write-by-id 26 17 1 1
-
-          Verify "DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
-
-          [1654680561.429054][3676:3681] CHIP:DMG:                        StatusIB =
-          [1654680561.429096][3676:3681] CHIP:DMG:                        {
-          [1654680561.429139][3676:3681] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1654680561.429181][3676:3681] CHIP:DMG:                        },
-          [1654680561.429222][3676:3681] CHIP:DMG:
-          [1654680561.429258][3676:3681] CHIP:DMG:                },
-          [1654680561.429301][3676:3681] CHIP:DMG:
-          [1654680561.429332][3676:3681] CHIP:DMG:        ],
-      disabled: true
+      PICS: DRLK.S.F01 && DRLK.S.A001a
+      command: "writeAttribute"
+      attribute: "MinRFIDCodeLength"
+      arguments:
+          value: 17
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads MinRFIDCodeLength attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read min-rfidcode-length 1 1
-
-          Verify "  MinRFIDCodeLength " on the TH(Chip-tool) Log:
-
-          [1654680510.153261][3668:3673] CHIP:DMG:        SuppressResponse = true,
-          [1654680510.153298][3668:3673] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680510.153333][3668:3673] CHIP:DMG: }
-          [1654680510.153513][3668:3673] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_001A DataVersion: 3738767914
-          [1654680510.153602][3668:3673] CHIP:TOO:   MinRFIDCodeLength: 10
-      disabled: true
+      PICS: DRLK.S.F01 && DRLK.S.A001a
+      command: "readAttribute"
+      attribute: "MinRFIDCodeLength"
+      response:
+          value: MinRFIDCodeLengthValue
 
     - label: "TH reads Credential RulesSupport attribute from DUT"
       PICS: DRLK.S.F08 && DRLK.S.A001b
-      verification: |
-          ./chip-tool doorlock read credential-rules-support 1 1
-
-          Verify " Credential RulesSupport " on the TH(Chip-tool) Log:
-
-          [1654680805.922076][3692:3697] CHIP:DMG:        SuppressResponse = true,
-          [1654680805.922118][3692:3697] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680805.922155][3692:3697] CHIP:DMG: }
-          [1654680805.922350][3692:3697] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_001B DataVersion: 3738767914
-          [1654680805.922451][3692:3697] CHIP:TOO:   CredentialRulesSupport: 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "CredentialRulesSupport"
+      response:
+          saveAs: CredentialRulesSupportValue
+          constraints:
+              type: bitmap8
+              minValue: 0
+              maxValue: 2
 
     - label: "TH writes Credential RulesSupport attribute as bit 0 is set to 1"
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F08 && DRLK.S.A001b
       verification: |
           ./chip-tool doorlock write-by-id 27 1 1 1
 
@@ -981,240 +616,205 @@ tests:
           [1653636825.034933][3467:3472] CHIP:DMG:                },
           [1653636825.034977][3467:3472] CHIP:DMG:
           [1653636825.035013][3467:3472] CHIP:DMG:        ],
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads Credential RulesSupport attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read credential-rules-support 1 1
-
-          Verify " Credential RulesSupport " on the TH(Chip-tool) Log:
-
-          [1654680805.922076][3692:3697] CHIP:DMG:        SuppressResponse = true,
-          [1654680805.922118][3692:3697] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680805.922155][3692:3697] CHIP:DMG: }
-          [1654680805.922350][3692:3697] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_001B DataVersion: 3738767914
-          [1654680805.922451][3692:3697] CHIP:TOO:   CredentialRulesSupport: 1
-      disabled: true
+      PICS: DRLK.S.F08 && DRLK.S.A001b
+      command: "readAttribute"
+      attribute: "CredentialRulesSupport"
+      response:
+          value: CredentialRulesSupportValue
 
     - label:
           "TH reads Language attribute from DUT TH saves the values as
           Current_Language Code"
       PICS: DRLK.S.A0021
-      verification: |
-          ./chip-tool doorlock read language 1 1
-
-          Verify " Language " on the TH(Chip-tool) Log:
-
-          [1654680885.954478][3700:3705] CHIP:DMG:        SuppressResponse = true,
-          [1654680885.954512][3700:3705] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680885.954543][3700:3705] CHIP:DMG: }
-          [1654680885.954710][3700:3705] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0021 DataVersion: 3738767914
-          [1654680885.954770][3700:3705] CHIP:TOO:   Language: en
-      disabled: true
+      command: "readAttribute"
+      attribute: "Language"
+      response:
+          saveAs: Current_Language_Code
+          constraints:
+              type: char_string
+              maxLength: 3
 
     - label: "TH writes Language attribute as fr"
-      verification: |
-          ./chip-tool doorlock write language fr 1 1
+      PICS: DRLK.S.A0021.Write
+      command: "writeAttribute"
+      attribute: "Language"
+      arguments:
+          value: "fr"
 
-          Verify "DUT sends SUCCESS response " on the TH(Chip-tool) Log:
-
-          [1654680959.481870][3711:3716] CHIP:DMG:                        StatusIB =
-          [1654680959.481910][3711:3716] CHIP:DMG:                        {
-          [1654680959.481949][3711:3716] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1654680959.481991][3711:3716] CHIP:DMG:                        },
-          [1654680959.482029][3711:3716] CHIP:DMG:
-          [1654680959.482061][3711:3716] CHIP:DMG:                },
-          [1654680959.482097][3711:3716] CHIP:DMG:
-          [1654680959.482126][3711:3716] CHIP:DMG:        ],
-          [1654680959.482161][3711:3716] CHIP:DMG:
-          [1654680959.482190][3711:3716] CHIP:DMG:        InteractionModelRevision = 1
-          [1654680959.482219][3711:3716] CHIP:DMG: }
-      disabled: true
+    - label: "TH writes Language attribute as fr"
+      PICS: " !DRLK.S.A0021.Write "
+      command: "writeAttribute"
+      attribute: "Language"
+      arguments:
+          value: "fr"
+      response:
+          error: UNSUPPORTED_WRITE]
 
     - label: "TH reads Language attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read language 1 1
+      PICS: DRLK.S.A0021.Write
+      command: "readAttribute"
+      attribute: "Language"
+      response:
+          value: "fr"
 
-          Verify " Language " on the TH(Chip-tool) Log:
-
-          [1654681045.720848][3721:3726] CHIP:DMG:        SuppressResponse = true,
-          [1654681045.720882][3721:3726] CHIP:DMG:        InteractionModelRevision = 1
-          [1654681045.720911][3721:3726] CHIP:DMG: }
-          [1654681045.721064][3721:3726] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0021 DataVersion: 3738767915
-          [1654681045.721119][3721:3726] CHIP:TOO:   Language: fr
-      disabled: true
+    - label: "TH reads Language attribute from DUT"
+      PICS: " !DRLK.S.A0021.Write "
+      command: "readAttribute"
+      attribute: "Language"
+      response:
+          value: Current_Language_Code
 
     - label:
           "TH reads LEDSettings attribute from DUT TH saves the values as
           Current_LEDSettings value"
       PICS: DRLK.S.A0022
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read ledsettings 1  1
-
-          Verify " LEDSettings " on the TH(Chip-tool) Log:
-
-          [1654681074.956471][3728:3733] CHIP:DMG:                                StatusIB =
-          [1654681074.956514][3728:3733] CHIP:DMG:                                {
-          [1654681074.956558][3728:3733] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654681074.956602][3728:3733] CHIP:DMG:                                },
-          [1654681074.956646][3728:3733] CHIP:DMG:
-          [1654681074.956686][3728:3733] CHIP:DMG:                        },
-          [1654681074.956729][3728:3733] CHIP:DMG:
-          [1654681074.956762][3728:3733] CHIP:DMG:                },
-          [1654681074.956801][3728:3733] CHIP:DMG:
-          [1654681074.956833][3728:3733] CHIP:DMG:        ],
-      disabled: true
+      command: "readAttribute"
+      attribute: "LEDSettings"
+      response:
+          saveAs: Current_LEDSettings
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 2
 
     - label: "TH writes LEDSettings attribute as 2"
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+      PICS: DRLK.S.A0022.Write
+      command: "writeAttribute"
+      attribute: "LEDSettings"
+      arguments:
+          value: 2
 
-          ./chip-tool doorlock write ledsettings 2 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
-
-          [[1653636933.733579][3485:3490] CHIP:DMG:                                StatusIB =
-          [1653636933.733614][3485:3490] CHIP:DMG:                                {
-          [1653636933.733652][3485:3490] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653636933.733692][3485:3490] CHIP:DMG:                                },
-          [1653636933.733729][3485:3490] CHIP:DMG:
-          [1653636933.733762][3485:3490] CHIP:DMG:                        },
-          [1653636933.733800][3485:3490] CHIP:DMG:
-          [1653636933.733830][3485:3490] CHIP:DMG:                },
-          [1653636933.733864][3485:3490] CHIP:DMG:
-          [1653636933.733891][3485:3490] CHIP:DMG:        ],
-      disabled: true
+    - label: "TH writes LEDSettings attribute as 2"
+      PICS: " !DRLK.S.A0022.Write && DRLK.S.A0022 "
+      command: "writeAttribute"
+      attribute: "LEDSettings"
+      arguments:
+          value: 2
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads LEDSettings attribute from DUT"
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+      PICS: DRLK.S.A0022.Write
+      command: "readAttribute"
+      attribute: "LEDSettings"
+      response:
+          value: 2
 
-          ./chip-tool doorlock read ledsettings 1 1
-
-          Verify " LEDSettings " on the TH(Chip-tool) Log:
-
-          [1654681074.956471][3728:3733] CHIP:DMG:                                StatusIB =
-          [1654681074.956514][3728:3733] CHIP:DMG:                                {
-          [1654681074.956558][3728:3733] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654681074.956602][3728:3733] CHIP:DMG:                                },
-          [1654681074.956646][3728:3733] CHIP:DMG:
-          [1654681074.956686][3728:3733] CHIP:DMG:                        },
-          [1654681074.956729][3728:3733] CHIP:DMG:
-          [1654681074.956762][3728:3733] CHIP:DMG:                },
-          [1654681074.956801][3728:3733] CHIP:DMG:
-          [1654681074.956833][3728:3733] CHIP:DMG:        ],
-      disabled: true
+    - label: "TH reads LEDSettings attribute from DUT"
+      PICS: " !DRLK.S.A0022.Write && DRLK.S.A0022 "
+      command: "readAttribute"
+      attribute: "LEDSettings"
+      response:
+          value: Current_LEDSettings
 
     - label:
           "TH reads AutoRelockTime attribute from DUT TH saves the values as
           Current_AutoRelockTime"
       PICS: DRLK.S.A0023
-      verification: |
-          ./chip-tool doorlock read  auto-relock-time 1 1
-
-          Verify " AutoRelockTime " on the TH(Chip-tool) Log:
-
-          [1654681151.469284][3736:3741] CHIP:DMG:        SuppressResponse = true,
-          [1654681151.469317][3736:3741] CHIP:DMG:        InteractionModelRevision = 1
-          [1654681151.469347][3736:3741] CHIP:DMG: }
-          [1654681151.469506][3736:3741] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0023 DataVersion: 3738767915
-          [1654681151.469588][3736:3741] CHIP:TOO:   AutoRelockTime: 60
-      disabled: true
+      command: "readAttribute"
+      attribute: "AutoRelockTime"
+      response:
+          saveAs: Current_AutoRelockTime
+          constraints:
+              type: int32u
+              minValue: 0
+              maxValue: 4294967294
 
     - label: "TH writes AutoRelockTime attribute as 180 seconds"
-      verification: |
-          ./chip-tool doorlock write auto-relock-time 180 1 1
+      PICS: DRLK.S.A0023.Write
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 180
 
-          Verify " DUT sends SUCCESS response " on the TH(Chip-tool) Log:
-
-          [1654681228.902110][3744:3749] CHIP:DMG:                        StatusIB =
-          [1654681228.902166][3744:3749] CHIP:DMG:                        {
-          [1654681228.902222][3744:3749] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1654681228.902283][3744:3749] CHIP:DMG:                        },
-          [1654681228.902339][3744:3749] CHIP:DMG:
-          [1654681228.902384][3744:3749] CHIP:DMG:                },
-          [1654681228.902437][3744:3749] CHIP:DMG:
-          [1654681228.902480][3744:3749] CHIP:DMG:        ],
-          [1654681228.902533][3744:3749] CHIP:DMG:
-          [1654681228.902576][3744:3749] CHIP:DMG:        InteractionModelRevision = 1
-          [1654681228.902619][3744:3749] CHIP:DMG: }
-      disabled: true
+    - label: "TH writes AutoRelockTime attribute as 180 seconds"
+      PICS: " !DRLK.S.A0023.Write && DRLK.S.A0023 "
+      command: "writeAttribute"
+      attribute: "AutoRelockTime"
+      arguments:
+          value: 180
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads AutoRelockTime attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read  auto-relock-time 1 1
+      PICS: DRLK.S.A0023.Write
+      command: "readAttribute"
+      attribute: "AutoRelockTime"
+      response:
+          value: 180
 
-          Verify " AutoRelockTime " on the TH(Chip-tool) Log:
-
-          [1654681283.157135][3754:3759] CHIP:DMG:        SuppressResponse = true,
-          [1654681283.157160][3754:3759] CHIP:DMG:        InteractionModelRevision = 1
-          [1654681283.157183][3754:3759] CHIP:DMG: }
-          [1654681283.157317][3754:3759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0023 DataVersion: 3738767916
-          [1654681283.157391][3754:3759] CHIP:TOO:   AutoRelockTime: 180
-      disabled: true
+    - label: "TH reads AutoRelockTime attribute from DUT"
+      PICS: " !DRLK.S.A0023.Write && DRLK.S.A0023 "
+      command: "readAttribute"
+      attribute: "AutoRelockTime"
+      response:
+          value: Current_AutoRelockTime
 
     - label:
           "TH reads SoundVolume attribute from DUT TH saves the values as
           Current_SoundVolume value"
       PICS: DRLK.S.A0024
-      verification: |
-          ./chip-tool doorlock read sound-volume 1 1
-
-          Verify " SoundVolume " on the TH(Chip-tool) Log:
-
-          [1654681357.022476][3768:3773] CHIP:DMG:        SuppressResponse = true,
-          [1654681357.022511][3768:3773] CHIP:DMG:        InteractionModelRevision = 1
-          [1654681357.022543][3768:3773] CHIP:DMG: }
-          [1654681357.022704][3768:3773] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0024 DataVersion: 3738767916
-          [1654681357.022787][3768:3773] CHIP:TOO:   SoundVolume: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "SoundVolume"
+      response:
+          saveAs: Current_SoundVolume
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 3
 
     - label: "TH writes SoundVolume attribute as 3"
-      verification: |
-          ./chip-tool doorlock write sound-volume 3 1 1
+      PICS: DRLK.S.A0024.Write
+      command: "writeAttribute"
+      attribute: "SoundVolume"
+      arguments:
+          value: 3
 
-          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
-
-          [1654681412.367916][3782:3787] CHIP:DMG:                        StatusIB =
-          [1654681412.367963][3782:3787] CHIP:DMG:                        {
-          [1654681412.368009][3782:3787] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1654681412.368055][3782:3787] CHIP:DMG:                        },
-          [1654681412.368099][3782:3787] CHIP:DMG:
-          [1654681412.368136][3782:3787] CHIP:DMG:                },
-          [1654681412.368180][3782:3787] CHIP:DMG:
-          [1654681412.368214][3782:3787] CHIP:DMG:        ],
-      disabled: true
+    - label: "TH writes SoundVolume attribute as 3"
+      PICS: " !DRLK.S.A0024.Write && DRLK.S.A0024 "
+      command: "writeAttribute"
+      attribute: "SoundVolume"
+      arguments:
+          value: 3
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads SoundVolume attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read sound-volume 1 1
+      PICS: DRLK.S.A0024.Write
+      command: "readAttribute"
+      attribute: "SoundVolume"
+      response:
+          value: 3
 
-          Verify " SoundVolume " on the TH(Chip-tool) Log:
-
-          [1654681449.086921][3789:3794] CHIP:DMG:        SuppressResponse = true,
-          [1654681449.086958][3789:3794] CHIP:DMG:        InteractionModelRevision = 1
-          [1654681449.086992][3789:3794] CHIP:DMG: }
-          [1654681449.087170][3789:3794] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0024 DataVersion: 3738767918
-          [1654681449.087262][3789:3794] CHIP:TOO:   SoundVolume: 3
-      disabled: true
+    - label: "TH reads SoundVolume attribute from DUT"
+      PICS: " !DRLK.S.A0024.Write && DRLK.S.A0024 "
+      command: "readAttribute"
+      attribute: "SoundVolume"
+      response:
+          value: Current_SoundVolume
 
     - label: "TH reads Supported OperatingModes attribute from DUT"
       PICS: DRLK.S.A0026
-      verification: |
-          ./chip-tool doorlock read supported-operating-modes 1 1
-
-          Verify " SupportedOperatingModes " on the TH(Chip-tool) Log:
-
-          [1654681500.464948][3797:3802] CHIP:DMG:        SuppressResponse = true,
-          [1654681500.464974][3797:3802] CHIP:DMG:        InteractionModelRevision = 1
-          [1654681500.464998][3797:3802] CHIP:DMG: }
-          [1654681500.465125][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0026 DataVersion: 3738767918
-          [1654681500.465198][3797:3802] CHIP:TOO:   SupportedOperatingModes: 65526
-      disabled: true
+      command: "readAttribute"
+      attribute: "SupportedOperatingModes"
+      response:
+          value: 0xFFF6
+          saveAs: Current_Supported
+          constraints:
+              type: enum16
 
     - label: "TH writes Supported OperatingModes attribute as bit 0 is set to 0"
+      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.A0026
       verification: |
           ./chip-tool doorlock write-by-id 38 0 1 1
 
@@ -1228,117 +828,105 @@ tests:
           [1653637108.039380][3522:3527] CHIP:DMG:                },
           [1653637108.039424][3522:3527] CHIP:DMG:
           [1653637108.039460][3522:3527] CHIP:DMG:        ],
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads Supported OperatingModes attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read supported-operating-modes 1 1
-
-          Verify " SupportedOperatingModes " on the TH(Chip-tool) Log:
-
-          [1654681500.464948][3797:3802] CHIP:DMG:        SuppressResponse = true,
-          [1654681500.464974][3797:3802] CHIP:DMG:        InteractionModelRevision = 1
-          [1654681500.464998][3797:3802] CHIP:DMG: }
-          [1654681500.465125][3797:3802] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0026 DataVersion: 3738767918
-          [1654681500.465198][3797:3802] CHIP:TOO:   SupportedOperatingModes: 65526
-      disabled: true
+      PICS: DRLK.S.A0026
+      command: "readAttribute"
+      attribute: "SupportedOperatingModes"
+      response:
+          value: Current_Supported
 
     - label:
           "TH reads OperatingMode attribute from DUT TH saves the values as
           Current_OperatingMode value"
       PICS: DRLK.S.A0025
-      verification: |
-          ./chip-tool doorlock read operating-mode 1 1
-
-          Verify "OperatingMode " on the TH(Chip-tool) Log:
-
-
-          [1654681628.413702][3817:3822] CHIP:DMG:        SuppressResponse = true,
-          [1654681628.413733][3817:3822] CHIP:DMG:        InteractionModelRevision = 1
-          [1654681628.413762][3817:3822] CHIP:DMG: }
-          [1654681628.413908][3817:3822] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0025 DataVersion: 3738767918
-          [1654681628.413987][3817:3822] CHIP:TOO:   OperatingMode: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "OperatingMode"
+      response:
+          saveAs: Current_OperatingMode
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 4
 
     - label:
           "TH writes OperatingMode attribute to a value as Normal and the new
           value is present in SupportedOperatingModes"
-      verification: |
-          ./chip-tool doorlock write operating-mode 0 1 1
+      PICS: DRLK.S.A0025.Write
+      command: "writeAttribute"
+      attribute: "OperatingMode"
+      arguments:
+          value: 0
 
-          Verify "DUT sends SUCCESS response " on the TH(Chip-tool) Log:
-
-          [1654681685.239429][3833:3838] CHIP:DMG:                        StatusIB =
-          [1654681685.239464][3833:3838] CHIP:DMG:                        {
-          [1654681685.239499][3833:3838] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1654681685.239532][3833:3838] CHIP:DMG:                        },
-          [1654681685.239567][3833:3838] CHIP:DMG:
-          [1654681685.239595][3833:3838] CHIP:DMG:                },
-          [1654681685.239628][3833:3838] CHIP:DMG:
-          [1654681685.239651][3833:3838] CHIP:DMG:        ],
-          [1654681685.239681][3833:3838] CHIP:DMG:
-      disabled: true
+    - label:
+          "TH writes OperatingMode attribute to a value as Normal and the new
+          value is present in SupportedOperatingModes"
+      PICS: " !DRLK.S.A0025.Write && DRLK.S.A0025 "
+      command: "writeAttribute"
+      attribute: "OperatingMode"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label:
           "TH writes OperatingMode attribute to a value as NoRemoteLockUnlock
           and the new value is present in Supported OperatingModes"
-      verification: |
-          ./chip-tool doorlock write operating-mode 3 1 1
+      PICS: DRLK.S.A0025.Write
+      command: "writeAttribute"
+      attribute: "OperatingMode"
+      arguments:
+          value: 3
 
-          Verify "OperatingMode response " on the TH(Chip-tool) Log:
-
-
-          [1654681685.239429][3833:3838] CHIP:DMG:                        StatusIB =
-          [1654681685.239464][3833:3838] CHIP:DMG:                        {
-          [1654681685.239499][3833:3838] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1654681685.239532][3833:3838] CHIP:DMG:                        },
-          [1654681685.239567][3833:3838] CHIP:DMG:
-          [1654681685.239595][3833:3838] CHIP:DMG:                },
-          [1654681685.239628][3833:3838] CHIP:DMG:
-          [1654681685.239651][3833:3838] CHIP:DMG:        ],
-          [1654681685.239681][3833:3838] CHIP:DMG:
-      disabled: true
+    - label:
+          "TH writes OperatingMode attribute to a value as NoRemoteLockUnlock
+          and the new value is present in Supported OperatingModes"
+      PICS: " !DRLK.S.A0025.Write && DRLK.S.A0025 "
+      command: "writeAttribute"
+      attribute: "OperatingMode"
+      arguments:
+          value: 3
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads OperatingMode attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read operating-mode 1 1
+      PICS: DRLK.S.A0025.Write
+      command: "readAttribute"
+      attribute: "OperatingMode"
+      response:
+          constraints:
+              anyOf: [0, 3]
 
-          Verify "OperatingMode " on the TH(Chip-tool) Log:
-
-          [1654681926.819078][3864:3870] CHIP:DMG:        SuppressResponse = true,
-          [1654681926.819124][3864:3870] CHIP:DMG:        InteractionModelRevision = 1
-          [1654681926.819165][3864:3870] CHIP:DMG: }
-          [1654681926.819486][3864:3870] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0025 DataVersion: 3738767921
-          [1654681926.819598][3864:3870] CHIP:TOO:   OperatingMode: 3
-      disabled: true
+    - label: "TH reads OperatingMode attribute from DUT"
+      PICS: " !DRLK.S.A0025.Write && DRLK.S.A0025 "
+      command: "readAttribute"
+      attribute: "OperatingMode"
+      response:
+          value: Current_OperatingMode
 
     - label: "TH reads Default ConfigurationRegister attribute from DUT"
       PICS: DRLK.S.A0027
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read default-configuration-register 1 1
-
-          Verify "Default ConfigurationRegister " on the TH(Chip-tool) Log:
-
-          [1654682006.877169][3876:3881] CHIP:DMG:                                StatusIB =
-          [1654682006.877222][3876:3881] CHIP:DMG:                                {
-          [1654682006.877277][3876:3881] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654682006.877330][3876:3881] CHIP:DMG:                                },
-          [1654682006.877385][3876:3881] CHIP:DMG:
-          [1654682006.877432][3876:3881] CHIP:DMG:                        },
-          [1654682006.877486][3876:3881] CHIP:DMG:
-          [1654682006.877529][3876:3881] CHIP:DMG:                },
-          [1654682006.877577][3876:3881] CHIP:DMG:
-          [1654682006.877615][3876:3881] CHIP:DMG:        ],
-          [1654682006.877663][3876:3881] CHIP:DMG:
-          [1654682006.877701][3876:3881] CHIP:DMG:        SuppressResponse = true,
-          [1654682006.877742][3876:3881] CHIP:DMG:        InteractionModelRevision = 1
-      disabled: true
+      command: "readAttribute"
+      attribute: "DefaultConfigurationRegister"
+      response:
+          saveAs: ConfigurationRegisterValue
+          constraints:
+              type: bitmap16
+              minValue: 0
+              maxValue: 7
 
     - label:
           "TH writes Default ConfigurationRegister attribute as bit 0 is set to
           1"
+      PICS: DRLK.S.A0027 && PICS_SKIP_SAMPLE_APP
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -1354,302 +942,166 @@ tests:
           [1653637348.334084][3570:3575] CHIP:DMG:                },
           [1653637348.334124][3570:3575] CHIP:DMG:
           [1653637348.334156][3570:3575] CHIP:DMG:        ],
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH reads Default ConfigurationRegister attribute from DUT"
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read default-configuration-register 1 1
-
-          Verify "Default ConfigurationRegister " on the TH(Chip-tool) Log:
-
-          [1654682006.877169][3876:3881] CHIP:DMG:                                StatusIB =
-          [1654682006.877222][3876:3881] CHIP:DMG:                                {
-          [1654682006.877277][3876:3881] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654682006.877330][3876:3881] CHIP:DMG:                                },
-          [1654682006.877385][3876:3881] CHIP:DMG:
-          [1654682006.877432][3876:3881] CHIP:DMG:                        },
-          [1654682006.877486][3876:3881] CHIP:DMG:
-          [1654682006.877529][3876:3881] CHIP:DMG:                },
-          [1654682006.877577][3876:3881] CHIP:DMG:
-          [1654682006.877615][3876:3881] CHIP:DMG:        ],
-          [1654682006.877663][3876:3881] CHIP:DMG:
-          [1654682006.877701][3876:3881] CHIP:DMG:        SuppressResponse = true,
-          [1654682006.877742][3876:3881] CHIP:DMG:        InteractionModelRevision = 1
-      disabled: true
+      PICS: DRLK.S.A0027
+      command: "readAttribute"
+      attribute: "DefaultConfigurationRegister"
+      response:
+          value: ConfigurationRegisterValue
 
     - label:
           "TH reads EnableLocalProgramming attribute from DUT TH saves the
           values as Current_EnableLocal Programming value"
       PICS: DRLK.S.A0028
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read enable-local-programming 1 1
-
-          Verify "EnableLocalProgramming " on the TH(Chip-tool) Log:
-
-          [1654682107.524282][3886:3891] CHIP:DMG:                                {
-          [1654682107.524320][3886:3891] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654682107.524357][3886:3891] CHIP:DMG:                                },
-          [1654682107.524395][3886:3891] CHIP:DMG:
-          [1654682107.524424][3886:3891] CHIP:DMG:                        },
-          [1654682107.524463][3886:3891] CHIP:DMG:
-          [1654682107.524491][3886:3891] CHIP:DMG:                },
-          [1654682107.524524][3886:3891] CHIP:DMG:
-          [1654682107.524548][3886:3891] CHIP:DMG:        ],
-      disabled: true
+      command: "readAttribute"
+      attribute: "EnableLocalProgramming"
+      response:
+          value: 1
+          saveAs: Current_EnableLocal_Programming
 
     - label: "TH writes EnableLocalProgramming attribute as false"
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+      PICS: DRLK.S.A0028.Write
+      command: "writeAttribute"
+      attribute: "EnableLocalProgramming"
+      arguments:
+          value: 0
 
-          ./chip-tool doorlock write-by-id 40 0 1 1
-
-          Verify "DUT responds with UNSUPPORTED_ATTRIBUTE" on the TH(Chip-tool) Log:
-
-          [1653637444.331118][3599:3604] CHIP:DMG:                        StatusIB =
-          [1653637444.331165][3599:3604] CHIP:DMG:                        {
-          [1653637444.331210][3599:3604] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653637444.331257][3599:3604] CHIP:DMG:                        },
-          [1653637444.331304][3599:3604] CHIP:DMG:
-          [1653637444.331342][3599:3604] CHIP:DMG:                },
-          [1653637444.331386][3599:3604] CHIP:DMG:
-          [1653637444.331421][3599:3604] CHIP:DMG:        ],
-          [1653637444.331465][3599:3604] CHIP:DMG:
-      disabled: true
+    - label: "TH writes EnableLocalProgramming attribute as false"
+      PICS: " !DRLK.S.A0028.Write && DRLK.S.A0028 "
+      command: "writeAttribute"
+      attribute: "EnableLocalProgramming"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads EnableLocalProgramming attribute from DUT"
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+      PICS: DRLK.S.A0028.Write
+      command: "readAttribute"
+      attribute: "EnableLocalProgramming"
+      response:
+          value: 0
 
-          ./chip-tool doorlock read enable-local-programming 1 1
-
-          Verify "EnableLocalProgramming " on the TH(Chip-tool) Log:
-
-          [1654682107.524282][3886:3891] CHIP:DMG:                                {
-          [1654682107.524320][3886:3891] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654682107.524357][3886:3891] CHIP:DMG:                                },
-          [1654682107.524395][3886:3891] CHIP:DMG:
-          [1654682107.524424][3886:3891] CHIP:DMG:                        },
-          [1654682107.524463][3886:3891] CHIP:DMG:
-          [1654682107.524491][3886:3891] CHIP:DMG:                },
-          [1654682107.524524][3886:3891] CHIP:DMG:
-          [1654682107.524548][3886:3891] CHIP:DMG:        ],
-      disabled: true
+    - label: "TH reads EnableLocalProgramming attribute from DUT"
+      PICS: " !DRLK.S.A0028.Write && DRLK.S.A0028 "
+      command: "readAttribute"
+      attribute: "EnableLocalProgramming"
+      response:
+          value: Current_EnableLocal_Programming
 
     - label: "TH reads EnableOneTouchLocking attribute from DUT"
       PICS: DRLK.S.A0029
-      verification: |
-          ./chip-tool doorlock read enable-one-touch-locking 1 1
-
-          Verify "EnableOneTouchLocking " on the TH(Chip-tool) Log:
-
-          [1654682200.857783][3895:3900] CHIP:DMG:        SuppressResponse = true,
-          [1654682200.857809][3895:3900] CHIP:DMG:        InteractionModelRevision = 1
-          [1654682200.857832][3895:3900] CHIP:DMG: }
-          [1654682200.857965][3895:3900] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0029 DataVersion: 3738767921
-          [1654682200.858010][3895:3900] CHIP:TOO:   EnableOneTouchLocking: FALSE
-      disabled: true
+      command: "readAttribute"
+      attribute: "EnableOneTouchLocking"
+      response:
+          value: 0
 
     - label: "TH writes EnableOneTouchLocking attribute as true"
       PICS: DRLK.S.A0029
-      verification: |
-          ./chip-tool doorlock write enable-one-touch-locking 1 1 1
-
-          Verify "DUT send the success response" on the TH(Chip-tool) Log:
-
-          [1654682241.954790][3903:3908] CHIP:DMG:                        StatusIB =
-          [1654682241.954869][3903:3908] CHIP:DMG:                        {
-          [1654682241.954928][3903:3908] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1654682241.954984][3903:3908] CHIP:DMG:                        },
-          [1654682241.955041][3903:3908] CHIP:DMG:
-          [1654682241.955091][3903:3908] CHIP:DMG:                },
-          [1654682241.955145][3903:3908] CHIP:DMG:
-          [1654682241.955188][3903:3908] CHIP:DMG:        ],
-          [1654682241.955241][3903:3908] CHIP:DMG:
-      disabled: true
+      command: "writeAttribute"
+      attribute: "EnableOneTouchLocking"
+      arguments:
+          value: 1
 
     - label: "TH reads EnableOneTouchLocking attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read enable-one-touch-locking 1 1
-
-          Verify "EnableOneTouchLocking " on the TH(Chip-tool) Log:
-
-          [1654682289.946247][3914:3919] CHIP:DMG:        SuppressResponse = true,
-          [1654682289.946294][3914:3919] CHIP:DMG:        InteractionModelRevision = 1
-          [1654682289.946336][3914:3919] CHIP:DMG: }
-          [1654682289.946551][3914:3919] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0029 DataVersion: 3738767922
-          [1654682289.946626][3914:3919] CHIP:TOO:   EnableOneTouchLocking: TRUE
-      disabled: true
+      PICS: DRLK.S.A0029
+      command: "readAttribute"
+      attribute: "EnableOneTouchLocking"
+      response:
+          value: 1
 
     - label: "TH reads EnableInside StatusLED attribute from DUT"
       PICS: DRLK.S.A002a
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read enable-inside-status-led 1 1
-
-          Verify "EnableInsideStatusLED" on the TH(Chip-tool) Log:
-
-          [1654682333.059815][3921:3926] CHIP:DMG:                                StatusIB =
-          [1654682333.059848][3921:3926] CHIP:DMG:                                {
-          [1654682333.059880][3921:3926] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654682333.059912][3921:3926] CHIP:DMG:                                },
-          [1654682333.059945][3921:3926] CHIP:DMG:
-          [1654682333.059973][3921:3926] CHIP:DMG:                        },
-          [1654682333.060005][3921:3926] CHIP:DMG:
-          [1654682333.060029][3921:3926] CHIP:DMG:                },
-          [1654682333.060060][3921:3926] CHIP:DMG:
-          [1654682333.060083][3921:3926] CHIP:DMG:        ],
-          [1654682333.060112][3921:3926] CHIP:DMG:
-      disabled: true
+      command: "readAttribute"
+      attribute: "EnableInsideStatusLED"
+      response:
+          value: 0
 
     - label: "TH writes EnableInsideStatusLED attribute as true"
       PICS: DRLK.S.A002a
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write-by-id 42 1 1 1
-
-          Verify "DUT send the success response" on the TH(Chip-tool) Log:
-
-          [1653386385.348368][3801:3806] CHIP:DMG:                        StatusIB =
-          [1653386385.348419][3801:3806] CHIP:DMG:                        {
-          [1653386385.348465][3801:3806] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653386385.348512][3801:3806] CHIP:DMG:                        },
-          [1653386385.348559][3801:3806] CHIP:DMG:
-          [1653386385.348599][3801:3806] CHIP:DMG:                },
-          [1653386385.348645][3801:3806] CHIP:DMG:
-          [1653386385.348681][3801:3806] CHIP:DMG:        ],
-      disabled: true
+      command: "writeAttribute"
+      attribute: "EnableInsideStatusLED"
+      arguments:
+          value: 1
 
     - label: "TH reads EnableInsideStatusLED attribute from DUT"
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read enable-inside-status-led 1 1
-
-          Verify "EnableInsideStatusLED" on the TH(Chip-tool) Log:
-
-          [1654682333.059815][3921:3926] CHIP:DMG:                                StatusIB =
-          [1654682333.059848][3921:3926] CHIP:DMG:                                {
-          [1654682333.059880][3921:3926] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654682333.059912][3921:3926] CHIP:DMG:                                },
-          [1654682333.059945][3921:3926] CHIP:DMG:
-          [1654682333.059973][3921:3926] CHIP:DMG:                        },
-          [1654682333.060005][3921:3926] CHIP:DMG:
-          [1654682333.060029][3921:3926] CHIP:DMG:                },
-          [1654682333.060060][3921:3926] CHIP:DMG:
-          [1654682333.060083][3921:3926] CHIP:DMG:        ],
-          [1654682333.060112][3921:3926] CHIP:DMG:
-      disabled: true
+      PICS: DRLK.S.A002a
+      command: "readAttribute"
+      attribute: "EnableInsideStatusLED"
+      response:
+          value: 1
 
     - label: "TH reads EnablePrivacyModeButton attribute from DUT"
       PICS: DRLK.S.A002b
-      verification: |
-          ./chip-tool doorlock read enable-privacy-mode-button 1 1
-
-          Verify " EnablePrivacyModeButton" on the TH(Chip-tool) Log:
-
-          [1654682475.460532][3931:3936] CHIP:DMG:        SuppressResponse = true,
-          [1654682475.460586][3931:3936] CHIP:DMG:        InteractionModelRevision = 1
-          [1654682475.460635][3931:3936] CHIP:DMG: }
-          [1654682475.460872][3931:3936] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_002B DataVersion: 3738767922
-          [1654682475.460959][3931:3936] CHIP:TOO:   EnablePrivacyModeButton: FALSE
-      disabled: true
+      command: "readAttribute"
+      attribute: "EnablePrivacyModeButton"
+      response:
+          value: 0
 
     - label: "TH writes EnablePrivacy ModeButton attribute as true"
       PICS: DRLK.S.A002b
-      verification: |
-          ./chip-tool doorlock write enable-privacy-mode-button 1 1 1
-
-          Verify " DUT send the success response" on the TH(Chip-tool) Log:
-
-          [1654682528.961800][3939:3944] CHIP:DMG:                        StatusIB =
-          [1654682528.961832][3939:3944] CHIP:DMG:                        {
-          [1654682528.961874][3939:3944] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1654682528.961916][3939:3944] CHIP:DMG:                        },
-          [1654682528.961949][3939:3944] CHIP:DMG:
-          [1654682528.961984][3939:3944] CHIP:DMG:                },
-          [1654682528.962014][3939:3944] CHIP:DMG:
-          [1654682528.962047][3939:3944] CHIP:DMG:        ],
-          [1654682528.962076][3939:3944] CHIP:DMG:
-          [1654682528.962110][3939:3944] CHIP:DMG:        InteractionModelRevision = 1
-      disabled: true
+      command: "writeAttribute"
+      attribute: "EnablePrivacyModeButton"
+      arguments:
+          value: 1
 
     - label: "TH reads EnablePrivacyModeButton attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read enable-privacy-mode-button 1 1
-
-          Verify " EnablePrivacyModeButton" on the TH(Chip-tool) Log:
-
-          [1654682565.141153][3948:3953] CHIP:DMG:        SuppressResponse = true,
-          [1654682565.141195][3948:3953] CHIP:DMG:        InteractionModelRevision = 1
-          [1654682565.141233][3948:3953] CHIP:DMG: }
-          [1654682565.141434][3948:3953] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_002B DataVersion: 3738767923
-          [1654682565.141510][3948:3953] CHIP:TOO:   EnablePrivacyModeButton: TRUE
-      disabled: true
+      PICS: DRLK.S.A002b
+      command: "readAttribute"
+      attribute: "EnablePrivacyModeButton"
+      response:
+          value: 1
 
     - label:
           "TH reads LocalProgrammingFeatures attribute from DUT TH saves the
           values as Current_LocalProgramming Features value"
       PICS: DRLK.S.A002c
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          saveAs: Current_LocalProgramming_Features
+          constraints:
+              type: bitmap8
+              minValue: 0
+              maxValue: 3
 
-          ./chip-tool doorlock read local-programming-features 1 1
+    - label:
+          "TH reads LocalProgrammingFeatures attribute from DUT.
+          DRLK.S.A0028(EnableLocalProgramming) is True."
+      PICS: DRLK.S.A002c && DRLK.S.A0028.ReadOnly
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x1, 0x2, 0x4, 0x8]
 
-          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
-
-          [1658987637.292491][2794:2799] CHIP:DMG:                                StatusIB =
-          [1658987637.292530][2794:2799] CHIP:DMG:                                {
-          [1658987637.292568][2794:2799] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658987637.292605][2794:2799] CHIP:DMG:                                },
-          [1658987637.292642][2794:2799] CHIP:DMG:
-          [1658987637.292675][2794:2799] CHIP:DMG:                        },
-          [1658987637.292713][2794:2799] CHIP:DMG:
-          [1658987637.292741][2794:2799] CHIP:DMG:                },
-          [1658987637.292774][2794:2799] CHIP:DMG:
-          [1658987637.292798][2794:2799] CHIP:DMG:        ],
-          [1658987637.292828][2794:2799] CHIP:DMG:
-          [1658987637.292852][2794:2799] CHIP:DMG:        SuppressResponse = true,
-          [1658987637.292878][2794:2799] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987637.292901][2794:2799] CHIP:DMG: }
-          [1658987637.293006][2794:2799] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
-
-    - label: "TH reads LocalProgrammingFeatures attribute from DUT"
-      PICS: DRLK.S.A002c && DRLK.S.A0028 && DRLK.S.A002c
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read local-programming-features 1 1
-
-          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
-
-          [1658987637.292491][2794:2799] CHIP:DMG:                                StatusIB =
-          [1658987637.292530][2794:2799] CHIP:DMG:                                {
-          [1658987637.292568][2794:2799] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658987637.292605][2794:2799] CHIP:DMG:                                },
-          [1658987637.292642][2794:2799] CHIP:DMG:
-          [1658987637.292675][2794:2799] CHIP:DMG:                        },
-          [1658987637.292713][2794:2799] CHIP:DMG:
-          [1658987637.292741][2794:2799] CHIP:DMG:                },
-          [1658987637.292774][2794:2799] CHIP:DMG:
-          [1658987637.292798][2794:2799] CHIP:DMG:        ],
-          [1658987637.292828][2794:2799] CHIP:DMG:
-          [1658987637.292852][2794:2799] CHIP:DMG:        SuppressResponse = true,
-          [1658987637.292878][2794:2799] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987637.292901][2794:2799] CHIP:DMG: }
-          [1658987637.293006][2794:2799] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
+    - label:
+          "TH reads LocalProgrammingFeatures attribute from DUT.
+          DRLK.S.A0028(EnableLocalProgramming) is False."
+      PICS: DRLK.S.A002c && !DRLK.S.A0028.ReadOnly
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8]
 
     - label:
           "TH writes to LocalProgrammingFeatures to disable all the features
           (Change all bits to 0)"
-      PICS: DRLK.S.A002c && DRLK.S.A0028 && DRLK.S.A002c
+      PICS:
+          DRLK.S.A002c && DRLK.S.A0028.ReadOnly && DRLK.S.A002c.Write &&
+          PICS_SKIP_SAMPLE_APP
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -1670,10 +1122,19 @@ tests:
           [1658987893.199873][2822:2827] CHIP:DMG: }
           [1658987893.199968][2822:2827] CHIP:DMG: WriteClient moving to [AwaitingDe]
           [1658987893.200012][2822:2827] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH sets the EnableLocalProgramming attribute to False"
-      PICS: DRLK.S.A002c && DRLK.S.A0028 && DRLK.S.A002c
+      PICS:
+          DRLK.S.A002c && DRLK.S.A0028.Write && DRLK.S.A002c.Write &&
+          PICS_SKIP_SAMPLE_APP
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -1716,10 +1177,19 @@ tests:
           [1658987637.292878][2794:2799] CHIP:DMG:        InteractionModelRevision = 1
           [1658987637.292901][2794:2799] CHIP:DMG: }
           [1658987637.293006][2794:2799] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH sets the EnableLocalProgramming attribute to True"
-      PICS: DRLK.S.A002c && DRLK.S.A0028 && DRLK.S.A002c
+      PICS:
+          DRLK.S.A002c && DRLK.S.A0028.Write && DRLK.S.A002c.Write &&
+          PICS_SKIP_SAMPLE_APP
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -1763,12 +1233,19 @@ tests:
           [1658987637.292878][2794:2799] CHIP:DMG:        InteractionModelRevision = 1
           [1658987637.292901][2794:2799] CHIP:DMG: }
           [1658987637.293006][2794:2799] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH sends a write message to change any one of the bits of the
           LocalProgrammingFeatures."
-      PICS: DRLK.S.A002c && DRLK.S.A002c
+      PICS: DRLK.S.A002c && DRLK.S.A002c.Write && PICS_SKIP_SAMPLE_APP
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -1789,12 +1266,19 @@ tests:
           [1658988308.728423][2866:2871] CHIP:DMG: }
           [1658988308.728500][2866:2871] CHIP:DMG: WriteClient moving to [AwaitingDe]
           [1658988308.728539][2866:2871] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH sends a write message to change any one of the bits of the
           LocalProgrammingFeatures."
-      PICS: DRLK.S.A002c && DRLK.S.A002c
+      PICS: DRLK.S.A002c && DRLK.S.A002c.ReadOnly && PICS_SKIP_SAMPLE_APP
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -1815,261 +1299,205 @@ tests:
           [1658988387.295632][2874:2879] CHIP:DMG: }
           [1658988387.295719][2874:2879] CHIP:DMG: WriteClient moving to [AwaitingDe]
           [1658988387.295760][2874:2879] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "TH reads WrongCodeEntry Limit attribute from DUT TH saves the values
           as Current_WrongCode EntryLimit value"
-      PICS: DRLK.S.F00 || DRLK.S.F01 && DRLK.S.A0030
-      verification: |
-          ./chip-tool doorlock read   wrong-code-entry-limit 1 1
-
-          Verify " WrongCodeEntry Limit" on the TH(Chip-tool) Log:
-
-          [1654682697.191640][3970:3975] CHIP:DMG:        SuppressResponse = true,
-          [1654682697.191686][3970:3975] CHIP:DMG:        InteractionModelRevision = 1
-          [1654682697.191728][3970:3975] CHIP:DMG: }
-          [1654682697.191939][3970:3975] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0030 DataVersion: 3738767923
-          [1654682697.192045][3970:3975] CHIP:TOO:   WrongCodeEntryLimit: 3
-      disabled: true
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030
+      command: "readAttribute"
+      attribute: "WrongCodeEntryLimit"
+      response:
+          saveAs: Current_WrongCode_EntryLimit
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
 
     - label: "TH writes WrongCodeEntryLimit attribute as 8"
-      verification: |
-          ./chip-tool doorlock write wrong-code-entry-limit 8 1 1
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030.Write
+      command: "writeAttribute"
+      attribute: "WrongCodeEntryLimit"
+      arguments:
+          value: 8
 
-          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
-
-          [1654682751.960343][3981:3987] CHIP:DMG:                        StatusIB =
-          [1654682751.960389][3981:3987] CHIP:DMG:                        {
-          [1654682751.960433][3981:3987] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1654682751.960483][3981:3987] CHIP:DMG:                        },
-          [1654682751.960528][3981:3987] CHIP:DMG:
-          [1654682751.960568][3981:3987] CHIP:DMG:                },
-          [1654682751.960616][3981:3987] CHIP:DMG:
-          [1654682751.960650][3981:3987] CHIP:DMG:        ],
-          [1654682751.960694][3981:3987] CHIP:DMG:
-      disabled: true
+    - label: "TH writes WrongCodeEntryLimit attribute as 8"
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && !DRLK.S.A0030.Write
+      command: "writeAttribute"
+      attribute: "WrongCodeEntryLimit"
+      arguments:
+          value: 8
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads WrongCode EntryLimit attribute"
-      verification: |
-          ./chip-tool doorlock read   wrong-code-entry-limit 1 1
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030.Write
+      command: "readAttribute"
+      attribute: "WrongCodeEntryLimit"
+      response:
+          value: 8
 
-          Verify " WrongCodeEntry Limit" on the TH(Chip-tool) Log:
-
-          [1654682801.226369][3989:3994] CHIP:DMG:        SuppressResponse = true,
-          [1654682801.226394][3989:3994] CHIP:DMG:        InteractionModelRevision = 1
-          [1654682801.226417][3989:3994] CHIP:DMG: }
-          [1654682801.226551][3989:3994] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0030 DataVersion: 3738767924
-          [1654682801.226627][3989:3994] CHIP:TOO:   WrongCodeEntryLimit: 8
-      disabled: true
+    - label: "TH reads WrongCode EntryLimit attribute"
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && !DRLK.S.A0030.Write
+      command: "readAttribute"
+      attribute: "WrongCodeEntryLimit"
+      response:
+          value: Current_WrongCode_EntryLimit
 
     - label:
           "TH reads UserCodeTemporary DisableTime attribute from DUT TH saves
           the values as Current_UserCode TemporaryDisableTime"
-      PICS: DRLK.S.F00 || DRLK.S.F01 && DRLK.S.A0031
-      verification: |
-          ./chip-tool doorlock read user-code-temporary-disable-time 1 1
-
-          Verify " UserCodeTemporary Disable" on the TH(Chip-tool) Log:
-
-          [1654682846.758616][3996:4001] CHIP:DMG:        SuppressResponse = true,
-          [1654682846.758658][3996:4001] CHIP:DMG:        InteractionModelRevision = 1
-          [1654682846.758713][3996:4001] CHIP:DMG: }
-          [1654682846.759061][3996:4001] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0031 DataVersion: 3738767924
-          [1654682846.759187][3996:4001] CHIP:TOO:   UserCodeTemporaryDisableTime: 10
-      disabled: true
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031
+      command: "readAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      response:
+          saveAs: Current_UserCode_TemporaryDisableTime
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
 
     - label: "TH writes UserCodeTemporaryDisableTime attribute as 120"
-      verification: |
-          ./chip-tool doorlock write user-code-temporary-disable-time 120 1 1
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031.Write
+      command: "writeAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      arguments:
+          value: 120
 
-          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
-
-          [1654682895.502869][4011:4016] CHIP:DMG:                        StatusIB =
-          [1654682895.502946][4011:4016] CHIP:DMG:                        {
-          [1654682895.503021][4011:4016] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1654682895.503087][4011:4016] CHIP:DMG:                        },
-          [1654682895.503153][4011:4016] CHIP:DMG:
-          [1654682895.503210][4011:4016] CHIP:DMG:                },
-          [1654682895.503273][4011:4016] CHIP:DMG:
-          [1654682895.503411][4011:4016] CHIP:DMG:        ],
-          [1654682895.503475][4011:4016] CHIP:DMG:
-          [1654682895.503526][4011:4016] CHIP:DMG:        InteractionModelRevision = 1
-      disabled: true
+    - label: "TH writes UserCodeTemporaryDisableTime attribute as 120"
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && !DRLK.S.A0031.Write
+      command: "writeAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      arguments:
+          value: 120
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads UserCodeTemporary DisableTime attribute"
-      verification: |
-          ./chip-tool doorlock read user-code-temporary-disable-time 1 1
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031.Write
+      command: "readAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      response:
+          value: 120
 
-          Verify " UserCodeTemporary Disable" on the TH(Chip-tool) Log:
-
-          [1654682975.285821][4032:4037] CHIP:DMG:        SuppressResponse = true,
-          [1654682975.285867][4032:4037] CHIP:DMG:        InteractionModelRevision = 1
-          [1654682975.285909][4032:4037] CHIP:DMG: }
-          [1654682975.286120][4032:4037] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0031 DataVersion: 3738767927
-          [1654682975.286230][4032:4037] CHIP:TOO:   UserCodeTemporaryDisableTime: 120
-      disabled: true
+    - label: "TH reads UserCodeTemporary DisableTime attribute"
+      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && !DRLK.S.A0031.Write
+      command: "readAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      response:
+          value: Current_UserCode_TemporaryDisableTime
 
     - label: "TH reads RequirePINfor RemoteOperation attribute from DUT"
       PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
-      verification: |
-          ./chip-tool doorlock read require-pinfor-remote-operation 1 1
-
-          Verify " RequirePINfor RemoteOperation" on the TH(Chip-tool) Log:
-
-          [1656335145.428166][4073:4078] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0033 DataVersion: 542587181
-          [1656335145.428293][4073:4078] CHIP:TOO:   RequirePINforRemoteOperation: FALSE
-          [1656335145.428485][4073:4078] CHIP:EM: Sending Standalone Ack for MessageCounter:10738875 on exchange 23314i
-      disabled: true
+      command: "readAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      response:
+          value: 0
+          saveAs: Current_RequirePINFor_RemoteOperation
 
     - label: "TH writes RequirePINfor RemoteOperation attribute as true"
-      verification: |
-          ./chip-tool doorlock write require-pinfor-remote-operation 1 1 1
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033.Write
+      command: "writeAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      arguments:
+          value: 1
 
-          Verify " DUT sends SUCCESS response" on the TH(Chip-tool) Log:
-
-          [1655211439.627206][18643:18648] CHIP:DMG: ReportDataMessage =
-          [1655211439.627269][18643:18648] CHIP:DMG: {
-          [1655211439.627323][18643:18648] CHIP:DMG:      AttributeReportIBs =
-          [1655211439.627399][18643:18648] CHIP:DMG:      [
-          [1655211439.627459][18643:18648] CHIP:DMG:              AttributeReportIB =
-          [1655211439.627538][18643:18648] CHIP:DMG:              {
-          [1655211439.627601][18643:18648] CHIP:DMG:                      AttributeStatusIB =
-          [1655211439.627678][18643:18648] CHIP:DMG:                      {
-          [1655211439.627751][18643:18648] CHIP:DMG:                              AttributePathIB =
-          [1655211439.627831][18643:18648] CHIP:DMG:                              {
-          [1655211439.627914][18643:18648] CHIP:DMG:                                      Endpoint = 0x1,
-          [1655211439.628007][18643:18648] CHIP:DMG:                                      Cluster = 0x101,
-          [1655211439.628099][18643:18648] CHIP:DMG:                                      Attribute = 0x0000_0033,
-          [1655211439.628177][18643:18648] CHIP:DMG:                              }
-          [1655211439.628264][18643:18648] CHIP:DMG:
-          [1655211439.628343][18643:18648] CHIP:DMG:                              StatusIB =
-          [1655211439.628424][18643:18648] CHIP:DMG:                              {
-          [1655211439.628508][18643:18648] CHIP:DMG:                                      status = 0x00 (SUCCESS),
-          [1655211439.628596][18643:18648] CHIP:DMG:                              },
-          [1655211439.628676][18643:18648] CHIP:DMG:
-          [1655211439.628745][18643:18648] CHIP:DMG:                      },
-          [1655211439.628826][18643:18648] CHIP:DMG:
-          [1655211439.628887][18643:18648] CHIP:DMG:              },
-          [1655211439.628959][18643:18648] CHIP:DMG:
-          [1655211439.629016][18643:18648] CHIP:DMG:      ],
-          [1655211439.629087][18643:18648] CHIP:DMG:
-          [1655211439.629145][18643:18648] CHIP:DMG:      SuppressResponse = true,
-          [1655211439.629207][18643:18648] CHIP:DMG:      InteractionModelRevision = 1
-          [1655211439.629263][18643:18648] CHIP:DMG: }
-      disabled: true
+    - label: "TH writes RequirePINfor RemoteOperation attribute as true"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033.Write
+      command: "writeAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads RequirePINfor RemoteOperation attribute"
-      verification: |
-          ./chip-tool doorlock read require-pinfor-remote-operation 1 1
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033.Write
+      command: "readAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      response:
+          value: 1
 
-          Verify " RequirePINfor RemoteOperation" on the TH(Chip-tool) Log:
-
-          [1656335583.516419][4104:4109] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0033 DataVersion: 542587182
-          [1656335583.516511][4104:4109] CHIP:TOO:   RequirePINforRemoteOperation: TRUE
-          [1656335583.516675][4104:4109] CHIP:EM: Sending Standalone Ack for MessageCounter:11532501 on exchange 26372i
-      disabled: true
+    - label: "TH reads RequirePINfor RemoteOperation attribute"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033.Write
+      command: "readAttribute"
+      attribute: "RequirePINforRemoteOperation"
+      response:
+          value: Current_RequirePINFor_RemoteOperation
 
     - label:
           "TH reads ExpiringUserTimeOut attribute from DUT TH saves the values
           as Current_ExpiringUserTimeOut"
       PICS: DRLK.S.F08 && DRLK.S.A0035
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read expiring-user-timeout 1 1
-
-          Verify " ExpiringUserTimeOut" on the TH(Chip-tool) Log:
-
-          [1654683235.889077][4073:4078] CHIP:DMG:                                StatusIB =
-          [1654683235.889118][4073:4078] CHIP:DMG:                                {
-          [1654683235.889152][4073:4078] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654683235.889190][4073:4078] CHIP:DMG:                                },
-          [1654683235.889227][4073:4078] CHIP:DMG:
-          [1654683235.889262][4073:4078] CHIP:DMG:                        },
-          [1654683235.889298][4073:4078] CHIP:DMG:
-          [1654683235.889326][4073:4078] CHIP:DMG:                },
-          [1654683235.889359][4073:4078] CHIP:DMG:
-          [1654683235.889383][4073:4078] CHIP:DMG:        ],
-      disabled: true
+      command: "readAttribute"
+      attribute: "ExpiringUserTimeout"
+      response:
+          saveAs: Current_ExpiringUserTimeOut
+          constraints:
+              type: int16u
+              minValue: 1
+              maxValue: 2880
 
     - label: "TH writes ExpiringUserTimeout attribute as 10 minutes"
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+      PICS: DRLK.S.F08 && DRLK.S.A0035.Write && DRLK.S.A0035
+      command: "writeAttribute"
+      attribute: "ExpiringUserTimeout"
+      arguments:
+          value: 10
 
-          ./chip-tool doorlock write-by-id 53 10 1 1
-
-          Verify "DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1653386652.024354][3831:3836] CHIP:DMG:                        StatusIB =
-          [1653386652.024390][3831:3836] CHIP:DMG:                        {
-          [1653386652.024424][3831:3836] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653386652.024460][3831:3836] CHIP:DMG:                        },
-          [1653386652.024495][3831:3836] CHIP:DMG:
-          [1653386652.024525][3831:3836] CHIP:DMG:                },
-          [1653386652.024561][3831:3836] CHIP:DMG:
-          [1653386652.024588][3831:3836] CHIP:DMG:        ],
-      disabled: true
+    - label: "TH writes ExpiringUserTimeout attribute as 10 minutes"
+      PICS: DRLK.S.F08 && !DRLK.S.A0035.Write && DRLK.S.A0035
+      command: "writeAttribute"
+      attribute: "ExpiringUserTimeout"
+      arguments:
+          value: 10
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads ExpiringUserTimeout attribute"
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
+      PICS: DRLK.S.F08 && DRLK.S.A0035.Write && DRLK.S.A0035
+      command: "readAttribute"
+      attribute: "ExpiringUserTimeout"
+      response:
+          value: 10
 
-           ./chip-tool doorlock read expiring-user-timeout 1 1
-
-          Verify " ExpiringUserTimeOut" on the TH(Chip-tool) Log:
-
-          [1654683235.889077][4073:4078] CHIP:DMG:                                StatusIB =
-          [1654683235.889118][4073:4078] CHIP:DMG:                                {
-          [1654683235.889152][4073:4078] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1654683235.889190][4073:4078] CHIP:DMG:                                },
-          [1654683235.889227][4073:4078] CHIP:DMG:
-          [1654683235.889262][4073:4078] CHIP:DMG:                        },
-          [1654683235.889298][4073:4078] CHIP:DMG:
-          [1654683235.889326][4073:4078] CHIP:DMG:                },
-          [1654683235.889359][4073:4078] CHIP:DMG:
-          [1654683235.889383][4073:4078] CHIP:DMG:        ],
-      disabled: true
+    - label: "TH reads ExpiringUserTimeout attribute"
+      PICS: DRLK.S.F08 && !DRLK.S.A0035.Write && DRLK.S.A0035
+      command: "readAttribute"
+      attribute: "ExpiringUserTimeout"
+      response:
+          value: Current_ExpiringUserTimeOut
 
     - label: "TH reads NumberOfCredentials SupportedPerUser attribute from DUT"
       PICS: DRLK.S.F08 && DRLK.S.A001c
-      verification: |
-          ./chip-tool doorlock read number-of-credentials-supported-per-user 1 1
-
-          Verify " NumberOfCredentials SupportedPerUser" on the TH(Chip-tool) Log:
-
-          [1654683489.274961][4132:4137] CHIP:DMG:        SuppressResponse = true,
-          [1654683489.275002][4132:4137] CHIP:DMG:        InteractionModelRevision = 1
-          [1654683489.275040][4132:4137] CHIP:DMG: }
-          [1654683489.275252][4132:4137] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_001C DataVersion: 3738767928
-          [1654683489.275410][4132:4137] CHIP:TOO:   NumberOfCredentialsSupportedPerUser: 5
-      disabled: true
+      command: "readAttribute"
+      attribute: "NumberOfCredentialsSupportedPerUser"
+      response:
+          saveAs: NumberOfCredentialsSupportedPerUserValue
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 255
 
     - label: "TH writes NumberOfCredentials SupportedPerUser attribute as 85"
-      verification: |
-          ./chip-tool doorlock  write-by-id 28 85 1 1
-          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1654683627.680196][4148:4153] CHIP:DMG:                        StatusIB =
-          [1654683627.680252][4148:4153] CHIP:DMG:                        {
-          [1654683627.680306][4148:4153] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1654683627.680353][4148:4153] CHIP:DMG:                        },
-          [1654683627.680409][4148:4153] CHIP:DMG:
-          [1654683627.680444][4148:4153] CHIP:DMG:                },
-          [1654683627.680497][4148:4153] CHIP:DMG:
-          [1654683627.680529][4148:4153] CHIP:DMG:        ],
-          [1654683627.680580][4148:4153] CHIP:DMG:
-          [1654683627.680612][4148:4153] CHIP:DMG:        InteractionModelRevision = 1
-      disabled: true
+      PICS: DRLK.S.F08 && DRLK.S.A001c
+      command: "writeAttribute"
+      attribute: "NumberOfCredentialsSupportedPerUser"
+      arguments:
+          value: 85
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads NumberOfCredentials SupportedPerUser attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read number-of-credentials-supported-per-user 1 1
-          Verify " NumberOfCredentials SupportedPerUser" on the TH(Chip-tool) Log:
-
-          [1654683489.274961][4132:4137] CHIP:DMG:        SuppressResponse = true,
-          [1654683489.275002][4132:4137] CHIP:DMG:        InteractionModelRevision = 1
-          [1654683489.275040][4132:4137] CHIP:DMG: }
-          [1654683489.275252][4132:4137] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_001C DataVersion: 3738767928
-          [1654683489.275410][4132:4137] CHIP:TOO:   NumberOfCredentialsSupportedPerUser: 5
-      disabled: true
+      PICS: DRLK.S.F08 && DRLK.S.A001c
+      command: "readAttribute"
+      attribute: "NumberOfCredentialsSupportedPerUser"
+      response:
+          value: NumberOfCredentialsSupportedPerUserValue

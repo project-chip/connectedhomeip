@@ -21,9 +21,9 @@ from datetime import datetime, timedelta, timezone
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import uint
-from matter_testing_support import (MatterBaseTest, async_test_body, default_matter_test_main, parse_pics, type_matches,
-                                    utc_time_in_matter_epoch)
-from mobly import asserts
+from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main, parse_pics,
+                                    type_matches, utc_time_in_matter_epoch)
+from mobly import asserts, signals
 
 
 def get_raw_type_list():
@@ -156,6 +156,33 @@ class TestMatterTestingSupport(MatterBaseTest):
             asserts.assert_false(True, "PICS parser did not throw an error as expected")
         except ValueError:
             pass
+
+    def test_time_compare_function(self):
+        # only offset, exact match
+        compare_time(received=1000, offset=timedelta(microseconds=1000), utc=0, tolerance=timedelta())
+        # only utc, exact match
+        compare_time(received=1000, offset=timedelta(), utc=1000, tolerance=timedelta())
+        # both, exact match
+        compare_time(received=2000, offset=timedelta(microseconds=1000), utc=1000, tolerance=timedelta())
+        # both, negative offset
+        compare_time(received=0, offset=timedelta(microseconds=-1000), utc=1000, tolerance=timedelta())
+
+        # Exact match, within delta, both
+        compare_time(received=2000, offset=timedelta(microseconds=1000), utc=1000, tolerance=timedelta(seconds=5))
+
+        # Just inside tolerance
+        compare_time(received=1001, offset=timedelta(), utc=2000, tolerance=timedelta(microseconds=1000))
+
+        # Just outside tolerance
+        try:
+            compare_time(received=999, offset=timedelta(), utc=2000, tolerance=timedelta(microseconds=1000))
+            asserts.fail("Expected failure case for time just outside of the tolerance failed")
+        except signals.TestFailure:
+            pass
+
+        # everything in the seconds range
+        compare_time(received=timedelta(seconds=3600).total_seconds() * 1000000,
+                     offset=timedelta(seconds=3605), utc=0, tolerance=timedelta(seconds=5))
 
 
 if __name__ == "__main__":

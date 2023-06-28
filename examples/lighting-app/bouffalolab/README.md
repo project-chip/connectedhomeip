@@ -11,6 +11,7 @@ The steps were verified on `Bouffalo Lab` BL602 and BL706 development board.
 -   `BL602-NIGHT-LIGHT`
 -   `XT-ZB6-DevKit`
 -   `BL706-NIGHT-LIGHT`
+-   `BL704L-DVK`
 
 > Warning: Changing the PID may cause compilation problems, we recommend leaving
 > it as the default while using this example.
@@ -71,14 +72,15 @@ Mac OS.
 
 ## Build CHIP Lighting App example
 
-The following steps take examples for BL602 develop board `BL602-IoT-Matter-V1`
-and BL706 develop board `XT-ZB6-DevKit`.
+The following steps take examples for BL602 develop board `BL602-IoT-Matter-V1`,
+BL706 develop board `XT-ZB6-DevKit` and BL704L DVK board `BL704L-DVK`
 
 -   Build lighting app with UART baudrate 2000000
 
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light build
     ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light build
+    ./scripts/build/build_examples.py --target bouffalolab-bl704l-dvk-light build
     ```
 
 -   Build lighting app with UART baudrate 115200
@@ -124,10 +126,12 @@ and BL706 develop board `XT-ZB6-DevKit`.
     -   Type following command for image download. Please set serial port
         accordingly, here we use /dev/ttyACM0 as a serial port example.
 
-        -   `bl602-iot-matter-v1` without additional build options
+        -   `bl602-iot-matter-v1` and `bl704l-dvk` without additional build
+            options
 
             ```shell
             ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl704l-dvk-light/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0
             ```
 
         -   `xt-zb6-devkit` with 115200 baudrate setting
@@ -142,6 +146,7 @@ and BL706 develop board `XT-ZB6-DevKit`.
             ```shell
             ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0 --erase
             ./out/bouffalolab-xt-zb6-devkit-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0 --erase
+            ./out/bouffalolab-bl704l-dvk-light/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0 --erase
             ```
 
             > Note, better to append --erase option to download image for BL602

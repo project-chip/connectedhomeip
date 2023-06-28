@@ -79,6 +79,21 @@ source_set("ota-requestor-test-srcs") {
   ]
 }
 
+source_set("operational-state-test-srcs") {
+  sources = [
+     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
+     "${chip_root}/src/app/clusters/operational-state-server/operational-state-delegate.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+
+  include_dirs =
+      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+}
+
 source_set("scenes-table-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
@@ -122,6 +137,8 @@ chip_test_suite("tests") {
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
+    "TestOperationalStateDelegate.cpp",
+    "TestOperationalStateDelegateImpl.cpp",
     "TestPendingNotificationMap.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
@@ -160,6 +177,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":binding-test-srcs",
+    ":operational-state-test-srcs",
     ":icd-management-test-srcs",
     ":ota-requestor-test-srcs",
     ":scenes-table-test-srcs",
@@ -172,6 +190,9 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/support:testing",
     "${nlunit_test_root}:nlunit-test",
   ]
+
+  include_dirs =
+      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
   if (chip_config_network_layer_ble &&
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {

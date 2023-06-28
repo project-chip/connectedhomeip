@@ -108,16 +108,19 @@ void OperationalStateServer::HandlePauseState(HandlerContext & ctx, const Comman
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
+    delegate->GetOperationalState(opState);
 
-    if (delegate->GetOperationalState().getStateID() == to_underlying(OperationalStateEnum::kPaused))
+    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kPaused))
     {
         response.commandResponseState = err;
     }
     else
     {
-        response.commandResponseState = delegate->HandlePauseStateCallback(err);
+        delegate->HandlePauseStateCallback(err);
+        response.commandResponseState = err;
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -129,24 +132,26 @@ void OperationalStateServer::HandleResumeState(HandlerContext & ctx, const Comma
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    uint8_t currentStateId = delegate->GetOperationalState().getStateID();
+    delegate->GetOperationalState(opState);
 
-    if (currentStateId == to_underlying(OperationalStateEnum::kRunning))
+    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kRunning))
     {
         response.commandResponseState = err;
     }
-    else if (currentStateId != to_underlying(OperationalStateEnum::kPaused) &&
-             currentStateId != to_underlying(OperationalStateEnum::kRunning))
+    else if (opState.operationalStateID != to_underlying(OperationalStateEnum::kPaused) &&
+             opState.operationalStateID != to_underlying(OperationalStateEnum::kRunning))
     {
-        err.set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
         response.commandResponseState = err;
     }
     else
     {
-        response.commandResponseState = delegate->HandleResumeStateCallback(err);
+        delegate->HandleResumeStateCallback(err);
+        response.commandResponseState = err;
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -158,16 +163,20 @@ void OperationalStateServer::HandleStartState(HandlerContext & ctx, const Comman
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    if (delegate->GetOperationalState().getStateID() == to_underlying(OperationalStateEnum::kRunning))
+    delegate->GetOperationalState(opState);
+
+    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kRunning))
     {
         response.commandResponseState = err;
     }
     else
     {
-        response.commandResponseState = delegate->HandleStartStateCallback(err);
+        delegate->HandleStartStateCallback(err);
+        response.commandResponseState = err;
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -179,16 +188,20 @@ void OperationalStateServer::HandleStopState(HandlerContext & ctx, const Command
     Commands::OperationalCommandResponse::Type response;
     Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
 
     VerifyOrReturn(delegate != nullptr, ChipLogError(NotSpecified, "Delegate is nullptr"));
 
-    if (delegate->GetOperationalState().getStateID() == to_underlying(OperationalStateEnum::kStopped))
+    delegate->GetOperationalState(opState);
+
+    if (opState.operationalStateID == to_underlying(OperationalStateEnum::kStopped))
     {
         response.commandResponseState = err;
     }
     else
     {
-        response.commandResponseState = delegate->HandleStopStateCallback(err);
+        delegate->HandleStopStateCallback(err);
+        response.commandResponseState = err;
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -228,31 +241,28 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     {
     case OperationalState::Attributes::OperationalStateList::Id: {
         Delegate * delegate                   = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-        GenericOperationalStateList * pOpList = nullptr;
-        size_t size                           = 0;
+        GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
+        size_t index = 0;
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-        err = delegate->GetOperationalStateList(&pOpList, size);
-        if (err != CHIP_NO_ERROR)
+        //operational state list is not found
+        if (delegate->GetOperationalStateAtIndex(index, opState) == CHIP_ERROR_NOT_FOUND)
         {
             err = aEncoder.EncodeNull();
         }
         else
         {
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                for (GenericOperationalStateList * pHead = pOpList; pHead != nullptr; pHead = pHead->next)
+                while(delegate->GetOperationalStateAtIndex(index, opState) != CHIP_ERROR_NOT_FOUND)
                 {
-                    err = encoder.Encode(*pHead);
+                    err = encoder.Encode(opState);
                     if (err != CHIP_NO_ERROR)
                     {
-                        delegate->ReleaseOperationalStateList(pOpList);
-                        pOpList = nullptr;
                         return err;
                     }
+                    index++;
                 }
-                delegate->ReleaseOperationalStateList(pOpList);
-                pOpList = nullptr;
                 return CHIP_NO_ERROR;
             });
         }
@@ -262,55 +272,47 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
     case OperationalState::Attributes::OperationalState::Id: {
 
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-
+        GenericOperationalState opState(to_underlying(OperationalStateEnum::kStopped));
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        return aEncoder.Encode(delegate->GetOperationalState());
+        delegate->GetOperationalState(opState);
+        return aEncoder.Encode(opState);
     }
     break;
 
     case OperationalState::Attributes::OperationalError::Id: {
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-
+        GenericOperationalError opErr(to_underlying(ErrorStateEnum::kNoError));
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        return aEncoder.Encode(delegate->GetOperationalError());
+        delegate->GetOperationalError(opErr);
+        return aEncoder.Encode(opErr);
     }
     break;
 
     case OperationalState::Attributes::PhaseList::Id: {
         Delegate * delegate                     = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-        GenericOperationalPhaseList * phaseList = nullptr;
-        size_t size                             = 0;
+
+        GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
+        size_t index = 0;
+
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        err = delegate->GetOperationalPhaseList(&phaseList, size);
-        if (err != CHIP_NO_ERROR)
+        err = delegate->GetOperationalPhaseAtIndex(index, phase);
+        if (err == CHIP_ERROR_NOT_FOUND || phase.isNullable())
         {
             err = aEncoder.EncodeNull();
-        }
-        else if (phaseList->isNullable())
-        {
-            err = aEncoder.EncodeNull();
-            delegate->ReleaseOperationalPhaseList(phaseList);
-            phaseList = nullptr;
         }
         else
         {
             return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-                for (GenericOperationalPhaseList * pHead = phaseList; pHead != nullptr; pHead = pHead->next)
+                while(delegate->GetOperationalPhaseAtIndex(index, phase) != CHIP_ERROR_NOT_FOUND)
                 {
-                    err = encoder.Encode(pHead->phaseName);
+                    err = encoder.Encode(phase.mPhaseName);
                     if (err != CHIP_NO_ERROR)
                     {
-                        delegate->ReleaseOperationalPhaseList(phaseList);
-                        phaseList = nullptr;
                         return err;
                     }
+                    index++;
                 }
-                delegate->ReleaseOperationalPhaseList(phaseList);
-                phaseList = nullptr;
                 return CHIP_NO_ERROR;
             });
         }
@@ -319,28 +321,18 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
     case OperationalState::Attributes::CurrentPhase::Id: {
         DataModel::Nullable<uint8_t> currentPhase;
-        GenericOperationalPhaseList * phaseList = nullptr;
-        size_t size                             = 0;
-
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
+        GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
+        size_t index = 0;
 
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        err = delegate->GetOperationalPhaseList(&phaseList, size);
-        if (err != CHIP_NO_ERROR)
+        err = delegate->GetOperationalPhaseAtIndex(index, phase);
+        if (err == CHIP_ERROR_NOT_FOUND || phase.isNullable())
         {
             err = aEncoder.EncodeNull();
-        }
-        else if (phaseList->isNullable())
-        {
-            err = aEncoder.EncodeNull();
-            delegate->ReleaseOperationalPhaseList(phaseList);
-            phaseList = nullptr;
         }
         else
         {
-            delegate->ReleaseOperationalPhaseList(phaseList);
-            phaseList = nullptr;
             CurrentPhase::Get(mEndpointId, currentPhase);
             err = aEncoder.Encode(currentPhase);
         }

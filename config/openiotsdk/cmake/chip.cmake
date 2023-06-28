@@ -31,12 +31,10 @@ set(CONFIG_CHIP_PROGRESS_LOGGING YES CACHE BOOL "Enable logging at progress leve
 set(CONFIG_CHIP_AUTOMATION_LOGGING YES CACHE BOOL "Enable logging at automation level")
 set(CONFIG_CHIP_ERROR_LOGGING YES CACHE BOOL "Enable logging at error level")
 
-set(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS NO CACHE BOOL "Enable using PSA Protected Storage")
 set(CONFIG_CHIP_CRYPTO "mbedtls" CACHE STRING "Matter crypto backend. Mbedtls as default")
-
-if(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS AND NOT TFM_SUPPORT)
-    message( FATAL_ERROR "You can not use PSA Protected Storage without TF-M support" )
-endif()
+set(CONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION "0" CACHE STRING "Software version number")
+set(CONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION_STRING ${TFM_NS_APP_VERSION} CACHE STRING "Software version in string format x.x.x")
+set(CONFIG_GN_DEPENDENCIES "")
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     set(CONFIG_CHIP_DEBUG YES)
@@ -44,15 +42,13 @@ else()
     set(CONFIG_CHIP_DEBUG NO)
 endif()
 
+# TF-M support requires the right order of generating targets
+list(APPEND CONFIG_GN_DEPENDENCIES tfm-ns-interface)
+
 # Add CHIP sources
 add_subdirectory(${OPEN_IOT_SDK_CONFIG} ./chip_build)
 
 # Additional chip target configuration
-
-# TF-M support requires the right order of generating targets
-if(TFM_SUPPORT)
-    add_dependencies(chip-gn tfm-ns-interface)
-endif()
 
 if ("${CONFIG_CHIP_CRYPTO}" STREQUAL "psa")
     target_compile_definitions(chip

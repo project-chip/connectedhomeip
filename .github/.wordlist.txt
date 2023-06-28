@@ -44,6 +44,7 @@ AdvSendAdvert
 AE
 aef
 AES
+AIDL
 AlarmCode
 algs
 alloc
@@ -164,6 +165,7 @@ bredr
 BridgedDeviceBasicInformation
 bridgedLightEndpoint
 bringup
+BroadcastReceiver
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
@@ -478,6 +480,7 @@ EEE
 eef
 ef
 EFR
+efuse
 eg
 EjQ
 elftools
@@ -1026,6 +1029,7 @@ peerNodeId
 peerSessionId
 pem
 percentageLiftValue
+perfetto
 periodicQueryTimeout
 pexpect
 pickString
@@ -1359,6 +1363,7 @@ tmp
 tngvndl
 TODO
 toJson
+tokenization
 tokenized
 tokenizer
 toolchain

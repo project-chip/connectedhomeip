@@ -21,6 +21,9 @@ config:
     nodeId: 0x12344321
     cluster: "Media Input"
     endpoint: 1
+    Index:
+        type: int8u
+        defaultValue: 1
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -43,17 +46,21 @@ tests:
       command: "readAttribute"
       attribute: "InputList"
 
-    - label: "Select Input Command"
+    - label:
+          "TH sends SelectInput command to DUT to select an input by passing the
+          index of the preferred input."
       PICS: MEDIAINPUT.S.C00.Rsp
       command: "SelectInput"
       arguments:
           values:
               - name: "Index"
-                value: 1
+                value: Index
 
-    - label: "Read current input list"
+    - label:
+          "TH reads _CurrentInput attribute from the DUT to show the current
+          input selected."
       PICS: MEDIAINPUT.S.A0001 && MEDIAINPUT.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentInput"
       response:
-          value: 1
+          value: Index

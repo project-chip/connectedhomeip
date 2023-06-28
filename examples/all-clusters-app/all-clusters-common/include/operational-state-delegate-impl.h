@@ -28,7 +28,9 @@ namespace app {
 namespace Clusters {
 namespace OperationalState {
 
-constexpr const char * kChildSafetyLockLabel = "child safety lock";
+/*
+ * An example state (not in spec) to present a device that is unable to honour the Pause/Resume/Start/Stop command
+*/
 enum class ManufactureOperationalStateEnum : uint8_t
 {
     kChildSafetyLock = 0x80,
@@ -40,45 +42,35 @@ class OperationalStateDelegate : public Delegate
 
 public:
     /**
-     * Get operational state.
-     * @param void.
-     * @return the const reference of operational state.
+     * Get current operational state.
+     * @param op Put a struct instance on the state, then call the delegate to fill it in.
+     * @return void.
      */
-    const GenericOperationalState & GetOperationalState() const override;
+    void GetOperationalState(GenericOperationalState & op) override;
 
     /**
-     * Get operational state list.
-     * @param operationalStateList The pointer to operational state list.
+     * Get the list of supported operational states.
+     * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
+     * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
+     * @param index The state of index starts at 0.
+     * @param operationalState  The GenericOperationalState is filled.
      */
-    CHIP_ERROR GetOperationalStateList(GenericOperationalStateList ** operationalStateList, size_t & size) override;
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
 
     /**
-     * Release OperationalStateStructDynamicList
-     * @param operationalStateList The pointer for which to clear the OperationalStateStructDynamicList.
-     * @return void
+     * Get the list of supported operational phase.
+     * Fills in the provided GenericOperationalPhase with the state at index `index` if there is one,
+     * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
+     * @param index The state of index starts at 0.
+     * @param operationalPhase  The GenericOperationalPhase is filled.
      */
-    void ReleaseOperationalStateList(GenericOperationalStateList * operationalStateList) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) override;
 
     /**
-     * Get operational phase list.
-     * @param operationalPhaseList The pointer to operational phase list.
-     * After a successful return the caller is responsible for calling ReleaseOperationalPhaseList on the outparam.
+     * Get current operational error.
+     * @param error.Put a struct instance on the state, then call the delegate to fill it in.
      */
-    CHIP_ERROR GetOperationalPhaseList(GenericOperationalPhaseList ** operationalPhaseList, size_t & size) override;
-
-    /**
-     * Release operational phase list
-     * @param operationalStateList The pointer for which to clear the GenericOperationalPhaseList.
-     * @return void
-     */
-    void ReleaseOperationalPhaseList(GenericOperationalPhaseList * operationalStateList) override;
-
-    /**
-     * Get operational error.
-     * @param void.
-     * @return the const reference of operational error.
-     */
-    const GenericOperationalError GetOperationalError() const override;
+    void GetOperationalError(GenericOperationalError &error) override;
 
     /**
      * Set operational error.
@@ -98,55 +90,43 @@ public:
     /**
      * Handle Command Callback in application: Pause
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    GenericOperationalError & HandlePauseStateCallback(GenericOperationalError & err) override;
+    void HandlePauseStateCallback(GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Resume
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    GenericOperationalError & HandleResumeStateCallback(GenericOperationalError & err) override;
+    void HandleResumeStateCallback(GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Start
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    GenericOperationalError & HandleStartStateCallback(GenericOperationalError & err) override;
+    void HandleStartStateCallback(GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Stop
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    GenericOperationalError & HandleStopStateCallback(GenericOperationalError & err) override;
-
-    /**
-     * Send OperationalError Event
-     * @param[in] set the operational error to event.
-     * @return true: send event success; fail : send event fail.
-     */
-    bool sendOperationalErrorEvent(const GenericOperationalError & err) override;
-
-    /**
-     * Send OperationCompletion Event
-     * @param[in] set the operation comletion to event.
-     * @return true: send event success; fail : send event fail.
-     */
-    bool sendOperationCompletion(const GenericOperationCompletion & op) override;
+    void HandleStopStateCallback(GenericOperationalError & err) override;
 
     OperationalStateDelegate(EndpointId aEndpointId, ClusterId aClusterId, GenericOperationalState aOperationalState,
-                             GenericOperationalError aOperationalError) :
+                             GenericOperationalError aOperationalError,
+                             Span<const GenericOperationalState> aOperationalStateList,
+                             Span<const GenericOperationalPhase> aOperationalPhaseList) :
         Delegate(aEndpointId, aClusterId),
-        mOperationalState(aOperationalState), mOperationalError(aOperationalError)
+        mOperationalState(aOperationalState), mOperationalError(aOperationalError),
+        mOperationalStateList(aOperationalStateList),
+        mOperationalPhaseList(aOperationalPhaseList)
     {}
     ~OperationalStateDelegate() = default;
 
 private:
     GenericOperationalState mOperationalState;
     GenericOperationalError mOperationalError;
+    app::DataModel::List<const GenericOperationalState> mOperationalStateList;
+    app::DataModel::List<const GenericOperationalPhase> mOperationalPhaseList;
 };
 
 } // namespace OperationalState

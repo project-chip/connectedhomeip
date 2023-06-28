@@ -18,6 +18,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 #include <app/util/config.h>
+#include <app/EventLogging.h>
+#include <app/reporting/reporting.h>
 #include <operational-state-delegate-impl.h>
 
 namespace chip {
@@ -33,11 +35,11 @@ struct DelegatesEnquiryTable
     /**
      * Endpoint Id
      */
-    chip::EndpointId mEndpointId;
+    EndpointId mEndpointId;
     /**
      * Cluster Id
      */
-    chip::ClusterId mClusterId;
+    ClusterId mClusterId;
     /**
      * point of Array(Items)
      */
@@ -48,13 +50,42 @@ struct DelegatesEnquiryTable
     size_t numOfItems;
 };
 
+/*
+ * An example to present device's endpointId
+*/
+constexpr EndpointId kDemoEndpointId = 1;
+
+/**
+ * Enquriy Table of Operational State List
+ * Note: User Define
+ */
+static const GenericOperationalState opStateList[] = {
+    GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
+    GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
+    GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
+    GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
+};
+
+/**
+ * Enquriy Table of Phase List
+ * Note: User Define
+ */
+static const GenericOperationalPhase opPhaseList[] = {
+    /**
+     * Phase List is null
+     */
+    GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
+};
+
 /**
  * Enquriy Table of Operational State Delegate
  * Note: User Define
  */
-static OperationalStateDelegate opStateDelegate(1, Clusters::OperationalState::Id,
+static OperationalStateDelegate opStateDelegate(Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id,
                                                 GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-                                                GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)));
+                                                GenericOperationalError(to_underlying(ErrorStateEnum::kNoError)),
+                                                Span<const GenericOperationalState>(opStateList),
+                                                Span<const GenericOperationalPhase>(opPhaseList));
 
 /**
  * Enquriy Table of Operational State Cluster and alias Cluter Delegate corresponding to endpointId and clusterId
@@ -62,7 +93,7 @@ static OperationalStateDelegate opStateDelegate(1, Clusters::OperationalState::I
  */
 constexpr DelegatesEnquiryTable kDelegatesEnquiryTable[] = {
     // EndpointId, ClusterId, Delegate
-    { 1, Clusters::OperationalState::Id, &opStateDelegate },
+    { Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id, &opStateDelegate },
 };
 
 /**
@@ -71,7 +102,7 @@ constexpr DelegatesEnquiryTable kDelegatesEnquiryTable[] = {
  * @param[in] aClusterID  The clusterId
  * @return the pointer of target delegate
  */
-Delegate * getGenericDelegateTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId)
+Delegate * getGenericDelegateTable(EndpointId aEndpointId, ClusterId aClusterId)
 {
     for (size_t i = 0; i < ArraySize(kDelegatesEnquiryTable); ++i)
     {
@@ -83,9 +114,61 @@ Delegate * getGenericDelegateTable(chip::EndpointId aEndpointId, chip::ClusterId
     return nullptr;
 }
 
-Delegate * GetOperationalStateDelegate(chip::EndpointId endpointId, chip::ClusterId clusterId)
+
+// @brief Instance getter for the default global delegate for operational state alias cluster
+// The delegate API assumes there will be separate delegate objects for each cluster instance.
+// (i.e. each separate operational state cluster derivation, on each separate endpoint)
+// @note This API should always be called prior to using the delegate and the return pointer should never be cached.
+// @return Default global delegate instance.
+Delegate * GetOperationalStateDelegate(EndpointId endpointId, ClusterId clusterId)
 {
     return getGenericDelegateTable(endpointId, clusterId);
+}
+
+/**
+ * Log OperationalError Event
+ * @param[in] aEndpointId Target endpointId to log event
+ * @param[in] err Set the operational error to event.
+ * @return true: send event success; fail : send event fail.
+ */
+bool LogOperationalErrorEvent(EndpointId aEndpointId, const GenericOperationalError & err)
+{
+    Events::OperationalError::Type event;
+    EventNumber eventNumber;
+
+    event.errorState = err;
+    CHIP_ERROR error = app::LogEvent(event, aEndpointId, eventNumber);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+
+    //notify operational state need to change
+    MatterReportingAttributeChangeCallback(aEndpointId, event.GetClusterId(), OperationalState::Attributes::OperationalState::Id);
+    return true;
+}
+
+/**
+ * Log OperationalCompletion Event
+ * @param[in] aEndpointId Target endpointId to log event
+ * @param[in] op Set the operational completion to event.
+ * @return true: send event success; fail : send event fail.
+ */
+bool LogOperationCompletion(EndpointId aEndpointId, const GenericOperationCompletion & op)
+{
+    Events::OperationCompletion::Type event;
+    EventNumber eventNumber;
+    event = op;
+
+    CHIP_ERROR error = app::LogEvent(event, aEndpointId, eventNumber);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace OperationalState
@@ -96,6 +179,6 @@ Delegate * GetOperationalStateDelegate(chip::EndpointId endpointId, chip::Cluste
 void MatterOperationalStatePluginServerInitCallback()
 {
     using namespace chip::app;
-    static Clusters::OperationalState::OperationalStateServer operationalstateServer(0x01, Clusters::OperationalState::Id);
+    static Clusters::OperationalState::OperationalStateServer operationalstateServer(Clusters::OperationalState::kDemoEndpointId, Clusters::OperationalState::Id);
     operationalstateServer.Init();
 }

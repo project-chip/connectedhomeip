@@ -17,7 +17,6 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
-#include <app/util/config.h>
 #include <operational-state-delegate-impl.h>
 
 namespace chip {
@@ -27,133 +26,15 @@ namespace OperationalState {
 
 using chip::Protocols::InteractionModel::Status;
 
-constexpr const char * kWasherPreSoak = "pre-soak";
-constexpr const char * kWasherRinse   = "rinse";
-constexpr const char * kWasherSpin    = "spin";
-/**
- * Template class to present Enquriy Table
- */
-template <typename T>
-struct EnquiryTable
-{
-    /**
-     * Endpoint Id
-     */
-    chip::EndpointId mEndpointId;
-    /**
-     * Cluster Id
-     */
-    chip::ClusterId mClusterId;
-    /**
-     * point of Array(Items)
-     */
-    T * pItems;
-    /**
-     * ArraySize of Array(Items)
-     */
-    size_t numOfItems;
-};
-
-/**
- * Enquriy Table of Phase List
- * Note: User Define
- */
-GenericOperationalPhase opPhaseList[] = {
-    /**
-     * Phase List is null
-     */
-    GenericOperationalPhase(),
-    /**
-     * Phase List isn't null
-     */
-    // GenericOperationalPhase(kWasherPreSoak, strlen(kWasherPreSoak)),
-    // GenericOperationalPhase(kWasherRinse, strlen(kWasherRinse)),
-    // GenericOperationalPhase(kWasherSpin, strlen(kWasherSpin)),
-};
-
-/**
- * Enquriy Table of Phase List corresponding to endpointId and clusterId
- * Note: User Define
- */
-constexpr EnquiryTable<GenericOperationalPhase> kPhaseListEnquiryTable[] = {
-    // EndpointId, ClusterId, Array of phaseList, ArraySize of phaseList
-    { 1, Clusters::OperationalState::Id, opPhaseList, ArraySize(opPhaseList) },
-};
-
-/**
- * Enquriy Table of Operational State List
- * Note: User Define
- */
-GenericOperationalState opStateList[] = {
-    GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-    GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
-    GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
-    GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
-    GenericOperationalState(to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock), kChildSafetyLockLabel,
-                            strlen(kChildSafetyLockLabel)),
-};
-
-/**
- * Enquriy Table of Operational State List corresponding to endpointId and clusterId
- * Note: User Define
- */
-constexpr EnquiryTable<GenericOperationalState> kOpStateListEnquiryTable[] = {
-    // EndpointId, ClusterId, Array of Operational State List, ArraySize of Operational State List
-    { 1, Clusters::OperationalState::Id, opStateList, ArraySize(opStateList) },
-};
-
-/**
- * Get the pointer of target Array(PhaseList) for target endpoint and cluster
- * @param[in] aEndpiontId The endpointId
- * @param[in] aClusterID  The clusterId
- * @param[out] size  The ArraySize of target Array(PhaseList)
- * @return the pointer of target Array(PhaseList)
- */
-const GenericOperationalPhase * getGenericPhaseListTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId, size_t & size)
-{
-    for (size_t i = 0; i < ArraySize(kPhaseListEnquiryTable); ++i)
-    {
-        if (kPhaseListEnquiryTable[i].mEndpointId == aEndpointId && kPhaseListEnquiryTable[i].mClusterId == aClusterId)
-        {
-            size = kPhaseListEnquiryTable[i].numOfItems;
-            return kPhaseListEnquiryTable[i].pItems;
-        }
-    }
-    size = 0;
-    return nullptr;
-}
-
-/**
- * Get the pointer of target Array(Operational State) for target endpoint and cluster
- * @param[in] aEndpiontId The endpointId
- * @param[in] aClusterID  The clusterId
- * @param[out] size  The ArraySize of target Array(Operational State)
- * @return the pointer of target Array(Operational State)
- */
-const GenericOperationalState * getGenericOperationalStateTable(chip::EndpointId aEndpointId, chip::ClusterId aClusterId,
-                                                                size_t & size)
-{
-    for (size_t i = 0; i < ArraySize(kOpStateListEnquiryTable); ++i)
-    {
-        if (kOpStateListEnquiryTable[i].mEndpointId == aEndpointId && kOpStateListEnquiryTable[i].mClusterId == aClusterId)
-        {
-            size = kOpStateListEnquiryTable[i].numOfItems;
-            return kOpStateListEnquiryTable[i].pItems;
-        }
-    }
-    size = 0;
-    return nullptr;
-}
-
 CHIP_ERROR OperationalStateDelegate::SetOperationalState(const GenericOperationalState & opState)
 {
     mOperationalState = opState;
     return CHIP_NO_ERROR;
 }
 
-const GenericOperationalState & OperationalStateDelegate::GetOperationalState() const
+void OperationalStateDelegate::GetOperationalState(GenericOperationalState & op)
 {
-    return mOperationalState;
+    op = mOperationalState;
 }
 
 CHIP_ERROR OperationalStateDelegate::SetOperationalError(const GenericOperationalError & opErrState)
@@ -162,236 +43,99 @@ CHIP_ERROR OperationalStateDelegate::SetOperationalError(const GenericOperationa
     return CHIP_NO_ERROR;
 }
 
-const GenericOperationalError OperationalStateDelegate::GetOperationalError() const
+void OperationalStateDelegate::GetOperationalError(GenericOperationalError &error)
 {
-    return mOperationalError;
+    error = mOperationalError;
 }
 
-CHIP_ERROR OperationalStateDelegate::GetOperationalStateList(GenericOperationalStateList ** operationalStateList, size_t & size)
+CHIP_ERROR OperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
-    CHIP_ERROR err                     = CHIP_ERROR_NO_MEMORY;
-    size                               = 0;
-    size_t i                           = 0;
-    size_t opStateListNumOfItems       = 0;
-    GenericOperationalStateList * head = nullptr;
-
-    if (!operationalStateList)
+    if (index > mOperationalStateList.size() - 1)
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_NOT_FOUND;
     }
-
-    const GenericOperationalState * src = getGenericOperationalStateTable(mEndpointId, mClusterId, opStateListNumOfItems);
-    if (!src || !opStateListNumOfItems)
+    else
     {
-        ChipLogError(Zcl, "Unable to find Operational State List for [ep=%d],[cid=%d]", mEndpointId, mClusterId);
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        operationalState = mOperationalStateList.data()[index];
     }
-
-    for (i = 0; i < opStateListNumOfItems; i++)
-    {
-        GenericOperationalStateList * des = chip::Platform::New<GenericOperationalStateList>(
-            src->operationalStateID, src->operationalStateLabel.HasValue() ? src->OperationalStateLabel : nullptr,
-            src->operationalStateLabel.HasValue() ? sizeof(src->OperationalStateLabel) : 0);
-        des->operationalStateID = src->operationalStateID;
-
-        if (des == nullptr)
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-            ExitNow();
-        }
-
-        if (head == nullptr)
-        {
-            head = des;
-        }
-        else
-        {
-            GenericOperationalStateList * pList = head;
-            while (pList->next != nullptr)
-            {
-                pList = pList->next;
-            }
-            pList->next = des;
-        }
-        src++;
-    }
-    size                  = i;
-    *operationalStateList = head;
     return CHIP_NO_ERROR;
-exit:
-    ReleaseOperationalStateList(head);
-    return err;
 }
 
-void OperationalStateDelegate::ReleaseOperationalStateList(GenericOperationalStateList * operationalStateList)
+CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase)
 {
-    while (operationalStateList)
+    if (index > mOperationalPhaseList.size() - 1)
     {
-        GenericOperationalStateList * del = operationalStateList;
-        operationalStateList              = operationalStateList->next;
-        chip::Platform::Delete(del);
+        return CHIP_ERROR_NOT_FOUND;
     }
-}
-
-CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseList(GenericOperationalPhaseList ** operationalPhaseList, size_t & size)
-{
-    CHIP_ERROR err                     = CHIP_ERROR_NO_MEMORY;
-    size                               = 0;
-    size_t i                           = 0;
-    size_t phaseListNumOfItems         = 0;
-    GenericOperationalPhaseList * head = nullptr;
-
-    if (!operationalPhaseList)
+    else
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        operationalPhase = mOperationalPhaseList.data()[index];
     }
-
-    const GenericOperationalPhase * src = getGenericPhaseListTable(mEndpointId, mClusterId, phaseListNumOfItems);
-    if (!src || !phaseListNumOfItems)
-    {
-        ChipLogError(Zcl, "Unable to find Phase List for [ep=%d],[cid=%d]", mEndpointId, mClusterId);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    for (i = 0; i < phaseListNumOfItems; i++)
-    {
-        GenericOperationalPhaseList * des = nullptr;
-        if (src->isNullable())
-        {
-            des = chip::Platform::New<GenericOperationalPhaseList>();
-        }
-        else
-        {
-            des = chip::Platform::New<GenericOperationalPhaseList>(src->PhaseName, sizeof(src->PhaseName));
-        }
-
-        if (des == nullptr)
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-            ExitNow();
-        }
-
-        if (head == nullptr)
-        {
-            head = des;
-        }
-        else
-        {
-            GenericOperationalPhaseList * pList = head;
-            while (pList->next != nullptr)
-            {
-                pList = pList->next;
-            }
-            pList->next = des;
-        }
-        src++;
-    }
-    size                  = i;
-    *operationalPhaseList = head;
     return CHIP_NO_ERROR;
-exit:
-    ReleaseOperationalPhaseList(head);
-    return err;
 }
 
-void OperationalStateDelegate::ReleaseOperationalPhaseList(GenericOperationalPhaseList * operationalPhaseList)
+void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
-    while (operationalPhaseList)
+    /*
+    * An example state to present a device that is unable to honour the Pause command
+    */
+    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
-        GenericOperationalPhaseList * del = operationalPhaseList;
-        operationalPhaseList              = operationalPhaseList->next;
-        chip::Platform::Delete(del);
-    }
-}
-
-GenericOperationalError & OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
-{
-    if (mOperationalState.getStateID() == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
-    {
-        err.set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
     else
     {
-        mOperationalState.set(to_underlying(OperationalStateEnum::kPaused));
-        err.set(to_underlying(ErrorStateEnum::kNoError));
+        mOperationalState.Set(to_underlying(OperationalStateEnum::kPaused));
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
-    return err;
 }
 
-GenericOperationalError & OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
+void OperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
-    if (mOperationalState.getStateID() == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
+    /*
+    * An example state to present a device that is unable to honour the Resume command
+    */
+    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
-        err.set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
+        err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
     }
     else
     {
-        mOperationalState.set(to_underlying(OperationalStateEnum::kRunning));
-        err.set(to_underlying(ErrorStateEnum::kNoError));
+        mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
-    return err;
 }
 
-GenericOperationalError & OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
+void OperationalStateDelegate::HandleStartStateCallback(GenericOperationalError & err)
 {
-    if (mOperationalState.getStateID() == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
+    /*
+    * An example state to present a device that is unable to honour the Start command
+    */
+    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
-        err.set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
+        err.Set(to_underlying(ErrorStateEnum::kUnableToStartOrResume));
     }
     else
     {
-        mOperationalState.set(to_underlying(OperationalStateEnum::kRunning));
-        err.set(to_underlying(ErrorStateEnum::kNoError));
+        mOperationalState.Set(to_underlying(OperationalStateEnum::kRunning));
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
-    return err;
 }
 
-GenericOperationalError & OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
+void OperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
-    if (mOperationalState.getStateID() == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
+    /*
+    * An example state to present a device that is unable to honour the Stop command
+    */
+    if (mOperationalState.operationalStateID == to_underlying(ManufactureOperationalStateEnum::kChildSafetyLock))
     {
-        err.set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
     else
     {
-        mOperationalState.set(to_underlying(OperationalStateEnum::kStopped));
-        err.set(to_underlying(ErrorStateEnum::kNoError));
+        mOperationalState.Set(to_underlying(OperationalStateEnum::kStopped));
+        err.Set(to_underlying(ErrorStateEnum::kNoError));
     }
-    return err;
-}
-
-bool OperationalStateDelegate::sendOperationalErrorEvent(const GenericOperationalError & err)
-{
-    Events::OperationalError::Type event;
-    EventNumber eventNumber;
-
-    event.errorState = err;
-    CHIP_ERROR error = chip::app::LogEvent(event, mEndpointId, eventNumber);
-
-    if (error != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    // set OperationalState attribute to Error
-    mOperationalState.set(to_underlying(OperationalStateEnum::kError));
-    return true;
-}
-
-bool OperationalStateDelegate::sendOperationCompletion(const GenericOperationCompletion & op)
-{
-    Events::OperationCompletion::Type event;
-    EventNumber eventNumber;
-    event = op;
-
-    CHIP_ERROR error = chip::app::LogEvent(event, mEndpointId, eventNumber);
-
-    if (error != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    return true;
 }
 
 } // namespace OperationalState

@@ -31,7 +31,7 @@
 
 #include "sl_board_control.h"
 
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(SL_WIFI))
 #include "spi_multiplex.h"
 #endif
 #define LCD_SIZE 128
@@ -120,18 +120,7 @@ int SilabsLCD::DrawPixel(void * pContext, int32_t x, int32_t y)
 
 int SilabsLCD::Update(void)
 {
-    int status;
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    pre_lcd_spi_transfer();
-#endif
-    status = DMD_updateDisplay();
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    post_lcd_spi_transfer();
-#endif
-    /*
-     * TO-DO; Above logic can be optimised by writing a common API
-     */
-    return status;
+    return updateDisplay();
 }
 
 void SilabsLCD::WriteDemoUI(bool state)
@@ -194,14 +183,7 @@ void SilabsLCD::WriteQRCode()
             }
         }
     }
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    pre_lcd_spi_transfer();
-#endif
-
-    DMD_updateDisplay();
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    post_lcd_spi_transfer();
-#endif
+    SilabsLCD::Update();
 }
 
 void SilabsLCD::SetQRCode(uint8_t * str, uint32_t size)

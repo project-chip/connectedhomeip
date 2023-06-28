@@ -1857,6 +1857,9 @@ static BOOL AttributeIsSpecifiedInRefrigeratorAlarmCluster(AttributeId aAttribut
     case Attributes::State::Id: {
         return YES;
     }
+    case Attributes::Supported::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -1948,6 +1951,9 @@ static BOOL AttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::SensitivityLevel::Id: {
+        return YES;
+    }
+    case Attributes::ExpiryDate::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

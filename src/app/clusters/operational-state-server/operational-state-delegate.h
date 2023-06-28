@@ -36,288 +36,233 @@ constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
 /**
  * A class which represents the operational state of an Operational State cluster derivation instance.
  */
-struct GenericOperationalState : public chip::app::Clusters::detail::Structs::OperationalStateStruct::Type
+struct GenericOperationalState : public app::Clusters::detail::Structs::OperationalStateStruct::Type
 {
-    GenericOperationalState(uint8_t state, const char * label = nullptr, size_t labelLen = 0) { set(state, label, labelLen); }
+    GenericOperationalState(uint8_t state, Optional<CharSpan> label = NullOptional)
+    {
+        Set(state, label);
+    }
 
     GenericOperationalState(const GenericOperationalState & op)
     {
-        set(op.operationalStateID, op.operationalStateLabel.HasValue() ? op.OperationalStateLabel : nullptr,
-            op.operationalStateLabel.HasValue() ? sizeof(op.OperationalStateLabel) : 0);
+        *this = op;
     }
 
     GenericOperationalState & operator=(const GenericOperationalState & op)
     {
-        set(op.operationalStateID, op.operationalStateLabel.HasValue() ? op.OperationalStateLabel : nullptr,
-            op.operationalStateLabel.HasValue() ? sizeof(op.OperationalStateLabel) : 0);
-
+        Set(op.operationalStateID, op.operationalStateLabel);
         return *this;
     }
 
-    void set(uint8_t state, const char * label = nullptr, size_t labelLen = 0)
+    void Set(uint8_t state, Optional<CharSpan> label = NullOptional)
     {
         operationalStateID = state;
-        if (label == nullptr)
+        if (label.HasValue())
         {
-            operationalStateLabel = Optional<chip::CharSpan>::Missing();
-        }
-        else
-        {
-            memset(OperationalStateLabel, 0, sizeof(OperationalStateLabel));
-            if (labelLen > kOperationalStateLabelMaxSize)
+            memset(mOperationalStateLabelBuffer, 0, sizeof(mOperationalStateLabelBuffer));
+            if (label.Value().size() > sizeof(mOperationalStateLabelBuffer))
             {
-                memcpy(OperationalStateLabel, label, kOperationalStateLabelMaxSize);
+                memcpy(mOperationalStateLabelBuffer, label.Value().data(), sizeof(mOperationalStateLabelBuffer));
+                operationalStateLabel.SetValue(CharSpan(mOperationalStateLabelBuffer, sizeof(mOperationalStateLabelBuffer)));
             }
             else
             {
-                memcpy(OperationalStateLabel, label, labelLen);
+                memcpy(mOperationalStateLabelBuffer, label.Value().data(), label.Value().size());
+                operationalStateLabel.SetValue(CharSpan(mOperationalStateLabelBuffer, label.Value().size()));
             }
-
-            operationalStateLabel.SetValue(chip::CharSpan(OperationalStateLabel, sizeof(OperationalStateLabel)));
+        }
+        else
+        {
+            operationalStateLabel = NullOptional;
         }
     }
-    uint8_t getStateID() const { return operationalStateID; }
-    char OperationalStateLabel[kOperationalStateLabelMaxSize];
+private:
+    char mOperationalStateLabelBuffer[kOperationalStateLabelMaxSize];
 };
 
 /**
- * A class hold the operational state list of operational state cluster
+ * A class which represents the operational error of an Operational State cluster derivation instance.
  */
-struct GenericOperationalStateList : public GenericOperationalState
+struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorStateStruct::Type
 {
-    GenericOperationalStateList(uint8_t state, const char * label = nullptr, size_t labelLen = 0) :
-        GenericOperationalState(state, label, labelLen)
-    {}
-    GenericOperationalStateList * next = nullptr;
-};
-
-/**
- * A class wrap the operational error of operational state cluster
- */
-struct GenericOperationalError : public chip::app::Clusters::detail::Structs::ErrorStateStruct::Type
-{
-    GenericOperationalError(uint8_t state, const char * label = nullptr, size_t labelLen = 0, const char * details = nullptr,
-                            size_t detailsLen = 0)
+    GenericOperationalError(uint8_t state, Optional<chip::CharSpan> label = NullOptional, Optional<chip::CharSpan> details = NullOptional)
     {
-        set(state, label, labelLen, details, detailsLen);
+        Set(state, label, details);
     }
 
     GenericOperationalError(const GenericOperationalError & error)
     {
-        set(error.errorStateID, error.errorStateLabel.HasValue() ? error.ErrorStateLabel : nullptr,
-            error.errorStateLabel.HasValue() ? sizeof(error.ErrorStateLabel) : 0,
-            error.errorStateDetails.HasValue() ? error.ErrorStateDetails : nullptr,
-            error.errorStateDetails.HasValue() ? sizeof(error.ErrorStateDetails) : 0);
+        *this = error;
     }
 
     GenericOperationalError & operator=(const GenericOperationalError & error)
     {
-        set(error.errorStateID, error.errorStateLabel.HasValue() ? error.ErrorStateLabel : nullptr,
-            error.errorStateLabel.HasValue() ? sizeof(error.ErrorStateLabel) : 0,
-            error.errorStateDetails.HasValue() ? error.ErrorStateDetails : nullptr,
-            error.errorStateDetails.HasValue() ? sizeof(error.ErrorStateDetails) : 0);
+        Set(error.errorStateID, error.errorStateLabel,
+            error.errorStateDetails);
         return *this;
     }
 
-    void set(uint8_t state, const char * label = nullptr, size_t labelLen = 0, const char * details = nullptr,
-             size_t detailsLen = 0)
+    void Set(uint8_t state, Optional<chip::CharSpan> label = NullOptional, Optional<chip::CharSpan> details = NullOptional)
     {
         errorStateID = state;
-        if (label == nullptr)
+        if (label.HasValue())
         {
-            errorStateLabel = Optional<chip::CharSpan>::Missing();
-        }
-        else
-        {
-            memset(ErrorStateLabel, 0, sizeof(ErrorStateLabel));
-            if (labelLen > kOperationalErrorLabelMaxSize)
+            memset(mErrorStateLabelBuffer, 0, sizeof(mErrorStateLabelBuffer));
+            if (label.Value().size() > sizeof(mErrorStateLabelBuffer))
             {
-                memcpy(ErrorStateLabel, label, kOperationalErrorLabelMaxSize);
+                memcpy(mErrorStateLabelBuffer, label.Value().data(), sizeof(mErrorStateLabelBuffer));
+                errorStateLabel.SetValue(CharSpan(mErrorStateLabelBuffer, sizeof(mErrorStateLabelBuffer)));
             }
             else
             {
-                memcpy(ErrorStateLabel, label, labelLen);
+                memcpy(mErrorStateLabelBuffer, label.Value().data(), label.Value().size());
+                errorStateLabel.SetValue(CharSpan(mErrorStateLabelBuffer, label.Value().size()));
             }
-
-            errorStateLabel.SetValue(chip::CharSpan(ErrorStateLabel, sizeof(ErrorStateLabel)));
-        }
-
-        if (details == nullptr)
-        {
-            errorStateDetails = Optional<chip::CharSpan>::Missing();
         }
         else
         {
-            memset(ErrorStateDetails, 0, sizeof(ErrorStateDetails));
-            if (labelLen > kOperationalErrorDetailsMaxSize)
+            errorStateLabel = NullOptional;
+        }
+
+        if (details.HasValue())
+        {
+            memset(mErrorStateDetailsBuffer, 0, sizeof(mErrorStateDetailsBuffer));
+            if (details.Value().size() > sizeof(mErrorStateDetailsBuffer))
             {
-                memcpy(ErrorStateDetails, details, kOperationalErrorDetailsMaxSize);
+                memcpy(mErrorStateDetailsBuffer, details.Value().data(), sizeof(mErrorStateDetailsBuffer));
+                errorStateDetails.SetValue(CharSpan(mErrorStateDetailsBuffer, sizeof(mErrorStateDetailsBuffer)));
             }
             else
             {
-                memcpy(ErrorStateDetails, details, detailsLen);
+                memcpy(mErrorStateDetailsBuffer, details.Value().data(), details.Value().size());
+                errorStateDetails.SetValue(CharSpan(mErrorStateDetailsBuffer, details.Value().size()));
             }
-
-            errorStateDetails.SetValue(chip::CharSpan(ErrorStateDetails, sizeof(ErrorStateDetails)));
+        }
+        else
+        {
+            errorStateDetails = NullOptional;
         }
     }
-    uint8_t getStateID() const { return errorStateID; }
-    char ErrorStateLabel[kOperationalErrorLabelMaxSize];
-    char ErrorStateDetails[kOperationalErrorDetailsMaxSize];
+private:
+    char mErrorStateLabelBuffer[kOperationalErrorLabelMaxSize];
+    char mErrorStateDetailsBuffer[kOperationalErrorDetailsMaxSize];
 };
 
 /**
- * A class presents the phase of operational state cluster
+ * A class which represents the operational phase of an Operational State cluster derivation instance.
  */
 struct GenericOperationalPhase
 {
-    char PhaseName[kOperationalPhaseNameMaxSize];
-    chip::app::DataModel::Nullable<chip::CharSpan> phaseName;
-
-    GenericOperationalPhase(const char * name = nullptr, size_t nameLen = 0) { set(name, nameLen); }
+    GenericOperationalPhase(app::DataModel::Nullable<CharSpan> name)
+    {
+        Set(name);
+    }
 
     GenericOperationalPhase(const GenericOperationalPhase & ph)
     {
-        if (ph.isNullable())
-        {
-            set();
-        }
-        else
-        {
-            set(ph.PhaseName, sizeof(ph.PhaseName));
-        }
+        *this = ph;
     }
 
     GenericOperationalPhase & operator=(const GenericOperationalPhase & ph)
     {
-        if (ph.isNullable())
-        {
-            set();
-        }
-        else
-        {
-            set(ph.PhaseName, sizeof(ph.PhaseName));
-        }
+        Set(ph.mPhaseName);
         return *this;
     }
 
-    void set(const char * name = nullptr, size_t nameLen = 0)
+    bool isNullable() const { return mPhaseName.IsNull(); }
+    app::DataModel::Nullable<CharSpan> mPhaseName;
+private:
+    void Set(app::DataModel::Nullable<CharSpan> name)
     {
-        if (name == nullptr)
+        if (name.IsNull())
         {
-            phaseName.SetNull();
+            mPhaseName.SetNull();
         }
         else
         {
-            memset(PhaseName, 0, sizeof(PhaseName));
-            if (nameLen > kOperationalPhaseNameMaxSize)
+            memset(mPhaseNameBuffer, 0, sizeof(mPhaseNameBuffer));
+            if (name.Value().size() > sizeof(mPhaseNameBuffer))
             {
-                memcpy(PhaseName, name, kOperationalPhaseNameMaxSize);
+                memcpy(mPhaseNameBuffer, name.Value().data(), sizeof(mPhaseNameBuffer));
+                mPhaseName = app::DataModel::Nullable<CharSpan>(CharSpan(mPhaseNameBuffer, sizeof(mPhaseNameBuffer)));
             }
             else
             {
-                memcpy(PhaseName, name, nameLen);
+                memcpy(mPhaseNameBuffer, name.Value().data(), name.Value().size());
+                mPhaseName = app::DataModel::Nullable<CharSpan>(CharSpan(mPhaseNameBuffer, name.Value().size()));
             }
-            phaseName = chip::app::DataModel::Nullable<chip::CharSpan>(chip::CharSpan(PhaseName, sizeof(PhaseName)));
         }
     }
-    bool isNullable() const { return phaseName.IsNull(); }
+
+    char mPhaseNameBuffer[kOperationalPhaseNameMaxSize];
 };
 
 /**
- * A class hold the phase list of operational state cluster
+ * A class which represents the operational completion of an Operational State cluster derivation instance.
  */
-struct GenericOperationalPhaseList : public GenericOperationalPhase
-{
-    GenericOperationalPhaseList(const char * name = nullptr, size_t nameLen = 0) : GenericOperationalPhase(name, nameLen) {}
-    GenericOperationalPhaseList * next = nullptr;
-};
-
-/**
- * A class wrap the operation completion of operational state cluster
- */
-struct GenericOperationCompletion : public chip::app::Clusters::OperationalState::Events::OperationCompletion::Type
+struct GenericOperationCompletion : public app::Clusters::OperationalState::Events::OperationCompletion::Type
 {
     GenericOperationCompletion(uint8_t aCompletionErrorCode)
     {
-
-        chip::app::DataModel::Nullable<uint32_t> __totalOperationalTime;
-        chip::app::DataModel::Nullable<uint32_t> __pausedTime;
-
         completionErrorCode = aCompletionErrorCode;
-
-        __totalOperationalTime.SetNull();
-        totalOperationalTime.SetValue(__totalOperationalTime);
-
-        __pausedTime.SetNull();
-        pausedTime.SetValue(__pausedTime);
+        totalOperationalTime.SetValue(app::DataModel::Nullable<uint32_t>());
+        pausedTime.SetValue(app::DataModel::Nullable<uint32_t>());
     }
 
     GenericOperationCompletion(uint8_t aCompletionErrorCode, uint32_t aTotalOperationalTime)
     {
-        chip::app::DataModel::Nullable<uint32_t> __pausedTime;
-
         completionErrorCode = aCompletionErrorCode;
-        totalOperationalTime.SetValue(chip::app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
-        __pausedTime.SetNull();
-        pausedTime.SetValue(__pausedTime);
+        totalOperationalTime.SetValue(app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
+        pausedTime.SetValue(app::DataModel::Nullable<uint32_t>());
     }
 
     GenericOperationCompletion(uint8_t aCompletionErrorCode, uint32_t aTotalOperationalTime, uint32_t aPausedTime)
     {
         completionErrorCode = aCompletionErrorCode;
-        totalOperationalTime.SetValue(chip::app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
-        pausedTime.SetValue(chip::app::DataModel::Nullable<uint32_t>(aPausedTime));
+        totalOperationalTime.SetValue(app::DataModel::Nullable<uint32_t>(aTotalOperationalTime));
+        pausedTime.SetValue(app::DataModel::Nullable<uint32_t>(aPausedTime));
     }
 };
 
 /**
  * A delegate to handle application logic of the Operational State aliased Cluster.
+ * The delegate API assumes there will be separate delegate objects for each cluster instance.
+ * (i.e. each separate operational state cluster derivation, on each separate endpoint),
+ * since the delegate is not handed the cluster id or endpoint.
  */
 class Delegate
 {
 public:
     /**
-     * Get operational state.
-     * @param void.
-     * @return the const reference of operational state.
+     * Get the current operational state.
+     * @param op Put a struct instance on the state, then call the delegate to fill it in.
+     * @return void.
      */
-    virtual const GenericOperationalState & GetOperationalState() const = 0;
+    virtual void GetOperationalState(GenericOperationalState & op) = 0;
 
     /**
-     * Get operational state list.
-     * @param operationalStateList The pointer to operational state list.
-     * After a successful return the caller is responsible for calling ReleaseOperationalStateList on the outparam.
+     * Get the list of supported operational states.
+     * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
+     * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
+     * @param index The state of index starts at 0.
+     * @param operationalState  The GenericOperationalState is filled.
      */
-    virtual CHIP_ERROR GetOperationalStateList(GenericOperationalStateList ** operationalStateList, size_t & size) = 0;
+    virtual CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) = 0;
 
     /**
-     * Release operational state list
-     * @param operationalStateList The pointer for which to clear the OperationalStateStructDynamicList.
-     * @return void
+     * Get the list of supported operational phase.
+     * Fills in the provided GenericOperationalPhase with the state at index `index` if there is one,
+     * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of states.
+     * @param index The state of index starts at 0.
+     * @param operationalPhase  The GenericOperationalPhase is filled.
      */
-    virtual void ReleaseOperationalStateList(GenericOperationalStateList * operationalStateList) = 0;
+    virtual CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) = 0;
 
     /**
-     * Get operational phase list.
-     * @param operationalPhaseList The pointer to operational phase list.
-     * After a successful return the caller is responsible for calling ReleaseOperationalPhaseList on the outparam.
+     * Get current operational error.
+     * @param error.Put a struct instance on the state, then call the delegate to fill it in.
      */
-    virtual CHIP_ERROR GetOperationalPhaseList(GenericOperationalPhaseList ** operationalPhaseList, size_t & size) = 0;
-
-    /**
-     * Release operational phase list
-     * @param operationalStateList The pointer for which to clear the GenericOperationalPhaseList.
-     * @return void
-     */
-    virtual void ReleaseOperationalPhaseList(GenericOperationalPhaseList * operationalPhaseList) = 0;
-
-    /**
-     * Get operational error.
-     * @param void.
-     * @return the const reference of operational error.
-     */
-    virtual const GenericOperationalError GetOperationalError() const = 0;
+    virtual void GetOperationalError(GenericOperationalError &error) = 0;
 
     /**
      * Set operational state.
@@ -337,44 +282,26 @@ public:
     /**
      * Handle Command Callback in application: Pause
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    virtual GenericOperationalError & HandlePauseStateCallback(GenericOperationalError & err) = 0;
+    virtual void HandlePauseStateCallback(GenericOperationalError & err) = 0;
 
     /**
      * Handle Command Callback in application: Resume
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    virtual GenericOperationalError & HandleResumeStateCallback(GenericOperationalError & err) = 0;
+    virtual void HandleResumeStateCallback(GenericOperationalError & err) = 0;
 
     /**
      * Handle Command Callback in application: Start
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    virtual GenericOperationalError & HandleStartStateCallback(GenericOperationalError & err) = 0;
+    virtual void HandleStartStateCallback(GenericOperationalError & err) = 0;
 
     /**
      * Handle Command Callback in application: Stop
      * @param[out] get operational error after callback.
-     * @return operational error after callback
      */
-    virtual GenericOperationalError & HandleStopStateCallback(GenericOperationalError & err) = 0;
-
-    /**
-     * Send OperationalError Event
-     * @param[in] set the operational error to event.
-     * @return true: send event success; fail : send event fail.
-     */
-    virtual bool sendOperationalErrorEvent(const GenericOperationalError & err) = 0;
-
-    /**
-     * Send OperationCompletion Event
-     * @param[in] set the operation comletion to event.
-     * @return true: send event success; fail : send event fail.
-     */
-    virtual bool sendOperationCompletion(const GenericOperationCompletion & op) = 0;
+    virtual void HandleStopStateCallback(GenericOperationalError & err) = 0;
 
     Delegate(EndpointId aEndpointId, ClusterId aClusterId) : mEndpointId(aEndpointId), mClusterId(aClusterId) {}
 

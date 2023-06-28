@@ -17,15 +17,8 @@
  */
 
 #pragma once
-#if 0
-#include "OperationalStateDataProvider.h"
-#endif
-
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
-#if 0
-#include <app/clusters/operational-state-server/operational-state-delegate.h>
-#endif
 #include <app/util/af.h>
 
 namespace chip {
@@ -79,12 +72,6 @@ public:
 private:
     EndpointId mEndpointId;
     ClusterId mClusterId;
-#if 0
-    Delegate * mDelegate;
-    OperationalStateDataProvider mOperationalStateDataProvider;
-    GenericOperationalState mOperationalState;
-    GenericOperationalErrorState mOperationalError;
-#endif
 
     /**
      * Handle Command: Pause.
@@ -121,9 +108,6 @@ public:
 
         mEndpointId = aEndpointId;
         mClusterId  = aClusterId;
-#if 0
-        mDelegate   = aDelegate;
-#endif
     }
 
     // Inherited from CommandHandlerInterface
