@@ -1,11 +1,10 @@
 # scripts/tests
 click
 colorama
+diskcache
+websockets
 
 # src/python_testing
 mobly
 pyasn1
 pyasn1_modules
-
-# scripts/tests/yaml/paths_finder.py
-diskcache
