@@ -229,15 +229,14 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AttributeValuePair.attributeID", "attributeID", value.isMember("attributeID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("AttributeValuePair.attributeValue", "attributeValue",
                                                                   value.isMember("attributeValue")));
 
     char labelWithMember[kMaxLabelLength];
-    if (value.isMember("attributeID"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "attributeID");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.attributeID, value["attributeID"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "attributeID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.attributeID, value["attributeID"]));
     valueCopy.removeMember("attributeID");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "attributeValue");

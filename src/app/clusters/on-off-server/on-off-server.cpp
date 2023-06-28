@@ -199,7 +199,7 @@ public:
 
         AttributeValuePair pairs[scenableAttributeCount];
 
-        pairs[0].attributeID.SetValue(Attributes::OnOff::Id);
+        pairs[0].attributeID    = Attributes::OnOff::Id;
         pairs[0].attributeValue = currentValue;
 
         app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
@@ -230,11 +230,7 @@ public:
         while (pair_iterator.Next())
         {
             auto & decodePair = pair_iterator.GetValue();
-            if (decodePair.attributeID.HasValue())
-            {
-                // If attribute ID was encoded, verify it is the proper ID for the OnOff attribute
-                VerifyOrReturnError(decodePair.attributeID.Value() == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
-            }
+            VerifyOrReturnError(decodePair.attributeID == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(
                 mSceneEndpointStatePairs.InsertPair(EndpointStatePair(endpoint, static_cast<bool>(decodePair.attributeValue))));
         }
@@ -545,7 +541,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 
 #ifdef EMBER_AF_PLUGIN_SCENES
         // Registers Scene handlers for the On/Off cluster on the server
-        // app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(OnOffServer::Instance().GetSceneHandler());
+        app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(OnOffServer::Instance().GetSceneHandler());
 #endif
 
 #ifdef EMBER_AF_PLUGIN_MODE_SELECT

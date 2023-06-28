@@ -635,11 +635,11 @@ class Scenes(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="attributeValue", Tag=1, Type=uint),
                     ])
 
-            attributeID: 'typing.Optional[uint]' = None
+            attributeID: 'uint' = 0
             attributeValue: 'uint' = 0
 
         @dataclass

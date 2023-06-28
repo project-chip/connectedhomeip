@@ -167,7 +167,7 @@ client cluster Scenes = 5 {
   }
 
   struct AttributeValuePair {
-    optional attrib_id attributeID = 0;
+    attrib_id attributeID = 0;
     int32u attributeValue = 1;
   }
 
