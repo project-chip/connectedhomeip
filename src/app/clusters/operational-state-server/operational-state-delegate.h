@@ -226,6 +226,9 @@ struct GenericOperationCompletion : public app::Clusters::OperationalState::Even
 
 /**
  * A delegate to handle application logic of the Operational State aliased Cluster.
+ * The delegate API assumes there will be separate delegate objects for each cluster instance.
+ * (i.e. each separate operational state cluster derivation, on each separate endpoint),
+ * since the delegate is not handed the cluster id or endpoint.
  */
 class Delegate
 {
