@@ -44,6 +44,36 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
 
+namespace {
+
+/**
+ * For all ModeBase alias clusters on the given endpoint, if the OnOff feature is supported and
+ * the OnMode attribute is set, update the CurrentMode attribute value to the OnMode value.
+ * @param endpoint
+ */
+void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
+{
+    for (const auto & element : ModeBase::GetModeBaseInstances())
+    {
+        auto modeBaseAlias = element.second;
+        if (modeBaseAlias->GetEndpointId() == endpoint)
+        {
+            if (modeBaseAlias->HasFeature(ModeBase::Feature::kOnOff))
+            {
+                ModeBase::Instance * modeBaseInstance               = element.second;
+                ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance->GetOnMode();
+                if (!onMode.IsNull())
+                {
+                    ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
+                    modeBaseInstance->UpdateCurrentMode(onMode.Value());
+                }
+            }
+        }
+    }
+}
+
+}
+
 /**********************************************************
  * Attributes Definition
  *********************************************************/
@@ -239,23 +269,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
 #endif
 #ifdef EMBER_AF_PLUGIN_MODE_BASE
         // If OnMode is not a null value, then change the current mode to it.
-        for (const auto & element : ModeBase::GetModeBaseInstances())
-        {
-            auto modeBaseAlias = element.second;
-            if (modeBaseAlias->GetEndpointId() == endpoint)
-            {
-                if (modeBaseAlias->HasFeature(ModeBase::Feature::kOnOff))
-                {
-                    ModeBase::Instance * modeBaseInstance               = element.second;
-                    ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance->GetOnMode();
-                    if (!onMode.IsNull())
-                    {
-                        ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
-                        modeBaseInstance->UpdateCurrentMode(onMode.Value());
-                    }
-                }
-            }
-        }
+        UpdateModeBaseCurrentModeToOnMode(endpoint);
 #endif
     }
     else // Set Off
@@ -345,23 +359,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 #endif
 #ifdef EMBER_AF_PLUGIN_MODE_BASE
         // If OnMode is not a null value, then change the current mode to it.
-        for (const auto & element : ModeBase::GetModeBaseInstances())
-        {
-            auto modeBaseAlias = element.second;
-            if (modeBaseAlias->GetEndpointId() == endpoint)
-            {
-                if (modeBaseAlias->HasFeature(ModeBase::Feature::kOnOff))
-                {
-                    ModeBase::Instance * modeBaseInstance               = element.second;
-                    ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance->GetOnMode();
-                    if (!onMode.IsNull())
-                    {
-                        ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
-                        modeBaseInstance->UpdateCurrentMode(onMode.Value());
-                    }
-                }
-            }
-        }
+        UpdateModeBaseCurrentModeToOnMode(endpoint);
 #endif
     }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
