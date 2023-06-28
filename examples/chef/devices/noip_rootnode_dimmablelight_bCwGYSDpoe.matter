@@ -335,8 +335,8 @@ client cluster Binding = 30 {
       cluster instances. */
 server cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
-    kPase = 1;
-    kCase = 2;
+    kPASE = 1;
+    kCASE = 2;
     kGroup = 3;
   }
 
@@ -502,7 +502,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   enum OTADownloadProtocol : ENUM8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
-    kHttps = 2;
+    kHTTPS = 2;
     kVendorSpecific = 3;
   }
 
@@ -694,7 +694,7 @@ server cluster TimeFormatLocalization = 44 {
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
   enum CommissioningErrorEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
     kNoFailSafe = 3;
@@ -773,7 +773,7 @@ server cluster DiagnosticLogs = 50 {
 
   enum TransferProtocolEnum : ENUM8 {
     kResponsePayload = 0;
-    kBdx = 1;
+    kBDX = 1;
   }
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -950,7 +950,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kUnassigned = 1;
     kSleepyEndDevice = 2;
     kEndDevice = 3;
-    kReed = 4;
+    kREED = 4;
     kRouter = 5;
     kLeader = 6;
   }
@@ -1111,10 +1111,10 @@ server cluster WiFiNetworkDiagnostics = 54 {
   enum SecurityTypeEnum : ENUM8 {
     kUnspecified = 0;
     kNone = 1;
-    kWep = 2;
-    kWpa = 3;
-    kWpa2 = 4;
-    kWpa3 = 5;
+    kWEP = 2;
+    kWPA = 3;
+    kWPA2 = 4;
+    kWPA3 = 5;
   }
 
   enum WiFiVersionEnum : ENUM8 {
@@ -1174,7 +1174,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate10M = 0;
     kRate100M = 1;
     kRate1G = 2;
-    kRate25g = 3;
+    kRate25G = 3;
     kRate5G = 4;
     kRate10G = 5;
     kRate40G = 6;
@@ -1308,7 +1308,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   enum NodeOperationalCertStatusEnum : ENUM8 {
-    kOk = 0;
+    kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -1504,7 +1504,7 @@ server cluster FixedLabel = 64 {
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 client cluster OccupancySensing = 1030 {
   enum OccupancySensorTypeEnum : ENUM8 {
-    kPir = 0;
+    kPIR = 0;
     kUltrasonic = 1;
     kPIRAndUltrasonic = 2;
     kPhysicalContact = 3;
@@ -1515,7 +1515,7 @@ client cluster OccupancySensing = 1030 {
   }
 
   bitmap OccupancySensorTypeBitmap : BITMAP8 {
-    kPir = 0x1;
+    kPIR = 0x1;
     kUltrasonic = 0x2;
     kPhysicalContact = 0x4;
   }

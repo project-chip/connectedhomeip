@@ -4,7 +4,7 @@ cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
   enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
     {{#zcl_enum_items}}
-    k{{asUpperCamelCase label}} = {{value}};
+    k{{asUpperCamelCase label preserveAcronyms=true}} = {{value}};
     {{/zcl_enum_items}}
   }
 
@@ -12,7 +12,7 @@ cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_bitmaps}}
   bitmap {{name}} : BITMAP{{multiply size 8}} {
     {{#zcl_bitmap_items}}
-    k{{asUpperCamelCase label}} = {{asHex mask}};
+    k{{asUpperCamelCase label preserveAcronyms=true}} = {{asHex mask}};
     {{/zcl_bitmap_items}}
   }
 
