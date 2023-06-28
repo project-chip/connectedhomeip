@@ -50,7 +50,7 @@ NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
 chip::app::Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
-app::Clusters::TemperatureControl::StaticSupportedTemperatureLevels instance;
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
 #ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
@@ -176,7 +176,7 @@ void ApplicationInit()
 #ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
     MatterOperationalStateServerInit();
 #endif
-    app::Clusters::TemperatureControl::SupportedTemperatureLevelsIterator::SetInstance(&instance);
+    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void ApplicationExit()

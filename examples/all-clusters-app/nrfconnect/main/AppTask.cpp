@@ -84,7 +84,7 @@ bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
 bool sHaveBLEConnections   = false;
 
-app::Clusters::TemperatureControl::StaticSupportedTemperatureLevels instance;
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
 } // namespace
 
@@ -221,7 +221,7 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
     }
 
-    app::Clusters::TemperatureControl::SupportedTemperatureLevelsIterator::SetInstance(&instance);
+    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     return err;
 }
 

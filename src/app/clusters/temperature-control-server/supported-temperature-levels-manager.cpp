@@ -22,14 +22,14 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace TemperatureControl {
-static SupportedTemperatureLevelsIterator * sInstance = nullptr;
+static SupportedTemperatureLevelsIteratorDelegate * sInstance = nullptr;
 
-SupportedTemperatureLevelsIterator * SupportedTemperatureLevelsIterator::GetInstance()
+SupportedTemperatureLevelsIteratorDelegate * SupportedTemperatureLevelsIteratorDelegate::GetInstance()
 {
     return sInstance;
 }
 
-void SupportedTemperatureLevelsIterator::SetInstance(SupportedTemperatureLevelsIterator * instance)
+void SupportedTemperatureLevelsIteratorDelegate::SetInstance(SupportedTemperatureLevelsIteratorDelegate * instance)
 {
     sInstance = instance;
 }

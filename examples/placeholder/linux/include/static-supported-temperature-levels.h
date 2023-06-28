@@ -31,22 +31,17 @@ namespace TemperatureControl {
  * This implementation statically defines the options.
  */
 
-class StaticSupportedTemperatureLevels : public SupportedTemperatureLevelsIterator
+class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsIteratorDelegate
 {
     struct EndpointPair
     {
         EndpointId mEndpointId;
         chip::CharSpan * mTemperatureLevels;
-        int mSize;
+        uint8_t mSize;
 
-        EndpointPair(EndpointId aEndpointId, chip::CharSpan * aTemperatureLevels, int aSize) :
-            mEndpointId(aEndpointId), mTemperatureLevels(new chip::CharSpan[aSize]), mSize(aSize)
-        {
-            for (int i = 0; i < aSize; i++)
-            {
-                mTemperatureLevels[i] = aTemperatureLevels[i];
-            }
-        }
+        EndpointPair(EndpointId aEndpointId, chip::CharSpan * aTemperatureLevels, uint8_t aSize) :
+            mEndpointId(aEndpointId), mTemperatureLevels(aTemperatureLevels), mSize(aSize)
+        {}
 
         ~EndpointPair() {}
     };
@@ -56,11 +51,11 @@ class StaticSupportedTemperatureLevels : public SupportedTemperatureLevelsIterat
 public:
     static const EndpointPair supportedOptionsByEndpoints[EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
-    int Size() override;
+    uint8_t Size() override;
 
-    bool Next(chip::CharSpan & item) override;
+    CHIP_ERROR Next(chip::MutableCharSpan & item) override;
 
-    ~StaticSupportedTemperatureLevels() {}
+    ~AppSupportedTemperatureLevelsDelegate() {}
 };
 
 } // namespace TemperatureControl

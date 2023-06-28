@@ -120,7 +120,7 @@ static SemaphoreHandle_t aesLock;
 static struct wlan_network sta_network;
 static struct wlan_network uap_network;
 
-chip::app::Clusters::TemperatureControl::StaticSupportedTemperatureLevels instance;
+chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
 const int TASK_MAIN_PRIO         = OS_PRIO_3;
 const int TASK_MAIN_STACK_SIZE   = 800;
@@ -1082,7 +1082,8 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
     InitBindingHandlers();
     // binding --
 
-    chip::app::Clusters::TemperatureControl::SupportedTemperatureLevelsIterator::SetInstance(&instance);
+    chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(
+        &sAppSupportedTemperatureLevelsDelegate);
 
     return;
 }

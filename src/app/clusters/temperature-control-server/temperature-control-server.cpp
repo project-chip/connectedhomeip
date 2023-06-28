@@ -33,7 +33,7 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-const uint8_t MaxTemperatureLevelStringSize = 32;
+const uint8_t kMaxTemperatureLevelStringSize = 32;
 
 class TemperatureControlAttrAccess : public AttributeAccessInterface
 {
@@ -53,8 +53,8 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
 
     if (TemperatureControl::Attributes::SupportedTemperatureLevels::Id == aPath.mAttributeId)
     {
-        TemperatureControl::SupportedTemperatureLevelsIterator * instance =
-            TemperatureControl::SupportedTemperatureLevelsIterator::GetInstance();
+        TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * instance =
+            TemperatureControl::SupportedTemperatureLevelsIteratorDelegate::GetInstance();
         if (instance == nullptr)
         {
             aEncoder.EncodeEmptyList();
@@ -65,11 +65,12 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
 
         CHIP_ERROR err;
         err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-            char buffer[MaxTemperatureLevelStringSize];
+            char buffer[kMaxTemperatureLevelStringSize];
             chip::MutableCharSpan item(buffer);
-            while (instance->Next(item))
+            while (instance->Next(item) == CHIP_NO_ERROR)
             {
-                ReturnErrorOnFailure(encoder.Encode(chip::CharSpan{ item.data(), item.size() }));
+                ReturnErrorOnFailure(encoder.Encode(item));
+                item = MutableCharSpan(buffer);
             }
             return CHIP_NO_ERROR;
         });
@@ -166,8 +167,8 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
     {
         if (targetTemperatureLevel.HasValue())
         {
-            TemperatureControl::SupportedTemperatureLevelsIterator * instance =
-                TemperatureControl::SupportedTemperatureLevelsIterator::GetInstance();
+            TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * instance =
+                TemperatureControl::SupportedTemperatureLevelsIteratorDelegate::GetInstance();
             if (instance == nullptr)
             {
                 status = Status::NotFound;

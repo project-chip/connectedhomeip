@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <app/util/config.h>
 #include <static-supported-temperature-levels.h>
+#include <zap-generated/gen_config.h>
 
 using namespace std;
 using namespace chip;
@@ -26,17 +26,18 @@ using namespace chip::app::Clusters::TemperatureControl;
 using chip::Protocols::InteractionModel::Status;
 
 // TODO: Configure your options for each endpoint
-chip::CharSpan StaticSupportedTemperatureLevels::temperatureLevelOptions[] = { chip::CharSpan("Cold", 4), chip::CharSpan("Warm", 4),
-                                                                               chip::CharSpan("Hot", 3) };
+chip::CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { chip::CharSpan("Hot", 3),
+                                                                                    chip::CharSpan("Warm", 4),
+                                                                                    chip::CharSpan("Freezing", 8) };
 
-const StaticSupportedTemperatureLevels::EndpointPair
-    StaticSupportedTemperatureLevels::supportedOptionsByEndpoints[EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
-        EndpointPair(1, StaticSupportedTemperatureLevels::temperatureLevelOptions, 3) // Options for Endpoint 1
+const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
+    [EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
+        EndpointPair(1, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions, 3) // Options for Endpoint 1
     };
 
-int StaticSupportedTemperatureLevels::Size()
+uint8_t AppSupportedTemperatureLevelsDelegate::Size()
 {
-    for (auto & endpointPair : StaticSupportedTemperatureLevels::supportedOptionsByEndpoints)
+    for (auto & endpointPair : AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints)
     {
         if (endpointPair.mEndpointId == mEndpoint)
         {
@@ -46,9 +47,9 @@ int StaticSupportedTemperatureLevels::Size()
     return 0;
 }
 
-bool StaticSupportedTemperatureLevels::Next(chip::MutableCharSpan & item)
+CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(chip::MutableCharSpan & item)
 {
-    for (auto & endpointPair : StaticSupportedTemperatureLevels::supportedOptionsByEndpoints)
+    for (auto & endpointPair : AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints)
     {
         if (endpointPair.mEndpointId == mEndpoint)
         {
@@ -58,11 +59,12 @@ bool StaticSupportedTemperatureLevels::Next(chip::MutableCharSpan & item)
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(Zcl, "Error copying char span to mutable char span %s", chip::ErrorStr(err));
+                    return err;
                 }
                 mIndex++;
-                return true;
+                return CHIP_NO_ERROR;
             }
         }
     }
-    return false;
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }

@@ -30,12 +30,12 @@ namespace TemperatureControl {
 /**
  * Interface to help manage the supported temperature levels of the Temperature Control Cluster.
  */
-class SupportedTemperatureLevelsIterator
+class SupportedTemperatureLevelsIteratorDelegate
 {
 public:
-    virtual ~SupportedTemperatureLevelsIterator() = default;
+    virtual ~SupportedTemperatureLevelsIteratorDelegate() = default;
 
-    SupportedTemperatureLevelsIterator() {}
+    SupportedTemperatureLevelsIteratorDelegate() {}
 
     void Reset(EndpointId endpoint)
     {
@@ -43,13 +43,13 @@ public:
         mIndex    = 0;
     }
 
-    virtual int Size() = 0;
+    virtual uint8_t Size() = 0;
 
-    virtual bool Next(chip::MutableCharSpan & item) = 0;
+    virtual CHIP_ERROR Next(chip::MutableCharSpan & item) = 0;
 
-    static SupportedTemperatureLevelsIterator * GetInstance();
+    static SupportedTemperatureLevelsIteratorDelegate * GetInstance();
 
-    static void SetInstance(SupportedTemperatureLevelsIterator * instance);
+    static void SetInstance(SupportedTemperatureLevelsIteratorDelegate * instance);
 
 protected:
     EndpointId mEndpoint;

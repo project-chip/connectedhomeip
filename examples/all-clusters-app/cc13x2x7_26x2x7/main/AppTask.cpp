@@ -73,7 +73,7 @@ AppTask AppTask::sAppTask;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 namespace {
-app::Clusters::TemperatureControl::StaticSupportedTemperatureLevels instance;
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -275,7 +275,7 @@ int AppTask::Init()
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
-    app::Clusters::TemperatureControl::SupportedTemperatureLevelsIterator::SetInstance(&instance);
+    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     return 0;
 }
 

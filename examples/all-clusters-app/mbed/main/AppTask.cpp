@@ -44,7 +44,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
 
 namespace {
-app::Clusters::TemperatureControl::StaticSupportedTemperatureLevels instance;
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 }
 
 AppTask AppTask::sAppTask;
@@ -89,7 +89,7 @@ int AppTask::Init()
         ChipLogError(NotSpecified, "DFU manager initialization failed: %s", error.AsString());
         return EXIT_FAILURE;
     }
-    app::Clusters::TemperatureControl::SupportedTemperatureLevelsIterator::SetInstance(&instance);
+    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     return 0;
 }
 

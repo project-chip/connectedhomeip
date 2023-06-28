@@ -23,10 +23,7 @@ assert(chip_build_tools)
 project_dir = "./.."
 
 executable("chip-shell") {
-  sources = [
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
-    "main.cpp",
-  ]
+  sources = [ "main.cpp" ]
 
   deps = [
     "${chip_root}/src/lib/shell",

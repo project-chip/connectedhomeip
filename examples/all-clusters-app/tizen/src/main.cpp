@@ -39,7 +39,7 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 NetworkCommissioning::TizenEthernetDriver sEthernetDriver;
 Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
 
-app::Clusters::TemperatureControl::StaticSupportedTemperatureLevels instance;
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 } // namespace
 
 void ApplicationInit()
@@ -48,7 +48,7 @@ void ApplicationInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     sEthernetNetworkCommissioningInstance.Init();
-    app::Clusters::TemperatureControl::SupportedTemperatureLevelsIterator::SetInstance(&instance);
+    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 int main(int argc, char * argv[])

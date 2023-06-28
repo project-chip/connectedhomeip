@@ -13779,7 +13779,7 @@
           "name": "Temperature Control",
           "code": 86,
           "mfgCode": null,
-          "define": "REFRIGERATOR_ALARM_CLUSTER",
+          "define": "TEMPERATURE_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -13831,7 +13831,7 @@
           "name": "Temperature Control",
           "code": 86,
           "mfgCode": null,
-          "define": "REFRIGERATOR_ALARM_CLUSTER",
+          "define": "TEMPERATURE_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
@@ -14049,7 +14049,7 @@
           "name": "Refrigerator Alarm",
           "code": 87,
           "mfgCode": null,
-          "define": "REFRIGERATOR_ALARM",
+          "define": "REFRIGERATOR_ALARM_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -14091,7 +14091,7 @@
           "name": "Refrigerator Alarm",
           "code": 87,
           "mfgCode": null,
-          "define": "REFRIGERATOR_ALARM",
+          "define": "REFRIGERATOR_ALARM_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [

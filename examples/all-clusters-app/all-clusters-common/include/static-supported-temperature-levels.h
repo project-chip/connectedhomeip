@@ -31,7 +31,7 @@ namespace TemperatureControl {
  * This implementation statically defines the options.
  */
 
-class StaticSupportedTemperatureLevels : public SupportedTemperatureLevelsIterator
+class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsIteratorDelegate
 {
     struct EndpointPair
     {
@@ -51,11 +51,11 @@ class StaticSupportedTemperatureLevels : public SupportedTemperatureLevelsIterat
 public:
     static const EndpointPair supportedOptionsByEndpoints[EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
-    int Size() override;
+    uint8_t Size() override;
 
-    bool Next(chip::MutableCharSpan & item) override;
+    CHIP_ERROR Next(chip::MutableCharSpan & item) override;
 
-    ~StaticSupportedTemperatureLevels() {}
+    ~AppSupportedTemperatureLevelsDelegate() {}
 };
 
 } // namespace TemperatureControl

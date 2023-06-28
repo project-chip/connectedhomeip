@@ -97,7 +97,7 @@ public:
 
 AppCallbacks sCallbacks;
 
-app::Clusters::TemperatureControl::StaticSupportedTemperatureLevels instance;
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
@@ -138,7 +138,8 @@ static void InitServer(intptr_t context)
         ESP_LOGE(TAG, "Failed to initialize endpoint array for supported-modes, err:%" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    app::Clusters::TemperatureControl::SupportedTemperatureLevelsIterator::SetInstance(&instance);
+    app::Clusters::TemperatureControl::SupportedTemperatureLevelsIteratorDelegate::SetInstance(
+        &sAppSupportedTemperatureLevelsDelegate);
 }
 
 extern "C" void app_main()
