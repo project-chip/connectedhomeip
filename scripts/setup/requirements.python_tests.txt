@@ -6,3 +6,6 @@ colorama
 mobly
 pyasn1
 pyasn1_modules
+
+# scripts/tests/yaml/paths_finder.py
+diskcache
