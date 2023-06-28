@@ -18,10 +18,7 @@
 
 #include <app/util/config.h>
 #include <static-supported-temperature-levels.h>
-<<<<<<< HEAD
 #include <zap-generated/gen_config.h>
-=======
->>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
 
 using namespace std;
 using namespace chip;
@@ -30,7 +27,6 @@ using namespace chip::app::Clusters::TemperatureControl;
 using chip::Protocols::InteractionModel::Status;
 
 // TODO: Configure your options for each endpoint
-<<<<<<< HEAD
 chip::CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { chip::CharSpan("Hot", 3),
                                                                                     chip::CharSpan("Warm", 4),
                                                                                     chip::CharSpan("Cold", 4) };
@@ -42,20 +38,7 @@ const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatur
 
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()
 {
-    for (auto & endpointPair : AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints)
-=======
-chip::CharSpan StaticSupportedTemperatureLevels::temperatureLevelOptions[] = { chip::CharSpan("Cold", 4), chip::CharSpan("Warm", 4),
-                                                                               chip::CharSpan("Hot", 3) };
-
-const StaticSupportedTemperatureLevels::EndpointPair
-    StaticSupportedTemperatureLevels::supportedOptionsByEndpoints[EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
-        EndpointPair(1, StaticSupportedTemperatureLevels::temperatureLevelOptions, 3) // Options for Endpoint 1
-    };
-
-int StaticSupportedTemperatureLevels::Size()
-{
     for (auto & endpointPair : StaticSupportedTemperatureLevels::supportedOptionsByEndpoints)
->>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
     {
         if (endpointPair.mEndpointId == mEndpoint)
         {
@@ -65,21 +48,14 @@ int StaticSupportedTemperatureLevels::Size()
     return 0;
 }
 
-<<<<<<< HEAD
 CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(chip::MutableCharSpan & item)
 {
     for (auto & endpointPair : AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints)
-=======
-bool StaticSupportedTemperatureLevels::Next(chip::CharSpan & item)
-{
-    for (auto & endpointPair : StaticSupportedTemperatureLevels::supportedOptionsByEndpoints)
->>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
     {
         if (endpointPair.mEndpointId == mEndpoint)
         {
             if (endpointPair.mSize > mIndex)
             {
-<<<<<<< HEAD
                 CHIP_ERROR err = chip::CopyCharSpanToMutableCharSpan(endpointPair.mTemperatureLevels[mIndex], item);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -92,13 +68,4 @@ bool StaticSupportedTemperatureLevels::Next(chip::CharSpan & item)
         }
     }
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-=======
-                item = endpointPair.mTemperatureLevels[mIndex];
-                mIndex++;
-                return true;
-            }
-        }
-    }
-    return false;
->>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
 }
