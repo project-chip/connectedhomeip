@@ -57,9 +57,9 @@ private:
 CHIP_ERROR FanAttrAccess::ReadPercentCurrent(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     // Return PercentSetting attribute value for now
-    DataModel::Nullable<chip::Percent> percentSetting;
+    DataModel::Nullable<Percent> percentSetting;
     PercentSetting::Get(endpoint, percentSetting);
-    chip::Percent ret = 0;
+    Percent ret = 0;
     if (!percentSetting.IsNull())
     {
         ret = percentSetting.Value();
@@ -103,18 +103,5 @@ CHIP_ERROR FanAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribut
 
 void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
-    // uint32_t featureMap = 0;
-
-    // featureMap |= to_underlying(FanControl::Feature::kMultiSpeed);
-    // featureMap |= to_underlying(FanControl::Feature::kAuto);
-    // featureMap |= to_underlying(FanControl::Feature::kWind);
-    // featureMap |= to_underlying(FanControl::Feature::kStep);
-    // featureMap |= to_underlying(FanControl::Feature::kRocking);
-    // featureMap |= to_underlying(FanControl::Feature::kAirflowDirection);
-
-    // FeatureMap::Set(endpoint, featureMap);
-    // WindSupport::Set(endpoint, 3);
-    // RockSupport::Set(endpoint, 3);
-
     registerAttributeAccessOverride(&gAttrAccess);
 }

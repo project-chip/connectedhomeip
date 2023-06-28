@@ -69,32 +69,32 @@ bool HasFeature(EndpointId endpoint, Feature feature)
     return success ? ((featureMap & to_underlying(feature)) != 0) : false;
 }
 
-inline bool SupportsMultiSpeed(chip::EndpointId endpointId)
+inline bool SupportsMultiSpeed(EndpointId endpointId)
 {
     return HasFeature(endpointId, Feature::kMultiSpeed);
 }
 
-inline bool SupportsAuto(chip::EndpointId endpointId)
+inline bool SupportsAuto(EndpointId endpointId)
 {
     return HasFeature(endpointId, Feature::kAuto);
 }
 
-inline bool SupportsRocking(chip::EndpointId endpointId)
+inline bool SupportsRocking(EndpointId endpointId)
 {
     return HasFeature(endpointId, Feature::kRocking);
 }
 
-inline bool SupportsWind(chip::EndpointId endpointId)
+inline bool SupportsWind(EndpointId endpointId)
 {
     return HasFeature(endpointId, Feature::kWind);
 }
 
-inline bool SupportsStep(chip::EndpointId endpointId)
+inline bool SupportsStep(EndpointId endpointId)
 {
     return HasFeature(endpointId, Feature::kStep);
 }
 
-inline bool SupportsAirflowDirection(chip::EndpointId endpointId)
+inline bool SupportsAirflowDirection(EndpointId endpointId)
 {
     return HasFeature(endpointId, Feature::kAirflowDirection);
 }
@@ -207,7 +207,7 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
     case RockSetting::Id: {
         if (SupportsRocking(attributePath.mEndpointId))
         {
-            chip::BitMask<RockBitmap> rockSupport;
+            BitMask<RockBitmap> rockSupport;
             EmberAfStatus status = RockSupport::Get(attributePath.mEndpointId, &rockSupport);
             VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::ConstraintError);
             auto rawRockSupport = rockSupport.Raw();
@@ -229,7 +229,7 @@ MatterFanControlClusterServerPreAttributeChangedCallback(const ConcreteAttribute
     case WindSetting::Id: {
         if (SupportsWind(attributePath.mEndpointId))
         {
-            chip::BitMask<WindBitmap> windSupport;
+            BitMask<WindBitmap> windSupport;
             EmberAfStatus status = WindSupport::Get(attributePath.mEndpointId, &windSupport);
             VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::ConstraintError);
             auto rawWindSupport = windSupport.Raw();
@@ -402,9 +402,8 @@ void MatterFanControlClusterServerAttributeChangedCallback(const app::ConcreteAt
     }
 }
 
-bool emberAfFanControlClusterStepCallback(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath,
-                                          const chip::app::Clusters::FanControl::Commands::Step::DecodableType & commandData)
+bool emberAfFanControlClusterStepCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                          const Commands::Step::DecodableType & commandData)
 {
     /*
      * TODO: Clarification needed in spec issue #6496 - if this is tied to the SpeedSetting attribute, then
