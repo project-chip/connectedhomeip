@@ -256,11 +256,10 @@ public:
     virtual CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) = 0;
 
     /**
-     * Get operational error.
-     * @param void.
-     * @return the const reference of operational error.
+     * Get current operational error.
+     * @param error.Put a struct instance on the state, then call the delegate to fill it in.
      */
-    virtual const GenericOperationalError GetOperationalError() const = 0;
+    virtual void GetOperationalError(GenericOperationalError &error) = 0;
 
     /**
      * Set operational state.

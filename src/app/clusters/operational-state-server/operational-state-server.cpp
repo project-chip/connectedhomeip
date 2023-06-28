@@ -281,10 +281,10 @@ CHIP_ERROR OperationalStateServer::Read(const ConcreteReadAttributePath & aPath,
 
     case OperationalState::Attributes::OperationalError::Id: {
         Delegate * delegate = OperationalState::GetOperationalStateDelegate(mEndpointId, mClusterId);
-
+        GenericOperationalError opErr(to_underlying(ErrorStateEnum::kNoError));
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        return aEncoder.Encode(delegate->GetOperationalError());
+        delegate->GetOperationalError(opErr);
+        return aEncoder.Encode(opErr);
     }
     break;
 

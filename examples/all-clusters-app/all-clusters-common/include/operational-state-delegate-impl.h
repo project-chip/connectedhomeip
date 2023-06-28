@@ -42,7 +42,7 @@ class OperationalStateDelegate : public Delegate
 
 public:
     /**
-     * Get operational state.
+     * Get current operational state.
      * @param op Put a struct instance on the state, then call the delegate to fill it in.
      * @return void.
      */
@@ -67,11 +67,10 @@ public:
     CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) override;
 
     /**
-     * Get operational error.
-     * @param void.
-     * @return the const reference of operational error.
+     * Get current operational error.
+     * @param error.Put a struct instance on the state, then call the delegate to fill it in.
      */
-    const GenericOperationalError GetOperationalError() const override;
+    void GetOperationalError(GenericOperationalError &error) override;
 
     /**
      * Set operational error.
