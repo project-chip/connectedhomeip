@@ -26760,8 +26760,8 @@ class FanControl(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="fanMode", Tag=0x00000000, Type=FanControl.Enums.FanModeType),
-                ClusterObjectFieldDescriptor(Label="fanModeSequence", Tag=0x00000001, Type=FanControl.Enums.FanModeSequenceType),
+                ClusterObjectFieldDescriptor(Label="fanMode", Tag=0x00000000, Type=FanControl.Enums.FanModeEnum),
+                ClusterObjectFieldDescriptor(Label="fanModeSequence", Tag=0x00000001, Type=FanControl.Enums.FanModeSequenceEnum),
                 ClusterObjectFieldDescriptor(Label="percentSetting", Tag=0x00000002, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="percentCurrent", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="speedMax", Tag=0x00000004, Type=typing.Optional[uint]),
@@ -26780,8 +26780,8 @@ class FanControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    fanMode: 'FanControl.Enums.FanModeType' = None
-    fanModeSequence: 'FanControl.Enums.FanModeSequenceType' = None
+    fanMode: 'FanControl.Enums.FanModeEnum' = None
+    fanModeSequence: 'FanControl.Enums.FanModeSequenceEnum' = None
     percentSetting: 'typing.Union[Nullable, uint]' = None
     percentCurrent: 'uint' = None
     speedMax: 'typing.Optional[uint]' = None
@@ -26809,29 +26809,7 @@ class FanControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
-        class DirectionEnum(MatterIntEnum):
-            kIncrease = 0x00
-            kDecrease = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 2,
-
-        class FanModeSequenceType(MatterIntEnum):
-            kOffLowMedHigh = 0x00
-            kOffLowHigh = 0x01
-            kOffLowMedHighAuto = 0x02
-            kOffLowHighAuto = 0x03
-            kOffOnAuto = 0x04
-            kOffOn = 0x05
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 6,
-
-        class FanModeType(MatterIntEnum):
+        class FanModeEnum(MatterIntEnum):
             kOff = 0x00
             kLow = 0x01
             kMedium = 0x02
@@ -26845,6 +26823,28 @@ class FanControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 7,
 
+        class FanModeSequenceEnum(MatterIntEnum):
+            kOffLowMedHigh = 0x00
+            kOffLowHigh = 0x01
+            kOffLowMedHighAuto = 0x02
+            kOffLowHighAuto = 0x03
+            kOffOnAuto = 0x04
+            kOffOn = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 6,
+
+        class StepDirectionEnum(MatterIntEnum):
+            kIncrease = 0x00
+            kDecrease = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 2,
+
     class Bitmaps:
         class Feature(IntFlag):
             kMultiSpeed = 0x1
@@ -26854,16 +26854,12 @@ class FanControl(Cluster):
             kStep = 0x10
             kAirflowDirection = 0x20
 
-        class RockSupportMask(IntFlag):
+        class RockBitmap(IntFlag):
             kRockLeftRight = 0x1
             kRockUpDown = 0x2
             kRockRound = 0x4
 
-        class WindSettingMask(IntFlag):
-            kSleepWind = 0x1
-            kNaturalWind = 0x2
-
-        class WindSupportMask(IntFlag):
+        class WindBitmap(IntFlag):
             kSleepWind = 0x1
             kNaturalWind = 0x2
 
@@ -26879,12 +26875,12 @@ class FanControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="direction", Tag=0, Type=FanControl.Enums.DirectionEnum),
+                        ClusterObjectFieldDescriptor(Label="direction", Tag=0, Type=FanControl.Enums.StepDirectionEnum),
                         ClusterObjectFieldDescriptor(Label="wrap", Tag=1, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="lowestOff", Tag=2, Type=typing.Optional[bool]),
                     ])
 
-            direction: 'FanControl.Enums.DirectionEnum' = 0
+            direction: 'FanControl.Enums.StepDirectionEnum' = 0
             wrap: 'typing.Optional[bool]' = None
             lowestOff: 'typing.Optional[bool]' = None
 
@@ -26901,9 +26897,9 @@ class FanControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeType)
+                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeEnum)
 
-            value: 'FanControl.Enums.FanModeType' = 0
+            value: 'FanControl.Enums.FanModeEnum' = 0
 
         @dataclass
         class FanModeSequence(ClusterAttributeDescriptor):
@@ -26917,9 +26913,9 @@ class FanControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeSequenceType)
+                return ClusterObjectFieldDescriptor(Type=FanControl.Enums.FanModeSequenceEnum)
 
-            value: 'FanControl.Enums.FanModeSequenceType' = 0
+            value: 'FanControl.Enums.FanModeSequenceEnum' = 0
 
         @dataclass
         class PercentSetting(ClusterAttributeDescriptor):

@@ -33054,7 +33054,7 @@ CHIPFanControlPercentSettingAttributeCallback::~CHIPFanControlPercentSettingAttr
 }
 
 void CHIPFanControlPercentSettingAttributeCallback::CallbackFn(void * context,
-                                                               const chip::app::DataModel::Nullable<uint8_t> & value)
+                                                               const chip::app::DataModel::Nullable<chip::Percent> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;

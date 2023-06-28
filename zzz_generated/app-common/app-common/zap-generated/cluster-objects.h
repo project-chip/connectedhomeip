@@ -23871,7 +23871,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
 
-    DirectionEnum direction = static_cast<DirectionEnum>(0);
+    StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
     Optional<bool> wrap;
     Optional<bool> lowestOff;
 
@@ -23888,7 +23888,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
 
-    DirectionEnum direction = static_cast<DirectionEnum>(0);
+    StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
     Optional<bool> wrap;
     Optional<bool> lowestOff;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -23901,9 +23901,9 @@ namespace Attributes {
 namespace FanMode {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::FanControl::FanModeType;
-    using DecodableType    = chip::app::Clusters::FanControl::FanModeType;
-    using DecodableArgType = chip::app::Clusters::FanControl::FanModeType;
+    using Type             = chip::app::Clusters::FanControl::FanModeEnum;
+    using DecodableType    = chip::app::Clusters::FanControl::FanModeEnum;
+    using DecodableArgType = chip::app::Clusters::FanControl::FanModeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FanMode::Id; }
@@ -23913,9 +23913,9 @@ struct TypeInfo
 namespace FanModeSequence {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::FanControl::FanModeSequenceType;
-    using DecodableType    = chip::app::Clusters::FanControl::FanModeSequenceType;
-    using DecodableArgType = chip::app::Clusters::FanControl::FanModeSequenceType;
+    using Type             = chip::app::Clusters::FanControl::FanModeSequenceEnum;
+    using DecodableType    = chip::app::Clusters::FanControl::FanModeSequenceEnum;
+    using DecodableArgType = chip::app::Clusters::FanControl::FanModeSequenceEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FanModeSequence::Id; }
@@ -23925,9 +23925,9 @@ struct TypeInfo
 namespace PercentSetting {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PercentSetting::Id; }
@@ -23937,9 +23937,9 @@ struct TypeInfo
 namespace PercentCurrent {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PercentCurrent::Id; }
@@ -23985,9 +23985,9 @@ struct TypeInfo
 namespace RockSupport {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RockSupport::Id; }
@@ -23997,9 +23997,9 @@ struct TypeInfo
 namespace RockSetting {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RockSetting::Id; }
@@ -24009,9 +24009,9 @@ struct TypeInfo
 namespace WindSupport {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WindSupport::Id; }
@@ -24021,9 +24021,9 @@ struct TypeInfo
 namespace WindSetting {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WindSetting::Id; }
@@ -24087,18 +24087,22 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::FanMode::TypeInfo::DecodableType fanMode = static_cast<chip::app::Clusters::FanControl::FanModeType>(0);
+        Attributes::FanMode::TypeInfo::DecodableType fanMode = static_cast<chip::app::Clusters::FanControl::FanModeEnum>(0);
         Attributes::FanModeSequence::TypeInfo::DecodableType fanModeSequence =
-            static_cast<chip::app::Clusters::FanControl::FanModeSequenceType>(0);
+            static_cast<chip::app::Clusters::FanControl::FanModeSequenceEnum>(0);
         Attributes::PercentSetting::TypeInfo::DecodableType percentSetting;
-        Attributes::PercentCurrent::TypeInfo::DecodableType percentCurrent = static_cast<uint8_t>(0);
+        Attributes::PercentCurrent::TypeInfo::DecodableType percentCurrent = static_cast<chip::Percent>(0);
         Attributes::SpeedMax::TypeInfo::DecodableType speedMax             = static_cast<uint8_t>(0);
         Attributes::SpeedSetting::TypeInfo::DecodableType speedSetting;
         Attributes::SpeedCurrent::TypeInfo::DecodableType speedCurrent = static_cast<uint8_t>(0);
-        Attributes::RockSupport::TypeInfo::DecodableType rockSupport   = static_cast<uint8_t>(0);
-        Attributes::RockSetting::TypeInfo::DecodableType rockSetting   = static_cast<uint8_t>(0);
-        Attributes::WindSupport::TypeInfo::DecodableType windSupport   = static_cast<uint8_t>(0);
-        Attributes::WindSetting::TypeInfo::DecodableType windSetting   = static_cast<uint8_t>(0);
+        Attributes::RockSupport::TypeInfo::DecodableType rockSupport =
+            static_cast<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>(0);
+        Attributes::RockSetting::TypeInfo::DecodableType rockSetting =
+            static_cast<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>(0);
+        Attributes::WindSupport::TypeInfo::DecodableType windSupport =
+            static_cast<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>(0);
+        Attributes::WindSetting::TypeInfo::DecodableType windSetting =
+            static_cast<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>(0);
         Attributes::AirflowDirection::TypeInfo::DecodableType airflowDirection =
             static_cast<chip::app::Clusters::FanControl::AirflowDirectionEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
