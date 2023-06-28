@@ -21,7 +21,14 @@ from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl
 
 class TLVMetaDataGenerator(CodeGenerator):
     """
-    Generation of cpp code containing TLV metadata information
+    Generation of cpp code containing TLV metadata information.
+
+    Example execution via codegen.py:
+
+      ./scripts/codegen.py                        \
+          --output-dir out/metaexample            \
+          --generator cpp-tlvmeta                 \
+          src/lib/format/protocol_messages.matter
     """
 
     def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):

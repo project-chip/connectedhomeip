@@ -1,0 +1,18 @@
+#include <lib/core/TLVTags.h>
+#include <lib/format/FlatTree.h>
+
+#include <array>
+
+namespace chip {
+namespace TLVMeta {
+
+// TODO: move definition outside
+struct ItemInfo {
+  Tag tag;
+  const char *name;
+}
+
+extern std::array<Node<ItemInfo>, {{ clusters | length }}> cluster_meta;
+
+} // namespace chip
+} // namespace TLVMeta
