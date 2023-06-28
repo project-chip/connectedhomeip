@@ -20,6 +20,8 @@
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
+#import <os/lock.h>
+
 @interface MTRErrorTests : XCTestCase
 
 @end
