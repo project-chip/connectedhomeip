@@ -645,7 +645,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     extensionFieldFailTestOut.clusterID          = kColorControlClusterId;
     extensionFieldFailTestOut.attributeValueList = TooManyPairs;
 
-    // Give a bigger buffer given we are using to many pairs on purpose
+    // Give a bigger buffer given we are using too many pairs on purpose
     uint8_t failBuffer[2 * scenes::kMaxFieldBytesPerCluster] = { 0 };
     ByteSpan fail_list(failBuffer);
 
