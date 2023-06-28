@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#import <Matter/MTRDefines.h>
+
 #import "MTRDeviceController_Internal.h"
 
 #import "MTRBaseDevice_Internal.h"
@@ -1021,6 +1023,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
  * Shim to allow us to treat an MTRDevicePairingDelegate as an
  * MTRDeviceControllerDelegate.
  */
+MTR_HIDDEN
 @interface MTRDevicePairingDelegateShim : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, readonly) id<MTRDevicePairingDelegate> delegate;
 - (instancetype)initWithDelegate:(id<MTRDevicePairingDelegate>)delegate;
@@ -1078,6 +1081,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
  * Shim to allow us to treat an MTRNOCChainIssuer as an
  * MTROperationalCertificateIssuer.
  */
+MTR_HIDDEN
 @interface MTROperationalCertificateChainIssuerShim : NSObject <MTROperationalCertificateIssuer>
 @property (nonatomic, readonly) id<MTRNOCChainIssuer> nocChainIssuer;
 @property (nonatomic, readonly) BOOL shouldSkipAttestationCertificateValidation;

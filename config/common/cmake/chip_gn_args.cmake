@@ -91,6 +91,18 @@ macro(matter_add_gn_arg key value)
     string(APPEND MATTER_GN_ARGS "--arg\n${key}\n${value}\n")
 endmacro()
 
+# Add list variable GN argument
+# [Args]:
+#   key - variable name
+#   value - list variable
+macro(matter_add_gn_arg_list key value)
+    set(_value_list ${value} ${ARGN})
+    if (_value_list)
+        string(REPLACE ";" "," _list_str "${_value_list}")
+        string(APPEND MATTER_GN_ARGS "--arg\n${key}\n[${_list_str}]\n")
+    endif()
+endmacro()
+
 # Add items to Matter common compiler flags
 # [Args]:
 #   flags - flags to add
@@ -148,6 +160,7 @@ endmacro()
 #   LIB_TESTS       Add Matter unit tests library
 #   DEVICE_INFO_EXAMPLE_PROVIDER Add example device info provider support
 #   PROJECT_CONFIG  Path to the project-specific configuration file
+#   PROJECT_CONFIG_INC_DIR  Extra include dirs for project configurations
 #
 macro(matter_common_gn_args)
     set(options)
@@ -158,8 +171,11 @@ macro(matter_common_gn_args)
         LIB_PW_RPC
         DEVICE_INFO_EXAMPLE_PROVIDER 
         PROJECT_CONFIG
+        
     )
-    set(multiValueArgs)
+    set(multiValueArgs
+        PROJECT_CONFIG_INC_DIR
+    )
 
     cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -196,6 +212,9 @@ macro(matter_common_gn_args)
         matter_add_gn_arg_string("chip_project_config_include"               "<${PROJECT_CONFIG}>")
         matter_add_gn_arg_string("chip_system_project_config_include"        "<${PROJECT_CONFIG}>")
     endif() # CHIP_PROJECT_CONFIG
+    if (ARG_PROJECT_CONFIG_INC_DIR)
+        matter_add_gn_arg_list("chip_project_config_include_dirs"             ${ARG_PROJECT_CONFIG_INC_DIR})
+    endif()
 endmacro()
 
 # Generate the temporary GN arguments file from the settings

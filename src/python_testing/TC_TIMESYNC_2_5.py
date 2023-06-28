@@ -67,7 +67,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         self.print_step(4, "Test setting unsorted list - expect error")
         if dst_max_size_dut > 1:
             th_utc = utc_time_in_matter_epoch()
-            dst = [dst_struct(offset=3600, validStarting=th_utc, valid_until=th_utc+1.577e+13),
+            dst = [dst_struct(offset=3600, validStarting=th_utc, validUntil=th_utc+1.577e+13),
                    dst_struct(offset=3600, validStarting=0, validUntil=th_utc)]
             await self.send_set_dst_cmd_expect_error(dst=dst, error=Status.ConstraintError)
 
@@ -79,7 +79,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         self.print_step(6, "Test setting list with invalid second entry - expect error")
         if dst_max_size_dut > 1:
             th_utc = utc_time_in_matter_epoch()
-            dst = [dst_struct(offset=3600, validStarting=0, valid_until=th_utc+3e+8),
+            dst = [dst_struct(offset=3600, validStarting=0, validUntil=th_utc+3e+8),
                    dst_struct(offset=3600, validStarting=th_utc, validUntil=th_utc+1.577e+13)]
             await self.send_set_dst_cmd_expect_error(dst=dst, error=Status.ConstraintError)
 
@@ -91,7 +91,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         self.print_step(8, "Test setting list with two null values - expect error")
         if dst_max_size_dut > 1:
             th_utc = utc_time_in_matter_epoch()
-            dst = [dst_struct(offset=3600, validStarting=0, valid_until=NullValue),
+            dst = [dst_struct(offset=3600, validStarting=0, validUntil=NullValue),
                    dst_struct(offset=3600, validStarting=th_utc+3e+8, validUntil=NullValue)]
             await self.send_set_dst_cmd_expect_error(dst=dst, error=Status.ConstraintError)
 
@@ -103,7 +103,7 @@ class TC_TIMESYNC_2_5(MatterBaseTest):
         self.print_step(10, "Test setting list with null value not at end - expect error")
         if dst_max_size_dut > 1:
             th_utc = utc_time_in_matter_epoch()
-            dst = [dst_struct(offset=3600, validStarting=0, valid_until=NullValue),
+            dst = [dst_struct(offset=3600, validStarting=0, validUntil=NullValue),
                    dst_struct(offset=3600, validStarting=th_utc+3e+8, validUntil=th_utc+1.577e+13)]
             await self.send_set_dst_cmd_expect_error(dst=dst, error=Status.ConstraintError)
 

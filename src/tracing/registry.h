@@ -27,14 +27,27 @@ namespace Tracing {
 /// All tracing backends MUST be unregistered before the application
 /// exits. Consider using [ScopedRegistration]
 ///
-/// MUST be called with the Matter thread lock held (from the Matter main loop or
-/// at application main)
+/// Thread safety:
+///    MUST be called with the Matter thread lock held (from the Matter main loop or
+///    at application main). This is because data logging and multiplexed tracing
+///    iterate over registered backends.
+///
+///    Even if iteration is thread safe (i.e. main() trace register/unregister),
+///    the thread safety of the tracing relies on the thread safety of the macro
+///    implementations. We generally require tracing backends to be thread safe.
+///
 void Register(Backend & backend);
 
 /// Unregister a backend from receiving tracing/logging data
 ///
-/// MUST be called with the Matter thread lock held (from the Matter main loop or
-/// at application main)
+/// Thread safety:
+///    MUST be called with the Matter thread lock held (from the Matter main loop or
+///    at application main). This is because data logging and multiplexed tracing
+///    iterate over registered backends.
+///
+///    Even if iteration is thread safe (i.e. main() trace register/unregister),
+///    the thread safety of the tracing relies on the thread safety of the macro
+///    implementations. We generally require tracing backends to be thread safe.
 void Unregister(Backend & backend);
 
 /// Convenience class to apply Register/Unregister automatically
@@ -54,7 +67,7 @@ private:
     Backend * mBackend;
 };
 
-#ifdef MATTER_TRACING_ENABLED
+#if MATTER_TRACING_ENABLED
 
 // Internal calls, that will delegate to appropriate backends as needed
 namespace Internal {

@@ -6712,7 +6712,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
@@ -6732,7 +6732,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
@@ -6752,7 +6752,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster OzoneConcentrationMeasurement {
@@ -6772,7 +6772,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster Pm25ConcentrationMeasurement {
@@ -6792,7 +6792,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
@@ -6812,7 +6812,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster Pm1ConcentrationMeasurement {
@@ -6832,7 +6832,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster Pm10ConcentrationMeasurement {
@@ -6852,7 +6852,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
@@ -6872,7 +6872,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster RadonConcentrationMeasurement {
@@ -6892,7 +6892,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster WakeOnLan {

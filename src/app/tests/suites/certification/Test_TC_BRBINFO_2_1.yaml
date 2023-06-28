@@ -167,9 +167,10 @@ tests:
           ./chip-tool bridgeddevicebasicinformation read node-label 1 3
 
           Verify the value of node-label is type of string and contains length between 0 and 32 in TH(chip-tool) Log:
+          Note: If the write  access is implemented then the value of the of the Nodelabel will be changed into "newnode"
 
           [1657696463.081741][15476:15481] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 2577979325
-          [1657696463.081791][15476:15481] CHIP:TOO:   NodeLabel: newnode
+          [1657696463.081791][15476:15481] CHIP:TOO:   NodeLabel: Light 1
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -509,3 +510,28 @@ tests:
       attribute: "UniqueID"
       response:
           value: UniqueIDValue
+
+    - label: "TH reads ProductAppearance from the DUT."
+      PICS: BRBINFO.S.A0014
+      command: "readAttribute"
+      attribute: "ProductAppearance"
+      response:
+          saveAs: ProductAppearancevalue
+          constraints:
+              type: ProductAppearanceStruct
+
+    - label: "TH writes ProductAppearance to the DUT."
+      PICS: BRBINFO.S.A0014
+      command: "writeAttribute"
+      attribute: "ProductAppearance"
+      arguments:
+          value: { "Finish": 3, "PrimaryColor": 4 }
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "TH reads ProductAppearance attribute from the DUT."
+      PICS: BRBINFO.S.A0014
+      command: "readAttribute"
+      attribute: "ProductAppearance"
+      response:
+          value: ProductAppearancevalue
