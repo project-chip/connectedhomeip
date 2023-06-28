@@ -7,12 +7,20 @@ namespace chip {
 namespace TLVMeta {
 
 // TODO: move definition outside
+
+/// Fake tags for indexing inside cluster meta data
+/// This is because attributes,commands and events share
+/// a shared ID namespace
+static constexpr Tag kClusterAttributes = ContextTag(1);
+static constexpr Tag kClusterCommands = ContextTag(2);
+static constexpr Tag kClusterEvents = ContextTag(3);
+
 struct ItemInfo {
   Tag tag;
   const char *name;
 }
 
-extern std::array<Node<ItemInfo>, {{ clusters | length }}> cluster_meta;
+extern std::array<Node<ItemInfo>, {{ clusters | length }}> {{table_name}};
 
 } // namespace chip
 } // namespace TLVMeta

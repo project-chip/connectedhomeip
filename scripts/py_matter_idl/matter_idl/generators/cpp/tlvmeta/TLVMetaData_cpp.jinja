@@ -7,15 +7,21 @@ namespace {
 using namespace chip::FlatTree;
 using namespace chip::TLV;
 
-{%- for cluster in clusters | sort(attribute='name') %}
+{%- for table in sub_tables %}
+
+Entry<ItemInfo> _{{table.full_name}}[] = {
+  {%-  for entry in table.entries %}
+  { { ContextTag({{entry.code}}), "{{entry.name}}"}, {{entry.reference | indexInTable(sub_tables)}} },
+  {%- endfor %}
+};
+{%- endfor %}
 
 // TODO: reference structures and everything else
-// Figure out IDs 
-{% endfor -%}
+// Figure out IDs
 
-Entry<ItemInfo> all_clusters[] = {
+Entry<ItemInfo> _all_clusters[] = {
 {%- for cluster in clusters | sort(attribute='code') %}
-  { ContextTag({{"0x%02X" | format(cluster.code)}}), "{{cluster.name}}" },
+  { { ContextTag({{"0x%02X" | format(cluster.code)}}), "{{cluster.name}}" }, {{cluster.name | indexInTable(sub_tables)}} },
 {%- endfor %}
 };
 
@@ -23,9 +29,11 @@ Entry<ItemInfo> all_clusters[] = {
 
 #define _ENTRY(n) { sizeof(n) / sizeof(n[0]), n}
 
-std::array<Node<ItemInfo>, {{ clusters | length }}> cluster_meta = { {
-  _ENTRY(all_clusters),
-  // TODO: add the rest
+std::array<Node<ItemInfo>, {{ clusters | length }}> {{table_name}} = { {
+  _ENTRY(_all_clusters),
+{%- for table in sub_tables %}
+  _ENTRY(_{{table.full_name}}), // {{loop.index}}
+{%- endfor %}
 } };
 
 } // namespace chip
