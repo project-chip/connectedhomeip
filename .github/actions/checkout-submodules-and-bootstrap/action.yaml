@@ -27,4 +27,4 @@ runs:
     - name: Upload Bootstrap Logs
       uses: ./.github/actions/upload-bootstrap-logs
       with:
-        platform: ${{ inputs.bootstrap-log-name }}
+        bootstrap-log-name: ${{ inputs.bootstrap-log-name }}
