@@ -184,8 +184,9 @@ void MatterLaundryWasherControlsClusterServerAttributeChangedCallback(const chip
     return;
 }
 
-Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                           EmberAfAttributeType attributeType, uint16_t size,
+                                                                           uint8_t * value)
 {
     return imcode::Success;
 }
