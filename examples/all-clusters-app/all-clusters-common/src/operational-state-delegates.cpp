@@ -48,6 +48,11 @@ struct DelegatesEnquiryTable
     size_t numOfItems;
 };
 
+/*
+ * An example to present device's endpointId
+*/
+constexpr EndpointId kDemoEndpointId = 1;
+
 /**
  * Enquriy Table of Operational State List
  * Note: User Define

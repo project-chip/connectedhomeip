@@ -29,11 +29,6 @@ namespace Clusters {
 namespace OperationalState {
 
 /*
- * An example to present device's endpointId
-*/
-constexpr EndpointId kDemoEndpointId = 1;
-
-/*
  * An example state (not in spec) to present a device that is unable to honour the Pause/Resume/Start/Stop command
 */
 enum class ManufactureOperationalStateEnum : uint8_t
