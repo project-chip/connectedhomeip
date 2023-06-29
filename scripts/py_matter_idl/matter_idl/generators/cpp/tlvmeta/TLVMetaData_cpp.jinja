@@ -18,7 +18,7 @@ Entry<ItemInfo> _{{table.full_name}}[] = {
 
 Entry<ItemInfo> _all_clusters[] = {
 {%- for cluster in clusters | sort(attribute='code') %}
-  { { ContextTag({{"0x%02X" | format(cluster.code)}}), "{{cluster.name}}" }, {{cluster.name | indexInTable(sub_tables)}} },
+  { { ClusterTag({{"0x%02X" | format(cluster.code)}}), "{{cluster.name}}" }, {{cluster.name | indexInTable(sub_tables)}} },
 {%- endfor %}
 };
 

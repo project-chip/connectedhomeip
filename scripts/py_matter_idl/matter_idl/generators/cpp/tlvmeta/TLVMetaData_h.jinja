@@ -7,16 +7,28 @@ namespace chip {
 namespace TLVMeta {
 
 // TODO: move definition outside
+static constexpr uint32_t kAttributeProfile = 1;
+static constexpr uint32_t kCommandProfile = 2;
+static constexpr uint32_t kEventProfile = 3;
 
-/// Fake tags for indexing inside cluster meta data
-/// This is because attributes,commands and events share
-/// a shared ID namespace
-static constexpr Tag kClusterAttributesTag = ContextTag(1);
-static constexpr Tag kClusterCommandsTag = ContextTag(2);
-static constexpr Tag kClusterEventsTag = ContextTag(3);
+constexpr TLV::Tag ClusterTag(uint32_t cluster_id) {
+  return TLV::CommonTag(cluster_id);
+}
+
+constexpr TLV::Tag AttributeTag(uint32_t attribute_id) {
+  return TLV::ProfileTag(kAttrbiuteProfile, attribute_id);
+}
+
+constexpr TLV::Tag CommandTag(uint32_t command_id) {
+  return TLV::ProfileTag(kCommandProfile, command_id);
+}
+
+constexpr TLV::Tag EventTag(uint32_t event_id) {
+  return TLV::ProfileTag(kEventProfile, event_id);
+}
 
 struct ItemInfo {
-  Tag tag;
+  TLV::Tag tag;
   const char *name;
 }
 
