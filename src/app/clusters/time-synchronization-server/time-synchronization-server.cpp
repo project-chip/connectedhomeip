@@ -638,11 +638,8 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
             VerifyOrReturnValue(ClearDSTOffset() == CHIP_NO_ERROR, TimeState::kInvalid);
             return TimeState::kInvalid;
         }
-        else
-        {
-            dstList[activeDstIndex].offset = 0;
-            return TimeState::kStopped;
-        }
+        dstList[activeDstIndex].offset = 0;
+        return TimeState::kStopped;
     }
     if (activeDstIndex > 0)
     {
