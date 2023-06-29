@@ -25,9 +25,6 @@ list(APPEND CMAKE_MODULE_PATH ${OPEN_IOT_SDK_CONFIG}/cmake)
 
 set(APP_TARGET chip-openiotsdk-shell-example_ns)
 
-set(TFM_SUPPORT YES)
-set(TFM_NS_APP_VERSION "0.0.1")
-
 # Toolchain files need to exist before first call to project
 include(toolchain)
 
@@ -37,7 +34,7 @@ include(sdk)
 
 add_executable(${APP_TARGET})
 
-# Application CHIP build configuration 
+# Application CHIP build configuration
 set(CONFIG_CHIP_LIB_SHELL YES)
 include(chip)
 
@@ -53,13 +50,13 @@ target_compile_definitions(openiotsdk-startup
         IOT_SDK_APP_MAIN_STACK_SIZE=8192
 )
 
-target_include_directories(${APP_TARGET} 
+target_include_directories(${APP_TARGET}
     PRIVATE
         main/include
         ${SHELL_COMMON}/include
 )
 
-target_sources(${APP_TARGET} 
+target_sources(${APP_TARGET}
     PRIVATE
         main/main_ns.cpp
         ${SHELL_COMMON}/cmd_misc.cpp

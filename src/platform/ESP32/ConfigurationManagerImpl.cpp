@@ -241,8 +241,13 @@ CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t 
 {
     // As per spec, codeLen has to be 2
     VerifyOrReturnError((code != nullptr) && (codeLen == 2), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Setting country is only possible on WiFi supported SoCs
+#if CONFIG_ESP32_WIFI_ENABLED
     // Write CountryCode to esp_phy layer
     ReturnErrorOnFailure(MapConfigError(esp_phy_update_country_info(code)));
+#endif
+
     // As we do not have API to read country code from esp_phy layer, we are writing to NVS and when client reads the
     // CountryCode then we read from NVS
     return GenericConfigurationManagerImpl<ESP32Config>::StoreCountryCode(code, codeLen);

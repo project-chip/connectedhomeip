@@ -22,13 +22,11 @@
 include(FetchContent)
 
 get_filename_component(OPEN_IOT_SDK_SOURCE ${CHIP_ROOT}/third_party/open-iot-sdk/sdk REALPATH)
-get_filename_component(OPEN_IOT_SDK_STORAGE_SOURCE ${CHIP_ROOT}/third_party/open-iot-sdk/storage REALPATH)
 
 # Open IoT SDK targets passed to CHIP build
 list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS)
 
 # Additional Open IoT SDK build configuration
-set(TFM_SUPPORT NO CACHE BOOL "Add Trusted Firmware-M (TF-M) support to application")
 set(TFM_NS_APP_VERSION "0.0.0" CACHE STRING "TF-M non-secure application version (in the x.x.x format)")
 set(CONFIG_CHIP_OPEN_IOT_SDK_LWIP_DEBUG NO CACHE BOOL "Enable LwIP debug logs")
 
@@ -72,26 +70,23 @@ set(IOTSDK_FETCH_LIST
     mbedtls
     lwip
     cmsis-sockets-api
+    trusted-firmware-m
 )
 
 set(MDH_PLATFORM ARM_AN552_MPS3)
 set(VARIANT "FVP")
 set(FETCHCONTENT_QUIET OFF)
-if(TFM_SUPPORT)
-    list(APPEND IOTSDK_FETCH_LIST trusted-firmware-m)
-    set(TFM_PLATFORM ${OPEN_IOT_SDK_EXAMPLE_COMMON}/tf-m/targets/an552)
-    set(TFM_PSA_FIRMWARE_UPDATE ON)
-    set(MCUBOOT_IMAGE_VERSION_NS ${TFM_NS_APP_VERSION})
-    set(TFM_CMAKE_ARGS "-DCONFIG_TFM_ENABLE_FP=ON;-DTFM_PROFILE=profile_medium;-DTFM_EXCEPTION_INFO_DUMP=ON;-DCONFIG_TFM_HALT_ON_CORE_PANIC=ON;-DTFM_ISOLATION_LEVEL=1;-DTFM_MBEDCRYPTO_PLATFORM_EXTRA_CONFIG_PATH=${OPEN_IOT_SDK_CONFIG}/mbedtls/mbedtls_config_psa.h;-DMBEDCRYPTO_BUILD_TYPE=${CMAKE_BUILD_TYPE};-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-    if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-        set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DMCUBOOT_LOG_LEVEL=INFO;-DTFM_SPM_LOG_LEVEL=TFM_SPM_LOG_LEVEL_DEBUG;-DTFM_PARTITION_LOG_LEVEL=TFM_PARTITION_LOG_LEVEL_INFO")
-    else()
-        set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DMCUBOOT_LOG_LEVEL=ERROR;-DTFM_SPM_LOG_LEVEL=TFM_SPM_LOG_LEVEL_DEBUG;-DTFM_PARTITION_LOG_LEVEL=TFM_PARTITION_LOG_LEVEL_ERROR")
-    endif()
-    if(TFM_PROJECT_CONFIG_HEADER_FILE)
-        set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DPROJECT_CONFIG_HEADER_FILE=${TFM_PROJECT_CONFIG_HEADER_FILE}")
-    endif()
-    set(LINKER_SCRIPT ${OPEN_IOT_SDK_CONFIG}/ld/cs300_gcc_tfm.ld)
+set(TFM_PLATFORM ${OPEN_IOT_SDK_EXAMPLE_COMMON}/tf-m/targets/an552)
+set(TFM_PSA_FIRMWARE_UPDATE ON)
+set(MCUBOOT_IMAGE_VERSION_NS ${TFM_NS_APP_VERSION})
+set(TFM_CMAKE_ARGS "-DCONFIG_TFM_ENABLE_FP=ON;-DTFM_PROFILE=profile_medium;-DTFM_EXCEPTION_INFO_DUMP=ON;-DCONFIG_TFM_HALT_ON_CORE_PANIC=ON;-DTFM_ISOLATION_LEVEL=1;-DTFM_MBEDCRYPTO_PLATFORM_EXTRA_CONFIG_PATH=${OPEN_IOT_SDK_CONFIG}/mbedtls/mbedtls_config_psa.h;-DMBEDCRYPTO_BUILD_TYPE=${CMAKE_BUILD_TYPE};-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DMCUBOOT_LOG_LEVEL=INFO;-DTFM_SPM_LOG_LEVEL=TFM_SPM_LOG_LEVEL_DEBUG;-DTFM_PARTITION_LOG_LEVEL=TFM_PARTITION_LOG_LEVEL_INFO")
+else()
+    set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DMCUBOOT_LOG_LEVEL=ERROR;-DTFM_SPM_LOG_LEVEL=TFM_SPM_LOG_LEVEL_DEBUG;-DTFM_PARTITION_LOG_LEVEL=TFM_PARTITION_LOG_LEVEL_ERROR")
+endif()
+if(TFM_PROJECT_CONFIG_HEADER_FILE)
+    set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DPROJECT_CONFIG_HEADER_FILE=${TFM_PROJECT_CONFIG_HEADER_FILE}")
 endif()
 
 # Add Open IoT SDK source
@@ -124,7 +119,7 @@ if(TARGET cmsis-rtos-api)
 
     target_compile_definitions(cmsis-rtos-api
         PUBLIC
-            DOMAIN_NS=$<IF:$<BOOL:${TFM_SUPPORT}>,1,0>
+            DOMAIN_NS=1
     )
 
     if(TARGET freertos-kernel)
@@ -141,11 +136,6 @@ if(TARGET cmsis-rtos-api)
         target_link_libraries(cmsis-rtos-api
             PUBLIC
                 freertos-cmsis-rtos
-        )
-
-        target_compile_definitions(cmsis-rtos-api
-            INTERFACE
-                CONFIG_RUN_FREERTOS_SECURE_ONLY=$<IF:$<BOOL:${TFM_SUPPORT}>,0,1>
         )
     elseif(TARGET cmsis-rtx)
         target_link_libraries(cmsis-rtos-api
@@ -191,7 +181,7 @@ endif()
 if(TARGET mcu-driver-hal)
     target_compile_definitions(mcu-driver-hal
         INTERFACE
-            DOMAIN_NS=$<IF:$<BOOL:${TFM_SUPPORT}>,1,0>
+            DOMAIN_NS=1
     )
 
     # Fixing the optimization issue for mcu-driver-hal target in the release build.
@@ -283,24 +273,8 @@ if("mbedtls" IN_LIST IOTSDK_FETCH_LIST)
     )
 endif()
 
-# Additional Open IoT SDK port components
-
-# Add Open IoT SDK storage source
-add_subdirectory(${OPEN_IOT_SDK_STORAGE_SOURCE} ./sdk_storage_build)
-list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
-    iotsdk-blockdevice
-    iotsdk-tdbstore
-)
-
-# Add custom storage library
-add_subdirectory(${OPEN_IOT_SDK_CONFIG}/storage storage_build)
-list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
-    openiotsdk-storage
-)
-
 function(sdk_post_build target)
     string(REPLACE "_ns" "" APP_NAME ${target})
-if(TFM_SUPPORT)
     include(ConvertElfToBin)
     include(SignTfmImage)
     ExternalProject_Get_Property(trusted-firmware-m-build BINARY_DIR)
@@ -355,29 +329,4 @@ if(TFM_SUPPORT)
             $<TARGET_FILE_DIR:${target}>/${target}_merged.elf
         VERBATIM
     )
-else()
-    add_custom_command(
-        TARGET
-            ${target}
-        POST_BUILD
-        DEPENDS
-            $<TARGET_FILE_DIR:${target}>/${target}.elf
-            $<TARGET_FILE_DIR:${target}>/${target}.map
-        COMMAND
-            # Rename output elf file
-            ${CMAKE_COMMAND} -E copy
-                $<TARGET_FILE_DIR:${target}>/${target}.elf
-                $<TARGET_FILE_DIR:${target}>/${APP_NAME}.elf
-        COMMAND
-            # Rename output map file
-            ${CMAKE_COMMAND} -E copy
-                $<TARGET_FILE_DIR:${target}>/${target}.map
-                $<TARGET_FILE_DIR:${target}>/${APP_NAME}.map
-        COMMAND rm
-        ARGS -Rf
-            $<TARGET_FILE_DIR:${target}>/${target}.elf
-            $<TARGET_FILE_DIR:${target}>/${target}.map
-        VERBATIM
-    )
-endif() #TFM_SUPPORT
 endfunction()

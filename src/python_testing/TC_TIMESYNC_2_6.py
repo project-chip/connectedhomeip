@@ -101,7 +101,7 @@ class TC_TIMESYNC_2_6(MatterBaseTest):
 
         self.print_step(14, "Set DefaultNTP to good IPv6")
         ntp = "fe80::1"
-        await self.send_set_default_ntp(ntp=ntp)
+        await self.send_set_default_ntp_cmd(ntp=ntp)
 
         self.print_step(15, "Read DefaultNTP")
         attr = await self.read_ts_attribute_expect_success(default_ntp_attr)
