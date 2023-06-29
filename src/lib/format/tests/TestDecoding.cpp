@@ -23,6 +23,8 @@
 #include "sample_data.h"
 #include <tlv/meta/protocols_meta.h>
 
+#include <vector>
+
 #include <nlunit-test.h>
 
 namespace {
@@ -55,11 +57,11 @@ using DecodePosition = chip::FlatTree::Position<chip::TLVMeta::ItemInfo, 16>;
 
 void NiceDecode(DecodePosition & position, TLVReader reader)
 {
-    CHIP_ERROR err = reader.Next(kTLVType_Structure, AnonymousTag());
-    if (err == CHIP_END_OF_TLV) {
-        printf("<empty>\n");
+    if (reader.GetTotalLength() == 0) {
         return;
-    } else if (err != CHIP_NO_ERROR) {
+    }
+    CHIP_ERROR err = reader.Next(kTLVType_Structure, AnonymousTag());
+    if (err != CHIP_NO_ERROR) {
         printf("UNEXPECTED DATA: %" CHIP_ERROR_FORMAT "\n", err.Format());
         return;
     }
@@ -72,15 +74,19 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
         return;
     }
 
-    TLVType unused;
-    reader.EnterContainer(unused);
-    size_t depth = 1; // entered structure
+    TLVType containerType;
+    std::vector<TLVType> containers;
+
+    reader.EnterContainer(containerType);
+    containers.push_back(containerType);
 
     while (true) {
         err = reader.Next();
         if (err == CHIP_END_OF_TLV) {
             position.Exit();
-            if (--depth == 0) {
+            reader.ExitContainer(containers.back());
+            containers.pop_back();
+            if (containers.empty()) {
                 break;
             }
             continue;
@@ -89,27 +95,38 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
         // we likely have a tag, try to find its data
         position.Enter(ByTag(reader.GetTag()));
 
-        for (size_t i = 0; i < depth; i++) {
+        for (size_t i = 0; i < containers.size(); i++) {
             printf("  ");
         }
 
         // FIXME: exit logic may be complex
         auto data = position.Get();
         if (data != nullptr) {
-            printf("%s:\n", data->name);
+            printf("%-25s: <FIXME>\n", data->name);
         } else {
             printf("TAG NOT FOUND\n");
         }
 
-        position.Exit();
+        switch (reader.GetType()) {
+          case kTLVType_Structure:
+          case kTLVType_List:
+          case kTLVType_Array:
+            reader.EnterContainer(containerType);
+            containers.push_back(containerType);
+            break;
+          default:
+            // assume regular element, no entering
+            position.Exit();
+            break;
+        }
+
+
+
     }
 }
 
 void TestSampleData(nlTestSuite * inSuite, void * inContext, const SamplePayload & data)
 {
-    // data.protocolId
-    // data.messageType
-
     printf("*******************************************\n");
     printf("* message type: %d\n", data.protocolId.ToFullyQualifiedSpecForm());
     printf("* message type: %d\n", data.messageType);

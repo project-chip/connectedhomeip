@@ -139,15 +139,21 @@ client cluster IMProtocol = 0xFFFF0001 {
   }
 
   struct StatusResponseMessage {
-   int8u status = 0;
+    int8u status = 0;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
   }
 
   struct ReadRequestMessage {
-   optional AttributePathIB attribute_requests[] = 0;
-   optional EventPathIB event_requests[] = 1;
-   optional EventFilterIB event_filters[] = 2;
-   optional boolean fabric_filtered = 3;
-   optional DataVersionFilterIB data_version_filters[] = 4;
+    optional AttributePathIB attribute_requests[] = 0;
+    optional EventPathIB event_requests[] = 1;
+    optional EventFilterIB event_filters[] = 2;
+    optional boolean fabric_filtered = 3;
+    optional DataVersionFilterIB data_version_filters[] = 4;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
   }
 
   struct SubscribeRequestMessage {
@@ -160,12 +166,18 @@ client cluster IMProtocol = 0xFFFF0001 {
     // NOTE: 6 is missing here ...
     boolean fabric_filtered = 7;
     optional DataVersionFilterIB data_version_filters = 8;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
   }
 
   struct SubscribeResponseMessage {
     int32u subscription_id = 0;
     // NOTE: 1 missing here
     int16u max_interval = 1;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
   }
 
   struct StatusIB {
@@ -227,6 +239,9 @@ client cluster IMProtocol = 0xFFFF0001 {
     optional EventReportIB event_reports[] = 2;
     optional boolean more_cunked_messages = 3;
     optional boolean suppress_response = 4;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
   }
 
   struct AttributeDataIB {
@@ -244,6 +259,9 @@ client cluster IMProtocol = 0xFFFF0001 {
     boolean timed_request = 1;
     AttributeDataIB write_requests[] = 2;
     optional boolean more_chunked_messages = 3;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
   }
 
   struct AttributeStatusIB {
@@ -253,6 +271,9 @@ client cluster IMProtocol = 0xFFFF0001 {
 
   struct WriteResponseMessage {
     AttributeStatusIB write_responses[] = 0;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
   }
 
   struct CommandPathIB {
@@ -274,6 +295,9 @@ client cluster IMProtocol = 0xFFFF0001 {
     boolean suppress_response = 0;
     boolean timed_request = 1;
     CommandDataIB invoke_requests[] = 2;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
   }
 
   struct CommandStatusIB {
@@ -289,10 +313,16 @@ client cluster IMProtocol = 0xFFFF0001 {
   struct InvokeResponseMessage {
     boolean suppress_response = 0;
     InvokeResponseIB invoke_responses = 1;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
   }
 
   struct TimedRequestMessage {
     int16u timeout = 0;
+
+    // 10.2.2.2. Context Tag Encoded Action Information
+    int8u interaction_model_revison = 0xFF;
   }
 
   // IDs here are based on Protocol opcodes, defined
