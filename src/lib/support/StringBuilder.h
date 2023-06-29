@@ -58,7 +58,7 @@ public:
 
 
     /// Write a formatted string to the stringbuilder
-    StringBuilderBase & Format(const char *format, ...) ENFORCE_FORMAT(2,3) {
+    StringBuilderBase & AddFormat(const char *format, ...) ENFORCE_FORMAT(2,3) {
         va_list args;
         va_start(args, format);
 

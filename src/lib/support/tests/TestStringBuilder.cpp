@@ -83,7 +83,7 @@ void TestFormat(nlTestSuite * inSuite, void * inContext)
     {
         StringBuilder<100> builder;
 
-        builder.Format("Test: %d Hello %s\n", 123, "world");
+        builder.AddFormat("Test: %d Hello %s\n", 123, "world");
 
         NL_TEST_ASSERT(inSuite, builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "Test: 123 Hello world\n") == 0);
@@ -92,7 +92,7 @@ void TestFormat(nlTestSuite * inSuite, void * inContext)
     {
         StringBuilder<100> builder;
 
-        builder.Format("Align: %-5s", "abc");
+        builder.AddFormat("Align: %-5s", "abc");
 
         NL_TEST_ASSERT(inSuite, builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "Align: abc  ") == 0);
@@ -101,8 +101,8 @@ void TestFormat(nlTestSuite * inSuite, void * inContext)
     {
         StringBuilder<100> builder;
 
-        builder.Format("Multi: %d", 1234);
-        builder.Format(", then 0x%04X", 0xab);
+        builder.AddFormat("Multi: %d", 1234);
+        builder.AddFormat(", then 0x%04X", 0xab);
 
         NL_TEST_ASSERT(inSuite, builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "Multi: 1234, then 0x00AB") == 0);
@@ -114,7 +114,7 @@ void TestFormatOverflow(nlTestSuite * inSuite, void * inContext)
     {
         StringBuilder<13> builder;
 
-        builder.Format("Test: %d Hello %s\n", 123, "world");
+        builder.AddFormat("Test: %d Hello %s\n", 123, "world");
 
         NL_TEST_ASSERT(inSuite, !builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "Test: 123 He") == 0);
@@ -123,7 +123,7 @@ void TestFormatOverflow(nlTestSuite * inSuite, void * inContext)
     {
         StringBuilder<11> builder;
 
-        builder.Format("%d %d %d %d %d", 1, 2, 3, 4, 1234);
+        builder.AddFormat("%d %d %d %d %d", 1, 2, 3, 4, 1234);
 
         NL_TEST_ASSERT(inSuite, !builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1 2 3 4 12") == 0);
@@ -132,15 +132,15 @@ void TestFormatOverflow(nlTestSuite * inSuite, void * inContext)
     {
         StringBuilder<11> builder;
 
-        builder.Format("%d", 1234);
+        builder.AddFormat("%d", 1234);
         NL_TEST_ASSERT(inSuite, builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1234") == 0);
 
-        builder.Format("%s", "abc");
+        builder.AddFormat("%s", "abc");
         NL_TEST_ASSERT(inSuite, builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1234abc") == 0);
 
-        builder.Format("%08x", 0x123456);
+        builder.AddFormat("%08x", 0x123456);
         NL_TEST_ASSERT(inSuite, !builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1234abc001") == 0);
     }

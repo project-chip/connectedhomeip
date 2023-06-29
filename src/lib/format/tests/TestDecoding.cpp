@@ -93,11 +93,11 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
         err = reader.Get(sVal);
         if (err != CHIP_NO_ERROR)
         {
-            out.Format("ERR: %" CHIP_ERROR_FORMAT, err.Format());
+            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
         }
         else
         {
-            out.Format("%" PRIi64, sVal);
+            out.AddFormat("%" PRIi64, sVal);
         }
         break;
     }
@@ -106,11 +106,11 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
         err = reader.Get(uVal);
         if (err != CHIP_NO_ERROR)
         {
-            out.Format("ERR: %" CHIP_ERROR_FORMAT, err.Format());
+            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
         }
         else
         {
-            out.Format("%" PRIu64, uVal);
+            out.AddFormat("%" PRIu64, uVal);
         }
         break;
     }
@@ -119,7 +119,7 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
         err = reader.Get(bVal);
         if (err != CHIP_NO_ERROR)
         {
-            out.Format("ERR: %" CHIP_ERROR_FORMAT, err.Format());
+            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
         }
         else
         {
@@ -132,11 +132,11 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
         err = reader.Get(fpVal);
         if (err != CHIP_NO_ERROR)
         {
-            out.Format("ERR: %" CHIP_ERROR_FORMAT, err.Format());
+            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
         }
         else
         {
-            out.Format("%lf", fpVal);
+            out.AddFormat("%lf", fpVal);
         }
         break;
     }
@@ -145,11 +145,11 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
         err                    = reader.GetDataPtr(strbuf);
         if (err != CHIP_NO_ERROR)
         {
-            out.Format("ERR: %" CHIP_ERROR_FORMAT, err.Format());
+            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
         }
         else
         {
-            out.Format("\"%-.*s\"", static_cast<int>(reader.GetLength()), strbuf);
+            out.AddFormat("\"%-.*s\"", static_cast<int>(reader.GetLength()), strbuf);
         }
         break;
     }
@@ -158,14 +158,14 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
         err                    = reader.GetDataPtr(strbuf);
         if (err != CHIP_NO_ERROR)
         {
-            out.Format("ERR: %" CHIP_ERROR_FORMAT, err.Format());
+            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
         }
         else
         {
             out.Add("hex:");
             for (uint32_t i = 0; i < reader.GetLength(); i++)
             {
-                out.Format("%02X", strbuf[i]);
+                out.AddFormat("%02X", strbuf[i]);
             }
         }
         break;
