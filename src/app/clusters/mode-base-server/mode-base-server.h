@@ -121,11 +121,9 @@ public:
      */
     Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId)
+        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId),
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature)
     {
-        mEndpointId = aEndpointId;
-        mClusterId  = aClusterId;
-        mFeature    = aFeature;
     }
 
     ~Instance() override;

@@ -36,9 +36,9 @@ CHIP_ERROR DishwasherModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::
 {
     if (modeIndex < NumberOfModes())
     {
-        if (label.size() >= modeOptions[modeIndex].label.size())
+        if (label.size() >= kModeOptions[modeIndex].label.size())
         {
-            CopyCharSpanToMutableCharSpan(modeOptions[modeIndex].label, label);
+            CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
             return CHIP_NO_ERROR;
         }
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -50,7 +50,7 @@ CHIP_ERROR DishwasherModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_
 {
     if (modeIndex < NumberOfModes())
     {
-        value = modeOptions[modeIndex].mode;
+        value = kModeOptions[modeIndex].mode;
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NOT_FOUND;
@@ -60,10 +60,10 @@ CHIP_ERROR DishwasherModeInstance::GetModeTagsByIndex(uint8_t modeIndex, List<Mo
 {
     if (modeIndex < NumberOfModes())
     {
-        if (tags.size() >= modeOptions[modeIndex].modeTags.size())
+        if (tags.size() >= kModeOptions[modeIndex].modeTags.size())
         {
-            std::copy(modeOptions[modeIndex].modeTags.begin(), modeOptions[modeIndex].modeTags.end(), tags.begin());
-            tags.reduce_size(modeOptions[modeIndex].modeTags.size());
+            std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
+            tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
 
             return CHIP_NO_ERROR;
         }

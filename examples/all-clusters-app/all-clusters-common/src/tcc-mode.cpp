@@ -36,9 +36,9 @@ CHIP_ERROR TccModeInstance::GetModeLabelByIndex(uint8_t modeIndex, chip::Mutable
 {
     if (modeIndex < NumberOfModes())
     {
-        if (label.size() >= modeOptions[modeIndex].label.size())
+        if (label.size() >= kModeOptions[modeIndex].label.size())
         {
-            CopyCharSpanToMutableCharSpan(modeOptions[modeIndex].label, label);
+            CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
             return CHIP_NO_ERROR;
         }
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -50,7 +50,7 @@ CHIP_ERROR TccModeInstance::GetModeValueByIndex(uint8_t modeIndex, uint8_t & val
 {
     if (modeIndex < NumberOfModes())
     {
-        value = modeOptions[modeIndex].mode;
+        value = kModeOptions[modeIndex].mode;
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NOT_FOUND;
@@ -60,10 +60,10 @@ CHIP_ERROR TccModeInstance::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagSt
 {
     if (modeIndex < NumberOfModes())
     {
-        if (tags.size() >= modeOptions[modeIndex].modeTags.size())
+        if (tags.size() >= kModeOptions[modeIndex].modeTags.size())
         {
-            std::copy(modeOptions[modeIndex].modeTags.begin(), modeOptions[modeIndex].modeTags.end(), tags.begin());
-            tags.reduce_size(modeOptions[modeIndex].modeTags.size());
+            std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
+            tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
 
             return CHIP_NO_ERROR;
         }

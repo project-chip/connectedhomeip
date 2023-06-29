@@ -52,7 +52,7 @@ private:
                                            { .value = static_cast<uint16_t>(Clusters::LaundryWasherMode::ModeTag::kHeavy) } };
     ModeTagStructType modeTagsWhites[1]   = { { .value = static_cast<uint16_t>(Clusters::LaundryWasherMode::ModeTag::kWhites) } };
 
-    const ModeOptionStructType modeOptions[4] = {
+    const ModeOptionStructType kModeOptions[4] = {
         BuildModeOptionStruct("Normal", Clusters::LaundryWasherMode::ModeNormal, List<const ModeTagStructType>(modeTagsNormal)),
         BuildModeOptionStruct("Delicate", Clusters::LaundryWasherMode::ModeDelicate,
                               List<const ModeTagStructType>(modeTagsDelicate)),
@@ -63,7 +63,7 @@ private:
     CHIP_ERROR AppInit() override;
     void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
-    uint8_t NumberOfModes() override { return ArraySize(modeOptions); };
+    uint8_t NumberOfModes() override { return ArraySize(kModeOptions); };
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label) override;
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags) override;

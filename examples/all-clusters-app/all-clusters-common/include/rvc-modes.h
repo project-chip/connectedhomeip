@@ -46,7 +46,7 @@ private:
     ModeTagStructType ModeTagsIdle[1]     = { { .value = static_cast<uint16_t>(Clusters::RvcRunMode::ModeTag::kIdle) } };
     ModeTagStructType ModeTagsCleaning[1] = { { .value = static_cast<uint16_t>(Clusters::RvcRunMode::ModeTag::kCleaning) } };
 
-    const ModeOptionStructType modeOptions[3] = {
+    const ModeOptionStructType kModeOptions[3] = {
         BuildModeOptionStruct("Idle", Clusters::RvcRunMode::ModeIdle, List<const ModeTagStructType>(ModeTagsIdle)),
         BuildModeOptionStruct("Cleaning", Clusters::RvcRunMode::ModeCleaning, List<const ModeTagStructType>(ModeTagsCleaning)),
         BuildModeOptionStruct("Mapping", Clusters::RvcRunMode::ModeMapping,
@@ -56,7 +56,7 @@ private:
     CHIP_ERROR AppInit() override;
     void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
-    uint8_t NumberOfModes() override { return ArraySize(modeOptions); };
+    uint8_t NumberOfModes() override { return ArraySize(kModeOptions); };
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label) override;
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags) override;
@@ -85,7 +85,7 @@ private:
     ModeTagStructType modeTagsBoost[2] = { { .value = static_cast<uint16_t>(Clusters::ModeBase::ModeTag::kMax) },
                                            { .value = static_cast<uint16_t>(Clusters::RvcCleanMode::ModeTag::kDeepClean) } };
 
-    const ModeOptionStructType modeOptions[3] = {
+    const ModeOptionStructType kModeOptions[3] = {
         BuildModeOptionStruct("Vacuum", Clusters::RvcCleanMode::ModeVacuum, List<const ModeTagStructType>(modeTagsVac)),
         BuildModeOptionStruct("Wash", Clusters::RvcCleanMode::ModeWash, List<const ModeTagStructType>(modeTagsMop)),
         BuildModeOptionStruct("Deep clean", Clusters::RvcCleanMode::ModeDeepClean, List<const ModeTagStructType>(modeTagsBoost)),
@@ -94,7 +94,7 @@ private:
     CHIP_ERROR AppInit() override;
     void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
-    uint8_t NumberOfModes() override { return ArraySize(modeOptions); };
+    uint8_t NumberOfModes() override { return ArraySize(kModeOptions); };
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label) override;
     CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags) override;
