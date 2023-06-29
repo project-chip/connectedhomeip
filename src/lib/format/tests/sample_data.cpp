@@ -79,7 +79,8 @@ const uint8_t payload_1_5[] = {
 
 } // namespace
 
-const SamplePayload secure_channel_mrp_ack              = { chip::Protocols::Id(VendorId::Common, 0), 16, ByteSpan(payload_0_16, sizeof(payload_0_16)) };
+const SamplePayload secure_channel_mrp_ack              = { chip::Protocols::Id(VendorId::Common, 0), 16,
+                                               ByteSpan(payload_0_16, sizeof(payload_0_16)) };
 const SamplePayload secure_channel_pkbdf_param_request  = { chip::Protocols::Id(VendorId::Common, 0), 32, ByteSpan(payload_0_32) };
 const SamplePayload secure_channel_pkbdf_param_response = { chip::Protocols::Id(VendorId::Common, 0), 33, ByteSpan(payload_0_33) };
 const SamplePayload secure_channel_pase_pake1           = { chip::Protocols::Id(VendorId::Common, 0), 34, ByteSpan(payload_0_34) };

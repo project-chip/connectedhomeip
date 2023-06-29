@@ -24,13 +24,13 @@ config("temporary_test_config") {
 
 source_set("temporary_test") {
   sources = [
-    "sample_data.h",
     "sample_data.cpp",
-    "tlv/meta/protocols_meta.h",
+    "sample_data.h",
     "tlv/meta/protocols_meta.cpp",
+    "tlv/meta/protocols_meta.h",
   ]
 
-  public_configs=[ ":temporary_test_config" ]
+  public_configs = [ ":temporary_test_config" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",

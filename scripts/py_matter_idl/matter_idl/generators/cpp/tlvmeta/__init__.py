@@ -26,7 +26,7 @@ class TableEntry:
     name: str                   # human friendly name
     reference: Optional[str]    # reference to full name
     real_type: str              # real type
-    item_type: str = 'kDefault' # type flag for decoding
+    item_type: str = 'kDefault'  # type flag for decoding
 
 
 @dataclass
@@ -60,7 +60,7 @@ class ClusterTablesGenerator:
         if type_reference not in self.known_types:
             type_reference = None
 
-        item_type = self.GetItemTypeFor(field.data_type.name);
+        item_type = self.GetItemTypeFor(field.data_type.name)
 
         real_type = "%s::%s" % (self.cluster.name, field.data_type.name)
         if field.is_list:

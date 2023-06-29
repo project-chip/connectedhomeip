@@ -15,18 +15,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <protocols/Protocols.h>
 #include <lib/support/Span.h>
+#include <protocols/Protocols.h>
 
 namespace chip {
 namespace TestData {
 
-struct SamplePayload {
+struct SamplePayload
+{
     Protocols::Id protocolId;
     uint8_t messageType;
     ByteSpan payload;
 };
-
 
 extern const SamplePayload secure_channel_mrp_ack;
 extern const SamplePayload secure_channel_pkbdf_param_request;

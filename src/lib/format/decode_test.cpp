@@ -1,5 +1,6 @@
 
 
-int main() {
+int main()
+{
     printf("TESTING...");
 }
