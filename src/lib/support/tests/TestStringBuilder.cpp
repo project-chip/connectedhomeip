@@ -128,6 +128,22 @@ void TestFormatOverflow(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, !builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1 2 3 4 12") == 0);
     }
+
+    {
+        StringBuilder<11> builder;
+
+        builder.Format("%d", 1234);
+        NL_TEST_ASSERT(inSuite, builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1234") == 0);
+
+        builder.Format("%s", "abc");
+        NL_TEST_ASSERT(inSuite, builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1234abc") == 0);
+
+        builder.Format("%08x", 0x123456);
+        NL_TEST_ASSERT(inSuite, !builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1234abc001") == 0);
+    }
 }
 
 const nlTest sTests[] = {
