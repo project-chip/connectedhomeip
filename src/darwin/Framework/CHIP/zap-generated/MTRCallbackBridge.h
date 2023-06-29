@@ -422,6 +422,10 @@ typedef void (*HEPAFilterMonitoringClusterDegradationDirectionEnumAttributeCallb
     void *, chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum);
 typedef void (*NullableHEPAFilterMonitoringClusterDegradationDirectionEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum> &);
+typedef void (*HEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback)(
+    void *, chip::app::Clusters::HepaFilterMonitoring::ProductIdentifierTypeEnum);
+typedef void (*NullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::HepaFilterMonitoring::ProductIdentifierTypeEnum> &);
 typedef void (*ActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttributeCallback)(
     void *, chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum);
 typedef void (*NullableActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttributeCallback)(
@@ -430,6 +434,11 @@ typedef void (*ActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAtt
     void *, chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum);
 typedef void (*NullableActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum> &);
+typedef void (*ActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback)(
+    void *, chip::app::Clusters::ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum);
+typedef void (*NullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback)(
+    void *,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum> &);
 typedef void (*DoorLockClusterAlarmCodeEnumAttributeCallback)(void *, chip::app::Clusters::DoorLock::AlarmCodeEnum);
 typedef void (*NullableDoorLockClusterAlarmCodeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::AlarmCodeEnum> &);
@@ -1221,6 +1230,10 @@ typedef void (*OperationalStateEventListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*OperationalStateAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*HEPAFilterMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*HEPAFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*HEPAFilterMonitoringAcceptedCommandListListAttributeCallback)(
@@ -1229,6 +1242,10 @@ typedef void (*HEPAFilterMonitoringEventListListAttributeCallback)(void * contex
                                                                    const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*HEPAFilterMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & data);
 typedef void (*ActivatedCarbonFilterMonitoringGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ActivatedCarbonFilterMonitoringAcceptedCommandListListAttributeCallback)(
@@ -9591,6 +9608,42 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackBridge
+    : public MTRCallbackBridge<HEPAFilterMonitoringReplacementProductListListAttributeCallback>
+{
+public:
+    MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<HEPAFilterMonitoringReplacementProductListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action) :
+        MTRCallbackBridge<HEPAFilterMonitoringReplacementProductListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::DecodableList<
+                    chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & value);
+};
+
+class MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackSubscriptionBridge
+    : public MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackBridge
+{
+public:
+    MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class MTRHEPAFilterMonitoringGeneratedCommandListListAttributeCallbackBridge
     : public MTRCallbackBridge<HEPAFilterMonitoringGeneratedCommandListListAttributeCallback>
 {
@@ -9718,6 +9771,46 @@ public:
     void OnSubscriptionEstablished();
     using MTRHEPAFilterMonitoringAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRHEPAFilterMonitoringAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallback>
+{
+public:
+    MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler) :
+        MTRCallbackBridge<ActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallback>(queue, handler,
+                                                                                                      OnSuccessFn){};
+
+    MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler,
+                                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<ActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallback>(queue, handler, action,
+                                                                                                      OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<
+            chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & value);
+};
+
+class MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallbackSubscriptionBridge
+    : public MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallbackBridge
+{
+public:
+    MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -22489,6 +22582,80 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<HEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>
+{
+public:
+    MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                   ResponseHandler handler) :
+        MTRCallbackBridge<HEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                   MTRActionBlock action) :
+        MTRCallbackBridge<HEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                                 OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::HepaFilterMonitoring::ProductIdentifierTypeEnum value);
+};
+
+class MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>
+{
+public:
+    MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler) :
+        MTRCallbackBridge<NullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>(queue, handler,
+                                                                                                         OnSuccessFn){};
+
+    MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                           ResponseHandler handler,
+                                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<NullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                                         OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::HepaFilterMonitoring::ProductIdentifierTypeEnum> & value);
+};
+
+class MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class MTRActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttributeCallbackBridge
     : public MTRCallbackBridge<ActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttributeCallback>
 {
@@ -22637,6 +22804,83 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<ActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>
+{
+public:
+    MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                              ResponseHandler handler) :
+        MTRCallbackBridge<ActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>(queue, handler,
+                                                                                                            OnSuccessFn){};
+
+    MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                              ResponseHandler handler,
+                                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<ActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>(queue, handler, action,
+                                                                                                            OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum value);
+};
+
+class MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>
+{
+public:
+    MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<NullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>(queue, handler,
+                                                                                                                    OnSuccessFn){};
+
+    MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                                      ResponseHandler handler,
+                                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<NullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallback>(
+            queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum> &
+            value);
+};
+
+class MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

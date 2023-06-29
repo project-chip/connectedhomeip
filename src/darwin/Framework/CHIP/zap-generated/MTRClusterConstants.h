@@ -3830,6 +3830,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeReplacementProductListID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeLastChangedTimeID MTR_NEWLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
@@ -3848,6 +3850,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeDegradationDirectionID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeChangeIndicationID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeInPlaceIndicatorID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeReplacementProductListID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeLastChangedTimeID MTR_NEWLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE

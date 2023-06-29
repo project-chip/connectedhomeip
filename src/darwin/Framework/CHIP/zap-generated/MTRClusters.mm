@@ -14036,6 +14036,42 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
+- (NSDictionary<NSString *, id> *)readAttributeReplacementProductListWithParams:(MTRReadParams * _Nullable)params
+{
+    return
+        [self.device readAttributeWithEndpointID:@(_endpoint)
+                                       clusterID:@(MTRClusterIDTypeHEPAFilterMonitoringID)
+                                     attributeID:@(MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeReplacementProductListID)
+                                          params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLastChangedTimeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeHEPAFilterMonitoringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeLastChangedTimeID)
+                                             params:params];
+}
+
+- (void)writeAttributeLastChangedTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeLastChangedTimeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeLastChangedTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                        params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(_endpoint)
+                                    clusterID:@(MTRClusterIDTypeHEPAFilterMonitoringID)
+                                  attributeID:@(MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeLastChangedTimeID)
+                                        value:dataValueDictionary
+                        expectedValueInterval:expectedValueIntervalMs
+                            timedWriteTimeout:timedWriteTimeout];
+}
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
@@ -14210,6 +14246,43 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                           clusterID:@(MTRClusterIDTypeActivatedCarbonFilterMonitoringID)
                         attributeID:@(MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeInPlaceIndicatorID)
                              params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeReplacementProductListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeActivatedCarbonFilterMonitoringID)
+                        attributeID:@(MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeReplacementProductListID)
+                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeLastChangedTimeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device
+        readAttributeWithEndpointID:@(_endpoint)
+                          clusterID:@(MTRClusterIDTypeActivatedCarbonFilterMonitoringID)
+                        attributeID:@(MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeLastChangedTimeID)
+                             params:params];
+}
+
+- (void)writeAttributeLastChangedTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeLastChangedTimeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeLastChangedTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                        params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(_endpoint)
+                                    clusterID:@(MTRClusterIDTypeActivatedCarbonFilterMonitoringID)
+                                  attributeID:@(MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeLastChangedTimeID)
+                                        value:dataValueDictionary
+                        expectedValueInterval:expectedValueIntervalMs
+                            timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params

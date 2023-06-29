@@ -2034,6 +2034,12 @@ static BOOL AttributeIsSpecifiedInHEPAFilterMonitoringCluster(AttributeId aAttri
     case Attributes::InPlaceIndicator::Id: {
         return YES;
     }
+    case Attributes::ReplacementProductList::Id: {
+        return YES;
+    }
+    case Attributes::LastChangedTime::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -2071,6 +2077,12 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
         return YES;
     }
     case Attributes::InPlaceIndicator::Id: {
+        return YES;
+    }
+    case Attributes::ReplacementProductList::Id: {
+        return YES;
+    }
+    case Attributes::LastChangedTime::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

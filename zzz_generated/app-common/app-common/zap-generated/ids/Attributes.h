@@ -3074,6 +3074,14 @@ namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3119,6 +3127,14 @@ static constexpr AttributeId Id = 0x00000002;
 namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3166,6 +3182,14 @@ namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3211,6 +3235,14 @@ static constexpr AttributeId Id = 0x00000002;
 namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3258,6 +3290,14 @@ namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3303,6 +3343,14 @@ static constexpr AttributeId Id = 0x00000002;
 namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3350,6 +3398,14 @@ namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3395,6 +3451,14 @@ static constexpr AttributeId Id = 0x00000002;
 namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3442,6 +3506,14 @@ namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3487,6 +3559,14 @@ static constexpr AttributeId Id = 0x00000002;
 namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3534,6 +3614,14 @@ namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
 
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3579,6 +3667,14 @@ static constexpr AttributeId Id = 0x00000002;
 namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace InPlaceIndicator
+
+namespace ReplacementProductList {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ReplacementProductList
+
+namespace LastChangedTime {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastChangedTime
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
