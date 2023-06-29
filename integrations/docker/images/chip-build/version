@@ -1,1 +1,1 @@
-0.7.22 Version bump reason: Update Silicon Labs docker
+0.7.23 Version bump reason: make slc-cli not use requirements.txt for efr32
