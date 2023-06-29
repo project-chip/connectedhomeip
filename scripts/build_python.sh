@@ -106,10 +106,6 @@ while (($#)); do
             ;;
         --install_virtual_env | -i)
             install_virtual_env=$2
-            if [[ "$install_virtual_env" != "yes" && "$install_virtual_env" != "no" ]]; then
-                echo "chip_virtual_env should have a yes/no value, not '$install_virtual_env'"
-                exit
-            fi
             shift
             ;;
         --clean_virtual_env | -c)
