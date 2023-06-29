@@ -13,10 +13,10 @@ RUN set -x \
 RUN set -x \
     && mkdir /opt/telink \
     && cd /opt/telink \
-    && wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/zephyr-sdk-0.16.1_linux-x86_64.tar.xz \
+    && wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz \
     && wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.1/sha256.sum | shasum --check --ignore-missing \
-    && tar xvf zephyr-sdk-0.16.1_linux-x86_64.tar.xz \
-    && rm -rf zephyr-sdk-0.16.1_linux-x86_64.tar.xz \
+    && tar xvf zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz \
+    && rm -rf zephyr-sdk-0.16.1_linux-x86_64_minimal.tar.xz \
     && cd zephyr-sdk-0.16.1 \
     && ./setup.sh -t riscv64-zephyr-elf -h -c \
     && cd / \
@@ -27,7 +27,7 @@ ARG ZEPHYR_REVISION=9b235736b59c56783471cf7cf026c14d59085a33
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install -U --no-cache-dir \
-    west==0.12.0 \
+    west==1.0.0 \
     imgtool==1.7.0 \
     && git clone https://github.com/telink-semi/zephyr \
     && cd zephyr \
