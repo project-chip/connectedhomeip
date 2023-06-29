@@ -233,23 +233,16 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
             printf("TAG NOT FOUND: ");
         }
 
-        switch (reader.GetType())
-        {
-        case kTLVType_Structure:
-        case kTLVType_List:
-        case kTLVType_Array:
+        if (TLVTypeIsContainer(reader.GetType())) {
             reader.EnterContainer(containerType);
             containers.push_back(containerType);
             printf("\n");
-            break;
-        default: {
+        } else {
             // assume regular element, no entering
             char buffer[256];
             PrettyPrintCurrentValue(reader, chip::MutableCharSpan(buffer));
             printf("%s\n", buffer);
             position.Exit();
-            break;
-        }
         }
     }
 }
