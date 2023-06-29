@@ -1,0 +1,10 @@
+<node>
+	<interface name="org.tizen.matter.example.lighting.Manager1">
+		<method name="LightStatus">
+			<arg direction="out" type="u" name="on" />
+		</method>
+		<method name="SetLightStatus">
+			<arg direction="in" type="u" name="on" />
+		</method>
+	</interface>
+</node>

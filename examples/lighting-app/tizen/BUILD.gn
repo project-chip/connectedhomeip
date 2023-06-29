@@ -23,11 +23,14 @@ assert(chip_build_tools)
 
 executable("chip-lighting-app") {
   sources = [
+    "${root_out_dir}/lightapp-iface.c",
+    "${root_out_dir}/lightapp-iface.h",
     "include/CHIPProjectAppConfig.h",
     "src/main.cpp",
   ]
 
   deps = [
+    "//:iface",
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/lighting-app/lighting-common:lighting-manager",
     "${chip_root}/examples/platform/tizen:app-main",
@@ -59,3 +62,24 @@ group("tizen:tpk") {
 group("default") {
   deps = [ ":tizen" ]
 }
+
+# group("iface") {
+action("iface") {
+  script = "${build_root}/gn_run_binary.py"
+  args = [
+    "gdbus-codegen",
+    "--interface-prefix=org.tizen.communication",
+    "--pragma-once",
+    "--c-namespace",
+    "LightApp",
+    "--c-generate-object-manager",
+    "--generate-c-code",
+    "lightapp-iface",
+    "../../examples/lighting-app/tizen/xml/Manager1.xml",
+  ]
+  outputs = [
+    "${root_out_dir}/lightapp-iface.h",
+    "${root_out_dir}/lightapp-iface.c",
+  ]
+}
+# }
