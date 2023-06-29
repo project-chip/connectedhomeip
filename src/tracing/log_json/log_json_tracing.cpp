@@ -21,6 +21,7 @@
 #include <lib/address_resolve/TracingStructs.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
+#include <lib/support/BytesToHex.h>
 #include <transport/TracingStructs.h>
 
 #include <json/json.h>
@@ -104,6 +105,13 @@ void DecodePayloadData(Json::Value & value, chip::ByteSpan payload)
 
     // TODO: a decode would be useful however it likely requires more decode
     //       metadata
+    //
+    // Hex encoding is possible, however it is quite crude
+    //
+    // char hex_buffer[1024];
+    // if (chip::Encoding::BytesToUppercaseHexString(payload.data(), payload.size(), hex_buffer, sizeof(hex_buffer)) == CHIP_NO_ERROR) {
+    //     value["payloadHex"] = hex_buffer;
+    // }
 }
 
 } // namespace
@@ -137,6 +145,7 @@ void LogJsonBackend::TraceInstant(const char * label, const char * group)
 
 void LogJsonBackend::LogMessageSend(MessageSendInfo & info)
 {
+
     Json::Value value;
     value["event"] = "MessageSend";
 
