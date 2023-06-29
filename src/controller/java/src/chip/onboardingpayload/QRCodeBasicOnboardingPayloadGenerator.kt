@@ -90,10 +90,6 @@ private fun generateBitSet(
   populateBits(bits, offset, payload.vendorId.toLong(), kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits)
   populateBits(bits, offset, payload.productId.toLong(), kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits)
   populateBits(bits, offset, payload.commissioningFlow.toLong(), kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits)
-
-  if (payload.discoveryCapabilities.isEmpty())
-    throw OnboardingPayloadException("Invalid argument")
-
   populateBits(bits, offset, payload.getRendezvousInformation(), kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits)
   populateBits(bits, offset, payload.discriminator.toLong(), kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits)  
   populateBits(bits, offset, payload.setupPinCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits)  
