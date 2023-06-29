@@ -8,7 +8,8 @@ RUN set -x \
     gcc-arm-none-eabi=15:9-2019-q4-0ubuntu1 \
     binutils-arm-none-eabi=2.34-4ubuntu1+13ubuntu1 \
     git-lfs \
-    openjdk-11-jdk \
+    openjdk-17-jdk \
+    python3-sphinx \
     ccache=3.7.7-1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
@@ -29,9 +30,10 @@ RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
 
 ENV PATH="${PATH}:/slc_cli/"
 
-#  TODO Fix me
-# RUN slc configuration  --sdk="$GSDK_ROOT" && \
-#     slc signature trust --sdk "$GSDK_ROOT"
+# Install Python Packages
 
-
+# SLC required Python Packages
 RUN pip3 install lark jinja2 stringcase
+
+# Sphinx required Python Packages
+RUN pip3 install myst_parser sphinx_rtd_theme sphinx_tabs linkify-it-py
