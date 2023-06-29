@@ -21,12 +21,6 @@ set -e
 # Print CHIP logs on stdout
 dlogutil CHIP &
 
-# List of tests which are currently expected to fail on Tizen platform.
-# TODO: Remove this list once the tests are fixed.
-XFAIL_TESTS=(
-    TestPASESession
-)
-
 FAILED=()
 STATUS=0
 
@@ -40,11 +34,6 @@ while IFS= read -r TEST; do
 
     RV=0
     "$TEST" || RV=$?
-
-    # If test is expected to fail, report failure if it succeeds
-    if [[ " ${XFAIL_TESTS[*]} " == *" ${NAME} "* ]]; then
-        [[ $RV -ne 0 ]] && RV=0 || RV=1
-    fi
 
     if [ "$RV" -eq 0 ]; then
         echo -e "DONE: \e[32mSUCCESS\e[0m"
