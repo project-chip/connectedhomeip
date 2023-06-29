@@ -35,6 +35,7 @@
         "content-launch-cluster.xml",
         "descriptor-cluster.xml",
         "diagnostic-logs-cluster.xml",
+        "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
         "door-lock-cluster.xml",
         "electrical-measurement-cluster.xml",

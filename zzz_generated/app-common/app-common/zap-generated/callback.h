@@ -385,13 +385,13 @@ void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Washer Controls Cluster Init
+/** @brief Laundry Washer Controls Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfWasherControlsClusterInitCallback(chip::EndpointId endpoint);
+void emberAfLaundryWasherControlsClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief RVC Run Mode Cluster Init
  *
@@ -448,6 +448,14 @@ void emberAfAirQualityClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Alarm Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherAlarmClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Operational State Cluster Init
  *
@@ -4486,42 +4494,42 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterServerTickCall
 void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Washer Controls Cluster
+// Laundry Washer Controls Cluster
 //
 
-/** @brief Washer Controls Cluster Server Init
+/** @brief Laundry Washer Controls Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfWasherControlsClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfLaundryWasherControlsClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Washer Controls Cluster Server Shutdown
+/** @brief Laundry Washer Controls Cluster Server Shutdown
  *
  * Server Shutdown
  *
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterWasherControlsClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterLaundryWasherControlsClusterServerShutdownCallback(chip::EndpointId endpoint);
 
-/** @brief Washer Controls Cluster Client Init
+/** @brief Laundry Washer Controls Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfWasherControlsClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfLaundryWasherControlsClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Washer Controls Cluster Server Attribute Changed
+/** @brief Laundry Washer Controls Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterWasherControlsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterLaundryWasherControlsClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Washer Controls Cluster Server Pre Attribute Changed
+/** @brief Laundry Washer Controls Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -4530,11 +4538,10 @@ void MatterWasherControlsClusterServerAttributeChangedCallback(const chip::app::
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status
-MatterWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Washer Controls Cluster Client Pre Attribute Changed
+/** @brief Laundry Washer Controls Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -4543,25 +4550,24 @@ MatterWasherControlsClusterServerPreAttributeChangedCallback(const chip::app::Co
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status
-MatterWasherControlsClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+chip::Protocols::InteractionModel::Status MatterLaundryWasherControlsClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Washer Controls Cluster Server Tick
+/** @brief Laundry Washer Controls Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfWasherControlsClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfLaundryWasherControlsClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Washer Controls Cluster Client Tick
+/** @brief Laundry Washer Controls Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfWasherControlsClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfLaundryWasherControlsClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // RVC Run Mode Cluster
@@ -5106,6 +5112,84 @@ void emberAfSmokeCoAlarmClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfSmokeCoAlarmClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Dishwasher Alarm Cluster
+//
+
+/** @brief Dishwasher Alarm Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherAlarmClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Alarm Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterDishwasherAlarmClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Alarm Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDishwasherAlarmClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Alarm Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterDishwasherAlarmClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Dishwasher Alarm Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterDishwasherAlarmClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Dishwasher Alarm Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterDishwasherAlarmClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Dishwasher Alarm Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDishwasherAlarmClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Dishwasher Alarm Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDishwasherAlarmClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Operational State Cluster
@@ -11759,6 +11843,18 @@ bool emberAfDishwasherModeClusterChangeToModeCallback(
 bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::SmokeCoAlarm::Commands::SelfTestRequest::DecodableType & commandData);
+/**
+ * @brief Dishwasher Alarm Cluster Reset Command callback (from client)
+ */
+bool emberAfDishwasherAlarmClusterResetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherAlarm::Commands::Reset::DecodableType & commandData);
+/**
+ * @brief Dishwasher Alarm Cluster ModifyEnabledAlarms Command callback (from client)
+ */
+bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
  * @brief Operational State Cluster Pause Command callback (from client)
  */

@@ -37,7 +37,7 @@ class ThreadStackManager;
 class ThreadStackManagerImpl;
 
 /**
- * Concrete implementation of the ThreadStackManager singleton object for BL702 platforms
+ * Concrete implementation of the ThreadStackManager singleton object for Bouffalo Lab platforms
  * using the Bouffalolab SDK and the OpenThread stack.
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
@@ -103,7 +103,7 @@ inline ThreadStackManager & ThreadStackMgr(void)
  * Returns the platform-specific implementation of the ThreadStackManager singleton object.
  *
  * Chip applications can use this to gain access to features of the ThreadStackManager
- * that are specific to BL702 platforms.
+ * that are specific to Bouffalo Lab platforms.
  */
 inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
 {

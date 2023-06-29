@@ -1121,11 +1121,7 @@ NS_ASSUME_NONNULL_BEGIN
                             auto & entry_3 = iter_3.GetValue();
                             MTRScenesClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
+                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
                             newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
@@ -2274,11 +2270,7 @@ NS_ASSUME_NONNULL_BEGIN
                             auto & entry_3 = iter_3.GetValue();
                             MTRScenesClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
+                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
                             newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }

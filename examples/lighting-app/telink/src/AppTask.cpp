@@ -127,32 +127,6 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
     }
 }
 
-#ifdef CONFIG_CHIP_PW_RPC
-void AppTask::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
-{
-    if (!btnPressed)
-    {
-        return;
-    }
-
-    switch (btnId)
-    {
-    case kButtonId_LightingAction:
-        ExampleActionButtonEventHandler();
-        break;
-    case kButtonId_FactoryReset:
-        FactoryResetButtonEventHandler();
-        break;
-    case kButtonId_StartThread:
-        StartThreadButtonEventHandler();
-        break;
-    case kButtonId_StartBleAdv:
-        StartBleAdvButtonEventHandler();
-        break;
-    }
-}
-#endif
-
 void AppTask::ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor)
 {
     if (aAction == PWMDevice::ON_ACTION)

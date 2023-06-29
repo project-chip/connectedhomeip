@@ -26,14 +26,18 @@ namespace LogJson {
 /// A Backend that outputs data to chip logging.
 ///
 /// Structured data is formatted as json strings.
+///
+/// THREAD SAFETY:
+///    class assumes that ChipLog* is thread_safe (generally
+///    we ChipLog* everywhere, so that condition seems to be met).
 class LogJsonBackend : public ::chip::Tracing::Backend
 {
 public:
     LogJsonBackend() = default;
 
-    void TraceBegin(Scope scope) override;
-    void TraceEnd(Scope scope) override;
-    void TraceInstant(Instant instant) override;
+    void TraceBegin(const char * label, const char * group) override;
+    void TraceEnd(const char * label, const char * group) override;
+    void TraceInstant(const char * label, const char * group) override;
     void LogMessageSend(MessageSendInfo &) override;
     void LogMessageReceived(MessageReceivedInfo &) override;
     void LogNodeLookup(NodeLookupInfo &) override;

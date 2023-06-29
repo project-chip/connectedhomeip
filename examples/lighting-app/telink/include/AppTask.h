@@ -20,10 +20,6 @@
 
 #include "AppTaskCommon.h"
 
-#ifdef CONFIG_CHIP_PW_RPC
-#include "Rpc.h"
-#endif
-
 class AppTask : public AppTaskCommon
 {
 public:
@@ -31,21 +27,7 @@ public:
     void UpdateClusterState(void);
     PWMDevice & GetPWMDevice(void) { return mPwmRgbBlueLed; }
 
-#ifdef CONFIG_CHIP_PW_RPC
-    enum ButtonId_t
-    {
-        kButtonId_LightingAction = 1,
-        kButtonId_FactoryReset,
-        kButtonId_StartThread,
-        kButtonId_StartBleAdv
-    } ButtonId;
-#endif
-
 private:
-#ifdef CONFIG_CHIP_PW_RPC
-    friend class chip::rpc::TelinkButton;
-    static void ButtonEventHandler(ButtonId_t btnId, bool btnPressed);
-#endif
     friend AppTask & GetAppTask(void);
     friend class AppTaskCommon;
 

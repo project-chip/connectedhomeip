@@ -9502,6 +9502,17 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAlarmCluster(
         value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
         return value;
     }
+    case Attributes::Supported::Id: {
+        using TypeInfo = Attributes::Supported::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+        return value;
+    }
     case Attributes::GeneratedCommandList::Id: {
         using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -9921,6 +9932,17 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::ExpiryDate::Id: {
+        using TypeInfo = Attributes::ExpiryDate::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
         return value;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -13211,7 +13233,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::RockSetting::Id: {
@@ -13222,7 +13244,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::WindSupport::Id: {
@@ -13233,7 +13255,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::WindSetting::Id: {
@@ -13244,7 +13266,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::AirflowDirection::Id: {

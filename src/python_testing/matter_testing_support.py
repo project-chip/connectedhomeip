@@ -188,10 +188,11 @@ def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None
     if utc is None:
         utc = utc_time_in_matter_epoch()
 
-    expected = utc + offset.microseconds
+    # total seconds includes fractional for microseconds
+    expected = utc + offset.total_seconds()*1000000
     delta_us = abs(expected - received)
     delta = timedelta(microseconds=delta_us)
-    asserts.assert_less(delta, tolerance, "Received time is out of tolerance")
+    asserts.assert_less_equal(delta, tolerance, "Received time is out of tolerance")
 
 
 @dataclass
