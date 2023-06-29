@@ -633,12 +633,12 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
     }
     if (!dstList[activeDstIndex].validUntil.IsNull() && dstList[activeDstIndex].validUntil.Value() <= chipEpochTime)
     {
-        if (mDstOffsetObj.validSize == 1) // last item in the list
+        if (activeDstIndex + 1 >= mDstOffsetObj.validSize) // last item in the list
         {
             VerifyOrReturnValue(ClearDSTOffset() == CHIP_NO_ERROR, TimeState::kInvalid);
             return TimeState::kInvalid;
         }
-        dstList[activeDstIndex].offset = 0;
+        dstList[activeDstIndex].offset = 0; // not using dst and last DST item in the list is not active yet
         return TimeState::kStopped;
     }
     if (activeDstIndex > 0)
