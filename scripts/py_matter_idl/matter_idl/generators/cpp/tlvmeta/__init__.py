@@ -43,7 +43,7 @@ class ClusterTablesGenerator:
         self.known_types = set()  # all types where we create reference_to
         self.list_types = set()  # all types that require a list entry
 
-    def FieldEntry(self, field: Field, tag_type:str = 'ContextTag') -> TableEntry:
+    def FieldEntry(self, field: Field, tag_type: str = 'ContextTag') -> TableEntry:
         type_reference = "%s_%s" % (self.cluster.name, field.data_type.name)
         if type_reference not in self.known_types:
             type_reference = None
@@ -54,7 +54,7 @@ class ClusterTablesGenerator:
 
             if type_reference:
                 self.list_types.add(type_reference)
-                type_reference = type_reference + "_list_";
+                type_reference = type_reference + "_list_"
 
         return TableEntry(
             code=f'{tag_type}({field.code})',
@@ -105,12 +105,13 @@ class ClusterTablesGenerator:
         # Clusters have attributes. They are direct descendants for
         # attributes
         cluster_entries = []
-        cluster_entries.extend([self.FieldEntry(a.definition, tag_type='AttributeTag') for a in self.cluster.attributes])
+        cluster_entries.extend([self.FieldEntry(
+            a.definition, tag_type='AttributeTag') for a in self.cluster.attributes])
         cluster_entries.extend([
-                # events always reference an existing struct
-                TableEntry(code=f'EventTag({e.code})', name=e.name, reference="%s_%s" %
-                           (self.cluster.name, e.name))
-                for e in self.cluster.events
+            # events always reference an existing struct
+            TableEntry(code=f'EventTag({e.code})', name=e.name, reference="%s_%s" %
+                       (self.cluster.name, e.name))
+            for e in self.cluster.events
         ])
         cluster_entries.extend(
             [entry for entry in self.CommandEntries()]
@@ -137,7 +138,7 @@ class ClusterTablesGenerator:
         for name in self.list_types:
             yield Table(
                 full_name="%s_list_" % name,
-                entries = [
+                entries=[
                     TableEntry(
                         code="AnonymousTag()",
                         name="[]",
@@ -154,7 +155,8 @@ class ClusterTablesGenerator:
 def CreateTables(idl: Idl) -> List[Table]:
     result = []
     for cluster in idl.clusters:
-        result.extend([table for table in ClusterTablesGenerator(cluster).GenerateTables()])
+        result.extend(
+            [table for table in ClusterTablesGenerator(cluster).GenerateTables()])
 
     return result
 
