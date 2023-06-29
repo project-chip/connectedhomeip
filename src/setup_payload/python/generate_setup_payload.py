@@ -17,11 +17,15 @@
 #
 import argparse
 import enum
+import os
 import sys
 
 import Base38
 from bitarray import bitarray
-from stdnum.verhoeff import calc_check_digit
+
+CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('src', 'setup_payload', 'python'))]
+sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'lib', 'support', 'verhoeff'))
+from Verhoeff import ComputeCheckChar   # noqa: E402 isort:skip
 
 # See section 5.1.4.1 Manual Pairing Code in the Matter specification v1.0
 MANUAL_DISCRIMINATOR_LEN = 4
@@ -103,7 +107,7 @@ class SetupPayload:
             payload += str(self.vid).zfill(MANUAL_VID_LEN)
             payload += str(self.pid).zfill(MANUAL_PID_LEN)
 
-        payload += calc_check_digit(payload)
+        payload += ComputeCheckChar(payload)
         return payload
 
     def generate_qrcode(self):
