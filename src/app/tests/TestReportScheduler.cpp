@@ -23,8 +23,6 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
-#define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
-
 namespace {
 
 uint8_t gDebugEventBuffer[128];
