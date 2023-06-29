@@ -52,11 +52,11 @@ help() {
     echo "General Options:
   -h, --help                Display this information.
 Input Options:
-  -d, --chip_detail_logging ChipDetailLoggingValue          Specify ChipDetailLoggingValue as true or false.
+  -d, --chip_detail_logging <true/false>                    Specify ChipDetailLoggingValue as true or false.
                                                             By default it is false.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
                                                             By default it is minimal.
-  -p, --enable_pybindings   EnableValue                     Specify whether to enable pybindings as python controller.
+  -p, --enable_pybindings   <true/false>                    Specify whether to enable pybindings as python controller.
 
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
