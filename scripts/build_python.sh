@@ -43,6 +43,7 @@ declare chip_mdns
 declare case_retry_delta
 declare install_virtual_env
 declare clean_virtual_env=yes
+declare install_pytest_requirements=yes
 
 help() {
 
@@ -62,6 +63,8 @@ Input Options:
   -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
                                                             <path> represents where the virtual environment is to be created.
   -c, --clean_virtual_env  <yes|no>                         When installing a virtual environment, create/clean it first.
+                                                            Defaults to yes.
+  --include_pytest_deps  <yes|no>                           Install requirements.python_tests.txt.
                                                             Defaults to yes.
   --extra_packages PACKAGES                                 Install extra Python packages from PyPI
   --include_yamltests                                       Whether to install the matter_yamltests wheel.
@@ -99,6 +102,10 @@ while (($#)); do
             ;;
         --clean_virtual_env | -c)
             clean_virtual_env=$2
+            shift
+            ;;
+        --include_pytest_deps)
+            install_pytest_requirements=$2
             shift
             ;;
         --extra_packages)
@@ -178,12 +185,21 @@ if [ -n "$install_virtual_env" ]; then
 
     if [ "$clean_virtual_env" = "yes" ]; then
         # Create a virtual environment that has access to the built python tools
+        echo_blue "Creating a clear VirtualEnv in '$ENVIRONMENT_ROOT' ..."
         virtualenv --clear "$ENVIRONMENT_ROOT"
+    elif [ ! -f "$ENVIRONMENT_ROOT"/bin/activate ]; then
+        echo_blue "Creating a new VirtualEnv in '$ENVIRONMENT_ROOT' ..."
+        virtualenv "$ENVIRONMENT_ROOT"
     fi
 
     source "$ENVIRONMENT_ROOT"/bin/activate
     "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
     "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${WHEEL[@]}"
+
+    if [ "$install_pytest_requirements" = "yes" ]; then
+        echo_blue "Installing python test dependencies ..."
+        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/setup/requirements.python_tests.txt"
+    fi
 
     echo ""
     echo_green "Compilation completed and WHL package installed in: "
