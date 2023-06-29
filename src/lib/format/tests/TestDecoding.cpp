@@ -18,6 +18,8 @@
 #include <lib/core/TLVReader.h>
 #include <lib/format/FlatTree.h>
 #include <lib/format/FlatTreePosition.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include "sample_data.h"
@@ -32,8 +34,8 @@ namespace {
 using namespace chip::TestData;
 using namespace chip::TLV;
 
-using chip::TLVMeta::ClusterTag;
 using chip::TLVMeta::AttributeTag;
+using chip::TLVMeta::ClusterTag;
 
 class ByTag
 {
@@ -53,23 +55,140 @@ void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)
     va_end(args);
 }
 
+// Returns a null terminated string containing the current reader value
+void PrettyPrintCurrentValue(TLVReader & reader, chip::MutableCharSpan out)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    switch (reader.GetType())
+    {
+    case kTLVType_SignedInteger: {
+        int64_t sVal;
+        err = reader.Get(sVal);
+        if (err != CHIP_NO_ERROR)
+        {
+            snprintf(out.data(), out.size(), "ERR: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            snprintf(out.data(), out.size(), "%" PRIi64, sVal);
+        }
+        out.data()[out.size() - 1] = '\0';
+        break;
+    }
+    case kTLVType_UnsignedInteger: {
+        uint64_t uVal;
+        err = reader.Get(uVal);
+        if (err != CHIP_NO_ERROR)
+        {
+            snprintf(out.data(), out.size(), "ERR: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            snprintf(out.data(), out.size(), "%" PRIu64, uVal);
+        }
+        out.data()[out.size() - 1] = '\0';
+        break;
+    }
+    case kTLVType_Boolean: {
+        bool bVal;
+        err = reader.Get(bVal);
+        if (err != CHIP_NO_ERROR)
+        {
+            snprintf(out.data(), out.size(), "ERR: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            chip::Platform::CopyString(out.data(), out.size(), bVal ? "true" : "false");
+        }
+        break;
+    }
+    case kTLVType_FloatingPointNumber: {
+        double fpVal;
+        err = reader.Get(fpVal);
+        if (err != CHIP_NO_ERROR)
+        {
+            snprintf(out.data(), out.size(), "ERR: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            snprintf(out.data(), out.size(), "%lf", fpVal);
+        }
+        out.data()[out.size() - 1] = '\0';
+        break;
+    }
+    case kTLVType_UTF8String: {
+        const uint8_t * strbuf = nullptr;
+        err                    = reader.GetDataPtr(strbuf);
+        if (err != CHIP_NO_ERROR)
+        {
+            snprintf(out.data(), out.size(), "ERR: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            snprintf(out.data(), out.size(), "\"%-.*s\"", static_cast<int>(reader.GetLength()), strbuf);
+        }
+        out.data()[out.size() - 1] = '\0';
+        break;
+    }
+    case kTLVType_ByteString: {
+        const uint8_t * strbuf = nullptr;
+        err                    = reader.GetDataPtr(strbuf);
+        if (err != CHIP_NO_ERROR)
+        {
+            snprintf(out.data(), out.size(), "ERR: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        else
+        {
+            chip::Platform::CopyString(out.data(), out.size(), "hex:");
+            if (out.size() > 6)
+            { // space for at least one byte
+                err = chip::Encoding::BytesToUppercaseHexString(strbuf, reader.GetLength(), out.data() + 4, out.size() - 4);
+                if (err != CHIP_NO_ERROR)
+                {
+                    snprintf(out.data(), out.size(), "ERR: %" CHIP_ERROR_FORMAT, err.Format());
+                }
+            }
+        }
+        out.data()[out.size() - 1] = '\0';
+        break;
+    }
+
+    case kTLVType_Null:
+        chip::Platform::CopyString(out.data(), out.size(), "NULL");
+        break;
+
+    case kTLVType_NotSpecified:
+        chip::Platform::CopyString(out.data(), out.size(), "Not Specified");
+        break;
+    default:
+        chip::Platform::CopyString(out.data(), out.size(), "???");
+        break;
+    }
+}
+
 using DecodePosition = chip::FlatTree::Position<chip::TLVMeta::ItemInfo, 16>;
 
 void NiceDecode(DecodePosition & position, TLVReader reader)
 {
-    if (reader.GetTotalLength() == 0) {
+    if (reader.GetTotalLength() == 0)
+    {
         return;
     }
     CHIP_ERROR err = reader.Next(kTLVType_Structure, AnonymousTag());
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         printf("UNEXPECTED DATA: %" CHIP_ERROR_FORMAT "\n", err.Format());
         return;
     }
 
     auto data = position.Get();
-    if (data != nullptr) {
+    if (data != nullptr)
+    {
         printf("%s:\n", data->name);
-    } else {
+    }
+    else
+    {
         printf("UNKNOWN DATA POSITION\n");
         return;
     }
@@ -80,13 +199,16 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
     reader.EnterContainer(containerType);
     containers.push_back(containerType);
 
-    while (true) {
+    while (true)
+    {
         err = reader.Next();
-        if (err == CHIP_END_OF_TLV) {
+        if (err == CHIP_END_OF_TLV)
+        {
             position.Exit();
             reader.ExitContainer(containers.back());
             containers.pop_back();
-            if (containers.empty()) {
+            if (containers.empty())
+            {
                 break;
             }
             continue;
@@ -95,33 +217,40 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
         // we likely have a tag, try to find its data
         position.Enter(ByTag(reader.GetTag()));
 
-        for (size_t i = 0; i < containers.size(); i++) {
+        for (size_t i = 0; i < containers.size(); i++)
+        {
             printf("  ");
         }
 
         // FIXME: exit logic may be complex
         auto data = position.Get();
-        if (data != nullptr) {
-            printf("%-25s: <FIXME>\n", data->name);
-        } else {
-            printf("TAG NOT FOUND\n");
+        if (data != nullptr)
+        {
+            printf("%-25s: ", data->name);
+        }
+        else
+        {
+            printf("TAG NOT FOUND: ");
         }
 
-        switch (reader.GetType()) {
-          case kTLVType_Structure:
-          case kTLVType_List:
-          case kTLVType_Array:
+        switch (reader.GetType())
+        {
+        case kTLVType_Structure:
+        case kTLVType_List:
+        case kTLVType_Array:
             reader.EnterContainer(containerType);
             containers.push_back(containerType);
+            printf("\n");
             break;
-          default:
+        default: {
             // assume regular element, no entering
+            char buffer[256];
+            PrettyPrintCurrentValue(reader, chip::MutableCharSpan(buffer));
+            printf("%s\n", buffer);
             position.Exit();
             break;
         }
-
-
-
+        }
     }
 }
 
@@ -135,7 +264,6 @@ void TestSampleData(nlTestSuite * inSuite, void * inContext, const SamplePayload
     TLVReader reader;
     reader.Init(data.payload);
 
-    // FIXME: now what
     Debug::Dump(reader, SimpleDumpWriter);
     printf("* NEW DATA:\n");
 
