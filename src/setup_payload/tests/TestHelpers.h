@@ -143,7 +143,8 @@ inline bool CheckWriteRead(SetupPayload & inPayload, bool allowInvalidPayload = 
     generator.SetAllowInvalidPayload(allowInvalidPayload);
     CHIP_ERROR err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
 
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         return false;
     }
 
