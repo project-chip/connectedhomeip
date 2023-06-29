@@ -30,9 +30,9 @@ constexpr TLV::Tag EventTag(uint32_t event_id) {
 struct ItemInfo {
   TLV::Tag tag;
   const char *name;
-}
+};
 
-extern std::array<Node<ItemInfo>, {{ clusters | length }}> {{table_name}};
+extern std::array<FlatTree::Node<ItemInfo>, {{ sub_tables | length }} + 1> {{table_name}};
 
-} // namespace chip
 } // namespace TLVMeta
+} // namespace chip

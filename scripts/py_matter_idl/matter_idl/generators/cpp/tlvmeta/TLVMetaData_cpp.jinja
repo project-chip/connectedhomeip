@@ -1,7 +1,7 @@
 #include <tlv/meta/{{table_name}}.h>
 
 namespace chip {
-namespace TLVData {
+namespace TLVMeta {
 namespace {
 
 using namespace chip::FlatTree;
@@ -26,12 +26,12 @@ Entry<ItemInfo> _all_clusters[] = {
 
 #define _ENTRY(n) { sizeof(n) / sizeof(n[0]), n}
 
-std::array<Node<ItemInfo>, {{ clusters | length }}> {{table_name}} = { {
+std::array<Node<ItemInfo>, {{ sub_tables | length }} + 1> {{table_name}} = { {
   _ENTRY(_all_clusters),
 {%- for table in sub_tables %}
   _ENTRY(_{{table.full_name}}), // {{loop.index}}
 {%- endfor %}
 } };
 
+} // namespace TLVMeta
 } // namespace chip
-} // namespace TLVData

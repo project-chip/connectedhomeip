@@ -1,7 +1,7 @@
 #include <tlv/meta/protocols_meta.h>
 
 namespace chip {
-namespace TLVData {
+namespace TLVMeta {
 namespace {
 
 using namespace chip::FlatTree;
@@ -142,11 +142,11 @@ Entry<ItemInfo> _IMProtocol_StatusResponseMessage[] = {
 };
 
 Entry<ItemInfo> _IMProtocol_ReadRequestMessage[] = {
-  { { ContextTag(0), "attribute_requests"}, 49 }, // IMProtocol::AttributePathIB[]
+  { { ContextTag(0), "attribute_requests"}, 50 }, // IMProtocol::AttributePathIB[]
   { { ContextTag(1), "event_requests"}, 43 }, // IMProtocol::EventPathIB[]
-  { { ContextTag(2), "event_filters"}, 47 }, // IMProtocol::EventFilterIB[]
+  { { ContextTag(2), "event_filters"}, 49 }, // IMProtocol::EventFilterIB[]
   { { ContextTag(3), "fabric_filtered"}, kInvalidNodeIndex }, // IMProtocol::boolean
-  { { ContextTag(4), "data_version_filters"}, 46 }, // IMProtocol::DataVersionFilterIB[]
+  { { ContextTag(4), "data_version_filters"}, 42 }, // IMProtocol::DataVersionFilterIB[]
 };
 
 Entry<ItemInfo> _IMProtocol_SubscribeRequestMessage[] = {
@@ -209,7 +209,7 @@ Entry<ItemInfo> _IMProtocol_EventReportIB[] = {
 
 Entry<ItemInfo> _IMProtocol_ReportDataMessage[] = {
   { { ContextTag(0), "subscription_id"}, kInvalidNodeIndex }, // IMProtocol::int32u
-  { { ContextTag(1), "attribute_reports"}, 50 }, // IMProtocol::AttributeReportIB[]
+  { { ContextTag(1), "attribute_reports"}, 46 }, // IMProtocol::AttributeReportIB[]
   { { ContextTag(2), "event_reports"}, 48 }, // IMProtocol::EventReportIB[]
   { { ContextTag(3), "more_cunked_messages"}, kInvalidNodeIndex }, // IMProtocol::boolean
   { { ContextTag(4), "suppress_response"}, kInvalidNodeIndex }, // IMProtocol::boolean
@@ -224,7 +224,7 @@ Entry<ItemInfo> _IMProtocol_AttributeDataIB[] = {
 Entry<ItemInfo> _IMProtocol_WriteRequestMessage[] = {
   { { ContextTag(0), "suppres_response"}, kInvalidNodeIndex }, // IMProtocol::boolean
   { { ContextTag(1), "timed_request"}, kInvalidNodeIndex }, // IMProtocol::boolean
-  { { ContextTag(2), "write_requests"}, 44 }, // IMProtocol::AttributeDataIB[]
+  { { ContextTag(2), "write_requests"}, 45 }, // IMProtocol::AttributeDataIB[]
   { { ContextTag(3), "more_chunked_messages"}, kInvalidNodeIndex }, // IMProtocol::boolean
 };
 
@@ -234,7 +234,7 @@ Entry<ItemInfo> _IMProtocol_AttributeStatusIB[] = {
 };
 
 Entry<ItemInfo> _IMProtocol_WriteResponseMessage[] = {
-  { { ContextTag(0), "write_responses"}, 42 }, // IMProtocol::AttributeStatusIB[]
+  { { ContextTag(0), "write_responses"}, 47 }, // IMProtocol::AttributeStatusIB[]
 };
 
 Entry<ItemInfo> _IMProtocol_CommandPathIB[] = {
@@ -251,7 +251,7 @@ Entry<ItemInfo> _IMProtocol_CommandDataIB[] = {
 Entry<ItemInfo> _IMProtocol_InvokeRequestMessage[] = {
   { { ContextTag(0), "suppress_response"}, kInvalidNodeIndex }, // IMProtocol::boolean
   { { ContextTag(1), "timed_request"}, kInvalidNodeIndex }, // IMProtocol::boolean
-  { { ContextTag(2), "invoke_requests"}, 45 }, // IMProtocol::CommandDataIB[]
+  { { ContextTag(2), "invoke_requests"}, 44 }, // IMProtocol::CommandDataIB[]
 };
 
 Entry<ItemInfo> _IMProtocol_CommandStatusIB[] = {
@@ -273,40 +273,40 @@ Entry<ItemInfo> _IMProtocol_TimedRequestMessage[] = {
   { { ContextTag(0), "timeout"}, kInvalidNodeIndex }, // IMProtocol::int16u
 };
 
-Entry<ItemInfo> _IMProtocol_AttributeStatusIB_list_[] = {
-  { { AnonymousTag(), "[]"}, 33 }, // IMProtocol_AttributeStatusIB[]
+Entry<ItemInfo> _IMProtocol_DataVersionFilterIB_list_[] = {
+  { { AnonymousTag(), "[]"}, 18 }, // IMProtocol_DataVersionFilterIB[]
 };
 
 Entry<ItemInfo> _IMProtocol_EventPathIB_list_[] = {
   { { AnonymousTag(), "[]"}, 15 }, // IMProtocol_EventPathIB[]
 };
 
-Entry<ItemInfo> _IMProtocol_AttributeDataIB_list_[] = {
-  { { AnonymousTag(), "[]"}, 31 }, // IMProtocol_AttributeDataIB[]
-};
-
 Entry<ItemInfo> _IMProtocol_CommandDataIB_list_[] = {
   { { AnonymousTag(), "[]"}, 36 }, // IMProtocol_CommandDataIB[]
 };
 
-Entry<ItemInfo> _IMProtocol_DataVersionFilterIB_list_[] = {
-  { { AnonymousTag(), "[]"}, 18 }, // IMProtocol_DataVersionFilterIB[]
+Entry<ItemInfo> _IMProtocol_AttributeDataIB_list_[] = {
+  { { AnonymousTag(), "[]"}, 31 }, // IMProtocol_AttributeDataIB[]
 };
 
-Entry<ItemInfo> _IMProtocol_EventFilterIB_list_[] = {
-  { { AnonymousTag(), "[]"}, 16 }, // IMProtocol_EventFilterIB[]
+Entry<ItemInfo> _IMProtocol_AttributeReportIB_list_[] = {
+  { { AnonymousTag(), "[]"}, 26 }, // IMProtocol_AttributeReportIB[]
+};
+
+Entry<ItemInfo> _IMProtocol_AttributeStatusIB_list_[] = {
+  { { AnonymousTag(), "[]"}, 33 }, // IMProtocol_AttributeStatusIB[]
 };
 
 Entry<ItemInfo> _IMProtocol_EventReportIB_list_[] = {
   { { AnonymousTag(), "[]"}, 29 }, // IMProtocol_EventReportIB[]
 };
 
-Entry<ItemInfo> _IMProtocol_AttributePathIB_list_[] = {
-  { { AnonymousTag(), "[]"}, 14 }, // IMProtocol_AttributePathIB[]
+Entry<ItemInfo> _IMProtocol_EventFilterIB_list_[] = {
+  { { AnonymousTag(), "[]"}, 16 }, // IMProtocol_EventFilterIB[]
 };
 
-Entry<ItemInfo> _IMProtocol_AttributeReportIB_list_[] = {
-  { { AnonymousTag(), "[]"}, 26 }, // IMProtocol_AttributeReportIB[]
+Entry<ItemInfo> _IMProtocol_AttributePathIB_list_[] = {
+  { { AnonymousTag(), "[]"}, 14 }, // IMProtocol_AttributePathIB[]
 };
 
 Entry<ItemInfo> _BdxProtocol[] = {
@@ -341,7 +341,7 @@ Entry<ItemInfo> _all_clusters[] = {
 
 #define _ENTRY(n) { sizeof(n) / sizeof(n[0]), n}
 
-std::array<Node<ItemInfo>, 4> protocols_meta = { {
+std::array<Node<ItemInfo>, 53 + 1> protocols_meta = { {
   _ENTRY(_all_clusters),
   _ENTRY(_SecureChannelProtocol), // 1
   _ENTRY(_SecureChannelProtocol_ICDParameterStruct), // 2
@@ -384,19 +384,19 @@ std::array<Node<ItemInfo>, 4> protocols_meta = { {
   _ENTRY(_IMProtocol_InvokeResponseIB), // 39
   _ENTRY(_IMProtocol_InvokeResponseMessage), // 40
   _ENTRY(_IMProtocol_TimedRequestMessage), // 41
-  _ENTRY(_IMProtocol_AttributeStatusIB_list_), // 42
+  _ENTRY(_IMProtocol_DataVersionFilterIB_list_), // 42
   _ENTRY(_IMProtocol_EventPathIB_list_), // 43
-  _ENTRY(_IMProtocol_AttributeDataIB_list_), // 44
-  _ENTRY(_IMProtocol_CommandDataIB_list_), // 45
-  _ENTRY(_IMProtocol_DataVersionFilterIB_list_), // 46
-  _ENTRY(_IMProtocol_EventFilterIB_list_), // 47
+  _ENTRY(_IMProtocol_CommandDataIB_list_), // 44
+  _ENTRY(_IMProtocol_AttributeDataIB_list_), // 45
+  _ENTRY(_IMProtocol_AttributeReportIB_list_), // 46
+  _ENTRY(_IMProtocol_AttributeStatusIB_list_), // 47
   _ENTRY(_IMProtocol_EventReportIB_list_), // 48
-  _ENTRY(_IMProtocol_AttributePathIB_list_), // 49
-  _ENTRY(_IMProtocol_AttributeReportIB_list_), // 50
+  _ENTRY(_IMProtocol_EventFilterIB_list_), // 49
+  _ENTRY(_IMProtocol_AttributePathIB_list_), // 50
   _ENTRY(_BdxProtocol), // 51
   _ENTRY(_UserDirectedCommissioningProtocol), // 52
   _ENTRY(_UserDirectedCommissioningProtocol_IdentificationDeclarationStruct), // 53
 } };
 
+} // namespace TLVMeta
 } // namespace chip
-} // namespace TLVData
