@@ -73,6 +73,24 @@ public:
         System::Clock::Timestamp mMinIntervalSeconds;
         System::Clock::Timestamp mMaxIntervalSeconds;
     };
+
+    // TODO: Completer the TimerDelegate class in tests and use calls to it in the ReportSchedulerImpl
+    class TimerDelegate
+    {
+    public:
+        using TimerCompleteCallback = void (*)(ReadHandlerNode * node);
+        virtual ~TimerDelegate() {}
+        virtual void StartTimer(ReadHandlerNode * node, System::Clock::Timeout aTimeout) = 0;
+        virtual void CancelTimer(ReadHandlerNode * node)                                 = 0;
+        virtual void IsTimerActive(ReadHandlerNode * node)                               = 0;
+
+        virtual void SetCallback(TimerCompleteCallback callback) = 0;
+
+    protected:
+        TimerCompleteCallback mCallback;
+    };
+
+    // TODO: Add constructor that requires a TimerDelegate
     /**
      *  Interface to act on changes in the ReadHandler reportability
      */
@@ -123,11 +141,14 @@ protected:
     /// @return Node Address if node was found, nullptr otherwise
     virtual ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler) = 0;
 
-    // virtual void ReportTimerCallback(System::Layer * aLayer, void * aAppState) = 0;
+    virtual CHIP_ERROR StartTimerForHandler(ReadHandlerNode * node, System::Clock::Timeout aTimeout) = 0;
+    virtual void CancelTimerForHandler(ReadHandlerNode * node)                                       = 0;
+    virtual bool CheckTimerActiveForHandler(ReadHandlerNode * node)                                  = 0;
 
     IntrusiveList<ReadHandlerNode> mReadHandlerList;
     // TODO: Assess if possible to pass in the interaction model handler pool upon construction
     ObjectPool<ReadHandlerNode, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mNodesPool;
+    TimerDelegate * mDelegate;
 };
 }; // namespace reporting
 }; // namespace app

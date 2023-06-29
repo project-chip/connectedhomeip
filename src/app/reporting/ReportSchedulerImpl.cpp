@@ -22,10 +22,11 @@ namespace chip {
 namespace app {
 namespace reporting {
 
-using Seconds16      = System::Clock::Seconds16;
-using Milliseconds32 = System::Clock::Milliseconds32;
-using Timeout        = System::Clock::Timeout;
-using Timestamp      = System::Clock::Timestamp;
+using Seconds16       = System::Clock::Seconds16;
+using Milliseconds32  = System::Clock::Milliseconds32;
+using Timeout         = System::Clock::Timeout;
+using Timestamp       = System::Clock::Timestamp;
+using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
 
 /// @brief Callback called when the report timer expires to schedule an engine run regardless of the state of the ReadHandlers, as
 /// the engine already verifies that read handlers are reportable before sending a report
@@ -120,15 +121,11 @@ CHIP_ERROR ReportSchedulerImpl::ScheduleReport(Timeout timeout, ReadHandler * aR
     VerifyOrReturnError(nullptr != node, CHIP_ERROR_NOT_FOUND);
 
     // Cancel Report if it is currently scheduled
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-        ReportTimerCallback, node);
+    CancelTimerForHandler(node);
 
     if (!IsChunkedReport(aReadHandler))
     {
-        // Schedule Report
-        ReturnErrorOnFailure(
-            InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-                timeout, ReportTimerCallback, node));
+        StartTimerForHandler(node, timeout);
     }
 
     return CHIP_NO_ERROR;
@@ -138,8 +135,7 @@ void ReportSchedulerImpl::CancelReport(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturn(nullptr != node);
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-        ReportTimerCallback, node);
+    CancelTimerForHandler(node);
 }
 
 void ReportSchedulerImpl::UnregisterReadHandler(ReadHandler * aReadHandler)
@@ -158,8 +154,6 @@ void ReportSchedulerImpl::UnregisterReadHandler(ReadHandler * aReadHandler)
 
 void ReportSchedulerImpl::UnregisterAllHandlers()
 {
-    // Verify list is populated
-    VerifyOrReturn(!mReadHandlerList.Empty());
     while (!mReadHandlerList.Empty())
     {
         ReadHandler * firstReadHandler = mReadHandlerList.begin()->GetReadHandler();
@@ -171,14 +165,11 @@ bool ReportSchedulerImpl::IsReportScheduled(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
     VerifyOrReturnValue(nullptr != node, false);
-    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->IsTimerActive(
-        ReportTimerCallback, node);
+    return CheckTimerActiveForHandler(node);
 }
 
 ReportSchedulerImpl::ReadHandlerNode * ReportSchedulerImpl::FindReadHandlerNode(const ReadHandler * aReadHandler)
 {
-    // Verify list is populated and handler is not null
-    VerifyOrReturnValue(!mReadHandlerList.Empty() && (nullptr != aReadHandler), nullptr);
     for (auto & iter : mReadHandlerList)
     {
         if (iter.GetReadHandler() == aReadHandler)
@@ -187,6 +178,26 @@ ReportSchedulerImpl::ReadHandlerNode * ReportSchedulerImpl::FindReadHandlerNode(
         }
     }
     return nullptr;
+}
+
+// TODO: Replace calls to SystemLayer()-> with calls to TimerDelegate->
+CHIP_ERROR ReportSchedulerImpl::StartTimerForHandler(ReadHandlerNode * node, System::Clock::Timeout aTimeout)
+{
+    // Schedule Report
+    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+        aTimeout, ReportTimerCallback, node);
+}
+
+void ReportSchedulerImpl::CancelTimerForHandler(ReadHandlerNode * node)
+{
+    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
+        ReportTimerCallback, node);
+}
+
+bool ReportSchedulerImpl::CheckTimerActiveForHandler(ReadHandlerNode * node)
+{
+    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->IsTimerActive(
+        ReportTimerCallback, node);
 }
 
 } // namespace reporting

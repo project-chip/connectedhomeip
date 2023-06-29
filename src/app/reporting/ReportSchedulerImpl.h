@@ -52,7 +52,9 @@ protected:
     /// @return Node Address if node was found, nullptr otherwise
     virtual ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler) override;
 
-    // void ReportTimerCallback(System::Layer * aLayer, void * aAppState) override;
+    virtual CHIP_ERROR StartTimerForHandler(ReadHandlerNode * node, System::Clock::Timeout aTimeout) override;
+    virtual void CancelTimerForHandler(ReadHandlerNode * node) override;
+    virtual bool CheckTimerActiveForHandler(ReadHandlerNode * node) override;
 };
 
 } // namespace reporting
