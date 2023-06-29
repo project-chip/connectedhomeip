@@ -33,7 +33,6 @@ IGNORE: Set[str] = {
     '/Test',
     '/tests/',
     '/tools/',
-    r'/lib/assign/ValueAssign\.h',
 
     # Platforms can opt in or out.
     '/darwin/',
@@ -154,5 +153,8 @@ ALLOW: Dict[str, Set[str]] = {
     # of a list of discovered things.
     'src/controller/SetUpCodePairer.h': {'deque'},
 
-    'src/controller/ExamplePersistentStorage.cpp': {'fstream'}
+    'src/controller/ExamplePersistentStorage.cpp': {'fstream'},
+
+    # Library meant for non-embedded
+    'src/tracing/log_json/log_json_tracing.cpp': {'string', 'sstream'}
 }

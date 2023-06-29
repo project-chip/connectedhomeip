@@ -26,6 +26,8 @@ namespace Minimal {
 
 namespace {
 
+using namespace mdns::Minimal::Internal;
+
 constexpr uint16_t kMdnsStandardPort = 5353;
 
 // Restriction for UDP packets:  https://tools.ietf.org/html/rfc1035#section-4.2.1
@@ -105,6 +107,12 @@ CHIP_ERROR ResponseSender::Respond(uint16_t messageId, const QueryData & query, 
 {
     mSendState.Reset(messageId, query, querySource);
 
+    if (query.IsAnnounceBroadcast())
+    {
+        // Deny listing large amount of data
+        mSendState.MarkWasSent(ResponseItemsSent::kServiceListingData);
+    }
+
     // Responder has a stateful 'additional replies required' that is used within the response
     // loop. 'no additionals required' is set at the start and additionals are marked as the query
     // reply is built.
@@ -158,7 +166,12 @@ CHIP_ERROR ResponseSender::Respond(uint16_t messageId, const QueryData & query, 
 
     // send all 'Additional' replies
     {
-        mSendState.SetResourceType(ResourceType::kAdditional);
+        if (!query.IsAnnounceBroadcast())
+        {
+            // Initial service broadcast should keep adding data as 'Answers' rather
+            // than addtional data (https://datatracker.ietf.org/doc/html/rfc6762#section-8.3)
+            mSendState.SetResourceType(ResourceType::kAdditional);
+        }
 
         QueryReplyFilter queryReplyFilter(query);
 
@@ -230,6 +243,45 @@ CHIP_ERROR ResponseSender::PrepareNewReplyPacket()
     }
 
     return CHIP_NO_ERROR;
+}
+
+bool ResponseSender::ShouldSend(const Responder & responder) const
+{
+    switch (responder.GetQType())
+    {
+    case QType::A:
+        return !mSendState.GetWasSent(ResponseItemsSent::kIPv4Addresses);
+    case QType::AAAA:
+        return !mSendState.GetWasSent(ResponseItemsSent::kIPv6Addresses);
+    case QType::PTR: {
+        static const QNamePart kDnsSdQueryPath[] = { "_services", "_dns-sd", "_udp", "local" };
+
+        if (responder.GetQName() == FullQName(kDnsSdQueryPath))
+        {
+            return !mSendState.GetWasSent(ResponseItemsSent::kServiceListingData);
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    return true;
+}
+
+void ResponseSender::ResponsesAdded(const Responder & responder)
+{
+    switch (responder.GetQType())
+    {
+    case QType::A:
+        mSendState.MarkWasSent(ResponseItemsSent::kIPv4Addresses);
+        break;
+    case QType::AAAA:
+        mSendState.MarkWasSent(ResponseItemsSent::kIPv6Addresses);
+        break;
+    default:
+        break;
+    }
 }
 
 void ResponseSender::AddResponse(const ResourceRecord & record)

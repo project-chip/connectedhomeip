@@ -95,7 +95,7 @@ int Button::Deinit(void)
     int ret = 0;
 
     /* Reconfigure output key pin to input */
-    ret = gpio_pin_configure(mOutput_matrix_pin->port, mOutput_matrix_pin->pin, GPIO_INPUT | GPIO_PULL_DOWN);
+    ret = gpio_pin_configure_dt(mOutput_matrix_pin, GPIO_INPUT | GPIO_PULL_DOWN);
     if (ret < 0)
     {
         LOG_ERR("Reconfig out pin err: %d", ret);

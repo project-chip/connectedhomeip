@@ -43,10 +43,7 @@ jobs:
                     - "-esp32-qemu"
                     - "-infineon"
                     # NOTE: imx image requires too much space for GitHub-hosted runners. It fails with:
-                    # ```
-                    # ....
                     # ApplyLayer exit status 1 stdout:  stderr: write /opt/fsl-imx-xwayland/5.15-kirkstone/sysroots/armv8a-poky-linux/opt/ltp/testcases/bin/fanotify15: no space left on device
-                    # ```
                     # - "-imx"
                     - "-k32w"
                     - "-mbed-os"
@@ -59,14 +56,8 @@ jobs:
                     # NOTE: vscode image consumes ~52 GB disk space but GitHub-hosted runners provide ~10 GB free disk space(https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
                     #- "-vscode"
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
+            - name: Checkout
+              uses: actions/checkout@v3
             - name: Build All images using project bash script
               run: |
                   cd integrations/docker/images/chip-build${{ matrix.img }}

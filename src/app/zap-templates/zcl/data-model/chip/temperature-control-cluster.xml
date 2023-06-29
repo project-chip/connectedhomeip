@@ -17,12 +17,6 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <struct name="TemperatureLevelStruct">
-    <cluster code="0x0056"/>
-    <item fieldId="0" name="Label" type="char_string" length="64" isNullable="false" writable="false"/>
-    <item fieldId="1" name="TemperatureLevel" type="int8u" isNullable="false" writable="false"/>
-  </struct>
-
   <cluster>
     <name>Temperature Control</name>
     <domain>Appliances</domain>
@@ -31,16 +25,16 @@ limitations under the License.
     <define>TEMPERATURE_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="TEMP_SETPOINT" type="INT16S" writable="false" optional="true">TemperatureSetpoint</attribute>
-    <attribute side="server" code="0x0001" define="MIN_TEMP" type="INT16S" writable="false" optional="true">MinTemperature</attribute>
-    <attribute side="server" code="0x0002" define="MAX_TEMP" type="INT16S" writable="false" optional="true">MaxTemperature</attribute>
-    <attribute side="server" code="0x0003" define="STEP" type="INT16S" writable="false" optional="true">Step</attribute>
-    <attribute side="server" code="0x0004" define="CURRENT_TEMP_LEVEL_IND" type="INT8U" writable="false" optional="true">CurrentTemperatureLevelIndex</attribute>
-    <attribute side="server" code="0x0005" define="SUPPORTED_TEMP_LEVELS" type="ARRAY" entryType="TemperatureLevelStruct" writable="false" optional="true">SupportedTemperatureLevels</attribute>
+    <attribute side="server" code="0x0000" define="TEMP_SETPOINT" type="temperature" writable="false" optional="true">TemperatureSetpoint</attribute>
+    <attribute side="server" code="0x0001" define="MIN_TEMP" type="temperature" writable="false" optional="true">MinTemperature</attribute>
+    <attribute side="server" code="0x0002" define="MAX_TEMP" type="temperature" writable="false" optional="true">MaxTemperature</attribute>
+    <attribute side="server" code="0x0003" define="STEP" type="temperature" writable="false" optional="true">Step</attribute>
+    <attribute side="server" code="0x0004" define="SELECTED_TEMP_LEVEL" type="INT8U" writable="false" optional="true">SelectedTemperatureLevel</attribute>
+    <attribute side="server" code="0x0005" define="SUPPORTED_TEMP_LEVELS" type="ARRAY" entryType="char_string" writable="false" optional="true">SupportedTemperatureLevels</attribute>
 
     <command source="client" code="0x00" name="SetTemperature" optional="false">
         <description>Set Temperature</description>
-        <arg name="TargetTemperature" type="INT16S" min="MIN_TEMP" max="MAX_TEMP" optional="true"/>
+        <arg name="TargetTemperature" type="temperature" min="MIN_TEMP" max="MAX_TEMP" optional="true"/>
         <arg name="TargetTemperatureLevel" type="INT8U" optional="true"/>
     </command>
   </cluster>
@@ -48,5 +42,6 @@ limitations under the License.
     <cluster code="0x0056"/>
     <field mask="0x01" name="TemperatureNumber" />
     <field mask="0x02" name="TemperatureLevel" />
+    <field mask="0x04" name="TemperatureStep" />
   </bitmap>
 </configurator>

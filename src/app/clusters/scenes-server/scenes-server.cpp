@@ -110,7 +110,7 @@ CHIP_ERROR ScenesServer::Init()
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     mGroupProvider = Credentials::GetGroupDataProvider();
 
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable = scenes::GetSceneTableImpl();
+    SceneTable * sceneTable = scenes::GetSceneTableImpl();
     ReturnErrorOnFailure(sceneTable->Init(&chip::Server::GetInstance().GetPersistentStorage()));
 
     for (auto endpoint : EnabledEndpointsWithServerCluster(Id))
@@ -143,8 +143,6 @@ void ScenesServer::Shutdown()
 {
     chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
 
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable = scenes::GetSceneTableImpl();
-    sceneTable->Finish();
     mGroupProvider = nullptr;
     mIsInitialized = false;
 }
@@ -159,8 +157,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         AddResponseOnError(ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
 
     // Get Scene Table Instance
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable =
-        scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
 
     // Response data
     response.groupID = req.groupID;
@@ -270,8 +267,7 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
         AddResponseOnError(ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
 
     // Get Scene Table Instance
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable =
-        scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
 
     // Response data
     response.groupID = req.groupID;
@@ -347,7 +343,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
         StatusIB(ToInteractionModelStatus(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize))).ToChipError());
 
     // Get Scene Table Instance
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable = scenes::GetSceneTableImpl(endpointID, endpointTableSize);
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(endpointID, endpointTableSize);
 
     // Verify Endpoint in group
     VerifyOrReturnError(nullptr != groupProvider, CHIP_ERROR_INTERNAL);
@@ -400,7 +396,7 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
         StatusIB(ToInteractionModelStatus(Attributes::SceneTableSize::Get(endpointID, &endpointTableSize))).ToChipError());
 
     // Get Scene Table Instance
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable = scenes::GetSceneTableImpl(endpointID, endpointTableSize);
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(endpointID, endpointTableSize);
 
     // Verify Endpoint in group
     VerifyOrReturnError(nullptr != groupProvider, CHIP_ERROR_INTERNAL);
@@ -491,7 +487,7 @@ CHIP_ERROR ScenesServer::Read(const ConcreteReadAttributePath & aPath, Attribute
         StatusIB(ToInteractionModelStatus(Attributes::SceneTableSize::Get(aPath.mEndpointId, &endpointTableSize))).ToChipError());
 
     // Get Scene Table Instance
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable;
+    SceneTable * sceneTable;
 
     switch (aPath.mAttributeId)
     {
@@ -511,7 +507,7 @@ CHIP_ERROR ScenesServer::Read(const ConcreteReadAttributePath & aPath, Attribute
 void ScenesServer::GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId)
 {
     // Get Scene Table Instance
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable = scenes::GetSceneTableImpl(aEndpointId);
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(aEndpointId);
     VerifyOrReturn(nullptr != sceneTable);
 
     MakeSceneInvalid(aEndpointId);
@@ -549,6 +545,32 @@ void ScenesServer::RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, Gr
     }
 }
 
+bool ScenesServer::IsHandlerRegistered(scenes::SceneHandler * handler)
+{
+    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+    return sceneTable->mHandlerList.Contains(handler);
+}
+
+void ScenesServer::RegisterSceneHandler(scenes::SceneHandler * handler)
+{
+    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+
+    if (!IsHandlerRegistered(handler))
+    {
+        sceneTable->RegisterHandler(handler);
+    }
+}
+
+void ScenesServer::UnregisterSceneHandler(scenes::SceneHandler * handler)
+{
+    SceneTable * sceneTable = scenes::GetSceneTableImpl();
+
+    if (IsHandlerRegistered(handler))
+    {
+        sceneTable->UnregisterHandler(handler);
+    }
+}
+
 void ScenesServer::HandleAddScene(HandlerContext & ctx, const Commands::AddScene::DecodableType & req)
 {
     AddSceneParse<Commands::AddScene::DecodableType, Commands::AddSceneResponse::Type>(ctx, req, mGroupProvider);
@@ -568,8 +590,7 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
         AddResponseOnError(ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
 
     // Get Scene Table Instance
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable =
-        scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
 
     // Response data
     response.groupID = req.groupID;
@@ -616,8 +637,7 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
         AddResponseOnError(ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
 
     // Get Scene Table Instance
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable =
-        scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
 
     // Response data
     response.groupID = req.groupID;
@@ -706,8 +726,7 @@ void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands
         AddResponseOnError(ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
 
     // Get Scene Table Instance
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable =
-        scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
 
     // Response data
     response.groupID = req.groupID;
@@ -762,8 +781,7 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
         AddResponseOnError(ctx, response, Attributes::SceneTableSize::Get(ctx.mRequestPath.mEndpointId, &endpointTableSize)));
 
     // Get Scene Table Instance
-    scenes::SceneTable<scenes::ExtensionFieldSetsImpl> * sceneTable =
-        scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
+    SceneTable * sceneTable = scenes::GetSceneTableImpl(ctx.mRequestPath.mEndpointId, endpointTableSize);
 
     // Response data
     response.groupIdentifierFrom = req.groupIdentifierFrom;

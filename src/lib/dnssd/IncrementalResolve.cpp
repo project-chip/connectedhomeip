@@ -22,7 +22,7 @@
 #include <lib/dnssd/minimal_mdns/Logging.h>
 #include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/support/CHIPMemString.h>
-#include <trace/trace.h>
+#include <tracing/macros.h>
 
 namespace chip {
 namespace Dnssd {
@@ -239,8 +239,6 @@ IncrementalResolver::RequiredInformationFlags IncrementalResolver::GetMissingReq
 
 CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const ResourceData & data, BytesRange packetRange)
 {
-    MATTER_TRACE_EVENT_SCOPE("Incremental resolver record parsing"); // measure until loop finished
-
     if (!IsActive())
     {
         return CHIP_NO_ERROR; // nothing to parse
@@ -251,14 +249,14 @@ CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const Reso
     case QType::TXT:
         if (data.GetName() != mRecordName.Get())
         {
-            MATTER_TRACE_EVENT_INSTANT("TXT not applicable");
+            MATTER_TRACE_INSTANT("TXT not applicable", "Resolver");
             return CHIP_NO_ERROR;
         }
         return OnTxtRecord(data, packetRange);
     case QType::A: {
         if (data.GetName() != mTargetHostName.Get())
         {
-            MATTER_TRACE_EVENT_INSTANT("A (IPv4) not applicable");
+            MATTER_TRACE_INSTANT("IPv4 not applicable", "Resolver");
             return CHIP_NO_ERROR;
         }
 
@@ -281,7 +279,7 @@ CHIP_ERROR IncrementalResolver::OnRecord(Inet::InterfaceId interface, const Reso
     case QType::AAAA: {
         if (data.GetName() != mTargetHostName.Get())
         {
-            MATTER_TRACE_EVENT_INSTANT("AAAA (IPv6) not applicable");
+            MATTER_TRACE_INSTANT("IPv6 not applicable", "Resolver");
             return CHIP_NO_ERROR;
         }
 

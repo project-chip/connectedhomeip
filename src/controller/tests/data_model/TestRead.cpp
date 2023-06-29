@@ -20,6 +20,8 @@
 #include "transport/SecureSession.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ClusterStateCache.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/mock/Constants.h>
@@ -237,6 +239,11 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
 {
     return true;
+}
+
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+{
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace app
@@ -4638,14 +4645,14 @@ void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apS
 
 System::Clock::Timeout TestReadInteraction::ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval)
 {
-    // Add 50ms of slack to our max interval to make sure we hit the
+    // Add 100ms of slack to our max interval to make sure we hit the
     // subscription liveness timer.
     const auto & ourMrpConfig = GetDefaultMRPConfig();
     auto publisherTransmissionTimeout =
         GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
                                  System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
 
-    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(50);
+    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(100);
 }
 
 // clang-format off

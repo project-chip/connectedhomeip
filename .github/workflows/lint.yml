@@ -23,10 +23,6 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
-env:
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
 jobs:
     code-lints:
         runs-on: ubuntu-latest
@@ -36,40 +32,15 @@ jobs:
             image: connectedhomeip/chip-build:0.6.47
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              if: ${{ !env.ACT }}
-              name: Checkout
-              with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            # To use act like:
-            #   act -j code-lints
-            #
-            # Note you likely still need to have non submodules setup for the
-            # local machine, like:
-            #   git submodule deinit --all
-            - uses: actions/checkout@v3
-              if: ${{ env.ACT }}
-              name: Checkout (ACT for local build)
+            - name: Checkout
+              uses: actions/checkout@v3
 
             # Bootstrap and checkout for internal scripts (like idl_lint)
             # to run
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+                platform: linux
 
             - name: Check for matter lint errors
               if: always()
@@ -222,8 +193,3 @@ jobs:
               if: always()
               run: |
                   git grep -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
-
-            - name: Check that our hardcoded SHA for clang-format on ARM mac matches the pigweed SHA.
-              if: always()
-              run: |
-                  ./scripts/lints/clang-format-version-matches.py

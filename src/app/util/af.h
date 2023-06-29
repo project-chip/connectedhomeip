@@ -35,8 +35,7 @@
 
 #include <app/util/af-types.h>
 
-#include <app/util/debug-printing.h>
-#include <app/util/ember-print.h>
+#include <app/util/endpoint-config-api.h>
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Iterators.h>
@@ -131,11 +130,6 @@ extern EmberAfDefinedEndpoint emAfEndpoints[];
 #endif
 
 /**
- * @brief Macro that takes index of endpoint, and returns Zigbee endpoint
- */
-chip::EndpointId emberAfEndpointFromIndex(uint16_t index);
-
-/**
  * @brief Returns root endpoint of a composed bridged device
  */
 chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
@@ -153,49 +147,17 @@ uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
 uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
 
 /**
- * Returns the index of the given endpoint in the list of all defined endpoints
- * (including disabled ones) that support the given cluster.
- *
- * Returns kEmberInvalidEndpointIndex if the given endpoint does not support the
- * given cluster.
- *
- * For fixed endpoints, the returned value never changes, but for dynamic
- * endpoints it can change if a dynamic endpoint is defined at a lower index
- * that also supports the given cluster.
- *
- * For example, if a device has 4 fixed endpoints (ids 0-3) and 2 dynamic
- * endpoints, and cluster X is supported on endpoints 1 and 3, then:
- *
- * 1) emberAfFindClusterServerEndpointIndex(0, X) returns kEmberInvalidEndpointIndex
- * 2) emberAfFindClusterServerEndpointIndex(1, X) returns 0
- * 3) emberAfFindClusterServerEndpointIndex(2, X) returns kEmberInvalidEndpointIndex
- * 4) emberAfFindClusterServerEndpointIndex(3, X) returns 1
- *
- * If the second dynamic endpoint is defined (via
- * emberAfSetDynamicEndpoint(1, 7, ...)) to
- * have endpoint id 7, and supports cluster X, but the first dynamic endpoint is
- * not defined, then emberAfFindClusterServerEndpointIndex(7, X) returns 2.
- *
- * If now the first dynamic endpoint is defined (via
- * emberAfSetDynamicEndpoint(0, 9, ...))
- * to have endpoint id 9, and supports cluster X, then
- * emberAfFindClusterServerEndpointIndex(7, X) starts returning 3 and
- * emberAfFindClusterServerEndpointIndex(9, X) returns 2.
- */
-uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
-/**
  *  @brief Returns the index of the given endpoint in the list of all endpoints that might support the given cluster server.
  *
  * Returns kEmberInvalidEndpointIndex if the given endpoint does not support the
  * given cluster or if the given endpoint is disabled.
  *
- * Unlike emberAfFindClusterServerEndpointIndex, this function always returns the same index
- * for a given endpointId instance, fixed or dynamic, if it does not return kEmberInvalidEndpointIndex.
+ * This function always returns the same index for a given endpointId instance, fixed or dynamic.
  *
- * The return index is identical to emberAfFindClusterServerEndpointIndex for fixed endpoints,
- * but for dynamic endpoints the indexing assumes that any dynamic endpoint could start supporting
- * the given server cluster.
+ * The return index for fixed endpoints will range from 0 to (fixedClusterServerEndpointCount - 1),
+ * For dynamic endpoints the indexing assumes that any dynamic endpoint could start supporting
+ * the given server cluster and their index will range from fixedClusterServerEndpointCount to
+ * (fixedClusterServerEndpointCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT - 1).
  *
  * For example, if a device has 4 fixed endpoints (ids 0-3) and 2 dynamic
  * endpoints, and cluster X is supported on endpoints 1 and 3, then
@@ -225,11 +187,6 @@ uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::
  */
 uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
                                               uint16_t fixedClusterServerEndpointCount);
-
-/**
- * @brief Returns the total number of endpoints (dynamic and pre-compiled).
- */
-uint16_t emberAfEndpointCount(void);
 
 /**
  * @brief Returns the number of pre-compiled endpoints.
@@ -278,11 +235,6 @@ bool emberAfIsDeviceIdentifying(chip::EndpointId endpoint);
  * @brief Enable/disable endpoints
  */
 bool emberAfEndpointEnableDisable(chip::EndpointId endpoint, bool enable);
-
-/**
- * @brief Determine if an endpoint at the specified index is enabled or disabled
- */
-bool emberAfEndpointIndexIsEnabled(uint16_t index);
 
 /** @brief Returns true if a given ZCL data type is a list type. */
 bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);

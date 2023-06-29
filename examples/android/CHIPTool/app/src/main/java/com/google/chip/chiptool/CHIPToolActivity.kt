@@ -28,9 +28,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import chip.setuppayload.SetupPayload
-import chip.setuppayload.SetupPayloadParser
-import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
+import chip.onboardingpayload.OnboardingPayload
+import chip.onboardingpayload.OnboardingPayloadParser
+import chip.onboardingpayload.UnrecognizedQrCodeException
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.EnterNetworkFragment
@@ -151,10 +151,10 @@ class CHIPToolActivity :
     val uri = records[0].toUri()
     if (!uri?.scheme.equals("mt", true)) return
 
-    lateinit var setupPayload: SetupPayload
+    lateinit var setupPayload: OnboardingPayload
     try {
       setupPayload =
-        SetupPayloadParser().parseQrCode(uri.toString().toUpperCase())
+              OnboardingPayloadParser().parseQrCode(uri.toString().toUpperCase())
     } catch (ex: UnrecognizedQrCodeException) {
       Log.e(TAG, "Unrecognized QR Code", ex)
       Toast.makeText(this, "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
@@ -208,10 +208,10 @@ class CHIPToolActivity :
       val payload = JSONObject(payloadString)
 
       // parse payload from JSON
-      val setupPayload = SetupPayload()
+      val setupPayload = OnboardingPayload()
       // set defaults
-      setupPayload.discoveryCapabilities = setOf()
-      setupPayload.optionalQRCodeInfo = mapOf()
+      setupPayload.discoveryCapabilities = mutableSetOf()
+      setupPayload.optionalQRCodeInfo = HashMap()
 
       // read from payload
       setupPayload.version = payload.getInt("version")
