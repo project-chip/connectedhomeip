@@ -33,6 +33,11 @@ struct OperationalStateStruct {
     optional char_string<64> operationalStateLabel = 1;
 }
 
+struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+}
+
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 server cluster OnOff = 6 {
   enum OnOffDelayedAllOffEffectVariant : ENUM8 {

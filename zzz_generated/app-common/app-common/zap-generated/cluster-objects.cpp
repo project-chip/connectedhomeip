@@ -298,6 +298,50 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace OperationalStateStruct
+namespace ReplacementProductStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kProductIdentifierType), productIdentifierType));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kProductIdentifierValue), productIdentifierValue));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kProductIdentifierType):
+            ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierType));
+            break;
+        case to_underlying(Fields::kProductIdentifierValue):
+            ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierValue));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+    return CHIP_NO_ERROR;
+}
+
+} // namespace ReplacementProductStruct
 } // namespace Structs
 } // namespace detail
 
@@ -13636,6 +13680,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace RvcOperationalState
 namespace HepaFilterMonitoring {
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {
@@ -13726,52 +13771,7 @@ namespace Events {} // namespace Events
 
 } // namespace HepaFilterMonitoring
 namespace ActivatedCarbonFilterMonitoring {
-namespace Structs {
-namespace ReplacementProductStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kProductIdentifierType), productIdentifierType));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kProductIdentifierValue), productIdentifierValue));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kProductIdentifierType):
-            ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierType));
-            break;
-        case to_underlying(Fields::kProductIdentifierValue):
-            ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierValue));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
-    return CHIP_NO_ERROR;
-}
-
-} // namespace ReplacementProductStruct
-} // namespace Structs
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {
@@ -13862,6 +13862,7 @@ namespace Events {} // namespace Events
 
 } // namespace ActivatedCarbonFilterMonitoring
 namespace CeramicFilterMonitoring {
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {
@@ -13952,6 +13953,7 @@ namespace Events {} // namespace Events
 
 } // namespace CeramicFilterMonitoring
 namespace ElectrostaticFilterMonitoring {
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {
@@ -14042,6 +14044,7 @@ namespace Events {} // namespace Events
 
 } // namespace ElectrostaticFilterMonitoring
 namespace UvFilterMonitoring {
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {
@@ -14132,6 +14135,7 @@ namespace Events {} // namespace Events
 
 } // namespace UvFilterMonitoring
 namespace IonizingFilterMonitoring {
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {
@@ -14222,6 +14226,7 @@ namespace Events {} // namespace Events
 
 } // namespace IonizingFilterMonitoring
 namespace ZeoliteFilterMonitoring {
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {
@@ -14312,6 +14317,7 @@ namespace Events {} // namespace Events
 
 } // namespace ZeoliteFilterMonitoring
 namespace OzoneFilterMonitoring {
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {
@@ -14402,6 +14408,7 @@ namespace Events {} // namespace Events
 
 } // namespace OzoneFilterMonitoring
 namespace WaterTankMonitoring {
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {
@@ -14492,6 +14499,7 @@ namespace Events {} // namespace Events
 
 } // namespace WaterTankMonitoring
 namespace FuelTankMonitoring {
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {
@@ -14582,6 +14590,7 @@ namespace Events {} // namespace Events
 
 } // namespace FuelTankMonitoring
 namespace InkCartridgeMonitoring {
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {
@@ -14672,6 +14681,7 @@ namespace Events {} // namespace Events
 
 } // namespace InkCartridgeMonitoring
 namespace TonerCartridgeMonitoring {
+namespace Structs {} // namespace Structs
 
 namespace Commands {
 namespace ResetCondition {

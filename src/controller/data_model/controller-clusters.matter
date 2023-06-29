@@ -33,6 +33,11 @@ struct OperationalStateStruct {
     optional char_string<64> operationalStateLabel = 1;
 }
 
+struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 client cluster Identify = 3 {
   enum EffectIdentifierEnum : ENUM8 {
@@ -3414,6 +3419,11 @@ client cluster HepaFilterMonitoring = 113 {
     kReplacementProductList = 0x3;
   }
 
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+  }
+
   readonly attribute optional percent condition = 0;
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
@@ -3507,6 +3517,11 @@ client cluster CeramicFilterMonitoring = 115 {
     kReplacementProductList = 0x3;
   }
 
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+  }
+
   readonly attribute percent condition = 0;
   readonly attribute DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
@@ -3549,6 +3564,11 @@ client cluster ElectrostaticFilterMonitoring = 116 {
     kCondition = 0x1;
     kWarning = 0x2;
     kReplacementProductList = 0x3;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3595,6 +3615,11 @@ client cluster UvFilterMonitoring = 117 {
     kReplacementProductList = 0x3;
   }
 
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+  }
+
   readonly attribute optional percent condition = 0;
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
@@ -3637,6 +3662,11 @@ client cluster IonizingFilterMonitoring = 118 {
     kCondition = 0x1;
     kWarning = 0x2;
     kReplacementProductList = 0x3;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3683,6 +3713,11 @@ client cluster ZeoliteFilterMonitoring = 119 {
     kReplacementProductList = 0x3;
   }
 
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+  }
+
   readonly attribute optional percent condition = 0;
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
@@ -3725,6 +3760,11 @@ client cluster OzoneFilterMonitoring = 120 {
     kCondition = 0x1;
     kWarning = 0x2;
     kReplacementProductList = 0x3;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3771,6 +3811,11 @@ client cluster WaterTankMonitoring = 121 {
     kReplacementProductList = 0x3;
   }
 
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+  }
+
   readonly attribute optional percent condition = 0;
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
@@ -3813,6 +3858,11 @@ client cluster FuelTankMonitoring = 122 {
     kCondition = 0x1;
     kWarning = 0x2;
     kReplacementProductList = 0x3;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;
@@ -3859,6 +3909,11 @@ client cluster InkCartridgeMonitoring = 123 {
     kReplacementProductList = 0x3;
   }
 
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+  }
+
   readonly attribute optional percent condition = 0;
   readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
   readonly attribute ChangeIndicationEnum changeIndication = 2;
@@ -3901,6 +3956,11 @@ client cluster TonerCartridgeMonitoring = 124 {
     kCondition = 0x1;
     kWarning = 0x2;
     kReplacementProductList = 0x3;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
   }
 
   readonly attribute optional percent condition = 0;

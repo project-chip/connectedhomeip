@@ -368,7 +368,18 @@ limitations under the License.
   </enum>
 
   <struct name="ReplacementProductStruct">
+    <cluster code="0x0071" />
     <cluster code="0x0072" />
+    <cluster code="0x0073" />
+    <cluster code="0x0074" />
+    <cluster code="0x0075" />
+    <cluster code="0x0076" />
+    <cluster code="0x0077" />
+    <cluster code="0x0078" />
+    <cluster code="0x0079" />
+    <cluster code="0x007A" />
+    <cluster code="0x007B" />
+    <cluster code="0x007C" />
     <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
     <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
   </struct>

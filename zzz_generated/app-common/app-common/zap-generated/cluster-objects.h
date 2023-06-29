@@ -193,6 +193,29 @@ public:
 using DecodableType = Type;
 
 } // namespace OperationalStateStruct
+namespace ReplacementProductStruct {
+enum class Fields : uint8_t
+{
+    kProductIdentifierType  = 0,
+    kProductIdentifierValue = 1,
+};
+
+struct Type
+{
+public:
+    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
+    chip::CharSpan productIdentifierValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ReplacementProductStruct
 } // namespace Structs
 } // namespace detail
 
@@ -17189,6 +17212,9 @@ public:
 } // namespace Events
 } // namespace RvcOperationalState
 namespace HepaFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -17373,29 +17399,7 @@ struct TypeInfo
 } // namespace HepaFilterMonitoring
 namespace ActivatedCarbonFilterMonitoring {
 namespace Structs {
-namespace ReplacementProductStruct {
-enum class Fields : uint8_t
-{
-    kProductIdentifierType  = 0,
-    kProductIdentifierValue = 1,
-};
-
-struct Type
-{
-public:
-    ProductIdentifierTypeEnum productIdentifierType = static_cast<ProductIdentifierTypeEnum>(0);
-    chip::CharSpan productIdentifierValue;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ReplacementProductStruct
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
 } // namespace Structs
 
 namespace Commands {
@@ -17580,6 +17584,9 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ActivatedCarbonFilterMonitoring
 namespace CeramicFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -17763,6 +17770,9 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace CeramicFilterMonitoring
 namespace ElectrostaticFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -17946,6 +17956,9 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ElectrostaticFilterMonitoring
 namespace UvFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -18128,6 +18141,9 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace UvFilterMonitoring
 namespace IonizingFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -18311,6 +18327,9 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace IonizingFilterMonitoring
 namespace ZeoliteFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -18494,6 +18513,9 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ZeoliteFilterMonitoring
 namespace OzoneFilterMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -18677,6 +18699,9 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace OzoneFilterMonitoring
 namespace WaterTankMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -18860,6 +18885,9 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace WaterTankMonitoring
 namespace FuelTankMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -19042,6 +19070,9 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace FuelTankMonitoring
 namespace InkCartridgeMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -19225,6 +19256,9 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace InkCartridgeMonitoring
 namespace TonerCartridgeMonitoring {
+namespace Structs {
+namespace ReplacementProductStruct = Clusters::detail::Structs::ReplacementProductStruct;
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.

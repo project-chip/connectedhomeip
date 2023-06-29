@@ -15596,6 +15596,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_productIdentifierType;
+                std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
+                jobject newElement_0_productIdentifierValue;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
+                                                                                     newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -15607,14 +15616,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID replacementProductStructStructCtor_1 =
-                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "()V");
+                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
                 if (replacementProductStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$HepaFilterMonitoringClusterReplacementProductStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1);
+                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
+                                              newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -16123,6 +16133,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_productIdentifierType;
+                std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
+                jobject newElement_0_productIdentifierValue;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
+                                                                                     newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -16134,7 +16153,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID replacementProductStructStructCtor_1 =
-                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "()V");
+                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
                 if (replacementProductStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl,
@@ -16142,7 +16161,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1);
+                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
+                                              newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -16381,6 +16401,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_productIdentifierType;
+                std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
+                jobject newElement_0_productIdentifierValue;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
+                                                                                     newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -16393,7 +16422,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID replacementProductStructStructCtor_1 =
-                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "()V");
+                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
                 if (replacementProductStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(
@@ -16401,7 +16430,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1);
+                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
+                                              newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -16640,6 +16670,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_productIdentifierType;
+                std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
+                jobject newElement_0_productIdentifierValue;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
+                                                                                     newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -16651,14 +16690,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID replacementProductStructStructCtor_1 =
-                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "()V");
+                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
                 if (replacementProductStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$UvFilterMonitoringClusterReplacementProductStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1);
+                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
+                                              newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -16897,6 +16937,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_productIdentifierType;
+                std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
+                jobject newElement_0_productIdentifierValue;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
+                                                                                     newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -16908,7 +16957,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID replacementProductStructStructCtor_1 =
-                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "()V");
+                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
                 if (replacementProductStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl,
@@ -16916,7 +16965,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1);
+                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
+                                              newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -17155,6 +17205,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_productIdentifierType;
+                std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
+                jobject newElement_0_productIdentifierValue;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
+                                                                                     newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -17166,7 +17225,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID replacementProductStructStructCtor_1 =
-                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "()V");
+                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
                 if (replacementProductStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl,
@@ -17174,7 +17233,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1);
+                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
+                                              newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -17413,6 +17473,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_productIdentifierType;
+                std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
+                jobject newElement_0_productIdentifierValue;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
+                                                                                     newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -17424,7 +17493,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID replacementProductStructStructCtor_1 =
-                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "()V");
+                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
                 if (replacementProductStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl,
@@ -17432,7 +17501,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1);
+                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
+                                              newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -17671,6 +17741,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_productIdentifierType;
+                std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
+                jobject newElement_0_productIdentifierValue;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
+                                                                                     newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -17682,14 +17761,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID replacementProductStructStructCtor_1 =
-                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "()V");
+                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
                 if (replacementProductStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$WaterTankMonitoringClusterReplacementProductStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1);
+                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
+                                              newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -17928,6 +18008,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_productIdentifierType;
+                std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
+                jobject newElement_0_productIdentifierValue;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
+                                                                                     newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -17939,14 +18028,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID replacementProductStructStructCtor_1 =
-                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "()V");
+                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
                 if (replacementProductStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$FuelTankMonitoringClusterReplacementProductStruct constructor");
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1);
+                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
+                                              newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -18185,6 +18275,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_productIdentifierType;
+                std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
+                jobject newElement_0_productIdentifierValue;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
+                                                                                     newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -18196,7 +18295,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID replacementProductStructStructCtor_1 =
-                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "()V");
+                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
                 if (replacementProductStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl,
@@ -18204,7 +18303,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1);
+                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
+                                              newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -18443,6 +18543,15 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
+                jobject newElement_0_productIdentifierType;
+                std::string newElement_0_productIdentifierTypeClassName     = "java/lang/Integer";
+                std::string newElement_0_productIdentifierTypeCtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0_productIdentifierTypeClassName.c_str(), newElement_0_productIdentifierTypeCtorSignature.c_str(),
+                    static_cast<uint8_t>(entry_0.productIdentifierType), newElement_0_productIdentifierType);
+                jobject newElement_0_productIdentifierValue;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.productIdentifierValue,
+                                                                                     newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -18454,7 +18563,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
                 jmethodID replacementProductStructStructCtor_1 =
-                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "()V");
+                    env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
                 if (replacementProductStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl,
@@ -18462,7 +18571,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1);
+                newElement_0 = env->NewObject(replacementProductStructStructClass_1, replacementProductStructStructCtor_1,
+                                              newElement_0_productIdentifierType, newElement_0_productIdentifierValue);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

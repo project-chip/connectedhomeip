@@ -33,6 +33,11 @@ struct OperationalStateStruct {
     optional char_string<64> operationalStateLabel = 1;
 }
 
+struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 client cluster Identify = 3 {
   enum EffectIdentifierEnum : ENUM8 {

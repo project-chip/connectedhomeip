@@ -10416,6 +10416,14 @@ static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(
                 auto & entry_0 = iter_0.GetValue();
                 MTRHEPAFilterMonitoringClusterReplacementProductStruct * newElement_0;
                 newElement_0 = [MTRHEPAFilterMonitoringClusterReplacementProductStruct new];
+                newElement_0.productIdentifierType =
+                    [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.productIdentifierType)];
+                newElement_0.productIdentifierValue = AsString(entry_0.productIdentifierValue);
+                if (newElement_0.productIdentifierValue == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

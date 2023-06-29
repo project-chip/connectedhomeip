@@ -782,6 +782,12 @@ MTR_NEWLY_AVAILABLE
 @end
 
 MTR_NEWLY_AVAILABLE
+@interface MTRHEPAFilterMonitoringClusterReplacementProductStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull productIdentifierType MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
 @interface MTRActivatedCarbonFilterMonitoringClusterReplacementProductStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull productIdentifierType MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_NEWLY_AVAILABLE;
