@@ -82,8 +82,8 @@ while (($#)); do
             ;;
         --chip_detail_logging | -d)
             chip_detail_logging=$2
-            if [[ "$chip_detail_logging" != "yes" && "$chip_detail_logging" != "no" ]]; then
-                echo "chip_detail_logging should have a yes/no value, not '$chip_detail_logging'"
+            if [[ "$chip_detail_logging" != "true" && "$chip_detail_logging" != "false" ]]; then
+                echo "chip_detail_logging should have a true/false value, not '$chip_detail_logging'"
                 exit
             fi
             shift
@@ -94,8 +94,8 @@ while (($#)); do
             ;;
         --enable_pybindings | -p)
             enable_pybindings=$2
-            if [[ "$enable_pybindings" != "yes" && "$enable_pybindings" != "no" ]]; then
-                echo "enable_pybindings should have a yes/no value, not '$enable_pybindings'"
+            if [[ "$enable_pybindings" != "true" && "$enable_pybindings" != "false" ]]; then
+                echo "enable_pybindings should have a true/false value, not '$enable_pybindings'"
                 exit
             fi
             shift
