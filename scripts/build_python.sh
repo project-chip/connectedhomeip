@@ -82,6 +82,10 @@ while (($#)); do
             ;;
         --chip_detail_logging | -d)
             chip_detail_logging=$2
+            if [[ "$chip_detail_logging" != "yes" && "$chip_detail_logging" != "no" ]]; then
+                echo "chip_detail_logging should have a yes/no value, not '$chip_detail_logging'"
+                exit
+            fi
             shift
             ;;
         --chip_mdns | -m)
@@ -90,6 +94,10 @@ while (($#)); do
             ;;
         --enable_pybindings | -p)
             enable_pybindings=$2
+            if [[ "$enable_pybindings" != "yes" && "$enable_pybindings" != "no" ]]; then
+                echo "enable_pybindings should have a yes/no value, not '$enable_pybindings'"
+                exit
+            fi
             shift
             ;;
         --time_between_case_retries | -t)
@@ -98,14 +106,26 @@ while (($#)); do
             ;;
         --install_virtual_env | -i)
             install_virtual_env=$2
+            if [[ "$install_virtual_env" != "yes" && "$install_virtual_env" != "no" ]]; then
+                echo "chip_virtual_env should have a yes/no value, not '$install_virtual_env'"
+                exit
+            fi
             shift
             ;;
         --clean_virtual_env | -c)
             clean_virtual_env=$2
+            if [[ "$clean_virtual_env" != "yes" && "$clean_virtual_env" != "no" ]]; then
+                echo "clean_virtual_env should have a yes/no value, not '$clean_virtual_env'"
+                exit
+            fi
             shift
             ;;
         --include_pytest_deps)
             install_pytest_requirements=$2
+            if [[ "$install_pytest_requirements" != "yes" && "$install_pytest_requirements" != "no" ]]; then
+                echo "install_pytest_requirements should have a yes/no value, not '$install_pytest_requirements'"
+                exit
+            fi
             shift
             ;;
         --extra_packages)
