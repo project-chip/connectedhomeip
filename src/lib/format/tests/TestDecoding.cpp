@@ -226,7 +226,7 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
         auto data = position.Get();
         if (data != nullptr)
         {
-            printf("%-25s: ", data->name);
+            printf("%s: ", data->name);
         }
         else
         {

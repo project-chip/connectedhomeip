@@ -27,9 +27,17 @@ constexpr TLV::Tag EventTag(uint32_t event_id) {
   return TLV::ProfileTag(kEventProfile, event_id);
 }
 
+enum class ItemType : uint8_t {
+  kDefault = 0,
+  kList = 1,
+  kEnum = 2,
+  kBitmap = 4,
+};
+
 struct ItemInfo {
   TLV::Tag tag;
   const char *name;
+  ItemType type;
 };
 
 extern std::array<FlatTree::Node<ItemInfo>, {{ sub_tables | length }} + 1> {{table_name}};

@@ -11,14 +11,14 @@ using namespace chip::TLV;
 
 Entry<ItemInfo> _{{table.full_name}}[] = {
   {%-  for entry in table.entries %}
-  { { {{entry.code}}, "{{entry.name}}"}, {{entry.reference | indexInTable(sub_tables)}} }, // {{entry.real_type}}
+  { { {{entry.code}}, "{{entry.name}}", ItemType::{{entry.item_type}} }, {{entry.reference | indexInTable(sub_tables)}} }, // {{entry.real_type}}
   {%- endfor %}
 };
 {%- endfor %}
 
 Entry<ItemInfo> _all_clusters[] = {
 {%- for cluster in clusters | sort(attribute='code') %}
-  { { ClusterTag({{"0x%02X" | format(cluster.code)}}), "{{cluster.name}}" }, {{cluster.name | indexInTable(sub_tables)}} },
+  { { ClusterTag({{"0x%02X" | format(cluster.code)}}), "{{cluster.name}}", ItemType::kDefault }, {{cluster.name | indexInTable(sub_tables)}} },
 {%- endfor %}
 };
 

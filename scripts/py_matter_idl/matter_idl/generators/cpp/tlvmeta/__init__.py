@@ -22,10 +22,11 @@ from matter_idl.matter_idl_types import Cluster, ClusterSide, Field, Idl, Struct
 
 @dataclass
 class TableEntry:
-    code: str                # Encoding like ContextTag() or AnonymousTag() or similar
-    name: str                # human friendly name
-    reference: Optional[str]  # reference to full name
-    real_type: str           # real type
+    code: str                   # Encoding like ContextTag() or AnonymousTag() or similar
+    name: str                   # human friendly name
+    reference: Optional[str]    # reference to full name
+    real_type: str              # real type
+    item_type: str = 'kDefault' # type flag for decoding
 
 
 @dataclass
@@ -43,14 +44,28 @@ class ClusterTablesGenerator:
         self.known_types = set()  # all types where we create reference_to
         self.list_types = set()  # all types that require a list entry
 
+    def GetItemTypeFor(self, typename: str) -> str:
+        for e in self.cluster.enums:
+            if typename == e.name:
+                return "kEnum"
+
+        for b in self.cluster.bitmaps:
+            if typename == b.name:
+                return "kBitmap"
+
+        return "kDefault"
+
     def FieldEntry(self, field: Field, tag_type: str = 'ContextTag') -> TableEntry:
         type_reference = "%s_%s" % (self.cluster.name, field.data_type.name)
         if type_reference not in self.known_types:
             type_reference = None
 
+        item_type = self.GetItemTypeFor(field.data_type.name);
+
         real_type = "%s::%s" % (self.cluster.name, field.data_type.name)
         if field.is_list:
             real_type = real_type + "[]"
+            item_type = "kList"
 
             if type_reference:
                 self.list_types.add(type_reference)
@@ -61,6 +76,7 @@ class ClusterTablesGenerator:
             name=field.name,
             reference=type_reference,
             real_type=real_type,
+            item_type=item_type,
         )
 
     def ComputeKnownTypes(self):
