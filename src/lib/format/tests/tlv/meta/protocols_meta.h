@@ -32,7 +32,7 @@ struct ItemInfo {
   const char *name;
 }
 
-extern std::array<Node<ItemInfo>, {{ clusters | length }}> {{table_name}};
+extern std::array<Node<ItemInfo>, 4> protocols_meta;
 
 } // namespace chip
 } // namespace TLVMeta

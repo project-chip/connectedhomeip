@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include <protocols/Protocols.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace TestData {

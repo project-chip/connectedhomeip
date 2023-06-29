@@ -206,7 +206,7 @@ class TLVMetaDataGenerator(CodeGenerator):
 
         self.internal_render_one_output(
             template_path="TLVMetaData_cpp.jinja",
-            output_file_name="tlv/ClusterMetaData.cpp",
+            output_file_name=f"tlv/meta/{self.table_name}.cpp",
             vars={
                 'clusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
                 'table_name': self.table_name,
@@ -217,7 +217,7 @@ class TLVMetaDataGenerator(CodeGenerator):
 
         self.internal_render_one_output(
             template_path="TLVMetaData_h.jinja",
-            output_file_name="tlv/ClusterMetaData.h",
+            output_file_name=f"tlv/meta/{self.table_name}.h",
             vars={
                 'clusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
                 'table_name': self.table_name,

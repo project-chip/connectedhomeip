@@ -18,6 +18,21 @@ import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
+source_set("temporary_test") {
+  sources = [
+    "sample_data.h",
+    "sample_data.cpp",
+    "tlv/meta/protocols_meta.h",
+    "tlv/meta/protocols_meta.cpp",
+  ]
+
+  include_dirs = [ "." ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/format:flat-tree",
+  ]
+}
+
 chip_test_suite("tests") {
   output_name = "libFormatTests"
 
@@ -35,6 +50,7 @@ chip_test_suite("tests") {
   ]
 
   public_deps = [
+    ":temporary_test",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/format:flat-tree",
     "${chip_root}/src/lib/support:testing",
