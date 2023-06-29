@@ -22,18 +22,18 @@ RUN git clone --depth=1 --branch=v4.2.0 https://github.com/SiliconLabs/gecko_sdk
 ENV GSDK_ROOT=/gecko_sdk/
 
 # SLC-cli install
+# TODO: figure out a way to make this a fixed version. Currently a moving target.
 RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
     unzip ./slc_cli_linux.zip -d ./ && \
-    rm ./slc_cli_linux.zip && \
-    cd ./slc_cli && \
-    pip3 install -r ./requirements.txt
+    rm ./slc_cli_linux.zip
 
 ENV PATH="${PATH}:/slc_cli/"
 
 # Install Python Packages
 
-# SLC required Python Packages
+# codegen.py build requirements
+# TODO: why are these added here instead of build-env?
 RUN pip3 install lark jinja2 stringcase
 
-# Sphinx required Python Packages
+# Sphinx dependencies (for slc-cli)
 RUN pip3 install myst_parser sphinx_rtd_theme sphinx_tabs linkify-it-py
