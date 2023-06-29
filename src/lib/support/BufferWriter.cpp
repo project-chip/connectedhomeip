@@ -23,10 +23,19 @@ namespace Encoding {
 BufferWriter & BufferWriter::Put(const char * s)
 {
     static_assert(CHAR_BIT == 8, "We're assuming char and uint8_t are the same size");
-    while (*s != 0)
-    {
-        Put(static_cast<uint8_t>(*s++));
-    }
+    return Put(s, strlen(s));
+}
+
+BufferWriter &BufferWriter::VFormat(const char *format, va_list args) {
+    mNeeded += vsnprintf(reinterpret_cast<char *>(mBuf + mNeeded), Available(), format, args);
+    return *this;
+}
+
+BufferWriter &BufferWriter::VFormatWithSize(size_t size, const char *format, va_list args) {
+    size_t oldsize = mSize;
+    mSize = size;
+    mNeeded += vsnprintf(reinterpret_cast<char *>(mBuf + mNeeded), Available(), format, args);
+    mSize = oldsize;
     return *this;
 }
 

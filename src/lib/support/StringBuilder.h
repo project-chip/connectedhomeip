@@ -56,6 +56,19 @@ public:
     /// Was nothing written yet?
     bool Empty() const { return mWriter.Needed() == 0; }
 
+
+    /// Write a formatted string to the stringbuilder
+    StringBuilderBase & Format(const char *format, ...) ENFORCE_FORMAT(2,3) {
+        va_list args;
+        va_start(args, format);
+
+        // we know for a fact that we reserve one extra byte for null
+        mWriter.VFormatWithSize(mWriter.Size() + 1, format, args);
+        va_end(args);
+        NullTerminate();
+        return *this;
+    }
+
     /// access the underlying value
     const char * c_str() const { return reinterpret_cast<const char *>(mWriter.Buffer()); }
 

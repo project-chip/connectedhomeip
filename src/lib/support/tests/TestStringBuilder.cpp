@@ -78,10 +78,64 @@ void TestOverflow(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void TestFormat(nlTestSuite * inSuite, void * inContext)
+{
+    {
+        StringBuilder<100> builder;
+
+        builder.Format("Test: %d Hello %s\n", 123, "world");
+
+        NL_TEST_ASSERT(inSuite, builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "Test: 123 Hello world\n") == 0);
+    }
+
+    {
+        StringBuilder<100> builder;
+
+        builder.Format("Align: %-5s", "abc");
+
+        NL_TEST_ASSERT(inSuite, builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "Align: abc  ") == 0);
+    }
+
+    {
+        StringBuilder<100> builder;
+
+        builder.Format("Multi: %d", 1234);
+        builder.Format(", then 0x%04X", 0xab);
+
+        NL_TEST_ASSERT(inSuite, builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "Multi: 1234, then 0x00AB") == 0);
+    }
+}
+
+void TestFormatOverflow(nlTestSuite * inSuite, void * inContext)
+{
+    {
+        StringBuilder<13> builder;
+
+        builder.Format("Test: %d Hello %s\n", 123, "world");
+
+        NL_TEST_ASSERT(inSuite, !builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "Test: 123 He") == 0);
+    }
+
+    {
+        StringBuilder<11> builder;
+
+        builder.Format("%d %d %d %d %d", 1, 2, 3, 4, 1234);
+
+        NL_TEST_ASSERT(inSuite, !builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1 2 3 4 12") == 0);
+    }
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestStringBuilder", TestStringBuilder), //
     NL_TEST_DEF("TestIntegerAppend", TestIntegerAppend), //
     NL_TEST_DEF("TestOverflow", TestOverflow),           //
+    NL_TEST_DEF("TestFormat", TestFormat),               //
+    NL_TEST_DEF("TestFormatOverflow", TestFormatOverflow),               //
     NL_TEST_SENTINEL()                                   //
 };
 
