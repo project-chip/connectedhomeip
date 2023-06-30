@@ -87,6 +87,10 @@ public:
     uint8_t * Buffer() { return mBuf; }
     const uint8_t * Buffer() const { return mBuf; }
 
+    /// Write a printf-formatted string to the underlying buffer.
+    ///
+    /// Uses VFormat internally: final '\0' is written (requires buffer space)
+    /// but is not considered in the buffer used size.
     BufferWriter & Format(const char * format, ...) ENFORCE_FORMAT(2, 3)
     {
         va_list args;
@@ -96,15 +100,27 @@ public:
         return *this;
     }
 
-    /// Since this uses vsnprintf internally, on overflow
-    /// this will write one less byte that strictly can be
-    /// written (since null terminator will be in the binary data)
+    /// Write a formatted string to the underlying buffer (like printf-style
+    /// methods).
+    ///
+    /// This uses vsnprintf internally, so space for a final 0 is required even
+    /// though that 0 is not counted for the buffer size. As a result, on overflow
+    /// this may write 1 byte less than strictly available internally.
+    ///
+    /// If you know that more buffer space is available, you can use VFormatWithSize.
+    ///
     BufferWriter & VFormat(const char * format, va_list args) ENFORCE_FORMAT(2, 0);
 
-    /// Assume a specific size for the buffer instead of mSize
+    /// Assume a specific size for the buffer instead of the contructor-provided size.
     ///
-    /// This is to allow avoiding off-by-one overflow truncation
-    /// when we know the underlying buffer size is larger.
+    /// This overrides the buffer size to be assumed `size` for the duration of the
+    /// format write.
+    ///
+    /// Generally used to allow avoiding off-by-one overflow truncation
+    /// when the underlying buffer is known to be larger, but could also be used to
+    /// limit internal output as well.
+    ///
+    /// ONLY USE IF YOU UNDERSTAND THE LOGIC BEHIND IT.
     BufferWriter & VFormatWithSize(size_t size, const char * format, va_list args) ENFORCE_FORMAT(3, 0);
 
 protected:
