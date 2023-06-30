@@ -1,4 +1,4 @@
 
 from .PyChip import chip
 
-__ALL__ = (chip)
+__all__ = [chip]
