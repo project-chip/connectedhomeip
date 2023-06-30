@@ -219,13 +219,13 @@ void PayloadDecoder::Decode(TLVReader & reader, StringBuilderBase & out)
     }
     if (data->type == ItemType::kProtocolBinaryData)
     {
-        printf("  BINARY DATA\n");
+        out.Add("  BINARY DATA\n");
         return;
     }
     CHIP_ERROR err = reader.Next(kTLVType_Structure, AnonymousTag());
     if (err != CHIP_NO_ERROR)
     {
-        printf("  ERROR getting Anonymous Structure TLV: %" CHIP_ERROR_FORMAT "\n", err.Format());
+        out.AddFormat("  ERROR getting Anonymous Structure TLV: %" CHIP_ERROR_FORMAT "\n", err.Format());
         return;
     }
 
