@@ -36,6 +36,7 @@ tests:
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
+          saveAs: CurrentMinMeasured
           constraints:
               type: int16u
               minValue: 0
@@ -46,9 +47,10 @@ tests:
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
+          saveAs: CurrentMaxMeasured
           constraints:
               type: int16u
-              minValue: 1
+              minValue: CurrentMinMeasured
               maxValue: 10000
 
     - label: "TH reads the MeasuredValue attribute from the DUT"
@@ -58,8 +60,8 @@ tests:
       response:
           constraints:
               type: int16u
-              minValue: 0
-              maxValue: 10000
+              minValue: CurrentMinMeasured
+              maxValue: CurrentMaxMeasured
 
     - label: "TH reads the Tolerance attribute from the DUT"
       PICS: RH.S.A0003
