@@ -49,7 +49,7 @@ from . import discovery
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
-from .clusters import Objects as GeneratedObjects  # noqa: F401 Need for eval
+from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
 from .exceptions import UnknownAttribute, UnknownCommand
@@ -1199,7 +1199,7 @@ class ChipDeviceControllerBase():
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
         self.CheckIsActive()
 
-        clusterType = eval(f"GeneratedObjects.{cluster}")
+        clusterType = getattr(GeneratedObjects, cluster)
 
         try:
             attributeType = eval(
