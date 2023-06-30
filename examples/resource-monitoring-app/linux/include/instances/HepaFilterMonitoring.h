@@ -18,27 +18,28 @@
 
 #pragma once
 
-#include <app/clusters/resource-monitoring-server/resource-monitoring-delegate.h>
+
+#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-// Defining mode select delegates for all mode select aliased clusters.
 namespace ResourceMonitoring {
 
-/// This is an application level delegate to handle HepaFilterMonitoringDelegate commands according to the specific business logic.
-//class HepaFilterMonitoringDelegate : public Delegate
-class HepaFilterMonitoringDelegate : public Delegate
+/// This is an application level instance to handle HepaFilterMonitoringInstance commands according to the specific business logic.
+class HepaFilterMonitoringInstance : public ResourceMonitoring::Instance
 {
 private:
-    CHIP_ERROR Init() override;
-    Status HandleResetCondition() override;
+    CHIP_ERROR AppInit() override;
+    chip::Protocols::InteractionModel::Status OnResetCondition() override;
 
 public:
-    explicit HepaFilterMonitoringDelegate() : Delegate() {}
+    HepaFilterMonitoringInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature, 
+    ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection) : Instance(aEndpointId,aClusterId,aFeature,aDegradationDirection ) {};
 
-    ~HepaFilterMonitoringDelegate() override = default;
+    ~HepaFilterMonitoringInstance() override = default;
 };
 
 } // namespace ResourceMonitoring

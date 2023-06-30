@@ -27,7 +27,7 @@
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
-#include <resource-monitoring-delegates.h>
+#include <resource-monitoring-instances.h>
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
@@ -49,11 +49,9 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &s
 #endif
 
 
-Clusters::ResourceMonitoring::HepaFilterMonitoringDelegate hepaFilterDelegate;
-Clusters::ResourceMonitoring::Instance HepafilterInstance(0x1, Clusters::HepaFilterMonitoring::Id, &hepaFilterDelegate);
+Clusters::ResourceMonitoring::HepaFilterMonitoringInstance HepafilterInstance(0x1, Clusters::HepaFilterMonitoring::Id, 1, ResourceMonitoring::DegradationDirectionEnum::kDown);
 
-Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringDelegate activatedCarbonFilterDelegate;
-Clusters::ResourceMonitoring::Instance ActivatedCarbonFilterInstance(0x1, Clusters::ActivatedCarbonFilterMonitoring::Id, &activatedCarbonFilterDelegate);
+Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance ActivatedCarbonFilterInstance(0x1, Clusters::ActivatedCarbonFilterMonitoring::Id, 1, ResourceMonitoring::DegradationDirectionEnum::kDown);
 
 void ApplicationInit()
 {

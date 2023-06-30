@@ -90,8 +90,8 @@ CHIP_ERROR Instance::Init()
 
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    ChipLogError(Zcl, "ResourceMonitoring: calling delegate->init()");
-    ReturnErrorOnFailure(mDelegate->Init());
+    ChipLogError(Zcl, "ResourceMonitoring: calling AppInit()");
+    ReturnErrorOnFailure(AppInit());
 
     ResourceMonitoringAliasesInstanceMap[mClusterId] = this;
 
@@ -106,12 +106,10 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
     {
         RequestT requestPayload;
 
-        //
         // If the command matches what the caller is looking for, let's mark this as being handled
         // even if errors happen after this. This ensures that we don't execute any fall-back strategies
         // to handle this command since at this point, the caller is taking responsibility for handling
         // the command in its entirety, warts and all.
-        //
         handlerContext.SetCommandHandled();
 
         if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)

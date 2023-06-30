@@ -18,5 +18,5 @@
 
 #pragma once
 
-#include <delegates/ActivatedCarbonFilterMonitoringDelegate.h>
-#include <delegates/HepaFilterMonitoringDelegate.h>
+#include <instances/ActivatedCarbonFilterMonitoring.h>
+#include <instances/HepaFilterMonitoring.h>

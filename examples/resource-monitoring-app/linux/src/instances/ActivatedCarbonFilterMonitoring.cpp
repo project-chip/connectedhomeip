@@ -1,6 +1,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
-#include <resource-monitoring-delegates.h>
+#include <instances/ActivatedCarbonFilterMonitoring.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::HepaFilterMonitoring;
@@ -10,16 +10,15 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
-//-- Hepa filter Monitoring delegate functions
-CHIP_ERROR ActivatedCarbonFilterMonitoringDelegate::Init()
+//-- Hepa filter Monitoring Instance functions
+CHIP_ERROR ActivatedCarbonFilterMonitoringInstance::AppInit()
 {
     ChipLogDetail(Zcl, "ActivatedCarbonFilterMonitoringDelegate::Init()");
     return CHIP_NO_ERROR;
 }
 
-Status ActivatedCarbonFilterMonitoringDelegate::HandleResetCondition()
+Status ActivatedCarbonFilterMonitoringInstance::OnResetCondition()
 {
-    ChipLogError(Zcl, "ActivatedCarbonFilterMonitoringDelegate::HandleResetCondition()");
+    ChipLogError(Zcl, "ActivatedCarbonFilterMonitoringDelegate::OnResetCondition()");
     return Status::Success;
 }
-

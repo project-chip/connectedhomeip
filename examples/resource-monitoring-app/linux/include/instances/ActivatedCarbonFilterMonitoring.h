@@ -18,28 +18,28 @@
 
 #pragma once
 
-
-#include <app/clusters/resource-monitoring-server/resource-monitoring-delegate.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-// Defining mode select delegates for all mode select aliased clusters.
 namespace ResourceMonitoring {
 
-/// This is an application level delegate to handle ActivatedCarbonFilterMonitoringDelegate commands according to the specific business logic.
-//class ActivatedCarbonFilterMonitoringDelegate : public Delegate
-class ActivatedCarbonFilterMonitoringDelegate : public Delegate
+/// This is an application level Instance to handle ActivatedCarbonfilterMonitoringInstance commands according to the specific business logic.
+class ActivatedCarbonFilterMonitoringInstance : public ResourceMonitoring::Instance
 {
 private:
-    CHIP_ERROR Init() override;
-    Status HandleResetCondition() override;
+    CHIP_ERROR AppInit() override;
+    chip::Protocols::InteractionModel::Status OnResetCondition() override;
 
 public:
-    explicit ActivatedCarbonFilterMonitoringDelegate() : Delegate() {}
-
-    ~ActivatedCarbonFilterMonitoringDelegate() override = default;
+    ActivatedCarbonFilterMonitoringInstance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature, 
+    ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection) 
+    : 
+    Instance(aEndpointId,aClusterId,aFeature,aDegradationDirection ) {};
+    ~ActivatedCarbonFilterMonitoringInstance() override = default;
 };
 
 } // namespace ResourceMonitoring
