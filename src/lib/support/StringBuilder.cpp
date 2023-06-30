@@ -36,7 +36,7 @@ StringBuilderBase & StringBuilderBase::AddFormat(const char * format, ...)
     // on invalid formats, printf-style methods return negative numbers
     if (needed > 0)
     {
-        mWriter.Skip(needed);
+        mWriter.Skip(static_cast<size_t>(needed));
     }
 
     va_end(args);
