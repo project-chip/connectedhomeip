@@ -727,7 +727,7 @@ tests:
 
           [1652341411.383669][2929:2934] CHIP:DMG: InvokeResponseMessage =
           [1652341411.383720][2929:2934] CHIP:DMG: {
-          [1652341411.383769][2929:2934] CHIP:DMG:         suppressResponse = false, 
+          [1652341411.383769][2929:2934] CHIP:DMG:         suppressResponse = false,
           [1652341411.383821][2929:2934] CHIP:DMG:         InvokeResponseIBs =
           [1652341411.383886][2929:2934] CHIP:DMG:         [
           [1652341411.383936][2929:2934] CHIP:DMG:                 InvokeResponseIB =
@@ -1045,7 +1045,7 @@ tests:
 
     - label: "service type must be _matterc._udp"
       verification: |
-          Run and Verify on  the below output in TH terminal Log: (Below is the sample log , as RPI doesn't support the extended discovery) 
+          Run and Verify on  the below output in TH terminal Log: (Below is the sample log , as RPI doesn't support the extended discovery)
           Verify the CM flag value is 0
 
           avahi-browse -rt _matterc._udp
