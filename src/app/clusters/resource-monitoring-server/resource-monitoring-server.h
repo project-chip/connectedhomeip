@@ -51,14 +51,34 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
-    // Generic accessor functions
-    EmberAfStatus GetFeature(uint32_t * value) const;
-    EmberAfStatus SetFeatureMap(uint32_t value) const;
+
+    // Attribute setters
+    chip::Protocols::InteractionModel::Status UpdateCondition(uint8_t aNewCondition);
+    chip::Protocols::InteractionModel::Status UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication);
+    chip::Protocols::InteractionModel::Status UpdateInPlaceIndicator(bool aNewInPlaceIndicator);
+
+    // Attribute getters
+    uint8_t GetCondition() const;
+    chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum GetChangeIndication() const;
+    bool GetInPlaceIndicator() const;
+
 
 private:
     EndpointId mEndpointId{};
     ClusterId mClusterId{};
+    
+    //attribute Data Store
+    chip::Percent mCondition;
+    const ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type mDegradationDirection;
+    ResourceMonitoring::Attributes::ChangeIndication::TypeInfo::Type mChangeIndication;
+    ResourceMonitoring::Attributes::InPlaceIndicator::TypeInfo::Type mInPlaceIndicator;
+    
+    uint32_t mFeature;
 
+    // todo description
+    bool IsAliascluster() const;
+
+    // todo description
     void HandleResetCondition(HandlerContext & ctx,
                               const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData);
 

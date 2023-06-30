@@ -20,6 +20,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <app/util/attribute-storage.h>
+#include <app/reporting/reporting.h>
 #include <app/util/util.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <map>
@@ -33,41 +34,12 @@ using chip::Protocols::InteractionModel::Status;
 
 using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
+// todo set ram to callback, see thread from william
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-// todo find a cleaner solution by modifying the zap generated code.
-EmberAfStatus Instance::GetFeature(uint32_t * value) const
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status =
-        emberAfReadAttribute(mEndpointId, mClusterId, ResourceMonitoring::Attributes::FeatureMap::Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-
-EmberAfStatus Instance::SetFeatureMap(uint32_t value) const
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(mEndpointId, mClusterId, ResourceMonitoring::Attributes::FeatureMap::Id, writable,
-                                 ZCL_BITMAP32_ATTRIBUTE_TYPE);
-}
 
 std::map<uint32_t, Instance *> Instance::ResourceMonitoringAliasesInstanceMap;
 
@@ -75,7 +47,7 @@ CHIP_ERROR Instance::Init()
 {
     ChipLogError(Zcl, "ResourceMonitoring: Init");
     // Check that the cluster ID given is a valid mode select alias cluster ID.
-    if (!std::any_of(AliasedClusters.begin(), AliasedClusters.end(), [this](ClusterId i) { return i == mClusterId; }))
+    if (!IsAliascluster())
     {
         ChipLogError(Zcl, "ResourceMonitoring: The cluster with ID %lu is not a mode select alias.", long(mClusterId));
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -123,15 +95,26 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
     }
 }
 
+bool Instance::IsAliascluster() const
+{
+    for ( unsigned int AliasedCluster : AliasedClusters)
+    {
+        if ( mClusterId == AliasedCluster )
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Instance::HandleResetCondition(HandlerContext & ctx,
                                     const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData)
 {
-    // uint8_t newMode = commandData.newMode;
 
-    Status checkIsChangeToThisModeAllowed = mDelegate->HandleResetCondition();
-    if (Status::Success != checkIsChangeToThisModeAllowed)
+    Status resetConditionSuccessful = OnResetCondition();
+    if (Status::Success != resetConditionSuccessful)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, checkIsChangeToThisModeAllowed);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, resetConditionSuccessful);
         return;
     }
 
@@ -156,19 +139,16 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
 bool Instance::HasFeature(ResourceMonitoring::Feature feature) const
 {
-    bool success;
-    uint32_t featureMap;
-    success = (GetFeature(&featureMap) == EMBER_ZCL_STATUS_SUCCESS);
-
-    return success && ((featureMap & to_underlying(feature)) != 0);
+        return ((mFeature & to_underlying(feature)) != 0);
 }
 
 // List the commands supported by this instance.
+//TODO do we need this? should a sdk developer override this if the command is not supported?
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
 {
     ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
-    callback(HepaFilterMonitoring::Commands::ResetCondition::Id, context);
+    callback(ResourceMonitoring::Commands::ResetCondition::Id, context);
 
     return CHIP_NO_ERROR;
 }
@@ -176,14 +156,100 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 // Implements the read functionality for non-standard attributes.
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    switch (aPath.mAttributeId)
+    {
+        case Attributes::Condition::Id:
+        {
+            ReturnErrorOnFailure(aEncoder.Encode(mCondition));
+            break;
+        }
+        case Attributes::DegradationDirection::Id:
+        {  
+            ReturnErrorOnFailure(aEncoder.Encode(mDegradationDirection));
+            break;
+        }
+        case Attributes::ChangeIndication::Id:
+        {  
+            ReturnErrorOnFailure(aEncoder.Encode(mChangeIndication));
+            break;
+        }       
+        case Attributes::InPlaceIndicator::Id:
+        {  
+            ReturnErrorOnFailure(aEncoder.Encode(mInPlaceIndicator));
+            break;
+        }
+    }
     return CHIP_NO_ERROR;
 }
 
 // Implements checking before attribute writes.
 CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, AttributeValueDecoder & aDecoder)
 {
-
+    //no writeable attributes supported
     return CHIP_NO_ERROR;
+}
+
+chip::Protocols::InteractionModel::Status Instance::UpdateCondition(uint8_t aNewCondition)
+{
+    if ( aNewCondition < 0 || aNewCondition > 100)
+    {
+        return Protocols::InteractionModel::Status::InvalidValue;
+    }
+    auto oldCondition = mCondition;
+    mCondition = aNewCondition;
+    if ( mCondition != oldCondition )
+    {
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::Condition::Id);
+    }
+    return Protocols::InteractionModel::Status::Success;
+}
+
+chip::Protocols::InteractionModel::Status Instance::UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication)
+{
+    if ( aNewChangeIndication == chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum::kWarning)
+    {
+        if ( !HasFeature(ResourceMonitoring::Feature::kWarning) )
+        {
+            return Protocols::InteractionModel::Status::InvalidValue;
+        }
+    }
+    auto oldChangeIndication = mChangeIndication;
+    mChangeIndication = aNewChangeIndication;
+    if ( mChangeIndication != oldChangeIndication )
+    {
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::ChangeIndication::Id);
+    }
+    return Protocols::InteractionModel::Status::Success;
+}
+chip::Protocols::InteractionModel::Status Instance::UpdateInPlaceIndicator(bool aNewInPlaceIndicator)
+{
+    auto oldInPlaceIndicator = mInPlaceIndicator;
+    mInPlaceIndicator = aNewInPlaceIndicator;
+    if ( mInPlaceIndicator != oldInPlaceIndicator )
+    {
+        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::InPlaceIndicator::Id);
+    }
+    return Protocols::InteractionModel::Status::Success;
+}
+
+// Attribute getters
+uint8_t Instance::GetCondition() const
+{
+    return mCondition;
+}
+chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum Instance::GetChangeIndication() const
+{
+    return mChangeIndication;
+}
+bool Instance::GetInPlaceIndicator() const
+{
+    return mInPlaceIndicator;
+}
+
+chip::Protocols::InteractionModel::Status Instance::OnResetCondition()
+{
+    ChipLogError(Zcl, "Instance::OnResetCondition()");
+    return Status::Success;
 }
 
 } // namespace ResourceMonitoring
