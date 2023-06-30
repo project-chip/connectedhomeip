@@ -80,7 +80,7 @@ const char * DecodeTagControl(const TLVTagControl aTagControl)
     }
 }
 
-void FormatCurrentTag(TLVReader & reader, chip::StringBuilderBase & out)
+void FormatCurrentTag(const TLVReader & reader, chip::StringBuilderBase & out)
 {
     chip::TLV::TLVTagControl tagControl = static_cast<TLVTagControl>(reader.GetControlByte() & kTLVTagControlMask);
     chip::TLV::Tag tag                  = reader.GetTag();
