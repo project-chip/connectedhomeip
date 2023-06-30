@@ -108,6 +108,7 @@ public:
             ReadHandler * readHandler =
                 readHandlerPool.CreateObject(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Subscribe);
             NL_TEST_ASSERT(aSuite, nullptr != readHandler);
+            VerifyOrReturn(nullptr != readHandler);
             NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sScheduler.RegisterReadHandler(readHandler));
             NL_TEST_ASSERT(aSuite, nullptr != sScheduler.FindReadHandlerNode(readHandler));
         }
@@ -246,6 +247,7 @@ public:
         NL_TEST_ASSERT(aSuite, sScheduler.IsReportScheduled(readHandler));
         reporting::ReportScheduler::ReadHandlerNode * node = sScheduler.FindReadHandlerNode(readHandler);
         NL_TEST_ASSERT(aSuite, nullptr != node);
+        VerifyOrReturn(nullptr != node);
         NL_TEST_ASSERT(aSuite, node->GetReadHandler() == readHandler);
 
         // Test OnBecameReportable
