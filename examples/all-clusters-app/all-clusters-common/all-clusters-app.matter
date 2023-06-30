@@ -2492,6 +2492,7 @@ server cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+<<<<<<< HEAD
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
 server cluster TemperatureControl = 86 {
   bitmap Feature : BITMAP32 {
@@ -2530,11 +2531,6 @@ server cluster RefrigeratorAlarm = 87 {
     AlarmMap mask = 3;
   }
 
-<<<<<<< HEAD
-=======
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
 server cluster TemperatureControl = 86 {
   bitmap Feature : BITMAP32 {
@@ -2546,7 +2542,6 @@ server cluster TemperatureControl = 86 {
   readonly attribute temperature temperatureSetpoint = 0;
   readonly attribute temperature minTemperature = 1;
   readonly attribute temperature maxTemperature = 2;
->>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6713,23 +6708,13 @@ endpoint 1 {
   }
 
   server cluster TemperatureControl {
-<<<<<<< HEAD
     ram      attribute selectedTemperatureLevel default = 0;
     callback attribute supportedTemperatureLevels;
-=======
-    ram      attribute temperatureSetpoint default = 1;
-    ram      attribute minTemperature default = 0;
-    ram      attribute maxTemperature default = 100;
->>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-<<<<<<< HEAD
     ram      attribute featureMap default = 2;
-=======
-    ram      attribute featureMap default = 1;
->>>>>>> 07d46e3ba1 (Restructure server implementation to match spec)
     ram      attribute clusterRevision default = 1;
   }
 
