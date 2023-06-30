@@ -31,13 +31,10 @@ namespace {
 using namespace chip::TestData;
 using namespace chip::Decoders;
 
-void TestSampleData(nlTestSuite * inSuite, void * inContext, const SamplePayload & data)
+void TestSampleData(nlTestSuite * inSuite, void * inContext, const PayloadDecoderInitParams & params, const SamplePayload & data)
 {
-    chip::Decoders::PayloadDecoder<64, 128> decoder(PayloadDecoderInitParams()
-                                                        .SetProtocol(data.protocolId)
-                                                        .SetMessageType(data.messageType)
-                                                        .SetProtocolDecodeTree(chip::TLVMeta::protocols_meta)
-                                                        .SetClusterDecodeTree(chip::TLVMeta::clusters_meta));
+    chip::Decoders::PayloadDecoder<64, 128> decoder(
+        PayloadDecoderInitParams(params).SetProtocol(data.protocolId).SetMessageType(data.messageType));
 
     decoder.StartDecoding(data.payload);
 
@@ -76,15 +73,19 @@ void TestSampleData(nlTestSuite * inSuite, void * inContext, const SamplePayload
 
 void TestDecode(nlTestSuite * inSuite, void * inContext)
 {
-    TestSampleData(inSuite, inContext, secure_channel_mrp_ack);
-    TestSampleData(inSuite, inContext, secure_channel_pkbdf_param_request);
-    TestSampleData(inSuite, inContext, secure_channel_pkbdf_param_response);
-    TestSampleData(inSuite, inContext, secure_channel_pase_pake1);
-    TestSampleData(inSuite, inContext, secure_channel_pase_pake2);
-    TestSampleData(inSuite, inContext, secure_channel_pase_pake3);
-    TestSampleData(inSuite, inContext, secure_channel_status_report);
-    TestSampleData(inSuite, inContext, im_protocol_read_request);
-    TestSampleData(inSuite, inContext, im_protocol_report_data);
+    PayloadDecoderInitParams params;
+
+    params.SetProtocolDecodeTree(chip::TLVMeta::protocols_meta).SetClusterDecodeTree(chip::TLVMeta::clusters_meta);
+
+    TestSampleData(inSuite, inContext, params, secure_channel_mrp_ack);
+    TestSampleData(inSuite, inContext, params, secure_channel_pkbdf_param_request);
+    TestSampleData(inSuite, inContext, params, secure_channel_pkbdf_param_response);
+    TestSampleData(inSuite, inContext, params, secure_channel_pase_pake1);
+    TestSampleData(inSuite, inContext, params, secure_channel_pase_pake2);
+    TestSampleData(inSuite, inContext, params, secure_channel_pase_pake3);
+    TestSampleData(inSuite, inContext, params, secure_channel_status_report);
+    TestSampleData(inSuite, inContext, params, im_protocol_read_request);
+    TestSampleData(inSuite, inContext, params, im_protocol_report_data);
 }
 
 const nlTest sTests[] = {
