@@ -43,24 +43,31 @@ class ClusterTablesGenerator:
         self.cluster = cluster
         self.known_types = set()  # all types where we create reference_to
         self.list_types = set()  # all types that require a list entry
+        self.item_type_map = {
+            "protocol_cluster_id": "kProtocolClusterId",
+            "protocol_attribute_id": "kProtocolAttributeId",
+            "protocol_command_id": "kProtocolCommandId",
+            "protocol_event_id": "kProtocolEventId",
 
-    def GetItemTypeFor(self, typename: str) -> str:
+            "cluster_attribute_payload": "kProtocolPayloadAttribute",
+            "cluster_command_payload": "kProtocolPayloadCommand",
+            "cluster_event_payload": "kProtocolPayloadEvent",
+
+            "protocol_binary_data": "kProtocolBinaryData",
+        }
+
         for e in self.cluster.enums:
-            if typename == e.name:
-                return "kEnum"
+            self.item_type_map[e.name] = "kEnum"
 
         for b in self.cluster.bitmaps:
-            if typename == b.name:
-                return "kBitmap"
-
-        return "kDefault"
+            self.item_type_map[b.name] = "kBitmap"
 
     def FieldEntry(self, field: Field, tag_type: str = 'ContextTag') -> TableEntry:
         type_reference = "%s_%s" % (self.cluster.name, field.data_type.name)
         if type_reference not in self.known_types:
             type_reference = None
 
-        item_type = self.GetItemTypeFor(field.data_type.name)
+        item_type = self.item_type_map.get(field.data_type.name, 'kDefault')
 
         real_type = "%s::%s" % (self.cluster.name, field.data_type.name)
         if field.is_list:

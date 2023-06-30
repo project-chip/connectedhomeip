@@ -28,10 +28,22 @@ constexpr TLV::Tag EventTag(uint32_t event_id) {
 }
 
 enum class ItemType : uint8_t {
-  kDefault = 0,
-  kList = 1,
-  kEnum = 2,
-  kBitmap = 4,
+  kDefault,
+  kList,
+  kEnum,
+  kBitmap,
+
+  // Special protocol types
+  kProtocolClusterId,
+  kProtocolAttributeId,
+  kProtocolCommandId,
+  kProtocolEventId,
+
+  kProtocolPayloadAttribute,
+  kProtocolPayloadCommand,
+  kProtocolPayloadEvent,
+
+  kProtocolBinaryData,
 };
 
 struct ItemInfo {

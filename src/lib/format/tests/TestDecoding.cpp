@@ -36,23 +36,40 @@ using namespace chip::TLV;
 
 using chip::TLVMeta::AttributeTag;
 using chip::TLVMeta::ClusterTag;
+using chip::TLVMeta::ItemType;
+
+class PayloadDecoder {
+  public:
+    PayloadDecoder(chip::Protocols::Id protocol, uint8_t messageType);
+
+  private:
+    static constexpr size_t kMaxDecodeDepth = 16;
+    
+    using DecodePosition = chip::FlatTree::Position<chip::TLVMeta::ItemInfo, kMaxDecodeDepth>;
+
+    DecodePosition mPayloadPosition;
+
+    // TODO: handle container entry/exit?
+};
+
 
 class ByTag
 {
-public:
+  public:
     constexpr ByTag(Tag tag) : mTag(tag) {}
     bool operator()(const chip::TLVMeta::ItemInfo & item) { return item.tag == mTag; }
 
-private:
+  private:
     const Tag mTag;
 };
 
-void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)
+PayloadDecoder::PayloadDecoder(chip::Protocols::Id protocol, uint8_t messageType)
+    : mPayloadPosition(chip::TLVMeta::protocols_meta)
 {
-    va_list args;
-    va_start(args, aFormat);
-    vprintf(aFormat, args);
-    va_end(args);
+    
+    // Find the right protocol (fake cluster id)
+    mPayloadPosition.Enter(ByTag(ClusterTag(0xFFFF0000 | protocol.ToFullyQualifiedSpecForm())));
+    mPayloadPosition.Enter(ByTag(AttributeTag(messageType)));
 }
 
 const char * DecodeTagControl(const TLVTagControl aTagControl)
@@ -174,17 +191,6 @@ using DecodePosition = chip::FlatTree::Position<chip::TLVMeta::ItemInfo, 16>;
 
 void NiceDecode(DecodePosition & position, TLVReader reader)
 {
-    if (reader.GetTotalLength() == 0)
-    {
-        return;
-    }
-    CHIP_ERROR err = reader.Next(kTLVType_Structure, AnonymousTag());
-    if (err != CHIP_NO_ERROR)
-    {
-        printf("UNEXPECTED DATA: %" CHIP_ERROR_FORMAT "\n", err.Format());
-        return;
-    }
-
     auto data = position.Get();
     if (data != nullptr)
     {
@@ -193,6 +199,22 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
     else
     {
         printf("UNKNOWN DATA POSITION\n");
+        return;
+    }
+
+    if (reader.GetTotalLength() == 0)
+    {
+        return;
+    }
+
+    if ((position.Get() != nullptr) && (position.Get()->type == ItemType::kProtocolBinaryData)) {
+        printf("BINARY DATA, not decoded\n");
+        return;
+    }
+    CHIP_ERROR err = reader.Next(kTLVType_Structure, AnonymousTag());
+    if (err != CHIP_NO_ERROR)
+    {
+        printf("UNEXPECTED DATA: %" CHIP_ERROR_FORMAT "\n", err.Format());
         return;
     }
 
@@ -220,7 +242,6 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
         // we likely have a tag, try to find its data
         position.Enter(ByTag(reader.GetTag()));
 
-
         chip::StringBuilder<256> line;
 
         for (size_t i = 0; i < containers.size(); i++)
@@ -239,17 +260,59 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
             line.Add(": ");
         }
 
-        if (TLVTypeIsContainer(reader.GetType()))
+        bool data_skip = false;
+        if (data != nullptr)
         {
-            reader.EnterContainer(containerType);
-            containers.push_back(containerType);
+            switch (data->type)
+            {
+            case ItemType::kProtocolClusterId:
+                line.Add(" (cluster_id): ");
+                break;
+            case ItemType::kProtocolAttributeId:
+                line.Add(" (attribute_id): ");
+                break;
+            case ItemType::kProtocolCommandId:
+                line.Add(" (command_id): ");
+                break;
+            case ItemType::kProtocolEventId:
+                line.Add(" (event_id): ");
+                break;
+            case ItemType::kProtocolBinaryData:
+                line.Add(" (binary - not parsed)");
+                data_skip = true;
+                break;
+            case ItemType::kProtocolPayloadAttribute:
+                line.Add("TODO(ATTRIBUTE DECODE)");
+                data_skip = true;
+                break;
+            case ItemType::kProtocolPayloadCommand:
+                line.Add("TODO(COMMAND DECODE)");
+                data_skip = true;
+                break;
+            case ItemType::kProtocolPayloadEvent:
+                line.Add("TODO(EVENT DECODE)");
+                data_skip = true;
+                break;
+            default:
+                break;
+            }
         }
-        else
-        {
-            // assume regular element, no entering
-            PrettyPrintCurrentValue(reader, line);
+
+        if (data_skip) {
             position.Exit();
-        }
+        } else {
+            if (TLVTypeIsContainer(reader.GetType()))
+            {
+                reader.EnterContainer(containerType);
+                containers.push_back(containerType);
+            }
+            else
+            {
+                // assume regular element, no entering
+                PrettyPrintCurrentValue(reader, line);
+                position.Exit();
+            }
+        } 
         printf("%s\n", line.c_str());
     }
 }
@@ -257,16 +320,14 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
 void TestSampleData(nlTestSuite * inSuite, void * inContext, const SamplePayload & data)
 {
     printf("*******************************************\n");
-    printf("* message type: %d\n", data.protocolId.ToFullyQualifiedSpecForm());
-    printf("* message type: %d\n", data.messageType);
-    printf("* DATA:\n");
 
     TLVReader reader;
     reader.Init(data.payload);
 
-    Debug::Dump(reader, SimpleDumpWriter);
-    printf("* NEW DATA:\n");
+    PayloadDecoder decoder(data.protocolId, data.messageType);
+    // FIXME: use decoder?
 
+    // test decode
     DecodePosition position(chip::TLVMeta::protocols_meta.data(), chip::TLVMeta::protocols_meta.size());
 
     // Find the right protocol (fake cluster id)

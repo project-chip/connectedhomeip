@@ -56,6 +56,9 @@ class Position
 public:
     Position(const Node<CONTENT> * tree, size_t treeSize) : mTree(tree), mTreeSize(treeSize) {}
 
+    template <size_t N>
+    Position(const std::array<Node<CONTENT>, N> &tree) : mTree(tree.data()), mTreeSize(N) {}
+
     /// Attempt to find a child of the current position that matches
     /// the given matcher
     template <typename MATCHER>
