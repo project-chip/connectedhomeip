@@ -151,7 +151,58 @@ bool SmokeCoAlarmServer::SetDeviceMuted(EndpointId endpointId, MuteStateEnum new
 
     if (success && (deviceMuted != newDeviceMuted))
     {
-        success = SetAttribute(endpointId, Attributes::DeviceMuted::Id, Attributes::DeviceMuted::Set, newDeviceMuted);
+        if (newDeviceMuted == MuteStateEnum::kMuted)
+        {
+            AlarmStateEnum alarmState;
+            success = GetAttribute(endpointId, Attributes::SmokeState::Id, Attributes::SmokeState::Get, alarmState);
+            if (success && (alarmState == AlarmStateEnum::kCritical))
+            {
+                success = false;
+            }
+
+            if (success)
+            {
+                success = GetAttribute(endpointId, Attributes::COState::Id, Attributes::COState::Get, alarmState);
+                if (success && (alarmState == AlarmStateEnum::kCritical))
+                {
+                    success = false;
+                }
+            }
+
+            if (success)
+            {
+                success = GetAttribute(endpointId, Attributes::BatteryAlert::Id, Attributes::BatteryAlert::Get, alarmState);
+                if (success && (alarmState == AlarmStateEnum::kCritical))
+                {
+                    success = false;
+                }
+            }
+
+            if (success)
+            {
+                success = GetAttribute(endpointId, Attributes::InterconnectSmokeAlarm::Id, Attributes::InterconnectSmokeAlarm::Get,
+                                       alarmState);
+                if (success && (alarmState == AlarmStateEnum::kCritical))
+                {
+                    success = false;
+                }
+            }
+
+            if (success)
+            {
+                success =
+                    GetAttribute(endpointId, Attributes::InterconnectCOAlarm::Id, Attributes::InterconnectCOAlarm::Get, alarmState);
+                if (success && (alarmState == AlarmStateEnum::kCritical))
+                {
+                    success = false;
+                }
+            }
+        }
+
+        if (success)
+        {
+            success = SetAttribute(endpointId, Attributes::DeviceMuted::Id, Attributes::DeviceMuted::Set, newDeviceMuted);
+        }
 
         if (success)
         {
