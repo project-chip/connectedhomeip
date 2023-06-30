@@ -22,7 +22,8 @@ network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
-    -   [Known issues](#known-issues-building)
+    -   [Overwrite board config files](#overwrite-board-config-files)
+    -   [Known issues building](#known-issues-building)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
@@ -35,7 +36,7 @@ network.
     -   [Building steps](#building-steps-1)
 -   [Low power](#low-power)
 
-    -   [Known issues](#known-issues-low-power)
+    -   [Known issues low power](#known-issues-low-power)
 
     </hr>
 
@@ -217,6 +218,23 @@ pycryptodome           3.9.8
 ```
 
 The resulting output file can be found in out/debug/chip-k32w0x-lock-example.
+
+### Overwrite board config files
+
+The example uses template/reference board configuration files.
+
+To overwrite the board configuration files, set `override_is_DK6=false` in the
+`k32w0_sdk` target from the app `BUILD.gn`:
+
+```
+k32w0_sdk("sdk") {
+    override_is_DK6 = false
+    ...
+}
+```
+
+This variable will be used by `k32w0_sdk.gni` to overwrite `chip_with_DK6` option,
+thus the reference board configuration files will no longer be used.
 
 ## Known issues building
 
