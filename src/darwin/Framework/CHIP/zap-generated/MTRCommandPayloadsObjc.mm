@@ -1121,11 +1121,7 @@ NS_ASSUME_NONNULL_BEGIN
                             auto & entry_3 = iter_3.GetValue();
                             MTRScenesClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
+                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
                             newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
@@ -2274,11 +2270,7 @@ NS_ASSUME_NONNULL_BEGIN
                             auto & entry_3 = iter_3.GetValue();
                             MTRScenesClusterAttributeValuePair * newElement_3;
                             newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            if (entry_3.attributeID.HasValue()) {
-                                newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID.Value()];
-                            } else {
-                                newElement_3.attributeID = nil;
-                            }
+                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
                             newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
                         }
@@ -6446,129 +6438,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRModeSelectClusterChangeToModeWithStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _newMode = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRModeSelectClusterChangeToModeWithStatusParams alloc] init];
-
-    other.newMode = self.newMode;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newMode:%@; >", NSStringFromClass([self class]), _newMode];
-    return descriptionString;
-}
-
-@end
-@implementation MTRModeSelectClusterChangeToModeResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _statusText = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRModeSelectClusterChangeToModeResponseParams alloc] init];
-
-    other.status = self.status;
-    other.statusText = self.statusText;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRModeSelectClusterChangeToModeResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::ModeSelect::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
-{
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        if (decodableStruct.statusText.HasValue()) {
-            self.statusText = AsString(decodableStruct.statusText.Value());
-            if (self.statusText == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
-            }
-        } else {
-            self.statusText = nil;
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-@end
 @implementation MTRTemperatureControlClusterSetTemperatureParams
 - (instancetype)init
 {
@@ -6814,15 +6683,15 @@ NS_ASSUME_NONNULL_BEGIN
     {
         self.commandResponseState = [MTROperationalStateClusterErrorStateStruct new];
         self.commandResponseState.errorStateID =
-            [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.commandResponseState.errorStateID)];
-        if (decodableStruct.commandResponseState.errorStateLabel.IsNull()) {
-            self.commandResponseState.errorStateLabel = nil;
-        } else {
+            [NSNumber numberWithUnsignedChar:decodableStruct.commandResponseState.errorStateID];
+        if (decodableStruct.commandResponseState.errorStateLabel.HasValue()) {
             self.commandResponseState.errorStateLabel = AsString(decodableStruct.commandResponseState.errorStateLabel.Value());
             if (self.commandResponseState.errorStateLabel == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                 return err;
             }
+        } else {
+            self.commandResponseState.errorStateLabel = nil;
         }
         if (decodableStruct.commandResponseState.errorStateDetails.HasValue()) {
             self.commandResponseState.errorStateDetails = AsString(decodableStruct.commandResponseState.errorStateDetails.Value());
@@ -6877,276 +6746,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
     auto other = [[MTRActivatedCarbonFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRCeramicFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRCeramicFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRElectrostaticFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRElectrostaticFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRUVFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRUVFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRIonizingFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRIonizingFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRZeoliteFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRZeoliteFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTROzoneFilterMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTROzoneFilterMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRWaterTankMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRWaterTankMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRFuelTankMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRFuelTankMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRInkCartridgeMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRInkCartridgeMonitoringClusterResetConditionParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-@implementation MTRTonerCartridgeMonitoringClusterResetConditionParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRTonerCartridgeMonitoringClusterResetConditionParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -12405,179 +12004,180 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:
     (const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType &)decodableStruct
 {
-    { { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-    auto iter_0 = decodableStruct.arg1.begin();
-    while (iter_0.Next()) {
-        auto & entry_0 = iter_0.GetValue();
-        MTRUnitTestingClusterNestedStructList * newElement_0;
-        newElement_0 = [MTRUnitTestingClusterNestedStructList new];
-        newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-        newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-        newElement_0.c = [MTRUnitTestingClusterSimpleStruct new];
-        newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
-        newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
-        newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
-        newElement_0.c.d = AsData(entry_0.c.d);
-        newElement_0.c.e = AsString(entry_0.c.e);
-        if (newElement_0.c.e == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            return err;
-        }
-        newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
-        newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
-        newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
+    {
         { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.d.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                MTRUnitTestingClusterSimpleStruct * newElement_2;
-                newElement_2 = [MTRUnitTestingClusterSimpleStruct new];
-                newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
-                newElement_2.b = [NSNumber numberWithBool:entry_2.b];
-                newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
-                newElement_2.d = AsData(entry_2.d);
-                newElement_2.e = AsString(entry_2.e);
-                if (newElement_2.e == nil) {
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.arg1.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRUnitTestingClusterNestedStructList * newElement_0;
+                newElement_0 = [MTRUnitTestingClusterNestedStructList new];
+                newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+                newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+                newElement_0.c = [MTRUnitTestingClusterSimpleStruct new];
+                newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
+                newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
+                newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
+                newElement_0.c.d = AsData(entry_0.c.d);
+                newElement_0.c.e = AsString(entry_0.c.e);
+                if (newElement_0.c.e == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     return err;
                 }
-                newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
-                newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
-                newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
-                [array_2 addObject:newElement_2];
+                newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
+                newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
+                newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.d.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        MTRUnitTestingClusterSimpleStruct * newElement_2;
+                        newElement_2 = [MTRUnitTestingClusterSimpleStruct new];
+                        newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
+                        newElement_2.b = [NSNumber numberWithBool:entry_2.b];
+                        newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
+                        newElement_2.d = AsData(entry_2.d);
+                        newElement_2.e = AsString(entry_2.e);
+                        if (newElement_2.e == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            return err;
+                        }
+                        newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
+                        newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
+                        newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        return err;
+                    }
+                    newElement_0.d = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.e.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        return err;
+                    }
+                    newElement_0.e = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.f.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSData * newElement_2;
+                        newElement_2 = AsData(entry_2);
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        return err;
+                    }
+                    newElement_0.f = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.g.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        return err;
+                    }
+                    newElement_0.g = array_2;
+                }
+                [array_0 addObject:newElement_0];
             }
-            CHIP_ERROR err = iter_2.GetStatus();
+            CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
-            newElement_0.d = array_2;
+            self.arg1 = array_0;
         }
+    }
+    {
         { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.e.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
-                [array_2 addObject:newElement_2];
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.arg2.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRUnitTestingClusterSimpleStruct * newElement_0;
+                newElement_0 = [MTRUnitTestingClusterSimpleStruct new];
+                newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+                newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+                newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
+                newElement_0.d = AsData(entry_0.d);
+                newElement_0.e = AsString(entry_0.e);
+                if (newElement_0.e == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    return err;
+                }
+                newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
+                newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
+                newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
+                [array_0 addObject:newElement_0];
             }
-            CHIP_ERROR err = iter_2.GetStatus();
+            CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
-            newElement_0.e = array_2;
+            self.arg2 = array_0;
         }
+    }
+    {
         { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.f.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSData * newElement_2;
-                newElement_2 = AsData(entry_2);
-                [array_2 addObject:newElement_2];
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.arg3.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                [array_0 addObject:newElement_0];
             }
-            CHIP_ERROR err = iter_2.GetStatus();
+            CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
-            newElement_0.f = array_2;
+            self.arg3 = array_0;
         }
+    }
+    {
         { // Scope for our temporary variables
-            auto * array_2 = [NSMutableArray new];
-            auto iter_2 = entry_0.g.begin();
-            while (iter_2.Next()) {
-                auto & entry_2 = iter_2.GetValue();
-                NSNumber * newElement_2;
-                newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
-                [array_2 addObject:newElement_2];
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.arg4.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithBool:entry_0];
+                [array_0 addObject:newElement_0];
             }
-            CHIP_ERROR err = iter_2.GetStatus();
+            CHIP_ERROR err = iter_0.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
-            newElement_0.g = array_2;
+            self.arg4 = array_0;
         }
-        [array_0 addObject:newElement_0];
     }
-    CHIP_ERROR err = iter_0.GetStatus();
-    if (err != CHIP_NO_ERROR) {
-        return err;
+    {
+        self.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.arg5)];
     }
-    self.arg1 = array_0;
-}
-}
-{
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = decodableStruct.arg2.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            MTRUnitTestingClusterSimpleStruct * newElement_0;
-            newElement_0 = [MTRUnitTestingClusterSimpleStruct new];
-            newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-            newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-            newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
-            newElement_0.d = AsData(entry_0.d);
-            newElement_0.e = AsString(entry_0.e);
-            if (newElement_0.e == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
-            }
-            newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
-            newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
-            newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
-            [array_0 addObject:newElement_0];
-        }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            return err;
-        }
-        self.arg2 = array_0;
+    {
+        self.arg6 = [NSNumber numberWithBool:decodableStruct.arg6];
     }
-}
-{
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = decodableStruct.arg3.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            NSNumber * newElement_0;
-            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-            [array_0 addObject:newElement_0];
-        }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            return err;
-        }
-        self.arg3 = array_0;
-    }
-}
-{
-    { // Scope for our temporary variables
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = decodableStruct.arg4.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            NSNumber * newElement_0;
-            newElement_0 = [NSNumber numberWithBool:entry_0];
-            [array_0 addObject:newElement_0];
-        }
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            return err;
-        }
-        self.arg4 = array_0;
-    }
-}
-{
-    self.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.arg5)];
-}
-{
-    self.arg6 = [NSNumber numberWithBool:decodableStruct.arg6];
-}
-return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 @end
 

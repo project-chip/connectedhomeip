@@ -186,8 +186,8 @@ enum class MoveMode : uint8_t
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MoveMode                                                                       = EmberAfMoveMode;
-static MoveMode __attribute__((unused)) kMoveModekUnknownEnumValue                   = static_cast<MoveMode>(2);
+using MoveMode                                                     = EmberAfMoveMode;
+static MoveMode __attribute__((unused)) kMoveModekUnknownEnumValue = static_cast<MoveMode>(2);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
@@ -205,8 +205,8 @@ enum class StepMode : uint8_t
     kUnknownEnumValue = 2,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StepMode                                                                       = EmberAfStepMode;
-static StepMode __attribute__((unused)) kStepModekUnknownEnumValue                   = static_cast<StepMode>(2);
+using StepMode                                                     = EmberAfStepMode;
+static StepMode __attribute__((unused)) kStepModekUnknownEnumValue = static_cast<StepMode>(2);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for Feature
@@ -1050,8 +1050,8 @@ enum class RadioFaultEnum : uint8_t
     kUnknownEnumValue = 7,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RadioFaultEnum                                                                 = EmberAfRadioFaultEnum;
-static RadioFaultEnum __attribute__((unused)) kRadioFaultEnumkUnknownEnumValue       = static_cast<RadioFaultEnum>(7);
+using RadioFaultEnum                                                           = EmberAfRadioFaultEnum;
+static RadioFaultEnum __attribute__((unused)) kRadioFaultEnumkUnknownEnumValue = static_cast<RadioFaultEnum>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace GeneralDiagnostics
 
@@ -1213,8 +1213,8 @@ enum class PHYRateEnum : uint8_t
     kUnknownEnumValue = 10,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PHYRateEnum                                                                    = EmberAfPHYRateEnum;
-static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue             = static_cast<PHYRateEnum>(10);
+using PHYRateEnum                                                        = EmberAfPHYRateEnum;
+static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue = static_cast<PHYRateEnum>(10);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for Feature
@@ -1468,48 +1468,14 @@ enum class Feature : uint32_t
 
 namespace ModeSelect {
 
-// Enum for ModeTag
-enum class ModeTag : uint16_t
-{
-    kAuto      = 0x00,
-    kQuick     = 0x01,
-    kQuiet     = 0x02,
-    kLowNoise  = 0x03,
-    kLowEnergy = 0x04,
-    kVacation  = 0x05,
-    kMin       = 0x06,
-    kMax       = 0x07,
-    kNight     = 0x08,
-    kDay       = 0x09,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 10,
-};
-
-// Enum for StatusCode
-enum class StatusCode : uint8_t
-{
-    kSuccess         = 0x00,
-    kUnsupportedMode = 0x01,
-    kGenericFailure  = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
+    kOnOff = 0x1,
 };
 } // namespace ModeSelect
 
-namespace LaundryWasherModeSelect {
+namespace LaundryWasherMode {
 
 // Enum for ModeTag
 enum class ModeTag : uint16_t
@@ -1528,12 +1494,11 @@ enum class ModeTag : uint16_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
+    kOnOff = 0x1,
 };
-} // namespace LaundryWasherModeSelect
+} // namespace LaundryWasherMode
 
-namespace RefrigeratorAndTemperatureControlledCabinetModeSelect {
+namespace RefrigeratorAndTemperatureControlledCabinetMode {
 
 // Enum for ModeTag
 enum class ModeTag : uint16_t
@@ -1550,12 +1515,35 @@ enum class ModeTag : uint16_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
+    kOnOff = 0x1,
 };
-} // namespace RefrigeratorAndTemperatureControlledCabinetModeSelect
+} // namespace RefrigeratorAndTemperatureControlledCabinetMode
 
-namespace RvcRunModeSelect {
+namespace LaundryWasherControls {
+
+// Enum for NumberOfRinsesEnum
+enum class NumberOfRinsesEnum : uint8_t
+{
+    kNone   = 0x00,
+    kNormal = 0x01,
+    kExtra  = 0x02,
+    kMax    = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kSpin  = 0x1,
+    kRinse = 0x2,
+};
+} // namespace LaundryWasherControls
+
+namespace RvcRunMode {
 
 // Enum for ModeTag
 enum class ModeTag : uint16_t
@@ -1590,12 +1578,11 @@ enum class StatusCode : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
+    kOnOff = 0x1,
 };
-} // namespace RvcRunModeSelect
+} // namespace RvcRunMode
 
-namespace RvcCleanModeSelect {
+namespace RvcCleanMode {
 
 // Enum for ModeTag
 enum class ModeTag : uint16_t
@@ -1624,10 +1611,9 @@ enum class StatusCode : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
+    kOnOff = 0x1,
 };
-} // namespace RvcCleanModeSelect
+} // namespace RvcCleanMode
 
 namespace TemperatureControl {
 
@@ -1636,6 +1622,7 @@ enum class Feature : uint32_t
 {
     kTemperatureNumber = 0x1,
     kTemperatureLevel  = 0x2,
+    kTemperatureStep   = 0x4,
 };
 } // namespace TemperatureControl
 
@@ -1648,7 +1635,7 @@ enum class AlarmMap : uint32_t
 };
 } // namespace RefrigeratorAlarm
 
-namespace DishwasherModeSelect {
+namespace DishwasherMode {
 
 // Enum for ModeTag
 enum class ModeTag : uint16_t
@@ -1666,10 +1653,9 @@ enum class ModeTag : uint16_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kOnOff          = 0x1,
-    kExtendedStatus = 0x2,
+    kOnOff = 0x1,
 };
-} // namespace DishwasherModeSelect
+} // namespace DishwasherMode
 
 namespace AirQuality {
 
@@ -1793,6 +1779,20 @@ enum class Feature : uint32_t
 };
 } // namespace SmokeCoAlarm
 
+namespace DishwasherAlarm {
+
+// Bitmap for AlarmMap
+enum class AlarmMap : uint32_t
+{
+    kInflowError     = 0x1,
+    kDrainError      = 0x2,
+    kDoorError       = 0x4,
+    kTempTooLow      = 0x8,
+    kTempTooHigh     = 0x10,
+    kWaterLevelError = 0x20,
+};
+} // namespace DishwasherAlarm
+
 namespace OperationalState {
 
 // Enum for ErrorStateEnum
@@ -1823,6 +1823,40 @@ enum class OperationalStateEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 } // namespace OperationalState
+
+namespace RvcOperationalState {
+
+// Enum for ErrorStateEnum
+enum class ErrorStateEnum : uint8_t
+{
+    kFailedToFindChargingDock = 0x40,
+    kStuck                    = 0x41,
+    kDustBinMissing           = 0x42,
+    kDustBinFull              = 0x43,
+    kWaterTankEmpty           = 0x44,
+    kWaterTankMissing         = 0x45,
+    kWaterTankLidOpen         = 0x46,
+    kMopCleaningPadMissing    = 0x47,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for OperationalStateEnum
+enum class OperationalStateEnum : uint8_t
+{
+    kSeekingCharger = 0x40,
+    kCharging       = 0x41,
+    kDocked         = 0x42,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+} // namespace RvcOperationalState
 
 namespace HepaFilterMonitoring {
 
@@ -3038,36 +3072,8 @@ enum class AirflowDirectionEnum : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Enum for DirectionEnum
-enum class DirectionEnum : uint8_t
-{
-    kIncrease = 0x00,
-    kDecrease = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
-
-// Enum for FanModeSequenceType
-enum class FanModeSequenceType : uint8_t
-{
-    kOffLowMedHigh     = 0x00,
-    kOffLowHigh        = 0x01,
-    kOffLowMedHighAuto = 0x02,
-    kOffLowHighAuto    = 0x03,
-    kOffOnAuto         = 0x04,
-    kOffOn             = 0x05,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 6,
-};
-
-// Enum for FanModeType
-enum class FanModeType : uint8_t
+// Enum for FanModeEnum
+enum class FanModeEnum : uint8_t
 {
     kOff    = 0x00,
     kLow    = 0x01,
@@ -3083,6 +3089,34 @@ enum class FanModeType : uint8_t
     kUnknownEnumValue = 7,
 };
 
+// Enum for FanModeSequenceEnum
+enum class FanModeSequenceEnum : uint8_t
+{
+    kOffLowMedHigh     = 0x00,
+    kOffLowHigh        = 0x01,
+    kOffLowMedHighAuto = 0x02,
+    kOffLowHighAuto    = 0x03,
+    kOffOnAuto         = 0x04,
+    kOffOn             = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
+};
+
+// Enum for StepDirectionEnum
+enum class StepDirectionEnum : uint8_t
+{
+    kIncrease = 0x00,
+    kDecrease = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
@@ -3094,23 +3128,16 @@ enum class Feature : uint32_t
     kAirflowDirection = 0x20,
 };
 
-// Bitmap for RockSupportMask
-enum class RockSupportMask : uint8_t
+// Bitmap for RockBitmap
+enum class RockBitmap : uint8_t
 {
     kRockLeftRight = 0x1,
     kRockUpDown    = 0x2,
     kRockRound     = 0x4,
 };
 
-// Bitmap for WindSettingMask
-enum class WindSettingMask : uint8_t
-{
-    kSleepWind   = 0x1,
-    kNaturalWind = 0x2,
-};
-
-// Bitmap for WindSupportMask
-enum class WindSupportMask : uint8_t
+// Bitmap for WindBitmap
+enum class WindBitmap : uint8_t
 {
     kSleepWind   = 0x1,
     kNaturalWind = 0x2,
@@ -3162,8 +3189,8 @@ enum class ColorMode : uint8_t
     kUnknownEnumValue = 3,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorMode                                                                      = EmberAfColorMode;
-static ColorMode __attribute__((unused)) kColorModekUnknownEnumValue                 = static_cast<ColorMode>(3);
+using ColorMode                                                      = EmberAfColorMode;
+static ColorMode __attribute__((unused)) kColorModekUnknownEnumValue = static_cast<ColorMode>(3);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Enum for HueDirection

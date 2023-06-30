@@ -23,13 +23,10 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    # XXX: Workaround for https://github.com/actions/cache/issues/1141
-    SEGMENT_DOWNLOAD_TIMEOUT_MINS: 3
-
+    
 jobs:
     zap_regeneration:
         name: ZAP Regeneration
-        timeout-minutes: 60
 
         runs-on: ubuntu-20.04
         container:
@@ -40,32 +37,16 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v3
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      submodules: true
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
-
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
+                submodules: true
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              timeout-minutes: 10
-              run: bash scripts/bootstrap.sh
+                platform: linux
 
             - name: Generate all
-              timeout-minutes: 5
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
             - name: Ensure git works in current working directory
               run: git config --global --add safe.directory `pwd`

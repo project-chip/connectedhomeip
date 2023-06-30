@@ -155,6 +155,12 @@ tests:
       verification: |
           ./chip-tool powersource read  event-list 1 1
 
+           On TH(chip-tool), Verify that the DUT response provides a list of supported events. This list can be empty or contain following optional event IDs:
+           if PS.S.E00(WiredFaultChange) : 0
+           if PS.S.E01(BatFaultChange): 1
+           if PS.S.E02(BatChargeFaultChange): 2
+           Optionally the list can also contain manufacturer specific event IDs.
+
            [1676465733.563197][27987:27989] CHIP:DMG: }
            [1676465733.563336][27987:27989] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_002F Attribute 0x0000_FFFA DataVersion: 2315782406
            [1676465733.563366][27987:27989] CHIP:TOO:   EventList: 1 entries

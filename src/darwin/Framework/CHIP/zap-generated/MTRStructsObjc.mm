@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _attributeID = nil;
+        _attributeID = @(0);
 
         _attributeValue = @(0);
     }
@@ -48,12 +48,12 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
-- (void)setAttributeId:(NSNumber * _Nullable)attributeId
+- (void)setAttributeId:(NSNumber * _Nonnull)attributeId
 {
     self.attributeID = attributeId;
 }
 
-- (NSNumber * _Nullable)attributeId
+- (NSNumber * _Nonnull)attributeId
 {
     return self.attributeID;
 }
@@ -2618,38 +2618,38 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRModeSelectClusterModeTagStruct
+@implementation MTRModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _mfgCode = nil;
+        _mfgCode = @(0);
 
         _value = @(0);
-
-        _tagName = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRModeSelectClusterModeTagStruct alloc] init];
+    auto other = [[MTRModeSelectClusterSemanticTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
-    other.tagName = self.tagName;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: mfgCode:%@; value:%@; tagName:%@; >", NSStringFromClass([self class]), _mfgCode, _value, _tagName];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRModeSelectClusterSemanticTag : MTRModeSelectClusterSemanticTagStruct
 @end
 
 @implementation MTRModeSelectClusterModeOptionStruct
@@ -2661,7 +2661,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mode = @(0);
 
-        _modeTags = [NSArray array];
+        _semanticTags = [NSArray array];
     }
     return self;
 }
@@ -2672,46 +2672,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.label = self.label;
     other.mode = self.mode;
-    other.modeTags = self.modeTags;
+    other.semanticTags = self.semanticTags;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRTemperatureControlClusterTemperatureLevelStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _label = @"";
-
-        _temperatureLevel = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRTemperatureControlClusterTemperatureLevelStruct alloc] init];
-
-    other.label = self.label;
-    other.temperatureLevel = self.temperatureLevel;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: label:%@; temperatureLevel:%@; >", NSStringFromClass([self class]), _label, _temperatureLevel];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; semanticTags:%@; >",
+                                             NSStringFromClass([self class]), _label, _mode, _semanticTags];
     return descriptionString;
 }
 
@@ -3048,7 +3017,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationalStateID = @(0);
 
-        _operationalStateLabel = @"";
+        _operationalStateLabel = nil;
     }
     return self;
 }

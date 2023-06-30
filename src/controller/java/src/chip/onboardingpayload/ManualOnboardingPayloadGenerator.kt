@@ -71,30 +71,31 @@ class ManualOnboardingPayloadGenerator(private val payloadContents: OnboardingPa
 
     var offset = 0
 
-    decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupCodeChunk1CharLength), chunk1)
+    decimalStringWithPadding(decimalString, offset, kManualSetupCodeChunk1CharLength, chunk1)
     offset += kManualSetupCodeChunk1CharLength
-    decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupCodeChunk2CharLength), chunk2)
+    decimalStringWithPadding(decimalString, offset, kManualSetupCodeChunk2CharLength, chunk2)
     offset += kManualSetupCodeChunk2CharLength
-    decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupCodeChunk3CharLength), chunk3)
+    decimalStringWithPadding(decimalString, offset, kManualSetupCodeChunk3CharLength, chunk3)
     offset += kManualSetupCodeChunk3CharLength
     
     if (useLongCode) {
-      decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupVendorIdCharLength), payloadContents.vendorId)
+      decimalStringWithPadding(decimalString, offset, kManualSetupVendorIdCharLength, payloadContents.vendorId)
       offset += kManualSetupVendorIdCharLength
-      decimalStringWithPadding(decimalString.sliceArray(offset until offset + kManualSetupProductIdCharLength), payloadContents.productId)
+      decimalStringWithPadding(decimalString, offset, kManualSetupProductIdCharLength, payloadContents.productId)
       offset += kManualSetupProductIdCharLength
     }
 
-    val checkDigit = Verhoeff10.charToVal(Verhoeff10.computeCheckChar(decimalString.concatToString()))
-    decimalStringWithPadding(decimalString.sliceArray(offset until offset + 2), checkDigit)
+    val str = decimalString.concatToString().substring(0, offset)
+    val checkDigit = Verhoeff10.charToVal(Verhoeff10.computeCheckChar(str))
+    decimalStringWithPadding(decimalString, offset, 1, checkDigit)
     offset += 1
 
     // Reduce decimalString size to be the size of written data and to not include null-terminator. In Kotlin, there is no direct
     // method to resize an array.We use copyOfRange(0, offset) to create a new CharArray that includes only the elements from index
     // 0 to offset-1, effectively reducing the size of the buffer.
-    decimalString.copyOfRange(0, offset)  
+    val newDecimalString = decimalString.copyOfRange(0, offset)  
 
-    return decimalString.joinToString()
+    return String(newDecimalString)
   }
 
   private fun chunk1PayloadRepresentation(payload: OnboardingPayload): Int {
@@ -141,12 +142,11 @@ class ManualOnboardingPayloadGenerator(private val payloadContents: OnboardingPa
     return ((payload.setupPinCode.toInt() shr pincodeShift) and pincodeMask) shl kManualSetupChunk3PINCodeMsbitsPos
   }
 
-  private fun decimalStringWithPadding(buffer: CharArray, number: Int): Unit {
-    val len = buffer.size - 1
-    val retval = String.format("%0${len}d", number).toCharArray(buffer, 0, buffer.size)
-
-    if (retval.size >= buffer.size) {
+  private fun decimalStringWithPadding(buffer: CharArray, offset: Int, len: Int, number: Int): Unit {
+    if (offset + len > buffer.size) {
         throw OnboardingPayloadException("The outBuffer has insufficient size")
     } 
+    
+    String.format("%0${len}d", number).toCharArray(buffer, offset, 0, len)
   }  
 }

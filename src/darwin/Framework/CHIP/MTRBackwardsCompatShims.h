@@ -17,6 +17,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRStructsObjc.h>
 
 /**
  * This file defines manual backwards-compat shims of various sorts to handle

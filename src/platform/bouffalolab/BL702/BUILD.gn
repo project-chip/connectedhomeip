@@ -25,60 +25,53 @@ if (chip_enable_openthread) {
 
 static_library("BL702") {
   sources = [
-    "../../FreeRTOS/SystemTimeSupport.cpp",
-    "../../SingletonConfigurationManager.cpp",
-    "CHIPDevicePlatformConfig.h",
-    "CHIPDevicePlatformEvent.h",
-    "CHIPmemory.cpp",
-    "ConfigurationManagerImpl.cpp",
-    "ConfigurationManagerImpl.h",
-    "ConnectivityManagerImpl.cpp",
-    "ConnectivityManagerImpl.h",
     "DiagnosticDataProviderImpl.cpp",
-    "DiagnosticDataProviderImpl.h",
-    "InetPlatformConfig.h",
-    "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "PlatformManagerImpl.cpp",
-    "PlatformManagerImpl.h",
-    "SystemPlatformConfig.h",
-    "bl702Config.cpp",
-    "bl702Config.h",
   ]
 
-  deps = []
+  common_sources = [
+    "../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../SingletonConfigurationManager.cpp",
+    "../common/BLConfig.cpp",
+    "../common/ConfigurationManagerImpl.cpp",
+    "../common/ConnectivityManagerImpl.cpp",
+    "../common/DiagnosticDataProviderImpl.cpp",
+    "../common/KeyValueStoreManagerImpl.cpp",
+    "../common/Logging.cpp",
+    "../common/PlatformManagerImpl.cpp",
 
-  public_deps = [
-    "${chip_root}/src/crypto",
-    "${chip_root}/src/platform:platform_base",
+    # "${chip_root}/src/credentials/CHIPCert.h",
+    # "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+
+    # "../common/FactoryDataProvider.cpp",
+    # "../common/FactoryDataProvider.h",
   ]
 
   if (chip_enable_ota_requestor) {
     sources += [
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
+      "../common/OTAImageProcessorImpl.cpp",
+      "../common/OTAImageProcessorImpl.h",
     ]
   }
 
   if (chip_enable_ble) {
     sources += [
-      "BLEManagerImpl.cpp",
-      "BLEManagerImpl.h",
+      "../common/BLEManagerImpl.cpp",
+      "../common/BLEManagerImpl.h",
     ]
   }
+  sources += common_sources
 
   if (chip_enable_openthread) {
     # needed for MTD/FTD
 
     import("//build_overrides/bouffalolab_iot_sdk.gni")
     import("${bouffalolab_iot_sdk_build_root}/bl702/bl_iot_sdk.gni")
-    public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk" ]
+    deps = [ "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk" ]
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
       "ThreadStackManagerImpl.cpp",
-      "ThreadStackManagerImpl.h",
     ]
 
     if (chip_mdns == "platform") {
@@ -90,4 +83,6 @@ static_library("BL702") {
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }

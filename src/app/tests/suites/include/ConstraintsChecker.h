@@ -80,9 +80,33 @@ protected:
     }
 
     template <typename T>
+    bool CheckConstraintMinLength(const char * itemName, const chip::app::DataModel::Nullable<chip::Span<T>> & current,
+                                  uint64_t expected)
+    {
+        if (current.IsNull())
+        {
+            return true;
+        }
+
+        return CheckConstraintMinLength(itemName, current.Value(), expected);
+    }
+
+    template <typename T>
     bool CheckConstraintMaxLength(const char * itemName, const chip::Span<T> & current, uint64_t expected)
     {
         return CheckConstraintMaxLength(itemName, current.size(), expected);
+    }
+
+    template <typename T>
+    bool CheckConstraintMaxLength(const char * itemName, const chip::app::DataModel::Nullable<chip::Span<T>> & current,
+                                  uint64_t expected)
+    {
+        if (current.IsNull())
+        {
+            return true;
+        }
+
+        return CheckConstraintMaxLength(itemName, current.Value(), expected);
     }
 
     template <typename T>
@@ -300,6 +324,17 @@ protected:
     }
 
     template <typename T, typename U>
+    bool CheckConstraintMinValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current,
+                                 const chip::app::DataModel::Nullable<U> & expected)
+    {
+        if (expected.IsNull())
+        {
+            return true;
+        }
+        return CheckConstraintMinValue(itemName, current, expected.Value());
+    }
+
+    template <typename T, typename U>
     bool CheckConstraintMinValue(const char * itemName, const T & current, const chip::Optional<U> & expected)
     {
         if (!expected.HasValue())
@@ -373,6 +408,17 @@ protected:
             return true;
         }
         return CheckConstraintMaxValue(itemName, current.Value(), static_cast<T>(expected));
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintMaxValue(const char * itemName, const chip::app::DataModel::Nullable<T> & current,
+                                 const chip::app::DataModel::Nullable<U> & expected)
+    {
+        if (expected.IsNull())
+        {
+            return true;
+        }
+        return CheckConstraintMaxValue(itemName, current, expected.Value());
     }
 
     template <typename T, typename U>

@@ -110,19 +110,6 @@
             "problemMatcher": []
         },
         {
-            "label": "Build nRF Connect Pigweed Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh pigweed-app nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/pigweed-app/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
-        },
-        {
             "label": "Build i.MX Linux examples",
             "type": "shell",
             "command": "./scripts/examples/imxlinux_example.sh ${input:imxExampleTarget} out/aarch64",
@@ -264,6 +251,7 @@
                 "-Cbuild",
                 "-d${input:openiotsdkDebugMode}",
                 "-l${input:openiotsdkLwipDebug}",
+                "-b${input:openiotsdkCryptoBackend}",
                 "${input:openiotsdkExample}"
             ],
             "group": "build",
@@ -284,6 +272,7 @@
                 "-Cbuild",
                 "-d${input:openiotsdkDebugMode}",
                 "-l${input:openiotsdkLwipDebug}",
+                "-b${input:openiotsdkCryptoBackend}",
                 "unit-tests"
             ],
             "group": "build",
@@ -492,6 +481,13 @@
             "description": "Do you want to use LwIP debug logs?",
             "options": ["false", "true"],
             "default": "false"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkCryptoBackend",
+            "description": "Which Crypto algorithm do you wish to use?",
+            "options": ["mbedtls", "psa"],
+            "default": "mbedtls"
         },
         {
             "type": "command",

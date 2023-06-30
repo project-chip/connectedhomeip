@@ -34,7 +34,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
-#include <trace/trace.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -154,7 +154,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("ArmFailSafe", "GeneralCommissioning");
+    MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
 
@@ -216,7 +216,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::CommissioningComplete::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("CommissioningComplete", "GeneralCommissioning");
+    MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
     DeviceControlServer * devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     auto & failSafe               = Server::GetInstance().GetFailSafeContext();
@@ -283,7 +283,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
                                                                    const app::ConcreteCommandPath & commandPath,
                                                                    const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
+    MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     Commands::SetRegulatoryConfigResponse::Type response;
 

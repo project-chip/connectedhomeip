@@ -15,7 +15,7 @@
 
 import logging
 from time import sleep
-from typing import Any, List, Mapping, Optional
+from typing import Any, List, Mapping
 
 import mbed_lstools
 import pytest
