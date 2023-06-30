@@ -83,12 +83,40 @@ public:
 namespace chip {
 namespace app {
 
-using InteractionModelEngine = chip::app::InteractionModelEngine;
-using ReportSchedulerImpl    = chip::app::reporting::ReportSchedulerImpl;
+using InteractionModelEngine = InteractionModelEngine;
+using ReportScheduler        = reporting::ReportScheduler;
+using ReportSchedulerImpl    = reporting::ReportSchedulerImpl;
+using ReadHandlerNode        = reporting::ReportScheduler::ReadHandlerNode;
 
-static const size_t kNumMaxReadHandlers = 30;
+class TestTimerDelegate : public ReportScheduler::TimerDelegate
+{
+public:
+    static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
+    {
+        ReadHandlerNode * node = static_cast<ReadHandlerNode *>(aAppState);
+        node->RunCallback();
+    }
+    virtual CHIP_ERROR StartTimer(ReadHandlerNode * node, System::Clock::Timeout aTimeout) override
+    {
+        return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+            aTimeout, TimerCallbackInterface, node);
+    }
+    virtual void CancelTimer(ReadHandlerNode * node) override
+    {
+        InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
+            TimerCallbackInterface, node);
+    }
+    virtual bool IsTimerActive(ReadHandlerNode * node) override
+    {
+        return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->IsTimerActive(
+            TimerCallbackInterface, node);
+    }
+};
 
-ReportSchedulerImpl sScheduler;
+static const size_t kNumMaxReadHandlers = 16;
+
+TestTimerDelegate sTestTimerDelegate;
+ReportSchedulerImpl sScheduler(&sTestTimerDelegate);
 
 class TestReportScheduler
 {
@@ -106,7 +134,7 @@ public:
         for (size_t i = 0; i < kNumMaxReadHandlers; i++)
         {
             ReadHandler * readHandler =
-                readHandlerPool.CreateObject(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Subscribe);
+                readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
             NL_TEST_ASSERT(aSuite, nullptr != readHandler);
             VerifyOrReturn(nullptr != readHandler);
             NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sScheduler.RegisterReadHandler(readHandler));
@@ -167,7 +195,7 @@ public:
 
         // Dirty read handler, will be triggered at min interval
         ReadHandler * readHandler1 =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Subscribe);
+            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMaxReportingIntervals(2));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler1->SetMinReportingIntervals(1));
         readHandler1->ForceDirtyState();
@@ -175,14 +203,14 @@ public:
 
         // Clean read handler, will be triggered at max interval
         ReadHandler * readHandler2 =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Subscribe);
+            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMaxReportingIntervals(3));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler2->SetMinReportingIntervals(0));
         readHandler2->MoveToState(ReadHandler::HandlerState::GeneratingReports);
 
         // Clean read handler, will be triggered at max interval, but will be cancelled before
         ReadHandler * readHandler3 =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Subscribe);
+            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMaxReportingIntervals(3));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler3->SetMinReportingIntervals(0));
         readHandler3->MoveToState(ReadHandler::HandlerState::GeneratingReports);
@@ -214,8 +242,8 @@ public:
         // Checks that all ReadHandlers are reportable
         NL_TEST_ASSERT(aSuite, sScheduler.IsReportableNow(readHandler1));
         NL_TEST_ASSERT(aSuite, sScheduler.IsReportableNow(readHandler2));
-        // Even if its timer got cancelled, readHandler3 should still be considered reportable as the max interval has expired and
-        // it is in generating report state
+        // Even if its timer got cancelled, readHandler3 should still be considered reportable as the max interval has expired
+        // and it is in generating report state
         NL_TEST_ASSERT(aSuite, sScheduler.IsReportableNow(readHandler3));
 
         sScheduler.UnregisterAllHandlers();
@@ -234,7 +262,7 @@ public:
         ObjectPool<ReadHandler, kNumMaxReadHandlers> readHandlerPool;
 
         ReadHandler * readHandler =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Subscribe);
+            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler->SetMaxReportingIntervals(2));
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == readHandler->SetMinReportingIntervals(1));
         readHandler->MoveToState(ReadHandler::HandlerState::GeneratingReports);
@@ -245,7 +273,7 @@ public:
         // Should have registered the read handler in the scheduler and scheduled a report
         NL_TEST_ASSERT(aSuite, sScheduler.GetNumReadHandlers() == 1);
         NL_TEST_ASSERT(aSuite, sScheduler.IsReportScheduled(readHandler));
-        reporting::ReportScheduler::ReadHandlerNode * node = sScheduler.FindReadHandlerNode(readHandler);
+        ReadHandlerNode * node = sScheduler.FindReadHandlerNode(readHandler);
         NL_TEST_ASSERT(aSuite, nullptr != node);
         VerifyOrReturn(nullptr != node);
         NL_TEST_ASSERT(aSuite, node->GetReadHandler() == readHandler);
@@ -253,7 +281,8 @@ public:
         // Test OnBecameReportable
         readHandler->ForceDirtyState();
         readHandler->mObserver->OnBecameReportable(readHandler);
-        // Should have changed the scheduled timeout to the handlers min interval, to check, we wait for the min interval to expire
+        // Should have changed the scheduled timeout to the handlers min interval, to check, we wait for the min interval to
+        // expire
         ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1100),
                                         [&]() -> bool { return sScheduler.IsReportableNow(readHandler); });
         // Check that no report is scheduled since the min interval has expired, the timer should now be stopped
@@ -262,8 +291,8 @@ public:
         // Test OnReportSent
         readHandler->ClearForceDirtyFlag();
         readHandler->mObserver->OnReportSent(readHandler);
-        // Should have changed the scheduled timeout to the handlers max interval, to check, we wait for the min interval to confirm
-        // it is not expired yet so the report should still be scheduled
+        // Should have changed the scheduled timeout to the handlers max interval, to check, we wait for the min interval to
+        // confirm it is not expired yet so the report should still be scheduled
         NL_TEST_ASSERT(aSuite, sScheduler.IsReportScheduled(readHandler));
         ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1100),
                                         [&]() -> bool { return sScheduler.IsReportableNow(readHandler); });

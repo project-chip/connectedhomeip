@@ -30,9 +30,14 @@ using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
 
 /// @brief Callback called when the report timer expires to schedule an engine run regardless of the state of the ReadHandlers, as
 /// the engine already verifies that read handlers are reportable before sending a report
-static void ReportTimerCallback(System::Layer * aLayer, void * aAppState)
+static void ReportTimerCallback()
 {
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+}
+
+ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportScheduler(aTimerDelegate)
+{
+    VerifyOrDie(nullptr != mTimerDelegate);
 }
 
 /// @brief When a ReadHandler is added, register it, which will schedule an engine run on the max interval
@@ -83,7 +88,7 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
     // If the handler is already registered, no need to register it again
     VerifyOrReturnValue(nullptr == newNode, CHIP_NO_ERROR);
-    newNode = mNodesPool.CreateObject(aReadHandler);
+    newNode = mNodesPool.CreateObject(aReadHandler, ReportTimerCallback);
     mReadHandlerList.PushBack(newNode);
 
     ChipLogProgress(DataManagement,
@@ -96,7 +101,7 @@ CHIP_ERROR ReportSchedulerImpl::RegisterReadHandler(ReadHandler * aReadHandler)
     if ((newNode->IsReportableNow()))
     {
         // If the handler is reportable now, just schedule a report immediately
-        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+        ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
     }
     else if (IsReadHandlerReportable(aReadHandler) && (newNode->GetMinInterval() > now))
     {
@@ -180,24 +185,20 @@ ReportSchedulerImpl::ReadHandlerNode * ReportSchedulerImpl::FindReadHandlerNode(
     return nullptr;
 }
 
-// TODO: Replace calls to SystemLayer()-> with calls to TimerDelegate->
 CHIP_ERROR ReportSchedulerImpl::StartTimerForHandler(ReadHandlerNode * node, System::Clock::Timeout aTimeout)
 {
     // Schedule Report
-    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        aTimeout, ReportTimerCallback, node);
+    return mTimerDelegate->StartTimer(node, aTimeout);
 }
 
 void ReportSchedulerImpl::CancelTimerForHandler(ReadHandlerNode * node)
 {
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-        ReportTimerCallback, node);
+    mTimerDelegate->CancelTimer(node);
 }
 
 bool ReportSchedulerImpl::CheckTimerActiveForHandler(ReadHandlerNode * node)
 {
-    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->IsTimerActive(
-        ReportTimerCallback, node);
+    return mTimerDelegate->IsTimerActive(node);
 }
 
 } // namespace reporting

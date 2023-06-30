@@ -28,6 +28,7 @@ namespace reporting {
 class ReportSchedulerImpl : public ReportScheduler
 {
 public:
+    ReportSchedulerImpl(TimerDelegate * aTimerDelegate);
     virtual ~ReportSchedulerImpl() override { UnregisterAllHandlers(); }
 
     // ReadHandlerObserver

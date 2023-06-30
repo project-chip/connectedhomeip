@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app/ReadHandler.h>
-#include <app/reporting/Engine.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/IntrusiveList.h>
 #include <system/SystemClock.h>
@@ -38,7 +37,9 @@ public:
     class ReadHandlerNode : public IntrusiveListNodeBase<>
     {
     public:
-        ReadHandlerNode(ReadHandler * aReadHandler)
+        using TimerCompleteCallback = void (*)();
+
+        ReadHandlerNode(ReadHandler * aReadHandler, TimerCompleteCallback aCallback) : mCallback(aCallback)
         {
             mReadHandler = aReadHandler;
             SetIntervalsTimeStamp(aReadHandler);
@@ -65,32 +66,28 @@ public:
             mMaxIntervalSeconds          = now + System::Clock::Seconds16(maxInterval);
         }
 
+        void RunCallback() { mCallback(); }
+
         System::Clock::Timestamp GetMinInterval() const { return mMinIntervalSeconds; }
         System::Clock::Timestamp GetMaxInterval() const { return mMaxIntervalSeconds; }
 
     private:
+        TimerCompleteCallback mCallback;
         ReadHandler * mReadHandler;
         System::Clock::Timestamp mMinIntervalSeconds;
         System::Clock::Timestamp mMaxIntervalSeconds;
     };
 
-    // TODO: Completer the TimerDelegate class in tests and use calls to it in the ReportSchedulerImpl
     class TimerDelegate
     {
     public:
-        using TimerCompleteCallback = void (*)(ReadHandlerNode * node);
         virtual ~TimerDelegate() {}
-        virtual void StartTimer(ReadHandlerNode * node, System::Clock::Timeout aTimeout) = 0;
-        virtual void CancelTimer(ReadHandlerNode * node)                                 = 0;
-        virtual void IsTimerActive(ReadHandlerNode * node)                               = 0;
-
-        virtual void SetCallback(TimerCompleteCallback callback) = 0;
-
-    protected:
-        TimerCompleteCallback mCallback;
+        virtual CHIP_ERROR StartTimer(ReadHandlerNode * node, System::Clock::Timeout aTimeout) = 0;
+        virtual void CancelTimer(ReadHandlerNode * node)                                       = 0;
+        virtual bool IsTimerActive(ReadHandlerNode * node)                                     = 0;
     };
 
-    // TODO: Add constructor that requires a TimerDelegate
+    ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}
     /**
      *  Interface to act on changes in the ReadHandler reportability
      */
@@ -146,9 +143,8 @@ protected:
     virtual bool CheckTimerActiveForHandler(ReadHandlerNode * node)                                  = 0;
 
     IntrusiveList<ReadHandlerNode> mReadHandlerList;
-    // TODO: Assess if possible to pass in the interaction model handler pool upon construction
     ObjectPool<ReadHandlerNode, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mNodesPool;
-    TimerDelegate * mDelegate;
+    TimerDelegate * mTimerDelegate;
 };
 }; // namespace reporting
 }; // namespace app
