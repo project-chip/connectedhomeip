@@ -25,7 +25,7 @@ import chip.interaction_model
 import chip.yaml.format_converter as Converter
 import stringcase
 from chip.ChipDeviceCtrl import ChipDeviceController, discovery
-from chip.clusters import ClusterObjects as ClustersObjects
+from chip.clusters import ClusterObjects
 from chip.clusters.Attribute import (AttributeStatus, EventReadResult, SubscriptionTransaction, TypedAttributePath,
                                      ValueDecodeFailure)
 from chip.exceptions import ChipStackError
@@ -371,7 +371,7 @@ class WaitForCommissioneeAction(BaseAction):
 
 
 class AttributeChangeAccumulator:
-    def __init__(self, name: str, expected_attribute: ClustersObjects.ClusterAttributeDescriptor,
+    def __init__(self, name: str, expected_attribute: ClusterObjects.ClusterAttributeDescriptor,
                  output_queue: queue.SimpleQueue):
         self._name = name
         self._expected_attribute = expected_attribute
