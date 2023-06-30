@@ -48,10 +48,12 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &s
 } // namespace
 #endif
 
+Clusters::ResourceMonitoring::HepaFilterMonitoringInstance HepafilterInstance(0x1, Clusters::HepaFilterMonitoring::Id, 1,
+                                                                              ResourceMonitoring::DegradationDirectionEnum::kDown);
 
-Clusters::ResourceMonitoring::HepaFilterMonitoringInstance HepafilterInstance(0x1, Clusters::HepaFilterMonitoring::Id, 1, ResourceMonitoring::DegradationDirectionEnum::kDown);
-
-Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance ActivatedCarbonFilterInstance(0x1, Clusters::ActivatedCarbonFilterMonitoring::Id, 1, ResourceMonitoring::DegradationDirectionEnum::kDown);
+Clusters::ResourceMonitoring::ActivatedCarbonFilterMonitoringInstance
+    ActivatedCarbonFilterInstance(0x1, Clusters::ActivatedCarbonFilterMonitoring::Id, 1,
+                                  ResourceMonitoring::DegradationDirectionEnum::kDown);
 
 void ApplicationInit()
 {

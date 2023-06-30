@@ -18,10 +18,10 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af.h>
 #include <map>
 
@@ -51,10 +51,10 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
-
     // Attribute setters
     chip::Protocols::InteractionModel::Status UpdateCondition(uint8_t aNewCondition);
-    chip::Protocols::InteractionModel::Status UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication);
+    chip::Protocols::InteractionModel::Status
+    UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication);
     chip::Protocols::InteractionModel::Status UpdateInPlaceIndicator(bool aNewInPlaceIndicator);
 
     // Attribute getters
@@ -62,17 +62,16 @@ public:
     chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum GetChangeIndication() const;
     bool GetInPlaceIndicator() const;
 
-
 private:
     EndpointId mEndpointId{};
     ClusterId mClusterId{};
-    
-    //attribute Data Store
+
+    // attribute Data Store
     chip::Percent mCondition;
     const ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type mDegradationDirection;
     ResourceMonitoring::Attributes::ChangeIndication::TypeInfo::Type mChangeIndication;
     ResourceMonitoring::Attributes::InPlaceIndicator::TypeInfo::Type mInPlaceIndicator;
-    
+
     uint32_t mFeature;
 
     // todo description
@@ -90,8 +89,8 @@ public:
      * @param aClusterId The ID of the ResourceMonitoring aliased cluster to be instantiated.
      * @param aDelegate A pointer to a delegate that will handle application layer logic.
      */
-    Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature, 
-        ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection) :
+    Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature,
+             ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDegradationDirection(aDegradationDirection)
     {
@@ -106,10 +105,10 @@ public:
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
     // the following methods will be overridden by the SDK user to implement the business logic of their application
-    
+
     /**
      * todo description
-    */
+     */
     virtual CHIP_ERROR AppInit() = 0;
 
     /**

@@ -19,11 +19,11 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
-#include <app/util/attribute-storage.h>
 #include <app/reporting/reporting.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/util.h>
-#include <platform/DiagnosticDataProvider.h>
 #include <map>
+#include <platform/DiagnosticDataProvider.h>
 
 // using namespace std;
 using namespace chip;
@@ -39,7 +39,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
-
 
 std::map<uint32_t, Instance *> Instance::ResourceMonitoringAliasesInstanceMap;
 
@@ -85,9 +84,8 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-
 // List the commands supported by this instance.
-//TODO do we need this? should a sdk developer override this if the command is not supported?
+// TODO do we need this? should a sdk developer override this if the command is not supported?
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
 {
@@ -97,39 +95,32 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     return CHIP_NO_ERROR;
 }
 
-
 bool Instance::HasFeature(ResourceMonitoring::Feature feature) const
 {
-        return ((mFeature & to_underlying(feature)) != 0);
+    return ((mFeature & to_underlying(feature)) != 0);
 }
-
-
 
 // Implements the read functionality for non-standard attributes.
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
-        case Attributes::Condition::Id:
-        {
-            ReturnErrorOnFailure(aEncoder.Encode(mCondition));
-            break;
-        }
-        case Attributes::DegradationDirection::Id:
-        {  
-            ReturnErrorOnFailure(aEncoder.Encode(mDegradationDirection));
-            break;
-        }
-        case Attributes::ChangeIndication::Id:
-        {  
-            ReturnErrorOnFailure(aEncoder.Encode(mChangeIndication));
-            break;
-        }       
-        case Attributes::InPlaceIndicator::Id:
-        {  
-            ReturnErrorOnFailure(aEncoder.Encode(mInPlaceIndicator));
-            break;
-        }
+    case Attributes::Condition::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mCondition));
+        break;
+    }
+    case Attributes::DegradationDirection::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mDegradationDirection));
+        break;
+    }
+    case Attributes::ChangeIndication::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mChangeIndication));
+        break;
+    }
+    case Attributes::InPlaceIndicator::Id: {
+        ReturnErrorOnFailure(aEncoder.Encode(mInPlaceIndicator));
+        break;
+    }
     }
     return CHIP_NO_ERROR;
 }
@@ -137,38 +128,38 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 // Implements checking before attribute writes.
 CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, AttributeValueDecoder & aDecoder)
 {
-    //no writeable attributes supported
+    // no writeable attributes supported
     return CHIP_NO_ERROR;
 }
 
-
 chip::Protocols::InteractionModel::Status Instance::UpdateCondition(uint8_t aNewCondition)
 {
-    if ( aNewCondition < 0 || aNewCondition > 100)
+    if (aNewCondition < 0 || aNewCondition > 100)
     {
         return Protocols::InteractionModel::Status::InvalidValue;
     }
     auto oldCondition = mCondition;
-    mCondition = aNewCondition;
-    if ( mCondition != oldCondition )
+    mCondition        = aNewCondition;
+    if (mCondition != oldCondition)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::Condition::Id);
     }
     return Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status Instance::UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication)
+chip::Protocols::InteractionModel::Status
+Instance::UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication)
 {
-    if ( aNewChangeIndication == chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum::kWarning)
+    if (aNewChangeIndication == chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum::kWarning)
     {
-        if ( !HasFeature(ResourceMonitoring::Feature::kWarning) )
+        if (!HasFeature(ResourceMonitoring::Feature::kWarning))
         {
             return Protocols::InteractionModel::Status::InvalidValue;
         }
     }
     auto oldChangeIndication = mChangeIndication;
-    mChangeIndication = aNewChangeIndication;
-    if ( mChangeIndication != oldChangeIndication )
+    mChangeIndication        = aNewChangeIndication;
+    if (mChangeIndication != oldChangeIndication)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::ChangeIndication::Id);
     }
@@ -177,8 +168,8 @@ chip::Protocols::InteractionModel::Status Instance::UpdateChangeIndication(chip:
 chip::Protocols::InteractionModel::Status Instance::UpdateInPlaceIndicator(bool aNewInPlaceIndicator)
 {
     auto oldInPlaceIndicator = mInPlaceIndicator;
-    mInPlaceIndicator = aNewInPlaceIndicator;
-    if ( mInPlaceIndicator != oldInPlaceIndicator )
+    mInPlaceIndicator        = aNewInPlaceIndicator;
+    if (mInPlaceIndicator != oldInPlaceIndicator)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::InPlaceIndicator::Id);
     }
@@ -200,9 +191,9 @@ bool Instance::GetInPlaceIndicator() const
 
 bool Instance::IsAliascluster() const
 {
-    for ( unsigned int AliasedCluster : AliasedClusters)
+    for (unsigned int AliasedCluster : AliasedClusters)
     {
-        if ( mClusterId == AliasedCluster )
+        if (mClusterId == AliasedCluster)
         {
             return true;
         }
