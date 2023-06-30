@@ -98,5 +98,10 @@ void TizenServiceAppMain::AppControl(app_control_h app_control)
 
         mLinuxThread = std::thread(TizenMainLoopWrapper);
         initialized  = true;
+
+        if (mInitializedCb)
+        {
+            mInitializedCb();
+        }
     }
 }

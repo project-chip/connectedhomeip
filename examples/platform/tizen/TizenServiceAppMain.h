@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <functional>
 #include <thread>
 
 #include <service_app.h>
@@ -39,10 +40,14 @@ public:
     virtual void AppTerminated();
     virtual void AppControl(app_control_h app_control);
 
+    using InitializedCb_fn = std::function<void()>;
+    void SetInitializedCb(InitializedCb_fn cb) { mInitializedCb = cb; }
+
 private:
     int mArgc     = 0;
     char ** mArgv = nullptr;
     OptionsProxy mLinuxArgs;
     std::thread mLinuxThread;
     bool initialized = false;
+    InitializedCb_fn mInitializedCb;
 };
