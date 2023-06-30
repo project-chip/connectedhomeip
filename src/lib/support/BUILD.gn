@@ -133,6 +133,8 @@ static_library("support") {
     "SortUtils.h",
     "StateMachine.h",
     "StringSplitter.h",
+    "StringBuilder.h",
+    "StringBuilder.cpp",
     "ThreadOperationalDataset.cpp",
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",

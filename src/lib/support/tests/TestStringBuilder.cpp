@@ -127,6 +127,9 @@ void TestFormatOverflow(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT(inSuite, !builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1 2 3 4 12") == 0);
+
+        builder.AddMarkerIfOverflow();
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1 2 3 4...") == 0);
     }
 
     {
@@ -140,9 +143,78 @@ void TestFormatOverflow(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1234abc") == 0);
 
+        builder.AddMarkerIfOverflow(); // no overflow
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1234abc") == 0);
+
         builder.AddFormat("%08x", 0x123456);
         NL_TEST_ASSERT(inSuite, !builder.Fit());
         NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1234abc001") == 0);
+
+        builder.AddMarkerIfOverflow();
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "1234abc...") == 0);
+    }
+}
+
+void TestOverflowMarker(nlTestSuite * inSuite, void * inContext)
+{
+    {
+        StringBuilder<1> builder; // useless builder, but ok
+
+        builder.Add("abc123");
+
+        NL_TEST_ASSERT(inSuite, !builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "") == 0);
+
+        builder.AddMarkerIfOverflow();
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "") == 0);
+    }
+
+    {
+        StringBuilder<2> builder;
+
+        builder.Add("abc123");
+
+        NL_TEST_ASSERT(inSuite, !builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "a") == 0);
+
+        builder.AddMarkerIfOverflow();
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), ".") == 0);
+    }
+
+    {
+        StringBuilder<3> builder;
+
+        builder.Add("abc123");
+
+        NL_TEST_ASSERT(inSuite, !builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "ab") == 0);
+
+        builder.AddMarkerIfOverflow();
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "..") == 0);
+    }
+
+    {
+        StringBuilder<4> builder;
+
+        builder.Add("abc123");
+
+        NL_TEST_ASSERT(inSuite, !builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "abc") == 0);
+
+        builder.AddMarkerIfOverflow();
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "...") == 0);
+    }
+
+    {
+        StringBuilder<5> builder;
+
+        builder.Add("abc123");
+
+        NL_TEST_ASSERT(inSuite, !builder.Fit());
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "abc1") == 0);
+
+        builder.AddMarkerIfOverflow();
+        NL_TEST_ASSERT(inSuite, strcmp(builder.c_str(), "a...") == 0);
     }
 }
 
@@ -152,6 +224,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TestOverflow", TestOverflow),             //
     NL_TEST_DEF("TestFormat", TestFormat),                 //
     NL_TEST_DEF("TestFormatOverflow", TestFormatOverflow), //
+    NL_TEST_DEF("TestOverflowMarker", TestOverflowMarker), //
     NL_TEST_SENTINEL()                                     //
 };
 
