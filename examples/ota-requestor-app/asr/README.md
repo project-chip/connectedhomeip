@@ -53,9 +53,9 @@ guides to get started
     ./chip-tool pairing onnetwork 1 20202021
     ```
 -   After OTA Provider commissioning is successful, use `chip-tool` to write ACL
-    for OAT Provider.
+    for OTA Provider.
     ```
-    ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null }]' <OTA REQUESTOR APP NODE ID> 0
+    ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null }]' 1 0
     ```
 -   Commission ota requestor device with node-id `OTA REQUESTOR APP NODE ID`
 -   After OTA Requestor commissioning is successful, use `chip-tool` to inform
