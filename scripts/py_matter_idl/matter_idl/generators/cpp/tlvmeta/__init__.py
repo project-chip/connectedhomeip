@@ -130,10 +130,15 @@ class ClusterTablesGenerator:
         cluster_entries = []
         cluster_entries.extend([self.FieldEntry(
             a.definition, tag_type='AttributeTag') for a in self.cluster.attributes])
+
         cluster_entries.extend([
             # events always reference an existing struct
-            TableEntry(code=f'EventTag({e.code})', name=e.name, reference="%s_%s" %
-                       (self.cluster.name, e.name))
+            TableEntry(
+                code=f'EventTag({e.code})',
+                name=e.name,
+                reference="%s_%s" % (self.cluster.name, e.name),
+                real_type = '%s::%s' % (self.cluster.name, e.name)
+            )
             for e in self.cluster.events
         ])
         cluster_entries.extend(
@@ -154,7 +159,7 @@ class ClusterTablesGenerator:
         for e in self.cluster.events:
             yield Table(
                 full_name="%s_%s" % (self.cluster.name, e.name),
-                entries=[self.FieldEntry(field) for field in s.fields]
+                entries=[self.FieldEntry(field) for field in e.fields]
             )
 
         # some items have lists, create an intermediate item for those

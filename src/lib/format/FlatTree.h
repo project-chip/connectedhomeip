@@ -49,8 +49,8 @@ struct Entry
 template <typename CONTENT>
 struct Node
 {
-    size_t entry_count;       // number of items in [entries]
-    Entry<CONTENT> * entries; // child items of [entry_count] size
+    size_t entry_count;             // number of items in [entries]
+    const Entry<CONTENT> * entries; // child items of [entry_count] size
 
     /// Attempt to find the entry with given matcher.
     ///

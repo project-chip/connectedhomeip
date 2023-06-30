@@ -9,14 +9,14 @@ using namespace chip::TLV;
 
 {%- for table in sub_tables %}
 
-Entry<ItemInfo> _{{table.full_name}}[] = {
+const Entry<ItemInfo> _{{table.full_name}}[] = {
   {%-  for entry in table.entries %}
   { { {{entry.code}}, "{{entry.name}}", ItemType::{{entry.item_type}} }, {{entry.reference | indexInTable(sub_tables)}} }, // {{entry.real_type}}
   {%- endfor %}
 };
 {%- endfor %}
 
-Entry<ItemInfo> _all_clusters[] = {
+const Entry<ItemInfo> _all_clusters[] = {
 {%- for cluster in clusters | sort(attribute='code') %}
   { { ClusterTag({{"0x%02X" | format(cluster.code)}}), "{{cluster.name}}", ItemType::kDefault }, {{cluster.name | indexInTable(sub_tables)}} },
 {%- endfor %}
@@ -26,7 +26,7 @@ Entry<ItemInfo> _all_clusters[] = {
 
 #define _ENTRY(n) { sizeof(n) / sizeof(n[0]), n}
 
-std::array<Node<ItemInfo>, {{ sub_tables | length }} + 1> {{table_name}} = { {
+const std::array<const Node<ItemInfo>, {{ sub_tables | length }} + 1> {{table_name}} = { {
   _ENTRY(_all_clusters),
 {%- for table in sub_tables %}
   _ENTRY(_{{table.full_name}}), // {{loop.index}}

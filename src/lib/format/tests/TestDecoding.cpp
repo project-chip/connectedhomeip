@@ -24,6 +24,7 @@
 
 #include "sample_data.h"
 #include <tlv/meta/protocols_meta.h>
+#include <tlv/meta/clusters_meta.h>
 
 #include <vector>
 

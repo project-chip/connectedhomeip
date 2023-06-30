@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 
 source_set("flat-tree") {
   sources = [
+    "tlv_meta.h", # TODO: move in separate source set
     "FlatTree.h",
     "FlatTreePosition.h",
   ]

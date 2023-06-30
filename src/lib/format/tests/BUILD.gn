@@ -26,6 +26,8 @@ source_set("temporary_test") {
   sources = [
     "sample_data.cpp",
     "sample_data.h",
+    "tlv/meta/clusters_meta.cpp",
+    "tlv/meta/clusters_meta.h",
     "tlv/meta/protocols_meta.cpp",
     "tlv/meta/protocols_meta.h",
   ]
