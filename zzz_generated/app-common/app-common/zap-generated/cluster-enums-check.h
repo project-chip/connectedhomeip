@@ -1400,8 +1400,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::EndOfServ
     using EnumType = SmokeCoAlarm::EndOfServiceEnum;
     switch (val)
     {
-    case EnumType::kExpired:
     case EnumType::kNormal:
+    case EnumType::kExpired:
         return val;
     default:
         return static_cast<EnumType>(2);
