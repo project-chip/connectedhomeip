@@ -184,6 +184,12 @@ chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum Instance::GetChang
 {
     return mChangeIndication;
 }
+
+chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum Instance::GetDegradationDirection() const
+{
+    return mDegradationDirection;
+}
+
 bool Instance::GetInPlaceIndicator() const
 {
     return mInPlaceIndicator;

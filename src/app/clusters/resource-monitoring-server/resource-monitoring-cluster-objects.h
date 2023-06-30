@@ -94,9 +94,9 @@ namespace DegradationDirection {
 static constexpr AttributeId Id = 0x00000001;
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum;
-    using DecodableType    = chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum;
-    using DecodableArgType = chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum;
+    using Type             = DegradationDirectionEnum;
+    using DecodableType    = DegradationDirectionEnum;
+    using DecodableArgType = DegradationDirectionEnum;
 
     static constexpr AttributeId GetAttributeId() { return Attributes::DegradationDirection::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
@@ -108,9 +108,9 @@ static constexpr AttributeId Id = 0x00000002;
 
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum;
-    using DecodableType    = chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum;
-    using DecodableArgType = chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum;
+    using Type             = ChangeIndicationEnum;
+    using DecodableType    = ChangeIndicationEnum;
+    using DecodableArgType = ChangeIndicationEnum;
 
     static constexpr AttributeId GetAttributeId() { return Attributes::ChangeIndication::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }

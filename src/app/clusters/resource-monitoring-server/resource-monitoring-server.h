@@ -53,13 +53,13 @@ public:
 
     // Attribute setters
     chip::Protocols::InteractionModel::Status UpdateCondition(uint8_t aNewCondition);
-    chip::Protocols::InteractionModel::Status
-    UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication);
+    chip::Protocols::InteractionModel::Status UpdateChangeIndication(ChangeIndicationEnum aNewChangeIndication);
     chip::Protocols::InteractionModel::Status UpdateInPlaceIndicator(bool aNewInPlaceIndicator);
 
     // Attribute getters
     uint8_t GetCondition() const;
-    chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum GetChangeIndication() const;
+    ChangeIndicationEnum GetChangeIndication() const;
+    DegradationDirectionEnum GetDegradationDirection() const;
     bool GetInPlaceIndicator() const;
 
 private:
@@ -68,9 +68,9 @@ private:
 
     // attribute Data Store
     chip::Percent mCondition;
-    const ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type mDegradationDirection;
-    ResourceMonitoring::Attributes::ChangeIndication::TypeInfo::Type mChangeIndication;
-    ResourceMonitoring::Attributes::InPlaceIndicator::TypeInfo::Type mInPlaceIndicator;
+    const DegradationDirectionEnum mDegradationDirection;
+    ChangeIndicationEnum mChangeIndication;
+    bool mInPlaceIndicator;
 
     uint32_t mFeature;
 
