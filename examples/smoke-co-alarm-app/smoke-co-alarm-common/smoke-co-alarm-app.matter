@@ -1797,6 +1797,9 @@ server cluster UnitTesting = 4294048773 {
     BOOLEAN arg3 = 2;
   }
 
+  command Test(): DefaultSuccess = 0;
+  command TestNotHandled(): DefaultSuccess = 1;
+  command TestSpecific(): TestSpecificResponse = 2;
   command TestEmitTestEventRequest(TestEmitTestEventRequestRequest): TestEmitTestEventResponse = 20;
 }
 
