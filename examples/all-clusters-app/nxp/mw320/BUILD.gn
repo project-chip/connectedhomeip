@@ -30,11 +30,9 @@ mw320_sdk("sdk") {
     "${examples_plat_dir}/app/project_include",
     "${chip_root}/src/app/util",
     "${chip_root}/examples/all-clusters-app/nxp/mw320/include",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 
   sources = [
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "include/CHIPProjectConfig.h",
     "include/FreeRTOSConfig.h",
   ]
@@ -70,6 +68,7 @@ mw320_executable("shell_mw320") {
   include_dirs = [
     "${chip_root}/src/platform/nxp/mw320",
     "${examples_plat_dir}/app/project_include",
+    "${chip_root}/src",
     "${chip_root}/src/app/util",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
     "${chip_root}/examples/all-clusters-app/nxp/mw320/include",

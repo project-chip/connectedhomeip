@@ -176,7 +176,7 @@ void ApplicationInit()
 #ifdef EMBER_AF_PLUGIN_OPERATIONAL_STATE_SERVER
     MatterOperationalStateServerInit();
 #endif
-    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 void ApplicationExit()

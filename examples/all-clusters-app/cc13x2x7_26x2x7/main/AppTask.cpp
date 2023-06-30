@@ -275,7 +275,7 @@ int AppTask::Init()
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
-    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     return 0;
 }
 

@@ -48,7 +48,7 @@ void ApplicationInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     sEthernetNetworkCommissioningInstance.Init();
-    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 int main(int argc, char * argv[])

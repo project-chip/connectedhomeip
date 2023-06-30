@@ -139,8 +139,7 @@ static void InitServer(intptr_t context)
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     GetAppTask().InitOTARequestor();
 #endif
-    chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(
-        &sAppSupportedTemperatureLevelsDelegate);
+    chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 CHIP_ERROR AppTask::StartAppTask()

@@ -144,8 +144,7 @@ static void InitServer(intptr_t context)
 #if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
 #endif
-    app::Clusters::TemperatureControl::SupportedTemperatureLevelsIteratorDelegate::SetInstance(
-        &sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 extern "C" void ChipTest(void)

@@ -1082,8 +1082,7 @@ static void run_chip_srv(System::Layer * aSystemLayer, void * aAppState)
     InitBindingHandlers();
     // binding --
 
-    chip::app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(
-        &sAppSupportedTemperatureLevelsDelegate);
+    chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
     return;
 }

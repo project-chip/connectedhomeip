@@ -2492,22 +2492,6 @@ server cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
-/** Attributes and commands for configuring the Refrigerator alarm. */
-server cluster RefrigeratorAlarm = 87 {
-  bitmap AlarmMap : BITMAP32 {
-    kDoorOpen = 0x1;
-  }
-
-  info event Notify = 0 {
-    AlarmMap active = 0;
-    AlarmMap inactive = 1;
-    AlarmMap state = 2;
-    AlarmMap mask = 3;
-  }
-
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
 server cluster TemperatureControl = 86 {
   bitmap Feature : BITMAP32 {
@@ -2516,9 +2500,8 @@ server cluster TemperatureControl = 86 {
     kTemperatureStep = 0x4;
   }
 
-  readonly attribute temperature temperatureSetpoint = 0;
-  readonly attribute temperature minTemperature = 1;
-  readonly attribute temperature maxTemperature = 2;
+  readonly attribute int8u selectedTemperatureLevel = 4;
+  readonly attribute char_string supportedTemperatureLevels[] = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6685,27 +6668,18 @@ endpoint 1 {
   }
 
   server cluster TemperatureControl {
-    ram      attribute temperatureSetpoint default = 1;
-    ram      attribute minTemperature default = 0;
-    ram      attribute maxTemperature default = 100;
+    ram      attribute selectedTemperatureLevel default = 0;
+    callback attribute supportedTemperatureLevels;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster RefrigeratorAlarm {
     emits event Notify;
-    ram      attribute mask default = 1;
-    ram      attribute state default = 0;
-    ram      attribute supported default = 1;
-  server cluster TemperatureControl {
-    ram      attribute temperatureSetpoint;
-    ram      attribute minTemperature;
-    ram      attribute maxTemperature;
-    ram      attribute step;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

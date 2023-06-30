@@ -28,18 +28,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Write temperature setpoint"
-      command: "writeAttribute"
-      attribute: "TemperatureSetpoint"
-      arguments:
-          value: 3
-
-    - label: "Read back temperature setpoint"
-      command: "readAttribute"
-      attribute: "TemperatureSetpoint"
-      response:
-          value: 3
-
     - label: "Read supported temperature levels"
       command: "readAttribute"
       attribute: "SupportedTemperatureLevels"

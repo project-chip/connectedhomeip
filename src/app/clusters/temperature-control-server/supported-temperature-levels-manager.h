@@ -47,14 +47,14 @@ public:
 
     virtual CHIP_ERROR Next(chip::MutableCharSpan & item) = 0;
 
-    static SupportedTemperatureLevelsIteratorDelegate * GetInstance();
-
-    static void SetInstance(SupportedTemperatureLevelsIteratorDelegate * instance);
-
 protected:
     EndpointId mEndpoint;
     uint8_t mIndex;
 };
+
+SupportedTemperatureLevelsIteratorDelegate * GetInstance();
+
+void SetInstance(SupportedTemperatureLevelsIteratorDelegate * instance);
 
 } // namespace TemperatureControl
 } // namespace Clusters

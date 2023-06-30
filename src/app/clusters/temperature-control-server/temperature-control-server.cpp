@@ -35,6 +35,8 @@ namespace {
 
 const uint8_t kMaxTemperatureLevelStringSize = 32;
 
+static SupportedTemperatureLevelsIteratorDelegate * sInstance = nullptr;
+
 class TemperatureControlAttrAccess : public AttributeAccessInterface
 {
 public:
@@ -47,14 +49,33 @@ public:
 } // namespace
 TemperatureControlAttrAccess gAttrAccess;
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace TemperatureControl {
+
+SupportedTemperatureLevelsIteratorDelegate * GetInstance()
+{
+    return sInstance;
+}
+
+void SetInstance(SupportedTemperatureLevelsIteratorDelegate * instance)
+{
+    sInstance = instance;
+}
+
+} // namespace TemperatureControl
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == TemperatureControl::Id);
 
     if (TemperatureControl::Attributes::SupportedTemperatureLevels::Id == aPath.mAttributeId)
     {
-        TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * instance =
-            TemperatureControl::SupportedTemperatureLevelsIteratorDelegate::GetInstance();
+        TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * instance = TemperatureControl::GetInstance();
         if (instance == nullptr)
         {
             aEncoder.EncodeEmptyList();
@@ -167,8 +188,7 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
     {
         if (targetTemperatureLevel.HasValue())
         {
-            TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * instance =
-                TemperatureControl::SupportedTemperatureLevelsIteratorDelegate::GetInstance();
+            TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * instance = TemperatureControl::GetInstance();
             if (instance == nullptr)
             {
                 status = Status::NotFound;

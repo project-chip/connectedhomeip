@@ -138,8 +138,7 @@ static void InitServer(intptr_t context)
         ESP_LOGE(TAG, "Failed to initialize endpoint array for supported-modes, err:%" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    app::Clusters::TemperatureControl::SupportedTemperatureLevelsIteratorDelegate::SetInstance(
-        &sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 extern "C" void app_main()

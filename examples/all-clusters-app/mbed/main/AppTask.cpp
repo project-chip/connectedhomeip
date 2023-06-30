@@ -89,7 +89,7 @@ int AppTask::Init()
         ChipLogError(NotSpecified, "DFU manager initialization failed: %s", error.AsString());
         return EXIT_FAILURE;
     }
-    app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     return 0;
 }
 
