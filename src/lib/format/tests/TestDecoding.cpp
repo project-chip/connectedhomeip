@@ -55,122 +55,95 @@ void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)
     va_end(args);
 }
 
-#if 0
-// TLVTagControl tagControl = static_cast<TLVTagControl>(reader.GetControlByte() & kTLVTagControlMask);
-void EncodeTag(chip::TLV::TLVTagControl tagControl, chip::TLV::Tag tag, chip::MutableCharSpan out)
+const char * DecodeTagControl(const TLVTagControl aTagControl)
 {
-    // FIXME: implement
+    switch (aTagControl)
+    {
+    case TLVTagControl::Anonymous:
+        return "Anonymous";
+    case TLVTagControl::ContextSpecific:
+        return "ContextSpecific";
+    case TLVTagControl::CommonProfile_2Bytes:
+        return "Common2B";
+    case TLVTagControl::CommonProfile_4Bytes:
+        return "Common4B";
+    case TLVTagControl::ImplicitProfile_2Bytes:
+        return "Implicit2B";
+    case TLVTagControl::ImplicitProfile_4Bytes:
+        return "Implicit4B";
+    case TLVTagControl::FullyQualified_6Bytes:
+        return "FullyQualified6B";
+    case TLVTagControl::FullyQualified_8Bytes:
+        return "FullyQualified8";
+    default:
+        return "???";
+    }
+}
+
+void FormatCurrentTag(TLVReader & reader, chip::StringBuilderBase & out)
+{
+    chip::TLV::TLVTagControl tagControl = static_cast<TLVTagControl>(reader.GetControlByte() & kTLVTagControlMask);
+    chip::TLV::Tag tag                  = reader.GetTag();
+
     if (IsProfileTag(tag))
     {
-        //  aWriter("tag[%s]: 0x%x::0x%x::0x%x, ", DecodeTagControl(tagControl), VendorIdFromTag(tag), ProfileNumFromTag(tag),
-        //        TagNumFromTag(tag));
+        out.AddFormat("%s(0x%x::0x%x::0x%x)", DecodeTagControl(tagControl), VendorIdFromTag(tag), ProfileNumFromTag(tag),
+                      TagNumFromTag(tag));
     }
     else if (IsContextTag(tag))
     {
-        // aWriter("tag[%s]: 0x%x, ", DecodeTagControl(tagControl), TagNumFromTag(tag));
-    }
-    else if (IsSpecialTag(tag))
-    {
-
-        // aWriter("tag[%s]: 0x%x, ", DecodeTagControl(tagControl), tag);
+        out.AddFormat("%s(0x%x)", DecodeTagControl(tagControl), TagNumFromTag(tag));
     }
     else
     {
-        // aWriter("tag[unknown]: 0x%x, ", tag);
+        out.AddFormat("tag[unknown]: 0x%" PRIx64, tag.RawValue());
     }
 }
-#endif
 
-// Returns a null terminated string containing the current reader value
-void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
+CHIP_ERROR FormatCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     switch (reader.GetType())
     {
     case kTLVType_SignedInteger: {
         int64_t sVal;
-        err = reader.Get(sVal);
-        if (err != CHIP_NO_ERROR)
-        {
-            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        else
-        {
-            out.AddFormat("%" PRIi64, sVal);
-        }
+        ReturnErrorOnFailure(reader.Get(sVal));
+        out.AddFormat("%" PRIi64, sVal);
         break;
     }
     case kTLVType_UnsignedInteger: {
         uint64_t uVal;
-        err = reader.Get(uVal);
-        if (err != CHIP_NO_ERROR)
-        {
-            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        else
-        {
-            out.AddFormat("%" PRIu64, uVal);
-        }
+        ReturnErrorOnFailure(reader.Get(uVal));
+        out.AddFormat("%" PRIu64, uVal);
         break;
     }
     case kTLVType_Boolean: {
         bool bVal;
-        err = reader.Get(bVal);
-        if (err != CHIP_NO_ERROR)
-        {
-            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        else
-        {
-            out.Add(bVal ? "true" : "false");
-        }
+        ReturnErrorOnFailure(reader.Get(bVal));
+        out.Add(bVal ? "true" : "false");
         break;
     }
     case kTLVType_FloatingPointNumber: {
         double fpVal;
-        err = reader.Get(fpVal);
-        if (err != CHIP_NO_ERROR)
-        {
-            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        else
-        {
-            out.AddFormat("%lf", fpVal);
-        }
+        ReturnErrorOnFailure(reader.Get(fpVal));
+        out.AddFormat("%lf", fpVal);
         break;
     }
     case kTLVType_UTF8String: {
         const uint8_t * strbuf = nullptr;
-        err                    = reader.GetDataPtr(strbuf);
-        if (err != CHIP_NO_ERROR)
-        {
-            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        else
-        {
-            out.AddFormat("\"%-.*s\"", static_cast<int>(reader.GetLength()), strbuf);
-        }
+        ReturnErrorOnFailure(reader.GetDataPtr(strbuf));
+        out.AddFormat("\"%-.*s\"", static_cast<int>(reader.GetLength()), strbuf);
         break;
     }
     case kTLVType_ByteString: {
         const uint8_t * strbuf = nullptr;
-        err                    = reader.GetDataPtr(strbuf);
-        if (err != CHIP_NO_ERROR)
+        ReturnErrorOnFailure(reader.GetDataPtr(strbuf));
+        out.Add("hex:");
+        for (uint32_t i = 0; i < reader.GetLength(); i++)
         {
-            out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        else
-        {
-            out.Add("hex:");
-            for (uint32_t i = 0; i < reader.GetLength(); i++)
-            {
-                out.AddFormat("%02X", strbuf[i]);
-            }
+            out.AddFormat("%02X", strbuf[i]);
         }
         break;
     }
-
     case kTLVType_Null:
         out.Add("NULL");
         break;
@@ -181,6 +154,19 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
     default:
         out.Add("???");
         break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+// Returns a null terminated string containing the current reader value
+void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
+{
+    CHIP_ERROR err = FormatCurrentValue(reader, out);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        out.AddFormat("ERR: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -234,36 +220,37 @@ void NiceDecode(DecodePosition & position, TLVReader reader)
         // we likely have a tag, try to find its data
         position.Enter(ByTag(reader.GetTag()));
 
+
+        chip::StringBuilder<256> line;
+
         for (size_t i = 0; i < containers.size(); i++)
         {
-            printf("  ");
+            line.Add("  ");
         }
 
-        // FIXME: exit logic may be complex
         auto data = position.Get();
         if (data != nullptr)
         {
-            printf("%s: ", data->name);
+            line.AddFormat("%s: ", data->name);
         }
         else
         {
-            printf("TAG NOT FOUND: ");
+            FormatCurrentTag(reader, line);
+            line.Add(": ");
         }
 
         if (TLVTypeIsContainer(reader.GetType()))
         {
             reader.EnterContainer(containerType);
             containers.push_back(containerType);
-            printf("\n");
         }
         else
         {
             // assume regular element, no entering
-            chip::StringBuilder<256> value;
-            PrettyPrintCurrentValue(reader, value);
-            printf("%s\n", value.c_str());
+            PrettyPrintCurrentValue(reader, line);
             position.Exit();
         }
+        printf("%s\n", line.c_str());
     }
 }
 
