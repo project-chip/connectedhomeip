@@ -48,18 +48,19 @@ CHIP_ERROR AppTask::Init(void)
     return CHIP_NO_ERROR;
 }
 
+void AppTask::SelfTestHandler(AppEvent * aEvent)
+{
+    AlarmMgr().StartSelfTesting();
+}
+
+
 void AppTask::SelfTestEventHandler(AppEvent * aEvent)
 {
     AppEvent event;
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
         event.ButtonEvent.Action = kButtonPushEvent;
-        event.Handler            = FactoryResetHandler;
+        event.Handler            = SelfTestHandler;        
         GetAppTask().PostEvent(&event);
     }
-}
-
-void AppTask::SelfTestHandler(void)
-{
-    AlarmMgr().StartSelfTesting();
 }

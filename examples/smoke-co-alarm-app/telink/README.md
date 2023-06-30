@@ -1,4 +1,4 @@
-# Matter Telink Contact Sensor Example Application
+# Matter Telink Smoke CO Alarm Example Application
 
 You can use this example as a reference for creating your own application.
 
@@ -58,7 +58,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | Toggle Contact State   | Manually triggers the Contact Sensor State                                                             |
+| Button 2 | SelfTest   | Start self testing                                                           |
 | Button 3 | NA                     | NA                                                                                                     |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
@@ -90,9 +90,6 @@ be used to specify the the effect. It is able to be in following effects:
 | Blinks (950 ms on/50 ms off)    | Finish ( `Clusters::Identify::EffectIdentifierEnum::kFinishEffect`)          |
 | LED off                         | Stop (`Clusters::Identify::EffectIdentifierEnum::kStopEffect`)               |
 
-#### Indicate current state of Contact Sensor
-
-**White** LED shows current state of Contact Sensor
 
 ### CHIP tool commands
 
@@ -109,6 +106,11 @@ be used to specify the the effect. It is able to be in following effects:
 
     ```
     ./chip-tool pairing ble-thread 1234 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd61f77bd3df233e051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212340410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8 20202021 3840
+    ```
+3. Request Self-Test
+
+    ```
+    chip-tool smokecoalarm self-test-request 1 1
     ```
 
 ### OTA with Linux OTA Provider
