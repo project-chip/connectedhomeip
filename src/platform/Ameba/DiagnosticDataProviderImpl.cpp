@@ -25,9 +25,12 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CHIPMemString.h>
+#include <platform/Ameba/AmebaUtils.h>
 #include <platform/Ameba/DiagnosticDataProviderImpl.h>
 
 #include <lwip_netconf.h>
+
+using namespace chip::DeviceLayer::Internal;
 
 namespace chip {
 namespace DeviceLayer {
@@ -248,19 +251,25 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
+    CHIP_ERROR err;
+    int32_t error;
+
     constexpr size_t bssIdSize = 6;
     VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    if (wifi_get_ap_bssid(BssId.data()) != 0)
+    error = matter_wifi_get_ap_bssid(BssId.data());
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+
+    if (err != CHIP_NO_ERROR)
     {
-        return CHIP_ERROR_READ_FAILED;
+        return err;
     }
 
     BssId.reduce_size(bssIdSize);
     ChipLogProgress(DeviceLayer, "%02x,%02x,%02x,%02x,%02x,%02x\n", BssId.data()[0], BssId.data()[1], BssId.data()[2],
                     BssId.data()[3], BssId.data()[4], BssId.data()[5]);
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
@@ -273,20 +282,25 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
+    CHIP_ERROR err;
+    int32_t error;
+
     using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
 
     unsigned int _auth_type;
-    unsigned short _security = 0;
+    unsigned short security = 0;
     rtw_wifi_setting_t setting;
 
-#ifdef CONFIG_PLATFORM_8721D
-    if (wext_get_enc_ext("wlan0", &_security, &setting.key_idx, setting.password) < 0)
+    error = matter_wifi_get_security_type("wlan0", &security, &setting.key_idx, setting.password);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+    if (err != CHIP_NO_ERROR)
     {
         securityType = SecurityTypeEnum::kUnspecified;
     }
+#ifdef CONFIG_PLATFORM_8721D
     else
     {
-        switch (_security)
+        switch (security)
         {
         case IW_ENCODE_ALG_NONE:
             securityType = SecurityTypeEnum::kNone;
@@ -306,14 +320,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
         }
     }
 #else
-    wext_get_enc_ext("wlan0", &_security, &setting.key_idx, setting.password);
-    if (wext_get_auth_type("wlan0", &_auth_type) < 0)
-    {
-        securityType = SecurityTypeEnum::kUnspecified;
-    }
     else
     {
-        switch (_security)
+        switch (security)
         {
         case IW_ENCODE_ALG_NONE:
             securityType = SecurityTypeEnum::kNone;
@@ -342,30 +351,40 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
     }
 #endif
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
+    CHIP_ERROR err;
+    int32_t error;
     unsigned char channel;
 
-    if (wext_get_channel("wlan0", &channel) < 0)
+    error = matter_wifi_get_wifi_channel_number("wlan0", &channel);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+    if (err != CHIP_NO_ERROR)
         channelNumber = 0;
     else
         channelNumber = (uint16_t) channel;
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    int _rssi = 0;
-    if (wifi_get_rssi(&_rssi) < 0)
-        rssi = 0;
-    else
-        rssi = _rssi;
+    CHIP_ERROR err;
+    int32_t error;
 
-    return CHIP_NO_ERROR;
+    error = matter_wifi_get_rssi((int *) &rssi);
+    err   = AmebaUtils::MapError(error, AmebaErrorType::kWiFiError);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        // set rssi to 0 upon error
+        rssi = 0;
+    }
+
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)

@@ -4645,14 +4645,14 @@ void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apS
 
 System::Clock::Timeout TestReadInteraction::ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval)
 {
-    // Add 50ms of slack to our max interval to make sure we hit the
+    // Add 100ms of slack to our max interval to make sure we hit the
     // subscription liveness timer.
     const auto & ourMrpConfig = GetDefaultMRPConfig();
     auto publisherTransmissionTimeout =
         GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
                                  System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
 
-    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(50);
+    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(100);
 }
 
 // clang-format off

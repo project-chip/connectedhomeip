@@ -8010,16 +8010,12 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
             newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
             { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
-                auto iter_2 = entry_0.modeTags.begin();
+                auto iter_2 = entry_0.semanticTags.begin();
                 while (iter_2.Next()) {
                     auto & entry_2 = iter_2.GetValue();
-                    MTRModeSelectClusterModeTagStruct * newElement_2;
-                    newElement_2 = [MTRModeSelectClusterModeTagStruct new];
-                    if (entry_2.mfgCode.HasValue()) {
-                        newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode.Value())];
-                    } else {
-                        newElement_2.mfgCode = nil;
-                    }
+                    MTRModeSelectClusterSemanticTagStruct * newElement_2;
+                    newElement_2 = [MTRModeSelectClusterSemanticTagStruct new];
+                    newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
                     newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                     [array_2 addObject:newElement_2];
                 }
@@ -8028,7 +8024,7 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
                     OnFailureFn(context, err);
                     return;
                 }
-                newElement_0.modeTags = array_2;
+                newElement_0.semanticTags = array_2;
             }
             [array_0 addObject:newElement_0];
         }
@@ -8436,6 +8432,29 @@ void MTRRefrigeratorAlarmStateAttributeCallbackBridge::OnSuccessFn(
 };
 
 void MTRRefrigeratorAlarmStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRRefrigeratorAlarmSupportedAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRRefrigeratorAlarmSupportedAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -8965,12 +8984,16 @@ void MTROperationalStateOperationalStateListListAttributeCallbackBridge::OnSucce
             auto & entry_0 = iter_0.GetValue();
             MTROperationalStateClusterOperationalStateStruct * newElement_0;
             newElement_0 = [MTROperationalStateClusterOperationalStateStruct new];
-            newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.operationalStateID)];
-            newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel);
-            if (newElement_0.operationalStateLabel == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                OnFailureFn(context, err);
-                return;
+            newElement_0.operationalStateID = [NSNumber numberWithUnsignedChar:entry_0.operationalStateID];
+            if (entry_0.operationalStateLabel.HasValue()) {
+                newElement_0.operationalStateLabel = AsString(entry_0.operationalStateLabel.Value());
+                if (newElement_0.operationalStateLabel == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    OnFailureFn(context, err);
+                    return;
+                }
+            } else {
+                newElement_0.operationalStateLabel = nil;
             }
             [array_0 addObject:newElement_0];
         }
@@ -9004,12 +9027,16 @@ void MTROperationalStateOperationalStateStructAttributeCallbackBridge::OnSuccess
 {
     MTROperationalStateClusterOperationalStateStruct * _Nonnull objCValue;
     objCValue = [MTROperationalStateClusterOperationalStateStruct new];
-    objCValue.operationalStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.operationalStateID)];
-    objCValue.operationalStateLabel = AsString(value.operationalStateLabel);
-    if (objCValue.operationalStateLabel == nil) {
-        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-        OnFailureFn(context, err);
-        return;
+    objCValue.operationalStateID = [NSNumber numberWithUnsignedChar:value.operationalStateID];
+    if (value.operationalStateLabel.HasValue()) {
+        objCValue.operationalStateLabel = AsString(value.operationalStateLabel.Value());
+        if (objCValue.operationalStateLabel == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            OnFailureFn(context, err);
+            return;
+        }
+    } else {
+        objCValue.operationalStateLabel = nil;
     }
     DispatchSuccess(context, objCValue);
 };
@@ -9034,16 +9061,16 @@ void MTROperationalStateOperationalErrorStructAttributeCallbackBridge::OnSuccess
 {
     MTROperationalStateClusterErrorStateStruct * _Nonnull objCValue;
     objCValue = [MTROperationalStateClusterErrorStateStruct new];
-    objCValue.errorStateID = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.errorStateID)];
-    if (value.errorStateLabel.IsNull()) {
-        objCValue.errorStateLabel = nil;
-    } else {
+    objCValue.errorStateID = [NSNumber numberWithUnsignedChar:value.errorStateID];
+    if (value.errorStateLabel.HasValue()) {
         objCValue.errorStateLabel = AsString(value.errorStateLabel.Value());
         if (objCValue.errorStateLabel == nil) {
             CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
             OnFailureFn(context, err);
             return;
         }
+    } else {
+        objCValue.errorStateLabel = nil;
     }
     if (value.errorStateDetails.HasValue()) {
         objCValue.errorStateDetails = AsString(value.errorStateDetails.Value());
@@ -10482,6 +10509,98 @@ void MTRThermostatAttributeListListAttributeCallbackBridge::OnSuccessFn(
 };
 
 void MTRThermostatAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRFanControlRockSupportAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRFanControlRockSupportAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRFanControlRockSettingAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRFanControlRockSettingAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRFanControlWindSupportAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRFanControlWindSupportAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRFanControlWindSettingAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRFanControlWindSettingAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23032,15 +23151,15 @@ void MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackSubscripti
     }
 }
 
-void MTRFanControlClusterDirectionEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::DirectionEnum value)
+void MTRFanControlClusterFanModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FanControl::FanModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFanControlClusterDirectionEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFanControlClusterFanModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23055,8 +23174,8 @@ void MTRFanControlClusterDirectionEnumAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRNullableFanControlClusterDirectionEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::DirectionEnum> & value)
+void MTRNullableFanControlClusterFanModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23067,7 +23186,7 @@ void MTRNullableFanControlClusterDirectionEnumAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFanControlClusterDirectionEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFanControlClusterFanModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23082,15 +23201,15 @@ void MTRNullableFanControlClusterDirectionEnumAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::FanModeSequenceType value)
+void MTRFanControlClusterFanModeSequenceEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FanControl::FanModeSequenceEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFanControlClusterFanModeSequenceEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23105,8 +23224,8 @@ void MTRFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceType> & value)
+void MTRNullableFanControlClusterFanModeSequenceEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23117,7 +23236,7 @@ void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFanControlClusterFanModeSequenceEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23132,15 +23251,15 @@ void MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackSubscriptio
     }
 }
 
-void MTRFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::FanModeType value)
+void MTRFanControlClusterStepDirectionEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::FanControl::StepDirectionEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRFanControlClusterStepDirectionEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23155,8 +23274,8 @@ void MTRFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeType> & value)
+void MTRNullableFanControlClusterStepDirectionEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::StepDirectionEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23167,7 +23286,7 @@ void MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFanControlClusterFanModeTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableFanControlClusterStepDirectionEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

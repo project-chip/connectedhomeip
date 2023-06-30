@@ -18,17 +18,17 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
+      "path": "../../../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
+    },
+    {
+      "pathRelativity": "relativeToZap",
       "path": "../../../../../src/app/zap-templates/zcl/zcl-with-test-extensions.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data with some extensions"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -15214,7 +15214,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "FanModeType",
+              "type": "FanModeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15230,7 +15230,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "FanModeSequenceType",
+              "type": "FanModeSequenceEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15246,7 +15246,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "Percent",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15262,7 +15262,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "Percent",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15326,7 +15326,7 @@
               "code": 7,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "RockBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15342,7 +15342,7 @@
               "code": 8,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "RockBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15358,7 +15358,7 @@
               "code": 9,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "WindBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15374,7 +15374,7 @@
               "code": 10,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "WindBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -24919,5 +24919,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 61442
     }
-  ]
+  ],
+  "log": []
 }

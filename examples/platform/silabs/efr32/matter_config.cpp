@@ -54,7 +54,9 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include "SilabsDeviceDataProvider.h"
+#include "SilabsTestEventTriggerDelegate.h"
 #include <app/InteractionModelEngine.h>
+#include <lib/support/BytesToHex.h>
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 ICDSubscriptionCallback SilabsMatterConfig::mICDSubscriptionHandler;
@@ -133,6 +135,12 @@ void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event
     }
 }
 
+#if SILABS_TEST_EVENT_TRIGGER_ENABLED
+static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+                                                                                          0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
+                                                                                          0xcc, 0xdd, 0xee, 0xff };
+#endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
+
 CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
     CHIP_ERROR err;
@@ -173,6 +181,18 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Create initParams with SDK example defaults here
     static chip::CommonCaseDeviceServerInitParams initParams;
+
+#if SILABS_TEST_EVENT_TRIGGER_ENABLED
+    if (Encoding::HexToBytes(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY, strlen(SILABS_TEST_EVENT_TRIGGER_ENABLE_KEY),
+                             sTestEventTriggerEnableKey,
+                             TestEventTriggerDelegate::kEnableKeyLength) != TestEventTriggerDelegate::kEnableKeyLength)
+    {
+        SILABS_LOG("Failed to convert the EnableKey string to octstr type value");
+        memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
+    }
+    static SilabsTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+#endif // SILABS_TEST_EVENT_TRIGGER_ENABLED
 
 #if CHIP_CRYPTO_PLATFORM
     // When building with EFR32 crypto, use the opaque key store

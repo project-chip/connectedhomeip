@@ -34,7 +34,7 @@ from zap_execution import ZapTool
 
 @dataclass
 class CmdLineArgs:
-    zapFile: str
+    zapFile: Optional[str]
     zclFile: str
     templateFile: str
     outputDir: str
@@ -44,6 +44,7 @@ class CmdLineArgs:
     version_check: bool = True
     lock_file: Optional[str] = None
     delete_output_dir: bool = False
+    matter_file_name: Optional[str] = None
 
 
 CHIP_ROOT_DIR = os.path.realpath(
@@ -118,13 +119,15 @@ def runArgumentsParser() -> CmdLineArgs:
 
     parser = argparse.ArgumentParser(
         description='Generate artifacts from .zapt templates')
-    parser.add_argument('zap', help='Path to the application .zap file')
+    parser.add_argument('zap', nargs="?", default=None, help='Path to the application .zap file')
     parser.add_argument('-t', '--templates', default=default_templates,
                         help='Path to the .zapt templates records to use for generating artifacts (default: "' + default_templates + '")')
     parser.add_argument('-z', '--zcl',
                         help='Path to the zcl templates records to use for generating artifacts (default: autodetect read from zap file)')
     parser.add_argument('-o', '--output-dir', default=None,
                         help='Output directory for the generated files (default: a temporary directory in out)')
+    parser.add_argument('-m', '--matter-file-name', default=None,
+                        help='Where to copy any generated .matter file')
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
     parser.add_argument('--parallel', action='store_true')
@@ -143,6 +146,7 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.set_defaults(version_check=True)
     parser.set_defaults(lock_file=None)
     parser.set_defaults(keep_output_dir=False)
+    parser.set_defaults(matter_file_name=None)
     args = parser.parse_args()
 
     delete_output_dir = False
@@ -154,7 +158,10 @@ def runArgumentsParser() -> CmdLineArgs:
     else:
         output_dir = ''
 
-    zap_file = getFilePath(args.zap)
+    if args.zap:
+        zap_file = getFilePath(args.zap)
+    else:
+        zap_file = None
 
     if args.zcl:
         zcl_file = getFilePath(args.zcl)
@@ -164,6 +171,11 @@ def runArgumentsParser() -> CmdLineArgs:
     templates_file = getFilePath(args.templates)
     output_dir = getDirPath(output_dir)
 
+    if args.matter_file_name:
+        matter_file_name = getFilePath(args.matter_file_name)
+    else:
+        matter_file_name = None
+
     return CmdLineArgs(
         zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap,
         parallel=args.parallel,
@@ -171,10 +183,24 @@ def runArgumentsParser() -> CmdLineArgs:
         version_check=args.version_check,
         lock_file=args.lock_file,
         delete_output_dir=delete_output_dir,
+        matter_file_name=matter_file_name,
     )
 
 
-def extractGeneratedIdl(output_dir, zap_config_path):
+def matterPathFromZapPath(zap_config_path):
+    if not zap_config_path:
+        return None
+
+    target_path = zap_config_path.replace(".zap", ".matter")
+    if not target_path.endswith(".matter"):
+        # We expect "something.zap" and don't handle corner cases of
+        # multiple extensions. This is to work with existing codebase only
+        raise Error("Unexpected input zap file  %s" % self.zap_config)
+
+    return target_path
+
+
+def extractGeneratedIdl(output_dir, matter_name):
     """Find a file Clusters.matter in the output directory and
        place it along with the input zap file.
 
@@ -184,13 +210,7 @@ def extractGeneratedIdl(output_dir, zap_config_path):
     if not os.path.exists(idl_path):
         return
 
-    target_path = zap_config_path.replace(".zap", ".matter")
-    if not target_path.endswith(".matter"):
-        # We expect "something.zap" and don't handle corner cases of
-        # multiple extensions. This is to work with existing codebase only
-        raise Error("Unexpected input zap file  %s" % self.zap_config)
-
-    shutil.move(idl_path, target_path)
+    shutil.move(idl_path, matter_name)
 
 
 def runGeneration(cmdLineArgs):
@@ -205,8 +225,11 @@ def runGeneration(cmdLineArgs):
     if cmdLineArgs.version_check:
         tool.version_check()
 
-    args = ['-z', zcl_file, '-g', templates_file,
-            '-i', zap_file, '-o', output_dir]
+    args = ['-z', zcl_file, '-g', templates_file, '-o', output_dir]
+
+    if zap_file:
+        args.append('-i')
+        args.append(zap_file)
 
     if parallel:
         # Parallel-compatible runs will need separate state
@@ -214,7 +237,13 @@ def runGeneration(cmdLineArgs):
 
     tool.run('generate', *args)
 
-    extractGeneratedIdl(output_dir, zap_file)
+    if cmdLineArgs.matter_file_name:
+        matter_name = cmdLineArgs.matter_file_name
+    else:
+        matter_name = matterPathFromZapPath(zap_file)
+
+    if matter_name:
+        extractGeneratedIdl(output_dir, matter_name)
 
 
 def getClangFormatBinaryChoices():

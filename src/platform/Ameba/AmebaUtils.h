@@ -24,6 +24,13 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+enum class AmebaErrorType
+{
+    kDctError,
+    kFlashError,
+    kWiFiError,
+};
+
 class AmebaUtils
 {
 public:
@@ -39,6 +46,14 @@ public:
     static CHIP_ERROR WiFiConnectProvisionedNetwork(void);
     static CHIP_ERROR WiFiConnect(const char * ssid, const char * password);
     static CHIP_ERROR SetCurrentProvisionedNetwork(void);
+    static CHIP_ERROR WiFiConnect(void);
+
+    static CHIP_ERROR MapError(int32_t error, AmebaErrorType type);
+
+private:
+    static CHIP_ERROR MapDctError(int32_t error);
+    static CHIP_ERROR MapFlashError(int32_t error);
+    static CHIP_ERROR MapWiFiError(int32_t error);
 };
 
 } // namespace Internal

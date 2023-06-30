@@ -22,7 +22,7 @@ limitations under the License.
 
   <struct name="AttributeValuePair">
     <cluster code="0x0005"/>
-    <item name="AttributeID" type="attrib_id" optional="true"/>
+    <item name="AttributeID" type="attrib_id" optional="false"/>
     <item name="AttributeValue" type="INT32U" optional="false"/>
   </struct>
 

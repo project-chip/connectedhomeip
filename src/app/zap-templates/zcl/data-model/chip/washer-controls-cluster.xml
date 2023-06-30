@@ -23,11 +23,19 @@ limitations under the License.
     <field mask="0x02" name="Rinse"/>
   </bitmap>
 
+  <enum name="NumberOfRinsesEnum" type="ENUM8">
+    <cluster code="0x0053"/>
+    <item name="None" value="0x0"/>
+    <item name="Normal" value="0x1"/>
+    <item name="Extra" value="0x2"/>
+    <item name="Max" value="0x3"/>
+  </enum>
+
   <cluster>
     <domain>Appliances</domain>
-    <name>Washer Controls</name>
+    <name>Laundry Washer Controls</name>
     <code>0x0053</code>
-    <define>WASHER_CONTROLS_CLUSTER</define>
+    <define>LAUNDRY_WASHER_CONTROLS_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine.</description>
@@ -36,7 +44,8 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="SPIN_SPEEDS"               type="ARRAY" entryType="CHAR_STRING"                                writable="false" isNullable="false" optional="true">SpinSpeeds</attribute>
     <attribute side="server" code="0x0001" define="SPIN_SPEED_CURRENT"        type="INT8U"                                min="0x00" max="0x1F"   writable="true"  isNullable="true"  optional="true">SpinSpeedCurrent</attribute>
-    <attribute side="server" code="0x0002" define="NUMBER_OF_RINSES"          type="INT8U"                                                        writable="true"  isNullable="true"  optional="true">NumberOfRinses</attribute>
-    <attribute side="server" code="0x0003" define="MAXRINSES"                 type="INT8U"                                min="0x00" max="0x08"   writable="false"                    optional="true">MaxRinses</attribute>
+    <attribute side="server" code="0x0002" define="NUMBER_OF_RINSES"          type="NumberOfRinsesEnum"                                           writable="true"  isNullable="false"  optional="true">NumberOfRinses</attribute>
+    <attribute side="server" code="0x0003" define="SUPPORTED_RINSES"          type="ARRAY" entryType="NumberOfRinsesEnum"                      writable="false"  isNullable="false"  optional="true">SupportedRinses</attribute>
   </cluster>
 </configurator>
+ 

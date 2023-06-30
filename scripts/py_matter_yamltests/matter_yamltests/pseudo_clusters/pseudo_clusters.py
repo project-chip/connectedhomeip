@@ -40,7 +40,7 @@ class PseudoClusters:
         if command:
             status = await command(request)
             # If the command does not returns an error, it is considered a success.
-            if status == None:
+            if status is None:
                 status = {}
 
         return status, []

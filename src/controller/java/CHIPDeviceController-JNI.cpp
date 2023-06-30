@@ -840,6 +840,269 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
     }
 }
 
+jint GetCalendarFieldID(JNIEnv * env, const char * method)
+{
+    jclass calendarCls = env->FindClass("java/util/Calendar");
+    jfieldID fieldID   = env->GetStaticFieldID(calendarCls, method, "I");
+    return env->GetStaticIntField(calendarCls, fieldID);
+}
+
+CHIP_ERROR GetEpochTime(JNIEnv * env, jobject calendar, uint32_t & epochTime)
+{
+    using namespace ASN1;
+    ASN1UniversalTime universalTime;
+
+    jmethodID getMethod = nullptr;
+
+    jint yearID   = GetCalendarFieldID(env, "YEAR");
+    jint monthID  = GetCalendarFieldID(env, "MONTH");
+    jint dayID    = GetCalendarFieldID(env, "DAY_OF_MONTH");
+    jint hourID   = GetCalendarFieldID(env, "HOUR_OF_DAY");
+    jint minuteID = GetCalendarFieldID(env, "MINUTE");
+    jint secondID = GetCalendarFieldID(env, "SECOND");
+
+    if (calendar == nullptr)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, calendar, "get", "(I)I", &getMethod));
+
+    universalTime.Year = static_cast<uint16_t>(env->CallIntMethod(calendar, getMethod, yearID));
+    // The first month of the year in the Gregorian and Julian calendars is JANUARY which is 0. See detailed in
+    // https://docs.oracle.com/javase/8/docs/api/java/util/Calendar.html#MONTH
+    universalTime.Month  = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, monthID)) + 1;
+    universalTime.Day    = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, dayID));
+    universalTime.Hour   = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, hourID));
+    universalTime.Minute = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, minuteID));
+    universalTime.Second = static_cast<uint8_t>(env->CallIntMethod(calendar, getMethod, secondID));
+
+    ReturnErrorOnFailure(ASN1ToChipEpochTime(universalTime, epochTime));
+
+    return CHIP_NO_ERROR;
+}
+
+JNI_METHOD(jbyteArray, createRootCertificate)
+(JNIEnv * env, jclass clazz, jobject jKeypair, jlong issuerId, jobject fabricId, jobject validityStart, jobject validityEnd)
+{
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    return nullptr;
+#else
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    uint32_t allocatedCertLength = chip::Credentials::kMaxDERCertLength;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> outBuf;
+    jbyteArray outRcac = nullptr;
+    CHIPP256KeypairBridge keypair;
+    Optional<FabricId> fabric = Optional<FabricId>();
+
+    VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
+
+    keypair.SetDelegate(jKeypair);
+    err = keypair.Initialize(Crypto::ECPKeyTarget::ECDSA);
+    SuccessOrExit(err);
+
+    if (fabricId != nullptr)
+    {
+        jlong jfabricId = chip::JniReferences::GetInstance().LongToPrimitive(fabricId);
+        fabric = MakeOptional(static_cast<FabricId>(jfabricId));
+    }
+
+    {
+        MutableByteSpan rcac(outBuf.Get(), allocatedCertLength);
+
+        uint32_t start;
+        uint32_t end;
+
+        err = GetEpochTime(env, validityStart, start);
+        SuccessOrExit(err);
+
+        err = GetEpochTime(env, validityEnd, end);
+        SuccessOrExit(err);
+
+        err = AndroidOperationalCredentialsIssuer::GenerateRootCertificate(keypair, static_cast<uint64_t>(issuerId), fabric, start,
+                                                                           end, rcac);
+        SuccessOrExit(err);
+
+        err = JniReferences::GetInstance().N2J_ByteArray(env, rcac.data(), static_cast<uint32_t>(rcac.size()), outRcac);
+        SuccessOrExit(err);
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to create Root Certificate. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+
+    return outRcac;
+#endif
+}
+
+JNI_METHOD(jbyteArray, createIntermediateCertificate)
+(JNIEnv * env, jclass clazz, jobject rootKeypair, jbyteArray rootCertificate, jbyteArray intermediatePublicKey, jlong issuerId,
+ jobject fabricId, jobject validityStart, jobject validityEnd)
+{
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    return nullptr;
+#else
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    uint32_t allocatedCertLength = chip::Credentials::kMaxDERCertLength;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> outBuf;
+    jbyteArray outIcac = nullptr;
+    CHIPP256KeypairBridge keypair;
+    Optional<FabricId> fabric = Optional<FabricId>();
+
+    chip::JniByteArray jniRcac(env, rootCertificate);
+    chip::JniByteArray jnipublicKey(env, intermediatePublicKey);
+
+    Credentials::P256PublicKeySpan publicKeySpan(reinterpret_cast<const uint8_t *>(jnipublicKey.data()));
+    Crypto::P256PublicKey publicKey{ publicKeySpan };
+
+    VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
+
+    keypair.SetDelegate(rootKeypair);
+    err = keypair.Initialize(Crypto::ECPKeyTarget::ECDSA);
+    SuccessOrExit(err);
+
+    if (fabricId != nullptr)
+    {
+        jlong jfabricId = chip::JniReferences::GetInstance().LongToPrimitive(fabricId);
+        fabric = MakeOptional(static_cast<FabricId>(jfabricId));
+    }
+
+    {
+        MutableByteSpan icac(outBuf.Get(), allocatedCertLength);
+
+        uint32_t start;
+        uint32_t end;
+
+        err = GetEpochTime(env, validityStart, start);
+        SuccessOrExit(err);
+
+        err = GetEpochTime(env, validityEnd, end);
+        SuccessOrExit(err);
+
+        err = AndroidOperationalCredentialsIssuer::GenerateIntermediateCertificate(
+            keypair, jniRcac.byteSpan(), publicKey, static_cast<uint64_t>(issuerId), fabric, start, end, icac);
+        SuccessOrExit(err);
+
+        ChipLogByteSpan(Controller, icac);
+
+        err = JniReferences::GetInstance().N2J_ByteArray(env, icac.data(), static_cast<uint32_t>(icac.size()), outIcac);
+        SuccessOrExit(err);
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to create Intermediate Certificate. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+
+    return outIcac;
+#endif
+}
+
+JNI_METHOD(jbyteArray, createOperationalCertificate)
+(JNIEnv * env, jclass clazz, jobject signingKeypair, jbyteArray signingCertificate, jbyteArray operationalPublicKey, jlong fabricId,
+ jlong nodeId, jobject caseAuthenticatedTags, jobject validityStart, jobject validityEnd)
+{
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    return nullptr;
+#else
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    uint32_t allocatedCertLength = chip::Credentials::kMaxDERCertLength;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> outBuf;
+    jbyteArray outNoc = nullptr;
+    CHIPP256KeypairBridge keypair;
+
+    chip::JniByteArray jniCert(env, signingCertificate);
+    chip::JniByteArray jnipublicKey(env, operationalPublicKey);
+
+    Credentials::P256PublicKeySpan publicKeySpan(reinterpret_cast<const uint8_t *>(jnipublicKey.data()));
+    Crypto::P256PublicKey publicKey{ publicKeySpan };
+
+    chip::CATValues cats = chip::kUndefinedCATs;
+    if (caseAuthenticatedTags != nullptr)
+    {
+        jint size;
+        JniReferences::GetInstance().GetListSize(caseAuthenticatedTags, size);
+        VerifyOrExit(static_cast<size_t>(size) <= chip::kMaxSubjectCATAttributeCount, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        for (jint i = 0; i < size; i++)
+        {
+            jobject cat = nullptr;
+            JniReferences::GetInstance().GetListItem(caseAuthenticatedTags, i, cat);
+            VerifyOrExit(cat != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+            cats.values[i] = static_cast<uint32_t>(JniReferences::GetInstance().IntegerToPrimitive(cat));
+        }
+    }
+
+    VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
+
+    keypair.SetDelegate(signingKeypair);
+    err = keypair.Initialize(Crypto::ECPKeyTarget::ECDSA);
+    SuccessOrExit(err);
+    {
+        MutableByteSpan noc(outBuf.Get(), allocatedCertLength);
+
+        uint32_t start;
+        uint32_t end;
+
+        err = GetEpochTime(env, validityStart, start);
+        SuccessOrExit(err);
+
+        err = GetEpochTime(env, validityEnd, end);
+        SuccessOrExit(err);
+
+        err = AndroidOperationalCredentialsIssuer::GenerateOperationalCertificate(
+            keypair, jniCert.byteSpan(), publicKey, static_cast<uint64_t>(fabricId), static_cast<uint64_t>(nodeId), cats, start,
+            end, noc);
+        SuccessOrExit(err);
+
+        ChipLogByteSpan(Controller, noc);
+
+        err = JniReferences::GetInstance().N2J_ByteArray(env, noc.data(), static_cast<uint32_t>(noc.size()), outNoc);
+        SuccessOrExit(err);
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to create Intermediate Certificate. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+
+    return outNoc;
+#endif
+}
+
+JNI_METHOD(jbyteArray, publicKeyFromCSR)
+(JNIEnv * env, jclass clazz, jbyteArray certificateSigningRequest)
+{
+    jbyteArray outJbytes = nullptr;
+
+    chip::JniByteArray jniCsr(env, certificateSigningRequest);
+    P256PublicKey publicKey;
+    CHIP_ERROR err = VerifyCertificateSigningRequest(jniCsr.byteSpan().data(), jniCsr.byteSpan().size(), publicKey);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "publicKeyFromCSR: %" CHIP_ERROR_FORMAT, err.Format());
+        return nullptr;
+    }
+
+    err = JniReferences::GetInstance().N2J_ByteArray(env, publicKey.Bytes(), static_cast<uint32_t>(publicKey.Length()), outJbytes);
+    SuccessOrExit(err);
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to publicKeyFromCSR. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+
+    return outJbytes;
+}
+
 JNI_METHOD(jbyteArray, convertX509CertToMatterCert)
 (JNIEnv * env, jobject self, jbyteArray x509Cert)
 {

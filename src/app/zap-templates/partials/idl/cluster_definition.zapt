@@ -2,17 +2,17 @@
 {{#if generateClientCluster}}client {{else}}server {{/if~}}
 cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
-  enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
+  enum {{asUpperCamelCase name preserveAcronyms=true}} : ENUM{{multiply size 8}} {
     {{#zcl_enum_items}}
-    k{{asUpperCamelCase label}} = {{value}};
+    k{{asUpperCamelCase label preserveAcronyms=true}} = {{value}};
     {{/zcl_enum_items}}
   }
 
   {{/zcl_enums}}
   {{#zcl_bitmaps}}
-  bitmap {{name}} : BITMAP{{multiply size 8}} {
+  bitmap {{asUpperCamelCase name preserveAcronyms=true}} : BITMAP{{multiply size 8}} {
     {{#zcl_bitmap_items}}
-    k{{asUpperCamelCase label}} = {{asHex mask}};
+    k{{asUpperCamelCase label preserveAcronyms=true}} = {{asHex mask}};
     {{/zcl_bitmap_items}}
   }
 
@@ -29,7 +29,7 @@ cluster {{asUpperCamelCase name}} = {{code}} {
         {{operation}}: {{role}}
       {{~#last}}) {{/last~}}
   {{~/chip_access_elements~}}
-  {{asUpperCamelCase name}} = {{code}} {
+  {{asUpperCamelCase name preserveAcronyms=true}} = {{code}} {
     {{#zcl_event_fields}}
     {{>idl_structure_member label=name}}
 

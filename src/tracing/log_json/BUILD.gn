@@ -26,6 +26,7 @@ static_library("log_json") {
   public_deps = [
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/tracing",
+    "${chip_root}/src/transport",
     "${chip_root}/third_party/jsoncpp",
   ]
 }

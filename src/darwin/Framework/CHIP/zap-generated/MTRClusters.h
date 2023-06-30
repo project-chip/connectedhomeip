@@ -2865,6 +2865,8 @@ MTR_NEWLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeStateWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
+- (NSDictionary<NSString *, id> *)readAttributeSupportedWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
@@ -2960,6 +2962,8 @@ MTR_NEWLY_AVAILABLE
 - (void)writeAttributeSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                          params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeExpiryDateWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 

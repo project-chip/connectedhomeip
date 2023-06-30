@@ -64,6 +64,9 @@ constexpr uint16_t kOptionRuntimeMs        = 0x102;
 constexpr uint16_t kOptionMulticastReplies = 0x103;
 constexpr uint16_t kOptionTraceTo          = 0x104;
 
+// Only used for argument parsing. Tracing setup owned by the main loop.
+chip::CommandLineApp::TracingSetup * tracing_setup_for_argparse = nullptr;
+
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
     switch (aIdentifier)
@@ -79,7 +82,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gOptions.query = aValue;
         return true;
     case kOptionTraceTo:
-        CommandLineApp::EnableTracingFor(aValue);
+        tracing_setup_for_argparse->EnableTracingFor(aValue);
         return true;
     case kOptionType:
         if (strcasecmp(aValue, "ANY") == 0)
@@ -313,10 +316,14 @@ int main(int argc, char ** args)
         return 1;
     }
 
+    chip::CommandLineApp::TracingSetup tracing_setup;
+
+    tracing_setup_for_argparse = &tracing_setup;
     if (!chip::ArgParser::ParseArgs(args[0], argc, args, allOptions))
     {
         return 1;
     }
+    tracing_setup_for_argparse = nullptr;
 
     printf("Running...\n");
 
@@ -359,7 +366,7 @@ int main(int argc, char ** args)
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 
-    CommandLineApp::StopTracing();
+    tracing_setup.StopTracing();
     DeviceLayer::PlatformMgr().Shutdown();
     Platform::MemoryShutdown();
 

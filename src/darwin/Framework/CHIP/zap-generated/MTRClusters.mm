@@ -1039,10 +1039,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
                                         auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                        if (element_2.attributeID != nil) {
-                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeID.Emplace();
-                                            definedValue_4 = element_2.attributeID.unsignedIntValue;
-                                        }
+                                        listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
                                         listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
                                     }
                                     listHolder_0->mList[i_0].attributeValueList
@@ -1591,10 +1588,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
                                         auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                        if (element_2.attributeID != nil) {
-                                            auto & definedValue_4 = listHolder_2->mList[i_2].attributeID.Emplace();
-                                            definedValue_4 = element_2.attributeID.unsignedIntValue;
-                                        }
+                                        listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
                                         listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
                                     }
                                     listHolder_0->mList[i_0].attributeValueList
@@ -13117,6 +13111,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
+- (NSDictionary<NSString *, id> *)readAttributeSupportedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeRefrigeratorAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterRefrigeratorAlarmAttributeSupportedID)
+                                             params:params];
+}
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
@@ -13444,6 +13446,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeExpiryDateWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeSmokeCOAlarmID)
+                                        attributeID:@(MTRAttributeIDTypeClusterSmokeCOAlarmAttributeExpiryDateID)
+                                             params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params

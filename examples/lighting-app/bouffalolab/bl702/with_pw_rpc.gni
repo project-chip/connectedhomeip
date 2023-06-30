@@ -21,7 +21,6 @@ import("${chip_root}/config/bouffalolab/common/lib/pw_rpc/pw_rpc.gni")
 import("${chip_root}/examples/platform/bouffalolab/bl702/args.gni")
 
 chip_enable_pw_rpc = true
-chip_build_pw_trace_lib = false
 
 cpp_standard = "gnu++17"
 
