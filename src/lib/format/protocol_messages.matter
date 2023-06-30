@@ -5,6 +5,20 @@
 ///
 /// This is NOT a real cluster.
 ///
+/// Since this is a protocol decoder, the following CUSTOM (non-zap) types
+/// Are used as markers for data:
+///
+/// Protocol decoding paths:
+///    protocol_cluster_id
+///    protocol_attribute_id
+///    protocol_command_id
+///    protocol_event_id
+///
+/// Payloads:
+///    cluster_attribute_payload
+///    cluster_command_payload
+///    cluster_event_payload
+///
 client cluster SecureChannelProtocol = 0xFFFF0000 {
 
   struct ICDParameterStruct {
@@ -109,16 +123,16 @@ client cluster IMProtocol = 0xFFFF0001 {
     boolean enable_tag_compression = 0;
     optional int64u node_id = 1;
     optional int16u endpoint_id = 2;
-    optional int32u cluster_id = 3;
-    optional int32u attribute_id = 4;
+    optional protocol_cluster_id cluster_id = 3;
+    optional protocol_attribute_id attribute_id = 4;
     optional nullable int16u list_index = 5;
   }
 
   struct EventPathIB {
     optional int64u node_id = 0;
     optional int16u endpoint_id = 1;
-    optional int32u cluster_id = 2;
-    optional int32u event_id = 3;
+    optional protocol_cluster_id cluster_id = 2;
+    optional protocol_event_id event_id = 3;
     boolean is_urgent = 4;
   }
 
@@ -130,7 +144,7 @@ client cluster IMProtocol = 0xFFFF0001 {
   struct ClusterPathIB {
     optional int64u node_id = 0;
     optional int16u endpoint_id = 1;
-    optional int32u cluster_id = 2;
+    optional protocol_cluster_id cluster_id = 2;
   }
 
   struct DataVersionFilterIB {
@@ -193,11 +207,7 @@ client cluster IMProtocol = 0xFFFF0001 {
   struct AttributeData {
     optional int32u data_version = 0;
     AttributePathIB path = 1;
-
-    // NOTE: this is variable data, actual content
-    //       is NOT defined and is context sensitive based
-    //       on the path
-    LONG_OCTET_STRING data = 2;
+    cluster_attribute_payload data = 2;
   }
 
   struct AttributeReportIB {
@@ -222,10 +232,7 @@ client cluster IMProtocol = 0xFFFF0001 {
     int64u delta_system_timestamp = 6;
     //  }
 
-    // NOTE: this is variable data, actual content
-    //       is NOT defined and is context sensitive based
-    //       on the path
-    LONG_OCTET_STRING data = 2;
+    cluster_event_payload data = 2;
   }
 
   struct EventReportIB {
@@ -247,11 +254,7 @@ client cluster IMProtocol = 0xFFFF0001 {
   struct AttributeDataIB {
     int32u data_version = 0;
     AttributePathIB path = 1;
-
-    // NOTE: this is variable data, actual content
-    //       is NOT defined and is context sensitive based
-    //       on the path
-    LONG_OCTET_STRING data = 2;
+    cluster_attribute_payload data = 2;
   }
 
   struct WriteRequestMessage {
@@ -278,17 +281,13 @@ client cluster IMProtocol = 0xFFFF0001 {
 
   struct CommandPathIB {
     optional int16u endpoint_id = 1;
-    optional int32u cluster_id = 2;
-    optional int32u command_id = 3;
+    optional protocol_cluster_id cluster_id = 2;
+    optional protocol_command_id command_id = 3;
   }
 
   struct CommandDataIB {
     CommandPathIB path = 0;
-
-    // NOTE: this is variable data, actual content
-    //       is NOT defined and is context sensitive based
-    //       on the path
-    LONG_OCTET_STRING data = 2;
+    cluster_command_payload data = 2;
   }
 
   struct InvokeRequestMessage {
