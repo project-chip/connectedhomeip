@@ -61,7 +61,7 @@ public:
 
     /// For strings we often want to know when they were truncated. If the underlying writer did
     /// not fit, this replaces the last 3 characters with "."
-    StringBuilderBase &AddMarkerIfOverflow();
+    StringBuilderBase & AddMarkerIfOverflow();
 
     /// access the underlying value
     const char * c_str() const { return reinterpret_cast<const char *>(mWriter.Buffer()); }
