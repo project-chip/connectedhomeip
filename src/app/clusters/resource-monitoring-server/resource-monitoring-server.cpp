@@ -70,58 +70,6 @@ CHIP_ERROR Instance::Init()
     return CHIP_NO_ERROR;
 }
 
-template <typename RequestT, typename FuncT>
-void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
-{
-    ChipLogError(Zcl, "resourcemonitoring: HandleCommand");
-    if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
-    {
-        RequestT requestPayload;
-
-        // If the command matches what the caller is looking for, let's mark this as being handled
-        // even if errors happen after this. This ensures that we don't execute any fall-back strategies
-        // to handle this command since at this point, the caller is taking responsibility for handling
-        // the command in its entirety, warts and all.
-        handlerContext.SetCommandHandled();
-
-        if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
-                                                     Protocols::InteractionModel::Status::InvalidCommand);
-            return;
-        }
-
-        func(handlerContext, requestPayload);
-    }
-}
-
-bool Instance::IsAliascluster() const
-{
-    for ( unsigned int AliasedCluster : AliasedClusters)
-    {
-        if ( mClusterId == AliasedCluster )
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-void Instance::HandleResetCondition(HandlerContext & ctx,
-                                    const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData)
-{
-
-    Status resetConditionSuccessful = OnResetCondition();
-    if (Status::Success != resetConditionSuccessful)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, resetConditionSuccessful);
-        return;
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
-    ChipLogProgress(Zcl, "ResourceMonitor: HandleResetCondition reset done");
-}
-
 // This function is called by the interaction model engine when a command destined for this instance is received.
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
@@ -137,10 +85,6 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-bool Instance::HasFeature(ResourceMonitoring::Feature feature) const
-{
-        return ((mFeature & to_underlying(feature)) != 0);
-}
 
 // List the commands supported by this instance.
 //TODO do we need this? should a sdk developer override this if the command is not supported?
@@ -152,6 +96,14 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
 
     return CHIP_NO_ERROR;
 }
+
+
+bool Instance::HasFeature(ResourceMonitoring::Feature feature) const
+{
+        return ((mFeature & to_underlying(feature)) != 0);
+}
+
+
 
 // Implements the read functionality for non-standard attributes.
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -188,6 +140,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & attributePath, Attr
     //no writeable attributes supported
     return CHIP_NO_ERROR;
 }
+
 
 chip::Protocols::InteractionModel::Status Instance::UpdateCondition(uint8_t aNewCondition)
 {
@@ -232,7 +185,6 @@ chip::Protocols::InteractionModel::Status Instance::UpdateInPlaceIndicator(bool 
     return Protocols::InteractionModel::Status::Success;
 }
 
-// Attribute getters
 uint8_t Instance::GetCondition() const
 {
     return mCondition;
@@ -244,6 +196,58 @@ chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum Instance::GetChang
 bool Instance::GetInPlaceIndicator() const
 {
     return mInPlaceIndicator;
+}
+
+bool Instance::IsAliascluster() const
+{
+    for ( unsigned int AliasedCluster : AliasedClusters)
+    {
+        if ( mClusterId == AliasedCluster )
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Instance::HandleResetCondition(HandlerContext & ctx,
+                                    const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData)
+{
+
+    Status resetConditionSuccessful = OnResetCondition();
+    if (Status::Success != resetConditionSuccessful)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, resetConditionSuccessful);
+        return;
+    }
+
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
+    ChipLogProgress(Zcl, "ResourceMonitor: HandleResetCondition reset done");
+}
+
+template <typename RequestT, typename FuncT>
+void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
+{
+    ChipLogError(Zcl, "resourcemonitoring: HandleCommand");
+    if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
+    {
+        RequestT requestPayload;
+
+        // If the command matches what the caller is looking for, let's mark this as being handled
+        // even if errors happen after this. This ensures that we don't execute any fall-back strategies
+        // to handle this command since at this point, the caller is taking responsibility for handling
+        // the command in its entirety, warts and all.
+        handlerContext.SetCommandHandled();
+
+        if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                     Protocols::InteractionModel::Status::InvalidCommand);
+            return;
+        }
+
+        func(handlerContext, requestPayload);
+    }
 }
 
 chip::Protocols::InteractionModel::Status Instance::OnResetCondition()
