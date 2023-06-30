@@ -27,7 +27,7 @@ class QRCodeBasicOnboardingPayloadGenerator(private val payload: OnboardingPaylo
 
   /**
    * This function is called to encode the binary data of a payload to a
-   * base38 null-terminated string.
+   * base38 string.
    *
    * The resulting size of the outBuffer span will be the size of data written.
    *
