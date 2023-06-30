@@ -18,11 +18,13 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
+#include <app/AttributePersistenceProvider.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <app/AttributePersistenceAccessors.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -54,8 +56,57 @@ bool Instance::isAliasCluster() const
     return false;
 }
 
+void Instance::loadPersistentAttributes()
+{
+    CHIP_ERROR err = AttributePersistenceAccessors::ReadUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "ModeBase: Loaded CurrentMode as %u", mCurrentMode);
+    }
+    else
+    {
+        // If we cannot find the previous CurrentMode, we will assume it to be the first mode in the
+        // list, as was initialised in the constructor.
+        ChipLogDetail(Zcl, "ModeBase: Unable to load the CurrentMode from the KVS. Assuming %u", mCurrentMode);
+    }
+    err = AttributePersistenceAccessors::ReadNullableUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
+    if (err == CHIP_NO_ERROR)
+    {
+        if (mStartUpMode.IsNull()){
+            ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as null");
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "ModeBase: Loaded StartUpMode as %u", mStartUpMode.Value());
+        }
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "ModeBase: Unable to load the StartUpMode from the KVS. Assuming null");
+    }
+    err = AttributePersistenceAccessors::ReadNullableUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), mOnMode);
+    if (err == CHIP_NO_ERROR)
+    {
+        if (mOnMode.IsNull()){
+            ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as null");
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "ModeBase: Loaded OnMode as %u", mOnMode.Value());
+        }
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "ModeBase: Unable to load the OnMode from the KVS.      Assuming null");
+    }
+}
+
 CHIP_ERROR Instance::Init()
 {
+    // Initialise the current mode with the value og the first mode. This ensures that it is representing a valid mode.
+    ReturnErrorOnFailure(GetModeValueByIndex(0, mCurrentMode));
+
+    ChipLogError(Zcl, "ModeBase: Initialising the cluster with ID %lu.", long(mClusterId));
     // Check that the cluster ID given is a valid mode base alias cluster ID.
     if (!isAliasCluster())
     {
@@ -70,85 +121,73 @@ CHIP_ERROR Instance::Init()
         return CHIP_ERROR_INVALID_ARGUMENT; // todo is this the correct error?
     }
 
+    loadPersistentAttributes();
+
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(AppInit());
 
     ModeBaseAliasesInstanceMap[mClusterId] = this;
 
-    // StartUp behavior relies on CurrentMode StartUpMode attributes being non-volatile.
-    if (!emberAfIsKnownVolatileAttribute(mEndpointId, mClusterId, Attributes::CurrentMode::Id) &&
-        !emberAfIsKnownVolatileAttribute(mEndpointId, mClusterId, Attributes::StartUpMode::Id))
+    // Read the StartUpMode attribute and set the CurrentMode attribute
+    if (!mStartUpMode.IsNull())
     {
-        // Read the StartUpMode attribute and set the CurrentMode attribute
-        // The StartUpMode attribute SHALL define the desired startup behavior of a
-        // device when it is supplied with power and this state SHALL be
-        // reflected in the CurrentMode attribute.  The values of the StartUpMode
-        // attribute are listed below.
-
-        DataModel::Nullable<uint8_t> startUpMode = GetStartUpMode();
-        if (!startUpMode.IsNull())
-        {
 #ifdef EMBER_AF_PLUGIN_ON_OFF
-            // OnMode with Power Up
-            // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
-            // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
-            // value when the server is supplied with power, except if the OnMode attribute is null.
-            if (emberAfContainsServer(mEndpointId, OnOff::Id) &&
-                emberAfContainsAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-                emberAfContainsAttribute(mEndpointId, mClusterId, ModeBase::Attributes::OnMode::Id) &&
-                HasFeature(ModeBase::Feature::kOnOff))
+        // OnMode with Power Up
+        // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
+        // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
+        // value when the server is supplied with power, except if the OnMode attribute is null.
+        if (emberAfContainsServer(mEndpointId, OnOff::Id) &&
+            emberAfContainsAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
+            emberAfContainsAttribute(mEndpointId, mClusterId, ModeBase::Attributes::OnMode::Id) &&
+            HasFeature(ModeBase::Feature::kOnOff))
+        {
+            DataModel::Nullable<uint8_t> onMode = GetOnMode();
+            bool onOffValueForStartUp           = false;
+            if (!emberAfIsKnownVolatileAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
+                OnOffServer::Instance().getOnOffValueForStartUp(mEndpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
             {
-                DataModel::Nullable<uint8_t> onMode = GetOnMode();
-                bool onOffValueForStartUp           = false;
-                if (!emberAfIsKnownVolatileAttribute(mEndpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-                    OnOffServer::Instance().getOnOffValueForStartUp(mEndpointId, onOffValueForStartUp) == EMBER_ZCL_STATUS_SUCCESS)
+                if (onOffValueForStartUp && !onMode.IsNull())
                 {
-                    if (onOffValueForStartUp && !onMode.IsNull())
-                    {
-                        ChipLogDetail(Zcl, "ModeBase: CurrentMode is overwritten by OnMode");
-                        // it is overwritten by the on/off cluster.
-                        return CHIP_NO_ERROR;
-                    }
+                    ChipLogDetail(Zcl, "ModeBase: CurrentMode is overwritten by OnMode");
+                    // it is overwritten by the on/off cluster.
+                    return CHIP_NO_ERROR;
                 }
-            }
-#endif // EMBER_AF_PLUGIN_ON_OFF
-
-            BootReasonType bootReason = BootReasonType::kUnspecified;
-            CHIP_ERROR error          = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
-
-            if (error != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "Unable to retrieve boot reason: %" CHIP_ERROR_FORMAT, error.Format());
-                // We really only care whether the boot reason is OTA.  Assume it's not.
-                bootReason = BootReasonType::kUnspecified;
-            }
-            if (bootReason == BootReasonType::kSoftwareUpdateCompleted)
-            {
-                ChipLogDetail(Zcl, "ModeBase: CurrentMode is ignored for OTA reboot");
-                return CHIP_NO_ERROR;
-            }
-
-            // Initialise currentMode to 0
-            uint8_t currentMode = GetCurrentMode();
-
-            if (startUpMode.Value() != currentMode)
-            {
-                ChipLogProgress(Zcl, "ModeBase: Changing CurrentMode to the StartUpMode value.");
-                Status status = UpdateCurrentMode(startUpMode.Value());
-                if (status != Status::Success)
-                {
-                    ChipLogError(Zcl, "ModeBase: Failed to change the CurrentMode to the StartUpMode value: %u", to_underlying(status));
-                    return StatusIB(status).ToChipError();
-                }
-
-                ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to the StartUpMode value %u", startUpMode.Value());
             }
         }
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "ModeBase: Skipped initializing CurrentMode by StartUpMode because one of them is volatile");
+#endif // EMBER_AF_PLUGIN_ON_OFF
+
+        // todo should we move this before the OnMode section and check for boot reason in the onoff server code?
+        // If we have powered up because of an OTA, do not override the CurrentMode.
+        BootReasonType bootReason = BootReasonType::kUnspecified;
+        CHIP_ERROR error = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
+
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Unable to retrieve boot reason: %" CHIP_ERROR_FORMAT
+                              ". Assuming that we did not reboot because of an OTA", error.Format());
+            bootReason = BootReasonType::kUnspecified;
+        }
+
+        if (bootReason == BootReasonType::kSoftwareUpdateCompleted)
+        {
+            ChipLogDetail(Zcl, "ModeBase: StartUpMode is ignored for OTA reboot.");
+            return CHIP_NO_ERROR;
+        }
+
+        // Set CurrentMode to StartUpMode
+        if (mStartUpMode.Value() != mCurrentMode)
+        {
+            ChipLogProgress(Zcl, "ModeBase: Changing CurrentMode to the StartUpMode value.");
+            Status status = UpdateCurrentMode(mStartUpMode.Value());
+            if (status != Status::Success)
+            {
+                ChipLogError(Zcl, "ModeBase: Failed to change the CurrentMode to the StartUpMode value: %u", to_underlying(status));
+                return StatusIB(status).ToChipError();
+            }
+
+            ChipLogProgress(Zcl, "ModeBase: Successfully initialized CurrentMode to the StartUpMode value %u", mStartUpMode.Value());
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -343,6 +382,8 @@ Status Instance::UpdateCurrentMode(uint8_t aNewMode)
     mCurrentMode    = aNewMode;
     if (mCurrentMode != oldMode)
     {
+        // Write new value to persistent storage.
+        AttributePersistenceAccessors::WriteUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id), mCurrentMode);
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
     }
@@ -362,6 +403,8 @@ Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
     mStartUpMode                                = aNewStartUpMode;
     if (mStartUpMode != oldStartUpMode)
     {
+        // Write new value to persistent storage.
+        AttributePersistenceAccessors::WriteNullableUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id), mStartUpMode);
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
     }
@@ -381,6 +424,8 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     mOnMode                                = aNewOnMode;
     if (mOnMode != oldOnMode)
     {
+        // Write new value to persistent storage.
+        AttributePersistenceAccessors::WriteNullableUint8Value(ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id), mOnMode);
         // The Administrator Commissioning cluster is always on the root endpoint.
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::OnMode::Id);
     }

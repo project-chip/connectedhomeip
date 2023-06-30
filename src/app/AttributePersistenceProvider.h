@@ -67,6 +67,9 @@ public:
      */
     virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
                                  MutableByteSpan & aValue) = 0;
+
+    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, EmberAfAttributeType aType,
+                                 uint16_t aSize, MutableByteSpan & aValue) = 0;
 };
 
 /**

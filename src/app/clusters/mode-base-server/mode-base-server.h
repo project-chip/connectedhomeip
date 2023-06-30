@@ -21,6 +21,7 @@
 #include "mode-base-cluster-objects.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/AttributePersistenceProvider.h>
 #include <app/util/af.h>
 #include <map>
 
@@ -111,6 +112,11 @@ private:
      */
     void handleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
 
+    /**
+     * Helper function that loads all the persistent attributes from the KVS. These attributes are CurrentMode,
+     * StartUpMode and OnMode.
+     */
+    void loadPersistentAttributes();
 public:
     /**
      * Creates a mode base cluster instance. The Init() function needs to be called for this instance to be registered and
@@ -124,6 +130,10 @@ public:
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId),
         mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature)
     {
+        mCurrentMode = 0; // This is a temporary value and may not be valid. We will change this to the value of the first
+                          // mode in the list at the start of the Init function to ensure that it represents a valid mode.
+        mStartUpMode = DataModel::Nullable<uint8_t>(); // Initialised to null
+        mOnMode = DataModel::Nullable<uint8_t>(); // Initialised to null
     }
 
     ~Instance() override;
@@ -147,8 +157,8 @@ public:
     /**
      * Get the mode label of the Nth mode in the list of modes.
      * @param modeIndex The index of the mode to be returned. It is assumed that modes are indexable from 0 and with no gaps.
-     * @param label a reference to the MutableCharSpan that is to contain the mode label. Use CopyCharSpanToMutableCharSpan
-     * to copy into the MutableCharSpan.
+     * @param label A reference to the mutable char span which will be mutated to receive the label on success. Use
+     * CopyCharSpanToMutableCharSpan to copy into the MutableCharSpan.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
     virtual CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)  = 0;
@@ -159,7 +169,7 @@ public:
      * @param value a reference to the uint8_t variable that is to contain the mode value.
      * @return Returns a CHIP_NO_ERROR if there was no error.
      */
-    virtual CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)  = 0;
+    virtual CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) = 0;
 
     /**
      * Get the mode tags of the Nth mode in the list of modes.

@@ -89,6 +89,7 @@ static_library("app") {
     "CommandSender.cpp",
     "DefaultAttributePersistenceProvider.cpp",
     "DeferredAttributePersistenceProvider.cpp",
+    "AttributePersistenceAccessors.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
     "EventManagement.cpp",
