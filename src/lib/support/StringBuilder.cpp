@@ -28,6 +28,8 @@ StringBuilderBase & StringBuilderBase::AddFormat(const char * format, ...)
     if (mWriter.Available() > 0)
     {
         output = reinterpret_cast<char *>(mWriter.Buffer() + mWriter.Needed());
+    } else {
+        output = reinterpret_cast<char *>(mWriter.Buffer() + mWriter.Size());
     }
 
     // the + 1 size here because StringBuilder reserves one byte for final null terminator
