@@ -20,6 +20,10 @@
 
 #include "sample_data.h"
 
+// FIXME: is this sane?
+#include <tlv/meta/clusters_meta.h>
+#include <tlv/meta/protocols_meta.h>
+
 #include <nlunit-test.h>
 
 namespace {
@@ -29,7 +33,12 @@ using namespace chip::Decoders;
 
 void TestSampleData(nlTestSuite * inSuite, void * inContext, const SamplePayload & data)
 {
-    chip::Decoders::PayloadDecoder<64, 128> decoder(data.protocolId, data.messageType);
+    chip::Decoders::PayloadDecoder<64, 128> decoder(PayloadDecoderInitParams()
+                                                        .SetProtocol(data.protocolId)
+                                                        .SetMessageType(data.messageType)
+                                                        .SetProtocolDecodeTree(chip::TLVMeta::protocols_meta)
+                                                        .SetClusterDecodeTree(chip::TLVMeta::clusters_meta));
+
     decoder.StartDecoding(data.payload);
 
     printf("*******************************************\n");

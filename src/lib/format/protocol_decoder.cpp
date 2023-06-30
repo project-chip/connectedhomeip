@@ -20,10 +20,6 @@
 #include <lib/format/FlatTree.h>
 #include <lib/format/FlatTreePosition.h>
 
-// FIXME: is this sane?
-#include <tlv/meta/clusters_meta.h>
-#include <tlv/meta/protocols_meta.h>
-
 namespace chip {
 namespace Decoders {
 
@@ -165,11 +161,13 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
 
 } // namespace
 
-PayloadDecoderBase::PayloadDecoderBase(chip::Protocols::Id protocol, uint8_t messageType, StringBuilderBase & nameBuilder,
+PayloadDecoderBase::PayloadDecoderBase(const PayloadDecoderInitParams & params, StringBuilderBase & nameBuilder,
                                        StringBuilderBase & valueBuilder) :
-    mProtocol(protocol),
-    mMessageType(messageType), mNameBuilder(nameBuilder), mValueBuilder(valueBuilder),
-    mPayloadPosition(chip::TLVMeta::protocols_meta), mIMContentPosition(chip::TLVMeta::clusters_meta)
+    mProtocol(params.GetProtocol()),
+    mMessageType(params.GetMessageType()), mNameBuilder(nameBuilder), mValueBuilder(valueBuilder),
+
+    mPayloadPosition(params.GetProtocolDecodeTree(), params.GetProtocolDecodeTreeSize()),
+    mIMContentPosition(params.GetClusterDecodeTree(), params.GetClusterDecodeTreeSize())
 {}
 
 void PayloadDecoderBase::StartDecoding(const TLVReader & reader)
@@ -308,7 +306,8 @@ void PayloadDecoderBase::NextFromValueRead(PayloadEntry & entry)
     auto data = mPayloadPosition.Get();
 
     // handle special types
-    if (data != nullptr) {
+    if (data != nullptr)
+    {
         if (data->type == ItemType::kProtocolBinaryData)
         {
             mPayloadPosition.Exit();

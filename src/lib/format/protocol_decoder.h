@@ -17,9 +17,9 @@
  */
 #pragma once
 
-#include <lib/format/tlv_meta.h>
-#include <lib/format/FlatTreePosition.h>
 #include <lib/core/TLVReader.h>
+#include <lib/format/FlatTreePosition.h>
+#include <lib/format/tlv_meta.h>
 #include <lib/support/StringBuilder.h>
 #include <protocols/Protocols.h>
 
@@ -123,11 +123,74 @@ private:
     uint32_t mSubId     = 0; // attribute, command or event id
 };
 
+/// Sets up decoding of some Matter data payload
+class PayloadDecoderInitParams
+{
+public:
+    using DecodeTree           = const FlatTree::Node<chip::TLVMeta::ItemInfo> *;
+    PayloadDecoderInitParams() = default;
+
+    PayloadDecoderInitParams & SetProtocol(Protocols::Id value)
+    {
+        mProtocol = value;
+        return *this;
+    }
+
+    PayloadDecoderInitParams & SetMessageType(uint8_t value)
+    {
+        mMessageType = value;
+        return *this;
+    }
+
+    PayloadDecoderInitParams & SetProtocolDecodeTree(DecodeTree tree, size_t s)
+    {
+        mProtocolTree     = tree;
+        mProtocolTreeSize = s;
+        return *this;
+    }
+
+    template <size_t N>
+    PayloadDecoderInitParams & SetProtocolDecodeTree(const std::array<const FlatTree::Node<chip::TLVMeta::ItemInfo>, N> &a)
+    {
+        return SetProtocolDecodeTree(a.data(), N);
+    }
+
+    PayloadDecoderInitParams & SetClusterDecodeTree(DecodeTree tree, size_t s)
+    {
+        mClusterTree     = tree;
+        mClusterTreeSize = s;
+        return *this;
+    }
+
+    template <size_t N>
+    PayloadDecoderInitParams & SetClusterDecodeTree(const std::array<const FlatTree::Node<chip::TLVMeta::ItemInfo>, N> &a)
+    {
+        return SetClusterDecodeTree(a.data(), N);
+    }
+
+    DecodeTree GetProtocolDecodeTree() const { return mProtocolTree; }
+    size_t GetProtocolDecodeTreeSize() const { return mProtocolTreeSize; }
+    DecodeTree GetClusterDecodeTree() const { return mClusterTree; }
+    size_t GetClusterDecodeTreeSize() const { return mClusterTreeSize; }
+
+    Protocols::Id GetProtocol() const { return mProtocol; }
+    uint8_t GetMessageType() const { return mMessageType; }
+
+private:
+    DecodeTree mProtocolTree = nullptr;
+    size_t mProtocolTreeSize = 0;
+
+    DecodeTree mClusterTree = nullptr;
+    size_t mClusterTreeSize = 0;
+
+    Protocols::Id mProtocol = Protocols::NotSpecified;
+    uint8_t mMessageType    = 0;
+};
+
 class PayloadDecoderBase
 {
 public:
-    PayloadDecoderBase(chip::Protocols::Id protocol, uint8_t messageType, StringBuilderBase & nameBuilder,
-                       StringBuilderBase & valueBuilder);
+    PayloadDecoderBase(const PayloadDecoderInitParams & params, StringBuilderBase & nameBuilder, StringBuilderBase & valueBuilder);
 
     /// Initialize decoding from the given reader
     /// Will create a copy of the reader, however the copy will contain
@@ -146,7 +209,7 @@ public:
     /// Returns false when decoding finished
     bool Next(PayloadEntry & entry);
 
-    const TLV::TLVReader &ReadState() const { return mReader; }
+    const TLV::TLVReader & ReadState() const { return mReader; }
 
 private:
     static constexpr size_t kMaxDecodeDepth = 16;
@@ -194,13 +257,12 @@ template <size_t kNameBufferSize, size_t kValueBufferSize>
 class PayloadDecoder : public PayloadDecoderBase
 {
 public:
-    PayloadDecoder(chip::Protocols::Id protocol, uint8_t messageType) : PayloadDecoderBase(protocol, messageType, mName, mValue) {}
+    PayloadDecoder(const PayloadDecoderInitParams &params) : PayloadDecoderBase(std::move(params), mName, mValue) {}
 
 private:
     chip::StringBuilder<kNameBufferSize> mName;
     chip::StringBuilder<kValueBufferSize> mValue;
 };
-
 
 } // namespace Decoders
 } // namespace chip
