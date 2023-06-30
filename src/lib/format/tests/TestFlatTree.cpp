@@ -37,18 +37,18 @@ struct NamedTag
 };
 
 Entry<NamedTag> node1[] = {
-    { {ContextTag(1), "hello"} },
-    { {ContextTag(2), "world"} },
+    { { ContextTag(1), "hello" } },
+    { { ContextTag(2), "world" } },
 };
 
 Entry<NamedTag> node2[] = {
-    { {ProfileTag(123, 1), "a"} },
-    { {ProfileTag(234, 2), "b"} },
-    { {ProfileTag(345, 3), "c"} },
+    { { ProfileTag(123, 1), "a" } },
+    { { ProfileTag(234, 2), "b" } },
+    { { ProfileTag(345, 3), "c" } },
 };
 
 Entry<NamedTag> node3[] = {
-    { {AnonymousTag(), "foo"} },
+    { { AnonymousTag(), "foo" } },
 };
 
 #define _ENTRY(n)                                                                                                                  \

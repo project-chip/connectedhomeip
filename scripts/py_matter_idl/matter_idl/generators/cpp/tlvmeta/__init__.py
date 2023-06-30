@@ -137,7 +137,7 @@ class ClusterTablesGenerator:
                 code=f'EventTag({e.code})',
                 name=e.name,
                 reference="%s_%s" % (self.cluster.name, e.name),
-                real_type = '%s::%s' % (self.cluster.name, e.name)
+                real_type='%s::%s' % (self.cluster.name, e.name)
             )
             for e in self.cluster.events
         ])

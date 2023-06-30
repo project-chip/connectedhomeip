@@ -44,7 +44,7 @@ public:
         kCommand,
         kEvent,
     };
-    PayloadEntry(const PayloadEntry &)             = default;
+    PayloadEntry(const PayloadEntry &) = default;
     PayloadEntry & operator=(const PayloadEntry &) = default;
 
     PayloadEntry() : mType(IMPayloadType::kNone), mName(""), mValue("") {}
@@ -150,7 +150,7 @@ public:
     }
 
     template <size_t N>
-    PayloadDecoderInitParams & SetProtocolDecodeTree(const std::array<const FlatTree::Node<chip::TLVMeta::ItemInfo>, N> &a)
+    PayloadDecoderInitParams & SetProtocolDecodeTree(const std::array<const FlatTree::Node<chip::TLVMeta::ItemInfo>, N> & a)
     {
         return SetProtocolDecodeTree(a.data(), N);
     }
@@ -163,7 +163,7 @@ public:
     }
 
     template <size_t N>
-    PayloadDecoderInitParams & SetClusterDecodeTree(const std::array<const FlatTree::Node<chip::TLVMeta::ItemInfo>, N> &a)
+    PayloadDecoderInitParams & SetClusterDecodeTree(const std::array<const FlatTree::Node<chip::TLVMeta::ItemInfo>, N> & a)
     {
         return SetClusterDecodeTree(a.data(), N);
     }
@@ -257,7 +257,7 @@ template <size_t kNameBufferSize, size_t kValueBufferSize>
 class PayloadDecoder : public PayloadDecoderBase
 {
 public:
-    PayloadDecoder(const PayloadDecoderInitParams &params) : PayloadDecoderBase(std::move(params), mName, mValue) {}
+    PayloadDecoder(const PayloadDecoderInitParams & params) : PayloadDecoderBase(std::move(params), mName, mValue) {}
 
 private:
     chip::StringBuilder<kNameBufferSize> mName;

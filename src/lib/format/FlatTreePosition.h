@@ -57,11 +57,13 @@ public:
     Position(const Node<CONTENT> * tree, size_t treeSize) : mTree(tree), mTreeSize(treeSize) {}
 
     template <size_t N>
-    Position(const std::array<const Node<CONTENT>, N> &tree) : mTree(tree.data()), mTreeSize(N) {}
+    Position(const std::array<const Node<CONTENT>, N> & tree) : mTree(tree.data()), mTreeSize(N)
+    {}
 
     // Move back to the top
-    void ResetToTop() {
-        mDescendDepth = 0;
+    void ResetToTop()
+    {
+        mDescendDepth        = 0;
         mUnknownDescendDepth = 0;
     }
 
