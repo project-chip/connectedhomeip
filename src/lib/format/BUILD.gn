@@ -17,7 +17,6 @@ import("//build_overrides/chip.gni")
 
 source_set("flat-tree") {
   sources = [
-    "tlv_meta.h", # TODO: move in separate source set
     "FlatTree.h",
     "FlatTreePosition.h",
   ]
@@ -25,4 +24,32 @@ source_set("flat-tree") {
   public_deps = [ "${chip_root}/src/lib/core" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
+}
+
+config("temporary_test_config") {
+  include_dirs = [ "." ]
+}
+
+source_set("protocol-decoder") {
+  sources = [
+    "tlv_meta.h", # TODO: move in separate source set
+    "protocol_decoder.cpp",
+    "protocol_decoder.h",
+
+    # TODO: codegen this and extra dep logic
+    "tlv/meta/clusters_meta.cpp",
+    "tlv/meta/clusters_meta.h",
+    "tlv/meta/protocols_meta.cpp",
+    "tlv/meta/protocols_meta.h",
+  ]
+
+  public_deps = [
+    ":flat-tree",
+    "${chip_root}/src/lib/core",
+  ]
+
+  public_configs = [
+    "${chip_root}/src:includes",
+    ":temporary_test_config",
+  ]
 }
