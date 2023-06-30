@@ -49,6 +49,21 @@ declare_args() {
   chip_print_memory_usage = false
 }
 
+if (slc_generate) {
+  # Generate Project Specific config (Board, hardware used etc..)
+  print(exec_script("${chip_root}/third_party/silabs/slc_gen/run_slc.py",
+                    [
+                      rebase_path(chip_root),
+                      "${silabs_board}",
+                      "${disable_lcd}",
+                      "${use_wstk_buttons}",
+                      "${use_wstk_leds}",
+                      "${use_external_flash}",
+                      "${silabs_mcu}",
+                    ],
+                    "list lines"))
+}
+
 if (wifi_soc) {
   siwx917_sdk("sdk") {
     sources = [
@@ -115,16 +130,16 @@ silabs_executable("smoke_co_alarm_app") {
   include_dirs = [ "include" ]
   defines = []
 
+  if (silabs_board == "BRD2704A") {
+    defines += [ "SL_STATUS_LED=0" ]
+  }
+
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
     "src/SmokeCoAlarmManager.cpp",
     "src/ZclCallbacks.cpp",
   ]
-
-  if (chip_build_libshell) {
-    sources += [ "src/EventHandlerLibShell.cpp" ]
-  }
 
   deps = [
     ":sdk",

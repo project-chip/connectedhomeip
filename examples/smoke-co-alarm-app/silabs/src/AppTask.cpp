@@ -21,7 +21,6 @@
 
 #include "LEDWidget.h"
 
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -38,7 +37,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#if defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)
+#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(BRD4325B))
 #define LIGHT_LED 1
 #else
 #define LIGHT_LED 0
