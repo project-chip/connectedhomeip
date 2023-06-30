@@ -30832,8 +30832,8 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -31198,8 +31198,8 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -31564,8 +31564,8 @@ class EthyleneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -31930,8 +31930,8 @@ class EthyleneOxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -32296,8 +32296,8 @@ class HydrogenConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -32662,8 +32662,8 @@ class HydrogenSulfideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -33028,8 +33028,8 @@ class NitricOxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -33394,8 +33394,8 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -33760,8 +33760,8 @@ class OxygenConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -34126,8 +34126,8 @@ class OzoneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -34492,8 +34492,8 @@ class SulfurDioxideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -34858,8 +34858,8 @@ class DissolvedOxygenConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -35224,8 +35224,8 @@ class BromateConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -35590,8 +35590,8 @@ class ChloraminesConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -35956,8 +35956,8 @@ class ChlorineConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -36322,8 +36322,8 @@ class FecalColiformEColiConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -36688,8 +36688,8 @@ class FluorideConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -37054,8 +37054,8 @@ class HaloaceticAcidsConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -37420,8 +37420,8 @@ class TotalTrihalomethanesConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -37786,8 +37786,8 @@ class TotalColiformBacteriaConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -38152,8 +38152,8 @@ class TurbidityConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -38518,8 +38518,8 @@ class CopperConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -38884,8 +38884,8 @@ class LeadConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -39250,8 +39250,8 @@ class ManganeseConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -39616,8 +39616,8 @@ class SulfateConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -39982,8 +39982,8 @@ class BromodichloromethaneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -40348,8 +40348,8 @@ class BromoformConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -40714,8 +40714,8 @@ class ChlorodibromomethaneConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -41080,8 +41080,8 @@ class ChloroformConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -41446,8 +41446,8 @@ class SodiumConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -41812,8 +41812,8 @@ class Pm25ConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -42178,8 +42178,8 @@ class FormaldehydeConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -42544,8 +42544,8 @@ class Pm1ConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -42910,8 +42910,8 @@ class Pm10ConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -43276,8 +43276,8 @@ class TotalVolatileOrganicCompoundsConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
@@ -43642,8 +43642,8 @@ class RadonConcentrationMeasurement(Cluster):
             kUnknownEnumValue = 5,
 
         class MeasurementMediumEnum(MatterIntEnum):
-            kGas = 0x00
-            kLiquid = 0x01
+            kAir = 0x00
+            kWater = 0x01
             kSoil = 0x02
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only

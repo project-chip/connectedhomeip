@@ -7820,8 +7820,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           CarbonMonoxideConcentrationMeasurement:
               LevelValueEnum:
@@ -7840,8 +7840,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           FormaldehydeConcentrationMeasurement:
               LevelValueEnum:
@@ -7860,8 +7860,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           NitrogenDioxideConcentrationMeasurement:
               LevelValueEnum:
@@ -7880,8 +7880,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           OzoneConcentrationMeasurement:
               LevelValueEnum:
@@ -7900,8 +7900,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           PM10ConcentrationMeasurement:
               LevelValueEnum:
@@ -7920,8 +7920,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           PM1ConcentrationMeasurement:
               LevelValueEnum:
@@ -7940,8 +7940,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           PM25ConcentrationMeasurement:
               LevelValueEnum:
@@ -7960,8 +7960,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           RadonConcentrationMeasurement:
               LevelValueEnum:
@@ -7980,8 +7980,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           TotalVolatileOrganicCompoundsConcentrationMeasurement:
               LevelValueEnum:
@@ -8000,8 +8000,8 @@
                   - PM3
                   - BQM3
               MeasurementMediumEnum:
-                  - Gas
-                  - Liquid
+                  - Air
+                  - Water
                   - Soil
           DoorLock:
               DlLockState:
