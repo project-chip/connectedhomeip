@@ -42,29 +42,177 @@ using chip::TLVMeta::CommandTag;
 using chip::TLVMeta::EventTag;
 using chip::TLVMeta::ItemType;
 
-class PayloadDecoder
+class PayloadEntry
 {
 public:
-    PayloadDecoder(chip::Protocols::Id protocol, uint8_t messageType);
+    enum class IMPayloadType
+    {
+        kNone = 0, // generally should not be used except initial init
+        kValue,    // represents a simple value to output
 
-    /// Outputs the decoded data for this protocol into [out]
-    void Decode(TLVReader & reader, StringBuilderBase & out);
+        kNestingEnter, // Nested struct enter. Has name, empty value
+        kNestingExit,  // Nested struct exit (has no name/value)
+
+        // Content payloads
+        kAttribute,
+        kCommand,
+        kEvent,
+    };
+    PayloadEntry(const PayloadEntry &)             = default;
+    PayloadEntry & operator=(const PayloadEntry &) = default;
+
+    PayloadEntry() : mType(IMPayloadType::kNone), mName(""), mValue("") {}
+
+    IMPayloadType GetType() const { return mType; }
+
+    const char * GetName() const { return mName; }
+    const char * GetValueText() const { return mValue; }
+
+    /// valid only if payload is an IM Payload
+    uint32_t GetClusterId() const { return mClusterId; };
+
+    /// valid only if payload as an Attribute ID
+    uint32_t GetAttributeId() const
+    {
+        VerifyOrReturnValue(mType == IMPayloadType::kAttribute, 0xFFFFFFFF);
+        return mSubId;
+    }
+
+    /// valid only if payload as a Command ID
+    uint32_t GetCommandId() const
+    {
+        VerifyOrReturnValue(mType == IMPayloadType::kCommand, 0xFFFFFFFF);
+        return mSubId;
+    }
+
+    /// valid only if payload as a Command ID
+    uint32_t GetEventId() const
+    {
+        VerifyOrReturnValue(mType == IMPayloadType::kEvent, 0xFFFFFFFF);
+        return mSubId;
+    }
+
+    static PayloadEntry SimpleValue(const char * name, const char * value)
+    {
+        return PayloadEntry(IMPayloadType::kValue, name, value);
+    }
+
+    static PayloadEntry NestingEnter(const char * name) { return PayloadEntry(IMPayloadType::kNestingEnter, name, ""); }
+
+    static PayloadEntry NestingExit() { return PayloadEntry(IMPayloadType::kNestingExit, "", ""); }
+
+    static PayloadEntry AttributePayload(uint32_t cluster_id, uint32_t attribute_id)
+    {
+        PayloadEntry result(IMPayloadType::kAttribute, "ATTR_DATA", "");
+        result.mClusterId = cluster_id;
+        result.mSubId     = attribute_id;
+
+        return result;
+    }
+
+    static PayloadEntry CommandPayload(uint32_t cluster_id, uint32_t command_id)
+    {
+        PayloadEntry result(IMPayloadType::kCommand, "COMMAND_DATA", "");
+        result.mClusterId = cluster_id;
+        result.mSubId     = command_id;
+        return result;
+    }
+
+    static PayloadEntry EventPayload(uint32_t cluster_id, uint32_t event_id)
+    {
+        PayloadEntry result(IMPayloadType::kEvent, "EVENT_DATA", "");
+        result.mClusterId = cluster_id;
+        result.mSubId     = event_id;
+        return result;
+    }
+
+private:
+    PayloadEntry(IMPayloadType type, const char * name, const char * value) : mType(type), mName(name), mValue(value) {}
+
+    IMPayloadType mType = IMPayloadType::kValue;
+    const char * mName  = nullptr;
+    const char * mValue = nullptr;
+
+    uint32_t mClusterId = 0;
+    uint32_t mSubId     = 0; // attribute, command or event id
+};
+
+class PayloadDecoderBase
+{
+public:
+    PayloadDecoderBase(chip::Protocols::Id protocol, uint8_t messageType, StringBuilderBase & nameBuilder,
+                       StringBuilderBase & valueBuilder);
+
+    /// Initialize decoding from the given reader
+    /// Will create a copy of the reader, however the copy will contain
+    /// pointers in the original reader (so data must stay valid while Next is called)
+    void StartDecoding(const TLVReader & reader);
+
+    void StartDecoding(chip::ByteSpan data)
+    {
+        TLVReader reader;
+        reader.Init(data);
+        StartDecoding(reader);
+    }
+
+    /// Get the next decoded entry from the underlying TLV
+    ///
+    /// Returns false when decoding finished
+    bool Next(PayloadEntry & entry);
+
+    const TLVReader &ReadState() const { return mReader; }
 
 private:
     static constexpr size_t kMaxDecodeDepth = 16;
+    using DecodePosition                    = chip::FlatTree::Position<chip::TLVMeta::ItemInfo, kMaxDecodeDepth>;
 
-    using DecodePosition = chip::FlatTree::Position<chip::TLVMeta::ItemInfo, kMaxDecodeDepth>;
+    enum class State
+    {
+        kStarting,
+        kValueRead,
+        kDone,
+    };
+
+    void NextFromStarting(PayloadEntry & entry);
+    void NextFromValueRead(PayloadEntry & entry);
+
+    /// Returns a "nesting enter" value, making sure that
+    /// nesting depth is sufficient.
+    void EnterContainer(PayloadEntry & entry);
+
+    /// Returns a "nesting exit" value, making sure that
+    /// nesting depth is sufficient.
+    void ExitContainer(PayloadEntry & entry);
 
     const chip::Protocols::Id mProtocol;
     const uint8_t mMessageType;
+
+    StringBuilderBase & mNameBuilder;
+    StringBuilderBase & mValueBuilder;
+
+    State mState = State::kStarting;
+    TLVReader mReader;
     DecodePosition mPayloadPosition;
     DecodePosition mIMContentPosition;
+    TLVType mNestingEnters[kMaxDecodeDepth];
+    size_t mCurrentNesting = 0;
 
     /// incremental state for parsing of paths
     uint32_t mClusterId   = 0;
     uint32_t mAttributeId = 0;
     uint32_t mEventId     = 0;
     uint32_t mCommandId   = 0;
+};
+
+template <size_t kNameBufferSize, size_t kValueBufferSize>
+class PayloadDecoder : public PayloadDecoderBase
+{
+public:
+    PayloadDecoder(chip::Protocols::Id protocol, uint8_t messageType) : PayloadDecoderBase(protocol, messageType, mName, mValue) {}
+
+private:
+    chip::StringBuilder<kNameBufferSize> mName;
+    chip::StringBuilder<kValueBufferSize> mValue;
 };
 
 class ByTag
@@ -77,15 +225,12 @@ private:
     const Tag mTag;
 };
 
-PayloadDecoder::PayloadDecoder(chip::Protocols::Id protocol, uint8_t messageType) :
-    mProtocol(protocol), mMessageType(messageType), mPayloadPosition(chip::TLVMeta::protocols_meta),
-    mIMContentPosition(chip::TLVMeta::clusters_meta)
-{
-
-    // Find the right protocol (fake cluster id)
-    mPayloadPosition.Enter(ByTag(ClusterTag(0xFFFF0000 | protocol.ToFullyQualifiedSpecForm())));
-    mPayloadPosition.Enter(ByTag(AttributeTag(messageType)));
-}
+PayloadDecoderBase::PayloadDecoderBase(chip::Protocols::Id protocol, uint8_t messageType, StringBuilderBase & nameBuilder,
+                                       StringBuilderBase & valueBuilder) :
+    mProtocol(protocol),
+    mMessageType(messageType), mNameBuilder(nameBuilder), mValueBuilder(valueBuilder),
+    mPayloadPosition(chip::TLVMeta::protocols_meta), mIMContentPosition(chip::TLVMeta::clusters_meta)
+{}
 
 const char * DecodeTagControl(const TLVTagControl aTagControl)
 {
@@ -202,165 +347,231 @@ void PrettyPrintCurrentValue(TLVReader & reader, chip::StringBuilderBase & out)
     }
 }
 
-void PayloadDecoder::Decode(TLVReader & reader, StringBuilderBase & out)
+void PayloadDecoderBase::StartDecoding(const TLVReader & reader)
 {
+    mReader = reader;
+    mPayloadPosition.ResetToTop();
+    mIMContentPosition.ResetToTop();
+    mCurrentNesting = 0;
+    mClusterId      = 0;
+    mAttributeId    = 0;
+    mEventId        = 0;
+    mCommandId      = 0;
+    mState          = State::kStarting;
+}
+
+bool PayloadDecoderBase::Next(PayloadEntry & entry)
+{
+    switch (mState)
+    {
+    case State::kStarting:
+        NextFromStarting(entry);
+        return true;
+    case State::kValueRead:
+        NextFromValueRead(entry);
+        return true;
+    case State::kDone:
+        return false;
+    }
+}
+
+void PayloadDecoderBase::NextFromStarting(PayloadEntry & entry)
+{
+    // Find the right protocol (fake cluster id)
+    mPayloadPosition.Enter(ByTag(ClusterTag(0xFFFF0000 | mProtocol.ToFullyQualifiedSpecForm())));
+    mPayloadPosition.Enter(ByTag(AttributeTag(mMessageType)));
+
     auto data = mPayloadPosition.Get();
     if (data == nullptr)
     {
         // do not try to decode unknown data. assume binary
-        out.AddFormat("UNKNOWN PROTOCOL: 0x%X, 0x%X\n", mProtocol.ToFullyQualifiedSpecForm(), mMessageType);
+        mNameBuilder.Reset().AddFormat("0x%X, 0x%X\n", mProtocol.ToFullyQualifiedSpecForm(), mMessageType);
+        mValueBuilder.Reset().Add("UNKNOWN PROTOCOL");
+        entry  = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
+        mState = State::kDone;
         return;
     }
-    out.AddFormat("%s:\n", data->name);
 
-    if (reader.GetTotalLength() == 0)
+    // name is known (so valid protocol)
+    if (mReader.GetTotalLength() == 0)
     {
+        mState = State::kDone;
+        entry  = PayloadEntry::SimpleValue(data->name, "");
         return;
     }
+
     if (data->type == ItemType::kProtocolBinaryData)
     {
-        out.Add("  BINARY DATA\n");
+        mState = State::kDone;
+        entry  = PayloadEntry::SimpleValue(data->name, "BINARY DATA");
         return;
     }
-    CHIP_ERROR err = reader.Next(kTLVType_Structure, AnonymousTag());
+
+    CHIP_ERROR err = mReader.Next(kTLVType_Structure, AnonymousTag());
     if (err != CHIP_NO_ERROR)
     {
-        out.AddFormat("  ERROR getting Anonymous Structure TLV: %" CHIP_ERROR_FORMAT "\n", err.Format());
+        mValueBuilder.Reset().AddFormat("ERROR getting Anonymous Structure TLV: %" CHIP_ERROR_FORMAT "\n", err.Format());
+        mState = State::kDone;
+        entry  = PayloadEntry::SimpleValue(data->name, mValueBuilder.c_str());
+        return;
+    }
+
+    EnterContainer(entry);
+}
+
+void PayloadDecoderBase::ExitContainer(PayloadEntry & entry)
+{
+    entry = PayloadEntry::NestingExit();
+
+    if (mCurrentNesting > 0)
+    {
+        mPayloadPosition.Exit();
+        mReader.ExitContainer(mNestingEnters[--mCurrentNesting]);
+    }
+
+    if (mCurrentNesting == 0)
+    {
+        mState = State::kDone;
+    }
+}
+
+void PayloadDecoderBase::EnterContainer(PayloadEntry & entry)
+{
+    if (mCurrentNesting >= kMaxDecodeDepth)
+    {
+        mValueBuilder.AddFormat("NESTING DEPTH REACHED");
+        entry = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
         return;
     }
 
     TLVType containerType;
-    std::vector<TLVType> containers;
-
-    reader.EnterContainer(containerType);
-    containers.push_back(containerType);
-
-    while (true)
+    CHIP_ERROR err = mReader.EnterContainer(containerType);
+    if (err != CHIP_NO_ERROR)
     {
-        err = reader.Next();
-        if (err == CHIP_END_OF_TLV)
-        {
-            mPayloadPosition.Exit();
-            reader.ExitContainer(containers.back());
-            containers.pop_back();
-            if (containers.empty())
-            {
-                break;
-            }
-            continue;
-        }
-
-        // we likely have a tag, try to find its data
-        mPayloadPosition.Enter(ByTag(reader.GetTag()));
-
-        for (size_t i = 0; i < containers.size(); i++)
-        {
-            out.Add("  ");
-        }
-
-        auto data = mPayloadPosition.Get();
-        if (data != nullptr)
-        {
-            out.AddFormat("%s: ", data->name);
-        }
-        else
-        {
-            FormatCurrentTag(reader, out);
-            out.Add(": ");
-        }
-
-        bool data_skip = false;
-        if (data != nullptr)
-        {
-            switch (data->type)
-            {
-            case ItemType::kProtocolClusterId:
-            case ItemType::kProtocolAttributeId:
-            case ItemType::kProtocolCommandId:
-            case ItemType::kProtocolEventId:
-                break;
-            case ItemType::kProtocolBinaryData:
-                out.Add(" (binary - not parsed)");
-                data_skip = true;
-                break;
-            case ItemType::kProtocolPayloadAttribute:
-                out.Add("TODO(ATTRIBUTE DECODE)");
-                data_skip = true;
-                break;
-            case ItemType::kProtocolPayloadCommand:
-                out.Add("TODO(COMMAND DECODE)");
-                data_skip = true;
-                break;
-            case ItemType::kProtocolPayloadEvent:
-                out.Add("TODO(EVENT DECODE)");
-                data_skip = true;
-                break;
-            default:
-                break;
-            }
-        }
-
-        if (data_skip)
-        {
-            mPayloadPosition.Exit();
-        }
-        else
-        {
-            if (TLVTypeIsContainer(reader.GetType()))
-            {
-                reader.EnterContainer(containerType);
-                containers.push_back(containerType);
-            }
-            else
-            {
-                // assume regular element, no entering
-                PrettyPrintCurrentValue(reader, out);
-                mPayloadPosition.Exit();
-            }
-        }
-        if (data != nullptr)
-        {
-            const chip::TLVMeta::ItemInfo * info = nullptr;
-            switch (data->type)
-            {
-            case ItemType::kProtocolClusterId:
-                reader.Get(mClusterId);
-                mIMContentPosition.ResetToTop();
-                mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
-                info = mIMContentPosition.Get();
-                break;
-            case ItemType::kProtocolAttributeId:
-                reader.Get(mAttributeId);
-                mIMContentPosition.ResetToTop();
-                mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
-                mIMContentPosition.Enter(ByTag(AttributeTag(mAttributeId)));
-                info = mIMContentPosition.Get();
-                break;
-            case ItemType::kProtocolCommandId:
-                reader.Get(mCommandId);
-                mIMContentPosition.ResetToTop();
-                mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
-                mIMContentPosition.Enter(ByTag(CommandTag(mCommandId)));
-                info = mIMContentPosition.Get();
-                break;
-            case ItemType::kProtocolEventId:
-                reader.Get(mEventId);
-                mIMContentPosition.ResetToTop();
-                mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
-                mIMContentPosition.Enter(ByTag(EventTag(mEventId)));
-                info = mIMContentPosition.Get();
-                break;
-            default:
-                break;
-            }
-            if (info != nullptr)
-            {
-                out.AddFormat(" == %s", info->name);
-            }
-        }
-        out.Add("\n");
+        mValueBuilder.AddFormat("ERROR entering container: %" CHIP_ERROR_FORMAT "\n", err.Format());
+        entry  = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
+        mState = State::kDone;
+        return;
     }
-    out.AddMarkerIfOverflow();
+
+    mState                            = State::kValueRead;
+    mNestingEnters[mCurrentNesting++] = containerType;
+
+    auto data = mPayloadPosition.Get();
+    if (data == nullptr)
+    {
+        FormatCurrentTag(mReader, mNameBuilder.Reset());
+        entry = PayloadEntry::NestingEnter(mNameBuilder.c_str());
+    }
+    else
+    {
+        entry = PayloadEntry::NestingEnter(data->name);
+    }
+}
+
+void PayloadDecoderBase::NextFromValueRead(PayloadEntry & entry)
+{
+    CHIP_ERROR err = mReader.Next();
+    if (err == CHIP_END_OF_TLV)
+    {
+        ExitContainer(entry);
+        return;
+    }
+
+    // Attempt to find information about the current tag
+    mPayloadPosition.Enter(ByTag(mReader.GetTag()));
+    auto data = mPayloadPosition.Get();
+
+    // handle special types
+    if (data != nullptr) {
+        if (data->type == ItemType::kProtocolBinaryData)
+        {
+            mPayloadPosition.Exit();
+            entry = PayloadEntry::SimpleValue(data->name, "BINARY DATA");
+            return;
+        }
+
+        if (data->type == ItemType::kProtocolPayloadAttribute)
+        {
+            mPayloadPosition.Exit();
+            entry = PayloadEntry::AttributePayload(mClusterId, mAttributeId);
+            return;
+        }
+
+        if (data->type == ItemType::kProtocolPayloadCommand)
+        {
+            mPayloadPosition.Exit();
+            entry = PayloadEntry::CommandPayload(mClusterId, mCommandId);
+            return;
+        }
+
+        if (data->type == ItemType::kProtocolPayloadEvent)
+        {
+            mPayloadPosition.Exit();
+            entry = PayloadEntry::EventPayload(mClusterId, mEventId);
+            return;
+        }
+    }
+
+    if (TLVTypeIsContainer(mReader.GetType()))
+    {
+        EnterContainer(entry);
+        return;
+    }
+
+    if (data == nullptr)
+    {
+        FormatCurrentTag(mReader, mNameBuilder.Reset());
+        PrettyPrintCurrentValue(mReader, mValueBuilder.Reset());
+        entry = PayloadEntry::SimpleValue(mNameBuilder.c_str(), mValueBuilder.c_str());
+        mPayloadPosition.Exit();
+        return;
+    }
+
+    // at this point, data is "simple data" or "simple data with meaning"
+
+    const chip::TLVMeta::ItemInfo * info = nullptr;
+    switch (data->type)
+    {
+    case ItemType::kProtocolClusterId:
+        mReader.Get(mClusterId);
+        mIMContentPosition.ResetToTop();
+        mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
+        info = mIMContentPosition.Get();
+        break;
+    case ItemType::kProtocolAttributeId:
+        mReader.Get(mAttributeId);
+        mIMContentPosition.ResetToTop();
+        mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
+        mIMContentPosition.Enter(ByTag(AttributeTag(mAttributeId)));
+        info = mIMContentPosition.Get();
+        break;
+    case ItemType::kProtocolCommandId:
+        mReader.Get(mCommandId);
+        mIMContentPosition.ResetToTop();
+        mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
+        mIMContentPosition.Enter(ByTag(CommandTag(mCommandId)));
+        info = mIMContentPosition.Get();
+        break;
+    case ItemType::kProtocolEventId:
+        mReader.Get(mEventId);
+        mIMContentPosition.ResetToTop();
+        mIMContentPosition.Enter(ByTag(ClusterTag(mClusterId)));
+        mIMContentPosition.Enter(ByTag(EventTag(mEventId)));
+        info = mIMContentPosition.Get();
+        break;
+    default:
+        break;
+    }
+
+    PrettyPrintCurrentValue(mReader, mValueBuilder.Reset());
+    if (info != nullptr)
+    {
+        mValueBuilder.Add(" == '").Add(info->name).Add("'");
+    }
+
+    mPayloadPosition.Exit();
+    entry = PayloadEntry::SimpleValue(data->name, mValueBuilder.c_str());
 }
 
 void TestSampleData(nlTestSuite * inSuite, void * inContext, const SamplePayload & data)
@@ -370,11 +581,39 @@ void TestSampleData(nlTestSuite * inSuite, void * inContext, const SamplePayload
     TLVReader reader;
     reader.Init(data.payload);
 
-    PayloadDecoder decoder(data.protocolId, data.messageType);
+    PayloadDecoder<64, 128> decoder(data.protocolId, data.messageType);
 
-    chip::StringBuilder<4*1024> output;
-    decoder.Decode(reader, output);
-    printf("%s", output.c_str());
+    decoder.StartDecoding(data.payload);
+
+    PayloadEntry entry;
+    int nesting = 0;
+    while (decoder.Next(entry))
+    {
+        switch (entry.GetType())
+        {
+        case PayloadEntry::IMPayloadType::kNestingExit:
+            nesting--;
+            continue;
+        case PayloadEntry::IMPayloadType::kAttribute:
+            printf("%*sATTRIBUTE: %d/%d\n", nesting * 2, "", entry.GetClusterId(), entry.GetAttributeId());
+            continue;
+        case PayloadEntry::IMPayloadType::kCommand:
+            printf("%*sCOMMAND: %d/%d\n", nesting * 2, "", entry.GetClusterId(), entry.GetCommandId());
+            continue;
+        case PayloadEntry::IMPayloadType::kEvent:
+            printf("%*sEVENT: %d/%d\n", nesting * 2, "", entry.GetClusterId(), entry.GetEventId());
+            continue;
+        default:
+            break;
+        }
+
+        printf("%*s%s: %s\n", nesting * 2, "", entry.GetName(), entry.GetValueText());
+
+        if (entry.GetType() == PayloadEntry::IMPayloadType::kNestingEnter)
+        {
+            nesting++;
+        }
+    }
 }
 
 void TestDecode(nlTestSuite * inSuite, void * inContext)

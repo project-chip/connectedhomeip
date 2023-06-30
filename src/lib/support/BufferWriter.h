@@ -96,6 +96,8 @@ public:
         return *this;
     }
 
+    void Reset() { mNeeded = 0; }
+
     /// Since this uses vsnprintf internally, on overflow
     /// this will write one less byte that strictly can be
     /// written (since null terminator will be in the binary data)
