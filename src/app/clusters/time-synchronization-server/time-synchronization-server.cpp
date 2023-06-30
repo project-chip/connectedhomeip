@@ -161,7 +161,7 @@ static bool emitTimeZoneStatusEvent(EndpointId ep)
 {
     const auto & tzList = TimeSynchronizationServer::Instance().GetTimeZone();
     VerifyOrReturnValue(tzList.size() != 0, false);
-    auto & tz = tzList[0].timeZone;
+    const auto & tz = tzList[0].timeZone;
     Events::TimeZoneStatus::Type event;
 
     event.offset = tz.offset;
@@ -335,8 +335,8 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
 
     while (newTzL.Next())
     {
-        auto & tzStore = mTimeZoneObj.timeZoneList[i];
-        auto & newTz   = newTzL.GetValue();
+        auto & tzStore     = mTimeZoneObj.timeZoneList[i];
+        const auto & newTz = newTzL.GetValue();
         if (newTz.offset < -43200 || newTz.offset > 50400)
         {
             ReturnErrorOnFailure(LoadTimeZone());
@@ -685,7 +685,7 @@ TimeSynchronizationAttrAccess gAttrAccess;
 
 CHIP_ERROR TimeSynchronizationAttrAccess::ReadTrustedTimeSource(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    auto tts = TimeSynchronizationServer::Instance().GetTrustedTimeSource();
+    const auto & tts = TimeSynchronizationServer::Instance().GetTrustedTimeSource();
     return aEncoder.Encode(tts);
 }
 
@@ -724,7 +724,7 @@ CHIP_ERROR TimeSynchronizationAttrAccess::ReadTimeZone(EndpointId endpoint, Attr
 CHIP_ERROR TimeSynchronizationAttrAccess::ReadDSTOffset(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        DSTOffset::TypeInfo::Type dstList = TimeSynchronizationServer::Instance().GetDSTOffset();
+        const auto & dstList = TimeSynchronizationServer::Instance().GetDSTOffset();
         for (const auto & dstOffset : dstList)
         {
             ReturnErrorOnFailure(encoder.Encode(dstOffset));
@@ -962,8 +962,8 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TimeSynchronization::Commands::SetDefaultNTP::DecodableType & commandData)
 {
-    Status status = Status::Success;
-    auto dNtpChar = commandData.defaultNTP;
+    Status status         = Status::Success;
+    const auto & dNtpChar = commandData.defaultNTP;
 
     if (!dNtpChar.IsNull() && dNtpChar.Value().size() > 0)
     {
