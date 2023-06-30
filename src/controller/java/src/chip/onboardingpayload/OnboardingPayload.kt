@@ -182,8 +182,8 @@ class OnboardingPayload(
       DiscoveryCapability.SOFT_AP
     )
 
-    // If discoveryCapabilities is empty or discoveryCapabilities contains values outside of allValid
-    if (discoveryCapabilities.isEmpty() || discoveryCapabilities.any { it !in allValid }) {
+    // If discoveryCapabilities is not empty and discoveryCapabilities contains values outside of allValid
+    if (!discoveryCapabilities.isEmpty() && discoveryCapabilities.any { it !in allValid }) {
       return false
     }
 
