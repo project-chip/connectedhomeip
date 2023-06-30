@@ -275,16 +275,9 @@ void PayloadDecoder::Decode(TLVReader & reader, StringBuilderBase & out)
             switch (data->type)
             {
             case ItemType::kProtocolClusterId:
-                out.Add(" (cluster_id): ");
-                break;
             case ItemType::kProtocolAttributeId:
-                out.Add(" (attribute_id): ");
-                break;
             case ItemType::kProtocolCommandId:
-                out.Add(" (command_id): ");
-                break;
             case ItemType::kProtocolEventId:
-                out.Add(" (event_id): ");
                 break;
             case ItemType::kProtocolBinaryData:
                 out.Add(" (binary - not parsed)");
@@ -367,6 +360,7 @@ void PayloadDecoder::Decode(TLVReader & reader, StringBuilderBase & out)
         }
         out.Add("\n");
     }
+    out.AddMarkerIfOverflow();
 }
 
 void TestSampleData(nlTestSuite * inSuite, void * inContext, const SamplePayload & data)
@@ -378,7 +372,7 @@ void TestSampleData(nlTestSuite * inSuite, void * inContext, const SamplePayload
 
     PayloadDecoder decoder(data.protocolId, data.messageType);
 
-    chip::StringBuilder<1024> output;
+    chip::StringBuilder<4*1024> output;
     decoder.Decode(reader, output);
     printf("%s", output.c_str());
 }
